@@ -4,7 +4,7 @@ import ChatComponent from "./Components/ChatComponent/ChatComponent"
 import LoginForm from "./Components/LoginComponent/LoginForm"
 import AdminPanel from "./Components/AdminPanelComponent/AdminPanel"
 import { NoAccess } from "./Components/NoAccess"
-import TaskPage from "./Components/TaskComponent/TaskPage"
+import TaskPage from "./Components/Task/Page/TaskComponent"
 import { Test } from "./Components/Test"
 
 export const publicRoutes = [

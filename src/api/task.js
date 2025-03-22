@@ -7,8 +7,14 @@ export const task = {
     return data
   },
 
-  delete: async (body) => {
+  deleteAll: async (body) => {
     const { data } = await baseAxios.delete("/api/task/clear", { data: body })
+
+    return data
+  },
+
+  delete: async (body) => {
+    const { data } = await baseAxios.delete("/api/task", { data: body })
 
     return data
   },
@@ -19,8 +25,14 @@ export const task = {
     return data
   },
 
-  getByUserId: async (id) => {
-    const { data } = await baseAxios.get(`/api/task/user/${id}`)
+  getAllTasks: async (id) => {
+    const { data } = await baseAxios.get(`/api/list_tasks`)
+
+    return data
+  },
+
+  getTaskByTicket: async (id) => {
+    const { data } = await baseAxios.get(`/api/task/ticket/${id}`)
 
     return data
   }

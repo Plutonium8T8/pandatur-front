@@ -1,7 +1,7 @@
 import { Tabs, Flex } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
-import { getLanguageByKey, showServerError, cleanFormValues } from "../../utils"
+import { getLanguageByKey, showServerError } from "../../utils"
 import { api } from "../../../api"
 import {
   TicketInfoForm,
@@ -26,12 +26,9 @@ export const EditBulkOrSingleLeadTabs = ({
   const submit = async (values, callback) => {
     setLoading(true)
     try {
-      const formattedValues = cleanFormValues(values)
-      if (!Object.keys(formattedValues).length) return
-
       await api.tickets.updateById({
         id: id ? [id] : selectedTickets,
-        ...formattedValues
+        ...values
       })
       onClose(true)
       callback()

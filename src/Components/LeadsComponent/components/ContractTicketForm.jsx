@@ -2,19 +2,10 @@ import { TextInput, Select, NumberInput, Flex, Button } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { getLanguageByKey } from "../../utils"
+import { getLanguageByKey, formatDate, parseServerDate } from "../../utils"
 import { LabelSwitch } from "../../LabelSwitch"
 import { paymentStatusOptions } from "../../../FormOptions"
-import dayjs from "dayjs"
-import { DATE_TIME_FORMAT, DD_MM_YYYY } from "../../../app-constants"
-
-const formatDate = (date) => {
-  return dayjs(date).format(DATE_TIME_FORMAT)
-}
-
-const parseServerDate = (date) => {
-  return date ? dayjs(date, DATE_TIME_FORMAT) : undefined
-}
+import { DD_MM_YYYY } from "../../../app-constants"
 
 export const ContractTicketForm = ({ onClose, onSubmit, loading, data }) => {
   const form = useForm({
@@ -33,13 +24,9 @@ export const ContractTicketForm = ({ onClose, onSubmit, loading, data }) => {
       ...rest
     }) => {
       const formattedData = {
-        ...(data_contractului && {
-          data_contractului: formatDate(data_contractului)
-        }),
-        ...(data_avansului && { data_avansului: formatDate(data_avansului) }),
-        ...(data_de_plata_integrala && {
-          data_de_plata_integrala: formatDate(data_de_plata_integrala)
-        }),
+        data_contractului: formatDate(data_contractului),
+        data_avansului: formatDate(data_avansului),
+        data_de_plata_integrala: formatDate(data_de_plata_integrala),
         contract_trimis: String(contract_trimis ?? false),
         contract_semnat: String(contract_semnat ?? false),
         achitare_efectuata: String(achitare_efectuata ?? false),

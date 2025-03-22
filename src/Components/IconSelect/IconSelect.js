@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import "./IconSelect.css"
+import React from "react"
+import { Select } from "@mantine/core"
 import { translations } from "../utils/translations"
 
 const IconSelect = ({
@@ -13,42 +13,33 @@ const IconSelect = ({
   disabled,
   hasError
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
   const language = localStorage.getItem("language") || "RO"
 
-  const handleSelect = (selectedValue) => {
-    onChange(selectedValue)
-    setIsOpen(false)
-  }
-
   return (
-    <div className={`input-group ${hasError ? "invalid-field" : ""} mb-16`}>
-      <label htmlFor={id}>{translations[label]?.[language] ?? label}</label>
-      <div className="custom-select-wrapper">
-        <div className="selected-option" onClick={() => setIsOpen(!isOpen)}>
-          <span className="task-icon">
-            {options.find((option) => option.name === value)?.icon}
-          </span>
-          <span className="task-text">{value || placeholder}</span>
-        </div>
+    <div className={`input-group-icon ${hasError ? "invalid-field" : ""}`}>
+      <label htmlFor={id} style={{ fontSize: "14px", fontWeight: 500 }}>
+        {translations[label]?.[language] ?? label}
+      </label>
 
-        {isOpen && (
-          <ul className="custom-dropdown">
-            {options.map((option, index) => (
-              <li
-                key={index}
-                onClick={() => handleSelect(option.name)}
-                className="custom-dropdown-item"
-              >
-                {option.icon}{" "}
-                <span className="task-text">
-                  {translations[option.name]?.[language] ?? option.name}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <Select
+        id={id}
+        data={options.map((option) => ({
+          value: option.name,
+          label: translations[option.name]?.[language] ?? option.name
+        }))}
+        value={value}
+        onChange={onChange}
+        placeholder={translations[placeholder]?.[language] ?? placeholder}
+        required={required}
+        disabled={disabled}
+        searchable
+        clearable
+        error={
+          hasError
+            ? (translations["error_field"]?.[language] ?? "Ошибка")
+            : undefined
+        }
+      />
     </div>
   )
 }

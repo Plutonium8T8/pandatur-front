@@ -4,6 +4,7 @@ import EmojiPicker from "emoji-picker-react"
 import ReactDOM from "react-dom"
 import { useApp, useUser } from "../../hooks"
 import { api } from "../../api"
+import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
 import {
   FaFacebook,
   FaViber,
@@ -42,6 +43,9 @@ const ChatMessages = ({
   const reactionContainerRef = useRef(null)
   const [isUserAtBottom, setIsUserAtBottom] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState("web")
+  const [tasks, setTasks] = useState([])
+  const [listTask, setListTask] = useState([])
+  const [selectedTask, setSelectedTask] = useState(null)
 
   const platformIcons = {
     facebook: <FaFacebook />,
@@ -80,23 +84,6 @@ const ChatMessages = ({
     const [day, month, year] = date.split("-")
     return new Date(`${year}-${month}-${day}T${time}`)
   }
-
-  const sortedMessages = messages
-    .filter((msg) => msg.ticket_id === selectTicketId)
-    .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent))
-
-  const groupedMessages = sortedMessages.reduce((acc, msg) => {
-    const messageDate =
-      parseDate(msg.time_sent)?.toLocaleDateString("ru-RU", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      }) || "—"
-
-    if (!acc[messageDate]) acc[messageDate] = []
-    acc[messageDate].push(msg)
-    return acc
-  }, {})
 
   const handleReactionClick = (reaction, messageId) => {
     setSelectedReaction((prev) => ({ ...prev, [messageId]: reaction }))
@@ -190,29 +177,19 @@ const ChatMessages = ({
     if (mimeType.startsWith("audio/")) return "audio"
     return "file"
   }
+
   const getLastReaction = (message) => {
-    if (!message.reactions) {
+    if (!message.reactions || message.reactions === "{}") {
       return "☺"
     }
 
     try {
-      const reactionsArray = message.reactions
-        .replace(/^{|}$/g, "")
-        .split('","')
-        .map((reaction) => reaction.replace(/(^"|"$|\")/g, "").trim())
+      const reactionsObject = JSON.parse(message.reactions)
 
-      const parsedReactions = reactionsArray.map((reaction) => {
-        try {
-          const normalizedReaction = reaction.replace('\"', "")
-          const parsed = JSON.parse(normalizedReaction)
-          return parsed.reaction
-        } catch {
-          return reaction
-        }
-      })
+      const reactionsArray = Object.values(reactionsObject)
 
-      return parsedReactions.length > 0
-        ? parsedReactions[parsedReactions.length - 1]
+      return reactionsArray.length > 0
+        ? reactionsArray[reactionsArray.length - 1]
         : "☺"
     } catch (error) {
       console.error("Ошибка при обработке реакций:", error)
@@ -355,6 +332,17 @@ const ChatMessages = ({
       setSelectedPlatform(lastPlatform || "web")
     }
   }, [selectedClient, messages])
+
+  const fetchTasks = async () => {
+    const data = await api.task.getAllTasks()
+    setTasks(data)
+  }
+
+  const openEditTask = (task) => {
+    console.log("Редактирование задачи:", task)
+    setSelectedTask(task)
+    setIsTaskModalOpen(true)
+  }
 
   return (
     <div className="chat-area">
@@ -609,7 +597,15 @@ const ChatMessages = ({
           </div>
         )}
       </div>
-
+      {selectTicketId && (
+        <TaskListOverlay
+          tasks={listTask}
+          fetchTasks={fetchTasks}
+          ticketId={selectTicketId}
+          userId={userId}
+          openEditTask={openEditTask}
+        />
+      )}
       <div className="manager-send-message-container">
         <textarea
           className="text-area-message"
@@ -665,13 +661,6 @@ const ChatMessages = ({
             >
               <FaFile />
             </button>
-            {/* <button
-                            className="action-button task-button"
-                            onClick={() => setIsTaskModalOpen(true)}
-                            disabled={!selectTicketId}
-                        >
-                            <FaTasks />
-                        </button> */}
           </div>
           <div className="select-row">
             <div className="input-group">
@@ -743,11 +732,6 @@ const ChatMessages = ({
               </div>
             )}
         </div>
-        {/* <TaskModal
-                    isOpen={isTaskModalOpen}
-                    onClose={() => setIsTaskModalOpen(false)}
-                    selectedTicketId={selectTicketId}
-                /> */}
       </div>
     </div>
   )

@@ -166,7 +166,7 @@ export const AppProvider = ({ children }) => {
         }
       }
       socketInstance.send(JSON.stringify(readMessageData))
-      console.log(`✅ Seen отправлен для ticket_id=${ticketId}`)
+      console.log(`✅ Seen transmis pentru ticket_id=${ticketId}`)
     } else {
       console.warn("WebSocket не подключён, не удалось отправить seen.")
     }
@@ -223,7 +223,7 @@ export const AppProvider = ({ children }) => {
 
       return ticket
     } catch (error) {
-      console.error("Ошибка при загрузке тикета:", error)
+      console.error("Eroare request ticket:", error)
       return null
     } finally {
       setIsLoading(false)
@@ -251,8 +251,8 @@ export const AppProvider = ({ children }) => {
 
       if (Array.isArray(data)) {
         setMessages((prevMessages) => {
-          console.log("Старые сообщения в state:", prevMessages)
-          console.log("Пришедшие новые сообщения:", data)
+          console.log("mesaje vechi in state:", prevMessages)
+          console.log("Mesaj nou:", data)
 
           const otherMessages = prevMessages.filter(
             (msg) => msg.ticket_id !== ticket_id
@@ -261,7 +261,7 @@ export const AppProvider = ({ children }) => {
           return [...otherMessages, ...data]
         })
 
-        console.log("Обновленный state сообщений:", data)
+        console.log("update state messages:", data)
 
         const unseenMessages = data.filter(
           (msg) => msg.seen_by === "{}" && msg.sender_id !== userId
@@ -276,14 +276,14 @@ export const AppProvider = ({ children }) => {
         )
       }
     } catch (error) {
-      console.error("Ошибка при получении сообщений:", error.message)
+      console.error("error request messages:", error.message)
     }
   }
 
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case "message": {
-        console.log("Новое сообщение из WebSocket:", message.data)
+        console.log("nou mesaj din WebSocket:", message.data)
 
         const {
           ticket_id,
@@ -331,7 +331,7 @@ export const AppProvider = ({ children }) => {
       case "seen": {
         const { ticket_id, seen_at } = message.data
 
-        console.log("🔄 Получен `seen` из WebSocket:", { ticket_id, seen_at })
+        console.log("🔄 Primit `seen` din WebSocket:", { ticket_id, seen_at })
 
         setMessages((prevMessages) => {
           return prevMessages.map((msg) =>
@@ -358,14 +358,12 @@ export const AppProvider = ({ children }) => {
         break
       }
       case "ticket": {
-        console.log("Пришел тикет:", message.data)
+        console.log("A venit ticket nou:", message.data)
 
         const ticketId = message.data.ticket_id
 
         if (!ticketId) {
-          console.warn(
-            "Не удалось извлечь ticket_id из сообщения типа 'ticket'."
-          )
+          console.warn("nu pot scoate ticket id din 'ticket'.")
           break
         }
 
@@ -379,14 +377,12 @@ export const AppProvider = ({ children }) => {
           })
           socketInstance.send(socketMessage)
         } else {
-          console.warn(
-            "Не удалось подключиться к комнатам. WebSocket не готов."
-          )
+          console.warn("eroor conect chat-room, WebSocket off.")
           console.log(
-            "Состояние WebSocket:",
+            "Stare WebSocket:",
             socketInstance
               ? socketInstance.readyState
-              : "Нет WebSocket соединения"
+              : "Nu exista conecsiune la webSocket"
           )
         }
         break
@@ -414,7 +410,7 @@ export const AppProvider = ({ children }) => {
         console.log("пришел понг")
         break
       default:
-        console.warn("Неизвестный тип сообщения:", message.type)
+        console.warn("inValid message_type din socket:", message.type)
     }
   }
 
@@ -428,7 +424,7 @@ export const AppProvider = ({ children }) => {
       0
     )
 
-    console.log(`🔄 Обновленный unreadCount: ${totalUnread}`)
+    console.log(`🔄 updated unreadCount: ${totalUnread}`)
     setUnreadCount(totalUnread)
   }, [tickets, unreadMessages])
 

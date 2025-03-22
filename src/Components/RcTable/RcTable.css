@@ -24,6 +24,7 @@
   position: relative;
   font-size: 14px;
 }
+
 .table thead .rc-table-cell:not(:last-child)::after {
   content: "";
   position: absolute;
@@ -60,4 +61,20 @@
   justify-content: center;
   align-items: center;
   height: 500px;
+}
+
+/* TODO  fix height component */
+.rc-table-scroll-container {
+  max-height: calc(100vh - 170px);
+  overflow-y: auto;
+}
+
+.table-container-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.table .rc-table-expanded-row-fixed {
+  width: 100% !important;
 }

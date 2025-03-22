@@ -1,9 +1,8 @@
 import { Select, Button, Flex, NumberInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
-import dayjs from "dayjs"
 import { useEffect } from "react"
-import { getLanguageByKey } from "../../utils"
+import { getLanguageByKey, formatDate, parseServerDate } from "../../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -14,15 +13,7 @@ import {
   nameExcursionOptions,
   purchaseProcessingOptions
 } from "../../../FormOptions"
-import { DATE_TIME_FORMAT, DD_MM_YYYY } from "../../../app-constants"
-
-const formatDate = (date) => {
-  return dayjs(date).format(DATE_TIME_FORMAT)
-}
-
-const parseServerDate = (date) => {
-  return date ? dayjs(date, DATE_TIME_FORMAT) : undefined
-}
+import { DD_MM_YYYY } from "../../../app-constants"
 
 export const TicketInfoForm = ({ onClose, onSubmit, loading, data }) => {
   const form = useForm({
@@ -36,16 +27,10 @@ export const TicketInfoForm = ({ onClose, onSubmit, loading, data }) => {
       ...rest
     }) => {
       const formattedData = {
-        ...(data_venit_in_oficiu && {
-          data_venit_in_oficiu: formatDate(data_venit_in_oficiu)
-        }),
-        ...(data_plecarii && { data_plecarii: formatDate(data_plecarii) }),
-        ...(data_intoarcerii && {
-          data_intoarcerii: formatDate(data_intoarcerii)
-        }),
-        ...(data_cererii_de_retur && {
-          data_cererii_de_retur: formatDate(data_cererii_de_retur)
-        })
+        data_venit_in_oficiu: formatDate(data_venit_in_oficiu),
+        data_plecarii: formatDate(data_plecarii),
+        data_intoarcerii: formatDate(data_intoarcerii),
+        data_cererii_de_retur: formatDate(data_cererii_de_retur)
       }
 
       return { ...formattedData, ...rest }
@@ -54,6 +39,7 @@ export const TicketInfoForm = ({ onClose, onSubmit, loading, data }) => {
 
   useEffect(() => {
     if (data) {
+      console.log("🚀 ~ useEffect ~ data:", data)
       form.setValues({
         data_venit_in_oficiu: parseServerDate(data?.data_venit_in_oficiu),
         data_plecarii: parseServerDate(data?.data_plecarii),

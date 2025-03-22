@@ -168,105 +168,100 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
 
   return (
     <div className="users-container" ref={chatListRef}>
-      {isLoading ? (
-        <div className="spinner-container">
-          <Spin />
-        </div>
-      ) : (
-        <>
-          <div className="header-list-chat">
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              <div className="extra-info-title">
-                {translations["Chat"][language]}
-              </div>
-              <label className="label-check">
-                {translations["Leadurile mele"][language]}
-                <input
-                  type="checkbox"
-                  id="myTicketsCheckbox"
-                  onChange={handleCheckboxChange}
-                  checked={showMyTickets}
-                />
-              </label>
+      <>
+        <div className="header-list-chat">
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="extra-info-title">
+              {translations["Chat"][language]}
             </div>
-
-            <div className="filter-container-chat">
+            <label className="label-check">
+              {translations["Leadurile mele"][language]}
               <input
-                type="text"
-                placeholder={"Cauta dupa Lead, Client sau Tag"}
-                onInput={handleFilterInput}
-                className="ticket-filter-input"
+                type="checkbox"
+                id="myTicketsCheckbox"
+                onChange={handleCheckboxChange}
+                checked={showMyTickets}
               />
-            </div>
+            </label>
           </div>
 
-          <div className="chat-item-container">
-            {sortedTickets.map((ticket) => {
-              const tags = parseTags(ticket.tags)
+          <div className="filter-container-chat">
+            <input
+              type="text"
+              placeholder={"Cauta dupa Lead, Client sau Tag"}
+              onInput={handleFilterInput}
+              className="ticket-filter-input"
+            />
+          </div>
+        </div>
 
-              return (
-                <div
-                  key={ticket.id}
-                  className={`chat-item ${ticket.id === selectTicketId ? "active" : ""}`}
-                  onClick={() => handleTicketClick(ticket.id)}
-                  data-ticket-id={ticket.id}
-                >
-                  <div className="foto-description">
-                    <img
-                      className="foto-user"
-                      src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
-                      alt="example"
-                    />
-                    <div className="tickets-descriptions">
-                      <div>{ticket.contact || "no contact"}</div>
-                      <div>{ticket.id ? `Lead: #${ticket.id}` : "no id"}</div>
-                      <div>{ticket.workflow || "no workflow"}</div>
-                      <div className="tags-ticket">
-                        {Array.isArray(tags) && tags.length > 0 ? (
-                          tags.map((tag, index) => (
-                            <span
-                              key={index}
-                              style={{
-                                display: "inline-block",
-                                backgroundColor: "#0f824c",
-                                color: "#fff",
-                                padding: "5px 10px",
-                                borderRadius: "20px",
-                                marginRight: "5px",
-                                fontSize: "12px"
-                              }}
-                            >
-                              {tag}
-                            </span>
-                          ))
-                        ) : tags?.length === 0 ? null : (
-                          <div>{translations["nici un tag"][language]}</div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="container-time-tasks-chat">
-                    <div className="info-message">
-                      <div className="last-message-container">
-                        <div className="last-message-ticket">
-                          {ticket.last_message || "No messages"}
-                        </div>
-                        <div className="chat-time">
-                          {formatDateTime(ticket.time_sent)}
-                        </div>
-                        {ticket.unseen_count > 0 && (
-                          <div className="unread-count">
-                            {ticket.unseen_count}
-                          </div>
-                        )}
-                      </div>
+        <div className="chat-item-container">
+          {sortedTickets.map((ticket) => {
+            const tags = parseTags(ticket.tags)
+
+            return (
+              <div
+                key={ticket.id}
+                className={`chat-item ${ticket.id === selectTicketId ? "active" : ""}`}
+                onClick={() => handleTicketClick(ticket.id)}
+                data-ticket-id={ticket.id}
+              >
+                <div className="foto-description">
+                  <img
+                    className="foto-user"
+                    src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
+                    alt="example"
+                  />
+                  <div className="tickets-descriptions">
+                    <div>{ticket.contact || "no contact"}</div>
+                    <div>{ticket.id ? `Lead: #${ticket.id}` : "no id"}</div>
+                    <div>{ticket.workflow || "no workflow"}</div>
+                    <div className="tags-ticket">
+                      {Array.isArray(tags) && tags.length > 0 ? (
+                        tags.map((tag, index) => (
+                          <span
+                            key={index}
+                            style={{
+                              display: "inline-block",
+                              backgroundColor: "#0f824c",
+                              color: "#fff",
+                              padding: "5px 10px",
+                              borderRadius: "20px",
+                              marginRight: "5px",
+                              fontSize: "12px"
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))
+                      ) : tags?.length === 0 ? null : (
+                        <div>{translations["nici un tag"][language]}</div>
+                      )}
                     </div>
                   </div>
                 </div>
-              )
-            })}
-          </div>
-        </>
+                <div className="container-time-tasks-chat">
+                  <div className="info-message">
+                    <div className="last-message-container">
+                      <div className="last-message-ticket">
+                        {ticket.last_message || "No messages"}
+                      </div>
+                      <div className="chat-time">
+                        {formatDateTime(ticket.time_sent)}
+                      </div>
+                      {ticket.unseen_count > 0 && (
+                        <div className="unread-count">
+                          {ticket.unseen_count}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </>
       )}
     </div>
   )

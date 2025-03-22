@@ -9,6 +9,7 @@ import { PrivateRoutes, PublicRoutes } from "./AppRoutes"
 import { Session } from "./Session"
 import "./App.css"
 import { MantineProvider } from "./MantineProvider"
+import { ModalsProvider } from "@mantine/modals"
 import "@mantine/core/styles.css"
 import "@mantine/dates/styles.css"
 // FIXME: Server sends date in an unsupported format (DD-MM-YYYY HH:mm:ss)
@@ -33,25 +34,27 @@ function App() {
 
   return (
     <MantineProvider>
-      <SnackbarProvider
-        autoHideDuration={5000}
-        maxSnack={5}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-      >
-        {JWT_TOKEN ? (
-          <UserProvider>
-            <Session>
-              <AppProvider>
-                <AppLayout>
-                  <PrivateRoutes />
-                </AppLayout>
-              </AppProvider>
-            </Session>
-          </UserProvider>
-        ) : (
-          <PublicRoutes />
-        )}
-      </SnackbarProvider>
+      <ModalsProvider>
+        <SnackbarProvider
+          autoHideDuration={5000}
+          maxSnack={5}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        >
+          {JWT_TOKEN ? (
+            <UserProvider>
+              <Session>
+                <AppProvider>
+                  <AppLayout>
+                    <PrivateRoutes />
+                  </AppLayout>
+                </AppProvider>
+              </Session>
+            </UserProvider>
+          ) : (
+            <PublicRoutes />
+          )}
+        </SnackbarProvider>
+      </ModalsProvider>
     </MantineProvider>
   )
 }

@@ -93,10 +93,6 @@ export const translations = {
     RO: "critică",
     RU: "критический"
   },
-  Prioritate: {
-    RO: "Prioritate",
-    RU: "Приоритет"
-  },
   "Etapa de lucru": {
     RO: "Etapa de lucru",
     RU: "Этап работы"
@@ -165,10 +161,6 @@ export const translations = {
     RO: "Log Out",
     RU: "Выйти"
   },
-  "Dată și oră": {
-    RO: "Dată și oră",
-    RU: "Время и дата"
-  },
   "Adaugă notificare": {
     RO: "Adaugă notificare",
     RU: "Добавить увед-е"
@@ -208,14 +200,6 @@ export const translations = {
   "Încărcăm leadurile": {
     RO: "Încărcăm leadurile",
     RU: "Загружаем лиды"
-  },
-  "Descriere task": {
-    RO: "Descriere task",
-    RU: "Описание задачи"
-  },
-  "Adaugă task": {
-    RO: "Adaugă task",
-    RU: "Добавить задачу"
   },
   "Grafic de lucru": {
     RO: "Grafic de lucru",
@@ -754,10 +738,6 @@ export const translations = {
     RO: "Creat de utilizatorul",
     RU: "Создан пользователем"
   },
-  Pentru: {
-    RO: "Pentru utilizatorul",
-    RU: "Для пользователя"
-  },
   "Alege utilizator": {
     RO: "Alege utilizator",
     RU: "Выбери пользователя"
@@ -1270,6 +1250,130 @@ export const translations = {
     RO: "inactiv",
     RU: "неактивный"
   },
+  Tasks: {
+    RO: "Task-uri",
+    RU: "Задачи"
+  },
+  "New Task": {
+    RO: "Task nou",
+    RU: "Новая задача"
+  },
+  Cautare: {
+    RO: "Căutare",
+    RU: "Поиск"
+  },
+  "Editare Task": {
+    RO: "Editare Task",
+    RU: "Редактирование задачи"
+  },
+  "Creare Task": {
+    RO: "Creare Task",
+    RU: "Создание задачи"
+  },
+  "Lead ID": {
+    RO: "Lead ID",
+    RU: "ID лида"
+  },
+  "Alege tip task": {
+    RO: "Alege tip task",
+    RU: "Выберите тип задачи"
+  },
+  Prioritate: {
+    RO: "Prioritate",
+    RU: "Приоритет"
+  },
+  Low: {
+    RO: "Scăzut",
+    RU: "Низкий"
+  },
+  Medium: {
+    RO: "Mediu",
+    RU: "Средний"
+  },
+  High: {
+    RO: "Ridicat",
+    RU: "Высокий"
+  },
+  Status: {
+    RO: "Status",
+    RU: "Статус"
+  },
+  "To Do": {
+    RO: "De făcut",
+    RU: "К выполнению"
+  },
+  "In Progress": {
+    RO: "În progres",
+    RU: "В процессе"
+  },
+  Done: {
+    RO: "Finalizat",
+    RU: "Готово"
+  },
+  Overdue: {
+    RO: "Întârziat",
+    RU: "Просрочено"
+  },
+  "Dată și oră": {
+    RO: "Dată și oră",
+    RU: "Дата и время"
+  },
+  "Descriere task": {
+    RO: "Descriere task",
+    RU: "Описание задачи"
+  },
+  Pentru: {
+    RO: "Pentru",
+    RU: "Для"
+  },
+  "Selectează utilizator": {
+    RO: "Selectează utilizator",
+    RU: "Выберите пользователя"
+  },
+  "De la utilizatorul": {
+    RO: "De la utilizatorul",
+    RU: "От пользователя"
+  },
+  "Adaugă task": {
+    RO: "Adaugă task",
+    RU: "Добавить задачу"
+  },
+  Anulare: {
+    RO: "Anulare",
+    RU: "Отмена"
+  },
+  Finalizați: {
+    RO: "Finalizați",
+    RU: "Завершить"
+  },
+  Acțiune: {
+    RO: "Acțiune",
+    RU: "Действие"
+  },
+  Modificați: {
+    RO: "Modificați",
+    RU: "Редактировать"
+  },
+  Ștergeți: {
+    RO: "Ștergeți",
+    RU: "Удалить"
+  },
+  "Task pentru Ticket-ul": {
+    RO: "Task pentru Ticket-ul",
+    RU: "Задача для тикета"
+  },
+  "Tipul Taskului": {
+    RO: "Tipul Taskului",
+    RU: "Тип задачи"
+  },
+  "Etapa Task": {
+    RO: "Etapa Task",
+    RU: "Этап задачи"
+  },
+  Deadline: {
+    RO: "Timp limita",
+    RU: "Время выполнения"
+  },
   Toate: {
     RO: "Toate",
     RU: "Всe"
@@ -1290,6 +1394,10 @@ export const translations = {
     RO: "FRA",
     RU: "ФРА"
   },
+  error_field: {
+    RO: "Completati randul",
+    RU: "Заполните поле"
+  },
   "Selectează flux de lucru": {
     RO: "Selectează flux de lucru",
     RU: "Выберите рабочий процесс"
@@ -1302,10 +1410,7 @@ export const translations = {
     RO: "Selectează contact",
     RU: "Выберите контекст"
   },
-  Status: {
-    RO: "Status",
-    RU: "Статус"
-  },
+
   Tehnician: {
     RO: "Tehnician",
     RU: "Техник"
@@ -1353,6 +1458,62 @@ export const translations = {
   "Filtrează tichete": {
     RO: "Filtrează tichete",
     RU: "Фильтровать тикеты"
+  },
+  "Confirmare ștergere": {
+    RO: "Confirmare ștergere",
+    RU: "Подтверждение удаления"
+  },
+  "Sigur doriți să ștergeți acest task?": {
+    RO: "Sigur doriți să ștergeți acest task?",
+    RU: "Вы уверены, что хотите удалить эту задачу?"
+  },
+  Anulează: {
+    RO: "Anulează",
+    RU: "Отмена"
+  },
+  "Task șters cu succes!": {
+    RO: "Task șters cu succes!",
+    RU: "Задача успешно удалена!"
+  },
+  "Eroare la ștergerea taskului": {
+    RO: "Eroare la ștergerea taskului",
+    RU: "Ошибка при удалении задачи"
+  },
+  "Task marcat ca finalizat!": {
+    RO: "Task marcat ca finalizat!",
+    RU: "Таск помечен как законченый!"
+  },
+  "Eroare la actualizarea statusului taskului": {
+    RO: "Eroare la actualizarea statusului taskului",
+    RU: "Ошибка при помечении таска"
+  },
+  "Eroare la încărcarea tichetelor": {
+    RO: "Eroare la încărcarea tichetelor",
+    RU: "Ошибка загрузки тикетов"
+  },
+  "Eroare la încărcarea utilizatorilor": {
+    RO: "Eroare la încărcarea utilizatorilor",
+    RU: "Ошибка загрузки пользователей"
+  },
+  "Toate câmpurile sunt obligatorii": {
+    RO: "Toate câmpurile sunt obligatorii",
+    RU: "Все поля обязательны для заполнения"
+  },
+  "Task actualizat cu succes!": {
+    RO: "Task actualizat cu succes!",
+    RU: "Задача успешно обновлена!"
+  },
+  "Task creat cu succes!": {
+    RO: "Task creat cu succes!",
+    RU: "Задача успешно создана!"
+  },
+  Задачи: {
+    RO: "Taskuri",
+    RU: "Задачи"
+  },
+  "Нет задач, создать?": {
+    RO: "Niciun task, creați unul?",
+    RU: "Нет задач, создать?"
   }
 }
 

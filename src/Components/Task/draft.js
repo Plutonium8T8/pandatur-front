@@ -17,7 +17,7 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
   const [error, setError] = useState(null)
   const [ticketIds, setTicketIds] = useState([])
   const [taskFor, setTaskFor] = useState("")
-  const [userList, setUserList] = useState([]) // Данные пользователей
+  const [userList, setUserList] = useState([])
   const [users, setUsers] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -39,7 +39,7 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
   useEffect(() => {
     if (isOpen && selectedTicketId) {
       setTicketId(selectedTicketId)
-      setSearchTerm(selectedTicketId.toString()) // Теперь поле обновляется
+      setSearchTerm(selectedTicketId.toString())
     }
   }, [isOpen, selectedTicketId])
 
@@ -47,7 +47,7 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
     try {
       const data = await api.tickets.list()
 
-      setTicketIds(data.map((ticket) => ticket.id)) // Сохраняем ticket_id
+      setTicketIds(data.map((ticket) => ticket.id))
     } catch (error) {
       console.error("Error fetching tickets:", error.message)
     }
@@ -68,7 +68,6 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
   const handleTaskSubmit = async (e) => {
     e.preventDefault()
     try {
-      // Проверяем, есть ли нужные данные
       if (!ticketId || !taskDate || !taskContent || !taskFor) {
         console.error("❌ Ошибка: Все поля должны быть заполнены.")
         return
@@ -79,8 +78,8 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
         scheduled_time: taskDate,
         description: taskContent,
         tags: [""],
-        created_by: userId, // ID текущего пользователя (кто создал задачу)
-        created_for: taskFor // ID выбранного пользователя (для кого создана задача)
+        created_by: userId,
+        created_for: taskFor
       }
 
       await api.task.create(taskData)
@@ -124,11 +123,10 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
     try {
       const usersData = await api.users.getTechnicianList()
 
-      // Корректное извлечение ID, имени и фамилии
       const formattedUsers = usersData.map((user) => ({
-        id: user.id.id, // ID пользователя
-        name: user.id.name || "N/A", // Имя (если пусто - "N/A")
-        surname: user.id.surname || "N/A" // Фамилия (если пусто - "N/A")
+        id: user.id.id,
+        name: user.id.name || "N/A",
+        surname: user.id.surname || "N/A"
       }))
 
       console.log("✅ Пользователи загружены:", formattedUsers)
@@ -139,7 +137,6 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
     }
   }
 
-  // Запуск загрузки пользователей при монтировании компонента
   useEffect(() => {
     fetchUsers()
   }, [userId])
@@ -254,13 +251,12 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
               id="for-user"
               value={searchUser}
               onChange={handleUserInputChange}
-              onFocus={() => setIsUserDropdownOpen(true)} // Открываем список при фокусе
-              onBlur={() => setTimeout(() => setIsUserDropdownOpen(false), 200)} // Закрытие списка после потери фокуса
+              onFocus={() => setIsUserDropdownOpen(true)}
+              onBlur={() => setTimeout(() => setIsUserDropdownOpen(false), 200)}
               placeholder={translations["Alege utilizator"][language]}
               required
             />
 
-            {/* Выпадающий список */}
             {isUserDropdownOpen && userList.length > 0 && (
               <ul className="dropdown-list">
                 {userList
@@ -302,7 +298,6 @@ const TaskModal = ({ isOpen, onClose, selectedTicketId }) => {
             </li>
           ) : (
             tasks.map((task) => {
-              // Найти пользователя по его ID в списке userList
               const assignedUser = userList.find(
                 (user) => user.id === task.created_for
               )
