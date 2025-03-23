@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useDOMElementHeight, useApp } from "../../hooks"
 import { priorityOptions } from "../../FormOptions/PriorityOption"
 import { workflowOptions } from "../../FormOptions/WorkFlowOption"
-import WorkflowColumn from "./WorkflowColumnComponent"
 import { TicketFilterModal } from "../TicketFilterModal"
 import { LeadTable } from "./LeadTable"
 import { useDebounce } from "../../hooks"
@@ -15,12 +14,13 @@ import SingleChat from "../ChatComponent/SingleChat"
 import { Spin } from "../Spin"
 import { RefLeadsFilter } from "./LeadsFilter"
 import TicketModal from "./TicketModal/TicketModalComponent"
-import { ScrollArea } from "@mantine/core"
 import "../../App.css"
 import "../SnackBarComponent/SnackBarComponent.css"
 import { SpinnerRightBottom } from "../SpinnerRightBottom"
 import { MantineModal } from "../MantineModal"
 import { EditBulkOrSingleLeadTabs } from "./components"
+import { VIEW_MODE, filteredWorkflows } from "./utils"
+import { WorkflowColumns } from "../WorkflowColumns"
 
 const SORT_BY = "creation_date"
 const ORDER = "DESC"
@@ -37,10 +37,6 @@ const normalizeLeadsFilters = (filters) => {
   }
 }
 
-const filteredWorkflows = workflowOptions.filter(
-  (wf) => wf !== "Realizat cu succes" && wf !== "Închis și nerealizat"
-)
-
 const Leads = () => {
   const refLeadsFilter = useRef()
   const { enqueueSnackbar } = useSnackbar()
@@ -50,7 +46,7 @@ const Leads = () => {
   const { ticketId } = useParams()
 
   const [hardTickets, setHardTickets] = useState([])
-  const [isTableView, setIsTableView] = useState(false)
+
   const [filteredTicketIds, setFilteredTicketIds] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -67,6 +63,8 @@ const Leads = () => {
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false)
   const [hardTicketFilters, setHardTicketFilters] = useState({})
   const [lightTicketFilters, setLightTicketFilters] = useState({})
+
+  const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN)
 
   const debouncedSearch = useDebounce(searchTerm)
 
@@ -193,8 +191,6 @@ const Leads = () => {
     }
   }
 
-  const closeTicketModal = () => setIsFilterOpen(false)
-
   const applyWorkflowFilters = (updatedFilters, ticketIds) => {
     setLightTicketFilters(updatedFilters)
 
@@ -203,7 +199,7 @@ const Leads = () => {
     )
 
     setFilteredTicketIds(ticketIds ?? null)
-    closeTicketModal()
+    setIsFilterOpen(false)
   }
 
   const handleApplyFiltersHardTicket = (formattedFilters) => {
@@ -214,7 +210,7 @@ const Leads = () => {
         setTotalLeads(pagination.total || 0)
         setCurrentPage(1)
         setHardTicketFilters(formattedFilters)
-        closeTicketModal()
+        setIsFilterOpen(false)
       },
       true
     )
@@ -242,19 +238,21 @@ const Leads = () => {
   }
 
   const fetchTicketList = () => {
+    const isViewModeList = viewMode === VIEW_MODE.LIST
+
     fetchTickets(
       {
-        type: isTableView ? HARD_TICKET : LIGHT_TICKET,
+        type: isViewModeList ? HARD_TICKET : LIGHT_TICKET,
         page: currentPage,
         attributes: {
           ...(debouncedSearch && { search: debouncedSearch }),
-          ...(isTableView ? hardTicketFilters : lightTicketFilters)
+          ...(isViewModeList ? hardTicketFilters : lightTicketFilters)
         },
         ...(groupTitle && { group_title: groupTitle })
       },
       (response) => {
         const { data, ...rest } = response
-        if (isTableView) {
+        if (isViewModeList) {
           setHardTickets(data)
           setTotalLeads(rest.pagination.total || 0)
           return
@@ -268,16 +266,16 @@ const Leads = () => {
   useEffect(() => {
     fetchTicketList()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, groupTitle, isTableView])
+  }, [debouncedSearch, groupTitle, viewMode])
 
   return (
     <>
       <RefLeadsFilter
+        onChangeViewMode={setViewMode}
         ref={refLeadsFilter}
         openCreateTicketModal={openCreateTicketModal}
         setSearchTerm={setSearchTerm}
         searchTerm={searchTerm}
-        setIsTableView={setIsTableView}
         selectedTickets={selectedTickets}
         onOpenModal={() => setIsModalOpen(true)}
         setIsFilterOpen={setIsFilterOpen}
@@ -297,7 +295,7 @@ const Leads = () => {
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
           </div>
-        ) : isTableView ? (
+        ) : viewMode === VIEW_MODE.LIST ? (
           <LeadTable
             loading={loading}
             currentPage={currentPage}
@@ -309,22 +307,15 @@ const Leads = () => {
             selectTicket={selectedTickets}
           />
         ) : (
-          <div className="container-tickets">
-            {workflowOptions
-              .filter((workflow) => selectedWorkflow.includes(workflow))
-              .map((workflow) => (
-                <WorkflowColumn
-                  key={workflow}
-                  workflow={workflow}
-                  tickets={filteredTickets}
-                  searchTerm={debouncedSearch}
-                  onEditTicket={(ticket) => {
-                    setCurrentTicket(ticket)
-                    setIsModalOpen(true)
-                  }}
-                />
-              ))}
-          </div>
+          <WorkflowColumns
+            selectedWorkflow={selectedWorkflow}
+            tickets={filteredTickets}
+            searchTerm={debouncedSearch}
+            onEditTicket={(ticket) => {
+              setCurrentTicket(ticket)
+              setIsModalOpen(true)
+            }}
+          />
         )}
       </div>
 
@@ -367,18 +358,13 @@ const Leads = () => {
 
       <MantineModal
         title={getLanguageByKey("Filtrează tichete")}
-        styles={{
-          body: { height: "700px" }
-        }}
-        size="700"
         keepMounted
-        open={isFilterOpen && !isTableView}
-        onClose={closeTicketModal}
-        scrollAreaComponent={ScrollArea.Autosize}
+        open={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
       >
         <TicketFilterModal
           loading={loading}
-          onClose={closeTicketModal}
+          onClose={() => setViewMode()}
           onApplyWorkflowFilters={(filters) =>
             applyWorkflowFilters(
               normalizeLeadsFilters(filters),
@@ -386,32 +372,15 @@ const Leads = () => {
             )
           }
           onApplyTicketFilters={(filters) => {
-            handleApplyFilterLightTicket(normalizeLeadsFilters(filters))
+            viewMode === VIEW_MODE.KANBAN
+              ? handleApplyFilterLightTicket(normalizeLeadsFilters(filters))
+              : handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
           }}
         />
       </MantineModal>
 
       <MantineModal
         keepMounted
-        open={isFilterOpen && isTableView}
-        onClose={closeTicketModal}
-      >
-        <TicketFilterModal
-          loading={loading}
-          onClose={closeTicketModal}
-          onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(
-              normalizeLeadsFilters(filters),
-              filteredTicketIds
-            )
-          }
-          onApplyTicketFilters={(filters) => {
-            handleApplyFilterLightTicket(normalizeLeadsFilters(filters))
-          }}
-        />
-      </MantineModal>
-
-      <MantineModal
         open={isModalOpen}
         onClose={() => closeModal()}
         title={getLanguageByKey("Editarea tichetelor în grup")}

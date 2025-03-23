@@ -14,6 +14,7 @@ import {
   Flex
 } from "@mantine/core"
 import { IoMdClose } from "react-icons/io"
+import { VIEW_MODE } from "../utils"
 
 export const RefLeadsFilter = forwardRef(
   (
@@ -21,7 +22,7 @@ export const RefLeadsFilter = forwardRef(
       openCreateTicketModal,
       searchTerm,
       setSearchTerm,
-      setIsTableView,
+      onChangeViewMode,
       selectedTickets,
       onOpenModal,
       setIsFilterOpen,
@@ -100,12 +101,10 @@ export const RefLeadsFilter = forwardRef(
 
         <Flex gap="md">
           <SegmentedControl
-            onChange={(value) => {
-              setIsTableView((prev) => value === "kanban")
-            }}
+            onChange={onChangeViewMode}
             data={[
-              { value: "list", label: <TbLayoutKanbanFilled /> },
-              { value: "kanban", label: <FaList /> }
+              { value: VIEW_MODE.KANBAN, label: <TbLayoutKanbanFilled /> },
+              { value: VIEW_MODE.LIST, label: <FaList /> }
             ]}
           />
 
