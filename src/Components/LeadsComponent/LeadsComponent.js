@@ -28,8 +28,9 @@ const HARD_TICKET = "hard"
 const LIGHT_TICKET = "light"
 const NUMBER_PAGE = 1
 
-const normalizeLeadsFilters = (filters) => {
+const normalizeLeadsFilters = (filters, hasWorkflow) => {
   return {
+    ...(hasWorkflow && { workflow: filteredWorkflows }),
     ...filters,
     technician_id: filters.technician_id
       ? filters.technician_id.map((t) => parseInt(t.split(":")[0]))
@@ -358,29 +359,41 @@ const Leads = () => {
 
       <MantineModal
         title={getLanguageByKey("Filtrează tichete")}
-        keepMounted
         open={isFilterOpen}
         onClose={() => setIsFilterOpen(false)}
       >
-        <TicketFilterModal
-          loading={loading}
-          onClose={() => setViewMode()}
-          onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(
-              normalizeLeadsFilters(filters),
-              filteredTicketIds
-            )
-          }
-          onApplyTicketFilters={(filters) => {
-            viewMode === VIEW_MODE.KANBAN
-              ? handleApplyFilterLightTicket(normalizeLeadsFilters(filters))
-              : handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
-          }}
-        />
+        {viewMode === VIEW_MODE.KANBAN ? (
+          <TicketFilterModal
+            loading={loading}
+            onClose={() => setViewMode()}
+            onApplyWorkflowFilters={(filters) =>
+              applyWorkflowFilters(
+                normalizeLeadsFilters(filters),
+                filteredTicketIds
+              )
+            }
+            onApplyTicketFilters={(filters) => {
+              handleApplyFilterLightTicket(normalizeLeadsFilters(filters, true))
+            }}
+          />
+        ) : (
+          <TicketFilterModal
+            loading={loading}
+            onClose={() => setViewMode()}
+            onApplyWorkflowFilters={(filters) =>
+              applyWorkflowFilters(
+                normalizeLeadsFilters(filters),
+                filteredTicketIds
+              )
+            }
+            onApplyTicketFilters={(filters) => {
+              handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
+            }}
+          />
+        )}
       </MantineModal>
 
       <MantineModal
-        keepMounted
         open={isModalOpen}
         onClose={() => closeModal()}
         title={getLanguageByKey("Editarea tichetelor în grup")}

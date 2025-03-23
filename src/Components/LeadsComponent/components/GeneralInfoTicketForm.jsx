@@ -18,7 +18,7 @@ import { getLanguageByKey } from "../../utils"
 import { useGetTechniciansList } from "../../../hooks"
 import { parseTags } from "../../../stringUtils"
 
-const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID"
+const GENERAL_FORM_ID = "GENERAL_FORM_ID"
 
 export const GeneralInfoTicketForm = ({
   onSubmit,
@@ -50,7 +50,7 @@ export const GeneralInfoTicketForm = ({
   return (
     <>
       <form
-        id={GENERAL_FORM_FILTER_ID}
+        id={GENERAL_FORM_ID}
         onSubmit={form.onSubmit((values) =>
           onSubmit(values, () => form.reset())
         )}
@@ -123,13 +123,12 @@ export const GeneralInfoTicketForm = ({
           {...form.getInputProps("description")}
         />
       </form>
-
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.(form.reset)}
         <Button variant="default" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
-        <Button loading={loading} type="submit" form={GENERAL_FORM_FILTER_ID}>
+        <Button loading={loading} type="submit" form={GENERAL_FORM_ID}>
           {getLanguageByKey("Trimite")}
         </Button>
       </Flex>

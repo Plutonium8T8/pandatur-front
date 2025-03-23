@@ -76,7 +76,7 @@ export const EditBulkOrSingleLeadTabs = ({
   }
 
   return (
-    <Tabs defaultValue="general_info">
+    <Tabs h="100%" defaultValue="general_info">
       <Tabs.List>
         <Tabs.Tab value="general_info">
           {getLanguageByKey("Informații generale")}
@@ -88,24 +88,28 @@ export const EditBulkOrSingleLeadTabs = ({
       </Tabs.List>
 
       <Tabs.Panel value="general_info" pt="xs">
-        <GeneralInfoTicketForm
-          data={generalInfoLightTicket}
-          onClose={onClose}
-          onSubmit={submit}
-          loading={loading}
-        />
+        <Flex direction="column" justify="space-between" h="100%">
+          <GeneralInfoTicketForm
+            data={generalInfoLightTicket}
+            onClose={onClose}
+            onSubmit={submit}
+            loading={loading}
+          />
+        </Flex>
       </Tabs.Panel>
 
-      <Tabs.Panel value="ticket_info" pt="xs">
+      <Tabs.Panel value="ticket_info" pt="xs" pb="md">
         <TicketInfoForm
+          setMinDate={new Date()}
           data={ticketInfo}
           onClose={onClose}
           onSubmit={submit}
           loading={loading}
         />
       </Tabs.Panel>
-      <Tabs.Panel value="contact" pt="xs">
+      <Tabs.Panel value="contact" pt="xs" pb="md">
         <ContractTicketForm
+          setMinDate={new Date()}
           data={ticketInfo}
           onClose={onClose}
           onSubmit={submit}
