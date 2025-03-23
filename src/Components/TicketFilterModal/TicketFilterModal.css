@@ -7,8 +7,10 @@
   padding: 5px;
 }
 
-.container-ticket-content {
-  height: calc(660px - (40px + 34px + 20px));
-  overflow-y: auto;
-  width: 100%;
+.leads-modal-filter-tabs .mantine-Tabs-panel[data-orientation="horizontal"] {
+  height: calc(100% - 36px);
+}
+
+.leads-modal-filter-tabs .mantine-Tabs-root[data-orientation="vertical"] {
+  height: 100%;
 }

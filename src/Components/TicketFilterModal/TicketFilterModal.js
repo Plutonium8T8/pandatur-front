@@ -1,24 +1,11 @@
 import React, { useState } from "react"
-import { platformOptions, filterDefaults, filteredWorkflows } from "./utils"
+import { platformOptions, filteredWorkflows } from "./utils"
 import { SelectWorkflow } from "./SelectWorkflow"
 import { getLanguageByKey } from "../utils"
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
+import { TicketsFilter } from "./TicketsFilter"
+import { cleanFormValues } from "../utils"
 import "./TicketFilterModal.css"
-import {
-  TicketInfoForm,
-  ContractTicketForm,
-  GeneralInfoTicketForm,
-  Invoice,
-  QualityControl
-} from "../LeadsComponent/components"
-
-const formatValue = (name, value) => {
-  if (name === "tags") {
-    return value.split(",").map((tag) => tag.trim())
-  }
-
-  return value
-}
 
 const systemFiltersInitialState = {
   workflow: filteredWorkflows
@@ -31,45 +18,14 @@ export const TicketFilterModal = ({
   resetTicketsFilters,
   loading
 }) => {
-  const [leadFilters, setLeadFilters] = useState(filterDefaults)
   const [systemFilters, setSystemFilters] = useState(systemFiltersInitialState)
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-
-    setLeadFilters((prev) => ({
-      ...prev,
-      [name]: formatValue(name, value)
-    }))
-  }
-
-  const changeFilters = (field, value) => {
-    setLeadFilters((prev) => ({
-      ...prev,
-      [field]: value
-    }))
-  }
-
-  const handleMultiSelectChange = (name, selectedValues) => {
-    setLeadFilters((prev) => ({
-      ...prev,
-      [name]: formatValue(name, selectedValues)
-    }))
-  }
-
-  const clearFilters = () => {
-    const resetFilters = {
-      ...filterDefaults,
-      workflow: filterDefaults.workflow || []
-    }
-
-    setLeadFilters(resetFilters)
-
-    resetTicketsFilters?.(resetFilters)
-  }
-
   return (
-    <Tabs defaultValue="filter_workflow">
+    <Tabs
+      h="100%"
+      className="leads-modal-filter-tabs"
+      defaultValue="filter_workflow"
+    >
       <Tabs.List>
         <Tabs.Tab value="filter_workflow">
           {getLanguageByKey("Filtru de sistem")}
@@ -83,7 +39,7 @@ export const TicketFilterModal = ({
       </Tabs.List>
 
       <Tabs.Panel value="filter_workflow" pt="xs">
-        <Flex direction="column" justify="space-between">
+        <Flex direction="column" justify="space-between" h="100%">
           <SelectWorkflow
             selectedValues={systemFilters.workflow}
             onChange={(_, value) =>
@@ -115,84 +71,33 @@ export const TicketFilterModal = ({
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_ticket" pt="xs">
-        <>
-          <Tabs defaultValue="filter_general_info" orientation="vertical">
-            <Tabs.List>
-              <Tabs.Tab value="filter_general_info">
-                {getLanguageByKey("Informații generale")}
-              </Tabs.Tab>
-              <Tabs.Tab value="filter_ticket_info">
-                {getLanguageByKey("Informații despre tichet")}
-              </Tabs.Tab>
-              <Tabs.Tab value="filter_contact">
-                {getLanguageByKey("Contact")}
-              </Tabs.Tab>
-              <Tabs.Tab value="filter_invoice">
-                {getLanguageByKey("Invoice")}
-              </Tabs.Tab>
-              <Tabs.Tab value="filter_quality_control">
-                {getLanguageByKey("Control calitate")}
-              </Tabs.Tab>
-            </Tabs.List>
-
-            <Tabs.Panel pl="20" value="filter_general_info">
-              <GeneralInfoTicketForm
-                loading={loading}
-                onClose={onClose}
-                onSubmit={onApplyTicketFilters}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel pl="20" value="filter_ticket_info">
-              <TicketInfoForm
-                loading={loading}
-                onClose={onClose}
-                onSubmit={onApplyTicketFilters}
-              />
-            </Tabs.Panel>
-            <Tabs.Panel pl="20" value="filter_contact">
-              <ContractTicketForm
-                loading={loading}
-                onClose={onClose}
-                onSubmit={onApplyTicketFilters}
-              />
-            </Tabs.Panel>
-
-            <Tabs.Panel pl="20" value="filter_invoice">
-              <Invoice
-                loading={loading}
-                onClose={onClose}
-                onSubmit={onApplyTicketFilters}
-              />
-            </Tabs.Panel>
-
-            <Tabs.Panel pl="20" value="filter_quality_control">
-              <QualityControl
-                loading={loading}
-                onClose={onClose}
-                onSubmit={onApplyTicketFilters}
-              />
-            </Tabs.Panel>
-          </Tabs>
-        </>
+        <TicketsFilter
+          onClose={onClose}
+          onSubmit={(values) => {
+            onApplyTicketFilters(cleanFormValues(values))
+          }}
+          loading={loading}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_message" pt="xs">
-        <MultiSelect
-          searchable
-          clearable
-          label={getLanguageByKey("Platforma mesaj")}
-          placeholder={getLanguageByKey("Platforma mesaj")}
-          data={platformOptions}
-          defaultValue={leadFilters.platform}
-        />
+        <Flex direction="column" justify="space-between" h="100%">
+          <MultiSelect
+            searchable
+            clearable
+            label={getLanguageByKey("Platforma mesaj")}
+            placeholder={getLanguageByKey("Platforma mesaj")}
+            data={platformOptions}
+          />
 
-        <Flex justify="end" gap="md" mt="md">
-          <Button variant="default" onClick={onClose}>
-            {getLanguageByKey("Închide")}
-          </Button>
-          <Button disabled variant="filled" loading={loading} onClick={onClose}>
-            {getLanguageByKey("Trimite")}
-          </Button>
+          <Flex justify="end" gap="md" mt="md">
+            <Button variant="default" onClick={onClose}>
+              {getLanguageByKey("Închide")}
+            </Button>
+            <Button disabled variant="filled">
+              {getLanguageByKey("Trimite")}
+            </Button>
+          </Flex>
         </Flex>
       </Tabs.Panel>
     </Tabs>
