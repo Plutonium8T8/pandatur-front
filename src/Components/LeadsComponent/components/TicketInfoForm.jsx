@@ -39,7 +39,6 @@ export const TicketInfoForm = ({ onClose, onSubmit, loading, data }) => {
 
   useEffect(() => {
     if (data) {
-      console.log("🚀 ~ useEffect ~ data:", data)
       form.setValues({
         data_venit_in_oficiu: parseServerDate(data?.data_venit_in_oficiu),
         data_plecarii: parseServerDate(data?.data_plecarii),
