@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import "./LeadTable.css"
-import { SpinnerRightBottom } from "../../SpinnerRightBottom"
 import { Pagination } from "../../Pagination"
 import { getLanguageByKey, cleanValue, showServerError } from "../../utils"
 import { TextEllipsis } from "../../TextEllipsis"
@@ -357,7 +356,7 @@ export const LeadTable = ({
       />
 
       {!!totalLeads && (
-        <Flex p="20" justify="center">
+        <Flex p="20" justify="center" className="leads-table-pagination">
           <Pagination
             totalPages={totalLeads}
             currentPage={currentPage}

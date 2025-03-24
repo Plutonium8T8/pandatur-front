@@ -14,3 +14,7 @@
 .row-id:hover {
   text-decoration: underline;
 }
+
+.leads-table-pagination {
+  border-top: 1px solid #f0f0f0;
+}
