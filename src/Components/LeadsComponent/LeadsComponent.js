@@ -6,7 +6,7 @@ import { workflowOptions } from "../../FormOptions/WorkFlowOption"
 import WorkflowColumn from "./WorkflowColumnComponent"
 import { TicketFilterModal } from "../TicketFilterModal"
 import { LeadTable } from "./LeadTable"
-import { useDebounce } from "../../hooks"
+import { useDebounce, useConfirmPopup } from "../../hooks"
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
@@ -19,7 +19,6 @@ import { Modal as MantineModal, Text } from "@mantine/core"
 import "../../App.css"
 import "../SnackBarComponent/SnackBarComponent.css"
 import { SpinnerRightBottom } from "../SpinnerRightBottom"
-
 import { EditBulkOrSingleLeadTabs } from "./components"
 
 const SORT_BY = "creation_date"
@@ -69,6 +68,9 @@ const Leads = () => {
   const [lightTicketFilters, setLightTicketFilters] = useState({})
 
   const debouncedSearch = useDebounce(searchTerm)
+  const deleteBulkLeads = useConfirmPopup({
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri")
+  })
 
   const filteredTickets = useMemo(() => {
     let result = tickets
@@ -281,7 +283,7 @@ const Leads = () => {
         selectedTickets={selectedTickets}
         onOpenModal={() => setIsModalOpen(true)}
         setIsFilterOpen={setIsFilterOpen}
-        deleteTicket={deleteTicket}
+        deleteTicket={() => deleteBulkLeads(deleteTicket)}
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads ?? tickets.length}
         isFilterOpen={isFilterOpen}
@@ -302,11 +304,11 @@ const Leads = () => {
             loading={loading}
             currentPage={currentPage}
             filteredLeads={hardTickets}
-            selectedTickets={selectedTickets}
-            toggleSelectTicket={toggleSelectTicket}
+            selectTicket={selectedTickets}
+            onSelectRow={toggleSelectTicket}
             totalLeads={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
-            selectTicket={selectedTickets}
+            fetchTickets={fetchTicketList}
           />
         ) : (
           <div className="container-tickets">
