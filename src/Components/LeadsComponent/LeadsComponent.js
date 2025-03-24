@@ -105,12 +105,6 @@ const Leads = () => {
   }
 
   const deleteTicket = async () => {
-    const findTicket = tickets.find((ticket) =>
-      selectedTickets.includes(ticket.id)
-    )
-
-    const newTickets = tickets.filter((ticket) => ticket.id !== findTicket.id)
-
     try {
       setLoading(true)
       await api.tickets.deleteById(selectedTickets)
@@ -126,7 +120,6 @@ const Leads = () => {
         }
       )
 
-      setTickets(newTickets)
       setSelectedTickets([])
       enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
         variant: "success"
@@ -305,7 +298,6 @@ const Leads = () => {
           </div>
         ) : isTableView ? (
           <LeadTable
-            loading={loading}
             currentPage={currentPage}
             filteredLeads={hardTickets}
             selectTicket={selectedTickets}

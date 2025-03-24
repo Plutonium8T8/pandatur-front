@@ -199,7 +199,6 @@ export const AppProvider = ({ children }) => {
   const fetchTickets = async () => {
     try {
       setSpinnerTickets(true)
-
       await getTicketsListRecursively(1)
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" })
@@ -208,8 +207,6 @@ export const AppProvider = ({ children }) => {
 
   const fetchSingleTicket = async (ticketId) => {
     try {
-      setIsLoading(true)
-
       const ticket = await api.tickets.ticket.getLightById(ticketId)
 
       setTickets((prevTickets) => {
@@ -225,8 +222,6 @@ export const AppProvider = ({ children }) => {
     } catch (error) {
       console.error("Eroare request ticket:", error)
       return null
-    } finally {
-      setIsLoading(false)
     }
   }
 
