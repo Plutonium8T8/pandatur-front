@@ -33,7 +33,7 @@ export const RcTable = ({
           tableLayout="fixed"
           emptyText={renderSpinOrEmptyBox(loading)}
           rowClassName={({ id }) =>
-            `${bordered ? "border" : ""} ${selectedRow.includes(id) ? "row-selection" : ""}`
+            `${bordered ? "border" : ""} ${selectedRow?.includes(id) ? "row-selection" : ""}`
           }
           columns={columns}
           data={data}

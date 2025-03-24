@@ -2,7 +2,8 @@ import {
   MantineProvider as BaseMantineProvider,
   createTheme,
   colorsTuple,
-  Button
+  Button,
+  ActionIcon
 } from "@mantine/core"
 import classes from "./MantineProvider.module.css"
 
@@ -12,9 +13,16 @@ const theme = createTheme({
   colors: {
     custom: colorsTuple("#0f824c")
   },
+
   primaryColor: "custom",
+
   components: {
-    Button: Button.extend({ classNames: classes })
+    Button: Button.extend({ classNames: classes }),
+    ActionIcon: ActionIcon.extend({
+      classNames: {
+        root: classes.rootActionIcon
+      }
+    })
   }
 })
 

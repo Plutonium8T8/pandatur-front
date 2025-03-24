@@ -5,7 +5,7 @@ import { priorityOptions } from "../../FormOptions/PriorityOption"
 import { workflowOptions } from "../../FormOptions/WorkFlowOption"
 import { TicketFilterModal } from "../TicketFilterModal"
 import { LeadTable } from "./LeadTable"
-import { useDebounce } from "../../hooks"
+import { useDebounce, useConfirmPopup } from "../../hooks"
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
@@ -68,6 +68,9 @@ const Leads = () => {
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN)
 
   const debouncedSearch = useDebounce(searchTerm)
+  const deleteBulkLeads = useConfirmPopup({
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri")
+  })
 
   const filteredTickets = useMemo(() => {
     let result = tickets
@@ -102,11 +105,6 @@ const Leads = () => {
   }
 
   const deleteTicket = async () => {
-    const findTicket = tickets.find((ticket) =>
-      selectedTickets.includes(ticket.id)
-    )
-    const newTickets = tickets.filter((ticket) => ticket.id !== findTicket.id)
-
     try {
       setLoading(true)
       await api.tickets.deleteById(selectedTickets)
@@ -122,8 +120,10 @@ const Leads = () => {
         }
       )
 
-      setTickets(newTickets)
       setSelectedTickets([])
+      enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
+        variant: "success"
+      })
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" })
     } finally {
@@ -296,14 +296,13 @@ const Leads = () => {
           </div>
         ) : viewMode === VIEW_MODE.LIST ? (
           <LeadTable
-            loading={loading}
             currentPage={currentPage}
             filteredLeads={hardTickets}
-            selectedTickets={selectedTickets}
-            toggleSelectTicket={toggleSelectTicket}
+            selectTicket={selectedTickets}
+            onSelectRow={toggleSelectTicket}
             totalLeads={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
-            selectTicket={selectedTickets}
+            fetchTickets={fetchTicketList}
           />
         ) : (
           <WorkflowColumns

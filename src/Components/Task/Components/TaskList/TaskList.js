@@ -6,7 +6,6 @@ import "./TaskList.css"
 import { TypeTask } from "../OptionsTaskType/OptionsTaskType"
 import { useSnackbar } from "notistack"
 import { api } from "../../../../api"
-import { openConfirmModal } from "@mantine/modals"
 import { Menu, Button } from "@mantine/core"
 import {
   IoEllipsisHorizontal,
@@ -14,6 +13,7 @@ import {
   IoTrash,
   IoPencil
 } from "react-icons/io5"
+import { useConfirmPopup } from "../../../../hooks"
 
 const TaskList = ({
   tasks,
@@ -29,6 +29,9 @@ const TaskList = ({
   const [, setColumn] = useState("")
   const [openMenuId, setOpenMenuId] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
+  const handleDeleteTaskById = useConfirmPopup({
+    subTitle: translations["Sigur doriți să ștergeți acest task?"][language]
+  })
 
   const priorityColors = {
     Low: "#4CAF50",
@@ -37,32 +40,20 @@ const TaskList = ({
   }
 
   const handleDeleteTask = (taskId) => {
-    openConfirmModal({
-      title: translations["Confirmare ștergere"][language],
-      centered: true,
-      children: (
-        <p>{translations["Sigur doriți să ștergeți acest task?"][language]}</p>
-      ),
-      labels: {
-        confirm: translations["Șterge"][language],
-        cancel: translations["Anulează"][language]
-      },
-      confirmProps: { color: "red" },
-      onConfirm: async () => {
-        try {
-          await api.task.delete({ id: taskId })
-          enqueueSnackbar(translations["Task șters cu succes!"][language], {
-            variant: "success"
-          })
-          fetchTasks()
-        } catch (error) {
-          enqueueSnackbar(
-            translations["Eroare la ștergerea taskului"][language],
-            {
-              variant: "error"
-            }
-          )
-        }
+    handleDeleteTaskById(async () => {
+      try {
+        await api.task.delete({ id: taskId })
+        enqueueSnackbar(translations["Task șters cu succes!"][language], {
+          variant: "success"
+        })
+        fetchTasks()
+      } catch (error) {
+        enqueueSnackbar(
+          translations["Eroare la ștergerea taskului"][language],
+          {
+            variant: "error"
+          }
+        )
       }
     })
   }
