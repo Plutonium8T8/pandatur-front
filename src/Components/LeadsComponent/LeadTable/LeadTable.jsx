@@ -24,10 +24,18 @@ import { useSnackbar } from "notistack"
 import { api } from "../../../api"
 import { useConfirmPopup } from "../../../hooks"
 import { EditBulkOrSingleLeadTabs } from "../../LeadsComponent/components"
+import { DateCell } from "../../DateCell"
 
 const renderTags = (tags) => {
   const isTags = tags.some(Boolean)
   return isTags ? tags.map((tag, index) => <Tag key={index}>{tag}</Tag>) : "—"
+}
+
+const priorityTagColors = {
+  joasă: "success",
+  medie: "processing",
+  înaltă: "warning",
+  critică: "danger"
 }
 
 export const LeadTable = ({
@@ -180,16 +188,17 @@ export const LeadTable = ({
       width: 200,
       align: "center",
       render: (tags) => (
-        <div style={{ width: 300 }} className="d-flex gap-8 flex-wrap">
-          {renderTags(tags)}
-        </div>
+        <div className="d-flex gap-8 flex-wrap">{renderTags(tags)}</div>
       )
     },
     {
       title: getLanguageByKey("Prioritate"),
       dataIndex: "priority",
       align: "center",
-      width: 100
+      width: 100,
+      render: (priority) => (
+        <Tag type={priorityTagColors[priority]}>{priority}</Tag>
+      )
     },
     {
       title: getLanguageByKey("Workflow"),
@@ -208,13 +217,17 @@ export const LeadTable = ({
       title: getLanguageByKey("Data de creare"),
       dataIndex: "creation_date",
       align: "center",
-      width: 200
+      width: 200,
+      render: (creation_date) => <DateCell date={creation_date} />
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
       dataIndex: "last_interaction_date",
       align: "center",
-      width: 200
+      width: 200,
+      render: (last_interaction_date) => (
+        <DateCell date={last_interaction_date} />
+      )
     },
     {
       title: getLanguageByKey("Achitat client"),
@@ -249,42 +262,46 @@ export const LeadTable = ({
       dataIndex: ["ticket_info", "data_avansului"],
       align: "center",
       width: 150,
-      render: (data_avansului) => cleanValue(data_avansului)
+      render: (data_avansului) => <DateCell date={data_avansului} />
     },
     {
       title: getLanguageByKey("Data cererii de retur"),
       dataIndex: ["ticket_info", "data_cererii_de_retur"],
       align: "center",
       width: 200,
-      render: (data_cererii_de_retur) => cleanValue(data_cererii_de_retur)
+      render: (data_cererii_de_retur) => (
+        <DateCell date={data_cererii_de_retur} />
+      )
     },
     {
       title: getLanguageByKey("Data contractului"),
       dataIndex: ["ticket_info", "data_contractului"],
       align: "center",
       width: 200,
-      render: (data_contractului) => cleanValue(data_contractului)
+      render: (data_contractului) => <DateCell date={data_contractului} />
     },
     {
       title: getLanguageByKey("Data de plată integrală"),
       dataIndex: ["ticket_info", "data_de_plata_integrala"],
       align: "center",
       width: 200,
-      render: (data_de_plata_integrala) => cleanValue(data_de_plata_integrala)
+      render: (data_de_plata_integrala) => (
+        <DateCell date={data_de_plata_integrala} />
+      )
     },
     {
       title: getLanguageByKey("Data plecării"),
       dataIndex: ["ticket_info", "data_plecarii"],
       align: "center",
       width: 200,
-      render: (data_plecarii) => cleanValue(data_plecarii)
+      render: (data_plecarii) => <DateCell date={data_plecarii} />
     },
     {
       title: getLanguageByKey("Data întoarcerii"),
       dataIndex: ["ticket_info", "data_intoarcerii"],
       align: "center",
       width: 200,
-      render: (data_intoarcerii) => cleanValue(data_intoarcerii)
+      render: (data_intoarcerii) => <DateCell date={data_intoarcerii} />
     },
     {
       title: getLanguageByKey("Tipul de transport"),
