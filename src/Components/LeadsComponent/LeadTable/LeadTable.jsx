@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import "./LeadTable.css"
 import { SpinnerRightBottom } from "../../SpinnerRightBottom"
 import { Pagination } from "../../Pagination"
-import { getLanguageByKey, cleanValue } from "../../utils"
+import { getLanguageByKey, cleanValue, showServerError } from "../../utils"
 import { TextEllipsis } from "../../TextEllipsis"
 import { Checkbox } from "../../Checkbox"
 import { Modal } from "../../Modal"
@@ -11,9 +11,19 @@ import SingleChat from "../../ChatComponent/SingleChat"
 import { useParams, useNavigate } from "react-router-dom"
 import { Tag } from "../../Tag"
 import { WorkflowTag } from "../../WorkflowTag"
-import { Flex, Paper, ActionIcon } from "@mantine/core"
+import {
+  Flex,
+  Paper,
+  ActionIcon,
+  Modal as MantineModal,
+  Text
+} from "@mantine/core"
 import { RcTable } from "../../RcTable"
 import { MdDelete, MdEdit } from "react-icons/md"
+import { useSnackbar } from "notistack"
+import { api } from "../../../api"
+import { useConfirmPopup } from "../../../hooks"
+import { EditBulkOrSingleLeadTabs } from "../../LeadsComponent/components"
 
 const renderTags = (tags) => {
   const isTags = tags.some(Boolean)
@@ -28,13 +38,42 @@ export const LeadTable = ({
   onChangePagination,
   currentPage,
   loading,
-  selectTicket
+  selectTicket,
+  fetchTickets
 }) => {
+  const { enqueueSnackbar } = useSnackbar()
   const [isChatOpen, setIsChatOpen] = useState(false)
   const [selectedTicketId, setSelectedTicketId] = useState(null)
   const { ticketId } = useParams()
   const navigate = useNavigate()
   const [selectedRow, setSelectedRow] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [id, setId] = useState()
+
+  const deleteLead = useConfirmPopup({
+    title: getLanguageByKey("Confirmare ștergere"),
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți acest lead"),
+    loading: isLoading
+  })
+
+  const handleDeleteLead = (id) => {
+    deleteLead(async () => {
+      setIsLoading(true)
+      try {
+        await api.tickets.deleteById([id])
+        enqueueSnackbar(getLanguageByKey("Lead șters cu succes"), {
+          variant: "success"
+        })
+        fetchTickets()
+      } catch (error) {
+        enqueueSnackbar(showServerError(error), {
+          variant: "error"
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    })
+  }
 
   const rcColumn = [
     {
@@ -269,17 +308,17 @@ export const LeadTable = ({
       render: (valuta_contului) => cleanValue(valuta_contului)
     },
     {
-      title: getLanguageByKey("Acțiuni"),
+      title: getLanguageByKey("Acțiune"),
       fixed: "right",
       width: 85,
-
-      render: () => (
+      dataIndex: "id",
+      render: (id) => (
         <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
           <Flex align="center" justify="center" gap="8" h="100%" p="xs">
-            <ActionIcon variant="danger">
+            <ActionIcon variant="danger" onClick={() => handleDeleteLead(id)}>
               <MdDelete />
             </ActionIcon>
-            <ActionIcon variant="outline">
+            <ActionIcon variant="outline" onClick={() => setId(id)}>
               <MdEdit />
             </ActionIcon>
           </Flex>
@@ -336,6 +375,25 @@ export const LeadTable = ({
           <SingleChat ticketId={selectedTicketId} onClose={closeChatModal} />
         )}
       </Modal>
+
+      <MantineModal
+        centered
+        opened={!!id}
+        onClose={() => setId()}
+        size="lg"
+        title={
+          <Text size="xl" fw="bold">
+            {getLanguageByKey("Editează ticketul")}
+          </Text>
+        }
+      >
+        <EditBulkOrSingleLeadTabs
+          onClose={() => setId()}
+          selectedTickets={selectedTickets}
+          fetchLeads={fetchTickets}
+          id={id}
+        />
+      </MantineModal>
     </>
   )
 }
