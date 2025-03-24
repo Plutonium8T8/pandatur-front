@@ -1511,9 +1511,17 @@ export const translations = {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?"
   },
-  Acțiuni: {
-    RO: "Acțiuni",
-    RU: "Действия"
+  "Lead șters cu succes": {
+    RO: "Lead șters cu succes",
+    RU: "Лид успешно удалён"
+  },
+  "Sigur doriți să ștergeți acest lead": {
+    RO: "Sigur doriți să ștergeți acest lead?",
+    RU: "Вы уверены, что хотите удалить этот лид?"
+  },
+  "Editează ticketul": {
+    RO: "Editează ticketul",
+    RU: "Редактировать тикет"
   }
 }
 
