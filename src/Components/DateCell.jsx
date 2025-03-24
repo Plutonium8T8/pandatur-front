@@ -1,14 +1,14 @@
 import { Flex, Text } from "@mantine/core"
 import dayjs from "dayjs"
 import { cleanValue } from "./utils"
-import { DD_MM_YYYY, FORMAT_TIME, DATE_TIME_FORMAT } from "../app-constants"
+import { DD_MM_YYYY, HH_mm, DD_MM_YYYY__HH_mm_ss } from "../app-constants"
 
 const formattedDate = (date) => {
-  const parsedDate = dayjs(date, DATE_TIME_FORMAT)
+  const parsedDate = dayjs(date, DD_MM_YYYY__HH_mm_ss)
 
   return {
     formateDate: parsedDate.format(DD_MM_YYYY),
-    formateTime: parsedDate.format(FORMAT_TIME)
+    formateTime: parsedDate.format(HH_mm)
   }
 }
 
