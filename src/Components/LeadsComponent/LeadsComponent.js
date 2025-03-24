@@ -108,6 +108,7 @@ const Leads = () => {
     const findTicket = tickets.find((ticket) =>
       selectedTickets.includes(ticket.id)
     )
+
     const newTickets = tickets.filter((ticket) => ticket.id !== findTicket.id)
 
     try {
@@ -127,6 +128,9 @@ const Leads = () => {
 
       setTickets(newTickets)
       setSelectedTickets([])
+      enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
+        variant: "success"
+      })
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" })
     } finally {

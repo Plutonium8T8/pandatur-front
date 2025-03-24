@@ -1526,6 +1526,10 @@ export const translations = {
   "Sigur doriți să ștergeți aceste leaduri": {
     RO: "Sigur doriți să ștergeți aceste leaduri ?",
     RU: "Вы уверены, что хотите удалить эти лиды?"
+  },
+  "Leadurile au fost șterse cu succes": {
+    RO: "Leadurile au fost șterse cu succes",
+    RU: "Лиды были успешно удалены"
   }
 }
 
