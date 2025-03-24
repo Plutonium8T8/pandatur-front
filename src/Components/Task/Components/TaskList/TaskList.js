@@ -30,7 +30,6 @@ const TaskList = ({
   const [openMenuId, setOpenMenuId] = useState(null)
   const { enqueueSnackbar } = useSnackbar()
   const handleDeleteTaskById = useConfirmPopup({
-    title: translations["Confirmare ștergere"][language],
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language]
   })
 

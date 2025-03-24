@@ -1522,6 +1522,10 @@ export const translations = {
   "Editează ticketul": {
     RO: "Editează ticketul",
     RU: "Редактировать тикет"
+  },
+  "Sigur doriți să ștergeți aceste leaduri": {
+    RO: "Sigur doriți să ștergeți aceste leaduri ?",
+    RU: "Вы уверены, что хотите удалить эти лиды?"
   }
 }
 
