@@ -2,7 +2,7 @@ import { Tabs, Flex, Button, ScrollArea } from "@mantine/core"
 import {
   TicketInfoForm,
   ContractTicketForm,
-  GeneralInfoTicketForm,
+  GeneralInformationLeadsFilter,
   Invoice,
   QualityControl
 } from "../../LeadsComponent/components"
@@ -16,7 +16,7 @@ const renderResetButton = (resetForm) => {
   )
 }
 
-export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
+export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
   return (
     <Tabs defaultValue="filter_general_info" orientation="vertical">
       <Tabs.List>
@@ -43,11 +43,12 @@ export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
         value="filter_general_info"
       >
         <Flex direction="column" justify="space-between" h="100%">
-          <GeneralInfoTicketForm
+          <GeneralInformationLeadsFilter
             loading={loading}
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
+            formId={formIds?.generalFormID}
           />
         </Flex>
       </Tabs.Panel>
@@ -59,6 +60,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
+            formId={formIds?.ticketInfoFormID}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -70,6 +72,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
+            formId={formIds?.contractFormID}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -81,6 +84,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
+            formId={formIds?.invoiceFormID}
           />
         </Flex>
       </Tabs.Panel>
@@ -92,6 +96,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading }) => {
             loading={loading}
             onClose={onClose}
             renderFooterButtons={renderResetButton}
+            formId={formIds?.qualityControlFormID}
           />
         </Flex>
       </Tabs.Panel>

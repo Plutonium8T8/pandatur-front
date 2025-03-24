@@ -10,8 +10,11 @@ export const Invoice = ({
   data,
   renderFooterButtons,
   onClose,
-  loading
+  loading,
+  formId
 }) => {
+  const idForm = formId || INVOICE_FORM_FILTER_ID
+
   const form = useForm({
     mode: "uncontrolled"
   })
@@ -19,7 +22,7 @@ export const Invoice = ({
   return (
     <>
       <form
-        id={INVOICE_FORM_FILTER_ID}
+        id={idForm}
         onSubmit={form.onSubmit((values) =>
           onSubmit(values, () => form.reset())
         )}
@@ -91,7 +94,7 @@ export const Invoice = ({
         <Button variant="default" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
-        <Button loading={loading} type="submit" form={INVOICE_FORM_FILTER_ID}>
+        <Button loading={loading} type="submit" form={idForm}>
           {getLanguageByKey("Trimite")}
         </Button>
       </Flex>

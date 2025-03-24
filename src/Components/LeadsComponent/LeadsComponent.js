@@ -19,7 +19,12 @@ import "../SnackBarComponent/SnackBarComponent.css"
 import { SpinnerRightBottom } from "../SpinnerRightBottom"
 import { MantineModal } from "../MantineModal"
 import { EditBulkOrSingleLeadTabs } from "./components"
-import { VIEW_MODE, filteredWorkflows } from "./utils"
+import {
+  VIEW_MODE,
+  filteredWorkflows,
+  formIDsList,
+  formIDsKanban
+} from "./utils"
 import { WorkflowColumns } from "../WorkflowColumns"
 
 const SORT_BY = "creation_date"
@@ -31,10 +36,7 @@ const NUMBER_PAGE = 1
 const normalizeLeadsFilters = (filters, hasWorkflow) => {
   return {
     ...(hasWorkflow && { workflow: filteredWorkflows }),
-    ...filters,
-    technician_id: filters.technician_id
-      ? filters.technician_id.map((t) => parseInt(t.split(":")[0]))
-      : []
+    ...filters
   }
 }
 
@@ -47,24 +49,22 @@ const Leads = () => {
   const { ticketId } = useParams()
 
   const [hardTickets, setHardTickets] = useState([])
-
   const [filteredTicketIds, setFilteredTicketIds] = useState(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [currentTicket, setCurrentTicket] = useState(null)
-  const [isFilterOpen, setIsFilterOpen] = useState(false)
   const [selectedTickets, setSelectedTickets] = useState([])
   const [loading, setLoading] = useState(false)
   const [totalLeads, setTotalLeads] = useState()
   const [currentPage, setCurrentPage] = useState(1)
-  const [loadingFilters, setLoadingFilters] = useState(false)
   const [isChatOpen, setIsChatOpen] = useState(!!ticketId)
   const [groupTitle, setGroupTitle] = useState("")
   const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows)
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false)
   const [hardTicketFilters, setHardTicketFilters] = useState({})
   const [lightTicketFilters, setLightTicketFilters] = useState({})
-
+  const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false)
+  const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false)
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN)
 
   const debouncedSearch = useDebounce(searchTerm)
@@ -157,11 +157,7 @@ const Leads = () => {
     showModalLoading
   ) => {
     try {
-      if (showModalLoading) {
-        setLoadingFilters(true)
-      } else {
-        setLoading(true)
-      }
+      setLoading(true)
       const hardTicket = await api.tickets.filters({
         page,
         sort_by: sortBy,
@@ -175,11 +171,7 @@ const Leads = () => {
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" })
     } finally {
-      if (showModalLoading) {
-        setLoadingFilters(false)
-      } else {
-        setLoading(false)
-      }
+      setLoading(false)
     }
   }
 
@@ -200,7 +192,7 @@ const Leads = () => {
     )
 
     setFilteredTicketIds(ticketIds ?? null)
-    setIsFilterOpen(false)
+    setIsOpenKanbanFilterModal(false)
   }
 
   const handleApplyFiltersHardTicket = (formattedFilters) => {
@@ -211,7 +203,7 @@ const Leads = () => {
         setTotalLeads(pagination.total || 0)
         setCurrentPage(1)
         setHardTicketFilters(formattedFilters)
-        setIsFilterOpen(false)
+        setIsOpenListFilterModal(false)
       },
       true
     )
@@ -279,11 +271,17 @@ const Leads = () => {
         searchTerm={searchTerm}
         selectedTickets={selectedTickets}
         onOpenModal={() => setIsModalOpen(true)}
-        setIsFilterOpen={setIsFilterOpen}
+        setIsFilterOpen={() => {
+          if (viewMode === VIEW_MODE.KANBAN) {
+            setIsOpenKanbanFilterModal(true)
+            return
+          }
+          setIsOpenListFilterModal(true)
+        }}
         deleteTicket={deleteTicket}
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads ?? tickets.length}
-        isFilterOpen={isFilterOpen}
+        hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
       />
 
       <div
@@ -325,7 +323,6 @@ const Leads = () => {
       <Modal
         open={isChatOpen}
         onClose={closeChatModal}
-        title=""
         width={1850}
         height={1000}
         footer={null}
@@ -358,39 +355,47 @@ const Leads = () => {
       )}
 
       <MantineModal
+        keepMounted
         title={getLanguageByKey("Filtrează tichete")}
-        open={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
+        open={isOpenKanbanFilterModal}
+        onClose={() => setIsOpenKanbanFilterModal(false)}
       >
-        {viewMode === VIEW_MODE.KANBAN ? (
-          <TicketFilterModal
-            loading={loading}
-            onClose={() => setViewMode()}
-            onApplyWorkflowFilters={(filters) =>
-              applyWorkflowFilters(
-                normalizeLeadsFilters(filters),
-                filteredTicketIds
-              )
-            }
-            onApplyTicketFilters={(filters) => {
-              handleApplyFilterLightTicket(normalizeLeadsFilters(filters, true))
-            }}
-          />
-        ) : (
-          <TicketFilterModal
-            loading={loading}
-            onClose={() => setViewMode()}
-            onApplyWorkflowFilters={(filters) =>
-              applyWorkflowFilters(
-                normalizeLeadsFilters(filters),
-                filteredTicketIds
-              )
-            }
-            onApplyTicketFilters={(filters) => {
-              handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
-            }}
-          />
-        )}
+        <TicketFilterModal
+          formIds={formIDsKanban}
+          loading={loading}
+          onClose={() => setIsOpenKanbanFilterModal(false)}
+          onApplyWorkflowFilters={(filters) =>
+            applyWorkflowFilters(
+              normalizeLeadsFilters(filters),
+              filteredTicketIds
+            )
+          }
+          onApplyTicketFilters={(filters) => {
+            handleApplyFilterLightTicket(normalizeLeadsFilters(filters, true))
+          }}
+        />
+      </MantineModal>
+
+      <MantineModal
+        keepMounted
+        title={getLanguageByKey("Filtrează tichete")}
+        open={isOpenListFilterModal}
+        onClose={() => setIsOpenListFilterModal(false)}
+      >
+        <TicketFilterModal
+          formIds={formIDsList}
+          loading={loading}
+          onClose={() => setIsOpenListFilterModal(false)}
+          onApplyWorkflowFilters={(filters) =>
+            applyWorkflowFilters(
+              normalizeLeadsFilters(filters),
+              filteredTicketIds
+            )
+          }
+          onApplyTicketFilters={(filters) => {
+            handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
+          }}
+        />
       </MantineModal>
 
       <MantineModal

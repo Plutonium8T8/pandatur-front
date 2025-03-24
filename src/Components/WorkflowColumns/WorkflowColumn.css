@@ -1,6 +1,5 @@
 .container-tickets {
   display: flex;
-  justify-content: space-between;
   overflow-x: scroll;
   gap: 10px;
   width: 100%;

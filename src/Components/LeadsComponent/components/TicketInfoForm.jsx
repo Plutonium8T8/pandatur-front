@@ -24,8 +24,11 @@ export const TicketInfoForm = ({
   onClose,
   loading,
   renderFooterButtons,
-  setMinDate
+  setMinDate,
+  formId
 }) => {
+  const idForm = formId || TICKET_FORM_FILTER_ID
+
   const form = useForm({
     mode: "uncontrolled",
 
@@ -70,7 +73,7 @@ export const TicketInfoForm = ({
   return (
     <>
       <form
-        id={TICKET_FORM_FILTER_ID}
+        id={idForm}
         onSubmit={form.onSubmit((values) =>
           onSubmit(values, () => form.reset())
         )}
@@ -224,7 +227,7 @@ export const TicketInfoForm = ({
         <Button variant="default" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
-        <Button loading={loading} type="submit" form={TICKET_FORM_FILTER_ID}>
+        <Button loading={loading} type="submit" form={idForm}>
           {getLanguageByKey("Trimite")}
         </Button>
       </Flex>

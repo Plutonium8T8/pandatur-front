@@ -16,7 +16,8 @@ export const TicketFilterModal = ({
   onApplyWorkflowFilters,
   onApplyTicketFilters,
   resetTicketsFilters,
-  loading
+  loading,
+  formIds
 }) => {
   const [systemFilters, setSystemFilters] = useState(systemFiltersInitialState)
 
@@ -72,6 +73,7 @@ export const TicketFilterModal = ({
 
       <Tabs.Panel value="filter_ticket" pt="xs">
         <TicketsFilter
+          formIds={formIds}
           onClose={onClose}
           onSubmit={(values) => {
             onApplyTicketFilters(cleanFormValues(values))

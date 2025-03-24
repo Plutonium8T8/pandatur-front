@@ -8,7 +8,6 @@ import {
   GeneralInfoTicketForm,
   ContractTicketForm
 } from "../components"
-import { Spin } from "../../Spin"
 
 export const EditBulkOrSingleLeadTabs = ({
   open,
@@ -66,14 +65,6 @@ export const EditBulkOrSingleLeadTabs = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
-
-  if (loading) {
-    return (
-      <Flex h="500" align="center" justify="center">
-        <Spin />
-      </Flex>
-    )
-  }
 
   return (
     <Tabs h="100%" defaultValue="general_info">

@@ -13,8 +13,11 @@ export const QualityControl = ({
   data,
   renderFooterButtons,
   onClose,
-  loading
+  loading,
+  formId
 }) => {
+  const idForm = formId || QUALITY_FORM_FILTER_ID
+
   const form = useForm({
     mode: "uncontrolled"
   })
@@ -22,7 +25,7 @@ export const QualityControl = ({
   return (
     <>
       <form
-        id={QUALITY_FORM_FILTER_ID}
+        id={idForm}
         onSubmit={form.onSubmit((values) =>
           onSubmit(values, () => form.reset())
         )}
@@ -78,7 +81,7 @@ export const QualityControl = ({
         <Button variant="default" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
-        <Button loading={loading} type="submit" form={QUALITY_FORM_FILTER_ID}>
+        <Button loading={loading} type="submit" form={idForm}>
           {getLanguageByKey("Trimite")}
         </Button>
       </Flex>

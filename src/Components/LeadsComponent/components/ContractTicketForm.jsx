@@ -16,8 +16,11 @@ export const ContractTicketForm = ({
   renderFooterButtons,
   onClose,
   loading,
-  setMinDate
+  setMinDate,
+  formId
 }) => {
+  const idForm = formId || CONTRACT_FORM_FILTER_ID
+
   const form = useForm({
     mode: "uncontrolled",
 
@@ -75,7 +78,7 @@ export const ContractTicketForm = ({
   return (
     <>
       <form
-        id={CONTRACT_FORM_FILTER_ID}
+        id={idForm}
         onSubmit={form.onSubmit((values) => {
           onSubmit(values, () => form.reset())
         })}
@@ -249,7 +252,7 @@ export const ContractTicketForm = ({
         <Button variant="default" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
-        <Button loading={loading} type="submit" form={CONTRACT_FORM_FILTER_ID}>
+        <Button loading={loading} type="submit" form={idForm}>
           {getLanguageByKey("Trimite")}
         </Button>
       </Flex>

@@ -29,7 +29,7 @@ export const RefLeadsFilter = forwardRef(
       deleteTicket,
       setGroupTitle,
       totalTicketsFiltered,
-      isFilterOpen
+      hasOpenFiltersModal
     },
     ref
   ) => {
@@ -91,9 +91,9 @@ export const RefLeadsFilter = forwardRef(
           )}
 
           <ActionIcon
+            variant={hasOpenFiltersModal ? "filled" : "outline"}
             size="36"
             onClick={() => setIsFilterOpen(true)}
-            variant={isFilterOpen ? "filled" : "outline"}
           >
             <LuFilter size={16} />
           </ActionIcon>
