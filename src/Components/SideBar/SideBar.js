@@ -12,7 +12,8 @@ import {
   FaBell,
   FaClipboardList,
   FaSignOutAlt,
-  FaUserSecret
+  FaUserSecret,
+  FaCalendar
 } from "react-icons/fa"
 import { clearCookies } from "../../Components/utils/clearCookies"
 import { api } from "../../api"
@@ -98,6 +99,13 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
             >
               <FaUserSecret size={24} />
               <span>{translations["Admin"][language]}</span>
+            </div>
+            <div
+              className={`menu-item ${isActive("schedules") ? "active" : ""}`}
+              onClick={() => handleNavigate("schedules")}
+            >
+              <FaCalendar size={24} />
+              <span>{["schedules"]}</span>
             </div>
             <div
               className={`menu-item ${isActive("notifications") ? "active" : ""}`}
