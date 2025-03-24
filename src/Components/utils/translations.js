@@ -1510,6 +1510,10 @@ export const translations = {
   "Нет задач, создать?": {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?"
+  },
+  Acțiuni: {
+    RO: "Acțiuni",
+    RU: "Действия"
   }
 }
 
