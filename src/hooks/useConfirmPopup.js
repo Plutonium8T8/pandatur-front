@@ -4,12 +4,12 @@ import { getLanguageByKey } from "../Components/utils"
 
 const { colors } = DEFAULT_THEME
 
-export const useConfirmPopup = ({ title, subTitle, onConfirm, loading }) => {
+export const useConfirmPopup = ({ subTitle, onConfirm, loading }) => {
   return (callback) =>
     openConfirmModal({
       title: (
         <Text fz="xl" fw="bold">
-          {title}
+          {getLanguageByKey("Confirmare ștergere")}
         </Text>
       ),
       centered: true,

@@ -40,7 +40,7 @@ const priorityTagColors = {
 
 export const LeadTable = ({
   selectedTickets,
-  toggleSelectTicket,
+  onSelectRow,
   filteredLeads,
   totalLeads,
   onChangePagination,
@@ -54,12 +54,10 @@ export const LeadTable = ({
   const [selectedTicketId, setSelectedTicketId] = useState(null)
   const { ticketId } = useParams()
   const navigate = useNavigate()
-  const [selectedRow, setSelectedRow] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [id, setId] = useState()
 
   const deleteLead = useConfirmPopup({
-    title: getLanguageByKey("Confirmare ștergere"),
     subTitle: getLanguageByKey("Sigur doriți să ștergeți acest lead"),
     loading: isLoading
   })
@@ -87,18 +85,13 @@ export const LeadTable = ({
     {
       width: 100,
       key: "checkbox",
+      dataIndex: "id",
       align: "center",
-      render: (row) => {
+      render: (id) => {
         return (
           <Checkbox
-            checked={selectedRow.includes(row.id)}
-            onChange={() => {
-              setSelectedRow((prev) =>
-                prev.includes(row.id)
-                  ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id]
-              )
-            }}
+            checked={selectTicket.includes(id)}
+            onChange={() => onSelectRow(id)}
           />
         )
       }
@@ -368,7 +361,7 @@ export const LeadTable = ({
         rowKey="id"
         columns={rcColumn}
         data={filteredLeads}
-        selectedRow={selectedRow}
+        selectedRow={selectTicket}
         bordered
       />
 
@@ -409,7 +402,6 @@ export const LeadTable = ({
       >
         <EditBulkOrSingleLeadTabs
           onClose={() => setId()}
-          selectedTickets={selectedTickets}
           fetchLeads={fetchTickets}
           id={id}
         />
