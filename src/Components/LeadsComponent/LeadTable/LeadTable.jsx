@@ -346,6 +346,7 @@ export const LeadTable = ({
   return (
     <>
       <RcTable
+        rowKey="id"
         columns={rcColumn}
         data={filteredLeads}
         selectedRow={selectedRow}
