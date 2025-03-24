@@ -188,7 +188,9 @@ export const LeadTable = ({
       width: 200,
       align: "center",
       render: (tags) => (
-        <div className="d-flex gap-8 flex-wrap">{renderTags(tags)}</div>
+        <Flex gap="8" wrap="wrap">
+          {renderTags(tags)}
+        </Flex>
       )
     },
     {
