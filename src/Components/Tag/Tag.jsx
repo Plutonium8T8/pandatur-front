@@ -3,7 +3,8 @@ import "./Tag.css"
 const variants = {
   success: "success",
   processing: "processing",
-  warning: "warning"
+  warning: "warning",
+  danger: "danger"
 }
 
 export const Tag = ({ children, type, ...props }) => {
