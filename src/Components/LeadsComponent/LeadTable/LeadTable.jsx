@@ -45,7 +45,7 @@ export const LeadTable = ({
   totalLeads,
   onChangePagination,
   currentPage,
-  loading,
+
   selectTicket,
   fetchTickets
 }) => {
@@ -54,17 +54,14 @@ export const LeadTable = ({
   const [selectedTicketId, setSelectedTicketId] = useState(null)
   const { ticketId } = useParams()
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(false)
   const [id, setId] = useState()
 
   const deleteLead = useConfirmPopup({
-    subTitle: getLanguageByKey("Sigur doriți să ștergeți acest lead"),
-    loading: isLoading
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți acest lead")
   })
 
   const handleDeleteLead = (id) => {
     deleteLead(async () => {
-      setIsLoading(true)
       try {
         await api.tickets.deleteById([id])
         enqueueSnackbar(getLanguageByKey("Lead șters cu succes"), {
@@ -75,8 +72,6 @@ export const LeadTable = ({
         enqueueSnackbar(showServerError(error), {
           variant: "error"
         })
-      } finally {
-        setIsLoading(false)
       }
     })
   }
@@ -345,10 +340,6 @@ export const LeadTable = ({
       setIsChatOpen(true)
     }
   }, [ticketId])
-
-  if (loading) {
-    return <SpinnerRightBottom />
-  }
 
   const closeChatModal = () => {
     setIsChatOpen(false)
