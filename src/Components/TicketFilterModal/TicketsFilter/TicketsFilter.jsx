@@ -56,10 +56,18 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
         <ScrollArea h="100%">
           <TicketInfoForm
             hideDisabledInput
-            loading={loading}
-            onClose={onClose}
             onSubmit={onSubmit}
-            renderFooterButtons={renderResetButton}
+            renderFooterButtons={({ onResetForm, formId }) => (
+              <>
+                {renderResetButton(onResetForm)}
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
             formId={formIds?.ticketInfoFormID}
           />
         </ScrollArea>
@@ -68,10 +76,19 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
         <ScrollArea h="100%">
           <ContractTicketForm
             hideDisabledInput
-            loading={loading}
-            onClose={onClose}
             onSubmit={onSubmit}
-            renderFooterButtons={renderResetButton}
+            renderFooterButtons={({ onResetForm, formId }) => (
+              <>
+                {renderResetButton()}
+
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
             formId={formIds?.contractFormID}
           />
         </ScrollArea>
@@ -80,10 +97,19 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
       <Tabs.Panel pl="lg" value="filter_invoice">
         <Flex direction="column" justify="space-between" h="100%">
           <Invoice
-            loading={loading}
-            onClose={onClose}
             onSubmit={onSubmit}
-            renderFooterButtons={renderResetButton}
+            renderFooterButtons={({ onResetForm, formId }) => (
+              <>
+                {renderResetButton(onResetForm)}
+
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
             formId={formIds?.invoiceFormID}
           />
         </Flex>
@@ -93,9 +119,17 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
         <Flex direction="column" justify="space-between" h="100%">
           <QualityControl
             onSubmit={onSubmit}
-            loading={loading}
-            onClose={onClose}
-            renderFooterButtons={renderResetButton}
+            renderFooterButtons={({ onResetForm, formId }) => (
+              <>
+                {renderResetButton(onResetForm)}
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
             formId={formIds?.qualityControlFormID}
           />
         </Flex>

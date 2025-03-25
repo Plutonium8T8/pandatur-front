@@ -3,7 +3,7 @@ import { useUser } from "../../hooks"
 import { enqueueSnackbar } from "notistack"
 import { api } from "../../api"
 import { translations } from "../utils/translations"
-import { Tabs, ScrollArea, Flex, Divider, Box } from "@mantine/core"
+import { Tabs, ScrollArea, Flex, Divider, Box, Button } from "@mantine/core"
 import {
   TicketInfoForm,
   ContractTicketForm,
@@ -253,9 +253,13 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="general">
           <Flex p="md" direction="column">
             <GeneralInfoTicketForm
-              loading={isLoadingGeneral}
               data={updatedTicket}
               onSubmit={(values) => updateTicketDate(values)}
+              renderFooterButtons={({ formId }) => (
+                <Button loading={isLoadingGeneral} type="submit" form={formId}>
+                  {getLanguageByKey("Actualizare")}
+                </Button>
+              )}
             />
 
             <Divider my="md" />
@@ -289,9 +293,17 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="info">
           <Flex p="md" direction="column">
             <TicketInfoForm
-              loading={isLoadingInfoTicket}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
+              renderFooterButtons={({ formId }) => (
+                <Button
+                  loading={isLoadingInfoTicket}
+                  type="submit"
+                  form={formId}
+                >
+                  {getLanguageByKey("Actualizare")}
+                </Button>
+              )}
             />
           </Flex>
         </Tabs.Panel>
@@ -299,9 +311,17 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="contract">
           <Flex p="md" direction="column">
             <ContractTicketForm
-              loading={isLoadingInfoTicket}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
+              renderFooterButtons={({ formId }) => (
+                <Button
+                  loading={isLoadingInfoTicket}
+                  type="submit"
+                  form={formId}
+                >
+                  {getLanguageByKey("Actualizare")}
+                </Button>
+              )}
             />
           </Flex>
         </Tabs.Panel>
@@ -309,9 +329,17 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="invoice">
           <Flex p="md" direction="column">
             <Invoice
-              loading={isLoadingInfoTicket}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
+              renderFooterButtons={({ formId }) => (
+                <Button
+                  loading={isLoadingInfoTicket}
+                  type="submit"
+                  form={formId}
+                >
+                  {getLanguageByKey("Actualizare")}
+                </Button>
+              )}
             />
           </Flex>
         </Tabs.Panel>
@@ -323,9 +351,17 @@ const ChatExtraInfo = ({
           <Flex p="md" direction="column">
             <QualityControl
               isSelect
-              loading={isLoadingInfoTicket}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
+              renderFooterButtons={({ formId }) => (
+                <Button
+                  loading={isLoadingInfoTicket}
+                  type="submit"
+                  form={formId}
+                >
+                  {getLanguageByKey("Actualizare")}
+                </Button>
+              )}
             />
           </Flex>
         </Tabs.Panel>

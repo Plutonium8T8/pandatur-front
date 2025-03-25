@@ -14,8 +14,6 @@ export const ContractTicketForm = ({
   data,
   hideDisabledInput,
   renderFooterButtons,
-  onClose,
-  loading,
   setMinDate,
   formId
 }) => {
@@ -248,13 +246,7 @@ export const ContractTicketForm = ({
       </form>
 
       <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.(form.reset)}
-        <Button variant="default" onClick={onClose}>
-          {getLanguageByKey("Închide")}
-        </Button>
-        <Button loading={loading} type="submit" form={idForm}>
-          {getLanguageByKey("Trimite")}
-        </Button>
+        {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
   )

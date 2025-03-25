@@ -4,8 +4,7 @@ import {
   Textarea,
   SegmentedControl,
   TagsInput,
-  Flex,
-  Button
+  Flex
 } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
@@ -22,7 +21,6 @@ const GENERAL_FORM_ID = "GENERAL_FORM_ID"
 
 export const GeneralInfoTicketForm = ({
   onSubmit,
-  loading,
   data,
   onClose,
   renderFooterButtons
@@ -124,13 +122,10 @@ export const GeneralInfoTicketForm = ({
         />
       </form>
       <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.(form.reset)}
-        <Button variant="default" onClick={onClose}>
-          {getLanguageByKey("Închide")}
-        </Button>
-        <Button loading={loading} type="submit" form={GENERAL_FORM_ID}>
-          {getLanguageByKey("Trimite")}
-        </Button>
+        {renderFooterButtons?.({
+          onResetForm: form.reset,
+          formId: GENERAL_FORM_ID
+        })}
       </Flex>
     </>
   )

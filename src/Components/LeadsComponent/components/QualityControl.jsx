@@ -1,4 +1,4 @@
-import { MultiSelect, Select, TextInput, Flex, Button } from "@mantine/core"
+import { MultiSelect, Select, TextInput, Flex } from "@mantine/core"
 import { useEffect } from "react"
 import { useForm } from "@mantine/form"
 import { getLanguageByKey } from "../../utils"
@@ -13,8 +13,6 @@ export const QualityControl = ({
   onSubmit,
   data,
   renderFooterButtons,
-  onClose,
-  loading,
   formId,
   isSelect
 }) => {
@@ -95,13 +93,7 @@ export const QualityControl = ({
       </form>
 
       <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.(form.reset)}
-        <Button variant="default" onClick={onClose}>
-          {getLanguageByKey("Închide")}
-        </Button>
-        <Button loading={loading} type="submit" form={idForm}>
-          {getLanguageByKey("Trimite")}
-        </Button>
+        {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
   )

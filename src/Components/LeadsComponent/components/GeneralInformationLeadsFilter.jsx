@@ -17,6 +17,7 @@ export const GeneralInformationLeadsFilter = ({
   const idForm = formId || GENERAL_FORM_FILTER_ID
 
   const { technicians } = useGetTechniciansList()
+
   const form = useForm({
     mode: "uncontrolled"
   })

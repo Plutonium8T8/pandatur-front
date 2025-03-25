@@ -1,4 +1,4 @@
-import { Select, Button, Flex, NumberInput } from "@mantine/core"
+import { Select, Flex, NumberInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
@@ -21,8 +21,6 @@ export const TicketInfoForm = ({
   onSubmit,
   data,
   hideDisabledInput,
-  onClose,
-  loading,
   renderFooterButtons,
   setMinDate,
   formId
@@ -223,13 +221,7 @@ export const TicketInfoForm = ({
       </form>
 
       <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.(form.reset)}
-        <Button variant="default" onClick={onClose}>
-          {getLanguageByKey("Închide")}
-        </Button>
-        <Button loading={loading} type="submit" form={idForm}>
-          {getLanguageByKey("Trimite")}
-        </Button>
+        {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
   )

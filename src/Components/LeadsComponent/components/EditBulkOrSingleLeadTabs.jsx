@@ -1,4 +1,4 @@
-import { Tabs, Flex } from "@mantine/core"
+import { Tabs, Flex, Button } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
 import { getLanguageByKey, showServerError } from "../../utils"
@@ -82,9 +82,17 @@ export const EditBulkOrSingleLeadTabs = ({
         <Flex direction="column" justify="space-between" h="100%">
           <GeneralInfoTicketForm
             data={generalInfoLightTicket}
-            onClose={onClose}
             onSubmit={submit}
-            loading={loading}
+            renderFooterButtons={({ formId }) => (
+              <>
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
           />
         </Flex>
       </Tabs.Panel>
@@ -93,18 +101,34 @@ export const EditBulkOrSingleLeadTabs = ({
         <TicketInfoForm
           setMinDate={new Date()}
           data={ticketInfo}
-          onClose={onClose}
           onSubmit={submit}
-          loading={loading}
+          renderFooterButtons={({ formId }) => (
+            <>
+              <Button variant="default" onClick={onClose}>
+                {getLanguageByKey("Închide")}
+              </Button>
+              <Button loading={loading} type="submit" form={formId}>
+                {getLanguageByKey("Trimite")}
+              </Button>
+            </>
+          )}
         />
       </Tabs.Panel>
       <Tabs.Panel value="contact" pt="xs" pb="md">
         <ContractTicketForm
           setMinDate={new Date()}
           data={ticketInfo}
-          onClose={onClose}
           onSubmit={submit}
-          loading={loading}
+          renderFooterButtons={({ formId }) => (
+            <>
+              <Button variant="default" onClick={onClose}>
+                {getLanguageByKey("Închide")}
+              </Button>
+              <Button loading={loading} type="submit" form={formId}>
+                {getLanguageByKey("Trimite")}
+              </Button>
+            </>
+          )}
         />
       </Tabs.Panel>
     </Tabs>
