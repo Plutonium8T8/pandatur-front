@@ -107,18 +107,6 @@ const ChatExtraInfo = ({
         { variant: "success" }
       )
 
-      // name: clientData.name || "",
-      // surname: clientData.surname || "",
-      // address: clientData.address || "",
-      // phone: clientData.phone || ""
-
-      // setPersonalInfo(clientId, {
-      //   name: result.name || "",
-      //   surname: result.surname || "",
-      //   address: result.address || "",
-      //   phone: result.phone || ""
-      // })
-
       setPersonalInfo((prev) => ({
         ...prev,
         [clientId]: {

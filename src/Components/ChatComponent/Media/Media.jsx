@@ -1,4 +1,5 @@
-import { getLanguageByKey } from "../utils"
+import { getLanguageByKey } from "../../utils"
+import "./Media.css"
 
 export const Media = ({ messages, selectTicketId }) => {
   return (
@@ -36,7 +37,7 @@ export const Media = ({ messages, selectTicketId }) => {
             {msg.mtype === "image" ? (
               <img
                 src={msg.message}
-                alt="Изображение"
+                alt=""
                 className="image-preview-in-chat"
                 onError={(e) => {
                   e.target.src =
@@ -57,12 +58,7 @@ export const Media = ({ messages, selectTicketId }) => {
                 {getLanguageByKey("Acest browser nu suporta audio")}
               </audio>
             ) : msg.mtype === "file" ? (
-              <a
-                href={msg.message}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="file-link"
-              >
+              <a href={msg.message} target="_blank" rel="noopener noreferrer">
                 {getLanguageByKey("Deschide file") || "Открыть файл"}
               </a>
             ) : null}
