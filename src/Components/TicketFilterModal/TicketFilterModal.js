@@ -1,9 +1,8 @@
 import React, { useState } from "react"
 import { platformOptions, filteredWorkflows } from "./utils"
-import { SelectWorkflow } from "./SelectWorkflow"
+import { SelectWorkflow, TicketsFilter } from "./components"
 import { getLanguageByKey } from "../utils"
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
-import { TicketsFilter } from "./TicketsFilter"
 import { cleanFormValues } from "../utils"
 import "./TicketFilterModal.css"
 
