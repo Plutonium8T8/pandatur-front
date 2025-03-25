@@ -1,4 +1,5 @@
 import { MultiSelect, Select, TextInput, Flex, Button } from "@mantine/core"
+import { useEffect } from "react"
 import { useForm } from "@mantine/form"
 import { getLanguageByKey } from "../../utils"
 import {
@@ -21,6 +22,18 @@ export const QualityControl = ({
   const form = useForm({
     mode: "uncontrolled"
   })
+
+  useEffect(() => {
+    if (data) {
+      form.setValues({
+        // motivul_refuzului: data?.motivul_refuzului,
+        evaluare_de_odihna: data?.evaluare_de_odihna,
+        urmatoarea_vacanta: data?.urmatoarea_vacanta,
+        manager: data?.manager,
+        vacanta: data?.vacanta
+      })
+    }
+  }, [data])
 
   return (
     <>

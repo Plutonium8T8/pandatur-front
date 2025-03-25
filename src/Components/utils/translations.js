@@ -1534,6 +1534,26 @@ export const translations = {
   "Leadurile au fost șterse cu succes": {
     RO: "Leadurile au fost șterse cu succes",
     RU: "Лиды были успешно удалены"
+  },
+  "Introduceți ID vechi": {
+    RO: "Introduceți ID vechi",
+    RU: "Введите старый ID”"
+  },
+  "ID-ul leadului este necesar": {
+    RO: "ID-ul leadului este necesar",
+    RU: "Требуется ID лида"
+  },
+  "Utilizatorii au fost combinați cu succes": {
+    RO: "Utilizatorii au fost combinați cu succes",
+    RU: "Пользователи успешно объединены"
+  },
+  "Biletele au fost combinate cu succes": {
+    RO: "Biletele au fost combinate cu succes",
+    RU: "Билеты успешно объединены"
+  },
+  "Datele despre ticket au fost create cu succes": {
+    RO: "Datele despre ticket au fost create cu succes",
+    RU: "Данные о тикете были успешно созданы"
   }
 }
 
