@@ -27,11 +27,11 @@ export const QualityControl = ({
   useEffect(() => {
     if (data) {
       form.setValues({
-        motivul_refuzului: data?.motivul_refuzului,
-        evaluare_de_odihna: data?.evaluare_de_odihna,
-        urmatoarea_vacanta: data?.urmatoarea_vacanta,
-        manager: data?.manager,
-        vacanta: data?.vacanta
+        motivul_refuzului: data.motivul_refuzului,
+        evaluare_de_odihna: data.evaluare_de_odihna,
+        urmatoarea_vacanta: data.urmatoarea_vacanta,
+        manager: data.manager,
+        vacanta: data.vacanta
       })
     }
   }, [data])

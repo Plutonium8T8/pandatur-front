@@ -19,13 +19,9 @@ import "../SnackBarComponent/SnackBarComponent.css"
 import { SpinnerRightBottom } from "../SpinnerRightBottom"
 import { MantineModal } from "../MantineModal"
 import { EditBulkOrSingleLeadTabs } from "./components"
-import {
-  VIEW_MODE,
-  filteredWorkflows,
-  formIDsList,
-  formIDsKanban
-} from "./utils"
+import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
 import { WorkflowColumns } from "../WorkflowColumns"
+import { filteredWorkflows } from "../TicketFilterModal/utils"
 
 const SORT_BY = "creation_date"
 const ORDER = "DESC"
@@ -105,30 +101,35 @@ const Leads = () => {
   }
 
   const deleteTicket = async () => {
-    try {
-      setLoading(true)
-      await api.tickets.deleteById(selectedTickets)
-      await fetchTickets(
-        {
-          type: HARD_TICKET,
-          page: currentPage,
-          attributes: hardTicketFilters
-        },
-        ({ data, pagination }) => {
-          setHardTickets(data)
-          setTotalLeads(pagination.total || 0)
-        }
-      )
+    deleteBulkLeads(async () => {
+      try {
+        setLoading(true)
+        await api.tickets.deleteById(selectedTickets)
+        await fetchTickets(
+          {
+            type: HARD_TICKET,
+            page: currentPage,
+            attributes: hardTicketFilters
+          },
+          ({ data, pagination }) => {
+            setHardTickets(data)
+            setTotalLeads(pagination.total || 0)
+          }
+        )
 
-      setSelectedTickets([])
-      enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
-        variant: "success"
-      })
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
-    } finally {
-      setLoading(false)
-    }
+        setSelectedTickets([])
+        enqueueSnackbar(
+          getLanguageByKey("Leadurile au fost șterse cu succes"),
+          {
+            variant: "success"
+          }
+        )
+      } catch (error) {
+        enqueueSnackbar(showServerError(error), { variant: "error" })
+      } finally {
+        setLoading(false)
+      }
+    })
   }
 
   const openCreateTicketModal = () => {

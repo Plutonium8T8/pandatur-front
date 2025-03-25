@@ -16,13 +16,13 @@ export const Invoice = ({ onSubmit, data, renderFooterButtons, formId }) => {
   useEffect(() => {
     if (data) {
       form.setValues({
-        f_serviciu: data?.f_serviciu,
-        f_nr_factura: data?.f_nr_factura,
-        f_numarul: data?.f_numarul,
-        f_pret: data?.f_pret,
-        f_suma: data?.f_suma,
-        valuta_contului: data?.valuta_contului,
-        iban: data?.iban
+        f_serviciu: data.f_serviciu,
+        f_nr_factura: data.f_nr_factura,
+        f_numarul: data.f_numarul,
+        f_pret: data.f_pret,
+        f_suma: data.f_suma,
+        valuta_contului: data.valuta_contului,
+        iban: data.iban
       })
     }
   }, [data])

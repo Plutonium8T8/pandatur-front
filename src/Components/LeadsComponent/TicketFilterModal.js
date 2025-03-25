@@ -19,6 +19,7 @@ import "./Modal.css"
 import { translations } from "../utils/translations"
 import { api } from "../../api"
 import { platformOptions } from "../../Components/utils/platformOptions"
+import { filterDefaults } from "./utils"
 
 const language = localStorage.getItem("language") || "RO"
 
@@ -55,13 +56,6 @@ const TicketFilterModal = ({
       "marketing"
     ],
     Messages: ["platform"]
-  }
-
-  const filterDefaults = {
-    workflow: workflowOptions.filter(
-      (wf) => wf !== "Realizat cu succes" && wf !== "Închis și nerealizat"
-    ),
-    tags: []
   }
 
   const handleApplyFilter = async () => {

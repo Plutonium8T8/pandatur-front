@@ -1,7 +1,6 @@
-import { Box } from "@mantine/core"
-import { getLanguageByKey } from "../../utils"
-import { Empty } from "../../Empty"
-import "./Media.css"
+import { Box, Flex } from "@mantine/core"
+import { getLanguageByKey } from "../utils"
+import { Empty } from "../Empty"
 
 export const Media = ({ messages, selectTicketId }) => {
   const mediaSources = messages.filter(
@@ -14,7 +13,13 @@ export const Media = ({ messages, selectTicketId }) => {
     <Box h="100%" p="md">
       {mediaSources.length ? (
         mediaSources.map((msg, index) => (
-          <div key={index} className="media-container">
+          <Flex
+            direction="column"
+            align="center"
+            mt="md"
+            style={{ border: "1px solid red" }}
+            key={index}
+          >
             <div className="sent-time">
               {(() => {
                 const parseCustomDate = (dateStr) => {
@@ -65,7 +70,7 @@ export const Media = ({ messages, selectTicketId }) => {
                 {getLanguageByKey("Deschide file") || "Открыть файл"}
               </a>
             ) : null}
-          </div>
+          </Flex>
         ))
       ) : (
         // TODO: Center on Y axis `Empty` component

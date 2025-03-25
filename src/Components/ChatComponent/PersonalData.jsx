@@ -13,7 +13,6 @@ export const PersonalData = ({ loading, onSubmit, data }) => {
       form.setValues({
         name: data.name,
         surname: data.surname,
-        address: data.address,
         phone: data.phone
       })
     }
