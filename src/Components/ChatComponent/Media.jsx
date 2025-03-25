@@ -13,13 +13,7 @@ export const Media = ({ messages, selectTicketId }) => {
     <Box h="100%" p="md">
       {mediaSources.length ? (
         mediaSources.map((msg, index) => (
-          <Flex
-            direction="column"
-            align="center"
-            mt="md"
-            style={{ border: "1px solid red" }}
-            key={index}
-          >
+          <Flex direction="column" align="center" mt="md" key={index}>
             <div className="sent-time">
               {(() => {
                 const parseCustomDate = (dateStr) => {

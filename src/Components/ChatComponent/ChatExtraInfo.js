@@ -242,12 +242,16 @@ const ChatExtraInfo = ({
     <ScrollArea maw="30%" w="100%" h="100%">
       <Tabs defaultValue="general">
         <Tabs.List>
-          <Tabs.Tab value="general">General</Tabs.Tab>
-          <Tabs.Tab value="info">Info</Tabs.Tab>
-          <Tabs.Tab value="contract">Contract</Tabs.Tab>
-          <Tabs.Tab value="invoice">Invoice</Tabs.Tab>
-          <Tabs.Tab value="media">Media</Tabs.Tab>
-          <Tabs.Tab value="quality_control">Control calitate</Tabs.Tab>
+          <Tabs.Tab value="general">{getLanguageByKey("General")}</Tabs.Tab>
+          <Tabs.Tab value="info">
+            {getLanguageByKey("Informații despre tichet")}
+          </Tabs.Tab>
+          <Tabs.Tab value="contract">{getLanguageByKey("Contract")}</Tabs.Tab>
+          <Tabs.Tab value="invoice">{getLanguageByKey("Invoice")}</Tabs.Tab>
+          <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+          <Tabs.Tab value="quality_control">
+            {getLanguageByKey("Control calitate")}
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="general">
