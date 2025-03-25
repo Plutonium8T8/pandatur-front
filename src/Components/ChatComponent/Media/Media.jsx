@@ -1,17 +1,19 @@
 import { Box } from "@mantine/core"
 import { getLanguageByKey } from "../../utils"
+import { Empty } from "../../Empty"
 import "./Media.css"
 
 export const Media = ({ messages, selectTicketId }) => {
+  const mediaSources = messages.filter(
+    (msg) =>
+      ["audio", "video", "image", "file"].includes(msg.mtype) &&
+      msg.ticket_id === selectTicketId
+  )
+
   return (
-    <Box p="md">
-      {messages
-        .filter(
-          (msg) =>
-            ["audio", "video", "image", "file"].includes(msg.mtype) &&
-            msg.ticket_id === selectTicketId
-        )
-        .map((msg, index) => (
+    <Box h="100%" p="md">
+      {mediaSources.length ? (
+        mediaSources.map((msg, index) => (
           <div key={index} className="media-container">
             <div className="sent-time">
               {(() => {
@@ -64,7 +66,11 @@ export const Media = ({ messages, selectTicketId }) => {
               </a>
             ) : null}
           </div>
-        ))}
+        ))
+      ) : (
+        // TODO: Center on Y axis `Empty` component
+        <Empty />
+      )}
     </Box>
   )
 }

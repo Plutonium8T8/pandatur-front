@@ -15,9 +15,12 @@ export const QualityControl = ({
   renderFooterButtons,
   onClose,
   loading,
-  formId
+  formId,
+  isSelect
 }) => {
   const idForm = formId || QUALITY_FORM_FILTER_ID
+
+  const CustomSelect = isSelect ? Select : MultiSelect
 
   const form = useForm({
     mode: "uncontrolled"
@@ -26,7 +29,7 @@ export const QualityControl = ({
   useEffect(() => {
     if (data) {
       form.setValues({
-        // motivul_refuzului: data?.motivul_refuzului,
+        motivul_refuzului: data?.motivul_refuzului,
         evaluare_de_odihna: data?.evaluare_de_odihna,
         urmatoarea_vacanta: data?.urmatoarea_vacanta,
         manager: data?.manager,
@@ -43,15 +46,17 @@ export const QualityControl = ({
           onSubmit(values, () => form.reset())
         )}
       >
-        <MultiSelect
-          clearable
-          searchable
-          label={getLanguageByKey("Motivul refuzului")}
-          placeholder={getLanguageByKey("Motivul refuzului")}
-          data={motivulRefuzuluiOptions}
-          key={form.key("motivul_refuzului")}
-          {...form.getInputProps("motivul_refuzului")}
-        />
+        {
+          <CustomSelect
+            clearable
+            searchable
+            label={getLanguageByKey("Motivul refuzului")}
+            placeholder={getLanguageByKey("Motivul refuzului")}
+            data={motivulRefuzuluiOptions}
+            key={form.key("motivul_refuzului")}
+            {...form.getInputProps("motivul_refuzului")}
+          />
+        }
 
         <Select
           mt="md"

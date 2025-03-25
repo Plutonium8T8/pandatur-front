@@ -20,6 +20,7 @@ export const GeneralInformationLeadsFilter = ({
   const form = useForm({
     mode: "uncontrolled"
   })
+
   return (
     <>
       <form
