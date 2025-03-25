@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useUser } from "../../hooks"
 import { enqueueSnackbar } from "notistack"
 import { api } from "../../api"
 import { translations } from "../utils/translations"
@@ -22,8 +21,6 @@ const parseId = (id) => {
   return Number(id.replace(/[{}]/g, "").trim())
 }
 
-const language = localStorage.getItem("language") || "RO"
-
 const ChatExtraInfo = ({
   selectTicketId,
   personalInfo = {},
@@ -38,7 +35,6 @@ const ChatExtraInfo = ({
   setTickets,
   tickets
 }) => {
-  const { hasRole } = useUser()
   const [extraInfo, setExtraInfo] = useState({})
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false)
   const [isLoadingPersonalDate, setIsLoadingPersonalDate] = useState(false)
@@ -289,14 +285,14 @@ const ChatExtraInfo = ({
               loading={isLoadingCombineLead}
               value={selectedClient}
               onSubmit={(values) => mergeCLientsData(values)}
-              placeholder={translations?.["Introduceți ID lead"]?.[language]}
+              placeholder={getLanguageByKey("Introduceți ID lead")}
             />
 
             <Box mt="md">
               <Merge
                 loading={isLoadingCombineClient}
                 value={ticketId}
-                placeholder={translations?.["Introduceți ID client"][language]}
+                placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => mergeData(values)}
               />
             </Box>

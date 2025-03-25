@@ -29,12 +29,14 @@ export const Merge = ({ placeholder, value, onSubmit, loading }) => {
         value={value}
         placeholder={getLanguageByKey("Introduceți ID vechi")}
       />
+
       <NumberInput
         hideControls
         mt="md"
         placeholder={placeholder}
         {...field.getInputProps()}
       />
+
       <Flex justify="end">
         <Button mt="md" onClick={triggerSubmit} loading={loading}>
           {getLanguageByKey("Combina")}

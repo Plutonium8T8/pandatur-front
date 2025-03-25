@@ -17,6 +17,7 @@ export const PersonalData = ({ loading, onSubmit, data }) => {
       })
     }
   }, [data])
+
   return (
     <Box>
       <Title order={3}>{getLanguageByKey("Date personale")}</Title>

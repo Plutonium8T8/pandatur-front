@@ -6,6 +6,7 @@ import { getLanguageByKey, formatDate, parseServerDate } from "../utils"
 import { LabelSwitch } from "../LabelSwitch"
 import { paymentStatusOptions } from "../../FormOptions"
 import { DD_MM_YYYY } from "../../app-constants"
+import { useUser } from "../../hooks"
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
 
@@ -18,6 +19,8 @@ export const ContractForm = ({
   formId
 }) => {
   const idForm = formId || CONTRACT_FORM_FILTER_ID
+  const { hasRole } = useUser()
+  const isAdmin = hasRole("ROLE_ADMIN")
 
   const form = useForm({
     mode: "uncontrolled",
@@ -237,12 +240,14 @@ export const ContractForm = ({
           />
         )}
 
-        <LabelSwitch
-          mt="md"
-          label={getLanguageByKey("Control Admin")}
-          key={form.key("control")}
-          {...form.getInputProps("control", { type: "checkbox" })}
-        />
+        {isAdmin && (
+          <LabelSwitch
+            mt="md"
+            label={getLanguageByKey("Control Admin")}
+            key={form.key("control")}
+            {...form.getInputProps("control", { type: "checkbox" })}
+          />
+        )}
       </form>
 
       <Flex justify="end" gap="md" mt="md">
