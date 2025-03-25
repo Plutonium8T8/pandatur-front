@@ -16,6 +16,8 @@ import {
   TicketInfoForm
 } from "../TicketForm"
 
+const FORMAT_MEDIA = ["audio", "video", "image", "file"]
+
 const parseId = (id) => {
   return Number(id.replace(/[{}]/g, "").trim())
 }
@@ -148,6 +150,11 @@ const ChatExtraInfo = ({
     selectTicketId
   ])
 
+  const mediaSources = messages.filter(
+    (msg) =>
+      FORMAT_MEDIA.includes(msg.mtype) && msg.ticket_id === selectTicketId
+  )
+
   const mergeCLientsData = async (id) => {
     const ticketOld = selectTicketId
 
@@ -248,7 +255,9 @@ const ChatExtraInfo = ({
           </Tabs.Tab>
           <Tabs.Tab value="contract">{getLanguageByKey("Contract")}</Tabs.Tab>
           <Tabs.Tab value="invoice">{getLanguageByKey("Invoice")}</Tabs.Tab>
-          <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+          {!!mediaSources.length && (
+            <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+          )}
           <Tabs.Tab value="quality_control">
             {getLanguageByKey("Control calitate")}
           </Tabs.Tab>
@@ -347,9 +356,11 @@ const ChatExtraInfo = ({
             />
           </Flex>
         </Tabs.Panel>
-        <Tabs.Panel value="media" h="100%">
-          <Media messages={messages} selectTicketId={selectTicketId} />
-        </Tabs.Panel>
+        {!!mediaSources.length && (
+          <Tabs.Panel value="media">
+            <Media messages={mediaSources} />
+          </Tabs.Panel>
+        )}
 
         <Tabs.Panel value="quality_control">
           <Flex p="md" direction="column">
