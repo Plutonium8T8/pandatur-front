@@ -10,13 +10,7 @@ import SingleChat from "../../ChatComponent/SingleChat"
 import { useParams, useNavigate } from "react-router-dom"
 import { Tag } from "../../Tag"
 import { WorkflowTag } from "../../WorkflowTag"
-import {
-  Flex,
-  Paper,
-  ActionIcon,
-  Modal as MantineModal,
-  Text
-} from "@mantine/core"
+import { Flex, Paper, ActionIcon, Text } from "@mantine/core"
 import { RcTable } from "../../RcTable"
 import { MdDelete, MdEdit } from "react-icons/md"
 import { useSnackbar } from "notistack"
@@ -24,6 +18,7 @@ import { api } from "../../../api"
 import { useConfirmPopup } from "../../../hooks"
 import { EditBulkOrSingleLeadTabs } from "../../LeadsComponent/components"
 import { DateCell } from "../../DateCell"
+import { MantineModal } from "../../MantineModal"
 
 const renderTags = (tags) => {
   const isTags = tags.some(Boolean)
