@@ -1,9 +1,10 @@
+import { Box } from "@mantine/core"
 import { getLanguageByKey } from "../../utils"
 import "./Media.css"
 
 export const Media = ({ messages, selectTicketId }) => {
   return (
-    <div className="extra-info-content">
+    <Box p="md">
       {messages
         .filter(
           (msg) =>
@@ -64,6 +65,6 @@ export const Media = ({ messages, selectTicketId }) => {
             ) : null}
           </div>
         ))}
-    </div>
+    </Box>
   )
 }

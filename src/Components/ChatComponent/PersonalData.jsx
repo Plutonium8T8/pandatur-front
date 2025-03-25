@@ -42,14 +42,6 @@ export const PersonalData = ({ loading, onSubmit, data }) => {
           {...form.getInputProps("surname")}
         />
 
-        <TextInput
-          mt="md"
-          label={getLanguageByKey("Adresă")}
-          placeholder={getLanguageByKey("Adresă")}
-          key={form.key("address")}
-          {...form.getInputProps("address")}
-        />
-
         <NumberInput
           hideControls
           mt="md"

@@ -239,97 +239,101 @@ const ChatExtraInfo = ({
   }, [selectedClient, selectTicketId, tickets, setPersonalInfo])
 
   return (
-    <ScrollArea>
-      <Tabs defaultValue="general">
-        <Tabs.List>
-          <Tabs.Tab value="general">General</Tabs.Tab>
-          <Tabs.Tab value="info">Info</Tabs.Tab>
-          <Tabs.Tab value="contract">Contract</Tabs.Tab>
-          <Tabs.Tab value="invoice">Invoice</Tabs.Tab>
-          <Tabs.Tab value="media">Media</Tabs.Tab>
-          <Tabs.Tab value="quality_control">Control calitate</Tabs.Tab>
-        </Tabs.List>
+    <Box maw="30%" w="100%">
+      <ScrollArea>
+        <Tabs defaultValue="general">
+          <Tabs.List>
+            <Tabs.Tab value="general">General</Tabs.Tab>
+            <Tabs.Tab value="info">Info</Tabs.Tab>
+            <Tabs.Tab value="contract">Contract</Tabs.Tab>
+            <Tabs.Tab value="invoice">Invoice</Tabs.Tab>
+            <Tabs.Tab value="media">Media</Tabs.Tab>
+            <Tabs.Tab value="quality_control">Control calitate</Tabs.Tab>
+          </Tabs.List>
 
-        <Tabs.Panel value="general">
-          <Flex p="md" direction="column">
-            <GeneralInfoTicketForm
-              loading={isLoadingGeneral}
-              data={updatedTicket}
-              onSubmit={(values) => updateTicketDate(values)}
-            />
-
-            <Divider my="md" />
-
-            <PersonalData
-              loading={isLoadingPersonalDate}
-              data={personalInfo[selectedClient]}
-              onSubmit={(values) => submitPersonalData(values)}
-            />
-
-            <Divider my="md" />
-
-            <Merge
-              loading={isLoadingCombineLead}
-              value={selectedClient}
-              onSubmit={(values) => mergeCLientsData(values)}
-              placeholder={translations?.["Introduceți ID lead"]?.[language]}
-            />
-
-            <Box mt="md">
-              <Merge
-                loading={isLoadingCombineClient}
-                value={ticketId}
-                placeholder={translations?.["Introduceți ID client"][language]}
-                onSubmit={(values) => mergeData(values)}
+          <Tabs.Panel value="general">
+            <Flex p="md" direction="column">
+              <GeneralInfoTicketForm
+                loading={isLoadingGeneral}
+                data={updatedTicket}
+                onSubmit={(values) => updateTicketDate(values)}
               />
-            </Box>
-          </Flex>
-        </Tabs.Panel>
 
-        <Tabs.Panel value="info">
-          <Flex p="md" direction="column">
-            <TicketInfoForm
-              loading={isLoadingInfoTicket}
-              data={extraInfo[selectTicketId]}
-              onSubmit={(values) => saveTicketExtraDate(values)}
-            />
-          </Flex>
-        </Tabs.Panel>
+              <Divider my="md" />
 
-        <Tabs.Panel value="contract">
-          <Flex p="md" direction="column">
-            <ContractTicketForm
-              loading={isLoadingInfoTicket}
-              data={extraInfo[selectTicketId]}
-              onSubmit={(values) => saveTicketExtraDate(values)}
-            />
-          </Flex>
-        </Tabs.Panel>
+              <PersonalData
+                loading={isLoadingPersonalDate}
+                data={personalInfo[selectedClient]}
+                onSubmit={(values) => submitPersonalData(values)}
+              />
 
-        <Tabs.Panel value="invoice">
-          <Flex p="md" direction="column">
-            <Invoice
-              loading={isLoadingInfoTicket}
-              data={extraInfo[selectTicketId]}
-              onSubmit={(values) => saveTicketExtraDate(values)}
-            />
-          </Flex>
-        </Tabs.Panel>
-        <Tabs.Panel value="media">
-          <Media messages={messages} selectTicketId={selectTicketId} />
-        </Tabs.Panel>
+              <Divider my="md" />
 
-        <Tabs.Panel value="quality_control">
-          <Flex p="md" direction="column">
-            <QualityControl
-              loading={isLoadingInfoTicket}
-              data={extraInfo[selectTicketId]}
-              onSubmit={(values) => saveTicketExtraDate(values)}
-            />
-          </Flex>
-        </Tabs.Panel>
-      </Tabs>
-    </ScrollArea>
+              <Merge
+                loading={isLoadingCombineLead}
+                value={selectedClient}
+                onSubmit={(values) => mergeCLientsData(values)}
+                placeholder={translations?.["Introduceți ID lead"]?.[language]}
+              />
+
+              <Box mt="md">
+                <Merge
+                  loading={isLoadingCombineClient}
+                  value={ticketId}
+                  placeholder={
+                    translations?.["Introduceți ID client"][language]
+                  }
+                  onSubmit={(values) => mergeData(values)}
+                />
+              </Box>
+            </Flex>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="info">
+            <Flex p="md" direction="column">
+              <TicketInfoForm
+                loading={isLoadingInfoTicket}
+                data={extraInfo[selectTicketId]}
+                onSubmit={(values) => saveTicketExtraDate(values)}
+              />
+            </Flex>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="contract">
+            <Flex p="md" direction="column">
+              <ContractTicketForm
+                loading={isLoadingInfoTicket}
+                data={extraInfo[selectTicketId]}
+                onSubmit={(values) => saveTicketExtraDate(values)}
+              />
+            </Flex>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="invoice">
+            <Flex p="md" direction="column">
+              <Invoice
+                loading={isLoadingInfoTicket}
+                data={extraInfo[selectTicketId]}
+                onSubmit={(values) => saveTicketExtraDate(values)}
+              />
+            </Flex>
+          </Tabs.Panel>
+          <Tabs.Panel value="media">
+            <Media messages={messages} selectTicketId={selectTicketId} />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="quality_control">
+            <Flex p="md" direction="column">
+              <QualityControl
+                loading={isLoadingInfoTicket}
+                data={extraInfo[selectTicketId]}
+                onSubmit={(values) => saveTicketExtraDate(values)}
+              />
+            </Flex>
+          </Tabs.Panel>
+        </Tabs>
+      </ScrollArea>
+    </Box>
   )
 }
 
