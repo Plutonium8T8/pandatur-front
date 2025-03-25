@@ -2,14 +2,14 @@ import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { getLanguageByKey, formatDate, parseServerDate } from "../../utils"
-import { LabelSwitch } from "../../LabelSwitch"
-import { paymentStatusOptions } from "../../../FormOptions"
-import { DD_MM_YYYY } from "../../../app-constants"
+import { getLanguageByKey, formatDate, parseServerDate } from "../utils"
+import { LabelSwitch } from "../LabelSwitch"
+import { paymentStatusOptions } from "../../FormOptions"
+import { DD_MM_YYYY } from "../../app-constants"
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
 
-export const ContractTicketForm = ({
+export const ContractForm = ({
   onSubmit,
   data,
   hideDisabledInput,

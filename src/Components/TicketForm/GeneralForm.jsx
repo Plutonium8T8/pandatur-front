@@ -12,14 +12,14 @@ import {
   workflowOptions,
   priorityOptions,
   groupTitleOptions
-} from "../../../FormOptions"
-import { getLanguageByKey } from "../../utils"
-import { useGetTechniciansList } from "../../../hooks"
-import { parseTags } from "../../../stringUtils"
+} from "../../FormOptions"
+import { getLanguageByKey } from "../utils"
+import { useGetTechniciansList } from "../../hooks"
+import { parseTags } from "../../stringUtils"
 
 const GENERAL_FORM_ID = "GENERAL_FORM_ID"
 
-export const GeneralInfoTicketForm = ({
+export const GeneralForm = ({
   onSubmit,
   data,
   onClose,

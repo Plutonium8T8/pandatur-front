@@ -2,7 +2,7 @@ import { Select, Flex, NumberInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { getLanguageByKey, formatDate, parseServerDate } from "../../utils"
+import { getLanguageByKey, formatDate, parseServerDate } from "../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -12,8 +12,8 @@ import {
   transportOptions,
   nameExcursionOptions,
   purchaseProcessingOptions
-} from "../../../FormOptions"
-import { DD_MM_YYYY } from "../../../app-constants"
+} from "../../FormOptions"
+import { DD_MM_YYYY } from "../../app-constants"
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
 

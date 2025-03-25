@@ -1,12 +1,17 @@
 import { Select, TextInput, NumberInput, Flex } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { getLanguageByKey } from "../../utils"
-import { valutaOptions, ibanOptions } from "../../../FormOptions"
+import { getLanguageByKey } from "../utils"
+import { valutaOptions, ibanOptions } from "../../FormOptions"
 
 const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID"
 
-export const Invoice = ({ onSubmit, data, renderFooterButtons, formId }) => {
+export const InvoiceForm = ({
+  onSubmit,
+  data,
+  renderFooterButtons,
+  formId
+}) => {
   const idForm = formId || INVOICE_FORM_FILTER_ID
 
   const form = useForm({

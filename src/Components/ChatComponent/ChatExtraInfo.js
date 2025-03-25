@@ -4,17 +4,17 @@ import { enqueueSnackbar } from "notistack"
 import { api } from "../../api"
 import { translations } from "../utils/translations"
 import { Tabs, ScrollArea, Flex, Divider, Box, Button } from "@mantine/core"
-import {
-  TicketInfoForm,
-  ContractTicketForm,
-  Invoice,
-  QualityControl,
-  GeneralInfoTicketForm
-} from "../LeadsComponent/components"
 import { Media } from "./Media"
 import { PersonalData } from "./PersonalData"
 import { Merge } from "./Merge"
 import { getLanguageByKey, showServerError } from "../utils"
+import {
+  ContractForm,
+  QualityControlForm,
+  InvoiceForm,
+  GeneralForm,
+  TicketInfoForm
+} from "../TicketForm"
 
 const parseId = (id) => {
   return Number(id.replace(/[{}]/g, "").trim())
@@ -252,7 +252,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="general">
           <Flex p="md" direction="column">
-            <GeneralInfoTicketForm
+            <GeneralForm
               data={updatedTicket}
               onSubmit={(values) => updateTicketDate(values)}
               renderFooterButtons={({ formId }) => (
@@ -310,7 +310,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="contract">
           <Flex p="md" direction="column">
-            <ContractTicketForm
+            <ContractForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
@@ -328,7 +328,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="invoice">
           <Flex p="md" direction="column">
-            <Invoice
+            <InvoiceForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
@@ -349,7 +349,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="quality_control">
           <Flex p="md" direction="column">
-            <QualityControl
+            <QualityControlForm
               isSelect
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}

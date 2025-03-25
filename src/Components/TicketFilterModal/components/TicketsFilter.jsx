@@ -1,11 +1,11 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core"
 import {
-  TicketInfoForm,
-  ContractTicketForm,
-  GeneralInformationLeadsFilter,
-  Invoice,
-  QualityControl
-} from "../../LeadsComponent/components"
+  ContractForm,
+  QualityControlForm,
+  InvoiceForm,
+  BasicGeneralForm,
+  TicketInfoForm
+} from "../../TicketForm"
 import { getLanguageByKey } from "../../utils"
 
 const renderResetButton = (resetForm) => {
@@ -43,7 +43,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
         value="filter_general_info"
       >
         <Flex direction="column" justify="space-between" h="100%">
-          <GeneralInformationLeadsFilter
+          <BasicGeneralForm
             loading={loading}
             onClose={onClose}
             onSubmit={onSubmit}
@@ -74,7 +74,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
       </Tabs.Panel>
       <Tabs.Panel pl="lg" value="filter_contract">
         <ScrollArea h="100%">
-          <ContractTicketForm
+          <ContractForm
             hideDisabledInput
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
@@ -96,7 +96,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
 
       <Tabs.Panel pl="lg" value="filter_invoice">
         <Flex direction="column" justify="space-between" h="100%">
-          <Invoice
+          <InvoiceForm
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
               <>
@@ -117,7 +117,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
 
       <Tabs.Panel pl="lg" value="filter_quality_control">
         <Flex direction="column" justify="space-between" h="100%">
-          <QualityControl
+          <QualityControlForm
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
               <>

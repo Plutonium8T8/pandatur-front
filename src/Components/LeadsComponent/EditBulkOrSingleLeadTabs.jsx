@@ -1,13 +1,9 @@
 import { Tabs, Flex, Button } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
-import { getLanguageByKey, showServerError } from "../../utils"
-import { api } from "../../../api"
-import {
-  TicketInfoForm,
-  GeneralInfoTicketForm,
-  ContractTicketForm
-} from "../components"
+import { getLanguageByKey, showServerError } from "../utils"
+import { api } from "../../api"
+import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForm"
 
 export const EditBulkOrSingleLeadTabs = ({
   open,
@@ -80,7 +76,7 @@ export const EditBulkOrSingleLeadTabs = ({
 
       <Tabs.Panel value="general_info" pt="xs">
         <Flex direction="column" justify="space-between" h="100%">
-          <GeneralInfoTicketForm
+          <GeneralForm
             data={generalInfoLightTicket}
             onSubmit={submit}
             renderFooterButtons={({ formId }) => (
@@ -115,7 +111,7 @@ export const EditBulkOrSingleLeadTabs = ({
         />
       </Tabs.Panel>
       <Tabs.Panel value="contact" pt="xs" pb="md">
-        <ContractTicketForm
+        <ContractForm
           setMinDate={new Date()}
           data={ticketInfo}
           onSubmit={submit}

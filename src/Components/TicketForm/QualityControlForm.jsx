@@ -1,15 +1,15 @@
 import { MultiSelect, Select, TextInput, Flex } from "@mantine/core"
 import { useEffect } from "react"
 import { useForm } from "@mantine/form"
-import { getLanguageByKey } from "../../utils"
+import { getLanguageByKey } from "../utils"
 import {
   motivulRefuzuluiOptions,
   evaluareOdihnaOptions
-} from "../../../FormOptions"
+} from "../../FormOptions"
 
 const QUALITY_FORM_FILTER_ID = "QUALITY_FORM_FILTER_ID"
 
-export const QualityControl = ({
+export const QualityControlForm = ({
   onSubmit,
   data,
   renderFooterButtons,
