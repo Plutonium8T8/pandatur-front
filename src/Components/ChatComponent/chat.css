@@ -29,6 +29,7 @@
   width: 50%;
   flex: 1;
   background-color: #f9f9f9;
+  border-right: 1px solid #ddd;
 }
 
 .chat-messages {
