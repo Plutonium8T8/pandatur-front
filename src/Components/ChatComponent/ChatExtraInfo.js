@@ -239,8 +239,13 @@ const ChatExtraInfo = ({
   }, [selectedClient, selectTicketId, tickets, setPersonalInfo])
 
   return (
-    <ScrollArea maw="35%" w="100%" h="100%">
-      <Tabs defaultValue="general">
+    <ScrollArea
+      maw="35%"
+      w="100%"
+      h="100%"
+      className="chat-extra-info-scroll-area"
+    >
+      <Tabs defaultValue="general" h="100%">
         <Tabs.List>
           <Tabs.Tab value="general">
             <Text>{getLanguageByKey("General")}</Text>
@@ -258,11 +263,10 @@ const ChatExtraInfo = ({
           <Tabs.Tab value="invoice">
             <Text>{getLanguageByKey("Invoice")}</Text>
           </Tabs.Tab>
-          {!!mediaSources.length && (
-            <Tabs.Tab value="media">
-              <Text>{getLanguageByKey("Media")}</Text>
-            </Tabs.Tab>
-          )}
+          <Tabs.Tab h="100%" value="media">
+            <Text>{getLanguageByKey("Media")}</Text>
+          </Tabs.Tab>
+
           <Tabs.Tab value="quality_control">
             <Text>{getLanguageByKey("Control calitate")}</Text>
           </Tabs.Tab>
@@ -361,13 +365,12 @@ const ChatExtraInfo = ({
             />
           </Box>
         </Tabs.Panel>
-        {!!mediaSources.length && (
-          <Tabs.Panel value="media">
-            <Box p="md">
-              <Media messages={mediaSources} />
-            </Box>
-          </Tabs.Panel>
-        )}
+
+        <Tabs.Panel value="media" h="100%">
+          <Box p="md" h="100%">
+            <Media messages={mediaSources} />
+          </Box>
+        </Tabs.Panel>
 
         <Tabs.Panel value="quality_control">
           <Box p="md">

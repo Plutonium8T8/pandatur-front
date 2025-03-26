@@ -1554,6 +1554,10 @@ export const translations = {
   "Datele despre ticket au fost create cu succes": {
     RO: "Datele despre ticket au fost create cu succes",
     RU: "Данные о тикете были успешно созданы"
+  },
+  "Fără date media": {
+    RO: "Fără date media",
+    RU: "Нет медиа-данных"
   }
 }
 
