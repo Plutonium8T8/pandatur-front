@@ -200,7 +200,6 @@
 
 .chat-item {
   padding: 5px 5px;
-  margin-bottom: 5px;
   cursor: pointer;
   font-size: 1em;
   color: black;
@@ -349,7 +348,7 @@
 .chat-item-container {
   display: flex;
   flex-direction: column;
-  margin-bottom: 30px;
+  height: 100%;
 }
 
 .info-message {
