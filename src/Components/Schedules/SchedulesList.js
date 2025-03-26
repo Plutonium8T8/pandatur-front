@@ -1,29 +1,63 @@
-import React, { useState } from "react"
-import { Card, Text, Stack, Button } from "@mantine/core"
+import React, { useEffect, useState } from "react"
+import { Card, Text, Stack, Button, Loader, Center } from "@mantine/core"
 import GroupScheduleView from "./GroupScheduleView"
+import { api } from "../../api"
+import { useSnackbar } from "notistack"
 import { translations } from "../utils/translations"
 
-// Заглушка пользователей по группам
-const groupData = {
-  1: [
-    { id: 101, name: "Иван Иванов" },
-    { id: 102, name: "Мария Смирнова" }
-  ],
-  2: [{ id: 201, name: "Алексей Петров" }],
-  3: [
-    { id: 301, name: "Ольга Кузнецова" },
-    { id: 302, name: "Дмитрий Орлов" }
-  ]
-}
-
-const groups = [
-  { id: 1, name: "Группа A" },
-  { id: 2, name: "Группа B" },
-  { id: 3, name: "Группа C" }
-]
-
 const SchedulesList = () => {
+  const [technicians, setTechnicians] = useState([])
+  const [groups, setGroups] = useState([])
+  const [groupUsers, setGroupUsers] = useState({})
   const [selectedGroup, setSelectedGroup] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const language = localStorage.getItem("language") || "RO"
+  const { enqueueSnackbar } = useSnackbar()
+
+  const fetchUsers = async () => {
+    setIsLoading(true)
+    try {
+      const response = await api.users.getTechnicianList()
+
+      const users = response.map((item) => ({
+        id: item.id.id,
+        name: `${item.id.name || "N/A"} ${item.id.surname || "N/A"}`,
+        department: item.department || "Fără departament"
+      }))
+
+      const grouped = users.reduce((acc, user) => {
+        const dept = user.department
+        if (!acc[dept]) acc[dept] = []
+        acc[dept].push(user)
+        return acc
+      }, {})
+
+      setTechnicians(users)
+      setGroupUsers(grouped)
+
+      setGroups(
+        Object.keys(grouped).map((dept, i) => ({
+          id: i + 1,
+          name: dept,
+          key: dept
+        }))
+      )
+    } catch (error) {
+      console.error("Eroare la încărcare:", error)
+      enqueueSnackbar(
+        translations["Eroare la încărcarea utilizatorilor"][language],
+        {
+          variant: "error"
+        }
+      )
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
 
   const handleGroupClick = (group) => {
     setSelectedGroup(group)
@@ -33,8 +67,16 @@ const SchedulesList = () => {
     setSelectedGroup(null)
   }
 
+  if (isLoading) {
+    return (
+      <Center h="200px">
+        <Loader />
+      </Center>
+    )
+  }
+
   if (selectedGroup) {
-    const users = groupData[selectedGroup.id] || []
+    const users = groupUsers[selectedGroup.key] || []
     return (
       <div>
         <Button onClick={handleBack} mb="md">
