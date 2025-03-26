@@ -5,7 +5,7 @@ import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
 import { Spin } from "../Spin"
-import ShiftDrawer from "./ShiftDrawer"
+import ShiftDrawer from "./ModalIntervals"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
 const GroupScheduleView = ({ groupUsers }) => {

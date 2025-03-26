@@ -1566,6 +1566,22 @@ export const translations = {
   "Căutare utilizator": {
     RO: "Căutare utilizator",
     RU: "Поиск пользователя"
+  },
+  "Adaugă grup": {
+    RO: "Adaugă grup",
+    RU: "Добавить группу"
+  },
+  Orar: {
+    RO: "Orar de lucru",
+    RU: "График работы"
+  },
+  "Nume grup": {
+    RO: "Nume grup",
+    RU: "Имя группы"
+  },
+  "Nimic găsit": {
+    RO: "Nimic găsit",
+    RU: "Ничего не найдено"
   }
 }
 

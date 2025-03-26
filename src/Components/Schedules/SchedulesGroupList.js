@@ -14,7 +14,7 @@ import {
 } from "@mantine/core"
 import { schedules } from "../../api/schedules"
 import { api } from "../../api"
-import GroupScheduleView from "./GroupScheduleView"
+import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
 import { translations } from "../utils/translations"
 
