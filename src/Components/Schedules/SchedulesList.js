@@ -1,63 +1,58 @@
 import React, { useEffect, useState } from "react"
-import { Card, Text, Stack, Button } from "@mantine/core"
-import GroupScheduleView from "./GroupScheduleView"
+import {
+  Card,
+  Text,
+  Stack,
+  Button,
+  Group,
+  Badge,
+  Avatar,
+  Tooltip,
+  AvatarGroup,
+  TooltipGroup,
+  ActionIcon
+} from "@mantine/core"
+import { schedules } from "../../api/schedules"
 import { api } from "../../api"
+import GroupScheduleView from "./GroupScheduleView"
 import { useSnackbar } from "notistack"
 import { translations } from "../utils/translations"
 
-const SchedulesList = () => {
-  const [technicians, setTechnicians] = useState([])
+const SchedulesList = ({ reload }) => {
   const [groups, setGroups] = useState([])
-  const [groupUsers, setGroupUsers] = useState({})
+  const [technicians, setTechnicians] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
 
-  const fetchUsers = async () => {
-    setIsLoading(true)
+  const fetchData = async () => {
     try {
-      const response = await api.users.getTechnicianList()
+      const [groupData, userData] = await Promise.all([
+        schedules.getAllGroups(),
+        api.users.getTechnicianList()
+      ])
 
-      const users = response.map((item) => ({
+      const users = userData.map((item) => ({
         id: item.id.id,
-        name: `${item.id.name || "N/A"} ${item.id.surname || "N/A"}`,
-        department: item.department || "Fără departament"
+        username: item.id.user?.username || "N/A",
+        photo: item.id.photo
       }))
-
-      const grouped = users.reduce((acc, user) => {
-        const dept = user.department
-        if (!acc[dept]) acc[dept] = []
-        acc[dept].push(user)
-        return acc
-      }, {})
-
       setTechnicians(users)
-      setGroupUsers(grouped)
 
-      setGroups(
-        Object.keys(grouped).map((dept, i) => ({
-          id: i + 1,
-          name: dept,
-          key: dept
-        }))
-      )
-    } catch (error) {
-      console.error("Eroare la încărcare:", error)
-      enqueueSnackbar(
-        translations["Eroare la încărcarea utilizatorilor"][language],
-        {
-          variant: "error"
-        }
-      )
-    } finally {
-      setIsLoading(false)
+      const formattedGroups = groupData.map((group) => ({
+        id: group.id,
+        name: group.name,
+        user_ids: group.user_ids
+      }))
+      setGroups(formattedGroups)
+    } catch (err) {
+      enqueueSnackbar("Eroare la încărcare", { variant: "error" })
     }
   }
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchData()
+  }, [reload])
 
   const handleGroupClick = (group) => {
     setSelectedGroup(group)
@@ -67,32 +62,107 @@ const SchedulesList = () => {
     setSelectedGroup(null)
   }
 
+  const handleDelete = async (id) => {
+    try {
+      await schedules.deleteGroup(id)
+      fetchData()
+      enqueueSnackbar("Grupul a fost șters", { variant: "success" })
+    } catch (err) {
+      enqueueSnackbar("Eroare la ștergere", { variant: "error" })
+    }
+  }
+
   if (selectedGroup) {
-    const users = groupUsers[selectedGroup.key] || []
+    const groupUsers = technicians.filter((t) =>
+      selectedGroup.user_ids.includes(t.id)
+    )
+
     return (
       <div>
         <Button onClick={handleBack} mb="md">
           ← Назад к группам
         </Button>
-        <GroupScheduleView groupUsers={users} />
+        <GroupScheduleView groupUsers={groupUsers} />
       </div>
     )
   }
 
   return (
-    <Stack spacing="sm">
-      {groups.map((group) => (
-        <Card
-          key={group.id}
-          shadow="sm"
-          padding="md"
-          withBorder
-          onClick={() => handleGroupClick(group)}
-          className="cursor-pointer hover:shadow-md transition"
-        >
-          <Text weight={500}>{group.name}</Text>
-        </Card>
-      ))}
+    <Stack spacing="md">
+      {groups.map((group) => {
+        const groupUsers = technicians.filter((u) =>
+          group.user_ids.includes(u.id)
+        )
+
+        return (
+          <Card
+            key={group.id}
+            shadow="xs"
+            padding="lg"
+            radius="md"
+            withBorder
+            className="group-card"
+          >
+            <Group position="apart" align="start">
+              <div
+                style={{ flex: 1, cursor: "pointer" }}
+                onClick={() => handleGroupClick(group)}
+              >
+                <Group spacing="xs" mb={10}>
+                  <Text size="md" fw={600}>
+                    {group.name}
+                  </Text>
+                  <Badge color="blue" variant="light">
+                    For a week
+                  </Badge>
+                </Group>
+
+                <Tooltip.Group openDelay={300} closeDelay={100}>
+                  <Avatar.Group spacing="sm">
+                    {groupUsers.slice(0, 5).map((u) => (
+                      <Tooltip label={u.username} withArrow key={u.id}>
+                        <Avatar
+                          size="md"
+                          radius="xl"
+                          src={u.photo || undefined}
+                          color="blue"
+                        >
+                          {u.username?.[0]?.toUpperCase() || "?"}
+                        </Avatar>
+                      </Tooltip>
+                    ))}
+
+                    {groupUsers.length > 5 && (
+                      <Tooltip
+                        withArrow
+                        label={
+                          <>
+                            {groupUsers.slice(5).map((u) => (
+                              <div key={u.id}>{u.username}</div>
+                            ))}
+                          </>
+                        }
+                      >
+                        <Avatar size="md" radius="xl" color="blue">
+                          +{groupUsers.length - 5}
+                        </Avatar>
+                      </Tooltip>
+                    )}
+                  </Avatar.Group>
+                </Tooltip.Group>
+              </div>
+
+              <ActionIcon
+                color="red"
+                variant="light"
+                onClick={() => handleDelete(group.id)}
+              >
+                🗑
+              </ActionIcon>
+            </Group>
+          </Card>
+        )
+      })}
     </Stack>
   )
 }

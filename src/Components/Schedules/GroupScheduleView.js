@@ -46,7 +46,7 @@ const GroupScheduleView = ({ groupUsers }) => {
           Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
         )
 
-        return { id: userId, name: user.name, shifts }
+        return { id: userId, name: user.username, shifts }
       })
       setSchedule(combined)
     } catch (e) {
@@ -140,9 +140,7 @@ const GroupScheduleView = ({ groupUsers }) => {
           <tbody>
             {schedule.map((employee, ei) => (
               <tr key={ei}>
-                <td>
-                  {employee.name} ({employee.id})
-                </td>
+                <td>{employee.name}</td>
                 {employee.shifts.map((shift, di) => (
                   <td
                     key={di}
