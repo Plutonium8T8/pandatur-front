@@ -29,13 +29,6 @@ const HARD_TICKET = "hard"
 const LIGHT_TICKET = "light"
 const NUMBER_PAGE = 1
 
-const normalizeLeadsFilters = (filters, hasWorkflow) => {
-  return {
-    ...(hasWorkflow && { workflow: filteredWorkflows }),
-    ...filters
-  }
-}
-
 const Leads = () => {
   const refLeadsFilter = useRef()
   const { enqueueSnackbar } = useSnackbar()
@@ -365,13 +358,13 @@ const Leads = () => {
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(
-              normalizeLeadsFilters(filters),
-              filteredTicketIds
-            )
+            applyWorkflowFilters(filters, filteredTicketIds)
           }
           onApplyTicketFilters={(filters) => {
-            handleApplyFilterLightTicket(normalizeLeadsFilters(filters, true))
+            handleApplyFilterLightTicket({
+              workflow: filteredWorkflows,
+              ...filters
+            })
           }}
         />
       </MantineModal>
@@ -387,13 +380,10 @@ const Leads = () => {
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
           onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(
-              normalizeLeadsFilters(filters),
-              filteredTicketIds
-            )
+            applyWorkflowFilters(filters, filteredTicketIds)
           }
           onApplyTicketFilters={(filters) => {
-            handleApplyFiltersHardTicket(normalizeLeadsFilters(filters))
+            handleApplyFiltersHardTicket(filters)
           }}
         />
       </MantineModal>
