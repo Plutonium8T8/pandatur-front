@@ -56,22 +56,22 @@ export const ContractForm = ({
   useEffect(() => {
     if (data) {
       form.setValues({
-        data_contractului: parseServerDate(data?.data_contractului),
-        data_avansului: parseServerDate(data?.data_avansului),
-        data_de_plata_integrala: parseServerDate(data?.data_de_plata_integrala),
-        numar_de_contract: data?.numar_de_contract,
-        contract_trimis: data?.contract_trimis,
-        contract_semnat: data?.contract_semnat,
-        tour_operator: data?.tour_operator,
-        numarul_cererii_de_la_operator: data?.numarul_cererii_de_la_operator,
-        achitare_efectuata: data?.achitare_efectuata,
-        rezervare_confirmata: data?.rezervare_confirmata,
-        contract_arhivat: data?.contract_arhivat,
-        statutul_platii: data?.statutul_platii,
-        avans_euro: data?.avans_euro,
-        pret_netto: data?.pret_netto,
-        achitat_client: data?.achitat_client,
-        control: data?.control
+        data_contractului: parseServerDate(data.data_contractului),
+        data_avansului: parseServerDate(data.data_avansului),
+        data_de_plata_integrala: parseServerDate(data.data_de_plata_integrala),
+        numar_de_contract: data.numar_de_contract,
+        contract_trimis: data.contract_trimis,
+        contract_semnat: data.contract_semnat,
+        tour_operator: data.tour_operator,
+        numarul_cererii_de_la_operator: data.numarul_cererii_de_la_operator,
+        achitare_efectuata: data.achitare_efectuata,
+        rezervare_confirmata: data.rezervare_confirmata,
+        contract_arhivat: data.contract_arhivat,
+        statutul_platii: data.statutul_platii,
+        avans_euro: data.avans_euro,
+        pret_netto: data.pret_netto,
+        achitat_client: data.achitat_client,
+        control: data.control
       })
     }
   }, [data])
