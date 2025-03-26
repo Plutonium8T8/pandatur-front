@@ -5,14 +5,16 @@ import { translations } from "../utils/translations"
 
 const Schedules = () => {
   const handleAddGroup = () => {
-    console.log("Добавить группу")
+    console.log(
+      "aici trebuie sa fie logica de creare de a grupului, cu group name and list_users"
+    )
   }
 
   return (
     <div className="p-4">
       <Group position="apart" mb="md">
         <Title order={2}>Schedules</Title>
-        {/* <Button onClick={handleAddGroup}>Добавить группу</Button> */}
+        <Button onClick={handleAddGroup}>Добавить группу</Button>
       </Group>
 
       <SchedulesList />

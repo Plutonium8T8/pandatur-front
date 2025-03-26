@@ -144,9 +144,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     >
       <Group align="flex-start" spacing="xl">
         <Avatar
-          src="https://randomuser.me/api/portraits/women/43.jpg"
-          size={100}
-          radius="xl"
+          src="https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp"
+          size={120}
         />
 
         <Stack style={{ flex: 1 }}>
