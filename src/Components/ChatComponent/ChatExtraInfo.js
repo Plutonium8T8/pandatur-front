@@ -1,14 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { enqueueSnackbar } from "notistack"
-import {
-  Tabs,
-  ScrollArea,
-  Flex,
-  Divider,
-  Box,
-  Button,
-  Text
-} from "@mantine/core"
+import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core"
 import { getLanguageByKey, showServerError } from "../utils"
 import { PersonalDataForm, Merge, Media } from "./components"
 import { api } from "../../api"
@@ -353,7 +345,7 @@ const ChatExtraInfo = ({
         </Tabs.Panel>
 
         <Tabs.Panel value="invoice">
-          <Box style={{ border: "1px solid red" }} p="md">
+          <Box p="md">
             <InvoiceForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
