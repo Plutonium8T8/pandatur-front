@@ -5,6 +5,20 @@ import { getLanguageByKey } from "../utils"
 import { useUser, useApp, useDOMElementHeight } from "../../hooks"
 import { ChatListItem } from "./components"
 
+const parseCustomDate = (dateStr) => {
+  if (!dateStr) return 0
+
+  const [datePart, timePart] = dateStr.split(" ")
+  if (!datePart || !timePart) return 0
+
+  const [day, month, year] = datePart.split("-").map(Number)
+  const [hours, minutes, seconds] = timePart.split(":").map(Number)
+
+  return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
+}
+
+const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent)
+
 const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   const { tickets, getClientMessagesSingle } = useApp()
   const { userId } = useUser()
@@ -45,10 +59,6 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
     })
   }, [selectTicketId])
 
-  const handleFilterInput = (e) => {
-    setSearchQuery(e.target.value.toLowerCase())
-  }
-
   const handleTicketClick = (ticketId) => {
     console.log("🖱 Клик по тикету в списке:", ticketId)
 
@@ -60,27 +70,13 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   const sortedTickets = useMemo(() => {
     let filtered = [...tickets]
 
-    const parseCustomDate = (dateStr) => {
-      if (!dateStr) return 0
-
-      const [datePart, timePart] = dateStr.split(" ")
-      if (!datePart || !timePart) return 0
-
-      const [day, month, year] = datePart.split("-").map(Number)
-      const [hours, minutes, seconds] = timePart.split(":").map(Number)
-
-      return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
-    }
-
-    const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent)
-
     filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a))
 
     if (showMyTickets) {
       filtered = filtered.filter((ticket) => ticket.technician_id === userId)
     }
 
-    if (searchQuery.trim()) {
+    if (searchQuery) {
       const lowerSearchQuery = searchQuery.toLowerCase()
       filtered = filtered.filter((ticket) => {
         const ticketId = ticket.id.toString().toLowerCase()
@@ -129,7 +125,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
 
         <TextInput
           placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
-          onInput={handleFilterInput}
+          onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
         />
       </Flex>
 

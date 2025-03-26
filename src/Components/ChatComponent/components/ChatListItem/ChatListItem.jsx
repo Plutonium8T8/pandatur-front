@@ -2,27 +2,8 @@ import { Box, Flex, Image, Text, Badge } from "@mantine/core"
 import { DEFAULT_PHOTO } from "../../../../app-constants"
 import { WorkflowTag } from "../../../WorkflowTag"
 import "./ChatListItem.css"
-
-const formatDateTime = (dateString) => {
-  if (!dateString) return "—"
-
-  const parts = dateString.split(" ")
-  if (parts.length !== 2) return "—"
-
-  const [datePart, timePart] = parts
-  const [day, month, year] = datePart.split("-")
-
-  if (!day || !month || !year) return "—"
-
-  const formattedDate = new Date(`${year}-${month}-${day}T${timePart}`)
-
-  return (
-    formattedDate.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit"
-    }) || "—"
-  )
-}
+import dayjs from "dayjs"
+import { HH_mm, DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants"
 
 export const ChatListItem = ({
   chat,
@@ -66,7 +47,9 @@ export const ChatListItem = ({
           <Box w="80%">
             <Text truncate>{chat.last_message || "No messages"}</Text>
           </Box>
-          <Text>{formatDateTime(chat.time_sent)}</Text>
+          <Text>
+            {dayjs(chat.time_sent, DD_MM_YYYY__HH_mm_ss).format(HH_mm)}
+          </Text>
         </Flex>
       </Box>
     </div>
