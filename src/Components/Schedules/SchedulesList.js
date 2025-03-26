@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Card, Text, Stack, Button, Loader, Center } from "@mantine/core"
+import { Card, Text, Stack, Button } from "@mantine/core"
 import GroupScheduleView from "./GroupScheduleView"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
@@ -65,14 +65,6 @@ const SchedulesList = () => {
 
   const handleBack = () => {
     setSelectedGroup(null)
-  }
-
-  if (isLoading) {
-    return (
-      <Center h="200px">
-        <Loader />
-      </Center>
-    )
   }
 
   if (selectedGroup) {

@@ -12,7 +12,7 @@ const Schedules = () => {
     <div className="p-4">
       <Group position="apart" mb="md">
         <Title order={2}>Schedules</Title>
-        <Button onClick={handleAddGroup}>Добавить группу</Button>
+        {/* <Button onClick={handleAddGroup}>Добавить группу</Button> */}
       </Group>
 
       <SchedulesList />
