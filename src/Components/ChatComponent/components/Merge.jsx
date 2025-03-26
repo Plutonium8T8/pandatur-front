@@ -1,6 +1,6 @@
 import { TextInput, NumberInput, Button, Flex } from "@mantine/core"
 import { useField } from "@mantine/form"
-import { getLanguageByKey } from "../utils"
+import { getLanguageByKey } from "../../utils"
 
 export const Merge = ({ placeholder, value, onSubmit, loading }) => {
   const field = useField({

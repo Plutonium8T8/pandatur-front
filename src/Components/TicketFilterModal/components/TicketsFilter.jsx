@@ -79,8 +79,7 @@ export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
               <>
-                {renderResetButton()}
-
+                {renderResetButton(onResetForm)}
                 <Button variant="default" onClick={onClose}>
                   {getLanguageByKey("Închide")}
                 </Button>

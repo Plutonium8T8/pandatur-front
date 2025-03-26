@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from "react"
 import { enqueueSnackbar } from "notistack"
-import { api } from "../../api"
-import { translations } from "../utils/translations"
-import { Tabs, ScrollArea, Flex, Divider, Box, Button } from "@mantine/core"
-import { Media } from "./Media"
-import { PersonalData } from "./PersonalData"
-import { Merge } from "./Merge"
+import {
+  Tabs,
+  ScrollArea,
+  Flex,
+  Divider,
+  Box,
+  Button,
+  Text
+} from "@mantine/core"
 import { getLanguageByKey, showServerError } from "../utils"
+import { PersonalDataForm, Merge, Media } from "./components"
+import { api } from "../../api"
 import {
   ContractForm,
   QualityControlForm,
@@ -242,20 +247,32 @@ const ChatExtraInfo = ({
   }, [selectedClient, selectTicketId, tickets, setPersonalInfo])
 
   return (
-    <ScrollArea maw="30%" w="100%" h="100%">
+    <ScrollArea maw="35%" w="100%" h="100%">
       <Tabs defaultValue="general">
         <Tabs.List>
-          <Tabs.Tab value="general">{getLanguageByKey("General")}</Tabs.Tab>
-          <Tabs.Tab value="info">
-            {getLanguageByKey("Informații despre tichet")}
+          <Tabs.Tab value="general">
+            <Text>{getLanguageByKey("General")}</Text>
           </Tabs.Tab>
-          <Tabs.Tab value="contract">{getLanguageByKey("Contract")}</Tabs.Tab>
-          <Tabs.Tab value="invoice">{getLanguageByKey("Invoice")}</Tabs.Tab>
+          <Tabs.Tab value="info">
+            <Box w="100">
+              <Text truncate="end">
+                {getLanguageByKey("Informații despre tichet")}
+              </Text>
+            </Box>
+          </Tabs.Tab>
+          <Tabs.Tab value="contract">
+            <Text>{getLanguageByKey("Contract")}</Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="invoice">
+            <Text>{getLanguageByKey("Invoice")}</Text>
+          </Tabs.Tab>
           {!!mediaSources.length && (
-            <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+            <Tabs.Tab value="media">
+              <Text>{getLanguageByKey("Media")}</Text>
+            </Tabs.Tab>
           )}
           <Tabs.Tab value="quality_control">
-            {getLanguageByKey("Control calitate")}
+            <Text>{getLanguageByKey("Control calitate")}</Text>
           </Tabs.Tab>
         </Tabs.List>
 
@@ -273,7 +290,7 @@ const ChatExtraInfo = ({
 
             <Divider my="md" />
 
-            <PersonalData
+            <PersonalDataForm
               loading={isLoadingPersonalDate}
               data={personalInfo[selectedClient]}
               onSubmit={(values) => submitPersonalData(values)}

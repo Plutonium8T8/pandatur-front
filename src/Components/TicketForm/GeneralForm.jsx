@@ -34,7 +34,7 @@ export const GeneralForm = ({
   useEffect(() => {
     if (data) {
       form.setValues({
-        technician_id: data.technician_id ? data.technician_id : undefined,
+        technician_id: data.technician_id ? `${data.technician_id}` : undefined,
         tags: parseTags(data.tags),
         workflow: data.workflow,
         priority: data.priority,

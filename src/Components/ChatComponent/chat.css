@@ -445,12 +445,6 @@ input:checked + .slider:before {
   transform: translateX(18px);
 }
 
-.sent-time {
-  font-size: 18px;
-  margin-bottom: 5px;
-  text-align: center;
-}
-
 .hidden {
   display: none;
 }

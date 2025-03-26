@@ -1,9 +1,9 @@
 import { TextInput, Title, Box, NumberInput, Button, Flex } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { getLanguageByKey } from "../utils"
+import { getLanguageByKey } from "../../utils"
 
-export const PersonalData = ({ loading, onSubmit, data }) => {
+export const PersonalDataForm = ({ loading, onSubmit, data }) => {
   const form = useForm({
     mode: "uncontrolled"
   })
