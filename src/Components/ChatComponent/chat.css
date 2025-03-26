@@ -198,27 +198,6 @@
   text-align: left;
 }
 
-.chat-item {
-  padding: 5px 5px;
-  cursor: pointer;
-  font-size: 1em;
-  color: black;
-  background-color: #f0f0f0;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
-}
-
-.chat-item.active {
-  background-color: #0f824c77;
-  color: #ffffff;
-}
-
-.chat-item:hover {
-  background-color: #f1f5ff;
-  color: black;
-}
-
 .extra-info {
   display: flex;
   flex-direction: column;
@@ -351,28 +330,6 @@
   height: 100%;
 }
 
-.info-message {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.last-message-container {
-  display: flex;
-  flex-direction: row;
-  position: relative;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  color: black;
-}
-
-.chat-time,
-.unread-count {
-  margin-left: 10px;
-  white-space: nowrap;
-}
-
 .empty-chat {
   display: flex;
   align-items: center;
@@ -381,24 +338,6 @@
   width: 100%;
   font-size: 24px;
   letter-spacing: 1px;
-}
-
-.unread-count {
-  border-radius: 100%;
-  background-color: red;
-  min-width: 20px;
-  height: 20px;
-  text-align: center;
-  align-items: center;
-  color: white;
-  margin-left: 4px;
-}
-
-.last-message-ticket {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex-grow: 1;
 }
 
 .message-content {
