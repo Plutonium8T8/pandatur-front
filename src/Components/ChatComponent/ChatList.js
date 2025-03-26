@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from "react"
 import { FixedSizeList } from "react-window"
-import { translations } from "../utils/translations"
-import { useUser, useApp } from "../../hooks"
-import { useDOMElementHeight } from "../../hooks"
+import { TextInput, Checkbox, Title, Flex, Box } from "@mantine/core"
+import { getLanguageByKey } from "../utils"
+import { useUser, useApp, useDOMElementHeight } from "../../hooks"
 import { ChatListItem } from "./components"
-
-const language = localStorage.getItem("language") || "RO"
 
 const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   const { tickets, getClientMessagesSingle } = useApp()
@@ -119,44 +117,33 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   }
 
   return (
-    <div className="users-container" ref={chatListRef}>
-      <div className="header-list-chat">
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div className="extra-info-title">
-            {translations["Chat"][language]}
-          </div>
-          <label className="label-check">
-            {translations["Leadurile mele"][language]}
-            <input
-              type="checkbox"
-              id="myTicketsCheckbox"
-              onChange={(e) => setShowMyTickets(e.target.checked)}
-              checked={showMyTickets}
-            />
-          </label>
-        </div>
+    <Box direction="column" w="20%" p="md" ref={chatListRef}>
+      <Flex direction="column" gap="xs" mb="xs">
+        <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
-        <div className="filter-container-chat">
-          <input
-            type="text"
-            placeholder={"Cauta dupa Lead, Client sau Tag"}
-            onInput={handleFilterInput}
-            className="ticket-filter-input"
-          />
-        </div>
-      </div>
+        <Checkbox
+          label={getLanguageByKey("Leadurile mele")}
+          onChange={(e) => setShowMyTickets(e.target.checked)}
+          checked={showMyTickets}
+        />
 
-      <div className="chat-item-container" ref={wrapperChatItemRef}>
+        <TextInput
+          placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+          onInput={handleFilterInput}
+        />
+      </Flex>
+
+      <Box h="100%" ref={wrapperChatItemRef}>
         <FixedSizeList
           height={wrapperChatHeight}
-          itemCount={sortedTickets.length || 0}
+          itemCount={sortedTickets?.length || 0}
           itemSize={110}
           width="100%"
         >
           {ChatItem}
         </FixedSizeList>
-      </div>
-    </div>
+      </Box>
+    </Box>
   )
 }
 

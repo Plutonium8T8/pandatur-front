@@ -12,17 +12,6 @@
   overflow: hidden;
 }
 
-.users-container {
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  padding: 0px 15px 15px 15px;
-  border-right: 1px solid #ddd;
-  overflow-y: auto;
-  width: 20%;
-  height: 100%;
-}
-
 .chat-area {
   display: flex;
   flex-direction: column;
@@ -324,12 +313,6 @@
   background-color: #0f824c;
 }
 
-.chat-item-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .empty-chat {
   display: flex;
   align-items: center;
@@ -463,13 +446,6 @@
   padding: 20px;
 }
 
-.filter-container-chat {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 4px;
-}
-
 .tabs {
   display: flex;
 }
@@ -592,28 +568,6 @@
   background-color: #0c6d40;
 }
 
-.header-list-chat {
-  position: sticky;
-  top: 0;
-  background: white;
-  z-index: 100;
-  padding: 10px 0px 10px 0px;
-}
-
-.users-container {
-  flex: 0 0 20%;
-  transition:
-    width 0.3s ease-in-out,
-    min-width 0.3s ease-in-out;
-  min-width: 20%;
-}
-
-.users-container.hidden {
-  width: 0;
-  min-width: 0;
-  overflow: hidden;
-}
-
 .chat-area {
   flex-grow: 1;
   display: flex;
@@ -697,14 +651,6 @@ input:checked + .slider:before {
     background-color 0.2s;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
   align-items: center;
-}
-
-.users-container.hidden + .toggle-chat-list {
-  left: 10px;
-}
-
-.users-container.hidden ~ .chat-area {
-  flex-grow: 2;
 }
 
 .toggle-chat-list:hover {
@@ -796,11 +742,6 @@ input:checked + .slider:before {
 
 .invalid-toggle .slider:before {
   background-color: darkred !important;
-}
-
-.label-check {
-  display: flex;
-  justify-content: space-between;
 }
 
 .toggle-chat-list-button {
