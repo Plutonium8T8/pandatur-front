@@ -1510,6 +1510,62 @@ export const translations = {
   "Нет задач, создать?": {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?"
+  },
+  Activați: {
+    RO: "Activați",
+    RU: "Активировать"
+  },
+  Dezactivați: {
+    RO: "Dezactivați",
+    RU: "Деактивировать"
+  },
+  "Eroare la actualizarea statusului": {
+    RO: "Eroare la actualizarea statusului",
+    RU: "Ошибка при обновлении статуса"
+  },
+  "Nume complet": {
+    RO: "Nume complet",
+    RU: "Полное имя"
+  },
+  Grup: {
+    RO: "Grupa",
+    RU: "Група"
+  },
+  Rol: {
+    RO: "Rol",
+    RU: "Роль"
+  },
+  Utilizatori: {
+    RO: "Utilizatori",
+    RU: "Пользователи"
+  },
+  "Adaugă utilizator": {
+    RO: "Adaugă utilizator",
+    RU: "Добавить пользователя"
+  },
+  Activ: {
+    RO: "Activ",
+    RU: "Активный"
+  },
+  Inactiv: {
+    RO: "Inactiv",
+    RU: "Отключен"
+  },
+  "Utilizator dezactivat": {
+    RO: "Utilizator dezactivat",
+    RU: "Пользователь деактивирован"
+  },
+  "Utilizator activat": {
+    RO: "Utilizator activat",
+    RU: "Пользователь активирован"
+  },
+  Users: {
+    RO: "Users",
+    RU: "Юзеры"
+  },
+  "Căutare utilizator": {
+    RO: "Căutare utilizator",
+    RU: "Поиск пользователя"
   }
 }
 

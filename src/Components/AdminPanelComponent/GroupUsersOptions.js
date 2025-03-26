@@ -1,0 +1,21 @@
+export const GroupUsersOptions = [
+  "Admin",
+  "Distribution",
+  "Quality Department",
+  "Marketing",
+  "Call Centre Romania",
+  "Brasov RO",
+  "Bucharest RO",
+  "Iasi RO",
+  "Front Office",
+  "Back MD",
+  "Back Flagman",
+  "Company branches",
+  "Agency",
+  "Corporate clients",
+  "Franchise PandaTur",
+  "Liber",
+  "Organic traffic",
+  "Sorting",
+  "Trainees"
+]

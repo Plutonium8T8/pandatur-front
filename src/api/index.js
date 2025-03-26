@@ -10,6 +10,7 @@ import { task } from "./task"
 import { notification } from "./notification"
 import { standalone } from "./standalone"
 import { activity } from "./activity"
+import { technicianDetails } from "./technicianDetails"
 
 export const api = {
   auth,
@@ -23,5 +24,6 @@ export const api = {
   task,
   notification,
   standalone,
-  activity
+  activity,
+  technicianDetails
 }

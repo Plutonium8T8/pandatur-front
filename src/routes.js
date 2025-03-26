@@ -2,7 +2,7 @@ import Dashboard from "./Components/DashboardComponent/Dashboard"
 import Leads from "./Components/LeadsComponent/LeadsComponent"
 import ChatComponent from "./Components/ChatComponent/ChatComponent"
 import LoginForm from "./Components/LoginComponent/LoginForm"
-import AdminPanel from "./Components/AdminPanelComponent/AdminPanel"
+import UsersComponent from "./Components/AdminPanelComponent/UsersComponent"
 import { NoAccess } from "./Components/NoAccess"
 import TaskPage from "./Components/Task/Page/TaskComponent"
 import Schedules from "./Components/Schedules/Schedules"
@@ -29,8 +29,8 @@ export const privateRoutes = (isAllowRole) => [
     component: ChatComponent
   },
   {
-    path: "/admin-panel",
-    component: isAllowRole ? AdminPanel : NoAccess
+    path: "/users",
+    component: isAllowRole ? UsersComponent : NoAccess
   },
   {
     path: "/leads/:ticketId?",

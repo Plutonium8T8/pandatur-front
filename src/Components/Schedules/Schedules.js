@@ -1,6 +1,7 @@
 import React from "react"
 import { Button, Title, Group } from "@mantine/core"
 import SchedulesList from "./SchedulesList"
+import { translations } from "../utils/translations"
 
 const Schedules = () => {
   const handleAddGroup = () => {

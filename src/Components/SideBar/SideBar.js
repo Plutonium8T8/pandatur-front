@@ -94,11 +94,11 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
               <span>{translations["Taskuri"][language]}</span>
             </div>
             <div
-              className={`menu-item ${isActive("admin-panel") ? "active" : ""}`}
-              onClick={() => handleNavigate("admin-panel")}
+              className={`menu-item ${isActive("users") ? "active" : ""}`}
+              onClick={() => handleNavigate("users")}
             >
               <FaUserSecret size={24} />
-              <span>{translations["Admin"][language]}</span>
+              <span>{translations["Users"][language]}</span>
             </div>
             <div
               className={`menu-item ${isActive("schedules") ? "active" : ""}`}

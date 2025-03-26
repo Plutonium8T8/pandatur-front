@@ -6,6 +6,8 @@ import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
 import { Spin } from "../Spin"
+import { Drawer, Stack, Group, Text, Button, TextInput } from "@mantine/core"
+import "./AdminPanel.css"
 
 const GroupScheduleView = ({ groupUsers }) => {
   const [schedule, setSchedule] = useState([])
@@ -104,7 +106,7 @@ const GroupScheduleView = ({ groupUsers }) => {
     try {
       setIsLoading(true)
 
-      const scheduleData = await api.schedules.getSchedules()
+      const scheduleData = await api.technicians.getSchedules()
 
       const combined = groupUsers.map((user) => {
         const userId = user.id
@@ -293,130 +295,101 @@ const GroupScheduleView = ({ groupUsers }) => {
         </table>
       </div>
 
-      {selectedEmployee !== null && selectedDay !== null && (
-        <div
-          className="modal-overlay"
-          onClick={() => {
-            setSelectedEmployee(null)
-            setSelectedDay(null)
-            setIntervals([])
-          }}
-        >
-          <div className="modal-container" onClick={(e) => e.stopPropagation()}>
-            <header className="modal-header">
-              <h2>
-                {schedule[selectedEmployee].name} (
-                {schedule[selectedEmployee].id}),{" "}
-                {
-                  translations[format(getWeekDays()[selectedDay], "EEEE")][
-                    language
-                  ]
-                }{" "}
-                , {format(getWeekDays()[selectedDay], "dd.MM")}
-              </h2>
-            </header>
+      <Drawer
+        opened={selectedEmployee !== null && selectedDay !== null}
+        onClose={() => {
+          setSelectedEmployee(null)
+          setSelectedDay(null)
+          setIntervals([])
+        }}
+        position="right"
+        size="lg"
+        padding="xl"
+        title={
+          selectedEmployee !== null &&
+          selectedDay !== null &&
+          getWeekDays()[selectedDay]
+            ? `${schedule[selectedEmployee].name} (${schedule[selectedEmployee].id}) — ${
+                translations[format(getWeekDays()[selectedDay], "EEEE")][
+                  language
+                ]
+              }, ${format(getWeekDays()[selectedDay], "dd.MM")}`
+            : ""
+        }
+      >
+        <form onSubmit={(e) => e.preventDefault()}>
+          <Stack>
+            {intervals.map((interval, index) => (
+              <Group key={index} align="flex-end">
+                <TextInput
+                  type="time"
+                  label="Start"
+                  value={interval.start}
+                  onChange={(e) => {
+                    const updated = [...intervals]
+                    updated[index].start = e.target.value
+                    setIntervals(updated)
+                  }}
+                />
+                <TextInput
+                  type="time"
+                  label="End"
+                  value={interval.end}
+                  onChange={(e) => {
+                    const updated = [...intervals]
+                    updated[index].end = e.target.value
+                    setIntervals(updated)
+                  }}
+                />
+                <Button
+                  variant="light"
+                  color="red"
+                  onClick={() => removeInterval(index)}
+                >
+                  <FaTrash />
+                </Button>
+              </Group>
+            ))}
 
-            <form
-              className="notification-form"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <div className="input-group">
-                <div className="time-inputs">
-                  {intervals.map((interval, index) => (
-                    <div key={index} className="time-interval">
-                      <label>
-                        Start
-                        <input
-                          type="time"
-                          value={interval.start}
-                          onChange={(e) => {
-                            const updated = [...intervals]
-                            updated[index].start = e.target.value
-                            setIntervals(updated)
-                          }}
-                        />
-                      </label>
-                      <label>
-                        End
-                        <input
-                          type="time"
-                          value={interval.end}
-                          onChange={(e) => {
-                            const updated = [...intervals]
-                            updated[index].end = e.target.value
-                            setIntervals(updated)
-                          }}
-                        />
-                      </label>
-                      <button
-                        type="button"
-                        className="delete-button"
-                        onClick={() => removeInterval(index)}
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
-                  ))}
+            <Group align="flex-end" mt="md">
+              <TextInput
+                type="time"
+                label="Start"
+                value={startTime}
+                onChange={(e) => setStartTime(e.target.value)}
+              />
+              <TextInput
+                type="time"
+                label="End"
+                value={endTime}
+                onChange={(e) => setEndTime(e.target.value)}
+              />
+              <Button onClick={addInterval} variant="light" color="green">
+                <FaPlus />
+              </Button>
+              <Button onClick={cutInterval} variant="light" color="yellow">
+                <FaMinus />
+              </Button>
+            </Group>
 
-                  <div className="add-interval">
-                    <label>
-                      Start
-                      <input
-                        type="time"
-                        value={startTime}
-                        onChange={(e) => setStartTime(e.target.value)}
-                      />
-                    </label>
-                    <label>
-                      End
-                      <input
-                        type="time"
-                        value={endTime}
-                        onChange={(e) => setEndTime(e.target.value)}
-                      />
-                    </label>
-                    <button
-                      type="button"
-                      className="add-button-plus"
-                      onClick={addInterval}
-                    >
-                      <FaPlus />
-                    </button>
-                    <button
-                      type="button"
-                      className="add-button-minus"
-                      onClick={cutInterval}
-                    >
-                      <FaMinus />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="button-container">
-                  <button
-                    type="submit"
-                    className="submit-button"
-                    onClick={saveShift}
-                  >
-                    {translations["Salvează"][language]}
-                  </button>
-                  <button
-                    type="button"
-                    className="clear-button"
-                    onClick={() => {
-                      setSelectedEmployee(null)
-                      setSelectedDay(null)
-                      setIntervals([])
-                    }}
-                  >
-                    {translations["Închide"][language]}
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <Group mt="xl" grow>
+              <Button onClick={saveShift} color="blue">
+                {translations["Salvează"][language]}
+              </Button>
+              <Button
+                variant="default"
+                onClick={() => {
+                  setSelectedEmployee(null)
+                  setSelectedDay(null)
+                  setIntervals([])
+                }}
+              >
+                {translations["Închide"][language]}
+              </Button>
+            </Group>
+          </Stack>
+        </form>
+      </Drawer>
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Card, Text, Stack, Button } from "@mantine/core"
 import GroupScheduleView from "./GroupScheduleView"
+import { translations } from "../utils/translations"
 
 // Заглушка пользователей по группам
 const groupData = {
