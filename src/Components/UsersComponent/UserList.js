@@ -53,8 +53,8 @@ const UserList = ({
     },
     {
       title: translations["Nume complet"][language],
-      dataIndex: "fullname",
-      key: "fullname",
+      dataIndex: "fullName",
+      key: "fullName",
       width: 250
     },
     {

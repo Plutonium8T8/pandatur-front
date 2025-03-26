@@ -35,9 +35,27 @@ const UsersComponent = () => {
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const data = await api.technicianDetails.getAllTechnicianList()
-      setUsers(data)
-      setFiltered(data)
+      const data = await api.users.getTechnicianList()
+      const normalized = data.map((item) => {
+        const personal = item.id || {}
+        const user = personal.user || {}
+        return {
+          id: personal.id,
+          fullName: user.username || "-",
+          email: user.email,
+          username: user.username,
+          // roles: user.roles ? JSON.parse(user.roles).map((r) => ({ role: r })) : [],
+          groups: item.groups || [],
+          jobTitle: item.job_title,
+          department: item.department,
+          salary: item.salary,
+          policyNumber: item.policy_number,
+          status: item.status
+        }
+      })
+
+      setUsers(normalized)
+      setFiltered(normalized)
     } catch (err) {
       console.error("Ошибка при загрузке:", err.message)
     } finally {
