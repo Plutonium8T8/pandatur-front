@@ -35,13 +35,18 @@ export const TicketInfoForm = ({
       data_plecarii,
       data_intoarcerii,
       data_cererii_de_retur,
+      buget,
       ...rest
     }) => {
       const formattedData = {
         data_venit_in_oficiu: formatDate(data_venit_in_oficiu),
         data_plecarii: formatDate(data_plecarii),
         data_intoarcerii: formatDate(data_intoarcerii),
-        data_cererii_de_retur: formatDate(data_cererii_de_retur)
+        data_cererii_de_retur: formatDate(data_cererii_de_retur),
+        buget: {
+          min: buget,
+          max: buget
+        }
       }
 
       return { ...formattedData, ...rest }

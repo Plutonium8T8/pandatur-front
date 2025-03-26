@@ -536,3 +536,13 @@ input:checked + .slider:before {
 .chat-extra-info-scroll-area > div > div {
   height: calc(100% - 50px);
 }
+
+.message.sent {
+  align-items: flex-end;
+  padding-left: 100px;
+}
+
+.message.sent .text {
+  background-color: #0f824c;
+  color: #fff;
+}
