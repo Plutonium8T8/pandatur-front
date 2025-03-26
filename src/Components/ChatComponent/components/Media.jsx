@@ -6,10 +6,10 @@ const FALLBACK_IMAGE = "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp"
 
 export const Media = ({ messages }) => {
   return (
-    <Box h="100%" p="md">
+    <>
       {messages.map((msg, index) => (
         <Flex direction="column" align="center" mt="md" key={index}>
-          <Box mt="6" ta="center" className="sent-time">
+          <Box mt="5" ta="center">
             <DateCell date={msg.time_sent} />
           </Box>
 
@@ -42,6 +42,6 @@ export const Media = ({ messages }) => {
           ) : null}
         </Flex>
       ))}
-    </Box>
+    </>
   )
 }

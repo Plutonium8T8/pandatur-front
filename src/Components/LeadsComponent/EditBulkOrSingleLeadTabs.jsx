@@ -74,8 +74,8 @@ export const EditBulkOrSingleLeadTabs = ({
         <Tabs.Tab value="contact">{getLanguageByKey("Contact")}</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="general_info" pt="xs">
-        <Flex direction="column" justify="space-between" h="100%">
+      <Tabs.Panel h="100%" value="general_info" pt="xs">
+        <Flex h="100%" direction="column" justify="space-between" pb="md">
           <GeneralForm
             data={generalInfoLightTicket}
             onSubmit={submit}

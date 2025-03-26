@@ -277,7 +277,7 @@ const ChatExtraInfo = ({
         </Tabs.List>
 
         <Tabs.Panel value="general">
-          <Flex p="md" direction="column">
+          <Box p="md">
             <GeneralForm
               data={updatedTicket}
               onSubmit={(values) => updateTicketDate(values)}
@@ -313,11 +313,11 @@ const ChatExtraInfo = ({
                 onSubmit={(values) => mergeData(values)}
               />
             </Box>
-          </Flex>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="info">
-          <Flex p="md" direction="column">
+          <Box p="md">
             <TicketInfoForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
@@ -331,11 +331,11 @@ const ChatExtraInfo = ({
                 </Button>
               )}
             />
-          </Flex>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="contract">
-          <Flex p="md" direction="column">
+          <Box p="md">
             <ContractForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
@@ -349,11 +349,11 @@ const ChatExtraInfo = ({
                 </Button>
               )}
             />
-          </Flex>
+          </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="invoice">
-          <Flex p="md" direction="column">
+          <Box style={{ border: "1px solid red" }} p="md">
             <InvoiceForm
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
@@ -367,16 +367,18 @@ const ChatExtraInfo = ({
                 </Button>
               )}
             />
-          </Flex>
+          </Box>
         </Tabs.Panel>
         {!!mediaSources.length && (
           <Tabs.Panel value="media">
-            <Media messages={mediaSources} />
+            <Box p="md">
+              <Media messages={mediaSources} />
+            </Box>
           </Tabs.Panel>
         )}
 
         <Tabs.Panel value="quality_control">
-          <Flex p="md" direction="column">
+          <Box p="md">
             <QualityControlForm
               isSelect
               data={extraInfo[selectTicketId]}
@@ -391,7 +393,7 @@ const ChatExtraInfo = ({
                 </Button>
               )}
             />
-          </Flex>
+          </Box>
         </Tabs.Panel>
       </Tabs>
     </ScrollArea>
