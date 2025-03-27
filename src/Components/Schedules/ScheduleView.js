@@ -4,7 +4,6 @@ import { translations } from "../utils/translations"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
-import { Spin } from "../Spin"
 import ShiftDrawer from "./ModalIntervals"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
@@ -87,14 +86,6 @@ const GroupScheduleView = ({ groupUsers }) => {
 
   const closeDrawer = () => {
     setSelected({ employeeIndex: null, dayIndex: null })
-  }
-
-  if (isLoading) {
-    return (
-      <div className="d-flex align-items-center justify-content-center h-full">
-        <Spin />
-      </div>
-    )
   }
 
   return (

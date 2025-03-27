@@ -14,6 +14,7 @@ import { schedules } from "../../api/schedules"
 import { api } from "../../api"
 import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
+import { FaTrash } from "react-icons/fa"
 import { translations } from "../utils/translations"
 
 const SchedulesList = ({}) => {
@@ -155,7 +156,7 @@ const SchedulesList = ({}) => {
                 variant="light"
                 onClick={() => handleDelete(group.id)}
               >
-                🗑
+                <FaTrash />
               </ActionIcon>
             </Group>
           </Card>
