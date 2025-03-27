@@ -331,7 +331,7 @@ export const AppProvider = ({ children }) => {
       case "seen": {
         const { ticket_id, seen_at } = message.data
 
-        console.log("🔄 Primit `seen` din WebSocket:", { ticket_id, seen_at })
+        // console.log("🔄 Primit `seen` din WebSocket:", { ticket_id, seen_at })
 
         setMessages((prevMessages) => {
           return prevMessages.map((msg) =>
@@ -424,7 +424,7 @@ export const AppProvider = ({ children }) => {
       0
     )
 
-    console.log(`🔄 updated unreadCount: ${totalUnread}`)
+    // console.log(`🔄 updated unreadCount: ${totalUnread}`)
     setUnreadCount(totalUnread)
   }, [tickets, unreadMessages])
 

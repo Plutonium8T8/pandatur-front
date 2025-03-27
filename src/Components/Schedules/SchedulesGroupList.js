@@ -8,8 +8,6 @@ import {
   Badge,
   Avatar,
   Tooltip,
-  AvatarGroup,
-  TooltipGroup,
   ActionIcon
 } from "@mantine/core"
 import { schedules } from "../../api/schedules"
@@ -18,7 +16,7 @@ import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
 import { translations } from "../utils/translations"
 
-const SchedulesList = ({ reload }) => {
+const SchedulesList = ({}) => {
   const [groups, setGroups] = useState([])
   const [technicians, setTechnicians] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
@@ -52,7 +50,7 @@ const SchedulesList = ({ reload }) => {
 
   useEffect(() => {
     fetchData()
-  }, [reload])
+  }, [])
 
   const handleGroupClick = (group) => {
     setSelectedGroup(group)

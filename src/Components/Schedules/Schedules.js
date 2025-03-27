@@ -6,7 +6,6 @@ import CreateGroupDrawer from "./ModalGroup"
 
 const Schedules = () => {
   const [opened, setOpened] = useState(false)
-  const [reload, setReload] = useState(false)
   const language = localStorage.getItem("language") || "RO"
 
   return (
@@ -18,14 +17,13 @@ const Schedules = () => {
         </Button>
       </Group>
 
-      <SchedulesList reload={reload} />
+      <SchedulesList />
 
       <CreateGroupDrawer
         opened={opened}
         onClose={() => setOpened(false)}
         onCreated={() => {
           setOpened(false)
-          setReload((r) => !r)
         }}
       />
     </div>

@@ -61,7 +61,19 @@ const ShiftDrawer = ({
       setIntervals((prev) => [...prev, payload])
       setStartTime("")
       setEndTime("")
-      fetchData()
+
+      setSchedule((prev) =>
+        prev.map((emp, i) =>
+          i === selected.employeeIndex
+            ? {
+                ...emp,
+                shifts: emp.shifts.map((sh, d) =>
+                  d === selected.dayIndex ? [...sh, payload] : sh
+                )
+              }
+            : emp
+        )
+      )
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" })
     }
