@@ -1,20 +1,15 @@
 import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
-import dayjs from "dayjs"
 import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../utils"
 import { LabelSwitch } from "../../LabelSwitch"
 import { paymentStatusOptions } from "../../../FormOptions"
 import { DD_MM_YYYY } from "../../../app-constants"
 import { useUser } from "../../../hooks"
-import { DD_MM_YYYY__HH_mm_ss } from "../../../app-constants"
+import { formatDateOrUndefined } from "../../utils"
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
-
-const formatDateOrUndefined = (date) => {
-  return date ? dayjs(date).format(DD_MM_YYYY__HH_mm_ss) : undefined
-}
 
 const convertStringOrUndefined = (data) => {
   if (typeof data === "boolean") {
@@ -53,28 +48,33 @@ export const ContractForm = ({
       ...rest
     }) => {
       const formattedData = {
-        data_contractului_after: formatDateOrUndefined(data_contractului?.[0]),
-        data_contractului_before: formatDateOrUndefined(data_contractului?.[1]),
-        data_avansului_after: formatDateOrUndefined(data_avansului?.[0]),
-        data_avansului_before: formatDateOrUndefined(data_avansului?.[1]),
-        data_de_plata_integrala_after: formatDateOrUndefined(
-          data_de_plata_integrala?.[0]
-        ),
-        data_de_plata_integrala_before: formatDateOrUndefined(
-          data_de_plata_integrala?.[1]
-        ),
+        data_contractului: formatDateOrUndefined(data_contractului),
+        data_avansului: formatDateOrUndefined(data_avansului),
+        data_de_plata_integrala: formatDateOrUndefined(data_de_plata_integrala),
         contract_trimis: convertStringOrUndefined(contract_trimis),
         contract_semnat: convertStringOrUndefined(contract_semnat),
         achitare_efectuata: convertStringOrUndefined(achitare_efectuata),
         rezervare_confirmata: convertStringOrUndefined(rezervare_confirmata),
         contract_arhivat: convertStringOrUndefined(contract_arhivat),
         control: convertStringOrUndefined(control),
-        avans_euro_min: avans_euro,
-        avans_euro_max: avans_euro,
-        pret_netto_min: pret_netto,
-        pret_netto_max: pret_netto,
-        achitat_client_min: achitat_client,
-        achitat_client_max: achitat_client
+        ...(avans_euro && {
+          avans_euro: {
+            min: avans_euro,
+            max: avans_euro
+          }
+        }),
+        ...(achitat_client && {
+          achitat_client: {
+            min: achitat_client,
+            max: achitat_client
+          }
+        }),
+        ...(pret_netto && {
+          pret_netto: {
+            min: pret_netto,
+            max: pret_netto
+          }
+        })
       }
 
       return { ...formattedData, ...rest }

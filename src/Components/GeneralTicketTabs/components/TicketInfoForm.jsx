@@ -3,6 +3,7 @@ import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../utils"
+import { formatDateOrUndefined } from "../../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -13,14 +14,9 @@ import {
   nameExcursionOptions,
   purchaseProcessingOptions
 } from "../../../FormOptions"
-import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "../../../app-constants"
-import dayjs from "dayjs"
+import { DD_MM_YYYY } from "../../../app-constants"
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
-
-const formatDateOrUndefined = (date) => {
-  return date ? dayjs(date).format(DD_MM_YYYY__HH_mm_ss) : undefined
-}
 
 export const TicketInfoForm = ({
   onSubmit,
@@ -45,20 +41,11 @@ export const TicketInfoForm = ({
     }) => {
       const formattedData = {
         data_plecarii: formatDateOrUndefined(data_plecarii),
-        data_venit_in_oficiu_after: formatDateOrUndefined(
-          data_venit_in_oficiu?.[0]
-        ),
-        data_venit_in_oficiu_before: formatDateOrUndefined(
-          data_venit_in_oficiu?.[1]
-        ),
-        data_intoarcerii_after: formatDateOrUndefined(data_intoarcerii?.[0]),
-        data_intoarcerii_before: formatDateOrUndefined(data_intoarcerii?.[1]),
-        data_cererii_de_retur_after: formatDateOrUndefined(
-          data_cererii_de_retur?.[0]
-        ),
-        data_cererii_de_retur_before: formatDateOrUndefined(
-          data_cererii_de_retur?.[1]
-        ),
+        data_venit_in_oficiu: formatDateOrUndefined(data_venit_in_oficiu),
+
+        data_intoarcerii: formatDateOrUndefined(data_intoarcerii),
+        data_cererii_de_retur: formatDateOrUndefined(data_cererii_de_retur),
+
         ...(buget && {
           buget: {
             min: buget,
@@ -103,6 +90,7 @@ export const TicketInfoForm = ({
         />
 
         <DatePickerInput
+          type="range"
           minDate={setMinDate}
           clearable
           valueFormat={DD_MM_YYYY}
