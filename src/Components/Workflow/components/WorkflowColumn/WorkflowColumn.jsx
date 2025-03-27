@@ -1,7 +1,7 @@
-import React from "react"
-import TicketCard from "./TicketCardComponent"
-import { getLanguageByKey } from "../utils/getLanguageByKey"
 import { getColorByWorkflowType, getBrightByWorkflowType } from "../WorkflowTag"
+import TicketCard from "../../../LeadsComponent/TicketCardComponent"
+import { getLanguageByKey } from "../../../utils"
+import "./WorkflowColumn.css"
 
 const priorityOrder = {
   joasă: 1,
@@ -9,7 +9,6 @@ const priorityOrder = {
   înaltă: 3,
   critică: 4
 }
-
 const filterTickets = (workflow, tickets) => {
   const filteredTickets = tickets
     .filter((ticket) => ticket.workflow === workflow)
@@ -35,7 +34,12 @@ const filterTickets = (workflow, tickets) => {
   return filteredTickets
 }
 
-const WorkflowColumn = ({ workflow, tickets, searchTerm, onEditTicket }) => {
+export const WorkflowColumn = ({
+  onEditTicket,
+  searchTerm,
+  workflow,
+  tickets
+}) => {
   const filteredTickets = filterTickets(workflow, tickets)
 
   return (
@@ -80,5 +84,3 @@ const WorkflowColumn = ({ workflow, tickets, searchTerm, onEditTicket }) => {
     </div>
   )
 }
-
-export default WorkflowColumn

@@ -1,6 +1,6 @@
 import { Box, Flex, Image, Text, Badge } from "@mantine/core"
 import { DEFAULT_PHOTO } from "../../../../app-constants"
-import { WorkflowTag } from "../../../WorkflowTag"
+import { WorkflowTag } from "../../../Workflow/components"
 import "./ChatListItem.css"
 import dayjs from "dayjs"
 import { HH_mm, DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants"

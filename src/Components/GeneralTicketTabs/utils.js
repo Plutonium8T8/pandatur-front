@@ -9,9 +9,11 @@ export const platformOptions = [
   "sipuni"
 ]
 
+export const filteredWorkflows = workflowOptions.filter(
+  (wf) => wf !== "Realizat cu succes" && wf !== "Închis și nerealizat"
+)
+
 export const filterDefaults = {
-  workflow: workflowOptions.filter(
-    (wf) => wf !== "Realizat cu succes" && wf !== "Închis și nerealizat"
-  ),
+  workflow: filteredWorkflows,
   tags: []
 }

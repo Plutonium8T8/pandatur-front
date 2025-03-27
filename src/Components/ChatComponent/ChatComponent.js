@@ -85,20 +85,22 @@ const ChatComponent = () => {
           setPersonalInfo={setPersonalInfo}
         />
 
-        <ChatExtraInfo
-          selectedClient={selectedClient}
-          ticketId={ticketId}
-          selectTicketId={selectTicketId}
-          setSelectTicketId={handleSelectTicket}
-          tickets={tickets}
-          updatedTicket={updatedTicket}
-          updateTicket={updateTicket}
-          setTickets={setTickets}
-          personalInfo={personalInfo}
-          setPersonalInfo={setPersonalInfo}
-          messages={messages}
-          isLoading={isLoading}
-        />
+        {selectTicketId && (
+          <ChatExtraInfo
+            selectedClient={selectedClient}
+            ticketId={ticketId}
+            selectTicketId={selectTicketId}
+            setSelectTicketId={handleSelectTicket}
+            tickets={tickets}
+            updatedTicket={updatedTicket}
+            updateTicket={updateTicket}
+            setTickets={setTickets}
+            personalInfo={personalInfo}
+            setPersonalInfo={setPersonalInfo}
+            messages={messages}
+            isLoading={isLoading}
+          />
+        )}
       </div>
     </div>
   )
