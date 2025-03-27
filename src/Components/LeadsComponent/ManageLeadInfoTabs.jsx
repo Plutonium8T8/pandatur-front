@@ -74,8 +74,12 @@ export const ManageLeadInfoTabs = ({
         <Tabs.Tab value="contact">{getLanguageByKey("Contact")}</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel h="100%" value="general_info" pt="xs">
-        <Flex h="100%" direction="column" justify="space-between" pb="md">
+      <Tabs.Panel
+        style={{ height: `calc(100% - 36px)` }}
+        value="general_info"
+        pt="xs"
+      >
+        <Flex direction="column" justify="space-between" h="100%">
           <GeneralForm
             data={generalInfoLightTicket}
             onSubmit={submit}
