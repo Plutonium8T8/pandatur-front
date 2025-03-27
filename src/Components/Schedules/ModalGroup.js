@@ -4,7 +4,13 @@ import { api } from "../../api"
 import { schedules } from "../../api/schedules"
 import { translations } from "../utils/translations"
 
-const CreateGroupDrawer = ({ opened, onClose, onGroupCreated }) => {
+const ModalGroup = ({
+  opened,
+  onClose,
+  onGroupCreated,
+  initialData = null,
+  isEditMode = false
+}) => {
   const [groupName, setGroupName] = useState("")
   const [users, setUsers] = useState([])
   const [selectedUserIds, setSelectedUserIds] = useState([])
@@ -28,28 +34,69 @@ const CreateGroupDrawer = ({ opened, onClose, onGroupCreated }) => {
 
   const handleSubmit = async () => {
     try {
-      await schedules.createGroup({
-        name: groupName,
-        user_ids: selectedUserIds.map((id) => parseInt(id))
-      })
+      if (isEditMode && initialData?.id) {
+        const groupId = initialData.id
+
+        await schedules.updateGroup(groupId, { name: groupName })
+
+        const currentUserIds = initialData.user_ids || []
+        const newUserIds = selectedUserIds.map((id) => parseInt(id))
+
+        const usersToAdd = newUserIds.filter(
+          (id) => !currentUserIds.includes(id)
+        )
+        const usersToRemove = currentUserIds.filter(
+          (id) => !newUserIds.includes(id)
+        )
+
+        if (usersToAdd.length > 0) {
+          await schedules.assignMultipleTechnicians(groupId, usersToAdd)
+        }
+
+        for (const userId of usersToRemove) {
+          await schedules.removeTechnician(groupId, userId)
+        }
+      } else {
+        await schedules.createGroup({
+          name: groupName,
+          user_ids: selectedUserIds.map((id) => parseInt(id))
+        })
+      }
+
       onClose()
       setGroupName("")
       setSelectedUserIds([])
       onGroupCreated()
     } catch (err) {
-      console.error("Ошибка при создании группы:", err.message)
+      console.error("Ошибка при сохранении группы:", err.message)
     }
   }
 
   useEffect(() => {
-    if (opened) fetchUsers()
-  }, [opened])
+    if (opened) {
+      fetchUsers()
+
+      if (isEditMode && initialData) {
+        setGroupName(initialData.name || "")
+        setSelectedUserIds(
+          initialData.user_ids?.map((id) => id.toString()) || []
+        )
+      } else {
+        setGroupName("")
+        setSelectedUserIds([])
+      }
+    }
+  }, [opened, initialData, isEditMode])
 
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={translations["Adaugă grup"][language]}
+      title={
+        isEditMode
+          ? translations["Modifică grup"][language]
+          : translations["Adaugă grup"][language]
+      }
       position="right"
       padding="md"
       size="md"
@@ -71,11 +118,13 @@ const CreateGroupDrawer = ({ opened, onClose, onGroupCreated }) => {
       />
       <Group mt="md" position="right">
         <Button onClick={handleSubmit}>
-          {translations["Creează"][language]}
+          {isEditMode
+            ? translations["Salvează"][language]
+            : translations["Creează"][language]}
         </Button>
       </Group>
     </Drawer>
   )
 }
 
-export default CreateGroupDrawer
+export default ModalGroup

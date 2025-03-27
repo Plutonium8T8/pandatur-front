@@ -31,15 +31,18 @@
 
 .schedule-table-container {
   width: 100%;
-  overflow-x: auto; /* Enables horizontal scrolling when needed */
+  overflow-x: auto;
+  /* Enables horizontal scrolling when needed */
 }
 
 .schedule-table {
   border-collapse: collapse;
   margin-top: 20px;
-  table-layout: fixed; /* Keeps columns consistent */
+  table-layout: fixed;
+  /* Keeps columns consistent */
   width: 100%;
-  min-width: fit-content; /* Ensures table fits content when wider than the viewport */
+  min-width: fit-content;
+  /* Ensures table fits content when wider than the viewport */
 }
 
 .schedule-table th,
@@ -49,8 +52,10 @@
   text-align: center;
   font-size: 14px;
   height: 50px;
-  min-width: 140px; /* Ensures each cell is at least 140px wide */
-  word-break: break-word; /* Ensures content wraps properly */
+  min-width: 140px;
+  /* Ensures each cell is at least 140px wide */
+  word-break: break-word;
+  /* Ensures content wraps properly */
 }
 
 .schedule-table th {
@@ -210,9 +215,12 @@
 .time-interval,
 .add-interval {
   display: flex;
-  align-items: center; /* Vertically center elements */
-  justify-content: space-evenly; /* Evenly distribute space between and around elements */
-  gap: 15px; /* Optional: control the minimum spacing between elements */
+  align-items: center;
+  /* Vertically center elements */
+  justify-content: space-evenly;
+  /* Evenly distribute space between and around elements */
+  gap: 15px;
+  /* Optional: control the minimum spacing between elements */
 }
 
 .time-interval {
@@ -240,14 +248,19 @@
 
 .add-button-minus,
 .add-button-plus {
-  display: flex; /* Use flexbox for alignment */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
+  display: flex;
+  /* Use flexbox for alignment */
+  align-items: center;
+  /* Center vertically */
+  justify-content: center;
+  /* Center horizontally */
   color: white;
   border: none;
-  padding: 10px 10px; /* Adjust padding for consistent button size */
+  padding: 10px 10px;
+  /* Adjust padding for consistent button size */
   border-radius: 5px;
-  font-size: 18px; /* Font size for the symbols */
+  font-size: 18px;
+  /* Font size for the symbols */
   cursor: pointer;
   transition: background-color 0.3s ease;
   text-align: center;
@@ -263,7 +276,8 @@
 
 .add-button-minus:hover,
 .add-button-plus:hover {
-  background-color: #a9b644; /* Slightly darker shade on hover */
+  background-color: #a9b644;
+  /* Slightly darker shade on hover */
 }
 
 .add-button-minus:hover {

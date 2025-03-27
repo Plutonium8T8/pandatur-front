@@ -14,13 +14,16 @@ import { schedules } from "../../api/schedules"
 import { api } from "../../api"
 import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
-import { FaTrash } from "react-icons/fa"
+import { FaTrash, FaEdit } from "react-icons/fa"
 import { translations } from "../utils/translations"
+import CreateGroupDrawer from "./ModalGroup"
 
 const SchedulesGroupList = ({ reload }) => {
   const [groups, setGroups] = useState([])
   const [technicians, setTechnicians] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
+  const [editOpened, setEditOpened] = useState(false)
+  const [editingGroup, setEditingGroup] = useState(null)
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
 
@@ -77,6 +80,11 @@ const SchedulesGroupList = ({ reload }) => {
     }
   }
 
+  const handleEdit = (group) => {
+    setEditingGroup(group)
+    setEditOpened(true)
+  }
+
   if (selectedGroup) {
     const groupUsers = technicians.filter((t) =>
       selectedGroup.user_ids.includes(t.id)
@@ -93,81 +101,100 @@ const SchedulesGroupList = ({ reload }) => {
   }
 
   return (
-    <Stack spacing="md">
-      {groups.map((group) => {
-        const groupUsers = technicians.filter((u) =>
-          group.user_ids.includes(u.id)
-        )
+    <>
+      <Stack spacing="md">
+        {groups.map((group) => {
+          const groupUsers = technicians.filter((u) =>
+            group.user_ids.includes(u.id)
+          )
 
-        return (
-          <Card
-            key={group.id}
-            shadow="xs"
-            padding="lg"
-            radius="md"
-            withBorder
-            className="group-card"
-          >
-            <Group position="apart" align="start">
-              <div
-                style={{ flex: 1, cursor: "pointer" }}
-                onClick={() => handleGroupClick(group)}
-              >
-                <Group spacing="xs" mb={10}>
-                  <Text size="md" fw={600}>
-                    {group.name}
-                  </Text>
-                  <Badge color="blue" variant="light">
-                    {translations["Pentru o săptămână"][language]}
-                  </Badge>
-                </Group>
+          return (
+            <Card
+              key={group.id}
+              shadow="xs"
+              padding="lg"
+              radius="md"
+              withBorder
+              className="group-card"
+            >
+              <Group position="apart" align="start">
+                <div
+                  style={{ flex: 1, cursor: "pointer" }}
+                  onClick={() => handleGroupClick(group)}
+                >
+                  <Group spacing="xs" mb={10}>
+                    <Text size="md" fw={600}>
+                      {group.name}
+                    </Text>
+                    <Badge color="blue" variant="light">
+                      {translations["Pentru o săptămână"][language]}
+                    </Badge>
+                  </Group>
 
-                <Tooltip.Group openDelay={300} closeDelay={100}>
-                  <Avatar.Group spacing="sm">
-                    {groupUsers.slice(0, 5).map((u) => (
-                      <Tooltip label={u.username} withArrow key={u.id}>
-                        <Avatar
-                          size="md"
-                          radius="xl"
-                          src={u.photo || undefined}
-                          color="blue"
+                  <Tooltip.Group openDelay={300} closeDelay={100}>
+                    <Avatar.Group spacing="sm">
+                      {groupUsers.slice(0, 5).map((u) => (
+                        <Tooltip label={u.username} withArrow key={u.id}>
+                          <Avatar
+                            size="md"
+                            radius="xl"
+                            src={u.photo || undefined}
+                            color="blue"
+                          >
+                            {u.username?.[0]?.toUpperCase() || "?"}
+                          </Avatar>
+                        </Tooltip>
+                      ))}
+                      {groupUsers.length > 5 && (
+                        <Tooltip
+                          withArrow
+                          label={
+                            <>
+                              {groupUsers.slice(5).map((u) => (
+                                <div key={u.id}>{u.username}</div>
+                              ))}
+                            </>
+                          }
                         >
-                          {u.username?.[0]?.toUpperCase() || "?"}
-                        </Avatar>
-                      </Tooltip>
-                    ))}
-                    {groupUsers.length > 5 && (
-                      <Tooltip
-                        withArrow
-                        label={
-                          <>
-                            {groupUsers.slice(5).map((u) => (
-                              <div key={u.id}>{u.username}</div>
-                            ))}
-                          </>
-                        }
-                      >
-                        <Avatar size="md" radius="xl" color="blue">
-                          +{groupUsers.length - 5}
-                        </Avatar>
-                      </Tooltip>
-                    )}
-                  </Avatar.Group>
-                </Tooltip.Group>
-              </div>
+                          <Avatar size="md" radius="xl" color="blue">
+                            +{groupUsers.length - 5}
+                          </Avatar>
+                        </Tooltip>
+                      )}
+                    </Avatar.Group>
+                  </Tooltip.Group>
+                </div>
 
-              <ActionIcon
-                color="red"
-                variant="light"
-                onClick={() => handleDelete(group.id)}
-              >
-                <FaTrash />
-              </ActionIcon>
-            </Group>
-          </Card>
-        )
-      })}
-    </Stack>
+                <Group>
+                  <ActionIcon
+                    color="blue"
+                    variant="light"
+                    onClick={() => handleEdit(group)}
+                  >
+                    <FaEdit />
+                  </ActionIcon>
+                  <ActionIcon
+                    color="red"
+                    variant="light"
+                    onClick={() => handleDelete(group.id)}
+                  >
+                    <FaTrash />
+                  </ActionIcon>
+                </Group>
+              </Group>
+            </Card>
+          )
+        })}
+      </Stack>
+
+      <CreateGroupDrawer
+        opened={editOpened}
+        onClose={() => setEditOpened(false)}
+        onGroupCreated={fetchData}
+        initialData={editingGroup}
+        isEditMode
+      />
+    </>
   )
 }
 

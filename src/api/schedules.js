@@ -24,7 +24,7 @@ export const schedules = {
 
   // Обновить группу по ID
   updateGroup: async (id, body) => {
-    const { data } = await baseAxios.put(`/api/schedule-groups/${id}`, body)
+    const { data } = await baseAxios.patch(`/api/schedule-groups/${id}`, body)
 
     return data
   },

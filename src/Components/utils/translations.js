@@ -1602,6 +1602,10 @@ export const translations = {
   "Pentru o săptămână": {
     RO: "Pentru o săptămână",
     RU: "На неделю"
+  },
+  "Modifică grup": {
+    RO: "Modifică grup",
+    RU: "Изменить группу"
   }
 }
 
