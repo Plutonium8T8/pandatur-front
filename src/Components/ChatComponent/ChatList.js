@@ -29,6 +29,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   const wrapperChatItemRef = useRef(null)
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef)
 
+  // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
     if (chatListRef.current && selectTicketId) {
       const container = chatListRef.current

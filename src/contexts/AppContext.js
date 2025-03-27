@@ -30,12 +30,10 @@ const normalizeLightTickets = (tickets) => {
 export const AppProvider = ({ children }) => {
   const socketRef = useRef(null)
   const [tickets, setTickets] = useState([])
-  const [ticketIds, setTicketIds] = useState([])
   const [messages, setMessages] = useState([])
   const [clientMessages, setClientMessages] = useState([])
   const [unreadCount, setUnreadCount] = useState(0)
   const { enqueueSnackbar } = useSnackbar()
-  const [isLoading, setIsLoading] = useState(false)
   const { userId } = useUser()
   const [unreadMessages, setUnreadMessages] = useState(new Map())
   const [selectTicketId, setSelectTicketId] = useState(null)
@@ -183,10 +181,6 @@ export const AppProvider = ({ children }) => {
 
       const processedTickets = normalizeLightTickets(data.tickets)
       setTickets((prev) => [...prev, ...processedTickets])
-      setTicketIds((prev) => [
-        ...prev,
-        ...processedTickets.map((ticket) => ticket.id)
-      ])
 
       connectToChatRooms(processedTickets.map((ticket) => ticket.id))
 
@@ -435,7 +429,6 @@ export const AppProvider = ({ children }) => {
         unreadCount,
         markMessagesAsRead,
         clientMessages,
-        isLoading,
         updateTicket,
         fetchTickets,
         socketRef,

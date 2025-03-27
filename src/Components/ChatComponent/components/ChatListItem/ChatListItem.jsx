@@ -39,7 +39,7 @@ export const ChatListItem = ({
           <div>
             <Text>{chat.contact || "no contact"}</Text>
             <Text>{chat.id ? `Lead: #${chat.id}` : "no id"}</Text>
-            {chat.workflow && <WorkflowTag type={chat.workflow} />}
+            <WorkflowTag type={chat.workflow || "no workflow"} />
           </div>
         </Flex>
 
