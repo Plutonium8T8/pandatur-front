@@ -2,6 +2,7 @@ import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import dayjs from "dayjs"
+import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../utils"
 import { LabelSwitch } from "../../LabelSwitch"
 import { paymentStatusOptions } from "../../../FormOptions"
@@ -196,8 +197,9 @@ export const ContractForm = ({
           mt="md"
           decimalScale={2}
           fixedDecimalScale
-          label={`${getLanguageByKey("Avans euro")} €`}
-          placeholder={`${getLanguageByKey("Avans euro")} €`}
+          leftSection={<MdOutlineEuroSymbol />}
+          label={getLanguageByKey("Avans euro")}
+          placeholder={getLanguageByKey("Avans euro")}
           key={form.key("avans_euro")}
           {...form.getInputProps("avans_euro")}
         />
@@ -207,8 +209,9 @@ export const ContractForm = ({
           mt="md"
           decimalScale={2}
           fixedDecimalScale
-          label={`${getLanguageByKey("Preț NETTO")} €`}
-          placeholder={`${getLanguageByKey("Preț NETTO")} €`}
+          leftSection={<MdOutlineEuroSymbol />}
+          label={getLanguageByKey("Preț NETTO")}
+          placeholder={getLanguageByKey("Preț NETTO")}
           key={form.key("pret_netto")}
           {...form.getInputProps("pret_netto")}
         />

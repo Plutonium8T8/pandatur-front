@@ -26,7 +26,7 @@ export const InvoiceForm = ({
         f_numarul: data.f_numarul,
         f_pret: data.f_pret,
         f_suma: data.f_suma,
-        valuta_contului: data.valuta_contului,
+        f_valuta_contului: data.f_valuta_contului,
         iban: data.iban
       })
     }
@@ -91,8 +91,8 @@ export const InvoiceForm = ({
           placeholder={getLanguageByKey("Valuta contului")}
           data={valutaOptions}
           clearable
-          key={form.key("valuta_contului")}
-          {...form.getInputProps("valuta_contului")}
+          key={form.key("f_valuta_contului")}
+          {...form.getInputProps("f_valuta_contului")}
         />
 
         <Select

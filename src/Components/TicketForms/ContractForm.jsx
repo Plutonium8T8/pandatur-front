@@ -2,6 +2,7 @@ import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
+import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey, formatDate, parseServerDate } from "../utils"
 import { LabelSwitch } from "../LabelSwitch"
 import { paymentStatusOptions } from "../../FormOptions"
@@ -186,9 +187,12 @@ export const ContractForm = ({
 
         <NumberInput
           hideControls
+          leftSection={<MdOutlineEuroSymbol />}
           mt="md"
-          label={`${getLanguageByKey("Avans euro")} €`}
-          placeholder={`${getLanguageByKey("Avans euro")} €`}
+          decimalScale={2}
+          fixedDecimalScale
+          label={getLanguageByKey("Avans euro")}
+          placeholder={getLanguageByKey("Avans euro")}
           key={form.key("avans_euro")}
           {...form.getInputProps("avans_euro")}
         />
@@ -196,8 +200,11 @@ export const ContractForm = ({
         <NumberInput
           hideControls
           mt="md"
-          label={`${getLanguageByKey("Preț NETTO")} €`}
-          placeholder={`${getLanguageByKey("Preț NETTO")} €`}
+          decimalScale={2}
+          fixedDecimalScale
+          leftSection={<MdOutlineEuroSymbol />}
+          label={getLanguageByKey("Preț NETTO")}
+          placeholder={getLanguageByKey("Preț NETTO")}
           key={form.key("pret_netto")}
           {...form.getInputProps("pret_netto")}
         />
@@ -206,6 +213,8 @@ export const ContractForm = ({
           hideControls
           mt="md"
           label={getLanguageByKey("Achitat client")}
+          decimalScale={2}
+          fixedDecimalScale
           placeholder={getLanguageByKey("Achitat client")}
           key={form.key("achitat_client")}
           {...form.getInputProps("achitat_client")}
@@ -225,8 +234,11 @@ export const ContractForm = ({
           <NumberInput
             disabled
             hideControls
+            decimalScale={2}
+            fixedDecimalScale
             mt="md"
-            label={`${getLanguageByKey("Comision companie")} €`}
+            leftSection={<MdOutlineEuroSymbol />}
+            label={getLanguageByKey("Comision companie")}
             placeholder={`${getLanguageByKey("Comision companie")} €`}
           />
         )}

@@ -1,6 +1,7 @@
 import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
+import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../utils"
 import {
   sourceOfLeadOptions,
@@ -80,10 +81,11 @@ export const TicketInfoForm = ({
       >
         <NumberInput
           hideControls
-          label={`${getLanguageByKey("Vânzare")} €`}
+          label={getLanguageByKey("Vânzare")}
           placeholder={getLanguageByKey("Indicați suma în euro")}
           decimalScale={2}
           fixedDecimalScale
+          leftSection={<MdOutlineEuroSymbol />}
           key={form.key("buget")}
           {...form.getInputProps("buget")}
         />
