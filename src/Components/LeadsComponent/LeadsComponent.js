@@ -34,7 +34,7 @@ const Leads = () => {
   const { enqueueSnackbar } = useSnackbar()
   const navigate = useNavigate()
   const leadsFilterHeight = useDOMElementHeight(refLeadsFilter)
-  const { tickets, isLoading, setTickets, spinnerTickets } = useApp()
+  const { tickets, setTickets, spinnerTickets } = useApp()
   const { ticketId } = useParams()
 
   const [hardTickets, setHardTickets] = useState([])
@@ -244,6 +244,7 @@ const Leads = () => {
           setTotalLeads(rest.pagination.total || 0)
           return
         }
+
         setFilteredTicketIds(data ?? null)
         setTotalLeads(rest.total || 0)
       }
@@ -284,7 +285,7 @@ const Leads = () => {
         }}
         className="dashboard-container"
       >
-        {isLoading || loading ? (
+        {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
           </div>
