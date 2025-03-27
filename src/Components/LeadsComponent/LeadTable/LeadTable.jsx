@@ -16,7 +16,7 @@ import { MdDelete, MdEdit } from "react-icons/md"
 import { useSnackbar } from "notistack"
 import { api } from "../../../api"
 import { useConfirmPopup } from "../../../hooks"
-import { EditBulkOrSingleLeadTabs } from "../../LeadsComponent/EditBulkOrSingleLeadTabs"
+import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs"
 import { DateCell } from "../../DateCell"
 import { MantineModal } from "../../MantineModal"
 
@@ -385,7 +385,7 @@ export const LeadTable = ({
           </Text>
         }
       >
-        <EditBulkOrSingleLeadTabs
+        <ManageLeadInfoTabs
           onClose={() => setId()}
           fetchLeads={fetchTickets}
           id={id}

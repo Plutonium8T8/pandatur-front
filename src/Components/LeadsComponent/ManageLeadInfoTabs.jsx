@@ -5,7 +5,7 @@ import { getLanguageByKey, showServerError } from "../utils"
 import { api } from "../../api"
 import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForms"
 
-export const EditBulkOrSingleLeadTabs = ({
+export const ManageLeadInfoTabs = ({
   open,
   onClose,
   selectedTickets,

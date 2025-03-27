@@ -18,7 +18,7 @@ import "../../App.css"
 import "../SnackBarComponent/SnackBarComponent.css"
 import { SpinnerRightBottom } from "../SpinnerRightBottom"
 import { MantineModal } from "../MantineModal"
-import { EditBulkOrSingleLeadTabs } from "./EditBulkOrSingleLeadTabs"
+import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs"
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
 import { WorkflowColumns } from "../WorkflowColumns"
 import { filteredWorkflows } from "../GeneralTicketTabs"
@@ -393,7 +393,7 @@ const Leads = () => {
         onClose={() => closeModal()}
         title={getLanguageByKey("Editarea tichetelor în grup")}
       >
-        <EditBulkOrSingleLeadTabs
+        <ManageLeadInfoTabs
           onClose={closeModal}
           selectedTickets={selectedTickets}
           fetchLeads={fetchTicketList}
