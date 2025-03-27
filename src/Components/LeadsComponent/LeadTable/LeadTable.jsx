@@ -19,10 +19,14 @@ import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs"
 import { DateCell } from "../../DateCell"
 import { MantineModal } from "../../MantineModal"
 import "./LeadTable.css"
+import { parseTags } from "../../../stringUtils"
 
 const renderTags = (tags) => {
-  const isTags = tags.some(Boolean)
-  return isTags ? tags.map((tag, index) => <Tag key={index}>{tag}</Tag>) : "—"
+  const tagList = parseTags(tags)
+  const isTags = tagList.some(Boolean)
+  return isTags
+    ? tagList.map((tag, index) => <Tag key={index}>{tag}</Tag>)
+    : "—"
 }
 
 const priorityTagColors = {
@@ -215,42 +219,42 @@ export const LeadTable = ({
     },
     {
       title: getLanguageByKey("Achitat client"),
-      dataIndex: ["ticket_info", "achitat_client"],
+      dataIndex: "achitat_client",
       align: "center",
       render: (achitat_client) => cleanValue(achitat_client),
       width: 150
     },
     {
       title: getLanguageByKey("Avans în euro"),
-      dataIndex: ["ticket_info", "avans_euro"],
+      dataIndex: "avans_euro",
       align: "center",
       render: (avans_euro) => cleanValue(avans_euro),
       width: 150
     },
     {
       title: getLanguageByKey("Comisionul companiei"),
-      dataIndex: ["ticket_info", "comision_companie"],
+      dataIndex: "comision_companie",
       align: "center",
       render: (comision_companie) => cleanValue(comision_companie),
       width: 200
     },
     {
       title: getLanguageByKey("Buget"),
-      dataIndex: ["ticket_info", "buget"],
+      dataIndex: "buget",
       align: "center",
       render: (buget) => cleanValue(buget),
       width: 75
     },
     {
       title: getLanguageByKey("Data avansului"),
-      dataIndex: ["ticket_info", "data_avansului"],
+      dataIndex: "data_avansului",
       align: "center",
       width: 150,
       render: (data_avansului) => <DateCell date={data_avansului} />
     },
     {
       title: getLanguageByKey("Data cererii de retur"),
-      dataIndex: ["ticket_info", "data_cererii_de_retur"],
+      dataIndex: "data_cererii_de_retur",
       align: "center",
       width: 200,
       render: (data_cererii_de_retur) => (
@@ -259,14 +263,14 @@ export const LeadTable = ({
     },
     {
       title: getLanguageByKey("Data contractului"),
-      dataIndex: ["ticket_info", "data_contractului"],
+      dataIndex: "data_contractului",
       align: "center",
       width: 200,
       render: (data_contractului) => <DateCell date={data_contractului} />
     },
     {
       title: getLanguageByKey("Data de plată integrală"),
-      dataIndex: ["ticket_info", "data_de_plata_integrala"],
+      dataIndex: "data_de_plata_integrala",
       align: "center",
       width: 200,
       render: (data_de_plata_integrala) => (
@@ -275,35 +279,35 @@ export const LeadTable = ({
     },
     {
       title: getLanguageByKey("Data plecării"),
-      dataIndex: ["ticket_info", "data_plecarii"],
+      dataIndex: "data_plecarii",
       align: "center",
       width: 200,
       render: (data_plecarii) => <DateCell date={data_plecarii} />
     },
     {
       title: getLanguageByKey("Data întoarcerii"),
-      dataIndex: ["ticket_info", "data_intoarcerii"],
+      dataIndex: "data_intoarcerii",
       align: "center",
       width: 200,
       render: (data_intoarcerii) => <DateCell date={data_intoarcerii} />
     },
     {
       title: getLanguageByKey("Tipul de transport"),
-      dataIndex: ["ticket_info", "tip_de_transport"],
+      dataIndex: "tip_de_transport",
       align: "center",
       width: 150,
       render: (tip_de_transport) => cleanValue(tip_de_transport)
     },
     {
       title: getLanguageByKey("Vacanță"),
-      dataIndex: ["ticket_info", "vacanta"],
+      dataIndex: "vacanta",
       align: "center",
       width: 200,
       render: (vacanta) => cleanValue(vacanta)
     },
     {
       title: getLanguageByKey("Valuta contului"),
-      dataIndex: ["ticket_info", "valuta_contului"],
+      dataIndex: "f_valuta_contului",
       align: "center",
       width: 150,
       render: (valuta_contului) => cleanValue(valuta_contului)
