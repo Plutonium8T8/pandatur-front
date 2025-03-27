@@ -1,4 +1,4 @@
-import { Select, Flex, NumberInput } from "@mantine/core"
+import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { getLanguageByKey } from "../../utils"
@@ -146,7 +146,7 @@ export const TicketInfoForm = ({
           />
         )}
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Sursă lead")}
           placeholder={getLanguageByKey("Sursă lead")}
@@ -156,7 +156,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("sursa_lead")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Promo")}
           placeholder={getLanguageByKey("Promo")}
@@ -166,7 +166,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("promo")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Marketing")}
           placeholder={getLanguageByKey("Marketing")}
@@ -176,7 +176,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("marketing")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Serviciu")}
           placeholder={getLanguageByKey("Serviciu")}
@@ -186,7 +186,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("tipul_serviciului")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Țară")}
           placeholder={getLanguageByKey("Țară")}
@@ -196,7 +196,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("tara")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Transport")}
           placeholder={getLanguageByKey("Transport")}
@@ -206,7 +206,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("tip_de_transport")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Excursie")}
           placeholder={getLanguageByKey("Excursie")}
@@ -216,7 +216,7 @@ export const TicketInfoForm = ({
           {...form.getInputProps("denumirea_excursiei_turului")}
         />
 
-        <Select
+        <MultiSelect
           mt="md"
           label={getLanguageByKey("Achiziție")}
           placeholder={getLanguageByKey("Achiziție")}

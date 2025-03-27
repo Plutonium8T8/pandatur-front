@@ -33,7 +33,7 @@ export const Media = ({ messages }) => {
                 {getLanguageByKey("Acest browser nu suporta video")}
               </video>
             ) : msg.mtype === "audio" ? (
-              <audio controls className="audio-preview">
+              <audio controls>
                 <source src={msg.message} type="audio/ogg" />
                 {getLanguageByKey("Acest browser nu suporta audio")}
               </audio>
