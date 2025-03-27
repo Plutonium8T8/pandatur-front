@@ -45,7 +45,9 @@ const SchedulesList = ({}) => {
       }))
       setGroups(formattedGroups)
     } catch (err) {
-      enqueueSnackbar("Eroare la încărcare", { variant: "error" })
+      enqueueSnackbar(translations["Eroare la încărcare"][language], {
+        variant: "error"
+      })
     }
   }
 
@@ -65,9 +67,13 @@ const SchedulesList = ({}) => {
     try {
       await schedules.deleteGroup(id)
       fetchData()
-      enqueueSnackbar("Grupul a fost șters", { variant: "success" })
+      enqueueSnackbar(translations["Grupul a fost șters"][language], {
+        variant: "success"
+      })
     } catch (err) {
-      enqueueSnackbar("Eroare la ștergere", { variant: "error" })
+      enqueueSnackbar(translations["Eroare la ștergere"][language], {
+        variant: "error"
+      })
     }
   }
 
@@ -79,7 +85,7 @@ const SchedulesList = ({}) => {
     return (
       <div>
         <Button onClick={handleBack} mb="md">
-          ← Назад к группам
+          ← {translations["Înapoi la grupuri"][language]}
         </Button>
         <GroupScheduleView groupUsers={groupUsers} />
       </div>
@@ -112,7 +118,7 @@ const SchedulesList = ({}) => {
                     {group.name}
                   </Text>
                   <Badge color="blue" variant="light">
-                    For a week
+                    {translations["Pentru o săptămână"][language]}
                   </Badge>
                 </Group>
 
@@ -130,7 +136,6 @@ const SchedulesList = ({}) => {
                         </Avatar>
                       </Tooltip>
                     ))}
-
                     {groupUsers.length > 5 && (
                       <Tooltip
                         withArrow
@@ -166,4 +171,4 @@ const SchedulesList = ({}) => {
   )
 }
 
-export default SchedulesList
+export default SchedulesGroupList

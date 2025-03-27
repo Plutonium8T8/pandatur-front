@@ -98,8 +98,7 @@ const GroupScheduleView = ({ groupUsers }) => {
         <button
           onClick={() => setCurrentWeekStart(addDays(currentWeekStart, -7))}
         >
-          {translations["săptămâna"][language]}{" "}
-          {translations["trecută"][language]}
+          {translations["săptămâna trecută"][language]}
         </button>
         <span>
           {translations["săptămâna"][language]}{" "}
@@ -109,8 +108,7 @@ const GroupScheduleView = ({ groupUsers }) => {
         <button
           onClick={() => setCurrentWeekStart(addDays(currentWeekStart, 7))}
         >
-          {translations["săptămâna"][language]}{" "}
-          {translations["viitoare"][language]}
+          {translations["săptămâna viitoare"][language]}
         </button>
       </div>
 

@@ -209,13 +209,13 @@ export const translations = {
     RO: "săptămâna",
     RU: "неделя"
   },
-  trecută: {
-    RO: "trecută",
-    RU: "предыдущая"
+  "săptămâna trecută": {
+    RO: "săptămâna trecută",
+    RU: "предыдущая неделя"
   },
-  viitoare: {
-    RO: "viitoare",
-    RU: "следующая"
+  "săptămâna viitoare": {
+    RO: "săptămâna viitoare",
+    RU: "следующая неделя"
   },
   Angajat: {
     RO: "Angajat",
@@ -1582,6 +1582,26 @@ export const translations = {
   "Nimic găsit": {
     RO: "Nimic găsit",
     RU: "Ничего не найдено"
+  },
+  "Eroare la încărcare": {
+    RO: "Eroare la încărcare",
+    RU: "Ошибка загрузки"
+  },
+  "Grupul a fost șters": {
+    RO: "Grupul a fost șters",
+    RU: "Группа удалена"
+  },
+  "Eroare la ștergere": {
+    RO: "Eroare la ștergere",
+    RU: "Ошибка при удалении"
+  },
+  "Înapoi la grupuri": {
+    RO: "Înapoi la grupuri",
+    RU: "Назад к группам"
+  },
+  "Pentru o săptămână": {
+    RO: "Pentru o săptămână",
+    RU: "На неделю"
   }
 }
 
