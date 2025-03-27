@@ -7,7 +7,7 @@ import { showServerError } from "../utils/showServerError"
 import ShiftDrawer from "./ModalIntervals"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
-const GroupScheduleView = ({ groupUsers }) => {
+const ScheduleView = ({ groupUsers }) => {
   const [schedule, setSchedule] = useState([])
   const [currentWeekStart, setCurrentWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -164,4 +164,4 @@ const GroupScheduleView = ({ groupUsers }) => {
   )
 }
 
-export default GroupScheduleView
+export default ScheduleView

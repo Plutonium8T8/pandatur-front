@@ -7,7 +7,7 @@ import { showServerError } from "../utils/showServerError"
 import { format, startOfWeek, addDays } from "date-fns"
 import { translations } from "../utils/translations"
 
-const ShiftDrawer = ({
+const ModalIntervals = ({
   opened,
   onClose,
   schedule,
@@ -182,4 +182,4 @@ const ShiftDrawer = ({
   )
 }
 
-export default ShiftDrawer
+export default ModalIntervals
