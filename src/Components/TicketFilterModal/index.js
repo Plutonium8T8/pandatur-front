@@ -1,1 +1,1 @@
-export * from "./TicketFilterModal"
+export { TicketFilterModal } from "./TicketFilterModal"
