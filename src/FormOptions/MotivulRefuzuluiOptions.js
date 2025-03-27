@@ -37,6 +37,5 @@ export const motivulRefuzuluiOptions = [
   "Reclamații",
   "Marketing",
   "Resurse umane",
-  "Alt motiv",
-  "Altele"
+  "Alt motiv"
 ].map((key) => getLanguageByKey(key))

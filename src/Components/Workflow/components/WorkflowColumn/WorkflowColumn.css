@@ -1,0 +1,59 @@
+.colone-ticket {
+  display: flex;
+  flex-direction: column;
+  /*
+     FIXME: The width works correctly only when each column is 450px. Need to investigate why this happens
+    */
+  flex: 0 0 450px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.name-workflow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 10px 18px;
+  color: #1f2937;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 6px;
+  background-color: #f9f9f9;
+}
+
+.ticket-counter-display {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ticket-counter-red {
+  background-color: #e53e3eee;
+}
+
+.ticket-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  min-width: 40px;
+  text-align: center;
+}
+
+.ticket-counter-green {
+  background-color: #38a169ee;
+}
+
+.scrollable-list {
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  gap: 10px;
+  max-height: 98vh;
+}

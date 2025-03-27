@@ -1,16 +1,11 @@
-import { Tabs, Flex } from "@mantine/core"
+import { Tabs, Flex, Button } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
-import { getLanguageByKey, showServerError } from "../../utils"
-import { api } from "../../../api"
-import {
-  TicketInfoForm,
-  GeneralInfoTicketForm,
-  ContractTicketForm
-} from "../components"
-import { Spin } from "../../Spin"
+import { getLanguageByKey, showServerError } from "../utils"
+import { api } from "../../api"
+import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForms"
 
-export const EditBulkOrSingleLeadTabs = ({
+export const ManageLeadInfoTabs = ({
   open,
   onClose,
   selectedTickets,
@@ -67,16 +62,8 @@ export const EditBulkOrSingleLeadTabs = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
-  if (loading) {
-    return (
-      <Flex h="500" align="center" justify="center">
-        <Spin />
-      </Flex>
-    )
-  }
-
   return (
-    <Tabs defaultValue="general_info">
+    <Tabs h="100%" defaultValue="general_info">
       <Tabs.List>
         <Tabs.Tab value="general_info">
           {getLanguageByKey("Informații generale")}
@@ -87,29 +74,61 @@ export const EditBulkOrSingleLeadTabs = ({
         <Tabs.Tab value="contact">{getLanguageByKey("Contact")}</Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="general_info" pt="xs">
-        <GeneralInfoTicketForm
-          data={generalInfoLightTicket}
-          onClose={onClose}
-          onSubmit={submit}
-          loading={loading}
-        />
+      <Tabs.Panel
+        style={{ height: `calc(100% - 36px)` }}
+        value="general_info"
+        pt="xs"
+      >
+        <Flex direction="column" justify="space-between" h="100%">
+          <GeneralForm
+            data={generalInfoLightTicket}
+            onSubmit={submit}
+            renderFooterButtons={({ formId }) => (
+              <>
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
+          />
+        </Flex>
       </Tabs.Panel>
 
-      <Tabs.Panel value="ticket_info" pt="xs">
+      <Tabs.Panel value="ticket_info" pt="xs" pb="md">
         <TicketInfoForm
+          setMinDate={new Date()}
           data={ticketInfo}
-          onClose={onClose}
           onSubmit={submit}
-          loading={loading}
+          renderFooterButtons={({ formId }) => (
+            <>
+              <Button variant="default" onClick={onClose}>
+                {getLanguageByKey("Închide")}
+              </Button>
+              <Button loading={loading} type="submit" form={formId}>
+                {getLanguageByKey("Trimite")}
+              </Button>
+            </>
+          )}
         />
       </Tabs.Panel>
-      <Tabs.Panel value="contact" pt="xs">
-        <ContractTicketForm
+      <Tabs.Panel value="contact" pt="xs" pb="md">
+        <ContractForm
+          setMinDate={new Date()}
           data={ticketInfo}
-          onClose={onClose}
           onSubmit={submit}
-          loading={loading}
+          renderFooterButtons={({ formId }) => (
+            <>
+              <Button variant="default" onClick={onClose}>
+                {getLanguageByKey("Închide")}
+              </Button>
+              <Button loading={loading} type="submit" form={formId}>
+                {getLanguageByKey("Trimite")}
+              </Button>
+            </>
+          )}
         />
       </Tabs.Panel>
     </Tabs>

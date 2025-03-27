@@ -2,7 +2,7 @@ import React from "react"
 import Select from "react-select"
 import { workflowOptions as rawWorkflowOptions } from "../../FormOptions/WorkFlowOption"
 import { translations } from "../utils/translations"
-import { getColorByWorkflowType } from "../WorkflowTag"
+import { getColorByWorkflowType } from "../Workflow/components"
 
 const workflowOptions = rawWorkflowOptions.map((workflow) => ({
   value: workflow,
