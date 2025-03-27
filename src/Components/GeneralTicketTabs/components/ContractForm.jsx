@@ -15,6 +15,12 @@ const formatDateOrUndefined = (date) => {
   return date ? dayjs(date).format(DD_MM_YYYY__HH_mm_ss) : undefined
 }
 
+const convertStringOrUndefined = (data) => {
+  if (typeof data === "boolean") {
+    return String(data)
+  }
+}
+
 export const ContractForm = ({
   onSubmit,
   data,
@@ -56,12 +62,12 @@ export const ContractForm = ({
         data_de_plata_integrala_before: formatDateOrUndefined(
           data_de_plata_integrala?.[1]
         ),
-        contract_trimis: String(contract_trimis ?? false),
-        contract_semnat: String(contract_semnat ?? false),
-        achitare_efectuata: String(achitare_efectuata ?? false),
-        rezervare_confirmata: String(rezervare_confirmata ?? false),
-        contract_arhivat: String(contract_arhivat ?? false),
-        control: String(control ?? false),
+        contract_trimis: convertStringOrUndefined(contract_trimis),
+        contract_semnat: convertStringOrUndefined(contract_semnat),
+        achitare_efectuata: convertStringOrUndefined(achitare_efectuata),
+        rezervare_confirmata: convertStringOrUndefined(rezervare_confirmata),
+        contract_arhivat: convertStringOrUndefined(contract_arhivat),
+        control: convertStringOrUndefined(control),
         avans_euro_min: avans_euro,
         avans_euro_max: avans_euro,
         pret_netto_min: pret_netto,

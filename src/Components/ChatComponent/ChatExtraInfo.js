@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import { enqueueSnackbar } from "notistack"
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core"
 import { getLanguageByKey, showServerError } from "../utils"
-import { PersonalDataForm, Merge, Media } from "./components"
+import { PersonalData4ClientForm, Merge, Media } from "./components"
 import { api } from "../../api"
 import {
   ContractForm,
@@ -286,7 +286,7 @@ const ChatExtraInfo = ({
 
             <Divider my="md" />
 
-            <PersonalDataForm
+            <PersonalData4ClientForm
               loading={isLoadingPersonalDate}
               data={personalInfo[selectedClient]}
               onSubmit={(values) => submitPersonalData(values)}

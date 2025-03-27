@@ -3,7 +3,7 @@ import { useForm } from "@mantine/form"
 import { useEffect } from "react"
 import { getLanguageByKey } from "../../utils"
 
-export const PersonalDataForm = ({ loading, onSubmit, data }) => {
+export const PersonalData4ClientForm = ({ loading, onSubmit, data }) => {
   const form = useForm({
     mode: "uncontrolled"
   })
