@@ -10,7 +10,7 @@ import {
   InvoiceForm,
   GeneralForm,
   TicketInfoForm
-} from "../TicketForm"
+} from "../TicketForms"
 
 const FORMAT_MEDIA = ["audio", "video", "image", "file"]
 

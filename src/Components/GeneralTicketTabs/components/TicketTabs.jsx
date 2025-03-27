@@ -1,12 +1,12 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core"
 import {
-  ContractForm,
   QualityControlForm,
   InvoiceForm,
-  BasicGeneralForm,
-  TicketInfoForm
-} from "../../TicketForm"
+  BasicGeneralForm
+} from "../../TicketForms"
 import { getLanguageByKey } from "../../utils"
+import { TicketInfoForm } from "./TicketInfoForm"
+import { ContractForm } from "./ContractForm"
 
 const renderResetButton = (resetForm) => {
   return (
@@ -16,7 +16,7 @@ const renderResetButton = (resetForm) => {
   )
 }
 
-export const TicketsFilter = ({ onClose, onSubmit, loading, formIds }) => {
+export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
   return (
     <Tabs defaultValue="filter_general_info" orientation="vertical">
       <Tabs.List>

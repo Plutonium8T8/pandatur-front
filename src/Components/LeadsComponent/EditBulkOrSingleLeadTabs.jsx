@@ -3,7 +3,7 @@ import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
 import { getLanguageByKey, showServerError } from "../utils"
 import { api } from "../../api"
-import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForm"
+import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForms"
 
 export const EditBulkOrSingleLeadTabs = ({
   open,

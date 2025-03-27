@@ -66,6 +66,8 @@ export const InvoiceForm = ({
         <NumberInput
           hideControls
           mt="md"
+          decimalScale={2}
+          fixedDecimalScale
           label={getLanguageByKey("F/preț")}
           placeholder={getLanguageByKey("F/preț")}
           key={form.key("f_pret")}
@@ -74,6 +76,8 @@ export const InvoiceForm = ({
 
         <NumberInput
           mt="md"
+          decimalScale={2}
+          fixedDecimalScale
           hideControls
           label={getLanguageByKey("F/sumă")}
           placeholder={getLanguageByKey("F/sumă")}

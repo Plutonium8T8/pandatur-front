@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { useSnackbar } from "notistack"
 import { useDOMElementHeight, useApp } from "../../hooks"
 import { priorityOptions } from "../../FormOptions/PriorityOption"
 import { workflowOptions } from "../../FormOptions/WorkFlowOption"
-import { TicketFilterModal } from "../TicketFilterModal"
+import { GeneralTicketTabs } from "../GeneralTicketTabs"
 import { LeadTable } from "./LeadTable"
 import { useDebounce, useConfirmPopup } from "../../hooks"
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils"
 import { api } from "../../api"
-import { useSnackbar } from "notistack"
 import { Modal } from "../Modal"
 import SingleChat from "../ChatComponent/SingleChat"
 import { Spin } from "../Spin"
@@ -21,7 +21,7 @@ import { MantineModal } from "../MantineModal"
 import { EditBulkOrSingleLeadTabs } from "./EditBulkOrSingleLeadTabs"
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
 import { WorkflowColumns } from "../WorkflowColumns"
-import { filteredWorkflows } from "../TicketFilterModal/utils"
+import { filteredWorkflows } from "../GeneralTicketTabs"
 
 const SORT_BY = "creation_date"
 const ORDER = "DESC"
@@ -353,7 +353,7 @@ const Leads = () => {
         open={isOpenKanbanFilterModal}
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
-        <TicketFilterModal
+        <GeneralTicketTabs
           formIds={formIDsKanban}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
@@ -375,7 +375,7 @@ const Leads = () => {
         open={isOpenListFilterModal}
         onClose={() => setIsOpenListFilterModal(false)}
       >
-        <TicketFilterModal
+        <GeneralTicketTabs
           formIds={formIDsList}
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}

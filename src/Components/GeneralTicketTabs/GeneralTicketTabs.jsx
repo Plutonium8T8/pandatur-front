@@ -1,15 +1,15 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
 import React, { useState } from "react"
 import { platformOptions, filteredWorkflows } from "./utils"
-import { SelectWorkflow, TicketsFilter } from "./components"
+import { SelectWorkflow, TicketTabs } from "./components"
 import { getLanguageByKey, cleanFormValues } from "../utils"
-import "./TicketFilterModal.css"
+import "./GeneralTicketTabs.css"
 
 const systemFiltersInitialState = {
   workflow: filteredWorkflows
 }
 
-export const TicketFilterModal = ({
+export const GeneralTicketTabs = ({
   onClose,
   onApplyWorkflowFilters,
   onApplyTicketFilters,
@@ -70,7 +70,7 @@ export const TicketFilterModal = ({
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_ticket" pt="xs">
-        <TicketsFilter
+        <TicketTabs
           formIds={formIds}
           onClose={onClose}
           onSubmit={(values) => {

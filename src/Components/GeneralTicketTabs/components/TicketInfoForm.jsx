@@ -1,8 +1,7 @@
 import { Select, Flex, NumberInput } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { getLanguageByKey, formatDate, parseServerDate } from "../utils"
+import { getLanguageByKey } from "../../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -12,10 +11,15 @@ import {
   transportOptions,
   nameExcursionOptions,
   purchaseProcessingOptions
-} from "../../FormOptions"
-import { DD_MM_YYYY } from "../../app-constants"
+} from "../../../FormOptions"
+import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "../../../app-constants"
+import dayjs from "dayjs"
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
+
+const formatDateOrUndefined = (date) => {
+  return date ? dayjs(date).format(DD_MM_YYYY__HH_mm_ss) : undefined
+}
 
 export const TicketInfoForm = ({
   onSubmit,
@@ -39,39 +43,32 @@ export const TicketInfoForm = ({
       ...rest
     }) => {
       const formattedData = {
-        data_venit_in_oficiu: formatDate(data_venit_in_oficiu),
-        data_plecarii: formatDate(data_plecarii),
-        data_intoarcerii: formatDate(data_intoarcerii),
-        data_cererii_de_retur: formatDate(data_cererii_de_retur),
-        buget: {
-          min: buget,
-          max: buget
-        }
+        data_plecarii: formatDateOrUndefined(data_plecarii),
+        data_venit_in_oficiu_after: formatDateOrUndefined(
+          data_venit_in_oficiu?.[0]
+        ),
+        data_venit_in_oficiu_before: formatDateOrUndefined(
+          data_venit_in_oficiu?.[1]
+        ),
+        data_intoarcerii_after: formatDateOrUndefined(data_intoarcerii?.[0]),
+        data_intoarcerii_before: formatDateOrUndefined(data_intoarcerii?.[1]),
+        data_cererii_de_retur_after: formatDateOrUndefined(
+          data_cererii_de_retur?.[0]
+        ),
+        data_cererii_de_retur_before: formatDateOrUndefined(
+          data_cererii_de_retur?.[1]
+        ),
+        ...(buget && {
+          buget: {
+            min: buget,
+            max: buget
+          }
+        })
       }
 
       return { ...formattedData, ...rest }
     }
   })
-
-  useEffect(() => {
-    if (data) {
-      form.setValues({
-        data_venit_in_oficiu: parseServerDate(data.data_venit_in_oficiu),
-        data_plecarii: parseServerDate(data.data_plecarii),
-        data_intoarcerii: parseServerDate(data.data_intoarcerii),
-        data_cererii_de_retur: parseServerDate(data.data_cererii_de_retur),
-        buget: data.buget,
-        sursa_lead: data.sursa_lead,
-        promo: data.promo,
-        marketing: data.marketing,
-        tipul_serviciului: data.tipul_serviciului,
-        tara: data.tara,
-        tip_de_transport: data.tip_de_transport,
-        denumirea_excursiei_turului: data.denumirea_excursiei_turului,
-        procesarea_achizitionarii: data.procesarea_achizitionarii
-      })
-    }
-  }, [data])
 
   return (
     <>
@@ -85,11 +82,14 @@ export const TicketInfoForm = ({
           hideControls
           label={`${getLanguageByKey("Vânzare")} €`}
           placeholder={getLanguageByKey("Indicați suma în euro")}
+          decimalScale={2}
+          fixedDecimalScale
           key={form.key("buget")}
           {...form.getInputProps("buget")}
         />
 
         <DatePickerInput
+          type="range"
           minDate={setMinDate}
           valueFormat={DD_MM_YYYY}
           clearable
@@ -112,6 +112,7 @@ export const TicketInfoForm = ({
         />
 
         <DatePickerInput
+          type="range"
           minDate={setMinDate}
           clearable
           valueFormat={DD_MM_YYYY}
@@ -123,6 +124,7 @@ export const TicketInfoForm = ({
         />
 
         <DatePickerInput
+          type="range"
           minDate={setMinDate}
           clearable
           valueFormat={DD_MM_YYYY}
