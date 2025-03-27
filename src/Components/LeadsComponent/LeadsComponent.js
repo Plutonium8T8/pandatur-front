@@ -20,7 +20,7 @@ import { SpinnerRightBottom } from "../SpinnerRightBottom"
 import { MantineModal } from "../MantineModal"
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs"
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
-import { WorkflowColumns } from "../WorkflowColumns"
+import { WorkflowColumns } from "../Workflow"
 import { filteredWorkflows } from "../GeneralTicketTabs"
 
 const SORT_BY = "creation_date"

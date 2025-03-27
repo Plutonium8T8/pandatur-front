@@ -91,6 +91,7 @@ export const ContractForm = ({
           key={form.key("numar_de_contract")}
           {...form.getInputProps("numar_de_contract")}
         />
+
         <DatePickerInput
           minDate={setMinDate}
           valueFormat={DD_MM_YYYY}

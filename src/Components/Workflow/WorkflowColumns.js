@@ -1,6 +1,6 @@
 import React from "react"
 import { workflowOptions } from "../../FormOptions"
-import { WorkflowColumn } from "./WorkflowColumn"
+import { WorkflowColumn } from "./components"
 import "./WorkflowColumns.css"
 
 export const WorkflowColumns = ({

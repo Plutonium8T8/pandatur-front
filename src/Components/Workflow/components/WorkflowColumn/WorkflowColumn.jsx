@@ -1,9 +1,6 @@
-import {
-  getColorByWorkflowType,
-  getBrightByWorkflowType
-} from "../../WorkflowTag"
-import TicketCard from "../../LeadsComponent/TicketCardComponent"
-import { getLanguageByKey } from "../../utils"
+import { getColorByWorkflowType, getBrightByWorkflowType } from "../WorkflowTag"
+import TicketCard from "../../../LeadsComponent/TicketCardComponent"
+import { getLanguageByKey } from "../../../utils"
 import "./WorkflowColumn.css"
 
 const priorityOrder = {
