@@ -17,7 +17,7 @@ import { useSnackbar } from "notistack"
 import { FaTrash } from "react-icons/fa"
 import { translations } from "../utils/translations"
 
-const SchedulesList = ({}) => {
+const SchedulesGroupList = ({}) => {
   const [groups, setGroups] = useState([])
   const [technicians, setTechnicians] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
