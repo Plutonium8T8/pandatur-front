@@ -110,7 +110,7 @@ const Leads = () => {
           },
           ({ data, pagination }) => {
             setHardTickets(data)
-            setTotalLeads(pagination.total || 0)
+            setTotalLeads(pagination?.total || 0)
           }
         )
 
@@ -198,7 +198,7 @@ const Leads = () => {
       { attributes: formattedFilters, page: NUMBER_PAGE, type: HARD_TICKET },
       ({ data, pagination }) => {
         setHardTickets(data)
-        setTotalLeads(pagination.total || 0)
+        setTotalLeads(pagination?.total || 0)
         setCurrentPage(1)
         setHardTicketFilters(formattedFilters)
         setIsOpenListFilterModal(false)
@@ -212,7 +212,7 @@ const Leads = () => {
       { page: NUMBER_PAGE, type: LIGHT_TICKET, attributes: formattedFilters },
       ({ data, pagination }) => {
         applyWorkflowFilters(formattedFilters, getTicketsIds(data))
-        setTotalLeads(pagination.total)
+        setTotalLeads(pagination?.total || 0)
       }
     )
   }
@@ -222,7 +222,7 @@ const Leads = () => {
       { page, type: HARD_TICKET, attributes: hardTicketFilters },
       ({ data, pagination }) => {
         setHardTickets(data)
-        setTotalLeads(pagination.total || 0)
+        setTotalLeads(pagination?.total || 0)
         setCurrentPage(page)
       }
     )
@@ -242,13 +242,13 @@ const Leads = () => {
         ...(groupTitle && { group_title: groupTitle })
       },
       ({ data, pagination }) => {
+        setTotalLeads(pagination?.total || 0)
+
         if (isViewModeList) {
           setHardTickets(data)
-          setTotalLeads(pagination.total || 0)
           return
         }
 
-        setTotalLeads(pagination.total)
         setFilteredTicketIds(getTicketsIds(data) ?? null)
       }
     )
