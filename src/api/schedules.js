@@ -1,82 +1,53 @@
 import { baseAxios } from "./baseAxios"
 
 export const schedules = {
-  // Получить все группы расписания
-  getAllGroups: async () => {
-    const { data } = await baseAxios.get("/api/schedule-groups")
-
+  // Получить все расписания
+  getSchedules: async () => {
+    const { data } = await baseAxios.get("/api/technicians/schedules")
     return data
   },
 
-  // Создать новую группу
-  createGroup: async (body) => {
-    const { data } = await baseAxios.post("/api/schedule-groups", body)
-
-    return data
-  },
-
-  // Получить одну группу по ID
-  getGroupById: async (id) => {
-    const { data } = await baseAxios.get(`/api/schedule-groups/${id}`)
-
-    return data
-  },
-
-  // Обновить группу по ID
-  updateGroup: async (id, body) => {
-    const { data } = await baseAxios.patch(`/api/schedule-groups/${id}`, body)
-
-    return data
-  },
-
-  // Удалить группу по ID
-  deleteGroup: async (id) => {
-    await baseAxios.delete(`/api/schedule-groups/${id}`)
-  },
-
-  // Получить группы для техника
-  getGroupsByTechnician: async (userId) => {
-    const { data } = await baseAxios.get(
-      `/api/schedule-groups/technician/${userId}`
-    )
-
-    return data
-  },
-
-  // Назначить техника в группу (одного)
-  assignTechnician: async (groupId, userId) => {
+  // Добавить интервал нескольким техникам
+  addTimeframe: async (payload) => {
     const { data } = await baseAxios.post(
-      `/api/schedule-groups/${groupId}/assign/${userId}`
+      "/api/technicians/schedule/timeframe",
+      payload
     )
-
     return data
   },
 
-  // 🔄 Массово назначить техников в группу
-  assignMultipleTechnicians: async (groupId, userIds) => {
-    const { data } = await baseAxios.post(`/api/schedule-groups/assign`, {
-      groupId,
-      userIds
-    })
-
-    return data
-  },
-
-  // Удалить техника из группы
-  removeTechnician: async (groupId, userId) => {
+  // Удалить интервал у нескольких техников
+  removeTimeframe: async (payload) => {
     const { data } = await baseAxios.delete(
-      `/api/schedule-groups/${groupId}/remove/${userId}`
+      "/api/technicians/schedule/timeframe",
+      { data: payload }
     )
-
     return data
   },
 
-  // Получить список техников в группе
-  getTechniciansInGroup: async (groupId) => {
-    const { data } = await baseAxios.get(
-      `/api/schedule-groups/${groupId}/technicians`
+  // Удалить расписание по дням у нескольких техников
+  deleteWeekdays: async (payload) => {
+    const { data } = await baseAxios.delete(
+      "/api/technicians/schedule/weekday",
+      { data: payload }
     )
+    return data
+  },
 
+  // Получить расписание одного техника
+  getTechnicianSchedule: async (technicianId) => {
+    const { data } = await baseAxios.get(
+      `/api/technicians/${technicianId}/schedule`
+    )
+    return data
+  },
+
+  // Обновить полностью расписание одного техника
+  updateTechnicianSchedule: async (technicianId, schedule) => {
+    const { data } = await baseAxios.post(
+      `/api/technicians/${technicianId}/schedule`,
+      schedule
+    )
     return data
   }
 }

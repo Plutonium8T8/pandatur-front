@@ -26,7 +26,17 @@ const ScheduleView = ({ groupUsers }) => {
   const fetchData = async () => {
     try {
       setIsLoading(true)
-      const scheduleData = await api.technicians.getSchedules()
+      const scheduleData = await api.schedules.getSchedules()
+
+      const dayKeys = [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ]
 
       const combined = groupUsers.map((user) => {
         const userId = user.id
@@ -36,41 +46,9 @@ const ScheduleView = ({ groupUsers }) => {
 
         const weeklySchedule = userSchedule?.weekly_schedule || {}
 
-        const dayKeys = [
-          "monday",
-          "tuesday",
-          "wednesday",
-          "thursday",
-          "friday",
-          "saturday",
-          "sunday"
-        ]
-
-        const shifts = dayKeys.map((day) => [])
-
-        // формат с ключами-днями: monday: [ { start, end } ]
-        dayKeys.forEach((day, i) => {
-          if (Array.isArray(weeklySchedule[day])) {
-            shifts[i] = weeklySchedule[day]
-          }
-        })
-
-        // формат с weekdays: { weekdays: ["Monday", "Wednesday"], start, end }
-        if (
-          weeklySchedule.weekdays &&
-          weeklySchedule.start &&
-          weeklySchedule.end
-        ) {
-          weeklySchedule.weekdays.forEach((dayName) => {
-            const index = dayKeys.indexOf(dayName.toLowerCase())
-            if (index !== -1) {
-              shifts[index].push({
-                start: weeklySchedule.start,
-                end: weeklySchedule.end
-              })
-            }
-          })
-        }
+        const shifts = dayKeys.map((day) =>
+          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
+        )
 
         return {
           id: userId,

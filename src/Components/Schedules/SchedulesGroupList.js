@@ -12,7 +12,7 @@ import {
   ScrollArea
 } from "@mantine/core"
 import { modals } from "@mantine/modals"
-import { schedules } from "../../api/schedules"
+import { groupSchedules } from "../../api/groupSchedules"
 import { api } from "../../api"
 import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
@@ -32,7 +32,7 @@ const SchedulesGroupList = ({ reload }) => {
   const fetchData = async () => {
     try {
       const [groupData, userData] = await Promise.all([
-        schedules.getAllGroups(),
+        groupSchedules.getAllGroups(),
         api.users.getTechnicianList()
       ])
 
@@ -88,7 +88,7 @@ const SchedulesGroupList = ({ reload }) => {
 
   const handleDelete = async (id) => {
     try {
-      await schedules.deleteGroup(id)
+      await groupSchedules.deleteGroup(id)
       fetchData()
       enqueueSnackbar(translations["Grupul a fost șters"][language], {
         variant: "success"

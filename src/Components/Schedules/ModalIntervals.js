@@ -74,12 +74,23 @@ const ModalIntervals = ({
     onClose()
   }
 
+  const getTechnicianIds = () => {
+    return [schedule[selected.employeeIndex].id]
+  }
+
+  const getWeekdays = () => {
+    return selectedDays.map((d) => dayApiNames[d])
+  }
+
   const addInterval = async () => {
     try {
-      const id = schedule[selected.employeeIndex].id
-      const weekdays = selectedDays.map((d) => dayApiNames[d])
-      const payload = { start: startTime, end: endTime, weekdays }
-      await api.technicians.createSchedule(id, payload)
+      const payload = {
+        technician_ids: getTechnicianIds(),
+        weekdays: getWeekdays(),
+        start: startTime,
+        end: endTime
+      }
+      await api.schedules.addTimeframe(payload)
       setStartTime("")
       setEndTime("")
       fetchData()
@@ -90,10 +101,13 @@ const ModalIntervals = ({
 
   const cutInterval = async () => {
     try {
-      const id = schedule[selected.employeeIndex].id
-      const weekdays = selectedDays.map((d) => dayApiNames[d])
-      const payload = { start: startTime, end: endTime, weekdays }
-      await api.technicians.deleteSchedule(id, payload)
+      const payload = {
+        technician_ids: getTechnicianIds(),
+        weekdays: getWeekdays(),
+        start: startTime,
+        end: endTime
+      }
+      await api.schedules.removeTimeframe(payload)
       setStartTime("")
       setEndTime("")
       fetchData()
@@ -103,12 +117,11 @@ const ModalIntervals = ({
   }
 
   const removeInterval = async (index) => {
-    const id = schedule[selected.employeeIndex].id
     const interval = intervals[index]
-    const weekday = dayApiNames[dayNames[selected.dayIndex]]
     try {
-      await api.technicians.deleteSchedule(id, {
-        weekdays: [weekday],
+      await api.schedules.removeTimeframe({
+        technician_ids: getTechnicianIds(),
+        weekdays: [dayApiNames[dayNames[selected.dayIndex]]],
         start: interval.start,
         end: interval.end
       })
