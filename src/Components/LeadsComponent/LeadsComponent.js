@@ -298,7 +298,7 @@ const Leads = () => {
             filteredLeads={hardTickets}
             selectTicket={selectedTickets}
             onSelectRow={toggleSelectTicket}
-            totalLeadsPages={getTotalPages(tickets.length)}
+            totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
             fetchTickets={fetchTicketList}
           />
