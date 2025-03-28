@@ -6,6 +6,8 @@ import { getLanguageByKey } from "../../../utils"
 import { useDOMElementHeight } from "../../../../hooks"
 import "./WorkflowColumn.css"
 
+const TICKET_CARD_HEIGHT = 110
+
 const priorityOrder = {
   joasă: 1,
   medie: 2,
@@ -82,7 +84,7 @@ export const WorkflowColumn = ({
         <FixedSizeList
           height={columnHeight}
           itemCount={filteredTickets.length}
-          itemSize={110}
+          itemSize={TICKET_CARD_HEIGHT}
           width="100%"
         >
           {({ index, style }) => (

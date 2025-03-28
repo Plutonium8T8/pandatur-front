@@ -53,7 +53,6 @@
 .scrollable-list {
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
   gap: 10px;
   height: 100%;
 }
