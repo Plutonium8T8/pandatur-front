@@ -11,7 +11,6 @@ const ModalIntervals = ({
   onClose,
   schedule,
   selected,
-  setSchedule,
   fetchData,
   selectedTechnicians = []
 }) => {
@@ -175,6 +174,22 @@ const ModalIntervals = ({
       <form onSubmit={(e) => e.preventDefault()}>
         <Stack>
           <Group spacing="xs" mt="xs">
+            <Button
+              size="xs"
+              variant={
+                selectedDays.length === dayButtons.length ? "filled" : "light"
+              }
+              onClick={() => {
+                if (selectedDays.length === dayButtons.length) {
+                  setSelectedDays([])
+                } else {
+                  setSelectedDays(dayButtons.map((d) => d.value))
+                }
+              }}
+              style={{ width: 65 }}
+            >
+              {translations["Toate"][language]}
+            </Button>
             {dayButtons.map((day) => (
               <Button
                 key={day.value}
@@ -183,7 +198,7 @@ const ModalIntervals = ({
                   selectedDays.includes(day.value) ? "filled" : "default"
                 }
                 onClick={() => toggleDay(day.value)}
-                style={{ width: 36, padding: 0 }}
+                style={{ width: 54 }}
               >
                 {day.label}
               </Button>

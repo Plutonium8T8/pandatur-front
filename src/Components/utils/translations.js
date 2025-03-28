@@ -1634,6 +1634,10 @@ export const translations = {
   "Intervale pentru mai mulți tehnicieni": {
     RO: "Intervale pentru mai mulți tehnicieni",
     RU: "Интервалы для нескольких техников"
+  },
+  Toate: {
+    RO: "Toate",
+    RU: "Все"
   }
 }
 

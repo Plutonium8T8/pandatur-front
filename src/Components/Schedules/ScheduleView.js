@@ -142,7 +142,27 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         <table className="schedule-table">
           <thead>
             <tr>
-              <th>{translations["Angajat"][language]}</th>
+              <td>
+                <Checkbox
+                  checked={
+                    selectedTechnicians.length === schedule.length &&
+                    schedule.length > 0
+                  }
+                  indeterminate={
+                    selectedTechnicians.length > 0 &&
+                    selectedTechnicians.length < schedule.length
+                  }
+                  onChange={() => {
+                    if (selectedTechnicians.length === schedule.length) {
+                      setSelectedTechnicians([])
+                    } else {
+                      setSelectedTechnicians(schedule.map((s) => s.id))
+                    }
+                  }}
+                  style={{ marginRight: 4 }}
+                />
+                {translations["Angajat"][language]}
+              </td>
               {getWeekDays().map((day, i) => (
                 <th key={i}>
                   {translations[format(day, "EEEE")][language]},{" "}
