@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Drawer, Stack, Group, TextInput, Button, Divider } from "@mantine/core"
+import { Drawer, Stack, Group, TextInput, Button } from "@mantine/core"
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
@@ -190,6 +190,7 @@ const ModalIntervals = ({
             >
               {translations["Toate"][language]}
             </Button>
+
             {dayButtons.map((day) => (
               <Button
                 key={day.value}
@@ -203,6 +204,7 @@ const ModalIntervals = ({
                 {day.label}
               </Button>
             ))}
+
             <Group align="flex-end" mt="md">
               <TextInput
                 type="time"
@@ -227,46 +229,49 @@ const ModalIntervals = ({
               </Button>
             </Group>
           </Group>
-          <Divider my="md" />
-          {intervals.length > 0 && selected.employeeIndex !== null && (
-            <div style={{ marginTop: 10, fontWeight: 500 }}>
-              {translations["Intervale pentru"][language]}{" "}
-              {schedule[selected.employeeIndex]?.name} (
-              {schedule[selected.employeeIndex]?.id})
-            </div>
-          )}
 
-          {intervals.map((interval, index) => (
-            <Group key={index} align="flex-end">
-              <TextInput
-                type="time"
-                label="Start"
-                value={interval.start}
-                onChange={(e) => {
-                  const updated = [...intervals]
-                  updated[index].start = e.target.value
-                  setIntervals(updated)
-                }}
-              />
-              <TextInput
-                type="time"
-                label="End"
-                value={interval.end}
-                onChange={(e) => {
-                  const updated = [...intervals]
-                  updated[index].end = e.target.value
-                  setIntervals(updated)
-                }}
-              />
-              <Button
-                variant="light"
-                color="red"
-                onClick={() => removeInterval(index)}
-              >
-                <FaTrash />
-              </Button>
-            </Group>
-          ))}
+          {selectedTechnicians.length <= 1 &&
+            intervals.length > 0 &&
+            selected.employeeIndex !== null && (
+              <div style={{ marginTop: 10, fontWeight: 500 }}>
+                {translations["Intervale pentru"][language]}{" "}
+                {schedule[selected.employeeIndex]?.name} (
+                {schedule[selected.employeeIndex]?.id})
+              </div>
+            )}
+
+          {selectedTechnicians.length <= 1 &&
+            intervals.map((interval, index) => (
+              <Group key={index} align="flex-end">
+                <TextInput
+                  type="time"
+                  label="Start"
+                  value={interval.start}
+                  onChange={(e) => {
+                    const updated = [...intervals]
+                    updated[index].start = e.target.value
+                    setIntervals(updated)
+                  }}
+                />
+                <TextInput
+                  type="time"
+                  label="End"
+                  value={interval.end}
+                  onChange={(e) => {
+                    const updated = [...intervals]
+                    updated[index].end = e.target.value
+                    setIntervals(updated)
+                  }}
+                />
+                <Button
+                  variant="light"
+                  color="red"
+                  onClick={() => removeInterval(index)}
+                >
+                  <FaTrash />
+                </Button>
+              </Group>
+            ))}
 
           <Group mt="xl" grow>
             <Button onClick={onClose} variant="default">

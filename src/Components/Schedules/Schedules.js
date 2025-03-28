@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Group, Button, Title } from "@mantine/core"
 import SchedulesList from "./SchedulesGroupList"
 import { translations } from "../utils/translations"
-import CreateGroupDrawer from "./ModalGroup"
+import ModalGroup from "./ModalGroup"
 
 const Schedules = () => {
   const [opened, setOpened] = useState(false)
@@ -23,7 +23,7 @@ const Schedules = () => {
 
       <SchedulesList reload={reload} setInGroupView={setInGroupView} />
 
-      <CreateGroupDrawer
+      <ModalGroup
         opened={opened}
         onClose={() => setOpened(false)}
         onGroupCreated={() => {

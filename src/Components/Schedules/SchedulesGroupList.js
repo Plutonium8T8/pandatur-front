@@ -14,7 +14,7 @@ import {
 import { modals } from "@mantine/modals"
 import { groupSchedules } from "../../api/groupSchedules"
 import { api } from "../../api"
-import GroupScheduleView from "./ScheduleView"
+import ScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
 import { FaTrash, FaEdit } from "react-icons/fa"
 import { translations } from "../utils/translations"
@@ -132,7 +132,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         <Button onClick={handleBack} mb="md">
           ← {translations["Înapoi la grupuri"][language]}
         </Button>
-        <GroupScheduleView
+        <ScheduleView
           groupId={selectedGroup.id}
           groupName={selectedGroup.name}
           groupUsers={technicians.filter((t) =>
