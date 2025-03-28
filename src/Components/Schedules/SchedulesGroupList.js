@@ -18,9 +18,9 @@ import GroupScheduleView from "./ScheduleView"
 import { useSnackbar } from "notistack"
 import { FaTrash, FaEdit } from "react-icons/fa"
 import { translations } from "../utils/translations"
-import CreateGroupDrawer from "./ModalGroup"
+import ModalGroup from "./ModalGroup"
 
-const SchedulesGroupList = ({ reload }) => {
+const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const [groups, setGroups] = useState([])
   const [technicians, setTechnicians] = useState([])
   const [selectedGroup, setSelectedGroup] = useState(null)
@@ -62,11 +62,14 @@ const SchedulesGroupList = ({ reload }) => {
 
   const handleGroupClick = (group) => {
     setSelectedGroup(group)
+    setInGroupView?.(true)
   }
 
   const handleBack = () => {
     setSelectedGroup(null)
+    setInGroupView?.(false)
   }
+
   const confirmDelete = (group) => {
     modals.openConfirmModal({
       centered: true,
@@ -209,7 +212,7 @@ const SchedulesGroupList = ({ reload }) => {
         </Stack>
       </ScrollArea>
 
-      <CreateGroupDrawer
+      <ModalGroup
         opened={editOpened}
         onClose={() => setEditOpened(false)}
         onGroupCreated={fetchData}

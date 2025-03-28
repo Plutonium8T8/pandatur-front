@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, Title, Group } from "@mantine/core"
+import { Group, Button, Title } from "@mantine/core"
 import SchedulesList from "./SchedulesGroupList"
 import { translations } from "../utils/translations"
 import CreateGroupDrawer from "./ModalGroup"
@@ -7,18 +7,21 @@ import CreateGroupDrawer from "./ModalGroup"
 const Schedules = () => {
   const [opened, setOpened] = useState(false)
   const [reload, setReload] = useState(false)
+  const [inGroupView, setInGroupView] = useState(false)
   const language = localStorage.getItem("language") || "RO"
 
   return (
     <div style={{ padding: "10px 20px" }}>
-      <Group mb="md">
-        <Title order={2}>{translations["Orar"][language]}</Title>
-        <Button ml="auto" onClick={() => setOpened(true)}>
-          {translations["Adaugă grup"][language]}
-        </Button>
-      </Group>
+      {!inGroupView && (
+        <Group mb="md">
+          <Title order={2}>{translations["Orar"][language]}</Title>
+          <Button ml="auto" onClick={() => setOpened(true)}>
+            {translations["Adaugă grup"][language]}
+          </Button>
+        </Group>
+      )}
 
-      <SchedulesList reload={reload} />
+      <SchedulesList reload={reload} setInGroupView={setInGroupView} />
 
       <CreateGroupDrawer
         opened={opened}

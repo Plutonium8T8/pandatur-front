@@ -4,7 +4,7 @@ import { translations } from "../utils/translations"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
-import ShiftDrawer from "./ModalIntervals"
+import ModalIntervals from "./ModalIntervals"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
 const ScheduleView = ({ groupUsers }) => {
@@ -162,7 +162,7 @@ const ScheduleView = ({ groupUsers }) => {
         </table>
       </div>
 
-      <ShiftDrawer
+      <ModalIntervals
         opened={selected.employeeIndex !== null}
         onClose={closeDrawer}
         schedule={schedule}
