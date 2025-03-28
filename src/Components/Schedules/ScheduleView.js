@@ -20,7 +20,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   )
   const [isLoading, setIsLoading] = useState(false)
   const [groupModalOpened, setGroupModalOpened] = useState(false)
-  const [selectedTechnicians, setSelectedTechnicians] = useState([]) // ✅ новое состояние
+  const [selectedTechnicians, setSelectedTechnicians] = useState([])
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
 
