@@ -118,7 +118,10 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         <Button onClick={handleBack} mb="md">
           ← {translations["Înapoi la grupuri"][language]}
         </Button>
-        <GroupScheduleView groupUsers={groupUsers} />
+        <GroupScheduleView
+          groupUsers={groupUsers}
+          groupName={selectedGroup.name}
+        />
       </div>
     )
   }

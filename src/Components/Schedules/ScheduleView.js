@@ -7,7 +7,7 @@ import { showServerError } from "../utils/showServerError"
 import ModalIntervals from "./ModalIntervals"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
-const ScheduleView = ({ groupUsers }) => {
+const ScheduleView = ({ groupUsers, groupName }) => {
   const [schedule, setSchedule] = useState([])
   const [currentWeekStart, setCurrentWeekStart] = useState(
     startOfWeek(new Date(), { weekStartsOn: 1 })
@@ -103,6 +103,19 @@ const ScheduleView = ({ groupUsers }) => {
       <div className="header-component">
         {translations["Grafic de lucru"][language]}
       </div>
+
+      {groupName && (
+        <div
+          style={{
+            textAlign: "center",
+            fontWeight: 500,
+            fontSize: 18,
+            marginTop: 4
+          }}
+        >
+          {groupName}
+        </div>
+      )}
 
       <div className="week-navigation">
         <button
