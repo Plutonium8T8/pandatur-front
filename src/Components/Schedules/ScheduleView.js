@@ -7,7 +7,7 @@ import { showServerError } from "../utils/showServerError"
 import ModalIntervals from "./ModalIntervals"
 import ModalGroup from "./ModalGroup"
 import { Button } from "@mantine/core"
-import "..//AdminPanelComponent OLD/AdminPanel.css"
+import "./AdminPanel.css"
 
 const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [schedule, setSchedule] = useState([])
