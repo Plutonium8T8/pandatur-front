@@ -85,7 +85,6 @@ export const WorkflowColumn = ({
           height={columnHeight}
           itemCount={filteredTickets.length}
           itemSize={TICKET_CARD_HEIGHT}
-          width="100%"
         >
           {({ index, style }) => (
             <div style={style}>
