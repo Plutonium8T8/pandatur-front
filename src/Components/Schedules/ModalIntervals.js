@@ -4,7 +4,6 @@ import { FaTrash, FaPlus, FaMinus } from "react-icons/fa"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
-import { format, startOfWeek, addDays } from "date-fns"
 import { translations } from "../utils/translations"
 
 const ModalIntervals = ({
@@ -20,9 +19,8 @@ const ModalIntervals = ({
   const [intervals, setIntervals] = useState([])
   const [startTime, setStartTime] = useState("")
   const [endTime, setEndTime] = useState("")
-  const currentWeekStart = startOfWeek(new Date(), { weekStartsOn: 1 })
+  const [selectedDays, setSelectedDays] = useState([])
 
-  const getWeekDay = (index) => addDays(currentWeekStart, index)
   const dayNames = [
     "monday",
     "tuesday",
@@ -33,12 +31,36 @@ const ModalIntervals = ({
     "sunday"
   ]
 
+  const dayApiNames = {
+    monday: "Monday",
+    tuesday: "Tuesday",
+    wednesday: "Wednesday",
+    thursday: "Thursday",
+    friday: "Friday",
+    saturday: "Saturday",
+    sunday: "Sunday"
+  }
+
+  const dayButtons = [
+    { label: "Mo", value: "monday" },
+    { label: "Tu", value: "tuesday" },
+    { label: "We", value: "wednesday" },
+    { label: "Th", value: "thursday" },
+    { label: "Fr", value: "friday" },
+    { label: "Sa", value: "saturday" },
+    { label: "Su", value: "sunday" }
+  ]
+
+  const toggleDay = (day) => {
+    setSelectedDays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    )
+  }
+
   useEffect(() => {
-    if (
-      opened &&
-      selected.employeeIndex !== null &&
-      selected.dayIndex !== null
-    ) {
+    if (opened && selected.employeeIndex !== null) {
+      const defaultDay = dayNames[selected.dayIndex]
+      setSelectedDays([defaultDay])
       const current =
         schedule[selected.employeeIndex]?.shifts[selected.dayIndex] || []
       setIntervals([...current])
@@ -55,10 +77,9 @@ const ModalIntervals = ({
   const addInterval = async () => {
     try {
       const id = schedule[selected.employeeIndex].id
-      const day = dayNames[selected.dayIndex]
-      const payload = { start: startTime, end: endTime, timezone: "EST" }
-      await api.technicians.createSchedule(id, day, payload)
-      setIntervals((prev) => [...prev, payload])
+      const weekdays = selectedDays.map((d) => dayApiNames[d])
+      const payload = { start: startTime, end: endTime, weekdays }
+      await api.technicians.createSchedule(id, payload)
       setStartTime("")
       setEndTime("")
       fetchData()
@@ -70,10 +91,9 @@ const ModalIntervals = ({
   const cutInterval = async () => {
     try {
       const id = schedule[selected.employeeIndex].id
-      const day = dayNames[selected.dayIndex]
-      const payload = { start: startTime, end: endTime, timezone: "EST" }
-      await api.technicians.deleteSchedule(id, day, payload)
-      setIntervals((prev) => [...prev, payload])
+      const weekdays = selectedDays.map((d) => dayApiNames[d])
+      const payload = { start: startTime, end: endTime, weekdays }
+      await api.technicians.deleteSchedule(id, payload)
       setStartTime("")
       setEndTime("")
       fetchData()
@@ -82,17 +102,17 @@ const ModalIntervals = ({
     }
   }
 
-  const removeInterval = async (i) => {
+  const removeInterval = async (index) => {
     const id = schedule[selected.employeeIndex].id
-    const day = dayNames[selected.dayIndex]
-    const interval = intervals[i]
+    const interval = intervals[index]
+    const weekday = dayApiNames[dayNames[selected.dayIndex]]
     try {
-      await api.technicians.deleteSchedule(id, day, {
+      await api.technicians.deleteSchedule(id, {
+        weekdays: [weekday],
         start: interval.start,
-        end: interval.end,
-        timezone: "EST"
+        end: interval.end
       })
-      setIntervals(intervals.filter((_, idx) => idx !== i))
+      setIntervals((prev) => prev.filter((_, i) => i !== index))
       fetchData()
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" })
@@ -100,8 +120,8 @@ const ModalIntervals = ({
   }
 
   const title =
-    opened && selected.employeeIndex !== null && selected.dayIndex !== null
-      ? `${schedule[selected.employeeIndex].name} (${schedule[selected.employeeIndex].id}) — ${translations[format(getWeekDay(selected.dayIndex), "EEEE")][language]}, ${format(getWeekDay(selected.dayIndex), "dd.MM")}`
+    opened && selected.employeeIndex !== null
+      ? `${schedule[selected.employeeIndex].name} (${schedule[selected.employeeIndex].id})`
       : ""
 
   return (
@@ -115,6 +135,21 @@ const ModalIntervals = ({
     >
       <form onSubmit={(e) => e.preventDefault()}>
         <Stack>
+          <Group spacing="xs" mt="xs">
+            {dayButtons.map((day) => (
+              <Button
+                key={day.value}
+                size="xs"
+                variant={
+                  selectedDays.includes(day.value) ? "filled" : "default"
+                }
+                onClick={() => toggleDay(day.value)}
+                style={{ width: 36, padding: 0 }}
+              >
+                {day.label}
+              </Button>
+            ))}
+          </Group>
           {intervals.map((interval, index) => (
             <Group key={index} align="flex-end">
               <TextInput

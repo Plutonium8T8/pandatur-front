@@ -27,13 +27,16 @@ const ScheduleView = ({ groupUsers }) => {
     try {
       setIsLoading(true)
       const scheduleData = await api.technicians.getSchedules()
+
       const combined = groupUsers.map((user) => {
         const userId = user.id
         const userSchedule = scheduleData.find(
           (s) => s.technician_id === userId
         )
+
         const weeklySchedule = userSchedule?.weekly_schedule || {}
-        const shifts = [
+
+        const dayKeys = [
           "monday",
           "tuesday",
           "wednesday",
@@ -41,12 +44,41 @@ const ScheduleView = ({ groupUsers }) => {
           "friday",
           "saturday",
           "sunday"
-        ].map((day) =>
-          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
-        )
+        ]
 
-        return { id: userId, name: user.username, shifts }
+        const shifts = dayKeys.map((day) => [])
+
+        // формат с ключами-днями: monday: [ { start, end } ]
+        dayKeys.forEach((day, i) => {
+          if (Array.isArray(weeklySchedule[day])) {
+            shifts[i] = weeklySchedule[day]
+          }
+        })
+
+        // формат с weekdays: { weekdays: ["Monday", "Wednesday"], start, end }
+        if (
+          weeklySchedule.weekdays &&
+          weeklySchedule.start &&
+          weeklySchedule.end
+        ) {
+          weeklySchedule.weekdays.forEach((dayName) => {
+            const index = dayKeys.indexOf(dayName.toLowerCase())
+            if (index !== -1) {
+              shifts[index].push({
+                start: weeklySchedule.start,
+                end: weeklySchedule.end
+              })
+            }
+          })
+        }
+
+        return {
+          id: userId,
+          name: user.username,
+          shifts
+        }
       })
+
       setSchedule(combined)
     } catch (e) {
       console.error("Ошибка загрузки расписания:", e)

@@ -8,8 +8,10 @@ import {
   Badge,
   Avatar,
   Tooltip,
-  ActionIcon
+  ActionIcon,
+  ScrollArea
 } from "@mantine/core"
+import { modals } from "@mantine/modals"
 import { schedules } from "../../api/schedules"
 import { api } from "../../api"
 import GroupScheduleView from "./ScheduleView"
@@ -65,6 +67,24 @@ const SchedulesGroupList = ({ reload }) => {
   const handleBack = () => {
     setSelectedGroup(null)
   }
+  const confirmDelete = (group) => {
+    modals.openConfirmModal({
+      centered: true,
+      title: translations["Confirmare ștergere"][language],
+      children: (
+        <Text size="sm">
+          {translations["Sunteți sigur că doriți să ștergeți grupul"][language]}
+          <b>{group.name}</b>?
+        </Text>
+      ),
+      labels: {
+        confirm: translations["Ștergeți"][language],
+        cancel: translations["Anulează"][language]
+      },
+      confirmProps: { color: "red" },
+      onConfirm: () => handleDelete(group.id)
+    })
+  }
 
   const handleDelete = async (id) => {
     try {
@@ -102,90 +122,92 @@ const SchedulesGroupList = ({ reload }) => {
 
   return (
     <>
-      <Stack spacing="md">
-        {groups.map((group) => {
-          const groupUsers = technicians.filter((u) =>
-            group.user_ids.includes(u.id)
-          )
+      <ScrollArea h="90vh" type="auto">
+        <Stack spacing="md">
+          {groups.map((group) => {
+            const groupUsers = technicians.filter((u) =>
+              group.user_ids.includes(u.id)
+            )
 
-          return (
-            <Card
-              key={group.id}
-              shadow="xs"
-              padding="lg"
-              radius="md"
-              withBorder
-              className="group-card"
-            >
-              <Group position="apart" align="start">
-                <div
-                  style={{ flex: 1, cursor: "pointer" }}
-                  onClick={() => handleGroupClick(group)}
-                >
-                  <Group spacing="xs" mb={10}>
-                    <Text size="md" fw={600}>
-                      {group.name}
-                    </Text>
-                    <Badge color="blue" variant="light">
-                      {translations["Pentru o săptămână"][language]}
-                    </Badge>
-                  </Group>
+            return (
+              <Card
+                key={group.id}
+                shadow="xs"
+                padding="lg"
+                radius="md"
+                withBorder
+                className="group-card"
+              >
+                <Group position="apart" align="start">
+                  <div
+                    style={{ flex: 1, cursor: "pointer" }}
+                    onClick={() => handleGroupClick(group)}
+                  >
+                    <Group spacing="xs" mb={10}>
+                      <Text size="md" fw={600}>
+                        {group.name}
+                      </Text>
+                      <Badge color="blue" variant="light">
+                        {translations["Pentru o săptămână"][language]}
+                      </Badge>
+                    </Group>
 
-                  <Tooltip.Group openDelay={300} closeDelay={100}>
-                    <Avatar.Group spacing="sm">
-                      {groupUsers.slice(0, 5).map((u) => (
-                        <Tooltip label={u.username} withArrow key={u.id}>
-                          <Avatar
-                            size="md"
-                            radius="xl"
-                            src={u.photo || undefined}
-                            color="blue"
+                    <Tooltip.Group openDelay={300} closeDelay={100}>
+                      <Avatar.Group spacing="sm">
+                        {groupUsers.slice(0, 5).map((u) => (
+                          <Tooltip label={u.username} withArrow key={u.id}>
+                            <Avatar
+                              size="md"
+                              radius="xl"
+                              src={u.photo || undefined}
+                              color="blue"
+                            >
+                              {u.username?.[0]?.toUpperCase() || "?"}
+                            </Avatar>
+                          </Tooltip>
+                        ))}
+                        {groupUsers.length > 5 && (
+                          <Tooltip
+                            withArrow
+                            label={
+                              <>
+                                {groupUsers.slice(5).map((u) => (
+                                  <div key={u.id}>{u.username}</div>
+                                ))}
+                              </>
+                            }
                           >
-                            {u.username?.[0]?.toUpperCase() || "?"}
-                          </Avatar>
-                        </Tooltip>
-                      ))}
-                      {groupUsers.length > 5 && (
-                        <Tooltip
-                          withArrow
-                          label={
-                            <>
-                              {groupUsers.slice(5).map((u) => (
-                                <div key={u.id}>{u.username}</div>
-                              ))}
-                            </>
-                          }
-                        >
-                          <Avatar size="md" radius="xl" color="blue">
-                            +{groupUsers.length - 5}
-                          </Avatar>
-                        </Tooltip>
-                      )}
-                    </Avatar.Group>
-                  </Tooltip.Group>
-                </div>
+                            <Avatar size="md" radius="xl" color="blue">
+                              +{groupUsers.length - 5}
+                            </Avatar>
+                          </Tooltip>
+                        )}
+                      </Avatar.Group>
+                    </Tooltip.Group>
+                  </div>
 
-                <Group>
-                  <ActionIcon
-                    color="blue"
-                    variant="light"
-                    onClick={() => handleEdit(group)}
-                  >
-                    <FaEdit />
-                  </ActionIcon>
-                  <ActionIcon
-                    color="red"
-                    variant="light"
-                    onClick={() => handleDelete(group.id)}
-                  >
-                    <FaTrash />
-                  </ActionIcon>
+                  <Group>
+                    <ActionIcon
+                      color="blue"
+                      variant="light"
+                      onClick={() => handleEdit(group)}
+                    >
+                      <FaEdit />
+                    </ActionIcon>
+                    <ActionIcon
+                      color="red"
+                      variant="light"
+                      onClick={() => confirmDelete(group)}
+                    >
+                      <FaTrash />
+                    </ActionIcon>
+                  </Group>
                 </Group>
-              </Group>
-            </Card>
-          )
-        })}
-      </Stack>
+              </Card>
+            )
+          })}
+        </Stack>
+      </ScrollArea>
 
       <CreateGroupDrawer
         opened={editOpened}
