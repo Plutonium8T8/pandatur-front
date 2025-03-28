@@ -1614,6 +1614,10 @@ export const translations = {
   "Modifică grupul": {
     RO: "Modifică grupul",
     RU: "Редактировать группу"
+  },
+  "Șterge interval dupa zile": {
+    RO: "Șterge interval dupa zile",
+    RU: "Удалить интервалы по дням"
   }
 }
 

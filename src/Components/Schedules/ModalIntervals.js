@@ -132,6 +132,21 @@ const ModalIntervals = ({
     }
   }
 
+  const deleteDays = async () => {
+    try {
+      const payload = {
+        technician_ids: getTechnicianIds(),
+        weekdays: getWeekdays()
+      }
+
+      await api.schedules.deleteWeekdays(payload)
+      fetchData()
+      onClose()
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" })
+    }
+  }
+
   const title =
     opened && selected.employeeIndex !== null
       ? `${schedule[selected.employeeIndex].name} (${schedule[selected.employeeIndex].id})`
@@ -222,6 +237,9 @@ const ModalIntervals = ({
             </Button>
             <Button variant="default" onClick={onClose}>
               {translations["Închide"][language]}
+            </Button>
+            <Button color="red" variant="outline" onClick={deleteDays}>
+              {translations["Șterge interval dupa zile"][language]}
             </Button>
           </Group>
         </Stack>
