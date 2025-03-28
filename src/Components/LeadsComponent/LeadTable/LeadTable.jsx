@@ -40,7 +40,7 @@ export const LeadTable = ({
   selectedTickets,
   onSelectRow,
   filteredLeads,
-  totalLeads,
+  totalLeadsPages,
   onChangePagination,
   currentPage,
 
@@ -354,10 +354,10 @@ export const LeadTable = ({
         bordered
       />
 
-      {!!totalLeads && (
+      {!!totalLeadsPages && (
         <Flex p="20" justify="center" className="leads-table-pagination">
           <Pagination
-            totalPages={totalLeads}
+            totalPages={totalLeadsPages}
             currentPage={currentPage}
             onPaginationChange={onChangePagination}
           />

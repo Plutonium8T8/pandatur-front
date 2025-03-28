@@ -30,7 +30,7 @@ const LIGHT_TICKET = "light"
 const NUMBER_PAGE = 1
 
 const getTicketsIds = (ticketList) => {
-  return ticketList.map((id) => id)
+  return ticketList.map(({ id }) => id)
 }
 
 const Leads = () => {
@@ -48,7 +48,7 @@ const Leads = () => {
   const [currentTicket, setCurrentTicket] = useState(null)
   const [selectedTickets, setSelectedTickets] = useState([])
   const [loading, setLoading] = useState(false)
-  const [totalLeads, setTotalLeads] = useState()
+  const [totalLeads, setTotalLeads] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [isChatOpen, setIsChatOpen] = useState(!!ticketId)
   const [groupTitle, setGroupTitle] = useState("")
@@ -210,9 +210,9 @@ const Leads = () => {
   const handleApplyFilterLightTicket = (formattedFilters) => {
     fetchTickets(
       { page: NUMBER_PAGE, type: LIGHT_TICKET, attributes: formattedFilters },
-      ({ data, total }) => {
-        applyWorkflowFilters(formattedFilters, getTicketsIds(data.data))
-        setTotalLeads(total)
+      ({ data, pagination }) => {
+        applyWorkflowFilters(formattedFilters, getTicketsIds(data))
+        setTotalLeads(pagination.total)
       }
     )
   }
@@ -241,16 +241,15 @@ const Leads = () => {
         },
         ...(groupTitle && { group_title: groupTitle })
       },
-      (response) => {
-        const { data, ...rest } = response
+      ({ data, pagination }) => {
         if (isViewModeList) {
           setHardTickets(data)
-          setTotalLeads(rest.pagination.total || 0)
+          setTotalLeads(pagination.total || 0)
           return
         }
 
-        setFilteredTicketIds(getTicketsIds(data.data) ?? null)
-        setTotalLeads(rest.total || 0)
+        setTotalLeads(pagination.total)
+        setFilteredTicketIds(getTicketsIds(data) ?? null)
       }
     )
   }
@@ -279,7 +278,7 @@ const Leads = () => {
         }}
         deleteTicket={deleteTicket}
         setGroupTitle={setGroupTitle}
-        totalTicketsFiltered={totalLeads ?? tickets.length}
+        totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
       />
 
@@ -299,7 +298,7 @@ const Leads = () => {
             filteredLeads={hardTickets}
             selectTicket={selectedTickets}
             onSelectRow={toggleSelectTicket}
-            totalLeads={getTotalPages(totalLeads)}
+            totalLeadsPages={getTotalPages(tickets.length)}
             onChangePagination={handlePaginationWorkflow}
             fetchTickets={fetchTicketList}
           />
