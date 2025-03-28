@@ -82,7 +82,9 @@
 .schedule-table td {
   background-color: #fff;
 }
-
+.shift-cell :first-child {
+  margin-bottom: 3px;
+}
 .schedule-table td:hover {
   background-color: #f1f1f1;
   cursor: pointer;
@@ -286,4 +288,10 @@
 
 .add-button-plus:hover {
   background-color: rgb(41, 167, 68);
+}
+
+.container-interval {
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 4px;
 }

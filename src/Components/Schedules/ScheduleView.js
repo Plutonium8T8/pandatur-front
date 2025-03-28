@@ -157,8 +157,10 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   >
                     {shift.length > 0
                       ? shift.map((i, idx) => (
-                          <div key={idx}>
-                            {i.start} - {i.end}
+                          <div className="container-interval">
+                            <div key={idx}>
+                              {i.start} - {i.end}
+                            </div>
                           </div>
                         ))
                       : "-"}
