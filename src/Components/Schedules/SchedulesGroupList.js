@@ -120,17 +120,13 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
       }
 
       setSelectedGroup(updatedSelectedGroup)
-      fetchData() // обновляет список групп
+      fetchData()
     } catch (err) {
       console.error("Ошибка при обновлении данных группы:", err)
     }
   }
 
   if (selectedGroup) {
-    const groupUsers = selectedGroup?.user_ids
-      ? technicians.filter((t) => selectedGroup.user_ids.includes(t.id))
-      : []
-
     return (
       <div>
         <Button onClick={handleBack} mb="md">

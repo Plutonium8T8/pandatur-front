@@ -59,7 +59,6 @@ const ModalGroup = ({
           await api.groupSchedules.removeTechnician(groupId, userId)
         }
 
-        // ✅ получаем свежие данные
         const updatedGroup = await api.groupSchedules.getGroupById(groupId)
         onGroupCreated(updatedGroup)
       } else {
