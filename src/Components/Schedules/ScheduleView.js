@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
 import ModalIntervals from "./ModalIntervals"
 import ModalGroup from "./ModalGroup"
-import { Button } from "@mantine/core"
+import { Button, Checkbox } from "@mantine/core"
 import "./AdminPanel.css"
 
 const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
@@ -20,6 +20,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   )
   const [isLoading, setIsLoading] = useState(false)
   const [groupModalOpened, setGroupModalOpened] = useState(false)
+  const [selectedTechnicians, setSelectedTechnicians] = useState([]) // ✅ новое состояние
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
 
@@ -94,6 +95,12 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     setSelected({ employeeIndex: null, dayIndex: null })
   }
 
+  const toggleTechnician = (id) => {
+    setSelectedTechnicians((prev) =>
+      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id]
+    )
+  }
+
   return (
     <div className="schedule-container">
       <div className="header-component">
@@ -148,7 +155,14 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
           <tbody>
             {schedule.map((employee, ei) => (
               <tr key={ei}>
-                <td>{employee.name}</td>
+                <td>
+                  <Checkbox
+                    checked={selectedTechnicians.includes(employee.id)}
+                    onChange={() => toggleTechnician(employee.id)}
+                    style={{ marginRight: 8 }}
+                  />
+                  {employee.name}
+                </td>
                 {employee.shifts.map((shift, di) => (
                   <td
                     key={di}
@@ -157,10 +171,8 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   >
                     {shift.length > 0
                       ? shift.map((i, idx) => (
-                          <div className="container-interval">
-                            <div key={idx}>
-                              {i.start} - {i.end}
-                            </div>
+                          <div className="container-interval" key={idx}>
+                            {i.start} - {i.end}
                           </div>
                         ))
                       : "-"}
@@ -208,6 +220,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         selected={selected}
         setSchedule={setSchedule}
         fetchData={fetchData}
+        selectedTechnicians={selectedTechnicians}
       />
     </div>
   )
