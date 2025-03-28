@@ -54,8 +54,7 @@ const TicketCard = ({ ticket, onEditTicket }) => {
               <div className="ticket-column">
                 <div className="ticket-photo">
                   <img
-                    // src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
-                    src={DEFAULT_PHOTO}
+                    src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
                     alt="User"
                     className="ticket-photo-image"
                   />
