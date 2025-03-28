@@ -58,17 +58,21 @@ const ModalGroup = ({
         for (const userId of usersToRemove) {
           await api.groupSchedules.removeTechnician(groupId, userId)
         }
+
+        // ✅ получаем свежие данные
+        const updatedGroup = await api.groupSchedules.getGroupById(groupId)
+        onGroupCreated(updatedGroup)
       } else {
         await api.groupSchedules.createGroup({
           name: groupName,
           user_ids: selectedUserIds.map((id) => parseInt(id))
         })
+        onGroupCreated()
       }
 
       onClose()
       setGroupName("")
       setSelectedUserIds([])
-      onGroupCreated()
     } catch (err) {
       console.error("Ошибка при сохранении группы:", err.message)
     }

@@ -108,10 +108,28 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
     setEditOpened(true)
   }
 
+  const handleGroupUpdate = async (updatedGroup) => {
+    try {
+      const usersInGroup = await groupSchedules.getTechniciansInGroup(
+        updatedGroup.id
+      )
+
+      const updatedSelectedGroup = {
+        ...updatedGroup,
+        user_ids: usersInGroup.map((u) => u.id)
+      }
+
+      setSelectedGroup(updatedSelectedGroup)
+      fetchData() // обновляет список групп
+    } catch (err) {
+      console.error("Ошибка при обновлении данных группы:", err)
+    }
+  }
+
   if (selectedGroup) {
-    const groupUsers = technicians.filter((t) =>
-      selectedGroup.user_ids.includes(t.id)
-    )
+    const groupUsers = selectedGroup?.user_ids
+      ? technicians.filter((t) => selectedGroup.user_ids.includes(t.id))
+      : []
 
     return (
       <div>
@@ -119,8 +137,12 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
           ← {translations["Înapoi la grupuri"][language]}
         </Button>
         <GroupScheduleView
-          groupUsers={groupUsers}
+          groupId={selectedGroup.id}
           groupName={selectedGroup.name}
+          groupUsers={technicians.filter((t) =>
+            selectedGroup.user_ids.includes(t.id)
+          )}
+          onGroupUpdate={handleGroupUpdate}
         />
       </div>
     )

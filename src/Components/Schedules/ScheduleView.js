@@ -5,18 +5,21 @@ import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { showServerError } from "../utils/showServerError"
 import ModalIntervals from "./ModalIntervals"
+import ModalGroup from "./ModalGroup"
+import { Button } from "@mantine/core"
 import "..//AdminPanelComponent OLD/AdminPanel.css"
 
-const ScheduleView = ({ groupUsers, groupName }) => {
+const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [schedule, setSchedule] = useState([])
-  const [currentWeekStart, setCurrentWeekStart] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
-  )
   const [selected, setSelected] = useState({
     employeeIndex: null,
     dayIndex: null
   })
+  const [currentWeekStart, setCurrentWeekStart] = useState(
+    startOfWeek(new Date(), { weekStartsOn: 1 })
+  )
   const [isLoading, setIsLoading] = useState(false)
+  const [groupModalOpened, setGroupModalOpened] = useState(false)
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
 
@@ -27,7 +30,6 @@ const ScheduleView = ({ groupUsers, groupName }) => {
     try {
       setIsLoading(true)
       const scheduleData = await api.schedules.getSchedules()
-
       const dayKeys = [
         "Monday",
         "Tuesday",
@@ -43,18 +45,13 @@ const ScheduleView = ({ groupUsers, groupName }) => {
         const userSchedule = scheduleData.find(
           (s) => s.technician_id === userId
         )
-
         const weeklySchedule = userSchedule?.weekly_schedule || {}
 
         const shifts = dayKeys.map((day) =>
           Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
         )
 
-        return {
-          id: userId,
-          name: user.username,
-          shifts
-        }
+        return { id: userId, name: user.username, shifts }
       })
 
       setSchedule(combined)
@@ -68,27 +65,26 @@ const ScheduleView = ({ groupUsers, groupName }) => {
 
   useEffect(() => {
     fetchData()
-  }, [groupUsers])
-
-  const calculateWorkedHours = (shifts) => {
-    return shifts
-      .reduce((total, shift) => {
-        return (
-          total +
-          shift.reduce(
-            (sum, i) => sum + parseTime(i.end) - parseTime(i.start),
-            0
-          )
-        )
-      }, 0)
-      .toFixed(2)
-  }
+  }, [groupUsers, groupId])
 
   const parseTime = (time) => {
     if (!time) return 0
     const [h, m] = time.split(":").map(Number)
     return h + m / 60
   }
+
+  const calculateWorkedHours = (shifts) =>
+    shifts
+      .reduce(
+        (total, shift) =>
+          total +
+          shift.reduce(
+            (sum, i) => sum + parseTime(i.end) - parseTime(i.start),
+            0
+          ),
+        0
+      )
+      .toFixed(2)
 
   const openDrawer = (employeeIndex, dayIndex) => {
     setSelected({ employeeIndex, dayIndex })
@@ -174,6 +170,34 @@ const ScheduleView = ({ groupUsers, groupName }) => {
           </tbody>
         </table>
       </div>
+
+      <Button
+        fullWidth
+        variant="outline"
+        color="blue"
+        style={{ marginTop: 20 }}
+        onClick={() => setGroupModalOpened(true)}
+      >
+        {translations["Modifică grupul"][language]}
+      </Button>
+
+      <ModalGroup
+        opened={groupModalOpened}
+        onClose={() => setGroupModalOpened(false)}
+        onGroupCreated={(updatedGroup) => {
+          fetchData()
+          setGroupModalOpened(false)
+          if (typeof onGroupUpdate === "function") {
+            onGroupUpdate(updatedGroup)
+          }
+        }}
+        initialData={{
+          id: groupId,
+          name: groupName,
+          user_ids: groupUsers.map((u) => u.id)
+        }}
+        isEditMode={true}
+      />
 
       <ModalIntervals
         opened={selected.employeeIndex !== null}

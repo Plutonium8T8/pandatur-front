@@ -1610,6 +1610,10 @@ export const translations = {
   "Sunteți sigur că doriți să ștergeți grupul": {
     RO: "Sunteți sigur că doriți să ștergeți grupul",
     RU: "Вы уверены что хотите удалить группу"
+  },
+  "Modifică grupul": {
+    RO: "Modifică grupul",
+    RU: "Редактировать группу"
   }
 }
 
