@@ -1,6 +1,9 @@
+import { FixedSizeList } from "react-window"
+import { useRef } from "react"
 import { getColorByWorkflowType, getBrightByWorkflowType } from "../WorkflowTag"
 import TicketCard from "../../../LeadsComponent/TicketCardComponent"
 import { getLanguageByKey } from "../../../utils"
+import { useDOMElementHeight } from "../../../../hooks"
 import "./WorkflowColumn.css"
 
 const priorityOrder = {
@@ -40,6 +43,9 @@ export const WorkflowColumn = ({
   workflow,
   tickets
 }) => {
+  const columnRef = useRef(null)
+  const columnHeight = useDOMElementHeight(columnRef)
+
   const filteredTickets = filterTickets(workflow, tickets)
 
   return (
@@ -72,14 +78,23 @@ export const WorkflowColumn = ({
           </div>
         </div>
       </div>
-      <div className="scrollable-list">
-        {filteredTickets.map((ticket) => (
-          <TicketCard
-            key={ticket.id}
-            ticket={ticket}
-            onEditTicket={onEditTicket}
-          />
-        ))}
+      <div ref={columnRef} className="scrollable-list">
+        <FixedSizeList
+          height={columnHeight}
+          itemCount={filteredTickets.length}
+          itemSize={110}
+          width="100%"
+        >
+          {({ index, style }) => (
+            <div style={style}>
+              <TicketCard
+                key={filteredTickets[index].id}
+                ticket={filteredTickets[index]}
+                onEditTicket={onEditTicket}
+              />
+            </div>
+          )}
+        </FixedSizeList>
       </div>
     </div>
   )

@@ -55,5 +55,5 @@
   flex-direction: column;
   overflow-y: scroll;
   gap: 10px;
-  max-height: 98vh;
+  height: 100%;
 }
