@@ -4,7 +4,7 @@ import { useSnackbar } from "notistack"
 import { useDOMElementHeight, useApp } from "../../hooks"
 import { priorityOptions } from "../../FormOptions/PriorityOption"
 import { workflowOptions } from "../../FormOptions/WorkFlowOption"
-import { GeneralTicketTabs } from "../GeneralTicketTabs"
+import { LeadsTicketTabsFilter } from "./LeadsTicketTabsFilter"
 import { LeadTable } from "./LeadTable"
 import { useDebounce, useConfirmPopup } from "../../hooks"
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils"
@@ -21,7 +21,7 @@ import { MantineModal } from "../MantineModal"
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs"
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
 import { WorkflowColumns } from "../Workflow"
-import { filteredWorkflows } from "../GeneralTicketTabs"
+import { filteredWorkflows } from "./LeadsTicketTabsFilter"
 
 const SORT_BY = "creation_date"
 const ORDER = "DESC"
@@ -357,7 +357,7 @@ const Leads = () => {
         open={isOpenKanbanFilterModal}
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
-        <GeneralTicketTabs
+        <LeadsTicketTabsFilter
           formIds={formIDsKanban}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
@@ -379,7 +379,7 @@ const Leads = () => {
         open={isOpenListFilterModal}
         onClose={() => setIsOpenListFilterModal(false)}
       >
-        <GeneralTicketTabs
+        <LeadsTicketTabsFilter
           formIds={formIDsList}
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}

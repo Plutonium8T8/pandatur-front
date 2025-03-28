@@ -2,8 +2,8 @@ import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { MdOutlineEuroSymbol } from "react-icons/md"
-import { getLanguageByKey } from "../../utils"
-import { formatDateOrUndefined } from "../../utils"
+import { getLanguageByKey } from "../../../utils"
+import { formatDateOrUndefined, formatNumericValue } from "../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -13,8 +13,8 @@ import {
   transportOptions,
   nameExcursionOptions,
   purchaseProcessingOptions
-} from "../../../FormOptions"
-import { DD_MM_YYYY } from "../../../app-constants"
+} from "../../../../FormOptions"
+import { DD_MM_YYYY } from "../../../../app-constants"
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
 
@@ -46,12 +46,7 @@ export const TicketInfoForm = ({
         data_intoarcerii: formatDateOrUndefined(data_intoarcerii),
         data_cererii_de_retur: formatDateOrUndefined(data_cererii_de_retur),
 
-        ...(buget && {
-          buget: {
-            min: buget,
-            max: buget
-          }
-        })
+        buget: formatNumericValue(buget)
       }
 
       return { ...formattedData, ...rest }

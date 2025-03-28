@@ -2,12 +2,12 @@ import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
 import { MdOutlineEuroSymbol } from "react-icons/md"
-import { getLanguageByKey } from "../../utils"
-import { LabelSwitch } from "../../LabelSwitch"
-import { paymentStatusOptions } from "../../../FormOptions"
-import { DD_MM_YYYY } from "../../../app-constants"
-import { useUser } from "../../../hooks"
-import { formatDateOrUndefined } from "../../utils"
+import { getLanguageByKey } from "../../../utils"
+import { LabelSwitch } from "../../../LabelSwitch"
+import { paymentStatusOptions } from "../../../../FormOptions"
+import { DD_MM_YYYY } from "../../../../app-constants"
+import { useUser } from "../../../../hooks"
+import { formatDateOrUndefined, formatNumericValue } from "../utils"
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
 
@@ -57,24 +57,9 @@ export const ContractForm = ({
         rezervare_confirmata: convertStringOrUndefined(rezervare_confirmata),
         contract_arhivat: convertStringOrUndefined(contract_arhivat),
         control: convertStringOrUndefined(control),
-        ...(avans_euro && {
-          avans_euro: {
-            min: avans_euro,
-            max: avans_euro
-          }
-        }),
-        ...(achitat_client && {
-          achitat_client: {
-            min: achitat_client,
-            max: achitat_client
-          }
-        }),
-        ...(pret_netto && {
-          pret_netto: {
-            min: pret_netto,
-            max: pret_netto
-          }
-        })
+        avans_euro: formatNumericValue(avans_euro),
+        achitat_client: formatNumericValue(achitat_client),
+        pret_netto: formatNumericValue(pret_netto)
       }
 
       return { ...formattedData, ...rest }
