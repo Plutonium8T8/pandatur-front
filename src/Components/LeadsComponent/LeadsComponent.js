@@ -29,6 +29,10 @@ const HARD_TICKET = "hard"
 const LIGHT_TICKET = "light"
 const NUMBER_PAGE = 1
 
+const getTicketsIds = (ticketList) => {
+  return ticketList.map((id) => id)
+}
+
 const Leads = () => {
   const refLeadsFilter = useRef()
   const { enqueueSnackbar } = useSnackbar()
@@ -207,7 +211,7 @@ const Leads = () => {
     fetchTickets(
       { page: NUMBER_PAGE, type: LIGHT_TICKET, attributes: formattedFilters },
       ({ data, total }) => {
-        applyWorkflowFilters(formattedFilters, data)
+        applyWorkflowFilters(formattedFilters, getTicketsIds(data.data))
         setTotalLeads(total)
       }
     )
@@ -245,7 +249,7 @@ const Leads = () => {
           return
         }
 
-        setFilteredTicketIds(data ?? null)
+        setFilteredTicketIds(getTicketsIds(data.data) ?? null)
         setTotalLeads(rest.total || 0)
       }
     )
