@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Drawer, TextInput, MultiSelect, Button, Group } from "@mantine/core"
 import { api } from "../../api"
-import { groupSchedules } from "../../api/groupSchedules"
 import { translations } from "../utils/translations"
 
 const ModalGroup = ({
@@ -37,7 +36,7 @@ const ModalGroup = ({
       if (isEditMode && initialData?.id) {
         const groupId = initialData.id
 
-        await groupSchedules.updateGroup(groupId, { name: groupName })
+        await api.groupSchedules.updateGroup(groupId, { name: groupName })
 
         const currentUserIds = initialData.user_ids || []
         const newUserIds = selectedUserIds.map((id) => parseInt(id))
@@ -50,14 +49,17 @@ const ModalGroup = ({
         )
 
         if (usersToAdd.length > 0) {
-          await groupSchedules.assignMultipleTechnicians(groupId, usersToAdd)
+          await api.groupSchedules.assignMultipleTechnicians(
+            groupId,
+            usersToAdd
+          )
         }
 
         for (const userId of usersToRemove) {
-          await groupSchedules.removeTechnician(groupId, userId)
+          await api.groupSchedules.removeTechnician(groupId, userId)
         }
       } else {
-        await groupSchedules.createGroup({
+        await api.groupSchedules.createGroup({
           name: groupName,
           user_ids: selectedUserIds.map((id) => parseInt(id))
         })
