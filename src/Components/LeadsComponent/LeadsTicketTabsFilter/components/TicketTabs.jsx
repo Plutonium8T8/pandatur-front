@@ -1,12 +1,9 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core"
-import {
-  QualityControlForm,
-  InvoiceForm,
-  BasicGeneralForm
-} from "../../TicketForms"
-import { getLanguageByKey } from "../../utils"
+import { QualityControlForm, BasicGeneralForm } from "../../../TicketForms"
+import { getLanguageByKey } from "../../../utils"
 import { TicketInfoForm } from "./TicketInfoForm"
 import { ContractForm } from "./ContractForm"
+import { InvoiceForm } from "./InvoiceForm"
 
 const renderResetButton = (resetForm) => {
   return (

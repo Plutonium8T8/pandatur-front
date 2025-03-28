@@ -2,14 +2,14 @@ import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
 import React, { useState } from "react"
 import { platformOptions, filteredWorkflows } from "./utils"
 import { SelectWorkflow, TicketTabs } from "./components"
-import { getLanguageByKey, cleanFormValues } from "../utils"
-import "./GeneralTicketTabs.css"
+import { getLanguageByKey, cleanFormValues } from "../../utils"
+import "./LeadsTicketTabsFilter.css"
 
 const systemFiltersInitialState = {
   workflow: filteredWorkflows
 }
 
-export const GeneralTicketTabs = ({
+export const LeadsTicketTabsFilter = ({
   onClose,
   onApplyWorkflowFilters,
   onApplyTicketFilters,
