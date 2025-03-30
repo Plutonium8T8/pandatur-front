@@ -1,5 +1,5 @@
 import { useEffect } from "react"
-import { MultiSelect, Select, TextInput, Flex } from "@mantine/core"
+import { MultiSelect, TextInput, Flex } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { getLanguageByKey } from "../../../utils"
 import {
@@ -7,19 +7,9 @@ import {
   evaluareOdihnaOptions
 } from "../../../../FormOptions"
 
-const QUALITY_FORM_FILTER_ID = "QUALITY_FORM_FILTER_ID"
+const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER"
 
-export const QualityControlForm = ({
-  onSubmit,
-  data,
-  renderFooterButtons,
-  formId,
-  isSelect
-}) => {
-  const idForm = formId || QUALITY_FORM_FILTER_ID
-
-  const CustomSelect = isSelect ? Select : MultiSelect
-
+export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
   const form = useForm({
     mode: "uncontrolled",
 
@@ -55,13 +45,13 @@ export const QualityControlForm = ({
   return (
     <>
       <form
-        id={idForm}
+        id={QUALITY_CONTROL_FORM_FILTER}
         onSubmit={form.onSubmit((values) =>
           onSubmit(values, () => form.reset())
         )}
       >
         {
-          <CustomSelect
+          <MultiSelect
             clearable
             searchable
             label={getLanguageByKey("Motivul refuzului")}
@@ -72,7 +62,7 @@ export const QualityControlForm = ({
           />
         }
 
-        <Select
+        <MultiSelect
           mt="md"
           clearable
           searchable
@@ -109,7 +99,10 @@ export const QualityControlForm = ({
       </form>
 
       <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
+        {renderFooterButtons?.({
+          onResetForm: form.reset,
+          formId: QUALITY_CONTROL_FORM_FILTER
+        })}
       </Flex>
     </>
   )

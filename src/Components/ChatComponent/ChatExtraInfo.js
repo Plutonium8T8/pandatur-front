@@ -375,7 +375,6 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="quality_control">
           <Box p="md">
             <QualityControlForm
-              isSelect
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
