@@ -9,7 +9,7 @@ export const SelectWorkflow = ({ onChange, selectedValues }) => {
       label={getLanguageByKey("Workflow")}
       placeholder={getLanguageByKey("Alege workflow pentru afisare in sistem")}
       data={workflowOptions}
-      onChange={(values) => onChange("workflow", values)}
+      onChange={onChange}
       defaultValue={selectedValues}
       value={selectedValues}
       clearable

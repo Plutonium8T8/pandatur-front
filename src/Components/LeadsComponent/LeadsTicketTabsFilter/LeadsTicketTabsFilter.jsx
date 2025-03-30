@@ -1,13 +1,10 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
-import React, { useState } from "react"
-import { platformOptions, filteredWorkflows } from "./utils"
+import { useState, useEffect } from "react"
+import { platformOptions } from "./utils"
 import { SelectWorkflow } from "./components"
 import { getLanguageByKey } from "../../utils"
+import { filteredWorkflows } from "../LeadsTicketTabsFilter/utils"
 import "./LeadsTicketTabsFilter.css"
-
-const systemFiltersInitialState = {
-  workflow: filteredWorkflows
-}
 
 export const LeadsTicketTabsFilter = ({
   onClose,
@@ -15,13 +12,18 @@ export const LeadsTicketTabsFilter = ({
   resetTicketsFilters,
   loading,
   formIds,
-  renderTicketForms
+  renderTicketForms,
+  systemWorkflow: baseSystemWorkflow
 }) => {
-  const [systemFilters, setSystemFilters] = useState(systemFiltersInitialState)
+  const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows)
 
   const defaultTabValue = onApplyWorkflowFilters
     ? "filter_workflow"
     : "filter_ticket"
+
+  useEffect(() => {
+    setSystemWorkflow(baseSystemWorkflow)
+  }, [])
 
   return (
     <Tabs
@@ -47,18 +49,14 @@ export const LeadsTicketTabsFilter = ({
         <Tabs.Panel value="filter_workflow" pt="xs">
           <Flex direction="column" justify="space-between" h="100%">
             <SelectWorkflow
-              selectedValues={systemFilters.workflow}
-              onChange={(_, value) =>
-                setSystemFilters({
-                  workflow: value
-                })
-              }
+              selectedValues={systemWorkflow}
+              onChange={setSystemWorkflow}
             />
 
             <Flex justify="end" gap="md" mt="md">
               <Button
                 variant="outline"
-                onClick={() => setSystemFilters(systemFiltersInitialState)}
+                onClick={() => setSystemWorkflow(filteredWorkflows)}
               >
                 {getLanguageByKey("Reset filter")}
               </Button>
@@ -68,7 +66,7 @@ export const LeadsTicketTabsFilter = ({
               <Button
                 variant="filled"
                 loading={loading}
-                onClick={() => onApplyWorkflowFilters(systemFilters)}
+                onClick={() => onApplyWorkflowFilters(systemWorkflow)}
               >
                 {getLanguageByKey("Trimite")}
               </Button>
