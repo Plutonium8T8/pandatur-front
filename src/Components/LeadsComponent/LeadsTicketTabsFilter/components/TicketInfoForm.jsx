@@ -1,9 +1,15 @@
 import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
+import { useEffect } from "react"
 import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../../utils"
-import { formatDateOrUndefined, formatNumericValue } from "../utils"
+import {
+  formatDateOrUndefined,
+  formatNumericValue,
+  convertDateToArray,
+  convertNumberRangeToSingleValue
+} from "../utils"
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -37,6 +43,14 @@ export const TicketInfoForm = ({
       data_intoarcerii,
       data_cererii_de_retur,
       buget,
+      sursa_lead,
+      promo,
+      marketing,
+      tipul_serviciului,
+      tara,
+      tip_de_transport,
+      denumirea_excursiei_turului,
+      procesarea_achizitionarii,
       ...rest
     }) => {
       const formattedData = {
@@ -45,13 +59,40 @@ export const TicketInfoForm = ({
 
         data_intoarcerii: formatDateOrUndefined(data_intoarcerii),
         data_cererii_de_retur: formatDateOrUndefined(data_cererii_de_retur),
-
-        buget: formatNumericValue(buget)
+        buget: formatNumericValue(buget),
+        sursa_lead: sursa_lead ?? undefined,
+        promo: promo ?? undefined,
+        marketing: marketing ?? undefined,
+        tipul_serviciului: tipul_serviciului ?? undefined,
+        tara: tara ?? undefined,
+        tip_de_transport: tip_de_transport ?? undefined,
+        denumirea_excursiei_turului: denumirea_excursiei_turului ?? undefined,
+        procesarea_achizitionarii: procesarea_achizitionarii ?? undefined
       }
 
       return { ...formattedData, ...rest }
     }
   })
+
+  useEffect(() => {
+    if (data) {
+      form.setValues({
+        data_venit_in_oficiu: convertDateToArray(data.data_venit_in_oficiu),
+        data_plecarii: convertDateToArray(data.data_plecarii),
+        data_intoarcerii: convertDateToArray(data.data_intoarcerii),
+        data_cererii_de_retur: convertDateToArray(data.data_cererii_de_retur),
+        buget: convertNumberRangeToSingleValue(data.buget),
+        sursa_lead: data.sursa_lead,
+        promo: data.promo,
+        marketing: data.marketing,
+        tipul_serviciului: data.tipul_serviciului,
+        tara: data.tara,
+        tip_de_transport: data.tip_de_transport,
+        denumirea_excursiei_turului: data.denumirea_excursiei_turului,
+        procesarea_achizitionarii: data.procesarea_achizitionarii
+      })
+    }
+  }, [data])
 
   return (
     <>

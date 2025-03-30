@@ -1,8 +1,9 @@
 import { Select, TextInput, NumberInput, Flex } from "@mantine/core"
 import { useForm } from "@mantine/form"
+import { useEffect } from "react"
 import { getLanguageByKey } from "../../../utils"
 import { valutaOptions, ibanOptions } from "../../../../FormOptions"
-import { formatNumericValue } from "../utils"
+import { formatNumericValue, convertNumberRangeToSingleValue } from "../utils"
 
 const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID"
 
@@ -16,15 +17,42 @@ export const InvoiceForm = ({
 
   const form = useForm({
     mode: "uncontrolled",
-    transformValues: ({ f_pret, f_suma, ...rest }) => {
+    transformValues: ({
+      f_pret,
+      f_suma,
+      f_serviciu,
+      f_nr_factura,
+      f_numarul,
+      f_valuta_contului,
+      iban
+    }) => {
       const formattedData = {
+        f_serviciu: f_serviciu ?? undefined,
+        f_nr_factura: f_nr_factura ?? undefined,
+        f_numarul: f_numarul ?? undefined,
         f_pret: formatNumericValue(f_pret),
-        f_suma: formatNumericValue(f_suma)
+        f_suma: formatNumericValue(f_suma),
+        f_valuta_contului: f_valuta_contului ?? undefined,
+        iban: iban ?? undefined
       }
 
-      return { ...formattedData, ...rest }
+      return formattedData
     }
   })
+
+  useEffect(() => {
+    if (data) {
+      form.setValues({
+        f_serviciu: data.f_serviciu,
+        f_nr_factura: data.f_nr_factura,
+        f_numarul: data.f_numarul,
+        f_pret: convertNumberRangeToSingleValue(data.f_pret),
+        f_suma: convertNumberRangeToSingleValue(data.f_suma),
+        f_valuta_contului: data.f_valuta_contului,
+        iban: data.iban
+      })
+    }
+  }, [data])
 
   return (
     <>
