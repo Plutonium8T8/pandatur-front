@@ -36,3 +36,19 @@ export const formatNumericValue = (value) => {
   const rangeValue = value ? { from: value, to: value } : value
   return rangeValue
 }
+
+export const convertDateToArray = (rangeDate = {}) => {
+  const { from, to } = rangeDate
+
+  return [
+    from ? dayjs(from, DD_MM_YYYY__HH_mm_ss) : undefined,
+    to ? dayjs(to, DD_MM_YYYY__HH_mm_ss) : undefined
+  ]
+}
+
+export const convertNumberRangeToSingleValue = (range = {}) => {
+  const { from, to } = range
+  // NOTE: `from` and `to` have the same value
+
+  return from && to ? from : undefined
+}

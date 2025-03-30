@@ -1,9 +1,10 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core"
-import { QualityControlForm, BasicGeneralForm } from "../../../TicketForms"
 import { getLanguageByKey } from "../../../utils"
 import { TicketInfoForm } from "./TicketInfoForm"
 import { ContractForm } from "./ContractForm"
 import { InvoiceForm } from "./InvoiceForm"
+import { QualityControlForm } from "./QualityControlForm"
+import { BasicGeneralForm } from "./BasicGeneralForm"
 
 const renderResetButton = (resetForm) => {
   return (
@@ -13,7 +14,13 @@ const renderResetButton = (resetForm) => {
   )
 }
 
-export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
+export const TicketTabs = ({
+  onClose,
+  onSubmit,
+  loading,
+  formIds,
+  initialData
+}) => {
   return (
     <Tabs defaultValue="filter_general_info" orientation="vertical">
       <Tabs.List>
@@ -41,6 +48,7 @@ export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
       >
         <Flex direction="column" justify="space-between" h="100%">
           <BasicGeneralForm
+            data={initialData}
             loading={loading}
             onClose={onClose}
             onSubmit={onSubmit}
@@ -52,6 +60,7 @@ export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
       <Tabs.Panel pl="lg" value="filter_ticket_info">
         <ScrollArea h="100%">
           <TicketInfoForm
+            data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
@@ -72,6 +81,7 @@ export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
       <Tabs.Panel pl="lg" value="filter_contract">
         <ScrollArea h="100%">
           <ContractForm
+            data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
@@ -93,6 +103,7 @@ export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
       <Tabs.Panel pl="lg" value="filter_invoice">
         <Flex direction="column" justify="space-between" h="100%">
           <InvoiceForm
+            data={initialData}
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
               <>
@@ -114,6 +125,7 @@ export const TicketTabs = ({ onClose, onSubmit, loading, formIds }) => {
       <Tabs.Panel pl="lg" value="filter_quality_control">
         <Flex direction="column" justify="space-between" h="100%">
           <QualityControlForm
+            data={initialData}
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
               <>

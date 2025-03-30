@@ -1,13 +1,19 @@
 import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
 import { DatePickerInput } from "@mantine/dates"
 import { useForm } from "@mantine/form"
+import { useEffect } from "react"
 import { MdOutlineEuroSymbol } from "react-icons/md"
 import { getLanguageByKey } from "../../../utils"
 import { LabelSwitch } from "../../../LabelSwitch"
 import { paymentStatusOptions } from "../../../../FormOptions"
 import { DD_MM_YYYY } from "../../../../app-constants"
 import { useUser } from "../../../../hooks"
-import { formatDateOrUndefined, formatNumericValue } from "../utils"
+import {
+  formatDateOrUndefined,
+  formatNumericValue,
+  convertDateToArray,
+  convertNumberRangeToSingleValue
+} from "../utils"
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
 
@@ -45,9 +51,11 @@ export const ContractForm = ({
       pret_netto,
       achitat_client,
       control,
+      numar_de_contract,
       ...rest
     }) => {
       const formattedData = {
+        numar_de_contract: numar_de_contract ?? undefined,
         data_contractului: formatDateOrUndefined(data_contractului),
         data_avansului: formatDateOrUndefined(data_avansului),
         data_de_plata_integrala: formatDateOrUndefined(data_de_plata_integrala),
@@ -65,6 +73,31 @@ export const ContractForm = ({
       return { ...formattedData, ...rest }
     }
   })
+
+  useEffect(() => {
+    if (data) {
+      form.setValues({
+        data_contractului: convertDateToArray(data.data_contractului),
+        data_avansului: convertDateToArray(data.data_avansului),
+        data_de_plata_integrala: convertDateToArray(
+          data.data_de_plata_integrala
+        ),
+        numar_de_contract: data.numar_de_contract,
+        contract_trimis: data.contract_trimis,
+        contract_semnat: data.contract_semnat,
+        tour_operator: data.tour_operator,
+        numarul_cererii_de_la_operator: data.numarul_cererii_de_la_operator,
+        achitare_efectuata: data.achitare_efectuata,
+        rezervare_confirmata: data.rezervare_confirmata,
+        contract_arhivat: data.contract_arhivat,
+        statutul_platii: data.statutul_platii,
+        avans_euro: convertNumberRangeToSingleValue(data.avans_euro),
+        pret_netto: convertNumberRangeToSingleValue(data.pret_netto),
+        achitat_client: convertNumberRangeToSingleValue(data.achitat_client),
+        control: data.control
+      })
+    }
+  }, [data])
 
   return (
     <>
