@@ -223,7 +223,9 @@ const Leads = () => {
         setTotalLeads(pagination?.total || 0)
         setIsOpenKanbanFilterModal(false)
         setFilteredTicketIds(getTicketsIds(data) ?? null)
-        setSelectedWorkflow(mergedLightTicketFilters.workflow)
+        setSelectedWorkflow(
+          mergedLightTicketFilters.workflow || filteredWorkflows
+        )
       }
     )
   }

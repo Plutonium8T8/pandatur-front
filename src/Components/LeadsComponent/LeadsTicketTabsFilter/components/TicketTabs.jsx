@@ -138,7 +138,6 @@ export const TicketTabs = ({
                 </Button>
               </>
             )}
-            formId={formIds?.qualityControlFormID}
           />
         </Flex>
       </Tabs.Panel>
