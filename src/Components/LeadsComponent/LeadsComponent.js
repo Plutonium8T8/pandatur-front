@@ -22,6 +22,7 @@ import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs"
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils"
 import { WorkflowColumns } from "../Workflow"
 import { filteredWorkflows } from "./LeadsTicketTabsFilter"
+import { TicketTabs } from "./LeadsTicketTabsFilter/components"
 
 const SORT_BY = "creation_date"
 const ORDER = "DESC"
@@ -86,7 +87,7 @@ const Leads = () => {
 
   const closeChatModal = () => {
     setIsChatOpen(false)
-    navigate("/leads") // При закрытии убираем ticketId из URL
+    navigate("/leads")
   }
 
   const toggleSelectTicket = (ticketId) => {
@@ -182,37 +183,47 @@ const Leads = () => {
     }
   }
 
-  const applyWorkflowFilters = (updatedFilters, ticketIds) => {
-    setLightTicketFilters(updatedFilters)
+  const handleApplyFiltersHardTicket = (selectedFilters) => {
+    const mergedHardTicketFilters = {
+      ...hardTicketFilters,
+      ...selectedFilters
+    }
 
-    setSelectedWorkflow(
-      Array.isArray(updatedFilters.workflow) ? updatedFilters.workflow : []
-    )
-
-    setFilteredTicketIds(ticketIds ?? null)
-    setIsOpenKanbanFilterModal(false)
-  }
-
-  const handleApplyFiltersHardTicket = (formattedFilters) => {
     fetchTickets(
-      { attributes: formattedFilters, page: NUMBER_PAGE, type: HARD_TICKET },
+      {
+        attributes: mergedHardTicketFilters,
+        page: NUMBER_PAGE,
+        type: HARD_TICKET
+      },
       ({ data, pagination }) => {
         setHardTickets(data)
+        setHardTicketFilters(mergedHardTicketFilters)
         setTotalLeads(pagination?.total || 0)
         setCurrentPage(1)
-        setHardTicketFilters(formattedFilters)
         setIsOpenListFilterModal(false)
       },
       true
     )
   }
 
-  const handleApplyFilterLightTicket = (formattedFilters) => {
+  const handleApplyFilterLightTicket = (selectedFilters) => {
+    const mergedLightTicketFilters = {
+      ...lightTicketFilters,
+      ...selectedFilters
+    }
+
     fetchTickets(
-      { page: NUMBER_PAGE, type: LIGHT_TICKET, attributes: formattedFilters },
+      {
+        page: NUMBER_PAGE,
+        type: LIGHT_TICKET,
+        attributes: mergedLightTicketFilters
+      },
       ({ data, pagination }) => {
-        applyWorkflowFilters(formattedFilters, getTicketsIds(data))
+        setLightTicketFilters(mergedLightTicketFilters)
         setTotalLeads(pagination?.total || 0)
+        setIsOpenKanbanFilterModal(false)
+        setFilteredTicketIds(getTicketsIds(data) ?? null)
+        setSelectedWorkflow(mergedLightTicketFilters.workflow)
       }
     )
   }
@@ -246,10 +257,9 @@ const Leads = () => {
 
         if (isViewModeList) {
           setHardTickets(data)
-          return
+        } else {
+          setFilteredTicketIds(getTicketsIds(data) ?? null)
         }
-
-        setFilteredTicketIds(getTicketsIds(data) ?? null)
       }
     )
   }
@@ -352,29 +362,35 @@ const Leads = () => {
       )}
 
       <MantineModal
-        keepMounted
         title={getLanguageByKey("Filtrează tichete")}
         open={isOpenKanbanFilterModal}
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
         <LeadsTicketTabsFilter
+          renderTicketForms={() => (
+            <TicketTabs
+              initialData={lightTicketFilters}
+              formIds={formIDsKanban}
+              onClose={() => setIsOpenKanbanFilterModal(false)}
+              onSubmit={handleApplyFilterLightTicket}
+              loading={loading}
+            />
+          )}
           formIds={formIDsKanban}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
-          onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(filters, filteredTicketIds)
-          }
-          onApplyTicketFilters={(filters) => {
-            handleApplyFilterLightTicket({
-              workflow: filteredWorkflows,
-              ...filters
-            })
+          onApplyWorkflowFilters={(filters) => {
+            setLightTicketFilters((prev) => ({ ...prev, ...filters }))
+            setSelectedWorkflow(
+              Array.isArray(filters.workflow) ? filters.workflow : []
+            )
+            setIsOpenKanbanFilterModal(false)
+            setFilteredTicketIds(filteredTicketIds ?? null)
           }}
         />
       </MantineModal>
 
       <MantineModal
-        keepMounted
         title={getLanguageByKey("Filtrează tichete")}
         open={isOpenListFilterModal}
         onClose={() => setIsOpenListFilterModal(false)}
@@ -383,12 +399,15 @@ const Leads = () => {
           formIds={formIDsList}
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
-          onApplyWorkflowFilters={(filters) =>
-            applyWorkflowFilters(filters, filteredTicketIds)
-          }
-          onApplyTicketFilters={(filters) => {
-            handleApplyFiltersHardTicket(filters)
-          }}
+          renderTicketForms={() => (
+            <TicketTabs
+              initialData={hardTicketFilters}
+              formIds={formIDsKanban}
+              onClose={() => setIsOpenKanbanFilterModal(false)}
+              onSubmit={handleApplyFiltersHardTicket}
+              loading={loading}
+            />
+          )}
         />
       </MantineModal>
 

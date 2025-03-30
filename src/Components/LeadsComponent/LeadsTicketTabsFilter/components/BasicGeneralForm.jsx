@@ -1,9 +1,10 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core"
 import { useForm } from "@mantine/form"
 import { useEffect } from "react"
-import { workflowOptions, priorityOptions } from "../../FormOptions"
-import { getLanguageByKey } from "../utils"
-import { useGetTechniciansList } from "../../hooks"
+import { workflowOptions, priorityOptions } from "../../../../FormOptions"
+import { getLanguageByKey } from "../../../utils"
+import { useGetTechniciansList } from "../../../../hooks"
+import { filteredWorkflows } from "../utils"
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID"
 
@@ -20,7 +21,17 @@ export const BasicGeneralForm = ({
   const { technicians } = useGetTechniciansList()
 
   const form = useForm({
-    mode: "uncontrolled"
+    mode: "uncontrolled",
+
+    transformValues: ({ workflow, priority, contact, tags, technician_id }) => {
+      return {
+        workflow: workflow ?? filteredWorkflows,
+        priority: priority ?? undefined,
+        contact: contact ?? undefined,
+        tags: tags ?? undefined,
+        technician_id: technician_id ?? undefined
+      }
+    }
   })
 
   useEffect(() => {

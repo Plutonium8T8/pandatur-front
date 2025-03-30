@@ -1,8 +1,8 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
 import React, { useState } from "react"
 import { platformOptions, filteredWorkflows } from "./utils"
-import { SelectWorkflow, TicketTabs } from "./components"
-import { getLanguageByKey, cleanFormValues } from "../../utils"
+import { SelectWorkflow } from "./components"
+import { getLanguageByKey } from "../../utils"
 import "./LeadsTicketTabsFilter.css"
 
 const systemFiltersInitialState = {
@@ -12,23 +12,29 @@ const systemFiltersInitialState = {
 export const LeadsTicketTabsFilter = ({
   onClose,
   onApplyWorkflowFilters,
-  onApplyTicketFilters,
   resetTicketsFilters,
   loading,
-  formIds
+  formIds,
+  renderTicketForms
 }) => {
   const [systemFilters, setSystemFilters] = useState(systemFiltersInitialState)
+
+  const defaultTabValue = onApplyWorkflowFilters
+    ? "filter_workflow"
+    : "filter_ticket"
 
   return (
     <Tabs
       h="100%"
       className="leads-modal-filter-tabs"
-      defaultValue="filter_workflow"
+      defaultValue={defaultTabValue}
     >
       <Tabs.List>
-        <Tabs.Tab value="filter_workflow">
-          {getLanguageByKey("Filtru de sistem")}
-        </Tabs.Tab>
+        {onApplyWorkflowFilters && (
+          <Tabs.Tab value="filter_workflow">
+            {getLanguageByKey("Filtru de sistem")}
+          </Tabs.Tab>
+        )}
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
         </Tabs.Tab>
@@ -37,47 +43,42 @@ export const LeadsTicketTabsFilter = ({
         </Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel value="filter_workflow" pt="xs">
-        <Flex direction="column" justify="space-between" h="100%">
-          <SelectWorkflow
-            selectedValues={systemFilters.workflow}
-            onChange={(_, value) =>
-              setSystemFilters({
-                workflow: value
-              })
-            }
-          />
+      {onApplyWorkflowFilters && (
+        <Tabs.Panel value="filter_workflow" pt="xs">
+          <Flex direction="column" justify="space-between" h="100%">
+            <SelectWorkflow
+              selectedValues={systemFilters.workflow}
+              onChange={(_, value) =>
+                setSystemFilters({
+                  workflow: value
+                })
+              }
+            />
 
-          <Flex justify="end" gap="md" mt="md">
-            <Button
-              variant="outline"
-              onClick={() => setSystemFilters(systemFiltersInitialState)}
-            >
-              {getLanguageByKey("Reset filter")}
-            </Button>
-            <Button variant="default" onClick={onClose}>
-              {getLanguageByKey("Închide")}
-            </Button>
-            <Button
-              variant="filled"
-              loading={loading}
-              onClick={() => onApplyWorkflowFilters(systemFilters)}
-            >
-              {getLanguageByKey("Trimite")}
-            </Button>
+            <Flex justify="end" gap="md" mt="md">
+              <Button
+                variant="outline"
+                onClick={() => setSystemFilters(systemFiltersInitialState)}
+              >
+                {getLanguageByKey("Reset filter")}
+              </Button>
+              <Button variant="default" onClick={onClose}>
+                {getLanguageByKey("Închide")}
+              </Button>
+              <Button
+                variant="filled"
+                loading={loading}
+                onClick={() => onApplyWorkflowFilters(systemFilters)}
+              >
+                {getLanguageByKey("Trimite")}
+              </Button>
+            </Flex>
           </Flex>
-        </Flex>
-      </Tabs.Panel>
+        </Tabs.Panel>
+      )}
 
       <Tabs.Panel value="filter_ticket" pt="xs">
-        <TicketTabs
-          formIds={formIds}
-          onClose={onClose}
-          onSubmit={(values) => {
-            onApplyTicketFilters(cleanFormValues(values))
-          }}
-          loading={loading}
-        />
+        {renderTicketForms?.()}
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_message" pt="xs">
