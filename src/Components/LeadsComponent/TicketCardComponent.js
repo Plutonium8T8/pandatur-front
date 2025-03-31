@@ -1,5 +1,6 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
+import { Image } from "@mantine/core"
 import { truncateText, parseTags } from "../../stringUtils"
 import { getPriorityColor } from "../utils/ticketUtils"
 import "./TicketCardComponent.css"
@@ -34,12 +35,6 @@ const TicketCard = ({ ticket, onEditTicket }) => {
           >
             Edit
           </button>
-          {/* <button
-            className="action-button-ticket"
-            onClick={() => setIsChatOpen(true)}
-          >
-            Open
-          </button> */}
         </div>
       )}
 
@@ -53,10 +48,10 @@ const TicketCard = ({ ticket, onEditTicket }) => {
             <div className="ticket-body">
               <div className="ticket-column">
                 <div className="ticket-photo">
-                  <img
+                  <Image
                     src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
-                    alt="User"
                     className="ticket-photo-image"
+                    fallbackSrc={DEFAULT_PHOTO}
                   />
                 </div>
               </div>
@@ -95,7 +90,6 @@ const TicketCard = ({ ticket, onEditTicket }) => {
       <Modal
         open={isChatOpen}
         onClose={() => setIsChatOpen(false)}
-        title=""
         width={1850}
         height={1000}
         footer={null}
