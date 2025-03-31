@@ -1,5 +1,5 @@
 import { RcTable } from "../RcTable"
-import { Button, Menu } from "@mantine/core"
+import { Button, Menu, Checkbox } from "@mantine/core"
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -9,6 +9,7 @@ import {
 import { translations } from "../utils/translations"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
+import { useState } from "react"
 
 const UserList = ({
   users,
@@ -19,6 +20,30 @@ const UserList = ({
 }) => {
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
+
+  const [selectedIds, setSelectedIds] = useState([])
+
+  const extractId = (u) => u.id?.user?.id || u.id?.id || u.id
+
+  const allIds = users.map(extractId).filter(Boolean)
+  const allSelected =
+    allIds.length > 0 && allIds.every((id) => selectedIds.includes(id))
+
+  const toggleSelect = (userId) => {
+    setSelectedIds((prev) =>
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId]
+    )
+  }
+
+  const toggleSelectAll = () => {
+    if (allSelected) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(allIds)
+    }
+  }
 
   const toggleUserStatus = async (id, currentStatus) => {
     try {
@@ -44,12 +69,70 @@ const UserList = ({
     }
   }
 
+  const handleToggleStatusSelected = async () => {
+    const promises = selectedIds.map(async (id) => {
+      try {
+        const user = users.find((u) => extractId(u) === id)
+        if (!user) return
+        const currentStatus = user.status
+        const newStatus = (!currentStatus).toString()
+        await api.technicianDetails.patchSingleTechnician(id, {
+          status: newStatus
+        })
+      } catch (err) {
+        console.error(`Ошибка при обновлении статуса пользователя ${id}:`, err)
+      }
+    })
+
+    await Promise.all(promises)
+    enqueueSnackbar("Статусы пользователей обновлены", { variant: "success" })
+    fetchUsers()
+    setSelectedIds([])
+  }
+
+  const handleDeleteSelected = async () => {
+    const promises = selectedIds.map(async (id) => {
+      try {
+        await api.technicianDetails.deleteTechnician(id)
+      } catch (err) {
+        console.error(`Ошибка при удалении пользователя ${id}:`, err)
+      }
+    })
+
+    await Promise.all(promises)
+    enqueueSnackbar("Пользователи удалены", { variant: "success" })
+    fetchUsers()
+    setSelectedIds([])
+  }
+
   const columns = [
+    {
+      title: (
+        <Checkbox
+          checked={allSelected}
+          indeterminate={selectedIds.length > 0 && !allSelected}
+          onChange={toggleSelectAll}
+        />
+      ),
+      dataIndex: "select",
+      key: "select",
+      width: 50,
+      render: (_, row) => {
+        const rowId = extractId(row)
+        return (
+          <Checkbox
+            checked={selectedIds.includes(rowId)}
+            onChange={() => toggleSelect(rowId)}
+          />
+        )
+      }
+    },
     {
       title: translations["ID"][language],
       dataIndex: "id",
       key: "id",
-      width: 100
+      width: 100,
+      render: (id) => id?.user?.id || id?.id || "—"
     },
     {
       title: translations["Nume complet"][language],
@@ -63,6 +146,12 @@ const UserList = ({
       key: "groups",
       width: 200,
       render: (groups) => groups?.join(", ") || "—"
+    },
+    {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      width: 250
     },
     {
       title: translations["Rol"][language],
@@ -126,15 +215,32 @@ const UserList = ({
   ]
 
   return (
-    <RcTable
-      columns={columns}
-      data={users}
-      loading={loading}
-      bordered
-      selectedRow={[]}
-      pagination={false}
-      rowKey="id"
-    />
+    <>
+      {selectedIds.length > 0 && (
+        <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
+          <Button
+            variant="light"
+            color="blue"
+            onClick={handleToggleStatusSelected}
+          >
+            {translations["Activați/Inactivați"][language] || "Toggle status"}
+          </Button>
+          <Button variant="light" color="red" onClick={handleDeleteSelected}>
+            {translations["Ștergeți selectați"][language] || "Delete selected"}
+          </Button>
+        </div>
+      )}
+
+      <RcTable
+        columns={columns}
+        data={users}
+        loading={loading}
+        bordered
+        selectedRow={[]}
+        pagination={false}
+        rowKey={(record) => extractId(record) || `temp-${Math.random()}`}
+      />
+    </>
   )
 }
 

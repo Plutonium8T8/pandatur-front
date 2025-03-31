@@ -105,13 +105,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         salary,
         personal_exemption_number,
         job_title,
-        department,
-        groups: [groups]
-      }
+        department
+      },
+      groups: [groups]
     }
 
     try {
-      await api.technicianDetails.createTechnicianUser(payload)
+      await api.technicians.createTechnicianUser(payload)
       enqueueSnackbar("Пользователь успешно создан", { variant: "success" })
       setForm({
         username: "",

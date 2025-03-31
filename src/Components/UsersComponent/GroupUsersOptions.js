@@ -17,5 +17,6 @@ export const GroupUsersOptions = [
   "Liber",
   "Organic traffic",
   "Sorting",
-  "Trainees"
+  "Trainees",
+  "Test"
 ]

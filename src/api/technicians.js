@@ -1,6 +1,6 @@
 import { baseAxios } from "./baseAxios"
 
-export const technicianDetails = {
+export const technicians = {
   getAllTechnicianList: async () => {
     const { data } = await baseAxios.get(`/api/users-technicians/details`)
 

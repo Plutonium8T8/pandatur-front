@@ -142,7 +142,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         <table className="schedule-table">
           <thead>
             <tr>
-              <td>
+              <th>
                 <Checkbox
                   checked={
                     selectedTechnicians.length === schedule.length &&
@@ -162,7 +162,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   style={{ marginRight: 4 }}
                 />
                 {translations["Angajat"][language]}
-              </td>
+              </th>
               {getWeekDays().map((day, i) => (
                 <th key={i}>
                   {translations[format(day, "EEEE")][language]},{" "}
