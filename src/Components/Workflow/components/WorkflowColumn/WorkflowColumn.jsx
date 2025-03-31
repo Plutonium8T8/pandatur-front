@@ -1,11 +1,13 @@
 import { FixedSizeList } from "react-window"
-import { Flex } from "@mantine/core"
+import { Flex, DEFAULT_THEME } from "@mantine/core"
 import { useRef } from "react"
 import { getColorByWorkflowType } from "../WorkflowTag"
 import TicketCard from "../../../LeadsComponent/TicketCardComponent"
 import { useDOMElementHeight } from "../../../../hooks"
 import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
 import "./WorkflowColumn.css"
+
+const { colors } = DEFAULT_THEME
 
 const TICKET_CARD_HEIGHT = 110
 
@@ -53,10 +55,13 @@ export const WorkflowColumn = ({
 
   return (
     <Flex
+      p="xs"
       direction="column"
+      bg={colors.gray[1]}
       className="colone-ticket"
       style={{
-        backgroundColor: getColorByWorkflowType(workflow, "")
+        backgroundColor: getColorByWorkflowType(workflow, ""),
+        borderRadius: 32
       }}
     >
       <WorkflowColumnHeader
@@ -64,7 +69,7 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <div ref={columnRef} className="scrollable-list">
+      <Flex direction="column" h="100%" ref={columnRef}>
         <FixedSizeList
           height={columnHeight}
           itemCount={filteredTickets.length}
@@ -80,7 +85,7 @@ export const WorkflowColumn = ({
             </div>
           )}
         </FixedSizeList>
-      </div>
+      </Flex>
     </Flex>
   )
 }
