@@ -1,9 +1,15 @@
-import { Tabs, Flex, Button } from "@mantine/core"
+import { Tabs, Flex, Button, Box, Text } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
 import { getLanguageByKey, showServerError } from "../utils"
 import { api } from "../../api"
-import { ContractForm, GeneralForm, TicketInfoForm } from "../TicketForms"
+import {
+  ContractForm,
+  GeneralForm,
+  TicketInfoForm,
+  QualityControlForm
+} from "../TicketForms"
+import { useFormTicket } from "../../hooks"
 
 export const ManageLeadInfoTabs = ({
   open,
@@ -18,7 +24,17 @@ export const ManageLeadInfoTabs = ({
   const [ticketInfo, setTicketInfo] = useState()
   const [generalInfoLightTicket, setGeneralInfoLightTicket] = useState()
 
+  const {
+    form,
+    hasErrorsTicketInfoForm,
+    hasErrorsContractForm,
+    hasErrorQualityControl
+  } = useFormTicket()
+
   const submit = async (values, callback) => {
+    if (form.validate().hasErrors) {
+      return
+    }
     setLoading(true)
     try {
       await api.tickets.updateById({
@@ -66,12 +82,23 @@ export const ManageLeadInfoTabs = ({
     <Tabs h="100%" defaultValue="general_info">
       <Tabs.List>
         <Tabs.Tab value="general_info">
-          {getLanguageByKey("Informații generale")}
+          <Text truncate="end">{getLanguageByKey("Informații generale")}</Text>
         </Tabs.Tab>
         <Tabs.Tab value="ticket_info">
-          {getLanguageByKey("Informații despre tichet")}
+          <Text c={hasErrorsTicketInfoForm ? "red" : "black"} truncate="end">
+            {getLanguageByKey("Informații despre tichet")}
+          </Text>
         </Tabs.Tab>
-        <Tabs.Tab value="contact">{getLanguageByKey("Contact")}</Tabs.Tab>
+        <Tabs.Tab value="contact">
+          <Text c={hasErrorsContractForm ? "red" : "black"}>
+            {getLanguageByKey("Contract")}
+          </Text>
+        </Tabs.Tab>
+        <Tabs.Tab value="quality_control">
+          <Text c={hasErrorQualityControl ? "red" : "black"}>
+            {getLanguageByKey("Control calitate")}
+          </Text>
+        </Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel
@@ -82,6 +109,7 @@ export const ManageLeadInfoTabs = ({
         <Flex direction="column" justify="space-between" h="100%">
           <GeneralForm
             data={generalInfoLightTicket}
+            formInstance={form}
             onSubmit={submit}
             renderFooterButtons={({ formId }) => (
               <>
@@ -99,6 +127,7 @@ export const ManageLeadInfoTabs = ({
 
       <Tabs.Panel value="ticket_info" pt="xs" pb="md">
         <TicketInfoForm
+          formInstance={form}
           setMinDate={new Date()}
           data={ticketInfo}
           onSubmit={submit}
@@ -116,6 +145,7 @@ export const ManageLeadInfoTabs = ({
       </Tabs.Panel>
       <Tabs.Panel value="contact" pt="xs" pb="md">
         <ContractForm
+          formInstance={form}
           setMinDate={new Date()}
           data={ticketInfo}
           onSubmit={submit}
@@ -128,6 +158,19 @@ export const ManageLeadInfoTabs = ({
                 {getLanguageByKey("Trimite")}
               </Button>
             </>
+          )}
+        />
+      </Tabs.Panel>
+
+      <Tabs.Panel value="quality_control">
+        <QualityControlForm
+          formInstance={form}
+          data={ticketInfo}
+          onSubmit={submit}
+          renderFooterButtons={({ formId }) => (
+            <Button loading={loading} type="submit" form={formId}>
+              {getLanguageByKey("Actualizare")}
+            </Button>
           )}
         />
       </Tabs.Panel>
