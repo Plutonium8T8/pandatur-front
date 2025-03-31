@@ -34,6 +34,27 @@ export const users = {
     return data
   },
 
+  updateMultipleTechnicians: async (body) => {
+    const { data } = await baseAxios.patch(
+      "/api/users-technician/update-multiple",
+      body
+    )
+
+    return data
+  },
+
+  updateUsersGroup: async (body) => {
+    const { data } = await baseAxios.patch("/api/user-groups/update", body)
+
+    return data
+  },
+
+  deleteMultipleUsers: async (body) => {
+    const { data } = await baseAxios.delete("/admin/users", { data: body })
+
+    return data
+  },
+
   getExtendedById: async (id) => {
     const { data } = await baseAxios.get(`/api/users-extended/${id}`)
 

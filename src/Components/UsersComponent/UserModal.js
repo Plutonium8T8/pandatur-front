@@ -74,6 +74,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       policy_number,
       salary,
       personal_exemption_number,
+      status,
       groups
     } = form
 
@@ -100,7 +101,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
       },
       technician: {
-        status: form.status.toString(),
+        status: status.toString(),
         policy_number,
         salary,
         personal_exemption_number,

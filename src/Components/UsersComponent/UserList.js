@@ -10,6 +10,7 @@ import { translations } from "../utils/translations"
 import { api } from "../../api"
 import { useSnackbar } from "notistack"
 import { useState } from "react"
+import GroupChangeModal from "./GroupChangeModal"
 
 const UserList = ({
   users,
@@ -20,11 +21,10 @@ const UserList = ({
 }) => {
   const language = localStorage.getItem("language") || "RO"
   const { enqueueSnackbar } = useSnackbar()
-
   const [selectedIds, setSelectedIds] = useState([])
+  const [groupModalOpen, setGroupModalOpen] = useState(false)
 
   const extractId = (u) => u.id?.user?.id || u.id?.id || u.id
-
   const allIds = users.map(extractId).filter(Boolean)
   const allSelected =
     allIds.length > 0 && allIds.every((id) => selectedIds.includes(id))
@@ -38,21 +38,15 @@ const UserList = ({
   }
 
   const toggleSelectAll = () => {
-    if (allSelected) {
-      setSelectedIds([])
-    } else {
-      setSelectedIds(allIds)
-    }
+    setSelectedIds(allSelected ? [] : allIds)
   }
 
   const toggleUserStatus = async (id, currentStatus) => {
     try {
       const newStatus = (!currentStatus).toString()
-
-      await api.technicianDetails.patchSingleTechnician(id, {
-        status: newStatus
+      await api.users.updateMultipleTechnicians({
+        users: [{ id, status: newStatus }]
       })
-
       fetchUsers()
       enqueueSnackbar(
         currentStatus
@@ -64,45 +58,74 @@ const UserList = ({
       console.error("Ошибка при смене статуса:", err)
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului"][language],
-        { variant: "error" }
+        {
+          variant: "error"
+        }
       )
     }
   }
 
   const handleToggleStatusSelected = async () => {
-    const promises = selectedIds.map(async (id) => {
-      try {
-        const user = users.find((u) => extractId(u) === id)
-        if (!user) return
-        const currentStatus = user.status
-        const newStatus = (!currentStatus).toString()
-        await api.technicianDetails.patchSingleTechnician(id, {
-          status: newStatus
+    try {
+      const payload = {
+        users: selectedIds.map((id) => {
+          const user = users.find((u) => extractId(u) === id)
+          return { id, status: !user?.status }
         })
-      } catch (err) {
-        console.error(`Ошибка при обновлении статуса пользователя ${id}:`, err)
       }
-    })
-
-    await Promise.all(promises)
-    enqueueSnackbar("Статусы пользователей обновлены", { variant: "success" })
-    fetchUsers()
-    setSelectedIds([])
+      await api.users.updateMultipleTechnicians(payload)
+      enqueueSnackbar("Статусы обновлены", { variant: "success" })
+      fetchUsers()
+      setSelectedIds([])
+    } catch (err) {
+      console.error("Ошибка при обновлении статуса:", err)
+      enqueueSnackbar("Ошибка при изменении статуса", { variant: "error" })
+    }
   }
 
   const handleDeleteSelected = async () => {
-    const promises = selectedIds.map(async (id) => {
-      try {
-        await api.technicianDetails.deleteTechnician(id)
-      } catch (err) {
-        console.error(`Ошибка при удалении пользователя ${id}:`, err)
-      }
-    })
+    try {
+      await api.users.deleteMultipleUsers({ user_ids: selectedIds })
+      enqueueSnackbar("Пользователи удалены", { variant: "success" })
+      fetchUsers()
+      setSelectedIds([])
+    } catch (err) {
+      console.error("Ошибка при удалении пользователей:", err)
+      enqueueSnackbar("Ошибка при удалении", { variant: "error" })
+    }
+  }
 
-    await Promise.all(promises)
-    enqueueSnackbar("Пользователи удалены", { variant: "success" })
-    fetchUsers()
-    setSelectedIds([])
+  const handleUpdateGroup = async () => {
+    const groupName = prompt("Введите название группы:")
+    if (!groupName) return
+
+    try {
+      await api.users.updateUsersGroup({
+        user_ids: selectedIds,
+        group_name: groupName
+      })
+      enqueueSnackbar("Группа обновлена", { variant: "success" })
+      fetchUsers()
+      setSelectedIds([])
+    } catch (err) {
+      console.error("Ошибка при смене группы:", err)
+      enqueueSnackbar("Ошибка при смене группы", { variant: "error" })
+    }
+  }
+
+  const handleChangeGroup = async (group) => {
+    try {
+      await api.users.updateUsersGroup({
+        user_ids: selectedIds,
+        group_name: group
+      })
+      enqueueSnackbar("Группа обновлена", { variant: "success" })
+      fetchUsers()
+      setSelectedIds([])
+    } catch (err) {
+      console.error("Ошибка при смене группы:", err)
+      enqueueSnackbar("Не удалось обновить группу", { variant: "error" })
+    }
   }
 
   const columns = [
@@ -226,13 +249,23 @@ const UserList = ({
             color="blue"
             onClick={handleToggleStatusSelected}
           >
-            {translations["Activați/Inactivați"][language] || "Toggle status"}
+            {translations["Activați/Inactivați"][language]}
+          </Button>
+          <Button variant="light" onClick={() => setGroupModalOpen(true)}>
+            Сменить группу
           </Button>
           <Button variant="light" color="red" onClick={handleDeleteSelected}>
-            {translations["Ștergeți selectați"][language] || "Delete selected"}
+            {translations["Ștergeți selectați"][language]}
           </Button>
         </div>
       )}
+
+      <GroupChangeModal
+        opened={groupModalOpen}
+        onClose={() => setGroupModalOpen(false)}
+        onConfirm={handleChangeGroup}
+        groupOptions={["IT", "Marketing", "HR", "Test"]}
+      />
 
       <RcTable
         columns={columns}
