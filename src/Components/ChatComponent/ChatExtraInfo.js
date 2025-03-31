@@ -11,7 +11,7 @@ import {
   GeneralForm,
   TicketInfoForm
 } from "../TicketForms"
-import { useFormTicket } from "./hooks"
+import { useFormTicket } from "../../hooks"
 
 const FORMAT_MEDIA = ["audio", "video", "image", "file"]
 
