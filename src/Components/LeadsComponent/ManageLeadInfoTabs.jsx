@@ -1,4 +1,4 @@
-import { Tabs, Flex, Button, Box, Text } from "@mantine/core"
+import { Tabs, Flex, Button, Text } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useState, useEffect } from "react"
 import { getLanguageByKey, showServerError } from "../utils"
@@ -82,27 +82,33 @@ export const ManageLeadInfoTabs = ({
     <Tabs h="100%" defaultValue="general_info">
       <Tabs.List>
         <Tabs.Tab value="general_info">
-          <Text truncate="end">{getLanguageByKey("Informații generale")}</Text>
+          <Text size="sm" truncate="end">
+            {getLanguageByKey("Informații generale")}
+          </Text>
         </Tabs.Tab>
         <Tabs.Tab value="ticket_info">
-          <Text c={hasErrorsTicketInfoForm ? "red" : "black"} truncate="end">
+          <Text
+            size="sm"
+            c={hasErrorsTicketInfoForm ? "red" : "black"}
+            truncate="end"
+          >
             {getLanguageByKey("Informații despre tichet")}
           </Text>
         </Tabs.Tab>
         <Tabs.Tab value="contact">
-          <Text c={hasErrorsContractForm ? "red" : "black"}>
+          <Text size="sm" c={hasErrorsContractForm ? "red" : "black"}>
             {getLanguageByKey("Contract")}
           </Text>
         </Tabs.Tab>
         <Tabs.Tab value="quality_control">
-          <Text c={hasErrorQualityControl ? "red" : "black"}>
+          <Text size="sm" c={hasErrorQualityControl ? "red" : "black"}>
             {getLanguageByKey("Control calitate")}
           </Text>
         </Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel
-        style={{ height: `calc(100% - 36px)` }}
+        style={{ height: `calc(100% - 42px)` }}
         value="general_info"
         pt="xs"
       >
@@ -162,17 +168,27 @@ export const ManageLeadInfoTabs = ({
         />
       </Tabs.Panel>
 
-      <Tabs.Panel value="quality_control">
-        <QualityControlForm
-          formInstance={form}
-          data={ticketInfo}
-          onSubmit={submit}
-          renderFooterButtons={({ formId }) => (
-            <Button loading={loading} type="submit" form={formId}>
-              {getLanguageByKey("Actualizare")}
-            </Button>
-          )}
-        />
+      <Tabs.Panel
+        style={{ height: `calc(100% - 42px)` }}
+        value="quality_control"
+      >
+        <Flex direction="column" justify="space-between" h="100%">
+          <QualityControlForm
+            formInstance={form}
+            data={ticketInfo}
+            onSubmit={submit}
+            renderFooterButtons={({ formId }) => (
+              <>
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Trimite")}
+                </Button>
+              </>
+            )}
+          />
+        </Flex>
       </Tabs.Panel>
     </Tabs>
   )
