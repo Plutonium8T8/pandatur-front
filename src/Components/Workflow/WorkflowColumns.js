@@ -1,7 +1,7 @@
 import React from "react"
+import { Flex } from "@mantine/core"
 import { workflowOptions } from "../../FormOptions"
 import { WorkflowColumn } from "./components"
-import "./WorkflowColumns.css"
 
 export const WorkflowColumns = ({
   tickets,
@@ -10,7 +10,7 @@ export const WorkflowColumns = ({
   selectedWorkflow
 }) => {
   return (
-    <div className="container-tickets">
+    <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll">
       {workflowOptions
         .filter((workflow) => selectedWorkflow.includes(workflow))
         .map((workflow) => (
@@ -22,6 +22,6 @@ export const WorkflowColumns = ({
             onEditTicket={onEditTicket}
           />
         ))}
-    </div>
+    </Flex>
   )
 }
