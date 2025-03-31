@@ -54,6 +54,12 @@ const ChatExtraInfo = ({
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
+      enqueueSnackbar(
+        getLanguageByKey("please_complete_required_fields_for_workflow_change"),
+        {
+          variant: "error"
+        }
+      )
       return
     }
 

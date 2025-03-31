@@ -3,6 +3,8 @@ import { useForm } from "@mantine/form"
 import { formatDate } from "../Components/utils"
 import { getLanguageByKey } from "../Components/utils"
 
+// TODO: Refactor this function in the future for better performance and readability
+
 export const useFormTicket = () => {
   const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState()
   const [hasErrorsContractForm, setHasErrorsContractForm] = useState()

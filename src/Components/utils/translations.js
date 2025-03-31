@@ -1562,11 +1562,9 @@ export const translations = {
   workflow_change_field_required: {
     RO: "Acest câmp este obligatoriu pentru a schimba fluxul de lucru",
     RU: "Это поле обязательно для изменения рабочего процесса"
+  },
+  please_complete_required_fields_for_workflow_change: {
+    RO: "Vă rugăm să completați câmpurile obligatorii pentru a schimba fluxul de lucru",
+    RU: "Пожалуйста, заполните обязательные поля, чтобы изменить рабочий процесс"
   }
 }
-
-// import { translations } from '../utils/translations';
-
-// const language = localStorage.getItem('language') || 'RO';
-
-// {translations['Adaugă lead'][language]}

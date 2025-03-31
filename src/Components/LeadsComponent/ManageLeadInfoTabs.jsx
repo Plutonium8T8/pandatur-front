@@ -33,6 +33,12 @@ export const ManageLeadInfoTabs = ({
 
   const submit = async (values, callback) => {
     if (form.validate().hasErrors) {
+      enqueueSnackbar(
+        getLanguageByKey("please_complete_required_fields_for_workflow_change"),
+        {
+          variant: "error"
+        }
+      )
       return
     }
     setLoading(true)
