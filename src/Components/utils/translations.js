@@ -1558,6 +1558,10 @@ export const translations = {
   "Fără date media": {
     RO: "Fără date media",
     RU: "Нет медиа-данных"
+  },
+  workflow_change_field_required: {
+    RO: "Acest câmp este obligatoriu pentru a schimba fluxul de lucru",
+    RU: "Это поле обязательно для изменения рабочего процесса"
   }
 }
 
