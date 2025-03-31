@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useForm } from "@mantine/form"
 import { formatDate } from "../Components/utils"
+import { getLanguageByKey } from "../Components/utils"
 
 export const useFormTicket = () => {
   const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState()
@@ -23,7 +24,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
 
@@ -38,7 +39,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       marketing: (value, values) => {
@@ -52,7 +53,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       tipul_serviciului: (value, values) => {
@@ -65,7 +66,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       tara: (value, values) => {
@@ -78,7 +79,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       tip_de_transport: (value, values) => {
@@ -91,7 +92,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       denumirea_excursiei_turului: (value, values) => {
@@ -104,7 +105,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       procesarea_achizitionarii: (value, values) => {
@@ -116,7 +117,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       numar_de_contract: (value, values) => {
@@ -127,7 +128,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       data_contractului: (value, values) => {
@@ -138,8 +139,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          setHasErrorsContractForm(true)
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       contract_trimis: (value, values) => {
@@ -150,8 +150,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          setHasErrorsContractForm(true)
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       contract_semnat: (value, values) => {
@@ -162,7 +161,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       achitare_efectuata: (value, values) => {
@@ -172,7 +171,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       buget: (value, values) => {
@@ -181,7 +180,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       data_plecarii: (value, values) => {
@@ -190,7 +189,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       data_intoarcerii: (value, values) => {
@@ -199,7 +198,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       tour_operator: (value, values) => {
@@ -208,7 +207,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       numarul_cererii_de_la_operator: (value, values) => {
@@ -217,7 +216,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
 
@@ -227,7 +226,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       contract_arhivat: (value, values) => {
@@ -236,7 +235,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       statutul_platii: (value, values) => {
@@ -245,7 +244,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       pret_netto: (value, values) => {
@@ -254,17 +253,17 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       control: (value, values) => {
         if (values.workflow === "Realizat cu succes" && !value) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       },
       motivul_refuzului: (value, values) => {
         if (values.workflow === "Închis și nerealizat" && !value) {
-          return "Acest camp este obligator pentru a trece la urmatorul flow"
+          return getLanguageByKey("workflow_change_field_required")
         }
       }
     },
