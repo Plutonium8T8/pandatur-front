@@ -9,14 +9,15 @@ import {
 
 const QUALITY_FORM_FILTER_ID = "QUALITY_FORM_FILTER_ID"
 
-export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
-  const form = useForm({
-    mode: "uncontrolled"
-  })
-
+export const QualityControlForm = ({
+  onSubmit,
+  data,
+  renderFooterButtons,
+  formInstance
+}) => {
   useEffect(() => {
     if (data) {
-      form.setValues({
+      formInstance.setValues({
         motivul_refuzului: data.motivul_refuzului,
         evaluare_de_odihna: data.evaluare_de_odihna,
         urmatoarea_vacanta: data.urmatoarea_vacanta,
@@ -30,9 +31,9 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
     <>
       <form
         id={QUALITY_FORM_FILTER_ID}
-        onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
-        )}
+        onSubmit={formInstance.onSubmit((values) => {
+          onSubmit(values, () => formInstance.reset())
+        })}
       >
         {
           <Select
@@ -41,8 +42,8 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
             label={getLanguageByKey("Motivul refuzului")}
             placeholder={getLanguageByKey("Motivul refuzului")}
             data={motivulRefuzuluiOptions}
-            key={form.key("motivul_refuzului")}
-            {...form.getInputProps("motivul_refuzului")}
+            key={formInstance.key("motivul_refuzului")}
+            {...formInstance.getInputProps("motivul_refuzului")}
           />
         }
 
@@ -53,38 +54,38 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
           label={getLanguageByKey("Evaluare odihnă")}
           placeholder={getLanguageByKey("Evaluare odihnă")}
           data={evaluareOdihnaOptions}
-          key={form.key("evaluare_de_odihna")}
-          {...form.getInputProps("evaluare_de_odihna")}
+          key={formInstance.key("evaluare_de_odihna")}
+          {...formInstance.getInputProps("evaluare_de_odihna")}
         />
 
         <TextInput
           mt="md"
           label={getLanguageByKey("Următoarea vacanță")}
           placeholder={getLanguageByKey("Următoarea vacanță")}
-          key={form.key("urmatoarea_vacanta")}
-          {...form.getInputProps("urmatoarea_vacanta")}
+          key={formInstance.key("urmatoarea_vacanta")}
+          {...formInstance.getInputProps("urmatoarea_vacanta")}
         />
 
         <TextInput
           mt="md"
           label={getLanguageByKey("Manager")}
           placeholder={getLanguageByKey("Manager")}
-          key={form.key("manager")}
-          {...form.getInputProps("manager")}
+          key={formInstance.key("manager")}
+          {...formInstance.getInputProps("manager")}
         />
 
         <TextInput
           mt="md"
           label={getLanguageByKey("Vacanța")}
           placeholder={getLanguageByKey("Vacanța")}
-          key={form.key("vacanta")}
-          {...form.getInputProps("vacanta")}
+          key={formInstance.key("vacanta")}
+          {...formInstance.getInputProps("vacanta")}
         />
       </form>
 
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
-          onResetForm: form.reset,
+          onResetForm: formInstance.reset,
           formId: QUALITY_FORM_FILTER_ID
         })}
       </Flex>

@@ -23,7 +23,8 @@ export const GeneralForm = ({
   onSubmit,
   data,
   onClose,
-  renderFooterButtons
+  renderFooterButtons,
+  formInstance
 }) => {
   const { technicians } = useGetTechniciansList()
 
@@ -44,6 +45,10 @@ export const GeneralForm = ({
       })
     }
   }, [data])
+
+  form.watch("workflow", ({ value }) => {
+    formInstance.setFieldValue("workflow", value)
+  })
 
   return (
     <>
