@@ -81,12 +81,6 @@
   margin-top: 10px;
 }
 
-.ticket-photo-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
 .ticket-id {
   font-size: 14px;
   font-weight: 600;

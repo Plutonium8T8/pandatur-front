@@ -50,7 +50,6 @@ const TicketCard = ({ ticket, onEditTicket }) => {
                 <div className="ticket-photo">
                   <Image
                     src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
-                    className="ticket-photo-image"
                     fallbackSrc={DEFAULT_PHOTO}
                   />
                 </div>
