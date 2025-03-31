@@ -11,6 +11,7 @@ import {
   GeneralForm,
   TicketInfoForm
 } from "../TicketForms"
+import { useFormTicket } from "./hooks"
 
 const FORMAT_MEDIA = ["audio", "video", "image", "file"]
 
@@ -22,7 +23,6 @@ const ChatExtraInfo = ({
   selectTicketId,
   personalInfo = {},
   setPersonalInfo,
-
   messages = [],
   updatedTicket,
   updateTicket,
@@ -39,6 +39,13 @@ const ChatExtraInfo = ({
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false)
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false)
 
+  const {
+    form,
+    hasErrorsTicketInfoForm,
+    hasErrorsContractForm,
+    hasErrorQualityControl
+  } = useFormTicket()
+
   useEffect(() => {
     if (selectTicketId) {
       fetchTicketExtraInfo(selectTicketId)
@@ -46,6 +53,10 @@ const ChatExtraInfo = ({
   }, [selectTicketId])
 
   const updateTicketDate = async (values) => {
+    if (form.validate().hasErrors) {
+      return
+    }
+
     setIsLoadingGeneral(true)
     try {
       await api.tickets.updateById({
@@ -252,13 +263,18 @@ const ChatExtraInfo = ({
           </Tabs.Tab>
           <Tabs.Tab value="info">
             <Box w="100">
-              <Text truncate="end">
+              <Text
+                c={hasErrorsTicketInfoForm ? "red" : "black"}
+                truncate="end"
+              >
                 {getLanguageByKey("Informații despre tichet")}
               </Text>
             </Box>
           </Tabs.Tab>
           <Tabs.Tab value="contract">
-            <Text>{getLanguageByKey("Contract")}</Text>
+            <Text c={hasErrorsContractForm ? "red" : "black"}>
+              {getLanguageByKey("Contract")}
+            </Text>
           </Tabs.Tab>
           <Tabs.Tab value="invoice">
             <Text>{getLanguageByKey("Invoice")}</Text>
@@ -268,7 +284,9 @@ const ChatExtraInfo = ({
           </Tabs.Tab>
 
           <Tabs.Tab value="quality_control">
-            <Text>{getLanguageByKey("Control calitate")}</Text>
+            <Text c={hasErrorQualityControl ? "red" : "black"}>
+              {getLanguageByKey("Control calitate")}
+            </Text>
           </Tabs.Tab>
         </Tabs.List>
 
@@ -276,7 +294,8 @@ const ChatExtraInfo = ({
           <Box p="md">
             <GeneralForm
               data={updatedTicket}
-              onSubmit={(values) => updateTicketDate(values)}
+              formInstance={form}
+              onSubmit={updateTicketDate}
               renderFooterButtons={({ formId }) => (
                 <Button loading={isLoadingGeneral} type="submit" form={formId}>
                   {getLanguageByKey("Actualizare")}
@@ -315,6 +334,7 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="info">
           <Box p="md">
             <TicketInfoForm
+              formInstance={form}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
@@ -333,6 +353,7 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="contract">
           <Box p="md">
             <ContractForm
+              formInstance={form}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
@@ -375,6 +396,7 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="quality_control">
           <Box p="md">
             <QualityControlForm
+              formInstance={form}
               data={extraInfo[selectTicketId]}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
