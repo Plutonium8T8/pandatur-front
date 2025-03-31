@@ -127,7 +127,6 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          setHasErrorsContractForm(true)
           return "Acest camp este obligator pentru a trece la urmatorul flow"
         }
       },
@@ -163,7 +162,6 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          setHasErrorsContractForm(true)
           return "Acest camp este obligator pentru a trece la urmatorul flow"
         }
       },
@@ -238,7 +236,6 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          setHasErrorsContractForm(true)
           return "Acest camp este obligator pentru a trece la urmatorul flow"
         }
       },
