@@ -1,9 +1,10 @@
 import { FixedSizeList } from "react-window"
+import { Flex } from "@mantine/core"
 import { useRef } from "react"
-import { getColorByWorkflowType, getBrightByWorkflowType } from "../WorkflowTag"
+import { getColorByWorkflowType } from "../WorkflowTag"
 import TicketCard from "../../../LeadsComponent/TicketCardComponent"
-import { getLanguageByKey } from "../../../utils"
 import { useDOMElementHeight } from "../../../../hooks"
+import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
 import "./WorkflowColumn.css"
 
 const TICKET_CARD_HEIGHT = 110
@@ -51,35 +52,18 @@ export const WorkflowColumn = ({
   const filteredTickets = filterTickets(workflow, tickets)
 
   return (
-    <div
+    <Flex
+      direction="column"
       className="colone-ticket"
       style={{
         backgroundColor: getColorByWorkflowType(workflow, "")
       }}
     >
-      <div
-        className="name-workflow"
-        style={{
-          backgroundColor: getBrightByWorkflowType(workflow, "")
-        }}
-      >
-        {getLanguageByKey(workflow)}
+      <WorkflowColumnHeader
+        workflow={workflow}
+        filteredTickets={filteredTickets}
+      />
 
-        <div className="ticket-counter-display">
-          <div className="ticket-counter ticket-counter-red">
-            {
-              filteredTickets.filter(
-                (ticket) =>
-                  ticket.creation_date === ticket.last_interaction_date
-              ).length
-            }
-          </div>
-          /
-          <div className="ticket-counter ticket-counter-green">
-            {filteredTickets.length}
-          </div>
-        </div>
-      </div>
       <div ref={columnRef} className="scrollable-list">
         <FixedSizeList
           height={columnHeight}
@@ -97,6 +81,6 @@ export const WorkflowColumn = ({
           )}
         </FixedSizeList>
       </div>
-    </div>
+    </Flex>
   )
 }
