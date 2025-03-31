@@ -1619,10 +1619,6 @@ export const translations = {
     RO: "Șterge interval dupa zile",
     RU: "Удалить интервалы по дням"
   },
-  "Intervale pentru mai mulți tehnicieni": {
-    RO: "Intervale pentru mai mulți tehnicieni",
-    RU: "Интервалы для многих пользователей"
-  },
   "Intervale pentru": {
     RO: "Intervale pentru",
     RU: "Интервалы для"
@@ -1635,9 +1631,13 @@ export const translations = {
     RO: "Intervale pentru mai mulți tehnicieni",
     RU: "Интервалы для нескольких техников"
   },
-  Toate: {
-    RO: "Toate",
-    RU: "Все"
+  "Activați/Inactivați": {
+    RO: "Activați/Inactivați",
+    RU: "Activați/Inactivați"
+  },
+  "Ștergeți selectați": {
+    RO: "Ștergeți selectați",
+    RU: "Ștergeți selectați"
   }
 }
 

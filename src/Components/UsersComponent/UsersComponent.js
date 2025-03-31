@@ -26,7 +26,11 @@ const UsersComponent = () => {
       users.filter(
         (u) =>
           u.fullName?.toLowerCase().includes(s) ||
-          u.groups?.some((g) => g.toLowerCase().includes(s)) ||
+          u.groups?.some((g) =>
+            typeof g === "string"
+              ? g.toLowerCase().includes(s)
+              : g.name?.toLowerCase().includes(s)
+          ) ||
           u.roles?.some((r) => r.role.toLowerCase().includes(s))
       )
     )

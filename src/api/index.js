@@ -10,7 +10,6 @@ import { task } from "./task"
 import { notification } from "./notification"
 import { standalone } from "./standalone"
 import { activity } from "./activity"
-import { technicians } from "./technicians"
 import { groupSchedules } from "./groupSchedules"
 
 export const api = {
@@ -26,6 +25,5 @@ export const api = {
   notification,
   standalone,
   activity,
-  technicians,
   groupSchedules
 }

@@ -13,6 +13,15 @@ export const users = {
     return data
   },
 
+  createTechnicianUser: async (body) => {
+    const { data } = await baseAxios.post(
+      "/api/technician/profile/create",
+      body
+    )
+
+    return data
+  },
+
   getTechnicianById: async (id) => {
     const { data } = await baseAxios.get(`/api/users-technician/${id}`)
 

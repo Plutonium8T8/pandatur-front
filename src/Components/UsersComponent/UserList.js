@@ -132,7 +132,7 @@ const UserList = ({
       dataIndex: "id",
       key: "id",
       width: 100,
-      render: (id) => id?.user?.id || id?.id || "—"
+      render: (id) => id
     },
     {
       title: translations["Nume complet"][language],
@@ -145,7 +145,10 @@ const UserList = ({
       dataIndex: "groups",
       key: "groups",
       width: 200,
-      render: (groups) => groups?.join(", ") || "—"
+      render: (groups) =>
+        Array.isArray(groups)
+          ? groups.map((g) => (typeof g === "string" ? g : g.name)).join(", ")
+          : "—"
     },
     {
       title: "Email",
@@ -238,7 +241,7 @@ const UserList = ({
         bordered
         selectedRow={[]}
         pagination={false}
-        rowKey={(record) => extractId(record) || `temp-${Math.random()}`}
+        scroll={{ y: "calc(100vh - 300px)" }}
       />
     </>
   )
