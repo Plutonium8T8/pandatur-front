@@ -140,10 +140,16 @@ const UserList = ({
       render: (id) => id
     },
     {
-      title: translations["Nume complet"][language],
-      dataIndex: "fullName",
-      key: "fullName",
-      width: 250
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      width: 150
+    },
+    {
+      title: "Surname",
+      dataIndex: "surname",
+      key: "surname",
+      width: 150
     },
     {
       title: "Email",

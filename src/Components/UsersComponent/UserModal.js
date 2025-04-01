@@ -22,6 +22,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [showPassword, setShowPassword] = useState(false)
 
   const [form, setForm] = useState({
+    name: "",
+    surname: "",
     username: "",
     email: "",
     password: "",
@@ -33,6 +35,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   useEffect(() => {
     if (initialUser) {
       setForm({
+        name: initialUser.name || "",
+        surname: initialUser.surname || "",
         username: initialUser.username || "",
         email: initialUser.email || "",
         password: "",
@@ -45,6 +49,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       })
     } else {
       setForm({
+        name: "",
+        surname: "",
         username: "",
         email: "",
         password: "",
@@ -89,16 +95,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       } else {
         const payload = {
           user: {
-            username,
-            email,
-            password,
+            username: form.username,
+            email: form.email,
+            password: form.password,
             roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
           },
           technician: {
-            status: status.toString(),
-            job_title
+            status: form.status.toString(),
+            job_title: form.job_title
           },
-          groups: [groups]
+          name: form.name,
+          surname: form.surname,
+          groups: [form.groups]
         }
 
         await api.users.createTechnicianUser(payload)
@@ -153,9 +161,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           />
 
           <TextInput
-            label="Username"
-            value={form.username}
-            onChange={(e) => setForm({ ...form, username: e.target.value })}
+            label="Name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+          />
+
+          <TextInput
+            label="Surname"
+            value={form.surname}
+            onChange={(e) => setForm({ ...form, surname: e.target.value })}
           />
 
           <TextInput

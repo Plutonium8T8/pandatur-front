@@ -43,17 +43,15 @@ const UsersComponent = () => {
       const normalized = data.map((item) => {
         const personal = item.id || {}
         const user = personal.user || {}
+
         return {
           id: personal.id,
-          fullName: user.username || "-",
-          email: user.email,
-          username: user.username,
-          // roles: user.roles ? JSON.parse(user.roles).map((r) => ({ role: r })) : [],
+          name: personal.name || "-",
+          surname: personal.surname || "-",
+          username: user.username || "-",
+          email: user.email || "-",
           groups: item.groups || [],
           jobTitle: item.job_title,
-          department: item.department,
-          salary: item.salary,
-          policyNumber: item.policy_number,
           status: item.status
         }
       })
