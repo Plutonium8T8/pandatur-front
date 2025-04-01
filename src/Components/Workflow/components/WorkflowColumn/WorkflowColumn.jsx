@@ -1,6 +1,6 @@
 import { VariableSizeList } from "react-window"
-import { Flex, DEFAULT_THEME } from "@mantine/core"
-import { useRef, useEffect } from "react"
+import { Flex, DEFAULT_THEME, Box } from "@mantine/core"
+import { useRef, useEffect, forwardRef } from "react"
 import { TicketCard } from "../TicketCard"
 import { useDOMElementHeight } from "../../../../hooks"
 import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
@@ -17,6 +17,7 @@ const priorityOrder = {
   înaltă: 3,
   critică: 4
 }
+
 const filterTickets = (workflow, tickets) => {
   const filteredTickets = tickets
     .filter((ticket) => ticket.workflow === workflow)
@@ -41,6 +42,18 @@ const filterTickets = (workflow, tickets) => {
 
   return filteredTickets
 }
+
+const wrapperColumn = forwardRef(({ style, ...rest }, ref) => (
+  <Box
+    ref={ref}
+    pos="relative"
+    mt="8px"
+    style={{
+      ...style
+    }}
+    {...rest}
+  />
+))
 
 export const WorkflowColumn = ({
   onEditTicket,
@@ -88,6 +101,7 @@ export const WorkflowColumn = ({
       direction="column"
       bg={colors.gray[1]}
       className="colone-ticket"
+      px="8px"
       style={{
         borderRadius: 32
       }}
@@ -103,6 +117,7 @@ export const WorkflowColumn = ({
           height={columnHeight}
           itemCount={filteredTickets.length}
           itemSize={(index) => rowHeights.current[index] || TICKET_CARD_HEIGHT}
+          innerElementType={wrapperColumn}
         >
           {CardItem}
         </VariableSizeList>
