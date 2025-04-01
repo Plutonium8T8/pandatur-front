@@ -20,16 +20,15 @@ import {
   Menu,
   ActionIcon
 } from "@mantine/core"
+import { useSnackbar } from "notistack"
 import { parseTags } from "../../../stringUtils"
 import { parseServerDate, getLanguageByKey, showServerError } from "../../utils"
 import { Modal } from "../../Modal"
 import SingleChat from "../../ChatComponent/SingleChat"
 import { Tag } from "../../Tag"
-import { DEFAULT_PHOTO } from "../../../app-constants"
-import { DD_MM_YYYY } from "../../../app-constants"
+import { DEFAULT_PHOTO, DD_MM_YYYY } from "../../../app-constants"
 import { api } from "../../../api"
 import { useConfirmPopup } from "../../../hooks"
-import { useSnackbar } from "notistack"
 
 const { colors } = DEFAULT_THEME
 
@@ -73,7 +72,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
 
   return (
     <>
-      <Link to={`/leads/${ticket.id}`} className="ticket-link">
+      <Link to={`/leads/${ticket.id}`}>
         <Card
           withBorder
           shadow="sm"
@@ -93,7 +92,6 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
 
           <Box
             onClick={(e) => {
-              console.log(e.target)
               e.preventDefault()
               e.stopPropagation()
             }}
@@ -113,7 +111,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
                   onClick={() => onEditTicket(ticket)}
                   leftSection={<MdModeEdit />}
                 >
-                  Edit
+                  {getLanguageByKey("edit")}
                 </Menu.Item>
 
                 <Divider />
@@ -122,7 +120,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
                   color="red"
                   leftSection={<MdDelete />}
                 >
-                  Delete
+                  {getLanguageByKey("delete")}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
@@ -143,6 +141,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
                     {firstClient?.name}
                   </Text>
                 )}
+
                 {ticket.contact && (
                   <Text c={colors.dark[4]}>{ticket.contact}</Text>
                 )}
@@ -163,7 +162,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
             <Flex direction="column" gap="8" px="8">
               <Flex align="center" gap="8">
                 <FaFingerprint />
-                <Text>{ticket.clients?.[0].id}</Text>
+                <Text>{firstClient?.id}</Text>
               </Flex>
 
               {firstClient?.phone && (

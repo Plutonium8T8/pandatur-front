@@ -1566,5 +1566,13 @@ export const translations = {
   please_complete_required_fields_for_workflow_change: {
     RO: "Vă rugăm să completați câmpurile obligatorii pentru a schimba fluxul de lucru",
     RU: "Пожалуйста, заполните обязательные поля, чтобы изменить рабочий процесс"
+  },
+  edit: {
+    RO: "Editează",
+    RU: "Редактировать"
+  },
+  delete: {
+    RO: "Șterge",
+    RU: "Удалить"
   }
 }
