@@ -1,15 +1,14 @@
 import { FixedSizeList } from "react-window"
 import { Flex, DEFAULT_THEME } from "@mantine/core"
 import { useRef } from "react"
-import { getColorByWorkflowType } from "../WorkflowTag"
-import TicketCard from "../../../LeadsComponent/TicketCardComponent"
+import { TicketCard } from "../TicketCard"
 import { useDOMElementHeight } from "../../../../hooks"
 import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
 import "./WorkflowColumn.css"
 
 const { colors } = DEFAULT_THEME
 
-const TICKET_CARD_HEIGHT = 110
+const TICKET_CARD_HEIGHT = 190
 
 const priorityOrder = {
   joasă: 1,
@@ -55,12 +54,10 @@ export const WorkflowColumn = ({
 
   return (
     <Flex
-      p="xs"
       direction="column"
       bg={colors.gray[1]}
       className="colone-ticket"
       style={{
-        backgroundColor: getColorByWorkflowType(workflow, ""),
         borderRadius: 32
       }}
     >

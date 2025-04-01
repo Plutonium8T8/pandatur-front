@@ -5,7 +5,12 @@ import { useSnackbar } from "notistack"
 import { MdDelete, MdEdit } from "react-icons/md"
 import { useParams, useNavigate } from "react-router-dom"
 import { Pagination } from "../../Pagination"
-import { getLanguageByKey, cleanValue, showServerError } from "../../utils"
+import {
+  getLanguageByKey,
+  cleanValue,
+  showServerError,
+  priorityTagColors
+} from "../../utils"
 import { TextEllipsis } from "../../TextEllipsis"
 import { Checkbox } from "../../Checkbox"
 import { Modal } from "../../Modal"
@@ -29,13 +34,6 @@ const renderTags = (tags) => {
     : "—"
 }
 
-const priorityTagColors = {
-  joasă: "success",
-  medie: "processing",
-  înaltă: "warning",
-  critică: "danger"
-}
-
 export const LeadTable = ({
   selectedTickets,
   onSelectRow,
@@ -55,14 +53,14 @@ export const LeadTable = ({
   const [id, setId] = useState()
 
   const deleteLead = useConfirmPopup({
-    subTitle: getLanguageByKey("Sigur doriți să ștergeți acest lead")
+    subTitle: getLanguageByKey("confirm_delete_lead")
   })
 
   const handleDeleteLead = (id) => {
     deleteLead(async () => {
       try {
         await api.tickets.deleteById([id])
-        enqueueSnackbar(getLanguageByKey("Lead șters cu succes"), {
+        enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
           variant: "success"
         })
         fetchTickets()

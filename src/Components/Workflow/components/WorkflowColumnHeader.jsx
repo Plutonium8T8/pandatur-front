@@ -13,26 +13,31 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
       align="center"
       style={{
         backgroundColor: getBrightByWorkflowType(workflow, ""),
-        borderRadius: "100px"
+        borderRadius: "50px"
       }}
     >
       <Text c={colors.dark[7]} fw="bold">
         {getLanguageByKey(workflow)}
       </Text>
 
-      <Flex gap="xs">
-        <Badge size="lg" color="red">
-          {
-            filteredTickets.filter(
-              (ticket) => ticket.creation_date === ticket.last_interaction_date
-            ).length
-          }
-        </Badge>
+      <Badge bg="white" c="white" size="lg">
+        <Flex gap="xs">
+          <Text fw="bold" c="red">
+            {
+              filteredTickets.filter(
+                (ticket) =>
+                  ticket.creation_date === ticket.last_interaction_date
+              ).length
+            }
+          </Text>
 
-        <Badge color="green" size="lg">
-          {filteredTickets.length}
-        </Badge>
-      </Flex>
+          <Text c={colors.dark[7]}>/</Text>
+
+          <Text fw="bold" c="green">
+            {filteredTickets.length}
+          </Text>
+        </Flex>
+      </Badge>
     </Flex>
   )
 }
