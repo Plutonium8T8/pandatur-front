@@ -39,7 +39,7 @@ const formatDate = (date) => {
 export const priorityTagColors = {
   joasă: "green",
   medie: "blue",
-  înaltă: "yelloy",
+  înaltă: "yellow",
   critică: "red"
 }
 

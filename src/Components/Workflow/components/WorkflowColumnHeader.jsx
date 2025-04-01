@@ -9,7 +9,6 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
     <Flex
       p="8"
       justify="space-between"
-      mb="md"
       align="center"
       style={{
         backgroundColor: getBrightByWorkflowType(workflow, ""),
