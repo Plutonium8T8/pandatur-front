@@ -25,11 +25,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     username: "",
     email: "",
     password: "",
-    department: "",
     job_title: "",
-    policy_number: "",
-    salary: "",
-    personal_exemption_number: "",
     status: false,
     groups: ""
   })
@@ -39,25 +35,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm({
         username: initialUser.username || "",
         email: initialUser.email || "",
-        password: "", // не загружаем пароль
-        department: initialUser.department || "",
-        job_title: initialUser.job_title || "",
-        policy_number: initialUser.policy_number || "",
-        salary: initialUser.salary || "",
-        personal_exemption_number: initialUser.personal_exemption_number || "",
-        status: initialUser.status === "true" || initialUser.status === true,
-        groups: initialUser.groups?.[0] || ""
+        password: "",
+        job_title: initialUser.job_title || initialUser.jobTitle || "",
+        status: Boolean(initialUser.status),
+        groups:
+          typeof initialUser.groups?.[0] === "string"
+            ? initialUser.groups[0]
+            : initialUser.groups?.[0]?.name || ""
       })
     } else {
       setForm({
         username: "",
         email: "",
         password: "",
-        department: "",
         job_title: "",
-        policy_number: "",
-        salary: "",
-        personal_exemption_number: "",
         status: false,
         groups: ""
       })
@@ -65,72 +56,71 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   }, [initialUser, opened])
 
   const handleCreate = async () => {
-    const {
-      username,
-      email,
-      password,
-      department,
-      job_title,
-      policy_number,
-      salary,
-      personal_exemption_number,
-      status,
-      groups
-    } = form
+    const { username, email, password, job_title, status, groups } = form
 
-    if (
-      !username ||
-      !email ||
-      !password ||
-      !department ||
-      !job_title ||
-      !policy_number ||
-      !salary ||
-      !personal_exemption_number ||
-      !groups
-    ) {
-      enqueueSnackbar("Заполните все обязательные поля", { variant: "warning" })
-      return
-    }
-
-    const payload = {
-      user: {
-        username,
-        email,
-        password,
-        roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
-      },
-      technician: {
-        status: status.toString(),
-        policy_number,
-        salary,
-        personal_exemption_number,
-        job_title,
-        department
-      },
-      groups: [groups]
+    if (!initialUser) {
+      if (!username || !email || !password || !job_title || !groups) {
+        enqueueSnackbar("Заполните все обязательные поля", {
+          variant: "warning"
+        })
+        return
+      }
     }
 
     try {
-      await api.users.createTechnicianUser(payload)
-      enqueueSnackbar("Пользователь успешно создан", { variant: "success" })
+      if (initialUser) {
+        const technicianId =
+          initialUser.id?.user?.id || initialUser.id?.id || initialUser.id
+        const payload = {
+          status: status.toString(),
+          job_title
+        }
+
+        await api.users.updateTechnician(technicianId, payload)
+
+        if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
+          await api.users.updateUsersGroup({
+            user_ids: [technicianId],
+            group_name: groups
+          })
+        }
+
+        enqueueSnackbar("Пользователь успешно обновлён", { variant: "success" })
+      } else {
+        const payload = {
+          user: {
+            username,
+            email,
+            password,
+            roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
+          },
+          technician: {
+            status: status.toString(),
+            job_title
+          },
+          groups: [groups]
+        }
+
+        await api.users.createTechnicianUser(payload)
+        enqueueSnackbar("Пользователь успешно создан", { variant: "success" })
+      }
+
       setForm({
         username: "",
         email: "",
         password: "",
-        department: "",
         job_title: "",
-        policy_number: "",
-        salary: "",
-        personal_exemption_number: "",
         status: false,
         groups: ""
       })
+
       onClose()
       onUserCreated()
     } catch (err) {
-      console.error("Ошибка при создании пользователя:", err.message)
-      enqueueSnackbar("Ошибка при создании пользователя", { variant: "error" })
+      console.error("Ошибка при сохранении пользователя:", err.message)
+      enqueueSnackbar("Ошибка при сохранении пользователя", {
+        variant: "error"
+      })
     }
   }
 
@@ -139,7 +129,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       opened={opened}
       onClose={onClose}
       position="right"
-      title="Создать нового пользователя"
+      title={
+        initialUser
+          ? "Редактировать пользователя"
+          : "Создать нового пользователя"
+      }
       padding="xl"
       size="lg"
     >
@@ -163,11 +157,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
           />
+
           <TextInput
             label="Email"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
           />
+
           <TextInput
             label="Password"
             type={showPassword ? "text" : "password"}
@@ -186,9 +182,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           <Select
             label="Grup user"
             placeholder="Alege grupul"
-            data={GroupUsersOptions.map((g) => ({ value: g }))}
+            data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
             value={GroupUsersOptions.includes(form.groups) ? form.groups : null}
             onChange={(value) => setForm({ ...form, groups: value || "" })}
+          />
+
+          <TextInput
+            label="Job title"
+            value={form.job_title}
+            onChange={(e) => setForm({ ...form, job_title: e.target.value })}
           />
 
           <Divider label="Drepturi in app" labelPosition="center" />
@@ -197,43 +199,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             employee={{ id: form.username, name: form.username }}
           />
 
-          <Divider label="Technician informations" labelPosition="center" />
-
-          <TextInput
-            label="Departament"
-            value={form.department}
-            onChange={(e) => setForm({ ...form, department: e.target.value })}
-          />
-          <TextInput
-            label="Job title"
-            value={form.job_title}
-            onChange={(e) => setForm({ ...form, job_title: e.target.value })}
-          />
-          <TextInput
-            label="Nr polis"
-            value={form.policy_number}
-            onChange={(e) =>
-              setForm({ ...form, policy_number: e.target.value })
-            }
-          />
-          <TextInput
-            label="Salariu"
-            value={form.salary}
-            onChange={(e) => setForm({ ...form, salary: e.target.value })}
-          />
-          <TextInput
-            label="IDNP"
-            value={form.personal_exemption_number}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                personal_exemption_number: e.target.value
-              })
-            }
-          />
-
           <Button fullWidth mt="sm" onClick={handleCreate}>
-            Create
+            {initialUser ? "Сохранить изменения" : "Создать"}
           </Button>
         </Stack>
       </Group>

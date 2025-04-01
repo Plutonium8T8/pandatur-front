@@ -95,24 +95,6 @@ const UserList = ({
     }
   }
 
-  const handleUpdateGroup = async () => {
-    const groupName = prompt("Введите название группы:")
-    if (!groupName) return
-
-    try {
-      await api.users.updateUsersGroup({
-        user_ids: selectedIds,
-        group_name: groupName
-      })
-      enqueueSnackbar("Группа обновлена", { variant: "success" })
-      fetchUsers()
-      setSelectedIds([])
-    } catch (err) {
-      console.error("Ошибка при смене группы:", err)
-      enqueueSnackbar("Ошибка при смене группы", { variant: "error" })
-    }
-  }
-
   const handleChangeGroup = async (group) => {
     try {
       await api.users.updateUsersGroup({
@@ -164,6 +146,12 @@ const UserList = ({
       width: 250
     },
     {
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      width: 250
+    },
+    {
       title: translations["Grup"][language],
       dataIndex: "groups",
       key: "groups",
@@ -174,17 +162,11 @@ const UserList = ({
           : "—"
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-      width: 250
-    },
-    {
-      title: translations["Rol"][language],
-      dataIndex: "roles",
-      key: "roles",
-      width: 250,
-      render: (roles) => roles?.map((r) => r.role).join(", ") || "—"
+      title: "Job Title",
+      dataIndex: "job_title",
+      key: "job_title",
+      width: 200,
+      render: (_, row) => row.jobTitle || "—"
     },
     {
       title: translations["Status"][language],
