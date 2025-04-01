@@ -44,9 +44,7 @@ const UserList = ({
   const toggleUserStatus = async (id, currentStatus) => {
     try {
       const newStatus = (!currentStatus).toString()
-      await api.users.updateMultipleTechnicians({
-        users: [{ id, status: newStatus }]
-      })
+      await api.users.updateTechnician(id, { status: newStatus })
       fetchUsers()
       enqueueSnackbar(
         currentStatus
@@ -58,9 +56,7 @@ const UserList = ({
       console.error("Ошибка при смене статуса:", err)
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului"][language],
-        {
-          variant: "error"
-        }
+        { variant: "error" }
       )
     }
   }
