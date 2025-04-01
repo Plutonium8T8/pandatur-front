@@ -1,6 +1,6 @@
-import { FixedSizeList } from "react-window"
+import { VariableSizeList } from "react-window"
 import { Flex, DEFAULT_THEME } from "@mantine/core"
-import { useRef } from "react"
+import { useRef, useEffect } from "react"
 import { TicketCard } from "../TicketCard"
 import { useDOMElementHeight } from "../../../../hooks"
 import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
@@ -9,6 +9,7 @@ import "./WorkflowColumn.css"
 const { colors } = DEFAULT_THEME
 
 const TICKET_CARD_HEIGHT = 190
+const SPACE_BETWEEN_CARDS = 12
 
 const priorityOrder = {
   joasă: 1,
@@ -49,8 +50,38 @@ export const WorkflowColumn = ({
 }) => {
   const columnRef = useRef(null)
   const columnHeight = useDOMElementHeight(columnRef)
+  const listRef = useRef(null)
+  const rowHeights = useRef({})
 
   const filteredTickets = filterTickets(workflow, tickets)
+
+  const CardItem = ({ index, style }) => {
+    const rowRef = useRef(null)
+
+    useEffect(() => {
+      if (rowRef.current) {
+        setRowHeight(index, rowRef.current.clientHeight + SPACE_BETWEEN_CARDS)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [rowRef])
+
+    function setRowHeight(index, size) {
+      listRef.current.resetAfterIndex(0)
+      rowHeights.current = { ...rowHeights.current, [index]: size }
+    }
+
+    return (
+      <div style={style}>
+        <div ref={rowRef}>
+          <TicketCard
+            key={filteredTickets[index].id}
+            ticket={filteredTickets[index]}
+            onEditTicket={onEditTicket}
+          />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <Flex
@@ -67,21 +98,14 @@ export const WorkflowColumn = ({
       />
 
       <Flex direction="column" h="100%" ref={columnRef}>
-        <FixedSizeList
+        <VariableSizeList
+          ref={listRef}
           height={columnHeight}
           itemCount={filteredTickets.length}
-          itemSize={TICKET_CARD_HEIGHT}
+          itemSize={(index) => rowHeights.current[index] || TICKET_CARD_HEIGHT}
         >
-          {({ index, style }) => (
-            <div style={style}>
-              <TicketCard
-                key={filteredTickets[index].id}
-                ticket={filteredTickets[index]}
-                onEditTicket={onEditTicket}
-              />
-            </div>
-          )}
-        </FixedSizeList>
+          {CardItem}
+        </VariableSizeList>
       </Flex>
     </Flex>
   )
