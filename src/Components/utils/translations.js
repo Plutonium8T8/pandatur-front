@@ -1515,11 +1515,11 @@ export const translations = {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?"
   },
-  "Lead șters cu succes": {
+  lead_deleted_successfully: {
     RO: "Lead șters cu succes",
     RU: "Лид успешно удалён"
   },
-  "Sigur doriți să ștergeți acest lead": {
+  confirm_delete_lead: {
     RO: "Sigur doriți să ștergeți acest lead?",
     RU: "Вы уверены, что хотите удалить этот лид?"
   },

@@ -1,7 +1,3 @@
 .colone-ticket {
-  /*
-     FIXME: The width works correctly only when each column is 450px. Need to investigate why this happens
-    */
   flex: 0 0 340px;
-  /* box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); */
 }
