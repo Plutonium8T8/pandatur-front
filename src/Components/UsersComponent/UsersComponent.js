@@ -1,27 +1,28 @@
-import { useEffect, useState } from "react"
-import { Text, TextInput, Button, Flex } from "@mantine/core"
-import { api } from "../../api"
-import UserModal from "./UserModal"
-import UserList from "./UserList"
-import { translations } from "../utils/translations"
+import { useEffect, useState } from "react";
+import { Text, TextInput, Button, Flex } from "@mantine/core";
+import { api } from "../../api";
+import UserModal from "./UserModal";
+import UserList from "./UserList";
+import { translations } from "../utils/translations";
+import { useSnackbar } from "notistack";
 
 const UsersComponent = () => {
-  const [users, setUsers] = useState([])
-  const [filtered, setFiltered] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-  const [opened, setOpened] = useState(false)
-  const [editUser, setEditUser] = useState(null)
-  const language = localStorage.getItem("language") || "RO"
+  const [users, setUsers] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [opened, setOpened] = useState(false);
+  const [editUser, setEditUser] = useState(null);
+  const language = localStorage.getItem("language") || "RO";
+  const { enqueueSnackbar } = useSnackbar();
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    if (!search) return setFiltered(users);
 
-  useEffect(() => {
-    if (!search) return setFiltered(users)
-
-    const s = search.toLowerCase()
+    const s = search.toLowerCase();
     setFiltered(
       users.filter(
         (u) =>
@@ -29,20 +30,20 @@ const UsersComponent = () => {
           u.groups?.some((g) =>
             typeof g === "string"
               ? g.toLowerCase().includes(s)
-              : g.name?.toLowerCase().includes(s)
+              : g.name?.toLowerCase().includes(s),
           ) ||
-          u.roles?.some((r) => r.role.toLowerCase().includes(s))
-      )
-    )
-  }, [search, users])
+          u.roles?.some((r) => r.role.toLowerCase().includes(s)),
+      ),
+    );
+  }, [search, users]);
 
   const fetchUsers = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const data = await api.users.getTechnicianList()
+      const data = await api.users.getTechnicianList();
       const normalized = data.map((item) => {
-        const personal = item.id || {}
-        const user = personal.user || {}
+        const personal = item.id || {};
+        const user = personal.user || {};
 
         return {
           id: personal.id,
@@ -52,27 +53,29 @@ const UsersComponent = () => {
           email: user.email || "-",
           groups: item.groups || [],
           jobTitle: item.job_title,
-          status: item.status
-        }
-      })
+          status: item.status,
+        };
+      });
 
-      setUsers(normalized)
-      setFiltered(normalized)
+      setUsers(normalized);
+      setFiltered(normalized);
     } catch (err) {
-      console.error("Ошибка при загрузке:", err.message)
+      console.error("Ошибка при загрузке:", err.message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDeleteUser = async (id) => {
     try {
-      await api.technicianDetails.deleteTechnician(id)
-      fetchUsers()
+      await api.users.deleteMultipleUsers({ user_ids: [id] }); // ✅ правильный API
+      enqueueSnackbar("Пользователь удалён", { variant: "success" }); // можно добавить
+      fetchUsers();
     } catch (err) {
-      console.error("Ошибка при удалении пользователя:", err.message)
+      console.error("Ошибка при удалении пользователя:", err.message);
+      enqueueSnackbar("Ошибка при удалении пользователя", { variant: "error" }); // можно добавить
     }
-  }
+  };
 
   return (
     <div className="task-container">
@@ -82,8 +85,8 @@ const UsersComponent = () => {
         </Text>
         <Button
           onClick={() => {
-            setEditUser(null)
-            setOpened(true)
+            setEditUser(null);
+            setOpened(true);
           }}
         >
           {translations["Adaugă utilizator"][language]}
@@ -102,8 +105,8 @@ const UsersComponent = () => {
         loading={loading}
         fetchUsers={fetchUsers}
         openEditUser={(user) => {
-          setEditUser(user)
-          setOpened(true)
+          setEditUser(user);
+          setOpened(true);
         }}
         handleDeleteUser={handleDeleteUser}
       />
@@ -111,14 +114,14 @@ const UsersComponent = () => {
       <UserModal
         opened={opened}
         onClose={() => {
-          setOpened(false)
-          setEditUser(null)
+          setOpened(false);
+          setEditUser(null);
         }}
         onUserCreated={fetchUsers}
         initialUser={editUser}
       />
     </div>
-  )
-}
+  );
+};
 
-export default UsersComponent
+export default UsersComponent;
