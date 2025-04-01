@@ -13,12 +13,10 @@ export const useGetTechniciansList = () => {
         setLoading(true)
         const data = await api.users.getTechnicianList()
 
-        const formattedTechnicians = data
-          .filter(({ id }) => !id?.user)
-          .map((item) => ({
-            value: `${item.id.id}`,
-            label: `${item.id.surname} ${item.id.name}`
-          }))
+        const formattedTechnicians = data.map((item) => ({
+          value: `${item.id.id}`,
+          label: `${item.id.surname} ${item.id.name}`
+        }))
 
         setLoading(false)
         setTechnicians(formattedTechnicians)

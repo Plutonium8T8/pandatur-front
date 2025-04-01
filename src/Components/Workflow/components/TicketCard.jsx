@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Link } from "react-router-dom"
 import { BsThreeDots } from "react-icons/bs"
+import { FaHeadphones } from "react-icons/fa6"
 import {
   MdAccessTime,
   MdOutlineLocalPhone,
@@ -26,15 +27,11 @@ import { parseServerDate, getLanguageByKey, showServerError } from "../../utils"
 import { Modal } from "../../Modal"
 import SingleChat from "../../ChatComponent/SingleChat"
 import { Tag } from "../../Tag"
-import { DEFAULT_PHOTO, DD_MM_YYYY } from "../../../app-constants"
+import { DEFAULT_PHOTO, DD_MM_YYYY, HH_mm } from "../../../app-constants"
 import { api } from "../../../api"
 import { useConfirmPopup } from "../../../hooks"
 
 const { colors } = DEFAULT_THEME
-
-const formatDate = (date) => {
-  return parseServerDate(date).format(DD_MM_YYYY)
-}
 
 export const priorityTagColors = {
   joasă: "green",
@@ -43,7 +40,12 @@ export const priorityTagColors = {
   critică: "red"
 }
 
-export const TicketCard = ({ ticket, onEditTicket }) => {
+export const TicketCard = ({
+  ticket,
+  onEditTicket,
+  technicianList,
+  fetchTickets
+}) => {
   const [isChatOpen, setIsChatOpen] = useState(false)
   const deleteTicketById = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead")
@@ -59,7 +61,7 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
         enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
           variant: "success"
         })
-        // fetchTickets()
+        await fetchTickets()
       } catch (error) {
         enqueueSnackbar(showServerError(error), {
           variant: "error"
@@ -69,6 +71,10 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
   }
 
   const firstClient = ticket.clients?.[0]
+
+  const technicianName = technicianList.find(
+    ({ value }) => Number(value) === ticket.technician_id
+  )
 
   return (
     <>
@@ -148,18 +154,30 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
 
                 <Flex c={colors.dark[3]} align="center" gap="4">
                   <MdAccessTime />
-                  <Text size="xs">{formatDate(ticket.creation_date)}</Text>
-                  {"-"}
-                  <Text size="xs">
-                    {formatDate(ticket.last_interaction_date)}
-                  </Text>
+
+                  <Flex direction="column">
+                    <Text size="xs">
+                      {parseServerDate(ticket.creation_date).format(DD_MM_YYYY)}
+                      : {parseServerDate(ticket.creation_date).format(HH_mm)}
+                    </Text>
+
+                    <Text size="xs">
+                      {parseServerDate(ticket.last_interaction_date).format(
+                        DD_MM_YYYY
+                      )}
+                      :{" "}
+                      {parseServerDate(ticket.last_interaction_date).format(
+                        HH_mm
+                      )}
+                    </Text>
+                  </Flex>
                 </Flex>
               </Box>
             </Flex>
 
             <Divider my="xs" />
 
-            <Flex direction="column" gap="8" px="8">
+            <Flex direction="column" gap="8" mb="8">
               <Flex align="center" gap="8">
                 <FaFingerprint />
                 <Text>{firstClient?.id}</Text>
@@ -171,16 +189,45 @@ export const TicketCard = ({ ticket, onEditTicket }) => {
                   <Text>{firstClient?.phone}</Text>
                 </Flex>
               )}
+            </Flex>
 
-              {!!tags.length && (
-                <Flex align="center" gap="8">
-                  <BsTagsFill />
+            {!!tags.length && (
+              <Flex pos="relative" align="center" gap="8">
+                <Box w="16px">
+                  <BsTagsFill size="16" />
+                </Box>
+                <Flex gap="4px" style={{ overflow: "hidden" }}>
                   {tags.map((tag) => (
                     <Tag>{tag}</Tag>
                   ))}
                 </Flex>
-              )}
-            </Flex>
+
+                <Box
+                  pos="absolute"
+                  right="0px"
+                  w="60px"
+                  h="100%"
+                  style={{
+                    background:
+                      "linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #ffffff 80%)"
+                  }}
+                />
+              </Flex>
+            )}
+
+            {ticket.technician_id && <Divider my="xs" />}
+
+            {ticket.technician_id && (
+              <Flex align="center" gap="8">
+                <FaHeadphones />
+
+                {technicianName?.label && (
+                  <Text>
+                    {technicianName.label} #{ticket.technician_id}
+                  </Text>
+                )}
+              </Flex>
+            )}
           </Box>
         </Card>
       </Link>

@@ -8,6 +8,7 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
   return (
     <Flex
       p="8"
+      pr="md"
       justify="space-between"
       align="center"
       style={{
@@ -15,10 +16,6 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
         borderRadius: "50px"
       }}
     >
-      <Text c={colors.dark[7]} fw="bold">
-        {getLanguageByKey(workflow)}
-      </Text>
-
       <Badge bg="white" c="white" size="lg">
         <Flex gap="xs">
           <Text fw="bold" c="red">
@@ -37,6 +34,10 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
           </Text>
         </Flex>
       </Badge>
+
+      <Text c={colors.dark[7]} fw="bold">
+        {getLanguageByKey(workflow)}
+      </Text>
     </Flex>
   )
 }

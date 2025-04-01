@@ -316,6 +316,7 @@ const Leads = () => {
           />
         ) : (
           <WorkflowColumns
+            fetchTickets={fetchTicketList}
             selectedWorkflow={selectedWorkflow}
             tickets={filteredTickets}
             searchTerm={debouncedSearch}
