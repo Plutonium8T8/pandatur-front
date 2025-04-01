@@ -29,10 +29,15 @@
   background-color: #0f824c;
 }
 
-.schedule-table-container {
+/* .schedule-table-container {
   width: 100%;
   overflow-x: auto;
-  /* Enables horizontal scrolling when needed */
+} */
+
+.schedule-table-container {
+  max-height: 700px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
 }
 
 .schedule-table {
@@ -82,9 +87,11 @@
 .schedule-table td {
   background-color: #fff;
 }
+
 .shift-cell :first-child {
   margin-bottom: 3px;
 }
+
 .schedule-table td:hover {
   background-color: #f1f1f1;
   cursor: pointer;

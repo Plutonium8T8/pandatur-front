@@ -62,10 +62,27 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   }, [initialUser, opened])
 
   const handleCreate = async () => {
-    const { username, email, password, job_title, status, groups } = form
+    const {
+      name,
+      surname,
+      username,
+      email,
+      password,
+      job_title,
+      status,
+      groups
+    } = form
 
     if (!initialUser) {
-      if (!username || !email || !password || !job_title || !groups) {
+      if (
+        !name ||
+        !surname ||
+        !username ||
+        !email ||
+        !password ||
+        !job_title ||
+        !groups
+      ) {
         enqueueSnackbar("Заполните все обязательные поля", {
           variant: "warning"
         })
@@ -75,14 +92,17 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
     try {
       if (initialUser) {
-        const technicianId =
-          initialUser.id?.user?.id || initialUser.id?.id || initialUser.id
-        const payload = {
+        const technicianId = initialUser.id?.id
+
+        await api.users.updateTechnician(technicianId, {
           status: status.toString(),
           job_title
-        }
+        })
 
-        await api.users.updateTechnician(technicianId, payload)
+        await api.users.updatePersonalData(technicianId, {
+          name,
+          surname
+        })
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
           await api.users.updateUsersGroup({
@@ -95,18 +115,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       } else {
         const payload = {
           user: {
-            username: form.username,
-            email: form.email,
-            password: form.password,
+            username,
+            email,
+            password,
             roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
           },
-          technician: {
-            status: form.status.toString(),
-            job_title: form.job_title
+          extended: {
+            name,
+            surname
           },
-          name: form.name,
-          surname: form.surname,
-          groups: [form.groups]
+          technician: {
+            status: status.toString(),
+            job_title
+          },
+          groups: [groups]
         }
 
         await api.users.createTechnicianUser(payload)
@@ -114,6 +136,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       }
 
       setForm({
+        name: "",
+        surname: "",
         username: "",
         email: "",
         password: "",
@@ -171,6 +195,14 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             value={form.surname}
             onChange={(e) => setForm({ ...form, surname: e.target.value })}
           />
+
+          {!initialUser && (
+            <TextInput
+              label="Username"
+              value={form.username}
+              onChange={(e) => setForm({ ...form, username: e.target.value })}
+            />
+          )}
 
           <TextInput
             label="Email"
