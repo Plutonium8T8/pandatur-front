@@ -1574,5 +1574,9 @@ export const translations = {
   delete: {
     RO: "Șterge",
     RU: "Удалить"
+  },
+  photo_or_video: {
+    RO: "Foto sau video",
+    RU: "Фото или видео"
   }
 }

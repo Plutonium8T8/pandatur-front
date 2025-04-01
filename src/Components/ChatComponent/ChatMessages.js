@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { FaFile, FaPaperPlane, FaSmile } from "react-icons/fa"
-import EmojiPicker from "emoji-picker-react"
-import ReactDOM from "react-dom"
+import { Select, Box } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
 import { api } from "../../api"
 import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
@@ -13,8 +11,8 @@ import {
   FaTelegram
 } from "react-icons/fa"
 import { translations } from "../utils/translations"
-import { templateOptions } from "../../FormOptions/MessageTemplate"
 import { Spin } from "../Spin"
+import { ChatInput } from "./components"
 
 const ChatMessages = ({
   selectTicketId,
@@ -29,17 +27,11 @@ const ChatMessages = ({
 
   const language = localStorage.getItem("language") || "RO"
   const [managerMessage, setManagerMessage] = useState("")
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
-  const [emojiPickerPosition, setEmojiPickerPosition] = useState({
-    top: 0,
-    left: 0
-  })
+
   const [selectedMessageId, setSelectedMessageId] = useState(null)
   const [selectedReaction, setSelectedReaction] = useState({})
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
-  const [selectedMessage, setSelectedMessage] = useState(null)
   const messageContainerRef = useRef(null)
-  const fileInputRef = useRef(null)
   const reactionContainerRef = useRef(null)
   const [isUserAtBottom, setIsUserAtBottom] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState("web")
@@ -87,10 +79,6 @@ const ChatMessages = ({
 
   const handleReactionClick = (reaction, messageId) => {
     setSelectedReaction((prev) => ({ ...prev, [messageId]: reaction }))
-  }
-
-  const handleEmojiClick = (emojiObject) => {
-    setManagerMessage((prev) => prev + emojiObject.emoji)
   }
 
   const uploadFile = async (file) => {
@@ -216,36 +204,6 @@ const ChatMessages = ({
     }
   }
 
-  const handleEmojiClickButton = (event) => {
-    const rect = event.target.getBoundingClientRect()
-    const emojiPickerHeight = 450
-
-    setEmojiPickerPosition({
-      top: rect.top + window.scrollY - emojiPickerHeight,
-      left: rect.left + window.scrollX
-    })
-
-    setShowEmojiPicker((prev) => !prev)
-  }
-
-  const handleFileButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click()
-    }
-  }
-
-  const handleSelectTemplateChange = (event) => {
-    const selectedKey = event.target.value
-
-    if (selectedKey) {
-      setSelectedMessage(selectedKey)
-      setManagerMessage(templateOptions[selectedKey])
-    } else {
-      setSelectedMessage(null)
-      setManagerMessage("")
-    }
-  }
-
   useEffect(() => {
     const newPersonalInfo = {}
 
@@ -344,6 +302,30 @@ const ChatMessages = ({
     setIsTaskModalOpen(true)
   }
 
+  const usersOptions = () =>
+    tickets
+      .find((ticket) => ticket.id === selectTicketId)
+      ?.client_id.replace(/[{}]/g, "")
+      .split(",")
+      .map((id) => {
+        const clientId = id.trim()
+        const clientInfo = personalInfo[clientId] || {}
+        const fullName = clientInfo.name
+          ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
+          : `ID: ${clientId}`
+
+        const platformsMessagesClient = messages.filter(
+          (msg) => msg.client_id === Number(clientId)
+        )
+
+        return [
+          ...new Set(platformsMessagesClient.map((msg) => msg.platform))
+        ].map((platform) => ({
+          value: `${clientId}-${platform}`,
+          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId}`
+        }))
+      })
+
   return (
     <div className="chat-area">
       <div className="chat-messages" ref={messageContainerRef}>
@@ -433,10 +415,10 @@ const ChatMessages = ({
                                   src={msg.message}
                                   alt="Изображение"
                                   className="image-preview-in-chat"
-                                  onError={(e) => {
-                                    e.target.src =
-                                      "https://via.placeholder.com/300?text=Ошибка+загрузки"
-                                  }}
+                                  // onError={(e) => {
+                                  //   e.target.src =
+                                  //     "https://via.placeholder.com/300?text=Ошибка+загрузки"
+                                  // }}
                                   onClick={() => {
                                     window.open(msg.message, "_blank")
                                   }}
@@ -606,133 +588,81 @@ const ChatMessages = ({
           openEditTask={openEditTask}
         />
       )}
-      <div className="manager-send-message-container">
-        <textarea
-          className="text-area-message"
-          value={managerMessage ?? ""}
-          onChange={(e) => setManagerMessage(e.target.value)}
-          placeholder={translations["Introduceți mesaj"][language]}
-          disabled={!selectTicketId}
-        />
-        <div className="message-options">
-          <div className="button-row">
-            <button
-              className="action-button send-button"
-              onClick={handleClick}
-              disabled={!selectTicketId}
-            >
-              <FaPaperPlane />
-            </button>
-            <button
-              className="action-button emoji-button"
-              onClick={handleEmojiClickButton}
-              disabled={!selectTicketId}
-            >
-              <FaSmile />
-            </button>
-            {showEmojiPicker &&
-              ReactDOM.createPortal(
-                <div
-                  className="emoji-picker-popup"
-                  style={{
-                    position: "absolute",
-                    top: emojiPickerPosition.top,
-                    left: emojiPickerPosition.left,
-                    zIndex: 1000
-                  }}
-                  onMouseEnter={() => setShowEmojiPicker(true)}
-                  onMouseLeave={() => setShowEmojiPicker(false)}
-                >
-                  <EmojiPicker onEmojiClick={handleEmojiClick} />
-                </div>,
-                document.body
-              )}
-            <input
-              type="file"
-              accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
-              onChange={handleFileSelect}
-              ref={fileInputRef}
-              style={{ display: "none" }}
-            />
-            <button
-              className="action-button file-button"
-              disabled={!selectTicketId}
-              onClick={handleFileButtonClick}
-            >
-              <FaFile />
-            </button>
-          </div>
-          <div className="select-row">
-            <div className="input-group">
-              <label htmlFor="message-template"></label>
-              <select
-                id="message-template"
-                className="task-select"
-                value={selectedMessage ?? ""}
-                onChange={handleSelectTemplateChange}
-              >
-                <option value="">
-                  {translations["Introduceți mesaj"]?.[language] ??
-                    translations[""]?.[language]}
-                </option>
 
-                {Object.entries(templateOptions).map(([key, value]) => (
-                  <option key={key} value={key}>
-                    {translations[key]?.[language] ?? key}
-                  </option>
-                ))}
+      <Box p="24">
+        <ChatInput
+          inputValue={managerMessage ?? ""}
+          onChangeTextArea={setManagerMessage}
+          id={selectTicketId}
+          onSendMessage={handleClick}
+          onHandleFileSelect={handleFileSelect}
+          renderSelectUserPlatform={() => {
+            return (
+              tickets &&
+              tickets.find((ticket) => ticket.id === selectTicketId)
+                ?.client_id && (
+                <Select
+                  w="100%"
+                  value={`${selectedClient}-${selectedPlatform}`}
+                  placeholder={translations["Alege client"][language]}
+                  data={usersOptions().flat()}
+                  onChange={(value, b) => {
+                    // const [clientId, platform] = value.split("-")
+                    // setSelectedClient(clientId)
+                    // setSelectedPlatform(platform)
+                  }}
+                />
+              )
+            )
+          }}
+        />
+
+        {/* {tickets &&
+          tickets.find((ticket) => ticket.id === selectTicketId)?.client_id && (
+            <div className="client-select-container">
+              <select
+                className="task-select"
+                value={`${selectedClient}-${selectedPlatform}`}
+                onChange={(e) => {
+                  const [clientId, platform] = e.target.value.split("-")
+                  setSelectedClient(clientId)
+                  setSelectedPlatform(platform)
+                }}
+              >
+                <option value="" disabled>
+                  {translations["Alege client"][language]}
+                </option>
+                {tickets
+                  .find((ticket) => ticket.id === selectTicketId)
+                  .client_id.replace(/[{}]/g, "")
+                  .split(",")
+                  .map((id) => {
+                    const clientId = id.trim()
+                    const clientInfo = personalInfo[clientId] || {}
+                    const fullName = clientInfo.name
+                      ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
+                      : `ID: ${clientId}`
+
+                    const clientMessages = messages.filter(
+                      (msg) => msg.client_id === Number(clientId)
+                    )
+                    const uniquePlatforms = [
+                      ...new Set(clientMessages.map((msg) => msg.platform))
+                    ]
+
+                    return uniquePlatforms.map((platform) => (
+                      <option
+                        key={`${clientId}-${platform}`}
+                        value={`${clientId}-${platform}`}
+                      >
+                        {` ${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId} `}
+                      </option>
+                    ))
+                  })}
               </select>
             </div>
-          </div>
-
-          {tickets &&
-            tickets.find((ticket) => ticket.id === selectTicketId)
-              ?.client_id && (
-              <div className="client-select-container">
-                <select
-                  className="task-select"
-                  value={`${selectedClient}-${selectedPlatform}`}
-                  onChange={(e) => {
-                    const [clientId, platform] = e.target.value.split("-")
-                    setSelectedClient(clientId)
-                    setSelectedPlatform(platform)
-                  }}
-                >
-                  <option value="" disabled>
-                    {translations["Alege client"][language]}
-                  </option>
-                  {tickets
-                    .find((ticket) => ticket.id === selectTicketId)
-                    .client_id.replace(/[{}]/g, "")
-                    .split(",")
-                    .map((id) => {
-                      const clientId = id.trim()
-                      const clientInfo = personalInfo[clientId] || {}
-                      const fullName = clientInfo.name
-                        ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-                        : `ID: ${clientId}`
-
-                      const clientMessages = messages.filter(
-                        (msg) => msg.client_id === Number(clientId)
-                      )
-                      const uniquePlatforms = [
-                        ...new Set(clientMessages.map((msg) => msg.platform))
-                      ]
-
-                      return uniquePlatforms.map((platform) => (
-                        <option
-                          key={`${clientId}-${platform}`}
-                          value={`${clientId}-${platform}`}
-                        >
-                          {` ${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId} `}
-                        </option>
-                      ))
-                    })}
-                </select>
-              </div>
-            )}
-        </div>
-      </div>
+          )} */}
+      </Box>
     </div>
   )
 }

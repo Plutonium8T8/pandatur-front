@@ -62,73 +62,13 @@
   text-align: right;
 }
 
-.manager-send-message-container .message-options label {
-  color: black;
-}
-
-.manager-send-message-container {
-  display: flex;
-  padding: 10px;
-  background-color: #fff;
-  border-top: 1px solid #ddd;
-  gap: 10px;
-  height: auto;
-  align-items: flex-start;
-}
-
-.text-area-message {
-  flex: 7;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  resize: none;
-  outline: none;
-  min-height: 138px;
-  width: 100%;
-  font-size: 18px;
-}
-
 .manager-send-message-container .input-group {
   gap: 0;
-}
-
-.message-options {
-  flex: 3;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 10px;
 }
 
 .button-row {
   display: flex;
   justify-content: space-between;
-  gap: 5px;
-  flex: 1;
-}
-
-.action-button {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.action-button:hover {
-  background-color: #0f824c;
-  color: #fff;
-}
-
-.select-row {
-  display: flex;
-  flex-direction: column;
   gap: 5px;
   flex: 1;
 }
@@ -178,14 +118,6 @@
 .message-row {
   display: flex;
   align-items: center;
-}
-
-.emoji-picker-popup {
-  background: white;
-  border: 1px solid #ccc;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  transition: opacity 0.2s;
 }
 
 .reaction-toggle-button {
