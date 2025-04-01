@@ -66,9 +66,11 @@ const UserList = ({
       const payload = {
         users: selectedIds.map((id) => {
           const user = users.find((u) => extractId(u) === id);
-          return { id, status: !user?.status };
+          const newStatus = (!user?.status).toString();
+          return { id, status: newStatus };
         }),
       };
+
       await api.users.updateMultipleTechnicians(payload);
       enqueueSnackbar("Статусы обновлены", { variant: "success" });
       fetchUsers();
