@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom"
-import { BsThreeDots } from "react-icons/bs"
-import { FaHeadphones } from "react-icons/fa6"
+import { BsThreeDots, BsTagsFill } from "react-icons/bs"
+import { FaHeadphones, FaFingerprint } from "react-icons/fa6"
 import {
   MdAccessTime,
   MdOutlineLocalPhone,
   MdModeEdit,
   MdDelete
 } from "react-icons/md"
-import { FaFingerprint } from "react-icons/fa6"
-import { BsTagsFill } from "react-icons/bs"
 import {
   Image,
   Box,
@@ -154,7 +152,7 @@ export const TicketCard = ({
             {firstClient?.phone && (
               <Flex align="center" gap="8">
                 <MdOutlineLocalPhone />
-                <Text>{firstClient.phone}</Text>
+                <Text>{firstClient?.phone}</Text>
               </Flex>
             )}
           </Flex>
