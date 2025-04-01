@@ -1,10 +1,12 @@
 import { VariableSizeList } from "react-window"
 import { Flex, DEFAULT_THEME, Box } from "@mantine/core"
 import { useRef, useEffect, forwardRef } from "react"
-import { TicketCard } from "../TicketCard"
-import { useDOMElementHeight } from "../../../../hooks"
-import { WorkflowColumnHeader } from "../WorkflowColumnHeader"
-import "./WorkflowColumn.css"
+import { useSnackbar } from "notistack"
+import { TicketCard } from "./TicketCard"
+import { useDOMElementHeight, useConfirmPopup } from "../../../hooks"
+import { WorkflowColumnHeader } from "./WorkflowColumnHeader"
+import { showServerError, getLanguageByKey } from "../../utils"
+import { api } from "../../../api"
 
 const { colors } = DEFAULT_THEME
 
@@ -67,11 +69,42 @@ export const WorkflowColumn = ({
   const columnHeight = useDOMElementHeight(columnRef)
   const listRef = useRef(null)
   const rowHeights = useRef({})
+  const { enqueueSnackbar } = useSnackbar()
+
+  const deleteTicketById = useConfirmPopup({
+    subTitle: getLanguageByKey("confirm_delete_lead")
+  })
 
   const filteredTickets = filterTickets(workflow, tickets)
 
   const CardItem = ({ index, style }) => {
     const rowRef = useRef(null)
+    const ticket = filteredTickets[index]
+
+    const technician = technicianList.find(
+      ({ value }) => Number(value) === ticket.technician_id
+    )
+
+    function setRowHeight(index, size) {
+      listRef.current.resetAfterIndex(0)
+      rowHeights.current = { ...rowHeights.current, [index]: size }
+    }
+
+    const handleDeleteLead = (id) => {
+      deleteTicketById(async () => {
+        try {
+          await api.tickets.deleteById([id])
+          enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
+            variant: "success"
+          })
+          await fetchTickets()
+        } catch (error) {
+          enqueueSnackbar(showServerError(error), {
+            variant: "error"
+          })
+        }
+      })
+    }
 
     useEffect(() => {
       if (rowRef.current) {
@@ -80,20 +113,15 @@ export const WorkflowColumn = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rowRef])
 
-    function setRowHeight(index, size) {
-      listRef.current.resetAfterIndex(0)
-      rowHeights.current = { ...rowHeights.current, [index]: size }
-    }
-
     return (
       <div style={style}>
         <div ref={rowRef}>
           <TicketCard
-            key={filteredTickets[index].id}
-            ticket={filteredTickets[index]}
+            key={ticket.id}
+            ticket={ticket}
             onEditTicket={onEditTicket}
-            technicianList={technicianList}
-            fetchTickets={fetchTickets}
+            technician={technician}
+            onDeleteTicket={handleDeleteLead}
           />
         </div>
       </div>
@@ -104,9 +132,9 @@ export const WorkflowColumn = ({
     <Flex
       direction="column"
       bg={colors.gray[1]}
-      className="colone-ticket"
       style={{
-        borderRadius: 32
+        borderRadius: 32,
+        flex: "0 0 340px"
       }}
     >
       <WorkflowColumnHeader
