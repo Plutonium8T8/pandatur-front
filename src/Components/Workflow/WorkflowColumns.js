@@ -1,13 +1,17 @@
 import { Flex } from "@mantine/core"
 import { workflowOptions } from "../../FormOptions"
 import { WorkflowColumn } from "./components"
+import { useGetTechniciansList } from "../../hooks"
 
 export const WorkflowColumns = ({
   tickets,
   searchTerm,
   onEditTicket,
-  selectedWorkflow
+  selectedWorkflow,
+  fetchTickets
 }) => {
+  const { technicians } = useGetTechniciansList()
+
   return (
     <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll">
       {workflowOptions
@@ -19,6 +23,8 @@ export const WorkflowColumns = ({
             tickets={tickets}
             searchTerm={searchTerm}
             onEditTicket={onEditTicket}
+            technicianList={technicians}
+            fetchTickets={fetchTickets}
           />
         ))}
     </Flex>

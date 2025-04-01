@@ -8,7 +8,7 @@ import "./WorkflowColumn.css"
 
 const { colors } = DEFAULT_THEME
 
-const TICKET_CARD_HEIGHT = 190
+const DEFAULT_TICKET_CARD_HEIGHT = 190
 const SPACE_BETWEEN_CARDS = 12
 
 const priorityOrder = {
@@ -59,7 +59,9 @@ export const WorkflowColumn = ({
   onEditTicket,
   searchTerm,
   workflow,
-  tickets
+  tickets,
+  technicianList,
+  fetchTickets
 }) => {
   const columnRef = useRef(null)
   const columnHeight = useDOMElementHeight(columnRef)
@@ -90,6 +92,8 @@ export const WorkflowColumn = ({
             key={filteredTickets[index].id}
             ticket={filteredTickets[index]}
             onEditTicket={onEditTicket}
+            technicianList={technicianList}
+            fetchTickets={fetchTickets}
           />
         </div>
       </div>
@@ -101,7 +105,6 @@ export const WorkflowColumn = ({
       direction="column"
       bg={colors.gray[1]}
       className="colone-ticket"
-      px="8px"
       style={{
         borderRadius: 32
       }}
@@ -111,12 +114,14 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <Flex direction="column" h="100%" ref={columnRef}>
+      <Flex px="8px" direction="column" h="100%" ref={columnRef}>
         <VariableSizeList
           ref={listRef}
           height={columnHeight}
           itemCount={filteredTickets.length}
-          itemSize={(index) => rowHeights.current[index] || TICKET_CARD_HEIGHT}
+          itemSize={(index) =>
+            rowHeights.current[index] || DEFAULT_TICKET_CARD_HEIGHT
+          }
           innerElementType={wrapperColumn}
         >
           {CardItem}
