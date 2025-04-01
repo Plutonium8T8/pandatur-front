@@ -92,17 +92,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
     try {
       if (initialUser) {
-        const technicianId = initialUser.id?.id
+        const technicianId = initialUser.id?.id || initialUser.id
+        const userId = initialUser.id?.user?.id || initialUser.id
 
-        await api.users.updateTechnician(technicianId, {
-          status: status.toString(),
-          job_title
-        })
-
-        await api.users.updatePersonalData(technicianId, {
-          name,
-          surname
-        })
+        await Promise.all([
+          api.users.updateTechnician(technicianId, {
+            status: status.toString(),
+            job_title
+          }),
+          api.users.updateExtended(technicianId, {
+            name,
+            surname
+          }),
+          api.users.updateUsernameAndEmail(userId, {
+            email
+          })
+        ])
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
           await api.users.updateUsersGroup({
