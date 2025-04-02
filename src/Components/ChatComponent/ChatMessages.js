@@ -279,6 +279,7 @@ const ChatMessages = ({
     setIsTaskModalOpen(true)
   }
 
+  // TODO: Please refactor me
   const usersOptions = () =>
     tickets
       .find((ticket) => ticket.id === selectTicketId)
@@ -566,42 +567,44 @@ const ChatMessages = ({
         />
       )}
 
-      <Box p="24">
-        <ChatInput
-          loading={loadingMessage}
-          inputValue={managerMessage ?? ""}
-          onChangeTextArea={setManagerMessage}
-          id={selectTicketId}
-          onSendMessage={() => {
-            if (!selectedClient) {
-              return
-            }
-            sendMessage(null, selectedPlatform)
-          }}
-          onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
-          renderSelectUserPlatform={() => {
-            return (
-              tickets &&
-              tickets.find((ticket) => ticket.id === selectTicketId)
-                ?.client_id && (
-                <Select
-                  size="md"
-                  w="100%"
-                  value={`${selectedClient}-${selectedPlatform}`}
-                  placeholder={translations["Alege client"][language]}
-                  data={usersOptions().flat()}
-                  onChange={(value) => {
-                    if (!value) return
-                    const [clientId, platform] = value.split("-")
-                    setSelectedClient(clientId)
-                    setSelectedPlatform(platform)
-                  }}
-                />
+      {selectTicketId && (
+        <Box p="24">
+          <ChatInput
+            loading={loadingMessage}
+            inputValue={managerMessage ?? ""}
+            onChangeTextArea={setManagerMessage}
+            id={selectTicketId}
+            onSendMessage={() => {
+              if (!selectedClient) {
+                return
+              }
+              sendMessage(null, selectedPlatform)
+            }}
+            onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
+            renderSelectUserPlatform={() => {
+              return (
+                tickets &&
+                tickets.find((ticket) => ticket.id === selectTicketId)
+                  ?.client_id && (
+                  <Select
+                    size="md"
+                    w="100%"
+                    value={`${selectedClient}-${selectedPlatform}`}
+                    placeholder={translations["Alege client"][language]}
+                    data={usersOptions().flat()}
+                    onChange={(value) => {
+                      if (!value) return
+                      const [clientId, platform] = value.split("-")
+                      setSelectedClient(clientId)
+                      setSelectedPlatform(platform)
+                    }}
+                  />
+                )
               )
-            )
-          }}
-        />
-      </Box>
+            }}
+          />
+        </Box>
+      )}
     </div>
   )
 }

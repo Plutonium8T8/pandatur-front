@@ -1,4 +1,4 @@
-import { Input, Flex, ActionIcon, Select } from "@mantine/core"
+import { Input, Flex, ActionIcon, Select, Box } from "@mantine/core"
 import { useState, useRef } from "react"
 import { createPortal } from "react-dom"
 import EmojiPicker from "emoji-picker-react"
@@ -9,7 +9,6 @@ import { templateOptions } from "../../../../FormOptions"
 import "./ChatInput.css"
 
 export const ChatInput = ({
-  id,
   inputValue,
   onChangeTextArea,
   onSendMessage,
@@ -88,7 +87,6 @@ export const ChatInput = ({
         <Input
           size="md"
           w="100%"
-          disabled={!id}
           value={inputValue}
           onChange={(e) => onChangeTextArea(e.target.value)}
           placeholder={getLanguageByKey("Introduceți mesaj")}
