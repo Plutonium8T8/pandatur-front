@@ -163,8 +163,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       onClose();
       onUserCreated();
     } catch (err) {
-      console.error("Ошибка при сохранении пользователя:", err);
-
       const serverMessage =
         err?.response?.data?.message || err?.response?.data?.error;
 

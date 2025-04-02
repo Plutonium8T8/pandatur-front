@@ -61,7 +61,10 @@ const UsersComponent = () => {
       setUsers(normalized);
       setFiltered(normalized);
     } catch (err) {
-      console.error("Eroare la încărcare:", err.message);
+      enqueueSnackbar(
+        translations["Eroare la încărcarea utilizatorilor"][language],
+        { variant: "error" },
+      );
     } finally {
       setLoading(false);
     }
@@ -75,7 +78,6 @@ const UsersComponent = () => {
       });
       fetchUsers();
     } catch (err) {
-      console.error("Eroare la ștergerea utilizatorului:", err.message);
       enqueueSnackbar(translations["Eroare la ștergere"][language], {
         variant: "error",
       });

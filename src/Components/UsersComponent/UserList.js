@@ -55,7 +55,6 @@ const UserList = ({
         { variant: "success" },
       );
     } catch (err) {
-      console.error("Ошибка при смене статуса:", err);
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului"][language],
         { variant: "error" },
@@ -80,7 +79,6 @@ const UserList = ({
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
-      console.error("Ошибка при обновлении статуса:", err);
       enqueueSnackbar(
         translations["Eroare la schimbarea statusului"][language],
         { variant: "error" },
@@ -110,7 +108,6 @@ const UserList = ({
           fetchUsers();
           setSelectedIds([]);
         } catch (err) {
-          console.error("Ошибка при удалении пользователей:", err);
           enqueueSnackbar(translations["Eroare la ștergere"][language], {
             variant: "error",
           });
@@ -131,7 +128,6 @@ const UserList = ({
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
-      console.error("Ошибка при смене группы:", err);
       enqueueSnackbar(
         translations["Eroare la actualizarea grupului"][language],
         { variant: "error" },
