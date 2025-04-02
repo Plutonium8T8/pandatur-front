@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from "react"
-import { startOfWeek, addDays, format } from "date-fns"
-import { translations } from "../utils/translations"
-import { api } from "../../api"
-import { useSnackbar } from "notistack"
-import { showServerError } from "../utils/showServerError"
-import ModalIntervals from "./ModalIntervals"
-import ModalGroup from "./ModalGroup"
-import { Button, Checkbox } from "@mantine/core"
-import "./Schedule.css"
+import React, { useEffect, useState } from "react";
+import { startOfWeek, addDays, format } from "date-fns";
+import { translations } from "../utils/translations";
+import { api } from "../../api";
+import { useSnackbar } from "notistack";
+import { showServerError } from "../utils/showServerError";
+import ModalIntervals from "./ModalIntervals";
+import ModalGroup from "./ModalGroup";
+import { Button, Checkbox } from "@mantine/core";
+import "./Schedule.css";
 
 const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
-  const [schedule, setSchedule] = useState([])
+  const [schedule, setSchedule] = useState([]);
   const [selected, setSelected] = useState({
     employeeIndex: null,
-    dayIndex: null
-  })
+    dayIndex: null,
+  });
   const [currentWeekStart, setCurrentWeekStart] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
-  )
-  const [isLoading, setIsLoading] = useState(false)
-  const [groupModalOpened, setGroupModalOpened] = useState(false)
-  const [selectedTechnicians, setSelectedTechnicians] = useState([])
-  const language = localStorage.getItem("language") || "RO"
-  const { enqueueSnackbar } = useSnackbar()
+    startOfWeek(new Date(), { weekStartsOn: 1 }),
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const [groupModalOpened, setGroupModalOpened] = useState(false);
+  const [selectedTechnicians, setSelectedTechnicians] = useState([]);
+  const language = localStorage.getItem("language") || "RO";
+  const { enqueueSnackbar } = useSnackbar();
 
   const getWeekDays = () =>
-    Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i))
+    Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i));
 
   const fetchData = async () => {
     try {
-      setIsLoading(true)
-      const scheduleData = await api.schedules.getSchedules()
+      setIsLoading(true);
+      const scheduleData = await api.schedules.getSchedules();
       const dayKeys = [
         "Monday",
         "Tuesday",
@@ -38,41 +38,43 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         "Thursday",
         "Friday",
         "Saturday",
-        "Sunday"
-      ]
+        "Sunday",
+      ];
 
       const combined = groupUsers.map((user) => {
-        const userId = user.id
+        const userId = user.id;
         const userSchedule = scheduleData.find(
-          (s) => s.technician_id === userId
-        )
-        const weeklySchedule = userSchedule?.weekly_schedule || {}
+          (s) => s.technician_id === userId,
+        );
+        const weeklySchedule = userSchedule?.weekly_schedule || {};
 
         const shifts = dayKeys.map((day) =>
-          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
-        )
+          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : [],
+        );
 
-        return { id: userId, name: user.username, shifts }
-      })
+        return { id: userId, name: user.username, shifts };
+      });
 
-      setSchedule(combined)
+      setSchedule(combined);
     } catch (e) {
-      console.error("Ошибка загрузки расписания:", e)
-      enqueueSnackbar(showServerError(e), { variant: "error" })
+      enqueueSnackbar(
+        translations["Eroare la încărcarea programului"][language],
+        { variant: "error" },
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [groupUsers, groupId])
+    fetchData();
+  }, [groupUsers, groupId]);
 
   const parseTime = (time) => {
-    if (!time) return 0
-    const [h, m] = time.split(":").map(Number)
-    return h + m / 60
-  }
+    if (!time) return 0;
+    const [h, m] = time.split(":").map(Number);
+    return h + m / 60;
+  };
 
   const calculateWorkedHours = (shifts) =>
     shifts
@@ -81,25 +83,25 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
           total +
           shift.reduce(
             (sum, i) => sum + parseTime(i.end) - parseTime(i.start),
-            0
+            0,
           ),
-        0
+        0,
       )
-      .toFixed(2)
+      .toFixed(2);
 
   const openDrawer = (employeeIndex, dayIndex) => {
-    setSelected({ employeeIndex, dayIndex })
-  }
+    setSelected({ employeeIndex, dayIndex });
+  };
 
   const closeDrawer = () => {
-    setSelected({ employeeIndex: null, dayIndex: null })
-  }
+    setSelected({ employeeIndex: null, dayIndex: null });
+  };
 
   const toggleTechnician = (id) => {
     setSelectedTechnicians((prev) =>
-      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id]
-    )
-  }
+      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id],
+    );
+  };
 
   return (
     <div className="schedule-container">
@@ -113,7 +115,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
             textAlign: "center",
             fontWeight: 500,
             fontSize: 18,
-            marginTop: 4
+            marginTop: 4,
           }}
         >
           {groupName}
@@ -154,9 +156,9 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   }
                   onChange={() => {
                     if (selectedTechnicians.length === schedule.length) {
-                      setSelectedTechnicians([])
+                      setSelectedTechnicians([]);
                     } else {
-                      setSelectedTechnicians(schedule.map((s) => s.id))
+                      setSelectedTechnicians(schedule.map((s) => s.id));
                     }
                   }}
                   style={{ marginRight: 4 }}
@@ -219,16 +221,16 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         opened={groupModalOpened}
         onClose={() => setGroupModalOpened(false)}
         onGroupCreated={(updatedGroup) => {
-          fetchData()
-          setGroupModalOpened(false)
+          fetchData();
+          setGroupModalOpened(false);
           if (typeof onGroupUpdate === "function") {
-            onGroupUpdate(updatedGroup)
+            onGroupUpdate(updatedGroup);
           }
         }}
         initialData={{
           id: groupId,
           name: groupName,
-          user_ids: groupUsers.map((u) => u.id)
+          user_ids: groupUsers.map((u) => u.id),
         }}
         isEditMode={true}
       />
@@ -243,7 +245,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         selectedTechnicians={selectedTechnicians}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ScheduleView
+export default ScheduleView;

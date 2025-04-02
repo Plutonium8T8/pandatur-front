@@ -1763,6 +1763,18 @@ export const translations = {
     RO: "Șterge",
     RU: "Удалить",
   },
+  schedules: {
+    RO: "Calendar",
+    RU: "Календарь",
+  },
+  "Eroare la salvarea grupului": {
+    RO: "Eroare la salvarea grupului",
+    RU: "Ошибка при сохранении группы",
+  },
+  "Eroare la încărcarea programului": {
+    RO: "Eroare la încărcarea programului",
+    RU: "Ошибка загрузки расписания",
+  },
 };
 
 // import { translations } from '../utils/translations';

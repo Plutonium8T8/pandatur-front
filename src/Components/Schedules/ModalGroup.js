@@ -1,97 +1,106 @@
-import React, { useEffect, useState } from "react"
-import { Drawer, TextInput, MultiSelect, Button, Group } from "@mantine/core"
-import { api } from "../../api"
-import { translations } from "../utils/translations"
+import React, { useEffect, useState } from "react";
+import { Drawer, TextInput, MultiSelect, Button, Group } from "@mantine/core";
+import { api } from "../../api";
+import { translations } from "../utils/translations";
+import { useSnackbar } from "notistack";
 
 const ModalGroup = ({
   opened,
   onClose,
   onGroupCreated,
   initialData = null,
-  isEditMode = false
+  isEditMode = false,
 }) => {
-  const [groupName, setGroupName] = useState("")
-  const [users, setUsers] = useState([])
-  const [selectedUserIds, setSelectedUserIds] = useState([])
-  const language = localStorage.getItem("language") || "RO"
+  const [groupName, setGroupName] = useState("");
+  const [users, setUsers] = useState([]);
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const language = localStorage.getItem("language") || "RO";
+  const { enqueueSnackbar } = useSnackbar();
 
   const fetchUsers = async () => {
     try {
-      const data = await api.users.getTechnicianList()
+      const data = await api.users.getTechnicianList();
       const parsed = data.map((item) => {
-        const user = item.id?.user
+        const user = item.id?.user;
         return {
           label: user?.username || "—",
-          value: user?.id?.toString()
-        }
-      })
-      setUsers(parsed)
+          value: user?.id?.toString(),
+        };
+      });
+      setUsers(parsed);
     } catch (err) {
-      console.error("Ошибка при загрузке пользователей:", err.message)
+      enqueueSnackbar(
+        translations["Eroare la încărcarea utilizatorilor"][language],
+        {
+          variant: "error",
+        },
+      );
     }
-  }
+  };
 
   const handleSubmit = async () => {
     try {
       if (isEditMode && initialData?.id) {
-        const groupId = initialData.id
+        const groupId = initialData.id;
 
-        await api.groupSchedules.updateGroup(groupId, { name: groupName })
+        await api.groupSchedules.updateGroup(groupId, { name: groupName });
 
-        const currentUserIds = initialData.user_ids || []
-        const newUserIds = selectedUserIds.map((id) => parseInt(id))
+        const currentUserIds = initialData.user_ids || [];
+        const newUserIds = selectedUserIds.map((id) => parseInt(id));
 
         const usersToAdd = newUserIds.filter(
-          (id) => !currentUserIds.includes(id)
-        )
+          (id) => !currentUserIds.includes(id),
+        );
         const usersToRemove = currentUserIds.filter(
-          (id) => !newUserIds.includes(id)
-        )
+          (id) => !newUserIds.includes(id),
+        );
 
         if (usersToAdd.length > 0) {
           await api.groupSchedules.assignMultipleTechnicians(
             groupId,
-            usersToAdd
-          )
+            usersToAdd,
+          );
         }
 
         for (const userId of usersToRemove) {
-          await api.groupSchedules.removeTechnician(groupId, userId)
+          await api.groupSchedules.removeTechnician(groupId, userId);
         }
 
-        const updatedGroup = await api.groupSchedules.getGroupById(groupId)
-        onGroupCreated(updatedGroup)
+        const updatedGroup = await api.groupSchedules.getGroupById(groupId);
+        onGroupCreated(updatedGroup);
       } else {
         await api.groupSchedules.createGroup({
           name: groupName,
-          user_ids: selectedUserIds.map((id) => parseInt(id))
-        })
-        onGroupCreated()
+          user_ids: selectedUserIds.map((id) => parseInt(id)),
+        });
+        onGroupCreated();
       }
 
-      onClose()
-      setGroupName("")
-      setSelectedUserIds([])
+      onClose();
+      setGroupName("");
+      setSelectedUserIds([]);
     } catch (err) {
-      console.error("Ошибка при сохранении группы:", err.message)
+      enqueueSnackbar(translations["Eroare la salvarea grupului"][language], {
+        variant: "error",
+      });
     }
-  }
+  };
 
   useEffect(() => {
     if (opened) {
-      fetchUsers()
+      fetchUsers();
 
       if (isEditMode && initialData) {
-        setGroupName(initialData.name || "")
+        setGroupName(initialData.name || "");
         setSelectedUserIds(
-          initialData.user_ids?.map((id) => id.toString()) || []
-        )
+          initialData.user_ids?.map((id) => id.toString()) || [],
+        );
       } else {
-        setGroupName("")
-        setSelectedUserIds([])
+        setGroupName("");
+        setSelectedUserIds([]);
       }
     }
-  }, [opened, initialData, isEditMode])
+  }, [opened, initialData, isEditMode]);
 
   return (
     <Drawer
@@ -129,7 +138,7 @@ const ModalGroup = ({
         </Button>
       </Group>
     </Drawer>
-  )
-}
+  );
+};
 
-export default ModalGroup
+export default ModalGroup;

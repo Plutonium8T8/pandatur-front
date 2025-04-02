@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Text,
@@ -9,66 +9,66 @@ import {
   Avatar,
   Tooltip,
   ActionIcon,
-  ScrollArea
-} from "@mantine/core"
-import { modals } from "@mantine/modals"
-import { groupSchedules } from "../../api/groupSchedules"
-import { api } from "../../api"
-import ScheduleView from "./ScheduleView"
-import { useSnackbar } from "notistack"
-import { FaTrash, FaEdit } from "react-icons/fa"
-import { translations } from "../utils/translations"
-import ModalGroup from "./ModalGroup"
+  ScrollArea,
+} from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { groupSchedules } from "../../api/groupSchedules";
+import { api } from "../../api";
+import ScheduleView from "./ScheduleView";
+import { useSnackbar } from "notistack";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { translations } from "../utils/translations";
+import ModalGroup from "./ModalGroup";
 
 const SchedulesGroupList = ({ reload, setInGroupView }) => {
-  const [groups, setGroups] = useState([])
-  const [technicians, setTechnicians] = useState([])
-  const [selectedGroup, setSelectedGroup] = useState(null)
-  const [editOpened, setEditOpened] = useState(false)
-  const [editingGroup, setEditingGroup] = useState(null)
-  const language = localStorage.getItem("language") || "RO"
-  const { enqueueSnackbar } = useSnackbar()
+  const [groups, setGroups] = useState([]);
+  const [technicians, setTechnicians] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [editOpened, setEditOpened] = useState(false);
+  const [editingGroup, setEditingGroup] = useState(null);
+  const language = localStorage.getItem("language") || "RO";
+  const { enqueueSnackbar } = useSnackbar();
 
   const fetchData = async () => {
     try {
       const [groupData, userData] = await Promise.all([
         groupSchedules.getAllGroups(),
-        api.users.getTechnicianList()
-      ])
+        api.users.getTechnicianList(),
+      ]);
 
       const users = userData.map((item) => ({
         id: item.id.id,
         username: item.id.user?.username || "N/A",
-        photo: item.id.photo
-      }))
-      setTechnicians(users)
+        photo: item.id.photo,
+      }));
+      setTechnicians(users);
 
       const formattedGroups = groupData.map((group) => ({
         id: group.id,
         name: group.name,
-        user_ids: group.user_ids
-      }))
-      setGroups(formattedGroups)
+        user_ids: group.user_ids,
+      }));
+      setGroups(formattedGroups);
     } catch (err) {
       enqueueSnackbar(translations["Eroare la încărcare"][language], {
-        variant: "error"
-      })
+        variant: "error",
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [reload])
+    fetchData();
+  }, [reload]);
 
   const handleGroupClick = (group) => {
-    setSelectedGroup(group)
-    setInGroupView?.(true)
-  }
+    setSelectedGroup(group);
+    setInGroupView?.(true);
+  };
 
   const handleBack = () => {
-    setSelectedGroup(null)
-    setInGroupView?.(false)
-  }
+    setSelectedGroup(null);
+    setInGroupView?.(false);
+  };
 
   const confirmDelete = (group) => {
     modals.openConfirmModal({
@@ -82,49 +82,54 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
       ),
       labels: {
         confirm: translations["Ștergeți"][language],
-        cancel: translations["Anulează"][language]
+        cancel: translations["Anulează"][language],
       },
       confirmProps: { color: "red" },
-      onConfirm: () => handleDelete(group.id)
-    })
-  }
+      onConfirm: () => handleDelete(group.id),
+    });
+  };
 
   const handleDelete = async (id) => {
     try {
-      await groupSchedules.deleteGroup(id)
-      fetchData()
+      await groupSchedules.deleteGroup(id);
+      fetchData();
       enqueueSnackbar(translations["Grupul a fost șters"][language], {
-        variant: "success"
-      })
+        variant: "success",
+      });
     } catch (err) {
       enqueueSnackbar(translations["Eroare la ștergere"][language], {
-        variant: "error"
-      })
+        variant: "error",
+      });
     }
-  }
+  };
 
   const handleEdit = (group) => {
-    setEditingGroup(group)
-    setEditOpened(true)
-  }
+    setEditingGroup(group);
+    setEditOpened(true);
+  };
 
   const handleGroupUpdate = async (updatedGroup) => {
     try {
       const usersInGroup = await groupSchedules.getTechniciansInGroup(
-        updatedGroup.id
-      )
+        updatedGroup.id,
+      );
 
       const updatedSelectedGroup = {
         ...updatedGroup,
-        user_ids: usersInGroup.map((u) => u.id)
-      }
+        user_ids: usersInGroup.map((u) => u.id),
+      };
 
-      setSelectedGroup(updatedSelectedGroup)
-      fetchData()
+      setSelectedGroup(updatedSelectedGroup);
+      fetchData();
     } catch (err) {
-      console.error("Ошибка при обновлении данных группы:", err)
+      enqueueSnackbar(
+        translations["Eroare la actualizarea grupului"][language],
+        {
+          variant: "error",
+        },
+      );
     }
-  }
+  };
 
   if (selectedGroup) {
     return (
@@ -136,12 +141,12 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
           groupId={selectedGroup.id}
           groupName={selectedGroup.name}
           groupUsers={technicians.filter((t) =>
-            selectedGroup.user_ids.includes(t.id)
+            selectedGroup.user_ids.includes(t.id),
           )}
           onGroupUpdate={handleGroupUpdate}
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -150,8 +155,8 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         <Stack spacing="md">
           {groups.map((group) => {
             const groupUsers = technicians.filter((u) =>
-              group.user_ids.includes(u.id)
-            )
+              group.user_ids.includes(u.id),
+            );
 
             return (
               <Card
@@ -228,7 +233,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
                   </Group>
                 </Group>
               </Card>
-            )
+            );
           })}
         </Stack>
       </ScrollArea>
@@ -241,7 +246,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         isEditMode
       />
     </>
-  )
-}
+  );
+};
 
-export default SchedulesGroupList
+export default SchedulesGroupList;
