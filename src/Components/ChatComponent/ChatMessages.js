@@ -279,7 +279,6 @@ const ChatMessages = ({
     setIsTaskModalOpen(true)
   }
 
-  // NOTE: This code is broken and throw errors
   const usersOptions = () =>
     tickets
       .find((ticket) => ticket.id === selectTicketId)
@@ -586,11 +585,13 @@ const ChatMessages = ({
               tickets.find((ticket) => ticket.id === selectTicketId)
                 ?.client_id && (
                 <Select
+                  size="md"
                   w="100%"
                   value={`${selectedClient}-${selectedPlatform}`}
                   placeholder={translations["Alege client"][language]}
                   data={usersOptions().flat()}
                   onChange={(value) => {
+                    if (!value) return
                     const [clientId, platform] = value.split("-")
                     setSelectedClient(clientId)
                     setSelectedPlatform(platform)
@@ -600,52 +601,6 @@ const ChatMessages = ({
             )
           }}
         />
-
-        {/* {tickets &&
-          tickets.find((ticket) => ticket.id === selectTicketId)?.client_id && (
-            <div className="client-select-container">
-              <select
-                className="task-select"
-                value={`${selectedClient}-${selectedPlatform}`}
-                onChange={(e) => {
-                  const [clientId, platform] = e.target.value.split("-")
-                  setSelectedClient(clientId)
-                  setSelectedPlatform(platform)
-                }}
-              >
-                <option value="" disabled>
-                  {translations["Alege client"][language]}
-                </option>
-                {tickets
-                  .find((ticket) => ticket.id === selectTicketId)
-                  .client_id.replace(/[{}]/g, "")
-                  .split(",")
-                  .map((id) => {
-                    const clientId = id.trim()
-                    const clientInfo = personalInfo[clientId] || {}
-                    const fullName = clientInfo.name
-                      ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-                      : `ID: ${clientId}`
-
-                    const clientMessages = messages.filter(
-                      (msg) => msg.client_id === Number(clientId)
-                    )
-                    const uniquePlatforms = [
-                      ...new Set(clientMessages.map((msg) => msg.platform))
-                    ]
-
-                    return uniquePlatforms.map((platform) => (
-                      <option
-                        key={`${clientId}-${platform}`}
-                        value={`${clientId}-${platform}`}
-                      >
-                        {` ${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId} `}
-                      </option>
-                    ))
-                  })}
-              </select>
-            </div>
-          )} */}
       </Box>
     </div>
   )

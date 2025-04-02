@@ -1582,5 +1582,9 @@ export const translations = {
   file_upload_failed: {
     RO: "Fișierul nu a fost încărcat. Vă rugăm să încercați din nou",
     RU: "Файл не удалось загрузить. Пожалуйста, попробуйте снова"
+  },
+  select_message_template: {
+    RO: "Selectează un template de mesaj",
+    RU: "Выберите шаблон сообщения"
   }
 }

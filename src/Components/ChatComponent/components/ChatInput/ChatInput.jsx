@@ -71,7 +71,7 @@ export const ChatInput = ({
           style={{ display: "none" }}
         />
         <ActionIcon
-          size="input-lg"
+          size="input-md"
           onClick={handleFileButtonClick}
           variant="default"
         >
@@ -79,23 +79,23 @@ export const ChatInput = ({
         </ActionIcon>
 
         <ActionIcon
-          size="input-lg"
+          size="input-md"
           onClick={handleEmojiClickButton}
           variant="default"
         >
           <FaSmile />
         </ActionIcon>
         <Input
-          size="lg"
+          size="md"
           w="100%"
           disabled={!id}
           value={inputValue}
-          onChange={(e) => onChangeTextArea(e.target.value.trim())}
+          onChange={(e) => onChangeTextArea(e.target.value)}
           placeholder={getLanguageByKey("Introduceți mesaj")}
         />
         <ActionIcon
           loading={loading}
-          size="input-lg"
+          size="input-md"
           onClick={onSendMessage}
           variant="default"
         >
@@ -105,9 +105,10 @@ export const ChatInput = ({
 
       <Flex gap="lg">
         <Select
+          size="md"
           w="100%"
           clearable
-          placeholder={getLanguageByKey("Introduceți mesaj")}
+          placeholder={getLanguageByKey("select_message_template")}
           onChange={handleSelectTemplateChange}
           value={selectedMessage ?? ""}
           data={Object.entries(templateOptions).map(([key, value]) => ({
