@@ -19,8 +19,7 @@ const ChatMessages = ({
   setSelectedClient,
   selectedClient,
   isLoading,
-  personalInfo,
-  setPersonalInfo
+  personalInfo
 }) => {
   const { userId } = useUser()
   const { messages, setMessages, tickets } = useApp()
@@ -202,20 +201,6 @@ const ChatMessages = ({
       setManagerMessage("")
     }
   }
-
-  useEffect(() => {
-    const newPersonalInfo = {}
-
-    tickets.forEach((ticket) => {
-      if (ticket.clients && Array.isArray(ticket.clients)) {
-        ticket.clients.forEach((client) => {
-          newPersonalInfo[client.id] = client
-        })
-      }
-    })
-
-    setPersonalInfo(newPersonalInfo)
-  }, [tickets])
 
   const handleScroll = () => {
     if (messageContainerRef.current) {
