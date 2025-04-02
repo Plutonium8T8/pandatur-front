@@ -1,35 +1,42 @@
-import { Modal, Select, Button, Stack } from "@mantine/core"
-import { useState } from "react"
-import { GroupUsersOptions } from "./GroupUsersOptions"
+import { Modal, Select, Button, Stack } from "@mantine/core";
+import { useState } from "react";
+import { GroupUsersOptions } from "./GroupUsersOptions";
+import { translations } from "../utils/translations";
 
 const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
-  const [group, setGroup] = useState("")
+  const [group, setGroup] = useState("");
+  const language = localStorage.getItem("language") || "RO";
 
   const handleConfirm = () => {
     if (group) {
-      onConfirm(group)
-      setGroup("")
-      onClose()
+      onConfirm(group);
+      setGroup("");
+      onClose();
     }
-  }
+  };
 
   return (
-    <Modal opened={opened} onClose={onClose} title="Schimbați grupul" centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={translations["Schimbă grupul"][language]}
+      centered
+    >
       <Stack>
         <Select
-          label="Alegeți un grup"
-          placeholder="Selectați grupul"
+          label={translations["Alege grupul"][language]}
+          placeholder={translations["Alege grupul"][language]}
           data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
           value={group}
           onChange={setGroup}
         />
 
         <Button onClick={handleConfirm} disabled={!group}>
-          Confirmați
+          {translations["Confirma"][language]}
         </Button>
       </Stack>
     </Modal>
-  )
-}
+  );
+};
 
-export default GroupChangeModal
+export default GroupChangeModal;
