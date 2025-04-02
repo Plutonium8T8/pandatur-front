@@ -101,7 +101,7 @@ const ChatMessages = ({
   }
 
   const sendMessage = async (selectedFile, platform) => {
-    if (!managerMessage && !selectedFile) {
+    if (!managerMessage.trim() && !selectedFile) {
       return
     }
 
@@ -111,7 +111,7 @@ const ChatMessages = ({
         sender_id: Number(userId),
         client_id: selectedClient,
         platform: platform,
-        message: managerMessage,
+        message: managerMessage.trim(),
         media_type: null,
         media_url: ""
       }
@@ -393,10 +393,10 @@ const ChatMessages = ({
                                   src={msg.message}
                                   alt="Изображение"
                                   className="image-preview-in-chat"
-                                  // onError={(e) => {
-                                  //   e.target.src =
-                                  //     "https://via.placeholder.com/300?text=Ошибка+загрузки"
-                                  // }}
+                                  onError={(e) => {
+                                    e.target.src =
+                                      "https://via.placeholder.com/300?text=Ошибка+загрузки"
+                                  }}
                                   onClick={() => {
                                     window.open(msg.message, "_blank")
                                   }}
