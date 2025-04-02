@@ -1,7 +1,8 @@
-import { Flex, Badge, DEFAULT_THEME } from "@mantine/core"
+import { Flex, Badge, DEFAULT_THEME, Divider } from "@mantine/core"
 import { useUser, useApp } from "../../../../hooks"
-import { getLanguageByKey } from "../../../utils"
+import { DD_MM_YYYY } from "../../../../app-constants"
 import { Message } from "../Message"
+import { parseServerDate, getFullName, getLanguageByKey } from "../../../utils"
 import "./GroupedMessages.css"
 
 const { colors } = DEFAULT_THEME
@@ -18,6 +19,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { userId } = useUser()
   const { messages } = useApp()
 
+  // TODO: Please refactor me
   const sortedMessages = messages
     .filter((msg) => msg.ticket_id === selectTicketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent))
@@ -26,12 +28,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   let lastClientId = null
 
   sortedMessages.forEach((msg) => {
-    const messageDate =
-      parseDate(msg.time_sent)?.toLocaleDateString("ru-RU", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-      }) || "—"
+    const messageDate = parseServerDate(msg.time_sent).format(DD_MM_YYYY)
 
     const currentClientId = Array.isArray(msg.client_id)
       ? msg.client_id[0].toString()
@@ -59,32 +56,34 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   })
 
   return (
-    <>
+    <Flex direction="column" gap="xl">
       {groupedMessages.map(({ date, clientId, messages }, index) => {
         const clientInfo = personalInfo[clientId] || {}
-        const clientName = clientInfo.name
-          ? `${clientInfo.name} ${clientInfo.surname || ""}`
-          : `ID: ${clientId}`
+        const clientName =
+          getFullName(clientInfo.name, clientInfo.surname) || `ID: ${clientId}`
 
         return (
           <Flex direction="column" gap="md" key={index}>
-            <Flex justify="center">
-              <Badge c="black" size="lg" bg={colors.gray[3]}>
-                {date}
-              </Badge>
-            </Flex>
+            <Divider
+              label={
+                <Badge c="black" size="lg" bg={colors.gray[2]}>
+                  {date}
+                </Badge>
+              }
+              labelPosition="center"
+            />
 
             <Flex justify="center">
-              <Badge c="black" size="lg" bg={colors.gray[3]}>
+              <Badge c="black" size="lg" bg={colors.gray[2]}>
                 {getLanguageByKey("Mesajele clientului")} #{clientId} -{" "}
                 {clientName}
               </Badge>
             </Flex>
             <Flex direction="column" gap="xs">
-              {messages.map((msg, msgIndex) => (
+              {messages.map((msg) => (
                 <Message
+                  key={msg.id}
                   msg={msg}
-                  msgIndex={msgIndex}
                   userId={userId}
                   personalInfo={personalInfo[clientId]}
                 />
@@ -93,6 +92,6 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
           </Flex>
         )
       })}
-    </>
+    </Flex>
   )
 }
