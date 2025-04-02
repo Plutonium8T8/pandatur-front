@@ -29,10 +29,6 @@
   scroll-behavior: auto;
 }
 
-.manager-send-message-container .task-select {
-  border: 1px solid #ddd;
-}
-
 .message {
   display: flex;
   flex-direction: column;
@@ -60,44 +56,6 @@
   color: white;
   margin-top: 3px;
   text-align: right;
-}
-
-.manager-send-message-container .input-group {
-  gap: 0;
-}
-
-.button-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
-  flex: 1;
-}
-
-.task-select {
-  width: 100%;
-}
-
-.task-select:focus {
-  border-color: #0f824c;
-  box-shadow: 0 0 5px rgba(15, 130, 76, 0.5);
-}
-
-.container-options-component {
-  text-align: left;
-}
-
-.select-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 10px;
-  align-items: center;
-}
-
-.select-container label {
-  margin-right: 10px;
-  font-weight: bold;
-  color: #555;
 }
 
 .empty-chat {
