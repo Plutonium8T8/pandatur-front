@@ -9,6 +9,8 @@ import ModalGroup from "./ModalGroup";
 import { Button, Checkbox } from "@mantine/core";
 import "./Schedule.css";
 
+const language = localStorage.getItem("language") || "RO";
+
 const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [schedule, setSchedule] = useState([]);
   const [selected, setSelected] = useState({
@@ -21,7 +23,6 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [groupModalOpened, setGroupModalOpened] = useState(false);
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
-  const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
 
   const getWeekDays = () =>

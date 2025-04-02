@@ -6,6 +6,8 @@ import UserList from "./UserList";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
 
+const language = localStorage.getItem("language") || "RO";
+
 const UsersComponent = () => {
   const [users, setUsers] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -13,7 +15,6 @@ const UsersComponent = () => {
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {

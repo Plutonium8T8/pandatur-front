@@ -17,10 +17,11 @@ import RolesComponent from "./RolesComponent";
 import { GroupUsersOptions } from "./GroupUsersOptions";
 import { translations } from "../utils/translations";
 
+const language = localStorage.getItem("language") || "RO";
+
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
-  const language = localStorage.getItem("language") || "RO";
 
   const [form, setForm] = useState({
     name: "",

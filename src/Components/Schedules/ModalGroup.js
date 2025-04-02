@@ -4,6 +4,8 @@ import { api } from "../../api";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
 
+const language = localStorage.getItem("language") || "RO";
+
 const ModalGroup = ({
   opened,
   onClose,
@@ -14,7 +16,6 @@ const ModalGroup = ({
   const [groupName, setGroupName] = useState("");
   const [users, setUsers] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
 
   const fetchUsers = async () => {

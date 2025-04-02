@@ -3,9 +3,10 @@ import { useState } from "react";
 import { GroupUsersOptions } from "./GroupUsersOptions";
 import { translations } from "../utils/translations";
 
+const language = localStorage.getItem("language") || "RO";
+
 const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
   const [group, setGroup] = useState("");
-  const language = localStorage.getItem("language") || "RO";
 
   const handleConfirm = () => {
     if (group) {

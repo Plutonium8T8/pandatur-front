@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react"
-import { Drawer, Stack, Group, TextInput, Button } from "@mantine/core"
-import { FaTrash, FaPlus, FaMinus } from "react-icons/fa"
-import { api } from "../../api"
-import { useSnackbar } from "notistack"
-import { showServerError } from "../utils/showServerError"
-import { translations } from "../utils/translations"
+import React, { useState, useEffect } from "react";
+import { Drawer, Stack, Group, TextInput, Button } from "@mantine/core";
+import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
+import { api } from "../../api";
+import { useSnackbar } from "notistack";
+import { showServerError } from "../utils/showServerError";
+import { translations } from "../utils/translations";
+
+const language = localStorage.getItem("language") || "RO";
 
 const ModalIntervals = ({
   opened,
@@ -12,14 +14,13 @@ const ModalIntervals = ({
   schedule,
   selected,
   fetchData,
-  selectedTechnicians = []
+  selectedTechnicians = [],
 }) => {
-  const { enqueueSnackbar } = useSnackbar()
-  const language = localStorage.getItem("language") || "RO"
-  const [intervals, setIntervals] = useState([])
-  const [startTime, setStartTime] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [selectedDays, setSelectedDays] = useState([])
+  const { enqueueSnackbar } = useSnackbar();
+  const [intervals, setIntervals] = useState([]);
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [selectedDays, setSelectedDays] = useState([]);
 
   const dayNames = [
     "monday",
@@ -28,8 +29,8 @@ const ModalIntervals = ({
     "thursday",
     "friday",
     "saturday",
-    "sunday"
-  ]
+    "sunday",
+  ];
   const dayApiNames = {
     monday: "Monday",
     tuesday: "Tuesday",
@@ -37,8 +38,8 @@ const ModalIntervals = ({
     thursday: "Thursday",
     friday: "Friday",
     saturday: "Saturday",
-    sunday: "Sunday"
-  }
+    sunday: "Sunday",
+  };
 
   const dayButtons = [
     { label: "Mo", value: "monday" },
@@ -47,33 +48,33 @@ const ModalIntervals = ({
     { label: "Th", value: "thursday" },
     { label: "Fr", value: "friday" },
     { label: "Sa", value: "saturday" },
-    { label: "Su", value: "sunday" }
-  ]
+    { label: "Su", value: "sunday" },
+  ];
 
   const toggleDay = (day) => {
     setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    )
-  }
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
+    );
+  };
 
   useEffect(() => {
     if (opened && selected.employeeIndex !== null) {
-      const defaultDay = dayNames[selected.dayIndex]
-      setSelectedDays([defaultDay])
+      const defaultDay = dayNames[selected.dayIndex];
+      setSelectedDays([defaultDay]);
       const current =
-        schedule[selected.employeeIndex]?.shifts[selected.dayIndex] || []
-      setIntervals([...current])
+        schedule[selected.employeeIndex]?.shifts[selected.dayIndex] || [];
+      setIntervals([...current]);
     }
-  }, [opened, selected, schedule])
+  }, [opened, selected, schedule]);
 
   const getTechnicianIds = () => {
     if (selectedTechnicians.length > 0) {
-      return selectedTechnicians
+      return selectedTechnicians;
     }
-    return [schedule[selected.employeeIndex]?.id]
-  }
+    return [schedule[selected.employeeIndex]?.id];
+  };
 
-  const getWeekdays = () => selectedDays.map((d) => dayApiNames[d])
+  const getWeekdays = () => selectedDays.map((d) => dayApiNames[d]);
 
   const addInterval = async () => {
     try {
@@ -81,15 +82,15 @@ const ModalIntervals = ({
         technician_ids: getTechnicianIds(),
         weekdays: getWeekdays(),
         start: startTime,
-        end: endTime
-      })
-      setStartTime("")
-      setEndTime("")
-      fetchData()
+        end: endTime,
+      });
+      setStartTime("");
+      setEndTime("");
+      fetchData();
     } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" })
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     }
-  }
+  };
 
   const cutInterval = async () => {
     try {
@@ -97,49 +98,49 @@ const ModalIntervals = ({
         technician_ids: getTechnicianIds(),
         weekdays: getWeekdays(),
         start: startTime,
-        end: endTime
-      })
-      setStartTime("")
-      setEndTime("")
-      fetchData()
+        end: endTime,
+      });
+      setStartTime("");
+      setEndTime("");
+      fetchData();
     } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" })
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     }
-  }
+  };
 
   const deleteByDays = async () => {
     try {
       await api.schedules.deleteWeekdays({
         technician_ids: getTechnicianIds(),
-        weekdays: getWeekdays()
-      })
-      fetchData()
+        weekdays: getWeekdays(),
+      });
+      fetchData();
     } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" })
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     }
-  }
+  };
 
   const removeInterval = async (index) => {
-    const interval = intervals[index]
+    const interval = intervals[index];
     try {
       await api.schedules.removeTimeframe({
         technician_ids: [schedule[selected.employeeIndex].id],
         weekdays: [dayApiNames[dayNames[selected.dayIndex]]],
         start: interval.start,
-        end: interval.end
-      })
-      setIntervals((prev) => prev.filter((_, i) => i !== index))
-      fetchData()
+        end: interval.end,
+      });
+      setIntervals((prev) => prev.filter((_, i) => i !== index));
+      fetchData();
     } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" })
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     }
-  }
+  };
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
       const names = schedule
         .filter((s) => selectedTechnicians.includes(s.id))
-        .map((s) => `${s.name} (${s.id})`)
+        .map((s) => `${s.name} (${s.id})`);
       return (
         <>
           <div style={{ fontWeight: 500, marginBottom: 5 }}>
@@ -147,20 +148,20 @@ const ModalIntervals = ({
           </div>
           <div>{names.join(", ")}</div>
         </>
-      )
+      );
     }
 
     if (selectedTechnicians.length === 1) {
-      const tech = schedule.find((s) => s.id === selectedTechnicians[0])
-      return tech ? `${tech.name} (${tech.id})` : ""
+      const tech = schedule.find((s) => s.id === selectedTechnicians[0]);
+      return tech ? `${tech.name} (${tech.id})` : "";
     }
 
     return selected.employeeIndex !== null
       ? `${schedule[selected.employeeIndex]?.name} (${schedule[selected.employeeIndex]?.id})`
-      : translations["Intervale pentru mai mulți tehnicieni"][language]
-  }
+      : translations["Intervale pentru mai mulți tehnicieni"][language];
+  };
 
-  const title = getSelectedNames()
+  const title = getSelectedNames();
 
   return (
     <Drawer
@@ -181,9 +182,9 @@ const ModalIntervals = ({
               }
               onClick={() => {
                 if (selectedDays.length === dayButtons.length) {
-                  setSelectedDays([])
+                  setSelectedDays([]);
                 } else {
-                  setSelectedDays(dayButtons.map((d) => d.value))
+                  setSelectedDays(dayButtons.map((d) => d.value));
                 }
               }}
               style={{ width: 65 }}
@@ -248,9 +249,9 @@ const ModalIntervals = ({
                   label="Start"
                   value={interval.start}
                   onChange={(e) => {
-                    const updated = [...intervals]
-                    updated[index].start = e.target.value
-                    setIntervals(updated)
+                    const updated = [...intervals];
+                    updated[index].start = e.target.value;
+                    setIntervals(updated);
                   }}
                 />
                 <TextInput
@@ -258,9 +259,9 @@ const ModalIntervals = ({
                   label="End"
                   value={interval.end}
                   onChange={(e) => {
-                    const updated = [...intervals]
-                    updated[index].end = e.target.value
-                    setIntervals(updated)
+                    const updated = [...intervals];
+                    updated[index].end = e.target.value;
+                    setIntervals(updated);
                   }}
                 />
                 <Button
@@ -281,7 +282,7 @@ const ModalIntervals = ({
         </Stack>
       </form>
     </Drawer>
-  )
-}
+  );
+};
 
-export default ModalIntervals
+export default ModalIntervals;

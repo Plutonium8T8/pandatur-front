@@ -20,13 +20,14 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import { translations } from "../utils/translations";
 import ModalGroup from "./ModalGroup";
 
+const language = localStorage.getItem("language") || "RO";
+
 const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const [groups, setGroups] = useState([]);
   const [technicians, setTechnicians] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [editOpened, setEditOpened] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
-  const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
 
   const fetchData = async () => {

@@ -1,14 +1,15 @@
-import React, { useState } from "react"
-import { Group, Button, Title } from "@mantine/core"
-import SchedulesList from "./SchedulesGroupList"
-import { translations } from "../utils/translations"
-import ModalGroup from "./ModalGroup"
+import React, { useState } from "react";
+import { Group, Button, Title } from "@mantine/core";
+import SchedulesList from "./SchedulesGroupList";
+import { translations } from "../utils/translations";
+import ModalGroup from "./ModalGroup";
+
+const language = localStorage.getItem("language") || "RO";
 
 const Schedules = () => {
-  const [opened, setOpened] = useState(false)
-  const [reload, setReload] = useState(false)
-  const [inGroupView, setInGroupView] = useState(false)
-  const language = localStorage.getItem("language") || "RO"
+  const [opened, setOpened] = useState(false);
+  const [reload, setReload] = useState(false);
+  const [inGroupView, setInGroupView] = useState(false);
 
   return (
     <div style={{ padding: "10px 20px" }}>
@@ -27,12 +28,12 @@ const Schedules = () => {
         opened={opened}
         onClose={() => setOpened(false)}
         onGroupCreated={() => {
-          setOpened(false)
-          setReload((r) => !r)
+          setOpened(false);
+          setReload((r) => !r);
         }}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Schedules
+export default Schedules;

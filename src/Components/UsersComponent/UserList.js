@@ -13,6 +13,8 @@ import { useState } from "react";
 import { useModals } from "@mantine/modals";
 import GroupChangeModal from "./GroupChangeModal";
 
+const language = localStorage.getItem("language") || "RO";
+
 const UserList = ({
   users,
   loading,
@@ -20,7 +22,6 @@ const UserList = ({
   handleDeleteUser = () => {},
   openEditUser = () => {},
 }) => {
-  const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
