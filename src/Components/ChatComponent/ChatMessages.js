@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { FaFile, FaPaperPlane, FaSmile } from "react-icons/fa"
 import EmojiPicker from "emoji-picker-react"
 import ReactDOM from "react-dom"
-import { Flex } from "@mantine/core"
+import { Flex, DEFAULT_THEME, Badge } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
 import { api } from "../../api"
 import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
@@ -16,6 +16,18 @@ import {
 import { translations } from "../utils/translations"
 import { templateOptions } from "../../FormOptions/MessageTemplate"
 import { Spin } from "../Spin"
+import { renderContent, getMediaType } from "./utils"
+
+const { colors } = DEFAULT_THEME
+const language = localStorage.getItem("language") || "RO"
+
+const platformIcons = {
+  facebook: <FaFacebook />,
+  instagram: <FaInstagram />,
+  whatsapp: <FaWhatsapp />,
+  viber: <FaViber />,
+  telegram: <FaTelegram />
+}
 
 const ChatMessages = ({
   selectTicketId,
@@ -28,7 +40,6 @@ const ChatMessages = ({
   const { userId } = useUser()
   const { messages, setMessages, tickets } = useApp()
 
-  const language = localStorage.getItem("language") || "RO"
   const [managerMessage, setManagerMessage] = useState("")
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
@@ -47,14 +58,6 @@ const ChatMessages = ({
   const [tasks, setTasks] = useState([])
   const [listTask, setListTask] = useState([])
   const [selectedTask, setSelectedTask] = useState(null)
-
-  const platformIcons = {
-    facebook: <FaFacebook />,
-    instagram: <FaInstagram />,
-    whatsapp: <FaWhatsapp />,
-    viber: <FaViber />,
-    telegram: <FaTelegram />
-  }
 
   const getLastClientWhoSentMessage = () => {
     if (!Array.isArray(messages) || messages.length === 0) return null
@@ -170,13 +173,6 @@ const ChatMessages = ({
     } catch (error) {
       console.error("Ошибка отправки сообщения:", error)
     }
-  }
-
-  const getMediaType = (mimeType) => {
-    if (mimeType.startsWith("image/")) return "image"
-    if (mimeType.startsWith("video/")) return "video"
-    if (mimeType.startsWith("audio/")) return "audio"
-    return "file"
   }
 
   const getLastReaction = (message) => {
@@ -415,81 +411,23 @@ const ChatMessages = ({
                   : `ID: ${clientId}`
 
                 return (
-                  <div key={index} className="message-group-container-chat">
-                    <div className="message-date-separator">📆 {date}</div>
-                    <div className="client-message-group">
-                      <div className="client-header">
-                        👤 {translations["Mesajele clientului"][language]} #
-                        {clientId} - {clientName}
-                      </div>
+                  <Flex direction="column" gap="md" key={index}>
+                    <Flex justify="center">
+                      <Badge c="black" size="lg" bg={colors.gray[3]}>
+                        {date}
+                      </Badge>
+                    </Flex>
+
+                    <div>
+                      <Flex justify="center">
+                        <Badge c="black" size="lg" bg={colors.gray[3]}>
+                          {translations["Mesajele clientului"][language]} #
+                          {clientId} - {clientName}
+                        </Badge>
+                      </Flex>
+
                       {messages.map((msg, msgIndex) => {
                         const uniqueKey = `${msg.id || msg.ticket_id}-${msg.time_sent}-${msgIndex}`
-
-                        const renderContent = () => {
-                          if (!msg.message) {
-                            return (
-                              <div className="text-message">
-                                {translations["Mesajul lipseste"][language]}
-                              </div>
-                            )
-                          }
-                          switch (msg.mtype) {
-                            case "image":
-                              return (
-                                <img
-                                  src={msg.message}
-                                  alt="Изображение"
-                                  className="image-preview-in-chat"
-                                  onError={(e) => {
-                                    e.target.src =
-                                      "https://via.placeholder.com/300?text=Ошибка+загрузки"
-                                  }}
-                                  onClick={() => {
-                                    window.open(msg.message, "_blank")
-                                  }}
-                                />
-                              )
-                            case "video":
-                              return (
-                                <video controls className="video-preview">
-                                  <source src={msg.message} type="video/mp4" />
-                                  {
-                                    translations[
-                                      "Acest browser nu suporta video"
-                                    ][language]
-                                  }
-                                </video>
-                              )
-                            case "audio":
-                              return (
-                                <audio controls className="audio-preview">
-                                  <source src={msg.message} type="audio/ogg" />
-                                  {
-                                    translations[
-                                      "Acest browser nu suporta audio"
-                                    ][language]
-                                  }
-                                </audio>
-                              )
-                            case "file":
-                              return (
-                                <a
-                                  href={msg.message}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="file-link"
-                                >
-                                  {translations["Deschide file"][language]}
-                                </a>
-                              )
-                            default:
-                              return (
-                                <div className="text-message">
-                                  {msg.message}
-                                </div>
-                              )
-                          }
-                        }
 
                         const lastReaction = getLastReaction(msg)
 
@@ -510,7 +448,7 @@ const ChatMessages = ({
                                 </div>
 
                                 <div className="text">
-                                  {renderContent()}
+                                  {renderContent(msg)}
                                   <div className="message-time">
                                     {msg.sender_id !== 1 &&
                                       msg.sender_id !== userId &&
@@ -593,7 +531,7 @@ const ChatMessages = ({
                         )
                       })}
                     </div>
-                  </div>
+                  </Flex>
                 )
               }
             )
