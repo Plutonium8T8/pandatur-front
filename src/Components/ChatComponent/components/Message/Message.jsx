@@ -5,12 +5,14 @@ import {
   FaWhatsapp,
   FaTelegram
 } from "react-icons/fa"
-import { Flex, Text, Avatar } from "@mantine/core"
+import { Flex, Text, Avatar, DEFAULT_THEME } from "@mantine/core"
 import { renderContent } from "../../utils"
 import { HH_mm } from "../../../../app-constants"
-import { parseServerDate } from "../../../utils"
+import { parseServerDate, getFullName } from "../../../utils"
 import { DEFAULT_PHOTO } from "../../../../app-constants"
 import "./Message.css"
+
+const { colors } = DEFAULT_THEME
 
 const platformIcons = {
   facebook: <FaFacebook />,
@@ -20,9 +22,7 @@ const platformIcons = {
   telegram: <FaTelegram />
 }
 
-export const Message = ({ msg, msgIndex, userId, personalInfo }) => {
-  const uniqueKey = `${msg.id || msg.ticket_id}-${msg.time_sent}-${msgIndex}`
-
+export const Message = ({ msg, userId, personalInfo }) => {
   const isMessageSentByMe = msg.sender_id === userId || msg.sender_id === 1
 
   return (
@@ -30,7 +30,6 @@ export const Message = ({ msg, msgIndex, userId, personalInfo }) => {
       <Flex
         w="70%"
         direction="column"
-        key={uniqueKey}
         className={`chat-message ${isMessageSentByMe ? "sent" : "received"}`}
       >
         <Flex justify={isMessageSentByMe ? "end" : "start"} gap="8">
@@ -39,9 +38,10 @@ export const Message = ({ msg, msgIndex, userId, personalInfo }) => {
           )}
           <Flex direction="column" p="8" className="text">
             {msg.sender_id !== 1 && msg.sender_id !== userId && (
-              <Flex align="center" gap="4">
+              <Flex c={colors.gray[7]} align="center" gap="4">
                 <Text size="sm" fw="bold">
-                  {personalInfo.name} {personalInfo.surname}
+                  {getFullName(personalInfo.name, personalInfo.surname) ||
+                    `#${msg.client_id}`}
                 </Text>
 
                 {platformIcons[msg.platform] || null}

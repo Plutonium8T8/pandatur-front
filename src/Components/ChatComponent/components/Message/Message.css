@@ -7,10 +7,23 @@
 }
 
 .chat-message.received .text {
-  border: 1px solid var(--mantine-color-dark-2);
+  border: 1px solid var(--mantine-color-gray-4);
 }
 
 .chat-message.sent .text {
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark-9);
+}
+
+.image-preview-in-chat {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  margin: 5px 0;
+}
+
+.video-preview {
+  max-width: 100%;
+  height: auto;
 }
