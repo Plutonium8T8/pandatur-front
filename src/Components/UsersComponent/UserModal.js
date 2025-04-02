@@ -275,9 +275,14 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             required
           />
 
-          <RolesComponent
-            employee={{ id: form.username, name: form.username }}
-          />
+          {initialUser && (
+            <RolesComponent
+              employee={{
+                id: initialUser.id?.user?.id || initialUser.id,
+                name: initialUser.name,
+              }}
+            />
+          )}
 
           <Button fullWidth mt="sm" onClick={handleCreate}>
             {initialUser
