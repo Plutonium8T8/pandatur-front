@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Button,
   Drawer,
@@ -8,18 +8,19 @@ import {
   Avatar,
   Group,
   ActionIcon,
-  Divider,
-  Select
-} from "@mantine/core"
-import { api } from "../../api"
-import { useSnackbar } from "notistack"
-import { IoEye, IoEyeOff } from "react-icons/io5"
-import RolesComponent from "./RolesComponent"
-import { GroupUsersOptions } from "./GroupUsersOptions"
+  Select,
+} from "@mantine/core";
+import { api } from "../../api";
+import { useSnackbar } from "notistack";
+import { IoEye, IoEyeOff } from "react-icons/io5";
+import RolesComponent from "./RolesComponent";
+import { GroupUsersOptions } from "./GroupUsersOptions";
+import { translations } from "../utils/translations";
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
-  const { enqueueSnackbar } = useSnackbar()
-  const [showPassword, setShowPassword] = useState(false)
+  const { enqueueSnackbar } = useSnackbar();
+  const [showPassword, setShowPassword] = useState(false);
+  const language = localStorage.getItem("language") || "RO";
 
   const [form, setForm] = useState({
     name: "",
@@ -29,8 +30,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     password: "",
     job_title: "",
     status: false,
-    groups: ""
-  })
+    groups: "",
+  });
 
   useEffect(() => {
     if (initialUser) {
@@ -45,8 +46,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         groups:
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
-            : initialUser.groups?.[0]?.name || ""
-      })
+            : initialUser.groups?.[0]?.name || "",
+      });
     } else {
       setForm({
         name: "",
@@ -56,10 +57,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         password: "",
         job_title: "",
         status: false,
-        groups: ""
-      })
+        groups: "",
+      });
     }
-  }, [initialUser, opened])
+  }, [initialUser, opened]);
 
   const handleCreate = async () => {
     const {
@@ -70,8 +71,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       password,
       job_title,
       status,
-      groups
-    } = form
+      groups,
+    } = form;
 
     if (!initialUser) {
       if (
@@ -83,61 +84,69 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         !job_title ||
         !groups
       ) {
-        enqueueSnackbar("Заполните все обязательные поля", {
-          variant: "warning"
-        })
-        return
+        enqueueSnackbar(
+          translations["Completați toate câmpurile obligatorii"][language],
+          {
+            variant: "warning",
+          },
+        );
+        return;
       }
     }
 
     try {
       if (initialUser) {
-        const technicianId = initialUser.id?.id || initialUser.id
-        const userId = initialUser.id?.user?.id || initialUser.id
+        const technicianId = initialUser.id?.id || initialUser.id;
+        const userId = initialUser.id?.user?.id || initialUser.id;
 
         await Promise.all([
           api.users.updateTechnician(technicianId, {
             status: status.toString(),
-            job_title
+            job_title,
           }),
           api.users.updateExtended(technicianId, {
             name,
-            surname
+            surname,
           }),
           api.users.updateUsernameAndEmail(userId, {
-            email
-          })
-        ])
+            email,
+          }),
+        ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
           await api.users.updateUsersGroup({
             user_ids: [technicianId],
-            group_name: groups
-          })
+            group_name: groups,
+          });
         }
 
-        enqueueSnackbar("Пользователь успешно обновлён", { variant: "success" })
+        enqueueSnackbar(
+          translations["Utilizator actualizat cu succes"][language],
+          { variant: "success" },
+        );
       } else {
         const payload = {
           user: {
             username,
             email,
             password,
-            roles: ["ROLE_USER", "ROLE_TECHNICIAN"]
+            roles: ["ROLE_USER", "ROLE_TECHNICIAN"],
           },
           extended: {
             name,
-            surname
+            surname,
           },
           technician: {
             status: status.toString(),
-            job_title
+            job_title,
           },
-          groups: [groups]
-        }
+          groups: [groups],
+        };
 
-        await api.users.createTechnicianUser(payload)
-        enqueueSnackbar("Пользователь успешно создан", { variant: "success" })
+        await api.users.createTechnicianUser(payload);
+        enqueueSnackbar(translations["Utilizator creat cu succes"][language], {
+          variant: "success",
+        });
       }
 
       setForm({
@@ -148,18 +157,23 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         password: "",
         job_title: "",
         status: false,
-        groups: ""
-      })
+        groups: "",
+      });
 
-      onClose()
-      onUserCreated()
+      onClose();
+      onUserCreated();
     } catch (err) {
-      console.error("Ошибка при сохранении пользователя:", err.message)
-      enqueueSnackbar("Ошибка при сохранении пользователя", {
-        variant: "error"
-      })
+      console.error("Ошибка при сохранении пользователя:", err);
+
+      const serverMessage =
+        err?.response?.data?.message || err?.response?.data?.error;
+
+      const fallbackMessage =
+        translations["Eroare la salvarea utilizatorului"][language];
+
+      enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
     }
-  }
+  };
 
   return (
     <Drawer
@@ -168,10 +182,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       position="right"
       title={
         initialUser
-          ? "Редактировать пользователя"
-          : "Создать нового пользователя"
+          ? translations["Modificați utilizator"][language]
+          : translations["Adaugă utilizator"][language]
       }
-      padding="xl"
+      padding="md"
       size="lg"
     >
       <Group align="flex-start" spacing="xl">
@@ -182,41 +196,46 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
         <Stack style={{ flex: 1 }}>
           <Switch
-            label="Активен"
+            label={translations["Activ"][language]}
             checked={form.status}
             onChange={(e) =>
               setForm({ ...form, status: e.currentTarget.checked })
             }
+            required
           />
 
           <TextInput
-            label="Name"
+            label={translations["Nume"][language]}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
           />
 
           <TextInput
-            label="Surname"
+            label={translations["Prenume"][language]}
             value={form.surname}
             onChange={(e) => setForm({ ...form, surname: e.target.value })}
+            required
           />
 
           {!initialUser && (
             <TextInput
-              label="Username"
+              label={translations["Login"][language]}
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
+              required
             />
           )}
 
           <TextInput
-            label="Email"
+            label={translations["Email"][language]}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
+            required
           />
 
           <TextInput
-            label="Password"
+            label={translations["password"][language]}
             type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
@@ -231,32 +250,34 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           />
 
           <Select
-            label="Grup user"
-            placeholder="Alege grupul"
+            label={translations["Grup utilizator"][language]}
+            placeholder={translations["Alege grupul"][language]}
             data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
             value={GroupUsersOptions.includes(form.groups) ? form.groups : null}
             onChange={(value) => setForm({ ...form, groups: value || "" })}
+            required
           />
 
           <TextInput
-            label="Job title"
+            label={translations["Funcție"][language]}
             value={form.job_title}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+            required
           />
-
-          <Divider label="Drepturi in app" labelPosition="center" />
 
           <RolesComponent
             employee={{ id: form.username, name: form.username }}
           />
 
           <Button fullWidth mt="sm" onClick={handleCreate}>
-            {initialUser ? "Сохранить изменения" : "Создать"}
+            {initialUser
+              ? translations["Salvează"][language]
+              : translations["Creează"][language]}
           </Button>
         </Stack>
       </Group>
     </Drawer>
-  )
-}
+  );
+};
 
-export default UserModal
+export default UserModal;
