@@ -103,6 +103,8 @@ const UsersComponent = () => {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         mb="md"
+        autoComplete="off"
+        name="search-user-field"
       />
 
       <UserList

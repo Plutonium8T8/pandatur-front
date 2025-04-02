@@ -206,6 +206,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
           <TextInput
             label={translations["Nume"][language]}
+            placeholder={translations["Nume"][language]}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
@@ -213,6 +214,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
           <TextInput
             label={translations["Prenume"][language]}
+            placeholder={translations["Prenume"][language]}
             value={form.surname}
             onChange={(e) => setForm({ ...form, surname: e.target.value })}
             required
@@ -221,6 +223,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           {!initialUser && (
             <TextInput
               label={translations["Login"][language]}
+              placeholder={translations["Login"][language]}
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
               required
@@ -229,17 +232,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
           <TextInput
             label={translations["Email"][language]}
+            placeholder={translations["Email"][language]}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
+            autoComplete="off"
             required
           />
 
           <TextInput
             label={translations["password"][language]}
+            placeholder={translations["password"][language]}
             type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required={!initialUser}
+            autoComplete="new-password"
+            name="new-password-field"
             rightSection={
               <ActionIcon
                 variant="subtle"
@@ -261,6 +269,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
           <TextInput
             label={translations["Funcție"][language]}
+            placeholder={translations["Funcție"][language]}
             value={form.job_title}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
             required
