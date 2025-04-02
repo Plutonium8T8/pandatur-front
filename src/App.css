@@ -1,3 +1,7 @@
+a {
+  text-decoration: none;
+}
+
 .statistics-section {
   margin: 20px 0;
   padding: 20px;
@@ -132,79 +136,10 @@
   cursor: pointer;
 }
 
-.container-tickets {
-  display: flex;
-  justify-content: space-between;
-  overflow-x: scroll;
-  gap: 10px;
-  width: 100%;
-  height: 100%;
-}
-
 .dashboard-container {
   margin-top: var(--leads-filter-height);
   height: calc(100% - var(--leads-filter-height));
   padding: 20px;
-}
-
-.colone-ticket {
-  display: flex;
-  flex-direction: column;
-  /*
-   FIXME: The width works correctly only when each column is 450px. Need to investigate why this happens
-  */
-  flex: 0 0 450px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.name-workflow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: bold;
-  font-size: 18px;
-  padding: 10px 18px;
-  color: #1f2937;
-  letter-spacing: 0.8px;
-  margin-bottom: 10px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border-radius: 6px;
-  background-color: #f9f9f9;
-}
-
-.ticket-counter-display {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.ticket-counter {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: bold;
-  color: white;
-  min-width: 40px;
-  text-align: center;
-}
-
-.ticket-counter-red {
-  background-color: #e53e3eee;
-}
-
-.ticket-counter-green {
-  background-color: #38a169ee;
-}
-
-.scrollable-list {
-  display: flex;
-  flex-direction: column;
-  overflow-y: scroll;
-  gap: 10px;
-  max-height: 98vh;
 }
 
 .container-select-priority-workflow {
@@ -322,22 +257,10 @@ button {
   padding: 4px;
 }
 
-.foto-user {
-  width: 50px;
-  height: 50px;
-  border-radius: 40px;
-}
-
 .container-time-tasks {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-}
-
-.foto-description {
-  display: flex;
-  gap: 5px;
-  flex-direction: row;
 }
 
 .chat-modal {
@@ -450,12 +373,6 @@ button {
   color: #555;
 }
 
-.container-time-tasks-chat {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
-
 .container-options-component {
   display: flex;
   flex-direction: column;
@@ -560,4 +477,8 @@ input {
 
 .h-full {
   height: 100%;
+}
+
+.overflow-x-scroll {
+  overflow-x: scroll;
 }

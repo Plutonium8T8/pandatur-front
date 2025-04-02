@@ -1,16 +1,16 @@
-import React from "react"
-import Select from "react-select"
-import { workflowOptions as rawWorkflowOptions } from "../../FormOptions/WorkFlowOption"
-import { translations } from "../utils/translations"
-import { getColorByWorkflowType } from "../WorkflowTag"
+import React from "react";
+import Select from "react-select";
+import { workflowOptions as rawWorkflowOptions } from "../../FormOptions/WorkFlowOption";
+import { translations } from "../utils/translations";
+import { getColorByWorkflowType } from "../Workflow/components";
 
 const workflowOptions = rawWorkflowOptions.map((workflow) => ({
   value: workflow,
-  label: workflow
-}))
+  label: workflow,
+}));
 
 export const Workflow = ({ ticket, onChange = () => {}, disabled = false }) => {
-  const language = localStorage.getItem("language") || "RO"
+  const language = localStorage.getItem("language") || "RO";
 
   const customStyles = {
     option: (provided, state) => ({
@@ -20,7 +20,7 @@ export const Workflow = ({ ticket, onChange = () => {}, disabled = false }) => {
         : getColorByWorkflowType(state.data.value, "#fff"),
       color: "#000",
       padding: "10px",
-      cursor: disabled ? "not-allowed" : "pointer"
+      cursor: disabled ? "not-allowed" : "pointer",
     }),
     control: (provided, state) => ({
       ...provided,
@@ -33,18 +33,18 @@ export const Workflow = ({ ticket, onChange = () => {}, disabled = false }) => {
       opacity: disabled ? 0.5 : 1,
       cursor: disabled ? "not-allowed" : "default",
       "&:hover": {
-        borderColor: getColorByWorkflowType(ticket?.workflow, "#aaa")
-      }
+        borderColor: getColorByWorkflowType(ticket?.workflow, "#aaa"),
+      },
     }),
     singleValue: (provided) => ({
       ...provided,
-      color: "#000"
-    })
-  }
+      color: "#000",
+    }),
+  };
 
   const selectedOption = workflowOptions.find(
-    (option) => option.value === ticket?.workflow
-  )
+    (option) => option.value === ticket?.workflow,
+  );
 
   return (
     <div className="container-options-component">
@@ -61,7 +61,7 @@ export const Workflow = ({ ticket, onChange = () => {}, disabled = false }) => {
         isDisabled={disabled}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Workflow
+export default Workflow;

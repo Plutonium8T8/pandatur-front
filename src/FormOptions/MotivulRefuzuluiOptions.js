@@ -1,4 +1,4 @@
-import { getLanguageByKey } from "../Components/utils/getLanguageByKey"
+import { getLanguageByKey } from "../Components/utils/getLanguageByKey";
 
 export const motivulRefuzuluiOptions = [
   "Clientul nu răspunde",
@@ -38,5 +38,4 @@ export const motivulRefuzuluiOptions = [
   "Marketing",
   "Resurse umane",
   "Alt motiv",
-  "Altele"
-].map((key) => getLanguageByKey(key))
+].map((key) => getLanguageByKey(key));

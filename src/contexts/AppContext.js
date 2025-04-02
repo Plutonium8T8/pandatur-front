@@ -1,10 +1,10 @@
-import React, { createContext, useState, useEffect, useRef } from "react"
-import { useSnackbar } from "notistack"
-import { useUser } from "../hooks"
-import { api } from "../api"
-import { showServerError } from "../Components/utils"
+import React, { createContext, useState, useEffect, useRef } from "react";
+import { useSnackbar } from "notistack";
+import { useUser } from "../hooks";
+import { api } from "../api";
+import { showServerError } from "../Components/utils";
 
-export const AppContext = createContext()
+export const AppContext = createContext();
 
 const parseClientId = (clientId) => {
   return clientId
@@ -12,8 +12,8 @@ const parseClientId = (clientId) => {
         .replace(/[{}]/g, "")
         .split(",")
         .map((id) => Number(id))
-    : []
-}
+    : [];
+};
 
 const normalizeLightTickets = (tickets) => {
   const ticketList = tickets.map((ticket) => ({
@@ -21,96 +21,94 @@ const normalizeLightTickets = (tickets) => {
     client_ids: parseClientId(ticket.client_id),
     last_message: ticket.last_message || "Нет сообщений",
     time_sent: ticket.time_sent || null,
-    unseen_count: ticket.unseen_count || 0
-  }))
+    unseen_count: ticket.unseen_count || 0,
+  }));
 
-  return ticketList
-}
+  return ticketList;
+};
 
 export const AppProvider = ({ children }) => {
-  const socketRef = useRef(null)
-  const [tickets, setTickets] = useState([])
-  const [ticketIds, setTicketIds] = useState([])
-  const [messages, setMessages] = useState([])
-  const [clientMessages, setClientMessages] = useState([])
-  const [unreadCount, setUnreadCount] = useState(0)
-  const { enqueueSnackbar } = useSnackbar()
-  const [isLoading, setIsLoading] = useState(false)
-  const { userId } = useUser()
-  const [unreadMessages, setUnreadMessages] = useState(new Map())
-  const [selectTicketId, setSelectTicketId] = useState(null)
-  const [spinnerTickets, setSpinnerTickets] = useState(false)
+  const socketRef = useRef(null);
+  const [tickets, setTickets] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [clientMessages, setClientMessages] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const { enqueueSnackbar } = useSnackbar();
+  const { userId } = useUser();
+  const [unreadMessages, setUnreadMessages] = useState(new Map());
+  const [selectTicketId, setSelectTicketId] = useState(null);
+  const [spinnerTickets, setSpinnerTickets] = useState(false);
 
   useEffect(() => {
-    let pingInterval
+    let pingInterval;
 
     if (socketRef.current) {
       pingInterval = setInterval(() => {
         if (socketRef.current.readyState === WebSocket.OPEN) {
-          const pingMessage = JSON.stringify({ type: "ping" })
-          socketRef.current.send(pingMessage)
+          const pingMessage = JSON.stringify({ type: "ping" });
+          socketRef.current.send(pingMessage);
         }
-      }, 5000)
+      }, 5000);
 
       return () => {
-        clearInterval(pingInterval)
+        clearInterval(pingInterval);
         if (socketRef.current) {
-          socketRef.current.onmessage = null
+          socketRef.current.onmessage = null;
         }
-      }
+      };
     }
-  }, [])
+  }, []);
 
   const connectToChatRooms = (ticketIds) => {
-    const socketInstance = socketRef.current
+    const socketInstance = socketRef.current;
     if (!socketInstance || socketInstance.readyState !== WebSocket.OPEN) {
-      console.warn("WebSocket не подключён или недоступен.")
-      return
+      console.warn("WebSocket не подключён или недоступен.");
+      return;
     }
 
     if (!ticketIds || ticketIds.length === 0) {
-      console.warn("Нет id для подключения к комнатам.")
-      return
+      console.warn("Нет id для подключения к комнатам.");
+      return;
     }
 
     const socketMessage = JSON.stringify({
       type: "connect",
-      data: { ticket_id: ticketIds }
-    })
+      data: { ticket_id: ticketIds },
+    });
 
-    socketInstance.send(socketMessage)
-  }
+    socketInstance.send(socketMessage);
+  };
 
   useEffect(() => {
     if (!socketRef.current) {
-      const socketInstance = new WebSocket(process.env.REACT_APP_WS_URL)
-      socketRef.current = socketInstance
+      const socketInstance = new WebSocket(process.env.REACT_APP_WS_URL);
+      socketRef.current = socketInstance;
 
       socketInstance.onopen = async () => {
-        console.log("Conectat la WebSocket")
-      }
+        console.log("Conectat la WebSocket");
+      };
 
       socketInstance.onmessage = (event) => {
-        const message = JSON.parse(event.data)
-        handleWebSocketMessage(message)
-      }
+        const message = JSON.parse(event.data);
+        handleWebSocketMessage(message);
+      };
 
       socketInstance.onerror = (error) => {
-        console.error("Eroare WebSocket:", error)
-      }
+        console.error("Eroare WebSocket:", error);
+      };
 
       socketInstance.onclose = () => {
-        console.log("Conexiunea WebSocket s-a închis")
-      }
+        console.log("Conexiunea WebSocket s-a închis");
+      };
     }
 
     return () => {
       if (socketRef.current) {
-        socketRef.current.close()
-        socketRef.current = null
+        socketRef.current.close();
+        socketRef.current = null;
       }
-    }
-  }, [])
+    };
+  }, []);
 
   useEffect(() => {
     const unread = messages.filter(
@@ -118,15 +116,15 @@ export const AppProvider = ({ children }) => {
         msg.seen_by != null &&
         msg.seen_by === "{}" &&
         msg.sender_id !== 1 &&
-        msg.sender_id !== userId
-    )
-    setUnreadCount(unread.length)
-  }, [messages])
+        msg.sender_id !== userId,
+    );
+    setUnreadCount(unread.length);
+  }, [messages]);
 
   const markMessagesAsRead = (ticketId) => {
-    if (!ticketId) return
+    if (!ticketId) return;
 
-    const socketInstance = socketRef.current
+    const socketInstance = socketRef.current;
 
     setMessages((prevMessages) =>
       prevMessages.map((msg) => {
@@ -134,165 +132,156 @@ export const AppProvider = ({ children }) => {
           return {
             ...msg,
             seen_by: JSON.stringify({ [userId]: true }),
-            seen_at: new Date().toISOString()
-          }
+            seen_at: new Date().toISOString(),
+          };
         }
-        return msg
-      })
-    )
+        return msg;
+      }),
+    );
 
     setUnreadMessages((prevUnread) => {
-      const updatedUnread = new Map(prevUnread)
+      const updatedUnread = new Map(prevUnread);
       updatedUnread.forEach((msg, msgId) => {
         if (msg.ticket_id === ticketId) {
-          updatedUnread.delete(msgId)
+          updatedUnread.delete(msgId);
         }
-      })
-      return updatedUnread
-    })
+      });
+      return updatedUnread;
+    });
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket
-      )
-    )
+        ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket,
+      ),
+    );
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
         type: "seen",
         data: {
           ticket_id: ticketId,
-          sender_id: Number(userId)
-        }
-      }
-      socketInstance.send(JSON.stringify(readMessageData))
-      console.log(`✅ Seen transmis pentru ticket_id=${ticketId}`)
+          sender_id: Number(userId),
+        },
+      };
+      socketInstance.send(JSON.stringify(readMessageData));
+      console.log(`✅ Seen transmis pentru ticket_id=${ticketId}`);
     } else {
-      console.warn("WebSocket не подключён, не удалось отправить seen.")
+      console.warn("WebSocket не подключён, не удалось отправить seen.");
     }
-  }
+  };
 
   const getTicketsListRecursively = async (page) => {
     try {
-      const data = await api.tickets.getLightList({ page: page })
+      const data = await api.tickets.getLightList({ page: page });
 
       if (page >= data.total_pages) {
-        setSpinnerTickets(false)
-        return
+        setSpinnerTickets(false);
+        return;
       }
 
-      const processedTickets = normalizeLightTickets(data.tickets)
-      setTickets((prev) => [...prev, ...processedTickets])
-      setTicketIds((prev) => [
-        ...prev,
-        ...processedTickets.map((ticket) => ticket.id)
-      ])
+      const processedTickets = normalizeLightTickets(data.tickets);
+      setTickets((prev) => [...prev, ...processedTickets]);
 
-      connectToChatRooms(processedTickets.map((ticket) => ticket.id))
+      connectToChatRooms(processedTickets.map((ticket) => ticket.id));
 
-      getTicketsListRecursively(page + 1)
+      getTicketsListRecursively(page + 1);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }
+  };
 
   const fetchTickets = async () => {
     try {
-      setSpinnerTickets(true)
-
-      await getTicketsListRecursively(1)
+      setSpinnerTickets(true);
+      await getTicketsListRecursively(1);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }
+  };
 
   const fetchSingleTicket = async (ticketId) => {
     try {
-      setIsLoading(true)
-
-      const ticket = await api.tickets.ticket.getLightById(ticketId)
+      const ticket = await api.tickets.ticket.getLightById(ticketId);
 
       setTickets((prevTickets) => {
-        const existingTicket = prevTickets.find((t) => t.id === ticketId)
+        const existingTicket = prevTickets.find((t) => t.id === ticketId);
         if (existingTicket) {
-          return prevTickets.map((t) => (t.id === ticketId ? ticket : t))
+          return prevTickets.map((t) => (t.id === ticketId ? ticket : t));
         } else {
-          return [...prevTickets, ticket]
+          return [...prevTickets, ticket];
         }
-      })
+      });
 
-      return ticket
+      return ticket;
     } catch (error) {
-      console.error("Eroare request ticket:", error)
-      return null
-    } finally {
-      setIsLoading(false)
+      console.error("Eroare request ticket:", error);
+      return null;
     }
-  }
+  };
 
   const updateTicket = async (updateData) => {
     try {
       const updatedTicket = await api.tickets.updateById({
         id: [updateData.id],
-        ...updateData
-      })
+        ...updateData,
+      });
 
-      return updatedTicket
+      return updatedTicket;
     } catch (error) {
-      console.error("Error updating ticket:", error.message || error)
-      throw error
+      console.error("Error updating ticket:", error.message || error);
+      throw error;
     }
-  }
+  };
 
   const getClientMessagesSingle = async (ticket_id) => {
-    console.log("Обновление сообщений для тикета:", ticket_id)
+    console.log("Обновление сообщений для тикета:", ticket_id);
     try {
-      const data = await api.messages.messagesTicketById(ticket_id)
+      const data = await api.messages.messagesTicketById(ticket_id);
 
       if (Array.isArray(data)) {
         setMessages((prevMessages) => {
-          console.log("mesaje vechi in state:", prevMessages)
-          console.log("Mesaj nou:", data)
+          console.log("mesaje vechi in state:", prevMessages);
+          console.log("Mesaj nou:", data);
 
           const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== ticket_id
-          )
+            (msg) => msg.ticket_id !== ticket_id,
+          );
 
-          return [...otherMessages, ...data]
-        })
+          return [...otherMessages, ...data];
+        });
 
-        console.log("update state messages:", data)
+        console.log("update state messages:", data);
 
         const unseenMessages = data.filter(
-          (msg) => msg.seen_by === "{}" && msg.sender_id !== userId
-        )
+          (msg) => msg.seen_by === "{}" && msg.sender_id !== userId,
+        );
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
             ticket.id === ticket_id
               ? { ...ticket, unseen_count: unseenMessages.length }
-              : ticket
-          )
-        )
+              : ticket,
+          ),
+        );
       }
     } catch (error) {
-      console.error("error request messages:", error.message)
+      console.error("error request messages:", error.message);
     }
-  }
+  };
 
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case "message": {
-        console.log("nou mesaj din WebSocket:", message.data)
+        console.log("nou mesaj din WebSocket:", message.data);
 
         const {
           ticket_id,
           message: msgText,
           time_sent,
-          sender_id
-        } = message.data
+          sender_id,
+        } = message.data;
 
-        setMessages((prevMessages) => [...prevMessages, message.data])
+        setMessages((prevMessages) => [...prevMessages, message.data]);
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -304,88 +293,88 @@ export const AppProvider = ({ children }) => {
                   unseen_count:
                     ticket_id === selectTicketId
                       ? 0
-                      : ticket.unseen_count + (sender_id !== userId ? 1 : 0)
+                      : ticket.unseen_count + (sender_id !== userId ? 1 : 0),
                 }
-              : ticket
-          )
-        )
+              : ticket,
+          ),
+        );
 
         setUnreadMessages((prevUnread) => {
-          const updatedUnread = new Map(prevUnread)
+          const updatedUnread = new Map(prevUnread);
 
           if (ticket_id === selectTicketId) {
             updatedUnread.forEach((msg, msgId) => {
               if (msg.ticket_id === ticket_id) {
-                updatedUnread.delete(msgId)
+                updatedUnread.delete(msgId);
               }
-            })
+            });
           } else if (sender_id !== userId) {
-            updatedUnread.set(message.data.id, message.data)
+            updatedUnread.set(message.data.id, message.data);
           }
 
-          return updatedUnread
-        })
+          return updatedUnread;
+        });
 
-        break
+        break;
       }
       case "seen": {
-        const { ticket_id, seen_at } = message.data
+        const { ticket_id, seen_at } = message.data;
 
         // console.log("🔄 Primit `seen` din WebSocket:", { ticket_id, seen_at })
 
         setMessages((prevMessages) => {
           return prevMessages.map((msg) =>
-            msg.ticket_id === ticket_id ? { ...msg, seen_at } : msg
-          )
-        })
+            msg.ticket_id === ticket_id ? { ...msg, seen_at } : msg,
+          );
+        });
 
         setUnreadMessages((prevUnreadMessages) => {
-          const updatedUnreadMap = new Map(prevUnreadMessages)
+          const updatedUnreadMap = new Map(prevUnreadMessages);
           updatedUnreadMap.forEach((msg, msgId) => {
             if (msg.ticket_id === ticket_id) {
-              updatedUnreadMap.delete(msgId)
+              updatedUnreadMap.delete(msgId);
             }
-          })
-          return updatedUnreadMap
-        })
+          });
+          return updatedUnreadMap;
+        });
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
-            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
-          )
-        )
+            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket,
+          ),
+        );
 
-        break
+        break;
       }
       case "ticket": {
-        console.log("A venit ticket nou:", message.data)
+        console.log("A venit ticket nou:", message.data);
 
-        const ticketId = message.data.ticket_id
+        const ticketId = message.data.ticket_id;
 
         if (!ticketId) {
-          console.warn("nu pot scoate ticket id din 'ticket'.")
-          break
+          console.warn("nu pot scoate ticket id din 'ticket'.");
+          break;
         }
 
-        fetchSingleTicket(ticketId)
+        fetchSingleTicket(ticketId);
 
-        const socketInstance = socketRef.current
+        const socketInstance = socketRef.current;
         if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
           const socketMessage = JSON.stringify({
             type: "connect",
-            data: { ticket_id: [ticketId] }
-          })
-          socketInstance.send(socketMessage)
+            data: { ticket_id: [ticketId] },
+          });
+          socketInstance.send(socketMessage);
         } else {
-          console.warn("eroor conect chat-room, WebSocket off.")
+          console.warn("eroor conect chat-room, WebSocket off.");
           console.log(
             "Stare WebSocket:",
             socketInstance
               ? socketInstance.readyState
-              : "Nu exista conecsiune la webSocket"
-          )
+              : "Nu exista conecsiune la webSocket",
+          );
         }
-        break
+        break;
       }
       // case "ticket_update": {
       //   console.log("обновление тикета :", message.data)
@@ -407,26 +396,26 @@ export const AppProvider = ({ children }) => {
       //   break
       // }
       case "pong":
-        console.log("пришел понг")
-        break
+        console.log("пришел понг");
+        break;
       default:
-        console.warn("inValid message_type din socket:", message.type)
+        console.warn("inValid message_type din socket:", message.type);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchTickets()
-  }, [])
+    fetchTickets();
+  }, []);
 
   useEffect(() => {
     const totalUnread = tickets.reduce(
       (sum, ticket) => sum + ticket.unseen_count,
-      0
-    )
+      0,
+    );
 
     // console.log(`🔄 updated unreadCount: ${totalUnread}`)
-    setUnreadCount(totalUnread)
-  }, [tickets, unreadMessages])
+    setUnreadCount(totalUnread);
+  }, [tickets, unreadMessages]);
 
   return (
     <AppContext.Provider
@@ -440,15 +429,14 @@ export const AppProvider = ({ children }) => {
         unreadCount,
         markMessagesAsRead,
         clientMessages,
-        isLoading,
         updateTicket,
         fetchTickets,
         socketRef,
         getClientMessagesSingle,
-        spinnerTickets
+        spinnerTickets,
       }}
     >
       {children}
     </AppContext.Provider>
-  )
-}
+  );
+};

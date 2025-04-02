@@ -1,8 +1,8 @@
-import Table from "rc-table"
-import { Pagination } from "../Pagination"
-import { Empty } from "../Empty"
-import "./RcTable.css"
-import { Spin } from "../Spin"
+import Table from "rc-table";
+import { Pagination } from "../Pagination";
+import { Empty } from "../Empty";
+import "./RcTable.css";
+import { Spin } from "../Spin";
 
 const renderSpinOrEmptyBox = (isLoading) => {
   if (isLoading) {
@@ -10,11 +10,11 @@ const renderSpinOrEmptyBox = (isLoading) => {
       <div className="table-spinner-loading">
         <Spin />
       </div>
-    )
+    );
   }
 
-  return <Empty />
-}
+  return <Empty />;
+};
 
 export const RcTable = ({
   columns,
@@ -33,7 +33,7 @@ export const RcTable = ({
           tableLayout="fixed"
           emptyText={renderSpinOrEmptyBox(loading)}
           rowClassName={({ id }) =>
-            `${bordered ? "border" : ""} ${selectedRow.includes(id) ? "row-selection" : ""}`
+            `${bordered ? "border" : ""} ${selectedRow?.includes(id) ? "row-selection" : ""}`
           }
           columns={columns}
           data={data}
@@ -47,5 +47,5 @@ export const RcTable = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};

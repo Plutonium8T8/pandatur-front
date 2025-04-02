@@ -1455,6 +1455,10 @@ export const translations = {
     RO: "Comision companie",
     RU: "Комиссия компании",
   },
+  "Filtrează tichete": {
+    RO: "Filtrează tichete",
+    RU: "Фильтровать тикеты",
+  },
   "Confirmare ștergere": {
     RO: "Confirmare ștergere",
     RU: "Подтверждение удаления",
@@ -1698,6 +1702,66 @@ export const translations = {
   "Eroare la actualizarea grupului": {
     RO: "Eroare la actualizarea grupului",
     RU: "Не удалось обновить группу",
+  },
+  lead_deleted_successfully: {
+    RO: "Lead șters cu succes",
+    RU: "Лид успешно удалён",
+  },
+  confirm_delete_lead: {
+    RO: "Sigur doriți să ștergeți acest lead?",
+    RU: "Вы уверены, что хотите удалить этот лид?",
+  },
+  "Editează ticketul": {
+    RO: "Editează ticketul",
+    RU: "Редактировать тикет",
+  },
+  "Sigur doriți să ștergeți aceste leaduri": {
+    RO: "Sigur doriți să ștergeți aceste leaduri ?",
+    RU: "Вы уверены, что хотите удалить эти лиды?",
+  },
+  "Leadurile au fost șterse cu succes": {
+    RO: "Leadurile au fost șterse cu succes",
+    RU: "Лиды были успешно удалены",
+  },
+  "Introduceți ID vechi": {
+    RO: "Introduceți ID vechi",
+    RU: "Введите старый ID”",
+  },
+  "ID-ul leadului este necesar": {
+    RO: "ID-ul leadului este necesar",
+    RU: "Требуется ID лида",
+  },
+  "Utilizatorii au fost combinați cu succes": {
+    RO: "Utilizatorii au fost combinați cu succes",
+    RU: "Пользователи успешно объединены",
+  },
+  "Biletele au fost combinate cu succes": {
+    RO: "Biletele au fost combinate cu succes",
+    RU: "Билеты успешно объединены",
+  },
+  "Datele despre ticket au fost create cu succes": {
+    RO: "Datele despre ticket au fost create cu succes",
+    RU: "Данные о тикете были успешно созданы",
+  },
+  "Fără date media": {
+    RO: "Fără date media",
+    RU: "Нет медиа-данных",
+  },
+  workflow_change_field_required: {
+    RO: "Acest câmp este obligatoriu pentru a schimba fluxul de lucru",
+    RU: "Это поле обязательно для изменения рабочего процесса",
+  },
+  please_complete_required_fields_for_workflow_change: {
+    RO: "Vă rugăm să completați câmpurile obligatorii pentru a schimba fluxul de lucru",
+    RU: "Пожалуйста, заполните обязательные поля, чтобы изменить рабочий процесс",
+  },
+  edit: {
+    RO: "Editează",
+    RU: "Редактировать",
+  },
+  delete: {
+    RO: "Șterge",
+    RU: "Удалить",
   },
 };
 

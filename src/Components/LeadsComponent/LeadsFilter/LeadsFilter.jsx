@@ -1,19 +1,20 @@
-import { forwardRef } from "react"
-import { FaTrash, FaEdit } from "react-icons/fa"
-import { TbLayoutKanbanFilled } from "react-icons/tb"
-import { IoMdAdd } from "react-icons/io"
-import { LuFilter } from "react-icons/lu"
-import { FaList } from "react-icons/fa6"
-import { getLanguageByKey } from "../../utils"
-import "./LeadsFilter.css"
+import { forwardRef } from "react";
+import { FaTrash, FaEdit } from "react-icons/fa";
+import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { IoMdAdd } from "react-icons/io";
+import { LuFilter } from "react-icons/lu";
+import { FaList } from "react-icons/fa6";
+import { getLanguageByKey } from "../../utils";
+import "./LeadsFilter.css";
 import {
   Button,
   ActionIcon,
   Input,
   SegmentedControl,
-  Flex
-} from "@mantine/core"
-import { IoMdClose } from "react-icons/io"
+  Flex,
+} from "@mantine/core";
+import { IoMdClose } from "react-icons/io";
+import { VIEW_MODE } from "../utils";
 
 export const RefLeadsFilter = forwardRef(
   (
@@ -21,16 +22,16 @@ export const RefLeadsFilter = forwardRef(
       openCreateTicketModal,
       searchTerm,
       setSearchTerm,
-      setIsTableView,
+      onChangeViewMode,
       selectedTickets,
       onOpenModal,
       setIsFilterOpen,
       deleteTicket,
       setGroupTitle,
       totalTicketsFiltered,
-      isFilterOpen
+      hasOpenFiltersModal,
     },
-    ref
+    ref,
   ) => {
     return (
       <Flex
@@ -59,7 +60,7 @@ export const RefLeadsFilter = forwardRef(
                 onClick={() => setSearchTerm("")}
                 style={{
                   display: searchTerm ? undefined : "none",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               />
             }
@@ -90,9 +91,9 @@ export const RefLeadsFilter = forwardRef(
           )}
 
           <ActionIcon
+            variant={hasOpenFiltersModal ? "filled" : "outline"}
             size="36"
             onClick={() => setIsFilterOpen(true)}
-            variant={isFilterOpen ? "filled" : "outline"}
           >
             <LuFilter size={16} />
           </ActionIcon>
@@ -100,12 +101,10 @@ export const RefLeadsFilter = forwardRef(
 
         <Flex gap="md">
           <SegmentedControl
-            onChange={(value) => {
-              setIsTableView((prev) => value === "kanban")
-            }}
+            onChange={onChangeViewMode}
             data={[
-              { value: "list", label: <TbLayoutKanbanFilled /> },
-              { value: "kanban", label: <FaList /> }
+              { value: VIEW_MODE.KANBAN, label: <TbLayoutKanbanFilled /> },
+              { value: VIEW_MODE.LIST, label: <FaList /> },
             ]}
           />
 
@@ -116,11 +115,11 @@ export const RefLeadsFilter = forwardRef(
               { value: "RO", label: "RO" },
               { value: "MD", label: "MD" },
               { value: "Filiale", label: getLanguageByKey("FIL") },
-              { value: "Francize", label: getLanguageByKey("FRA") }
+              { value: "Francize", label: getLanguageByKey("FRA") },
             ]}
           />
         </Flex>
       </Flex>
-    )
-  }
-)
+    );
+  },
+);
