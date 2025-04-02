@@ -37,7 +37,6 @@
 .schedule-table-container {
   max-height: 700px;
   overflow-y: auto;
-  border: 1px solid #ddd;
 }
 
 .schedule-table {
