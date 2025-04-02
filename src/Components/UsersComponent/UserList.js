@@ -10,6 +10,7 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
+import { useModals } from "@mantine/modals";
 import GroupChangeModal from "./GroupChangeModal";
 
 const UserList = ({
@@ -23,6 +24,7 @@ const UserList = ({
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const modals = useModals();
 
   const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
   const allIds = users.map(extractId).filter(Boolean);
@@ -72,25 +74,49 @@ const UserList = ({
       };
 
       await api.users.updateMultipleTechnicians(payload);
-      enqueueSnackbar("Статусы обновлены", { variant: "success" });
+      enqueueSnackbar(translations["Statuturi actualizate"][language], {
+        variant: "success",
+      });
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
       console.error("Ошибка при обновлении статуса:", err);
-      enqueueSnackbar("Ошибка при изменении статуса", { variant: "error" });
+      enqueueSnackbar(
+        translations["Eroare la schimbarea statusului"][language],
+        { variant: "error" },
+      );
     }
   };
 
-  const handleDeleteSelected = async () => {
-    try {
-      await api.users.deleteMultipleUsers({ user_ids: selectedIds });
-      enqueueSnackbar("Пользователи удалены", { variant: "success" });
-      fetchUsers();
-      setSelectedIds([]);
-    } catch (err) {
-      console.error("Ошибка при удалении пользователей:", err);
-      enqueueSnackbar("Ошибка при удалении", { variant: "error" });
-    }
+  const handleDeleteSelected = () => {
+    modals.openConfirmModal({
+      centered: true,
+      title: translations["Confirmare ștergere"][language],
+      children:
+        translations["Sigur doriți să ștergeți utilizatorii selectați?"][
+          language
+        ],
+      labels: {
+        confirm: translations["Ștergeți"][language],
+        cancel: translations["Anulează"][language],
+      },
+      confirmProps: { color: "red" },
+      onConfirm: async () => {
+        try {
+          await api.users.deleteMultipleUsers({ user_ids: selectedIds });
+          enqueueSnackbar(translations["Utilizator șters"][language], {
+            variant: "success",
+          });
+          fetchUsers();
+          setSelectedIds([]);
+        } catch (err) {
+          console.error("Ошибка при удалении пользователей:", err);
+          enqueueSnackbar(translations["Eroare la ștergere"][language], {
+            variant: "error",
+          });
+        }
+      },
+    });
   };
 
   const handleChangeGroup = async (group) => {
@@ -99,12 +125,17 @@ const UserList = ({
         user_ids: selectedIds,
         group_name: group,
       });
-      enqueueSnackbar("Группа обновлена", { variant: "success" });
+      enqueueSnackbar(translations["Grup actualizat"][language], {
+        variant: "success",
+      });
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
       console.error("Ошибка при смене группы:", err);
-      enqueueSnackbar("Не удалось обновить группу", { variant: "error" });
+      enqueueSnackbar(
+        translations["Eroare la actualizarea grupului"][language],
+        { variant: "error" },
+      );
     }
   };
 
@@ -138,19 +169,19 @@ const UserList = ({
       render: (id) => id,
     },
     {
-      title: "Name",
+      title: translations["Nume"][language],
       dataIndex: "name",
       key: "name",
       width: 150,
     },
     {
-      title: "Surname",
+      title: translations["Prenume"][language],
       dataIndex: "surname",
       key: "surname",
       width: 150,
     },
     {
-      title: "Email",
+      title: translations["Email"][language],
       dataIndex: "email",
       key: "email",
       width: 250,
@@ -166,7 +197,7 @@ const UserList = ({
           : "—",
     },
     {
-      title: "Job Title",
+      title: translations["Funcție"][language],
       dataIndex: "job_title",
       key: "job_title",
       width: 200,
@@ -235,13 +266,13 @@ const UserList = ({
             color="blue"
             onClick={handleToggleStatusSelected}
           >
-            {translations["Activați/Inactivați"][language]}
+            {translations["Schimbǎ status"][language]}
           </Button>
           <Button variant="light" onClick={() => setGroupModalOpen(true)}>
-            Сменить группу
+            {translations["Schimbă grupul"][language]}
           </Button>
           <Button variant="light" color="red" onClick={handleDeleteSelected}>
-            {translations["Ștergeți selectați"][language]}
+            {translations["Șterge"][language]}
           </Button>
         </div>
       )}

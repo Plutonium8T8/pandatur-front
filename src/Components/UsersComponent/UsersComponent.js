@@ -15,6 +15,7 @@ const UsersComponent = () => {
   const [editUser, setEditUser] = useState(null);
   const language = localStorage.getItem("language") || "RO";
   const { enqueueSnackbar } = useSnackbar();
+
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -60,7 +61,7 @@ const UsersComponent = () => {
       setUsers(normalized);
       setFiltered(normalized);
     } catch (err) {
-      console.error("Ошибка при загрузке:", err.message);
+      console.error("Eroare la încărcare:", err.message);
     } finally {
       setLoading(false);
     }
@@ -68,12 +69,16 @@ const UsersComponent = () => {
 
   const handleDeleteUser = async (id) => {
     try {
-      await api.users.deleteMultipleUsers({ user_ids: [id] }); // ✅ правильный API
-      enqueueSnackbar("Пользователь удалён", { variant: "success" }); // можно добавить
+      await api.users.deleteMultipleUsers({ user_ids: [id] });
+      enqueueSnackbar(translations["Utilizator șters"][language], {
+        variant: "success",
+      });
       fetchUsers();
     } catch (err) {
-      console.error("Ошибка при удалении пользователя:", err.message);
-      enqueueSnackbar("Ошибка при удалении пользователя", { variant: "error" }); // можно добавить
+      console.error("Eroare la ștergerea utilizatorului:", err.message);
+      enqueueSnackbar(translations["Eroare la ștergere"][language], {
+        variant: "error",
+      });
     }
   };
 

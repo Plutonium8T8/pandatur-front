@@ -272,7 +272,7 @@ export const translations = {
   },
   password: {
     RO: "Parolă",
-    RU: "пароль",
+    RU: "Пароль",
   },
   "Informații extinse": {
     RO: "Informații extinse",
@@ -1631,13 +1631,9 @@ export const translations = {
     RO: "Intervale pentru mai mulți tehnicieni",
     RU: "Интервалы для нескольких техников",
   },
-  "Activați/Inactivați": {
-    RO: "Activați/Inactivați",
-    RU: "Activați/Inactivați",
-  },
-  "Ștergeți selectați": {
-    RO: "Ștergeți selectați",
-    RU: "Ștergeți selectați",
+  "Schimbǎ status": {
+    RO: "Schimbǎ status",
+    RU: "Сменить статус",
   },
   "Grup utilizator": {
     RO: "Grup utilizator",
@@ -1674,6 +1670,34 @@ export const translations = {
   "Eroare la salvarea utilizatorului": {
     RO: "Eroare la salvarea utilizatorului",
     RU: "Ошибка при сохранении пользователя",
+  },
+  "Utilizator șters": {
+    RO: "Utilizator șters",
+    RU: "Пользователь удалён",
+  },
+  "Schimbă grupul": {
+    RO: "Schimbă grupul",
+    RU: "Сменить группу",
+  },
+  "Sigur doriți să ștergeți utilizatorii selectați?": {
+    RO: "Sigur doriți să ștergeți utilizatorii selectați?",
+    RU: "Вы уверены, что хотите удалить выбранных пользователей?",
+  },
+  "Statuturi actualizate": {
+    RO: "Statuturi actualizate",
+    RU: "Статусы обновлены",
+  },
+  "Eroare la schimbarea statusului": {
+    RO: "Eroare la schimbarea statusului",
+    RU: "Ошибка при изменении статуса",
+  },
+  "Grup actualizat": {
+    RO: "Grup actualizat",
+    RU: "Группа обновлена",
+  },
+  "Eroare la actualizarea grupului": {
+    RO: "Eroare la actualizarea grupului",
+    RU: "Не удалось обновить группу",
   },
 };
 

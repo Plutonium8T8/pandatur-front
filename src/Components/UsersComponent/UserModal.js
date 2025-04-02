@@ -239,6 +239,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
+            required={!initialUser}
             rightSection={
               <ActionIcon
                 variant="subtle"
