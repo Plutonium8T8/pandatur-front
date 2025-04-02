@@ -1578,5 +1578,9 @@ export const translations = {
   photo_or_video: {
     RO: "Foto sau video",
     RU: "Фото или видео"
+  },
+  file_upload_failed: {
+    RO: "Fișierul nu a fost încărcat. Vă rugăm să încercați din nou",
+    RU: "Файл не удалось загрузить. Пожалуйста, попробуйте снова"
   }
 }

@@ -14,7 +14,8 @@ export const ChatInput = ({
   onChangeTextArea,
   onSendMessage,
   onHandleFileSelect,
-  renderSelectUserPlatform
+  renderSelectUserPlatform,
+  loading
 }) => {
   const fileInputRef = useRef(null)
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -51,13 +52,21 @@ export const ChatInput = ({
       fileInputRef.current.click()
     }
   }
+
+  const handleFile = (e) => {
+    const selectedFile = e.target.files[0]
+    if (!selectedFile) return
+
+    onHandleFileSelect(selectedFile)
+  }
+
   return (
     <>
       <Flex gap="lg" align="center" mb="lg">
         <input
           type="file"
           accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
-          onChange={onHandleFileSelect}
+          onChange={handleFile}
           ref={fileInputRef}
           style={{ display: "none" }}
         />
@@ -84,7 +93,12 @@ export const ChatInput = ({
           onChange={(e) => onChangeTextArea(e.target.value.trim())}
           placeholder={getLanguageByKey("Introduceți mesaj")}
         />
-        <ActionIcon size="input-lg" onClick={onSendMessage} variant="default">
+        <ActionIcon
+          loading={loading}
+          size="input-lg"
+          onClick={onSendMessage}
+          variant="default"
+        >
           <FaPaperPlane />
         </ActionIcon>
       </Flex>

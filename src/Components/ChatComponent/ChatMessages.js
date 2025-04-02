@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Select, Box } from "@mantine/core"
-import { useApp, useUser } from "../../hooks"
-import { api } from "../../api"
-import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
 import {
   FaFacebook,
   FaViber,
@@ -10,7 +7,12 @@ import {
   FaWhatsapp,
   FaTelegram
 } from "react-icons/fa"
+import { useSnackbar } from "notistack"
+import { useApp, useUser } from "../../hooks"
+import { api } from "../../api"
+import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
 import { translations } from "../utils/translations"
+import { getLanguageByKey, showServerError } from "../utils"
 import { Spin } from "../Spin"
 import { ChatInput } from "./components"
 
@@ -24,6 +26,7 @@ const ChatMessages = ({
 }) => {
   const { userId } = useUser()
   const { messages, setMessages, tickets } = useApp()
+  const { enqueueSnackbar } = useSnackbar()
 
   const language = localStorage.getItem("language") || "RO"
   const [managerMessage, setManagerMessage] = useState("")
@@ -38,6 +41,7 @@ const ChatMessages = ({
   const [tasks, setTasks] = useState([])
   const [listTask, setListTask] = useState([])
   const [selectedTask, setSelectedTask] = useState(null)
+  const [loadingMessage, setLoadingMessage] = useState(false)
 
   const platformIcons = {
     facebook: <FaFacebook />,
@@ -85,49 +89,46 @@ const ChatMessages = ({
     const formData = new FormData()
     formData.append("file", file)
 
-    console.log("Подготовка к загрузке файла...")
-    console.log("FormData:", formData)
-
     try {
       const data = await api.messages.upload(formData)
 
       return data
     } catch (error) {
-      console.error("Ошибка загрузки файла:", error)
-      throw error
+      enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
+        variant: "error"
+      })
     }
   }
 
   const sendMessage = async (selectedFile, platform) => {
-    if (!managerMessage.trim() && !selectedFile) {
-      console.error("Ошибка: Отправка пустого сообщения невозможна.")
+    if (!managerMessage && !selectedFile) {
       return
     }
 
+    setLoadingMessage(true)
     try {
       const messageData = {
         sender_id: Number(userId),
         client_id: selectedClient,
         platform: platform,
-        message: managerMessage.trim(),
+        message: managerMessage,
         media_type: null,
         media_url: ""
       }
 
       if (selectedFile) {
-        console.log("Загрузка файла...")
         const uploadResponse = await uploadFile(selectedFile)
 
         if (!uploadResponse || !uploadResponse.url) {
-          console.error("Ошибка загрузки файла")
+          enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
+            variant: "error"
+          })
           return
         }
 
         messageData.media_url = uploadResponse.url
         messageData.media_type = getMediaType(selectedFile.type)
       }
-
-      console.log("Отправляемые данные:", JSON.stringify(messageData, null, 2))
 
       let apiUrl = api.messages.send.create
 
@@ -137,16 +138,9 @@ const ChatMessages = ({
         apiUrl = api.messages.send.viber
       }
 
-      console.log(`📡 Отправка сообщения через API: ${apiUrl}`)
-
-      setManagerMessage("")
-
       await apiUrl(messageData)
 
-      console.log(
-        `✅ Сообщение успешно отправлено через API ${apiUrl}:`,
-        messageData
-      )
+      setManagerMessage("")
 
       setMessages((prevMessages) => [
         ...prevMessages,
@@ -155,7 +149,9 @@ const ChatMessages = ({
 
       if (!selectedFile) setManagerMessage("")
     } catch (error) {
-      console.error("Ошибка отправки сообщения:", error)
+      enqueueSnackbar(showServerError(error), { variant: "error" })
+    } finally {
+      setLoadingMessage(false)
     }
   }
 
@@ -182,25 +178,6 @@ const ChatMessages = ({
     } catch (error) {
       console.error("Ошибка при обработке реакций:", error)
       return "☺"
-    }
-  }
-
-  const handleClick = () => {
-    if (!selectedClient) {
-      console.error("⚠️ Ошибка: Клиент не выбран!")
-      return
-    }
-    sendMessage(null, selectedPlatform)
-  }
-
-  const handleFileSelect = async (e) => {
-    const selectedFile = e.target.files[0]
-    if (!selectedFile) return
-
-    try {
-      await sendMessage(selectedFile, selectedPlatform)
-    } catch (error) {
-      console.error("Ошибка обработки файла:", error)
     }
   }
 
@@ -302,6 +279,7 @@ const ChatMessages = ({
     setIsTaskModalOpen(true)
   }
 
+  // NOTE: This code is broken and throw errors
   const usersOptions = () =>
     tickets
       .find((ticket) => ticket.id === selectTicketId)
@@ -591,11 +569,17 @@ const ChatMessages = ({
 
       <Box p="24">
         <ChatInput
+          loading={loadingMessage}
           inputValue={managerMessage ?? ""}
           onChangeTextArea={setManagerMessage}
           id={selectTicketId}
-          onSendMessage={handleClick}
-          onHandleFileSelect={handleFileSelect}
+          onSendMessage={() => {
+            if (!selectedClient) {
+              return
+            }
+            sendMessage(null, selectedPlatform)
+          }}
+          onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
           renderSelectUserPlatform={() => {
             return (
               tickets &&
@@ -606,10 +590,10 @@ const ChatMessages = ({
                   value={`${selectedClient}-${selectedPlatform}`}
                   placeholder={translations["Alege client"][language]}
                   data={usersOptions().flat()}
-                  onChange={(value, b) => {
-                    // const [clientId, platform] = value.split("-")
-                    // setSelectedClient(clientId)
-                    // setSelectedPlatform(platform)
+                  onChange={(value) => {
+                    const [clientId, platform] = value.split("-")
+                    setSelectedClient(clientId)
+                    setSelectedPlatform(platform)
                   }}
                 />
               )
