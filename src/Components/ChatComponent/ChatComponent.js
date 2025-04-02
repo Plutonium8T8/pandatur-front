@@ -53,6 +53,20 @@ const ChatComponent = () => {
     }
   }
 
+  useEffect(() => {
+    const newPersonalInfo = {}
+
+    tickets.forEach((ticket) => {
+      if (ticket.clients && Array.isArray(ticket.clients)) {
+        ticket.clients.forEach((client) => {
+          newPersonalInfo[client.id] = { ...client, photo: ticket.photo_url }
+        })
+      }
+    })
+
+    setPersonalInfo(newPersonalInfo)
+  }, [tickets])
+
   const updatedTicket =
     tickets.find((ticket) => ticket.id === selectTicketId) || null
 
@@ -82,7 +96,6 @@ const ChatComponent = () => {
           selectedClient={selectedClient}
           isLoading={isLoading}
           personalInfo={personalInfo}
-          setPersonalInfo={setPersonalInfo}
         />
 
         {selectTicketId && (
