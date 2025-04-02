@@ -5,28 +5,21 @@
   height: 100%;
 }
 
+.chat-area {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+
+.chat-messages {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
 .chat-container {
   display: flex;
   height: 100%;
   width: 100%;
   overflow: hidden;
-}
-
-.chat-area {
-  display: flex;
-  flex-direction: column;
-  width: 50%;
-  flex: 1;
-  background-color: #f9f9f9;
-  border-right: 1px solid #ddd;
-}
-
-.chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  height: 100vh;
-  scroll-behavior: auto;
 }
 
 .manager-send-message-container .task-select {
@@ -258,7 +251,6 @@
   gap: 20px;
   flex-direction: column;
   background-color: white;
-  padding: 0px 10px 0px 10px;
 }
 
 .client-message-group {
@@ -282,13 +274,6 @@
   text-transform: uppercase;
   letter-spacing: 1px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.chat-area {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  transition: width 0.3s ease-in-out;
 }
 
 .switch {
@@ -394,10 +379,6 @@ input:checked + .slider:before {
 
 .chat-container.chat-hidden .toggle-chat-list-button {
   left: 10px;
-}
-
-.chat-container.chat-hidden .chat-area {
-  flex-grow: 2;
 }
 
 .chat-close-button {

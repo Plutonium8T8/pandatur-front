@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react"
 import { FaFile, FaPaperPlane, FaSmile } from "react-icons/fa"
 import EmojiPicker from "emoji-picker-react"
 import ReactDOM from "react-dom"
+import { Flex } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
 import { api } from "../../api"
 import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
@@ -345,12 +346,18 @@ const ChatMessages = ({
   }
 
   return (
-    <div className="chat-area">
-      <div className="chat-messages" ref={messageContainerRef}>
+    <Flex w="50%" direction="column" className="chat-area">
+      <Flex
+        h="100vh"
+        p="16"
+        direction="column"
+        className="chat-messages"
+        ref={messageContainerRef}
+      >
         {isLoading ? (
-          <div className="spinner-container">
+          <Flex h="100%" align="center" justify="center">
             <Spin />
-          </div>
+          </Flex>
         ) : selectTicketId ? (
           (() => {
             const parseDate = (dateString) => {
@@ -596,7 +603,7 @@ const ChatMessages = ({
             <p>{translations["Alege lead"][language]}</p>
           </div>
         )}
-      </div>
+      </Flex>
       {selectTicketId && (
         <TaskListOverlay
           tasks={listTask}
@@ -733,7 +740,7 @@ const ChatMessages = ({
             )}
         </div>
       </div>
-    </div>
+    </Flex>
   )
 }
 
