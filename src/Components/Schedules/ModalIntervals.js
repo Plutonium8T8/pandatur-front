@@ -139,6 +139,15 @@ const ModalIntervals = ({
     }
   }, [schedule, shouldRefresh]);
 
+  useEffect(() => {
+    if (!opened) {
+      setSelectedDays([]);
+      setStartTime("");
+      setEndTime("");
+      setIntervalsByDay({});
+    }
+  }, [opened]);
+
   const deleteByDays = async () => {
     const payload = {
       technician_ids: getTechnicianIds(),
