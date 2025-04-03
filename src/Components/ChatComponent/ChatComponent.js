@@ -59,7 +59,10 @@ const ChatComponent = () => {
     tickets.forEach((ticket) => {
       if (ticket.clients && Array.isArray(ticket.clients)) {
         ticket.clients.forEach((client) => {
-          newPersonalInfo[client.id] = { ...client, photo: ticket.photo_url }
+          newPersonalInfo[client.id] = {
+            ...client,
+            photo: ticket?.photo_url
+          }
         })
       }
     })

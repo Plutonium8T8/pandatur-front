@@ -1,1 +1,2 @@
-export * from "./Message"
+export * from "./SendedMessage"
+export * from "./ReceivedMessage"
