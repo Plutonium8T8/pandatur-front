@@ -287,7 +287,7 @@ const ChatMessages = ({
   }
 
   return (
-    <Flex w="50%" direction="column" className="chat-area">
+    <Flex w="100%" direction="column" className="chat-area">
       <Flex
         h="100vh"
         p="16"
