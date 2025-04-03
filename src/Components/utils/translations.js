@@ -1815,6 +1815,10 @@ export const translations = {
     RO: "Du",
     RU: "Вс",
   },
+  "Fără intervale": {
+    RO: "Fără intervale",
+    RU: "Без интервалов",
+  }
 };
 
 // import { translations } from '../utils/translations';

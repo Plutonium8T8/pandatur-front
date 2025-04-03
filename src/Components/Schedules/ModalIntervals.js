@@ -39,35 +39,46 @@ const ModalIntervals = ({
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
   const [intervalsByDay, setIntervalsByDay] = useState({});
+  const selectedEmployee = schedule[selected.employeeIndex];
+  const selectedShifts = selectedEmployee?.shifts || [];
+
+  const isAddOrCutDisabled = !startTime || !endTime || selectedDays.length === 0;
+  const isDeleteDisabled = selectedDays.length === 0;
 
   const toggleDay = (day) => {
-    const updated = selectedDays.includes(day)
-      ? selectedDays.filter((d) => d !== day)
-      : [...selectedDays, day];
-    setSelectedDays(updated);
+    setSelectedDays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
   };
 
   useEffect(() => {
     if (!opened || selected.employeeIndex === null) return;
 
-    const selectedEmployee = schedule[selected.employeeIndex];
-    const selectedShifts = selectedEmployee?.shifts || [];
-
-    const updatedIntervals = {};
-
-    DAYS.forEach((day, idx) => {
-      if (selectedDays.includes(day.value)) {
-        updatedIntervals[day.value] = selectedShifts[idx] || [];
+    if (selected.dayIndex !== null) {
+      const defaultDay = DAYS[selected.dayIndex]?.value;
+      if (defaultDay && !selectedDays.includes(defaultDay)) {
+        setSelectedDays([defaultDay]);
       }
-    });
+    }
+  }, [opened, selected]);
 
-    setIntervalsByDay(updatedIntervals);
-  }, [opened, selected, selectedDays, schedule]);
+  useEffect(() => {
+    if (!opened || selected.employeeIndex === null) return;
+
+    const updated = {};
+    selectedDays.forEach((day) => {
+      const index = DAYS.findIndex((d) => d.value === day);
+      updated[day] = selectedShifts[index] || [];
+    });
+    setIntervalsByDay(updated);
+  }, [selectedDays, opened, selected.employeeIndex]);
 
   const getTechnicianIds = () =>
     selectedTechnicians.length > 0
       ? selectedTechnicians
-      : [schedule[selected.employeeIndex]?.id];
+      : [selectedEmployee?.id];
 
   const getWeekdays = () =>
     DAYS.filter((d) => selectedDays.includes(d.value)).map((d) => d.apiName);
@@ -83,24 +94,27 @@ const ModalIntervals = ({
     }
   };
 
-  const addInterval = () => handleRequest(api.schedules.addTimeframe, {
-    technician_ids: getTechnicianIds(),
-    weekdays: getWeekdays(),
-    start: startTime,
-    end: endTime,
-  });
+  const addInterval = () =>
+    handleRequest(api.schedules.addTimeframe, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+      start: startTime,
+      end: endTime,
+    });
 
-  const cutInterval = () => handleRequest(api.schedules.removeTimeframe, {
-    technician_ids: getTechnicianIds(),
-    weekdays: getWeekdays(),
-    start: startTime,
-    end: endTime,
-  });
+  const cutInterval = () =>
+    handleRequest(api.schedules.removeTimeframe, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+      start: startTime,
+      end: endTime,
+    });
 
-  const deleteByDays = () => handleRequest(api.schedules.deleteWeekdays, {
-    technician_ids: getTechnicianIds(),
-    weekdays: getWeekdays(),
-  });
+  const deleteByDays = () =>
+    handleRequest(api.schedules.deleteWeekdays, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+    });
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
@@ -122,8 +136,8 @@ const ModalIntervals = ({
       return tech ? `${tech.name} (${tech.id})` : "";
     }
 
-    return selected.employeeIndex !== null
-      ? `${schedule[selected.employeeIndex]?.name} (${schedule[selected.employeeIndex]?.id})`
+    return selectedEmployee
+      ? `${selectedEmployee.name} (${selectedEmployee.id})`
       : translations["Intervale pentru mai mulți tehnicieni"][language];
   };
 
@@ -142,13 +156,13 @@ const ModalIntervals = ({
             <Button
               size="xs"
               variant={selectedDays.length === DAYS.length ? "filled" : "light"}
-              onClick={() => {
+              onClick={() =>
                 setSelectedDays(
                   selectedDays.length === DAYS.length
                     ? []
                     : DAYS.map((d) => d.value)
-                );
-              }}
+                )
+              }
               style={{ width: 65 }}
             >
               {translations["Toate"][language]}
@@ -173,7 +187,6 @@ const ModalIntervals = ({
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
               />
-
               <TextInput
                 type="time"
                 label={translations["End"][language]}
@@ -185,7 +198,7 @@ const ModalIntervals = ({
                 variant="light"
                 color="green"
                 onClick={addInterval}
-                disabled={!startTime || !endTime}
+                disabled={isAddOrCutDisabled}
               >
                 <FaPlus />
               </ActionIcon>
@@ -194,7 +207,7 @@ const ModalIntervals = ({
                 variant="light"
                 color="yellow"
                 onClick={cutInterval}
-                disabled={!startTime || !endTime}
+                disabled={isAddOrCutDisabled}
               >
                 <FaMinus />
               </ActionIcon>
@@ -203,53 +216,85 @@ const ModalIntervals = ({
                 variant="light"
                 color="red"
                 onClick={deleteByDays}
-                disabled={!startTime || !endTime}
+                disabled={isDeleteDisabled}
               >
                 <FaTrash />
               </ActionIcon>
             </Group>
           </Group>
 
-          {selectedTechnicians.length <= 1 && selected.employeeIndex !== null &&
+          {selectedTechnicians.length <= 1 &&
+            selectedEmployee &&
             Object.entries(intervalsByDay).map(([dayKey, intervals]) => {
-              const dayLabel = DAYS.find(d => d.value === dayKey)?.label;
+              const dayLabel = DAYS.find((d) => d.value === dayKey)?.label;
               return (
                 <Stack key={dayKey} mt="md">
                   <Text fw={600}>{dayLabel}</Text>
-                  {intervals.map((interval, index) => (
-                    <Group key={index} align="flex-end">
-                      <TextInput
-                        type="time"
-                        label={translations["Start"][language]}
-                        value={interval.start}
-                        onChange={(e) => {
-                          const updated = [...intervals];
-                          updated[index].start = e.target.value;
-                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
-                        }}
-                      />
-                      <TextInput
-                        type="time"
-                        label={translations["End"][language]}
-                        value={interval.end}
-                        onChange={(e) => {
-                          const updated = [...intervals];
-                          updated[index].end = e.target.value;
-                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
-                        }}
-                      />
-                      <ActionIcon
-                        variant="light"
-                        color="red"
-                        onClick={() => {
-                          const updated = intervals.filter((_, i) => i !== index);
-                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
-                        }}
-                      >
-                        <FaTrash />
-                      </ActionIcon>
-                    </Group>
-                  ))}
+                  {intervals.length > 0 ? (
+                    intervals.map((interval, index) => (
+                      <Group key={index} align="flex-end">
+                        <TextInput
+                          type="time"
+                          label={translations["Start"][language]}
+                          value={interval.start}
+                          onChange={(e) => {
+                            const updated = [...intervals];
+                            updated[index].start = e.target.value;
+                            setIntervalsByDay({
+                              ...intervalsByDay,
+                              [dayKey]: updated,
+                            });
+                          }}
+                        />
+                        <TextInput
+                          type="time"
+                          label={translations["End"][language]}
+                          value={interval.end}
+                          onChange={(e) => {
+                            const updated = [...intervals];
+                            updated[index].end = e.target.value;
+                            setIntervalsByDay({
+                              ...intervalsByDay,
+                              [dayKey]: updated,
+                            });
+                          }}
+                        />
+                        <ActionIcon
+                          variant="light"
+                          color="red"
+                          onClick={async () => {
+                            const weekday = DAYS.find((d) => d.value === dayKey).apiName;
+
+                            try {
+                              await api.schedules.removeTimeframe({
+                                technician_ids: getTechnicianIds(),
+                                weekdays: [weekday],
+                                start: interval.start,
+                                end: interval.end,
+                              });
+
+                              // обновляем локальное состояние
+                              const updated = intervals.filter((_, i) => i !== index);
+                              setIntervalsByDay((prev) => ({
+                                ...prev,
+                                [dayKey]: updated,
+                              }));
+
+                              fetchData();
+                            } catch (e) {
+                              enqueueSnackbar(showServerError(e), { variant: "error" });
+                            }
+                          }}
+                        >
+                          <FaTrash />
+                        </ActionIcon>
+                      </Group>
+                    ))
+                  ) : (
+                    <Text size="sm">
+                      {translations["Fără intervale"][language]}
+                    </Text>
+                  )}
                 </Stack>
               );
             })}
@@ -261,7 +306,7 @@ const ModalIntervals = ({
           </Group>
         </Stack>
       </form>
-    </Drawer>
+    </Drawer >
   );
 };
 
