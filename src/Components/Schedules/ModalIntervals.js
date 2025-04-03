@@ -8,6 +8,16 @@ import { translations } from "../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
 
+const DAYS = [
+  { label: "Mo", value: "monday", apiName: "Monday" },
+  { label: "Tu", value: "tuesday", apiName: "Tuesday" },
+  { label: "We", value: "wednesday", apiName: "Wednesday" },
+  { label: "Th", value: "thursday", apiName: "Thursday" },
+  { label: "Fr", value: "friday", apiName: "Friday" },
+  { label: "Sa", value: "saturday", apiName: "Saturday" },
+  { label: "Su", value: "sunday", apiName: "Sunday" },
+];
+
 const ModalIntervals = ({
   opened,
   onClose,
@@ -22,35 +32,6 @@ const ModalIntervals = ({
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
 
-  const dayNames = [
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-    "sunday",
-  ];
-  const dayApiNames = {
-    monday: "Monday",
-    tuesday: "Tuesday",
-    wednesday: "Wednesday",
-    thursday: "Thursday",
-    friday: "Friday",
-    saturday: "Saturday",
-    sunday: "Sunday",
-  };
-
-  const dayButtons = [
-    { label: "Mo", value: "monday" },
-    { label: "Tu", value: "tuesday" },
-    { label: "We", value: "wednesday" },
-    { label: "Th", value: "thursday" },
-    { label: "Fr", value: "friday" },
-    { label: "Sa", value: "saturday" },
-    { label: "Su", value: "sunday" },
-  ];
-
   const toggleDay = (day) => {
     setSelectedDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
@@ -59,7 +40,7 @@ const ModalIntervals = ({
 
   useEffect(() => {
     if (opened && selected.employeeIndex !== null) {
-      const defaultDay = dayNames[selected.dayIndex];
+      const defaultDay = DAYS[selected.dayIndex]?.value;
       setSelectedDays([defaultDay]);
       const current =
         schedule[selected.employeeIndex]?.shifts[selected.dayIndex] || [];
@@ -67,23 +48,17 @@ const ModalIntervals = ({
     }
   }, [opened, selected, schedule]);
 
-  const getTechnicianIds = () => {
-    if (selectedTechnicians.length > 0) {
-      return selectedTechnicians;
-    }
-    return [schedule[selected.employeeIndex]?.id];
-  };
+  const getTechnicianIds = () =>
+    selectedTechnicians.length > 0
+      ? selectedTechnicians
+      : [schedule[selected.employeeIndex]?.id];
 
-  const getWeekdays = () => selectedDays.map((d) => dayApiNames[d]);
+  const getWeekdays = () =>
+    DAYS.filter((d) => selectedDays.includes(d.value)).map((d) => d.apiName);
 
-  const addInterval = async () => {
+  const handleRequest = async (apiMethod, payload) => {
     try {
-      await api.schedules.addTimeframe({
-        technician_ids: getTechnicianIds(),
-        weekdays: getWeekdays(),
-        start: startTime,
-        end: endTime,
-      });
+      await apiMethod(payload);
       setStartTime("");
       setEndTime("");
       fetchData();
@@ -92,48 +67,39 @@ const ModalIntervals = ({
     }
   };
 
-  const cutInterval = async () => {
-    try {
-      await api.schedules.removeTimeframe({
-        technician_ids: getTechnicianIds(),
-        weekdays: getWeekdays(),
-        start: startTime,
-        end: endTime,
-      });
-      setStartTime("");
-      setEndTime("");
-      fetchData();
-    } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    }
-  };
+  const addInterval = () =>
+    handleRequest(api.schedules.addTimeframe, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+      start: startTime,
+      end: endTime,
+    });
 
-  const deleteByDays = async () => {
-    try {
-      await api.schedules.deleteWeekdays({
-        technician_ids: getTechnicianIds(),
-        weekdays: getWeekdays(),
-      });
-      fetchData();
-    } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    }
-  };
+  const cutInterval = () =>
+    handleRequest(api.schedules.removeTimeframe, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+      start: startTime,
+      end: endTime,
+    });
+
+  const deleteByDays = () =>
+    handleRequest(api.schedules.deleteWeekdays, {
+      technician_ids: getTechnicianIds(),
+      weekdays: getWeekdays(),
+    });
 
   const removeInterval = async (index) => {
     const interval = intervals[index];
-    try {
-      await api.schedules.removeTimeframe({
-        technician_ids: [schedule[selected.employeeIndex].id],
-        weekdays: [dayApiNames[dayNames[selected.dayIndex]]],
-        start: interval.start,
-        end: interval.end,
-      });
-      setIntervals((prev) => prev.filter((_, i) => i !== index));
-      fetchData();
-    } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    }
+    const weekday = DAYS[selected.dayIndex]?.apiName;
+
+    await handleRequest(api.schedules.removeTimeframe, {
+      technician_ids: [schedule[selected.employeeIndex].id],
+      weekdays: [weekday],
+      start: interval.start,
+      end: interval.end,
+    });
+    setIntervals((prev) => prev.filter((_, i) => i !== index));
   };
 
   const getSelectedNames = () => {
@@ -161,13 +127,11 @@ const ModalIntervals = ({
       : translations["Intervale pentru mai mulți tehnicieni"][language];
   };
 
-  const title = getSelectedNames();
-
   return (
     <Drawer
       opened={opened}
       onClose={onClose}
-      title={title}
+      title={getSelectedNames()}
       position="right"
       size="lg"
       padding="xl"
@@ -177,22 +141,20 @@ const ModalIntervals = ({
           <Group spacing="xs" mt="xs">
             <Button
               size="xs"
-              variant={
-                selectedDays.length === dayButtons.length ? "filled" : "light"
-              }
+              variant={selectedDays.length === DAYS.length ? "filled" : "light"}
               onClick={() => {
-                if (selectedDays.length === dayButtons.length) {
-                  setSelectedDays([]);
-                } else {
-                  setSelectedDays(dayButtons.map((d) => d.value));
-                }
+                setSelectedDays(
+                  selectedDays.length === DAYS.length
+                    ? []
+                    : DAYS.map((d) => d.value),
+                );
               }}
               style={{ width: 65 }}
             >
               {translations["Toate"][language]}
             </Button>
 
-            {dayButtons.map((day) => (
+            {DAYS.map((day) => (
               <Button
                 key={day.value}
                 size="xs"
