@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { Flex } from "@mantine/core"
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa"
+import { Flex, ActionIcon } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
 import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
 import ChatList from "./ChatList"
-import ChatMessages from "./ChatMessages"
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa"
+import { ChatMessages } from "./components"
 
 const ChatComponent = () => {
   const { tickets, updateTicket, setTickets, messages, markMessagesAsRead } =
@@ -75,16 +75,24 @@ const ChatComponent = () => {
     tickets.find((ticket) => ticket.id === selectTicketId) || null
 
   return (
-    <div className="chat-wrapper">
-      <div
+    <Flex h="100%" className="chat-wrapper">
+      <Flex
+        w="100%"
+        h="100%"
+        style={{ border: "1px solid green" }}
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        <button
-          className="toggle-chat-list-button"
+        <ActionIcon
+          variant="default"
+          // className="toggle-chat-list-button"
           onClick={() => setIsChatListVisible((prev) => !prev)}
         >
-          {isChatListVisible ? <FaArrowLeft /> : <FaArrowRight />}
-        </button>
+          {isChatListVisible ? (
+            <FaArrowLeft size="12" />
+          ) : (
+            <FaArrowRight size="12" />
+          )}
+        </ActionIcon>
 
         {isChatListVisible && (
           <ChatList
@@ -104,7 +112,7 @@ const ChatComponent = () => {
           />
         </Flex>
 
-        {selectTicketId && (
+        {true && (
           <ChatExtraInfo
             selectedClient={selectedClient}
             ticketId={ticketId}
@@ -120,8 +128,8 @@ const ChatComponent = () => {
             isLoading={isLoading}
           />
         )}
-      </div>
-    </div>
+      </Flex>
+    </Flex>
   )
 }
 

@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Flex, Box, Select } from "@mantine/core"
 import { useSnackbar } from "notistack"
-import { useApp, useUser } from "../../hooks"
-import { api } from "../../api"
-import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
-import { translations } from "../utils/translations"
-import { getLanguageByKey, showServerError } from "../utils"
-import { Spin } from "../Spin"
-import { ChatInput } from "./components"
-import { getMediaType } from "./utils"
-import { GroupedMessages } from "./components"
+import { useApp, useUser } from "../../../../hooks"
+import { api } from "../../../../api"
+import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay"
+import { translations } from "../../../utils/translations"
+import { getLanguageByKey, showServerError } from "../../../utils"
+import { Spin } from "../../../Spin"
+import { ChatInput } from ".."
+import { getMediaType } from "../../utils"
+import { GroupedMessages } from "../GroupedMessages"
+import "./ChatMessages.css"
 
 const language = localStorage.getItem("language") || "RO"
 
-const ChatMessages = ({
+export const ChatMessages = ({
   selectTicketId,
   setSelectedClient,
   selectedClient,
@@ -294,5 +295,3 @@ const ChatMessages = ({
     </Flex>
   )
 }
-
-export default ChatMessages

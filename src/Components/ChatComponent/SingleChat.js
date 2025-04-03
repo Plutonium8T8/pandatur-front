@@ -3,7 +3,7 @@ import { Flex } from "@mantine/core"
 import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
 import ChatList from "./ChatList"
-import ChatMessages from "./ChatMessages"
+import { ChatMessages } from "./components"
 import { FaTimes } from "react-icons/fa"
 import { useUser, useApp } from "../../hooks"
 
