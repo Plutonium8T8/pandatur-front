@@ -1,12 +1,5 @@
 import React, { useState, useEffect, useRef } from "react"
-import { Select, Box } from "@mantine/core"
-import {
-  FaFacebook,
-  FaViber,
-  FaInstagram,
-  FaWhatsapp,
-  FaTelegram
-} from "react-icons/fa"
+import { Flex, Box, Select } from "@mantine/core"
 import { useSnackbar } from "notistack"
 import { useApp, useUser } from "../../hooks"
 import { api } from "../../api"
@@ -15,41 +8,28 @@ import { translations } from "../utils/translations"
 import { getLanguageByKey, showServerError } from "../utils"
 import { Spin } from "../Spin"
 import { ChatInput } from "./components"
+import { getMediaType } from "./utils"
+import { GroupedMessages } from "./components"
+
+const language = localStorage.getItem("language") || "RO"
 
 const ChatMessages = ({
   selectTicketId,
   setSelectedClient,
   selectedClient,
   isLoading,
-  personalInfo,
-  setPersonalInfo
+  personalInfo
 }) => {
   const { userId } = useUser()
   const { messages, setMessages, tickets } = useApp()
   const { enqueueSnackbar } = useSnackbar()
 
-  const language = localStorage.getItem("language") || "RO"
   const [managerMessage, setManagerMessage] = useState("")
 
-  const [selectedMessageId, setSelectedMessageId] = useState(null)
-  const [selectedReaction, setSelectedReaction] = useState({})
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
   const messageContainerRef = useRef(null)
-  const reactionContainerRef = useRef(null)
   const [isUserAtBottom, setIsUserAtBottom] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState("web")
-  const [tasks, setTasks] = useState([])
-  const [listTask, setListTask] = useState([])
-  const [selectedTask, setSelectedTask] = useState(null)
   const [loadingMessage, setLoadingMessage] = useState(false)
-
-  const platformIcons = {
-    facebook: <FaFacebook />,
-    instagram: <FaInstagram />,
-    whatsapp: <FaWhatsapp />,
-    viber: <FaViber />,
-    telegram: <FaTelegram />
-  }
 
   const getLastClientWhoSentMessage = () => {
     if (!Array.isArray(messages) || messages.length === 0) return null
@@ -66,9 +46,6 @@ const ChatMessages = ({
   useEffect(() => {
     const lastClient = getLastClientWhoSentMessage()
     if (lastClient) {
-      console.log(
-        `🔍 Последний клиент, который отправил сообщение: ${lastClient}`
-      )
       setSelectedClient(String(lastClient))
     }
   }, [messages, selectTicketId])
@@ -79,10 +56,6 @@ const ChatMessages = ({
     if (!date || !time) return null
     const [day, month, year] = date.split("-")
     return new Date(`${year}-${month}-${day}T${time}`)
-  }
-
-  const handleReactionClick = (reaction, messageId) => {
-    setSelectedReaction((prev) => ({ ...prev, [messageId]: reaction }))
   }
 
   const uploadFile = async (file) => {
@@ -138,14 +111,14 @@ const ChatMessages = ({
         apiUrl = api.messages.send.viber
       }
 
-      await apiUrl(messageData)
-
-      setManagerMessage("")
-
       setMessages((prevMessages) => [
         ...prevMessages,
         { ...messageData, seenAt: false }
       ])
+
+      await apiUrl(messageData)
+
+      setManagerMessage("")
 
       if (!selectedFile) setManagerMessage("")
     } catch (error) {
@@ -154,46 +127,6 @@ const ChatMessages = ({
       setLoadingMessage(false)
     }
   }
-
-  const getMediaType = (mimeType) => {
-    if (mimeType.startsWith("image/")) return "image"
-    if (mimeType.startsWith("video/")) return "video"
-    if (mimeType.startsWith("audio/")) return "audio"
-    return "file"
-  }
-
-  const getLastReaction = (message) => {
-    if (!message.reactions || message.reactions === "{}") {
-      return "☺"
-    }
-
-    try {
-      const reactionsObject = JSON.parse(message.reactions)
-
-      const reactionsArray = Object.values(reactionsObject)
-
-      return reactionsArray.length > 0
-        ? reactionsArray[reactionsArray.length - 1]
-        : "☺"
-    } catch (error) {
-      console.error("Ошибка при обработке реакций:", error)
-      return "☺"
-    }
-  }
-
-  useEffect(() => {
-    const newPersonalInfo = {}
-
-    tickets.forEach((ticket) => {
-      if (ticket.clients && Array.isArray(ticket.clients)) {
-        ticket.clients.forEach((client) => {
-          newPersonalInfo[client.id] = client
-        })
-      }
-    })
-
-    setPersonalInfo(newPersonalInfo)
-  }, [tickets])
 
   const handleScroll = () => {
     if (messageContainerRef.current) {
@@ -261,23 +194,10 @@ const ChatMessages = ({
   useEffect(() => {
     if (selectedClient) {
       const lastPlatform = getLastMessagePlatform(selectedClient)
-      console.log(
-        `🔍 Последняя платформа для клиента ${selectedClient}: ${lastPlatform}`
-      )
+
       setSelectedPlatform(lastPlatform || "web")
     }
   }, [selectedClient, messages])
-
-  const fetchTasks = async () => {
-    const data = await api.task.getAllTasks()
-    setTasks(data)
-  }
-
-  const openEditTask = (task) => {
-    console.log("Редактирование задачи:", task)
-    setSelectedTask(task)
-    setIsTaskModalOpen(true)
-  }
 
   // TODO: Please refactor me
   const usersOptions = () =>
@@ -305,266 +225,32 @@ const ChatMessages = ({
       })
 
   return (
-    <div className="chat-area">
-      <div className="chat-messages" ref={messageContainerRef}>
+    <Flex w="100%" direction="column" className="chat-area">
+      <Flex
+        h="100vh"
+        p="16"
+        direction="column"
+        className="chat-messages"
+        ref={messageContainerRef}
+      >
         {isLoading ? (
-          <div className="spinner-container">
+          <Flex h="100%" align="center" justify="center">
             <Spin />
-          </div>
+          </Flex>
         ) : selectTicketId ? (
-          (() => {
-            const parseDate = (dateString) => {
-              if (!dateString) return null
-              const [date, time] = dateString.split(" ")
-              if (!date || !time) return null
-              const [day, month, year] = date.split("-")
-              return new Date(`${year}-${month}-${day}T${time}`)
-            }
-
-            const sortedMessages = messages
-              .filter((msg) => msg.ticket_id === selectTicketId)
-              .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent))
-
-            const groupedMessages = []
-            let lastClientId = null
-
-            sortedMessages.forEach((msg) => {
-              const messageDate =
-                parseDate(msg.time_sent)?.toLocaleDateString("ru-RU", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric"
-                }) || "—"
-
-              const currentClientId = Array.isArray(msg.client_id)
-                ? msg.client_id[0].toString()
-                : msg.client_id.toString()
-              let lastGroup =
-                groupedMessages.length > 0
-                  ? groupedMessages[groupedMessages.length - 1]
-                  : null
-
-              if (
-                !lastGroup ||
-                lastGroup.date !== messageDate ||
-                lastClientId !== currentClientId
-              ) {
-                lastClientId = currentClientId
-                groupedMessages.push({
-                  date: messageDate,
-                  clientId: currentClientId,
-                  messages: [msg]
-                })
-              } else {
-                lastGroup.messages.push(msg)
-              }
-            })
-
-            return groupedMessages.map(
-              ({ date, clientId, messages }, index) => {
-                const clientInfo = personalInfo[clientId] || {}
-                const clientName = clientInfo.name
-                  ? `${clientInfo.name} ${clientInfo.surname || ""}`
-                  : `ID: ${clientId}`
-
-                return (
-                  <div key={index} className="message-group-container-chat">
-                    <div className="message-date-separator">📆 {date}</div>
-                    <div className="client-message-group">
-                      <div className="client-header">
-                        👤 {translations["Mesajele clientului"][language]} #
-                        {clientId} - {clientName}
-                      </div>
-                      {messages.map((msg, msgIndex) => {
-                        const uniqueKey = `${msg.id || msg.ticket_id}-${msg.time_sent}-${msgIndex}`
-
-                        const renderContent = () => {
-                          if (!msg.message) {
-                            return (
-                              <div className="text-message">
-                                {translations["Mesajul lipseste"][language]}
-                              </div>
-                            )
-                          }
-                          switch (msg.mtype) {
-                            case "image":
-                              return (
-                                <img
-                                  src={msg.message}
-                                  alt="Изображение"
-                                  className="image-preview-in-chat"
-                                  onError={(e) => {
-                                    e.target.src =
-                                      "https://via.placeholder.com/300?text=Ошибка+загрузки"
-                                  }}
-                                  onClick={() => {
-                                    window.open(msg.message, "_blank")
-                                  }}
-                                />
-                              )
-                            case "video":
-                              return (
-                                <video controls className="video-preview">
-                                  <source src={msg.message} type="video/mp4" />
-                                  {
-                                    translations[
-                                      "Acest browser nu suporta video"
-                                    ][language]
-                                  }
-                                </video>
-                              )
-                            case "audio":
-                              return (
-                                <audio controls className="audio-preview">
-                                  <source src={msg.message} type="audio/ogg" />
-                                  {
-                                    translations[
-                                      "Acest browser nu suporta audio"
-                                    ][language]
-                                  }
-                                </audio>
-                              )
-                            case "file":
-                              return (
-                                <a
-                                  href={msg.message}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="file-link"
-                                >
-                                  {translations["Deschide file"][language]}
-                                </a>
-                              )
-                            default:
-                              return (
-                                <div className="text-message">
-                                  {msg.message}
-                                </div>
-                              )
-                          }
-                        }
-
-                        const lastReaction = getLastReaction(msg)
-
-                        return (
-                          <div
-                            key={uniqueKey}
-                            className={`message ${msg.sender_id === userId || msg.sender_id === 1 ? "sent" : "received"}`}
-                          >
-                            <div className="message-content">
-                              <div className="message-row">
-                                <div
-                                  style={{
-                                    fontSize: "30px",
-                                    marginRight: "8px"
-                                  }}
-                                >
-                                  {platformIcons[msg.platform] || null}
-                                </div>
-
-                                <div className="text">
-                                  {renderContent()}
-                                  <div className="message-time">
-                                    {msg.sender_id !== 1 &&
-                                      msg.sender_id !== userId &&
-                                      (() => {
-                                        const cleanClientId = String(
-                                          msg.client_id
-                                        ).replace(/[{}]/g, "")
-                                        const clientInfo =
-                                          personalInfo[cleanClientId]
-
-                                        return (
-                                          <span className="client-name">
-                                            {clientInfo
-                                              ? `${clientInfo.name} ${clientInfo.surname || ""}`
-                                              : "Неизвестный"}
-                                          </span>
-                                        )
-                                      })()}
-                                    <div
-                                      className="reaction-toggle-button"
-                                      onClick={() =>
-                                        setSelectedMessageId(
-                                          selectedMessageId === msg.id
-                                            ? null
-                                            : msg.id
-                                        )
-                                      }
-                                    >
-                                      {lastReaction || "☺"}
-                                    </div>
-                                    <div className="time-messages">
-                                      {parseDate(
-                                        msg.time_sent
-                                      )?.toLocaleTimeString("ru-RU", {
-                                        hour: "2-digit",
-                                        minute: "2-digit"
-                                      }) || "—"}
-                                    </div>
-                                  </div>
-                                  {selectedMessageId === msg.id && (
-                                    <div
-                                      className="reaction-container"
-                                      ref={reactionContainerRef}
-                                    >
-                                      <div className="reaction-buttons">
-                                        {[
-                                          "☺",
-                                          "👍",
-                                          "❤️",
-                                          "😂",
-                                          "😮",
-                                          "😢",
-                                          "😡"
-                                        ].map((reaction) => (
-                                          <div
-                                            key={reaction}
-                                            onClick={() =>
-                                              handleReactionClick(
-                                                reaction,
-                                                msg.id
-                                              )
-                                            }
-                                            className={
-                                              selectedReaction[msg.id] ===
-                                              reaction
-                                                ? "active"
-                                                : ""
-                                            }
-                                          >
-                                            {reaction}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )
-              }
-            )
-          })()
+          <GroupedMessages
+            personalInfo={personalInfo}
+            selectTicketId={selectTicketId}
+          />
         ) : (
           <div className="empty-chat">
             <p>{translations["Alege lead"][language]}</p>
           </div>
         )}
-      </div>
+      </Flex>
+
       {selectTicketId && (
-        <TaskListOverlay
-          tasks={listTask}
-          fetchTasks={fetchTasks}
-          ticketId={selectTicketId}
-          userId={userId}
-          openEditTask={openEditTask}
-        />
+        <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
       {selectTicketId && (
@@ -605,7 +291,7 @@ const ChatMessages = ({
           />
         </Box>
       )}
-    </div>
+    </Flex>
   )
 }
 
