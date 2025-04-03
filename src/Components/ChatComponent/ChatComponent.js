@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+import { Flex } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
 import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
@@ -93,13 +94,15 @@ const ChatComponent = () => {
           />
         )}
 
-        <ChatMessages
-          selectTicketId={selectTicketId}
-          setSelectedClient={setSelectedClient}
-          selectedClient={selectedClient}
-          isLoading={isLoading}
-          personalInfo={personalInfo}
-        />
+        <Flex w="50%">
+          <ChatMessages
+            selectTicketId={selectTicketId}
+            setSelectedClient={setSelectedClient}
+            selectedClient={selectedClient}
+            isLoading={isLoading}
+            personalInfo={personalInfo}
+          />
+        </Flex>
 
         {selectTicketId && (
           <ChatExtraInfo

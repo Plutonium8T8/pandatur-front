@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"
+import { Flex } from "@mantine/core"
 import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
 import ChatList from "./ChatList"
@@ -79,14 +80,16 @@ const SingleChat = ({ ticketId, onClose }) => {
         />
       )}
 
-      <ChatMessages
-        selectTicketId={selectTicketId}
-        setSelectedClient={setSelectedClient}
-        selectedClient={selectedClient}
-        isLoading={isLoading}
-        personalInfo={personalInfo}
-        setPersonalInfo={setPersonalInfo}
-      />
+      <Flex w="70%">
+        <ChatMessages
+          selectTicketId={selectTicketId}
+          setSelectedClient={setSelectedClient}
+          selectedClient={selectedClient}
+          isLoading={isLoading}
+          personalInfo={personalInfo}
+          setPersonalInfo={setPersonalInfo}
+        />
+      </Flex>
 
       <ChatExtraInfo
         selectedClient={selectedClient}
