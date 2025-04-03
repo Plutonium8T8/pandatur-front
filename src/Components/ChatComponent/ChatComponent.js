@@ -1,16 +1,22 @@
 import React, { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa"
-import { Flex, ActionIcon } from "@mantine/core"
+import { Flex, ActionIcon, Box } from "@mantine/core"
 import { useApp, useUser } from "../../hooks"
-import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
 import ChatList from "./ChatList"
 import { ChatMessages } from "./components"
+import "./chat.css"
 
 const ChatComponent = () => {
-  const { tickets, updateTicket, setTickets, messages, markMessagesAsRead } =
-    useApp()
+  const {
+    tickets,
+    updateTicket,
+    setTickets,
+    messages,
+    markMessagesAsRead,
+    getClientMessagesSingle
+  } = useApp()
   const { ticketId } = useParams()
   const navigate = useNavigate()
   const { userId } = useUser()
@@ -22,11 +28,8 @@ const ChatComponent = () => {
   const [selectedClient, setSelectedClient] = useState("")
   const [isChatListVisible, setIsChatListVisible] = useState(true)
 
-  useEffect(() => {
-    if (ticketId && Number(ticketId) !== selectTicketId) {
-      setSelectTicketId(Number(ticketId))
-    }
-  }, [ticketId])
+  const updatedTicket =
+    tickets.find((ticket) => ticket.id === selectTicketId) || null
 
   useEffect(() => {
     if (!selectTicketId || !messages.length) return
@@ -71,38 +74,49 @@ const ChatComponent = () => {
     setPersonalInfo(newPersonalInfo)
   }, [tickets])
 
-  const updatedTicket =
-    tickets.find((ticket) => ticket.id === selectTicketId) || null
+  useEffect(() => {
+    if (!selectTicketId) return
+
+    setIsLoading(true)
+
+    getClientMessagesSingle(selectTicketId).finally(() => {
+      setIsLoading(false)
+    })
+  }, [selectTicketId])
+
+  useEffect(() => {
+    if (ticketId && Number(ticketId) !== selectTicketId) {
+      setSelectTicketId(Number(ticketId))
+    }
+  }, [ticketId])
 
   return (
     <Flex h="100%" className="chat-wrapper">
       <Flex
         w="100%"
         h="100%"
-        style={{ border: "1px solid green" }}
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        <ActionIcon
-          variant="default"
-          // className="toggle-chat-list-button"
-          onClick={() => setIsChatListVisible((prev) => !prev)}
-        >
-          {isChatListVisible ? (
-            <FaArrowLeft size="12" />
-          ) : (
-            <FaArrowRight size="12" />
-          )}
-        </ActionIcon>
-
         {isChatListVisible && (
           <ChatList
-            setIsLoading={setIsLoading}
             selectTicketId={selectTicketId}
             setSelectTicketId={handleSelectTicket}
           />
         )}
 
-        <Flex w="50%">
+        <Flex pos="relative" w="50%">
+          <Box pos="absolute" left="10px" top="10px" style={{ zIndex: 999 }}>
+            <ActionIcon
+              variant="default"
+              onClick={() => setIsChatListVisible((prev) => !prev)}
+            >
+              {isChatListVisible ? (
+                <FaArrowLeft size="12" />
+              ) : (
+                <FaArrowRight size="12" />
+              )}
+            </ActionIcon>
+          </Box>
           <ChatMessages
             selectTicketId={selectTicketId}
             setSelectedClient={setSelectedClient}

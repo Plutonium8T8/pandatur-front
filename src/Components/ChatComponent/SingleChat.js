@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Flex } from "@mantine/core"
+import { Flex, ActionIcon, Box } from "@mantine/core"
 import "./chat.css"
 import ChatExtraInfo from "./ChatExtraInfo"
 import ChatList from "./ChatList"
@@ -68,9 +68,11 @@ const SingleChat = ({ ticketId, onClose }) => {
 
   return (
     <div className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}>
-      <button className="chat-close-button" onClick={onClose}>
-        <FaTimes />
-      </button>
+      <Box pos="absolute" left="20px" top="20px">
+        <ActionIcon onClick={onClose} variant="default">
+          <FaTimes />
+        </ActionIcon>
+      </Box>
 
       {isChatListVisible && (
         <ChatList

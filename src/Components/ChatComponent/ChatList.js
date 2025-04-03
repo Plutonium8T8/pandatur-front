@@ -19,8 +19,8 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent)
 
-const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
-  const { tickets, getClientMessagesSingle } = useApp()
+const ChatList = ({ selectTicketId, setSelectTicketId }) => {
+  const { tickets } = useApp()
   const { userId } = useUser()
   const [showMyTickets, setShowMyTickets] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -49,16 +49,6 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
       }
     }
   }, [selectTicketId, tickets])
-
-  useEffect(() => {
-    if (!selectTicketId) return
-
-    setIsLoading(true)
-
-    getClientMessagesSingle(selectTicketId).finally(() => {
-      setIsLoading(false)
-    })
-  }, [selectTicketId])
 
   const handleTicketClick = (ticketId) => {
     console.log("🖱 Клик по тикету в списке:", ticketId)
