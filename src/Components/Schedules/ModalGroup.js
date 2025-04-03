@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
-import { useGetTechniciansList } from "../../hooks/useGetTechniciansList"; // путь поправь под свой проект
+import { useGetTechniciansList } from "../../hooks";
 import { api } from "../../api";
 
 const language = localStorage.getItem("language") || "RO";

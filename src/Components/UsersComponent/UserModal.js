@@ -230,6 +230,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           )}
 
           <TextInput
+            type="email"
             label={translations["Email"][language]}
             placeholder={translations["Email"][language]}
             value={form.email}

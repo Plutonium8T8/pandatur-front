@@ -13,6 +13,8 @@ import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
 import { translations } from "../../../utils/translations";
 import { useGetTechniciansList } from "../../../../hooks";
 
+const language = localStorage.getItem("language") || "RO";
+
 const TaskModal = ({
   isOpen,
   onClose,
@@ -26,7 +28,6 @@ const TaskModal = ({
   const [scheduledTime, setScheduledTime] = useState(null);
   const [ticketIds, setTicketIds] = useState([]);
   const [loading, setLoading] = useState(false);
-  const language = localStorage.getItem("language") || "RO";
   const { technicians: userList } = useGetTechniciansList();
 
   useEffect(() => {
