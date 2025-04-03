@@ -166,7 +166,6 @@ const ModalIntervals = ({
         if (dayValue) delete updated[dayValue];
       });
       setIntervalsByDay(updated);
-      // и убираем эти дни из selectedDays
       setSelectedDays((prev) =>
         prev.filter((d) => !getWeekdays().includes(
           DAYS.find((day) => day.value === d)?.apiName
@@ -177,25 +176,64 @@ const ModalIntervals = ({
     }
   };
 
+  const handleDeleteInterval = async (dayKey, intervalIndex, interval) => {
+    const weekday = DAYS.find((d) => d.value === dayKey)?.apiName;
+
+    try {
+      await api.schedules.removeTimeframe({
+        technician_ids: getTechnicianIds(),
+        weekdays: [weekday],
+        start: interval.start,
+        end: interval.end,
+      });
+
+      setIntervalsByDay((prev) => {
+        const updated = prev[dayKey].filter((_, i) => i !== intervalIndex);
+        return { ...prev, [dayKey]: updated };
+      });
+
+      fetchData();
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    }
+  };
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
       const names = schedule
         .filter((s) => selectedTechnicians.includes(s.id))
-        .map((s) => `${s.name} (${s.id})`);
+        .map((s) => s.name);
+
       return (
         <>
           <div style={{ fontWeight: 500, marginBottom: 5 }}>
             {translations["Utilizatori selectați"][language]}:
           </div>
-          <div>{names.join(", ")}</div>
+          <div
+            style={{
+              border: "1px solid #ccc",
+              borderRadius: 8,
+              padding: "8px 12px",
+              background: "#f9f9f9",
+              display: "flex",
+              flexDirection: "row",
+              gap: "4px",
+            }}
+          >
+            {names.map((name, idx) => (
+              <div key={idx}>
+                {name}
+                {idx !== names.length - 1 ? "," : ""}
+              </div>
+            ))}
+          </div>
         </>
       );
     }
 
     if (selectedTechnicians.length === 1) {
       const tech = schedule.find((s) => s.id === selectedTechnicians[0]);
-      return tech ? `${tech.name} (${tech.id})` : "";
+      return tech ? tech.name : "";
     }
 
     return selectedEmployee
@@ -324,28 +362,7 @@ const ModalIntervals = ({
                         <ActionIcon
                           variant="light"
                           color="red"
-                          onClick={async () => {
-                            const weekday = DAYS.find((d) => d.value === dayKey).apiName;
-
-                            try {
-                              await api.schedules.removeTimeframe({
-                                technician_ids: getTechnicianIds(),
-                                weekdays: [weekday],
-                                start: interval.start,
-                                end: interval.end,
-                              });
-
-                              const updated = intervals.filter((_, i) => i !== index);
-                              setIntervalsByDay((prev) => ({
-                                ...prev,
-                                [dayKey]: updated,
-                              }));
-
-                              fetchData();
-                            } catch (e) {
-                              enqueueSnackbar(showServerError(e), { variant: "error" });
-                            }
-                          }}
+                          onClick={() => handleDeleteInterval(dayKey, index, interval)}
                         >
                           <FaTrash />
                         </ActionIcon>

@@ -32,6 +32,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     try {
       setIsLoading(true);
       const scheduleData = await api.schedules.getSchedules();
+
       const dayKeys = [
         "Monday",
         "Tuesday",
@@ -141,11 +142,21 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         </button>
       </div>
 
+      <Button
+        fullWidth
+        variant="outline"
+        color="blue"
+        style={{ marginTop: 20 }}
+        onClick={() => setGroupModalOpened(true)}
+      >
+        {translations["Modifică grupul"][language]}
+      </Button>
+
       <div className="schedule-table-container">
         <table className="schedule-table">
           <thead>
             <tr>
-              <th>
+              <th style={{ width: 40 }}>
                 <Checkbox
                   checked={
                     selectedTechnicians.length === schedule.length &&
@@ -162,10 +173,9 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                       setSelectedTechnicians(schedule.map((s) => s.id));
                     }
                   }}
-                  style={{ marginRight: 4 }}
                 />
-                {translations["Angajat"][language]}
               </th>
+              <th>{translations["Angajat"][language]}</th>
               {getWeekDays().map((day, i) => (
                 <th key={i}>
                   {translations[format(day, "EEEE")][language]},{" "}
@@ -182,10 +192,9 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   <Checkbox
                     checked={selectedTechnicians.includes(employee.id)}
                     onChange={() => toggleTechnician(employee.id)}
-                    style={{ marginRight: 8 }}
                   />
-                  {employee.name}
                 </td>
+                <td>{employee.name}</td>
                 {employee.shifts.map((shift, di) => (
                   <td
                     key={di}
@@ -194,10 +203,10 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   >
                     {shift.length > 0
                       ? shift.map((i, idx) => (
-                          <div className="container-interval" key={idx}>
-                            {i.start} - {i.end}
-                          </div>
-                        ))
+                        <div className="container-interval" key={idx}>
+                          {i.start} - {i.end}
+                        </div>
+                      ))
                       : "-"}
                   </td>
                 ))}
@@ -207,16 +216,6 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
           </tbody>
         </table>
       </div>
-
-      <Button
-        fullWidth
-        variant="outline"
-        color="blue"
-        style={{ marginTop: 20 }}
-        onClick={() => setGroupModalOpened(true)}
-      >
-        {translations["Modifică grupul"][language]}
-      </Button>
 
       <ModalGroup
         opened={groupModalOpened}
