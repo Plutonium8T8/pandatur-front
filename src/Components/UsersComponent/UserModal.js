@@ -7,32 +7,34 @@ import {
   Switch,
   Avatar,
   Group,
-  ActionIcon,
   Select,
+  PasswordInput
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
-import { IoEye, IoEyeOff } from "react-icons/io5";
 import RolesComponent from "./RolesComponent";
 import { GroupUsersOptions } from "./GroupUsersOptions";
 import { translations } from "../utils/translations";
+import { DEFAULT_PHOTO } from "../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
+
+
+const initialFormState = {
+  name: "",
+  surname: "",
+  username: "",
+  email: "",
+  password: "",
+  job_title: "",
+  status: false,
+  groups: "",
+};
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [showPassword, setShowPassword] = useState(false);
-
-  const [form, setForm] = useState({
-    name: "",
-    surname: "",
-    username: "",
-    email: "",
-    password: "",
-    job_title: "",
-    status: false,
-    groups: "",
-  });
+  const [form, setForm] = useState(initialFormState);
 
   useEffect(() => {
     if (initialUser) {
@@ -50,16 +52,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             : initialUser.groups?.[0]?.name || "",
       });
     } else {
-      setForm({
-        name: "",
-        surname: "",
-        username: "",
-        email: "",
-        password: "",
-        job_title: "",
-        status: false,
-        groups: "",
-      });
+      setForm(initialFormState);
     }
   }, [initialUser, opened]);
 
@@ -87,9 +80,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       ) {
         enqueueSnackbar(
           translations["Completați toate câmpurile obligatorii"][language],
-          {
-            variant: "warning",
-          },
+          { variant: "warning" }
         );
         return;
       }
@@ -109,9 +100,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name,
             surname,
           }),
-          api.users.updateUsernameAndEmail(userId, {
-            email,
-          }),
+          api.users.updateUsernameAndEmail(userId, { email }),
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
@@ -123,7 +112,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
         enqueueSnackbar(
           translations["Utilizator actualizat cu succes"][language],
-          { variant: "success" },
+          { variant: "success" }
         );
       } else {
         const payload = {
@@ -145,31 +134,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         };
 
         await api.users.createTechnicianUser(payload);
-        enqueueSnackbar(translations["Utilizator creat cu succes"][language], {
-          variant: "success",
-        });
+        enqueueSnackbar(
+          translations["Utilizator creat cu succes"][language],
+          { variant: "success" }
+        );
       }
 
-      setForm({
-        name: "",
-        surname: "",
-        username: "",
-        email: "",
-        password: "",
-        job_title: "",
-        status: false,
-        groups: "",
-      });
-
+      setForm(initialFormState);
       onClose();
       onUserCreated();
     } catch (err) {
       const serverMessage =
         err?.response?.data?.message || err?.response?.data?.error;
-
       const fallbackMessage =
         translations["Eroare la salvarea utilizatorului"][language];
-
       enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
     }
   };
@@ -188,10 +166,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       size="lg"
     >
       <Group align="flex-start" spacing="xl">
-        <Avatar
-          src="https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp"
-          size={120}
-        />
+        <Avatar src={DEFAULT_PHOTO} size={120} />
 
         <Stack style={{ flex: 1 }}>
           <Switch
@@ -239,23 +214,14 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             required
           />
 
-          <TextInput
+          <PasswordInput
             label={translations["password"][language]}
             placeholder={translations["password"][language]}
-            type={showPassword ? "text" : "password"}
             value={form.password}
             onChange={(e) => setForm({ ...form, password: e.target.value })}
             required={!initialUser}
             autoComplete="new-password"
             name="new-password-field"
-            rightSection={
-              <ActionIcon
-                variant="subtle"
-                onClick={() => setShowPassword((prev) => !prev)}
-              >
-                {showPassword ? <IoEyeOff size={18} /> : <IoEye size={18} />}
-              </ActionIcon>
-            }
           />
 
           <Select

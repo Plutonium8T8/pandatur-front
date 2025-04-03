@@ -17,13 +17,13 @@ import { translations } from "../utils/translations";
 const language = localStorage.getItem("language") || "RO";
 
 const DAYS = [
-  { label: translations["Mo"][language], value: "monday", apiName: "Monday" },
-  { label: translations["Tu"][language], value: "tuesday", apiName: "Tuesday" },
-  { label: translations["We"][language], value: "wednesday", apiName: "Wednesday" },
-  { label: translations["Th"][language], value: "thursday", apiName: "Thursday" },
-  { label: translations["Fr"][language], value: "friday", apiName: "Friday" },
-  { label: translations["Sa"][language], value: "saturday", apiName: "Saturday" },
-  { label: translations["Su"][language], value: "sunday", apiName: "Sunday" },
+  { label: translations["Mo"][language], value: translations["Monday"][language], apiName: "Monday" },
+  { label: translations["Tu"][language], value: translations["Tuesday"][language], apiName: "Tuesday" },
+  { label: translations["We"][language], value: translations["Wednesday"][language], apiName: "Wednesday" },
+  { label: translations["Th"][language], value: translations["Thursday"][language], apiName: "Thursday" },
+  { label: translations["Fr"][language], value: translations["Friday"][language], apiName: "Friday" },
+  { label: translations["Sa"][language], value: translations["Saturday"][language], apiName: "Saturday" },
+  { label: translations["Su"][language], value: translations["Sunday"][language], apiName: "Sunday" },
 ];
 
 const ModalIntervals = ({
@@ -326,7 +326,7 @@ const ModalIntervals = ({
           {selectedTechnicians.length <= 1 &&
             selectedEmployee &&
             Object.entries(intervalsByDay).map(([dayKey, intervals]) => {
-              const dayLabel = DAYS.find((d) => d.value === dayKey)?.label;
+              const dayLabel = DAYS.find((d) => d.value === dayKey)?.value;
               return (
                 <Stack key={dayKey} mt="md">
                   <Text fw={600}>{dayLabel}</Text>

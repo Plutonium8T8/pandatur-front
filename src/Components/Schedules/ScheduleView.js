@@ -11,6 +11,16 @@ import "./Schedule.css";
 
 const language = localStorage.getItem("language") || "RO";
 
+const dayKeys = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [schedule, setSchedule] = useState([]);
   const [selected, setSelected] = useState({
@@ -33,25 +43,15 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
       setIsLoading(true);
       const scheduleData = await api.schedules.getSchedules();
 
-      const dayKeys = [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ];
-
       const combined = groupUsers.map((user) => {
         const userId = user.id;
         const userSchedule = scheduleData.find(
-          (s) => s.technician_id === userId,
+          (s) => s.technician_id === userId
         );
         const weeklySchedule = userSchedule?.weekly_schedule || {};
 
         const shifts = dayKeys.map((day) =>
-          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : [],
+          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
         );
 
         return { id: userId, name: user.username, shifts };
@@ -61,7 +61,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     } catch (e) {
       enqueueSnackbar(
         translations["Eroare la încărcarea programului"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     } finally {
       setIsLoading(false);

@@ -18,8 +18,8 @@ const language = localStorage.getItem("language") || "RO";
 const UserList = ({
   users,
   loading,
-  fetchUsers = () => {},
-  openEditUser = () => {},
+  fetchUsers = () => { },
+  openEditUser = () => { },
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
@@ -89,8 +89,8 @@ const UserList = ({
     subTitle:
       selectedIds.length > 1
         ? translations["Sigur doriți să ștergeți utilizatorii selectați?"][
-            language
-          ]
+        language
+        ]
         : translations["Sigur doriți să ștergeți utilizatorul?"][language],
     loading: false,
   });
