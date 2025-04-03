@@ -1,7 +1,7 @@
 import { Flex, Badge, DEFAULT_THEME, Divider } from "@mantine/core"
 import { useUser, useApp } from "../../../../hooks"
 import { DD_MM_YYYY } from "../../../../app-constants"
-import { Message } from "../Message"
+import { SendedMessage, ReceivedMessage } from "../Message"
 import { parseServerDate, getFullName, getLanguageByKey } from "../../../utils"
 import "./GroupedMessages.css"
 
@@ -80,14 +80,15 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
               </Badge>
             </Flex>
             <Flex direction="column" gap="xs">
-              {messages.map((msg) => (
-                <Message
-                  key={msg.id}
-                  msg={msg}
-                  userId={userId}
-                  personalInfo={personalInfo[clientId]}
-                />
-              ))}
+              {messages.map((msg) => {
+                const isMessageSentByMe =
+                  msg.sender_id === userId || msg.sender_id === 1
+                return isMessageSentByMe ? (
+                  <SendedMessage msg={msg} personalInfo={personalInfo} />
+                ) : (
+                  <ReceivedMessage msg={msg} personalInfo={personalInfo} />
+                )
+              })}
             </Flex>
           </Flex>
         )
