@@ -1779,6 +1779,42 @@ export const translations = {
     RO: "Sigur doriți să ștergeți utilizatorul?",
     RU: "Вы уверены что хотите удалить пользователя?",
   },
+  Start: {
+    RO: "Început",
+    RU: "Начало",
+  },
+  End: {
+    RO: "Sfârșit",
+    RU: "Конец",
+  },
+  Mo: {
+    RO: "Lu",
+    RU: "Пн",
+  },
+  Tu: {
+    RO: "Ma",
+    RU: "Вт",
+  },
+  We: {
+    RO: "Mi",
+    RU: "Ср",
+  },
+  Th: {
+    RO: "Jo",
+    RU: "Чт",
+  },
+  Fr: {
+    RO: "Vi",
+    RU: "Пт",
+  },
+  Sa: {
+    RO: "Sâ",
+    RU: "Сб",
+  },
+  Su: {
+    RO: "Du",
+    RU: "Вс",
+  },
 };
 
 // import { translations } from '../utils/translations';

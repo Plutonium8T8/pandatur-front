@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Drawer, Stack, Group, TextInput, Button } from "@mantine/core";
+import {
+  Drawer,
+  Stack,
+  Group,
+  TextInput,
+  Button,
+  ActionIcon,
+} from "@mantine/core";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
@@ -9,13 +16,25 @@ import { translations } from "../utils/translations";
 const language = localStorage.getItem("language") || "RO";
 
 const DAYS = [
-  { label: "Mo", value: "monday", apiName: "Monday" },
-  { label: "Tu", value: "tuesday", apiName: "Tuesday" },
-  { label: "We", value: "wednesday", apiName: "Wednesday" },
-  { label: "Th", value: "thursday", apiName: "Thursday" },
-  { label: "Fr", value: "friday", apiName: "Friday" },
-  { label: "Sa", value: "saturday", apiName: "Saturday" },
-  { label: "Su", value: "sunday", apiName: "Sunday" },
+  { label: translations["Mo"][language], value: "monday", apiName: "Monday" },
+  { label: translations["Tu"][language], value: "tuesday", apiName: "Tuesday" },
+  {
+    label: translations["We"][language],
+    value: "wednesday",
+    apiName: "Wednesday",
+  },
+  {
+    label: translations["Th"][language],
+    value: "thursday",
+    apiName: "Thursday",
+  },
+  { label: translations["Fr"][language], value: "friday", apiName: "Friday" },
+  {
+    label: translations["Sa"][language],
+    value: "saturday",
+    apiName: "Saturday",
+  },
+  { label: translations["Su"][language], value: "sunday", apiName: "Sunday" },
 ];
 
 const ModalIntervals = ({
@@ -171,25 +190,44 @@ const ModalIntervals = ({
             <Group align="flex-end" mt="md">
               <TextInput
                 type="time"
-                label="Start"
+                label={translations["Start"][language]}
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
               />
+
               <TextInput
                 type="time"
-                label="End"
+                label={translations["End"][language]}
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
               />
-              <Button onClick={addInterval} variant="light" color="green">
+
+              <ActionIcon
+                variant="light"
+                color="green"
+                onClick={addInterval}
+                disabled={!startTime || !endTime}
+              >
                 <FaPlus />
-              </Button>
-              <Button onClick={cutInterval} variant="light" color="yellow">
+              </ActionIcon>
+
+              <ActionIcon
+                variant="light"
+                color="yellow"
+                onClick={cutInterval}
+                disabled={!startTime || !endTime}
+              >
                 <FaMinus />
-              </Button>
-              <Button onClick={deleteByDays} variant="light" color="red">
+              </ActionIcon>
+
+              <ActionIcon
+                variant="light"
+                color="red"
+                onClick={deleteByDays}
+                disabled={!startTime || !endTime}
+              >
                 <FaTrash />
-              </Button>
+              </ActionIcon>
             </Group>
           </Group>
 
@@ -208,7 +246,7 @@ const ModalIntervals = ({
               <Group key={index} align="flex-end">
                 <TextInput
                   type="time"
-                  label="Start"
+                  label={translations["Start"][language]}
                   value={interval.start}
                   onChange={(e) => {
                     const updated = [...intervals];
@@ -218,7 +256,7 @@ const ModalIntervals = ({
                 />
                 <TextInput
                   type="time"
-                  label="End"
+                  label={translations["End"][language]}
                   value={interval.end}
                   onChange={(e) => {
                     const updated = [...intervals];
@@ -226,13 +264,13 @@ const ModalIntervals = ({
                     setIntervals(updated);
                   }}
                 />
-                <Button
+                <ActionIcon
                   variant="light"
                   color="red"
                   onClick={() => removeInterval(index)}
                 >
                   <FaTrash />
-                </Button>
+                </ActionIcon>
               </Group>
             ))}
 
