@@ -1586,5 +1586,13 @@ export const translations = {
   select_message_template: {
     RO: "Selectează un template de mesaj",
     RU: "Выберите шаблон сообщения"
+  },
+  more_options: {
+    RO: "Mai multe opțiuni",
+    RU: "Больше вариантов"
+  },
+  task: {
+    RO: "Sarcini",
+    RU: "Задачи"
   }
 }
