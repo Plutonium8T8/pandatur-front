@@ -1,41 +1,25 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FaFile, FaPaperPlane, FaSmile } from "react-icons/fa";
-import EmojiPicker from "emoji-picker-react";
-import ReactDOM from "react-dom";
-import { Flex, DEFAULT_THEME, Badge } from "@mantine/core";
-import { useApp, useUser } from "../../hooks";
-import { api } from "../../api";
-import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay";
-import {
-  FaFacebook,
-  FaViber,
-  FaInstagram,
-  FaWhatsapp,
-  FaTelegram,
-} from "react-icons/fa";
-import { translations } from "../utils/translations";
-import { templateOptions } from "../../FormOptions/MessageTemplate";
-import { Spin } from "../Spin";
-import { renderContent, getMediaType } from "./utils";
+import React, { useState, useEffect, useRef } from "react"
+import { FaFile, FaPaperPlane, FaSmile } from "react-icons/fa"
+import EmojiPicker from "emoji-picker-react"
+import ReactDOM from "react-dom"
+import { Flex } from "@mantine/core"
+import { useApp, useUser } from "../../hooks"
+import { api } from "../../api"
+import TaskListOverlay from "../Task/Components/TicketTask/TaskListOverlay"
+import { translations } from "../utils/translations"
+import { templateOptions } from "../../FormOptions/MessageTemplate"
+import { Spin } from "../Spin"
+import { getMediaType } from "./utils"
+import { GroupedMessages } from "./components"
 
-const { colors } = DEFAULT_THEME;
-const language = localStorage.getItem("language") || "RO";
-
-const platformIcons = {
-  facebook: <FaFacebook />,
-  instagram: <FaInstagram />,
-  whatsapp: <FaWhatsapp />,
-  viber: <FaViber />,
-  telegram: <FaTelegram />,
-};
+const language = localStorage.getItem("language") || "RO"
 
 const ChatMessages = ({
   selectTicketId,
   setSelectedClient,
   selectedClient,
   isLoading,
-  personalInfo,
-  setPersonalInfo,
+  personalInfo
 }) => {
   const { userId } = useUser();
   const { messages, setMessages, tickets } = useApp();
@@ -44,20 +28,18 @@ const ChatMessages = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
-    left: 0,
-  });
-  const [selectedMessageId, setSelectedMessageId] = useState(null);
-  const [selectedReaction, setSelectedReaction] = useState({});
-  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState(null);
-  const messageContainerRef = useRef(null);
-  const fileInputRef = useRef(null);
-  const reactionContainerRef = useRef(null);
-  const [isUserAtBottom, setIsUserAtBottom] = useState(true);
-  const [selectedPlatform, setSelectedPlatform] = useState("web");
-  const [tasks, setTasks] = useState([]);
-  const [listTask, setListTask] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
+    left: 0
+  })
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false)
+  const [selectedMessage, setSelectedMessage] = useState(null)
+  const messageContainerRef = useRef(null)
+  const fileInputRef = useRef(null)
+  const reactionContainerRef = useRef(null)
+  const [isUserAtBottom, setIsUserAtBottom] = useState(true)
+  const [selectedPlatform, setSelectedPlatform] = useState("web")
+  const [tasks, setTasks] = useState([])
+  const [listTask, setListTask] = useState([])
+  const [selectedTask, setSelectedTask] = useState(null)
 
   const getLastClientWhoSentMessage = () => {
     if (!Array.isArray(messages) || messages.length === 0) return null;
@@ -83,16 +65,12 @@ const ChatMessages = ({
   }, [messages, selectTicketId]);
 
   const parseDate = (dateString) => {
-    if (!dateString) return null;
-    const [date, time] = dateString.split(" ");
-    if (!date || !time) return null;
-    const [day, month, year] = date.split("-");
-    return new Date(`${year}-${month}-${day}T${time}`);
-  };
-
-  const handleReactionClick = (reaction, messageId) => {
-    setSelectedReaction((prev) => ({ ...prev, [messageId]: reaction }));
-  };
+    if (!dateString) return null
+    const [date, time] = dateString.split(" ")
+    if (!date || !time) return null
+    const [day, month, year] = date.split("-")
+    return new Date(`${year}-${month}-${day}T${time}`)
+  }
 
   const handleEmojiClick = (emojiObject) => {
     setManagerMessage((prev) => prev + emojiObject.emoji);
@@ -174,26 +152,7 @@ const ChatMessages = ({
     } catch (error) {
       console.error("Ошибка отправки сообщения:", error);
     }
-  };
-
-  const getLastReaction = (message) => {
-    if (!message.reactions || message.reactions === "{}") {
-      return "☺";
-    }
-
-    try {
-      const reactionsObject = JSON.parse(message.reactions);
-
-      const reactionsArray = Object.values(reactionsObject);
-
-      return reactionsArray.length > 0
-        ? reactionsArray[reactionsArray.length - 1]
-        : "☺";
-    } catch (error) {
-      console.error("Ошибка при обработке реакций:", error);
-      return "☺";
-    }
-  };
+  }
 
   const handleClick = () => {
     if (!selectedClient) {
@@ -242,21 +201,7 @@ const ChatMessages = ({
       setSelectedMessage(null);
       setManagerMessage("");
     }
-  };
-
-  useEffect(() => {
-    const newPersonalInfo = {};
-
-    tickets.forEach((ticket) => {
-      if (ticket.clients && Array.isArray(ticket.clients)) {
-        ticket.clients.forEach((client) => {
-          newPersonalInfo[client.id] = client;
-        });
-      }
-    });
-
-    setPersonalInfo(newPersonalInfo);
-  }, [tickets]);
+  }
 
   const handleScroll = () => {
     if (messageContainerRef.current) {
@@ -343,7 +288,7 @@ const ChatMessages = ({
   };
 
   return (
-    <Flex w="50%" direction="column" className="chat-area">
+    <Flex w="100%" direction="column" className="chat-area">
       <Flex
         h="100vh"
         p="16"
@@ -356,187 +301,10 @@ const ChatMessages = ({
             <Spin />
           </Flex>
         ) : selectTicketId ? (
-          (() => {
-            const parseDate = (dateString) => {
-              if (!dateString) return null;
-              const [date, time] = dateString.split(" ");
-              if (!date || !time) return null;
-              const [day, month, year] = date.split("-");
-              return new Date(`${year}-${month}-${day}T${time}`);
-            };
-
-            const sortedMessages = messages
-              .filter((msg) => msg.ticket_id === selectTicketId)
-              .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
-
-            const groupedMessages = [];
-            let lastClientId = null;
-
-            sortedMessages.forEach((msg) => {
-              const messageDate =
-                parseDate(msg.time_sent)?.toLocaleDateString("ru-RU", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                }) || "—";
-
-              const currentClientId = Array.isArray(msg.client_id)
-                ? msg.client_id[0].toString()
-                : msg.client_id.toString();
-              let lastGroup =
-                groupedMessages.length > 0
-                  ? groupedMessages[groupedMessages.length - 1]
-                  : null;
-
-              if (
-                !lastGroup ||
-                lastGroup.date !== messageDate ||
-                lastClientId !== currentClientId
-              ) {
-                lastClientId = currentClientId;
-                groupedMessages.push({
-                  date: messageDate,
-                  clientId: currentClientId,
-                  messages: [msg],
-                });
-              } else {
-                lastGroup.messages.push(msg);
-              }
-            });
-
-            return groupedMessages.map(
-              ({ date, clientId, messages }, index) => {
-                const clientInfo = personalInfo[clientId] || {};
-                const clientName = clientInfo.name
-                  ? `${clientInfo.name} ${clientInfo.surname || ""}`
-                  : `ID: ${clientId}`;
-
-                return (
-                  <Flex direction="column" gap="md" key={index}>
-                    <Flex justify="center">
-                      <Badge c="black" size="lg" bg={colors.gray[3]}>
-                        {date}
-                      </Badge>
-                    </Flex>
-
-                    <div>
-                      <Flex justify="center">
-                        <Badge c="black" size="lg" bg={colors.gray[3]}>
-                          {translations["Mesajele clientului"][language]} #
-                          {clientId} - {clientName}
-                        </Badge>
-                      </Flex>
-
-                      {messages.map((msg, msgIndex) => {
-                        const uniqueKey = `${msg.id || msg.ticket_id}-${msg.time_sent}-${msgIndex}`;
-
-                        const lastReaction = getLastReaction(msg);
-
-                        return (
-                          <div
-                            key={uniqueKey}
-                            className={`message ${msg.sender_id === userId || msg.sender_id === 1 ? "sent" : "received"}`}
-                          >
-                            <div className="message-content">
-                              <div className="message-row">
-                                <div
-                                  style={{
-                                    fontSize: "30px",
-                                    marginRight: "8px",
-                                  }}
-                                >
-                                  {platformIcons[msg.platform] || null}
-                                </div>
-
-                                <div className="text">
-                                  {renderContent(msg)}
-                                  <div className="message-time">
-                                    {msg.sender_id !== 1 &&
-                                      msg.sender_id !== userId &&
-                                      (() => {
-                                        const cleanClientId = String(
-                                          msg.client_id,
-                                        ).replace(/[{}]/g, "");
-                                        const clientInfo =
-                                          personalInfo[cleanClientId];
-
-                                        return (
-                                          <span className="client-name">
-                                            {clientInfo
-                                              ? `${clientInfo.name} ${clientInfo.surname || ""}`
-                                              : "Неизвестный"}
-                                          </span>
-                                        );
-                                      })()}
-                                    <div
-                                      className="reaction-toggle-button"
-                                      onClick={() =>
-                                        setSelectedMessageId(
-                                          selectedMessageId === msg.id
-                                            ? null
-                                            : msg.id,
-                                        )
-                                      }
-                                    >
-                                      {lastReaction || "☺"}
-                                    </div>
-                                    <div className="time-messages">
-                                      {parseDate(
-                                        msg.time_sent,
-                                      )?.toLocaleTimeString("ru-RU", {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      }) || "—"}
-                                    </div>
-                                  </div>
-                                  {selectedMessageId === msg.id && (
-                                    <div
-                                      className="reaction-container"
-                                      ref={reactionContainerRef}
-                                    >
-                                      <div className="reaction-buttons">
-                                        {[
-                                          "☺",
-                                          "👍",
-                                          "❤️",
-                                          "😂",
-                                          "😮",
-                                          "😢",
-                                          "😡",
-                                        ].map((reaction) => (
-                                          <div
-                                            key={reaction}
-                                            onClick={() =>
-                                              handleReactionClick(
-                                                reaction,
-                                                msg.id,
-                                              )
-                                            }
-                                            className={
-                                              selectedReaction[msg.id] ===
-                                              reaction
-                                                ? "active"
-                                                : ""
-                                            }
-                                          >
-                                            {reaction}
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </Flex>
-                );
-              },
-            );
-          })()
+          <GroupedMessages
+            personalInfo={personalInfo}
+            selectTicketId={selectTicketId}
+          />
         ) : (
           <div className="empty-chat">
             <p>{translations["Alege lead"][language]}</p>

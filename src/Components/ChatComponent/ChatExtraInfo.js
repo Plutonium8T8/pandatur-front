@@ -122,6 +122,7 @@ const ChatExtraInfo = ({
       setPersonalInfo((prev) => ({
         ...prev,
         [clientId]: {
+          ...prev[clientId],
           name: result.name || "",
           surname: result.surname || "",
           address: result.address || "",
@@ -246,6 +247,7 @@ const ChatExtraInfo = ({
       setPersonalInfo((prev) => ({
         ...prev,
         [clientId]: {
+          ...prev[clientId],
           name: clientData.name || "",
           surname: clientData.surname || "",
           address: clientData.address || "",

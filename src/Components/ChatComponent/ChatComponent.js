@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useApp, useUser } from "../../hooks";
-import "./chat.css";
-import ChatExtraInfo from "./ChatExtraInfo";
-import ChatList from "./ChatList";
-import ChatMessages from "./ChatMessages";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import React, { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { Flex } from "@mantine/core"
+import { useApp, useUser } from "../../hooks"
+import "./chat.css"
+import ChatExtraInfo from "./ChatExtraInfo"
+import ChatList from "./ChatList"
+import ChatMessages from "./ChatMessages"
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa"
 
 const ChatComponent = () => {
   const { tickets, updateTicket, setTickets, messages, markMessagesAsRead } =
@@ -51,7 +52,24 @@ const ChatComponent = () => {
       setSelectTicketId(ticketId);
       navigate(`/chat/${ticketId}`);
     }
-  };
+  }
+
+  useEffect(() => {
+    const newPersonalInfo = {}
+
+    tickets.forEach((ticket) => {
+      if (ticket.clients && Array.isArray(ticket.clients)) {
+        ticket.clients.forEach((client) => {
+          newPersonalInfo[client.id] = {
+            ...client,
+            photo: ticket?.photo_url
+          }
+        })
+      }
+    })
+
+    setPersonalInfo(newPersonalInfo)
+  }, [tickets])
 
   const updatedTicket =
     tickets.find((ticket) => ticket.id === selectTicketId) || null;
@@ -76,14 +94,15 @@ const ChatComponent = () => {
           />
         )}
 
-        <ChatMessages
-          selectTicketId={selectTicketId}
-          setSelectedClient={setSelectedClient}
-          selectedClient={selectedClient}
-          isLoading={isLoading}
-          personalInfo={personalInfo}
-          setPersonalInfo={setPersonalInfo}
-        />
+        <Flex w="50%">
+          <ChatMessages
+            selectTicketId={selectTicketId}
+            setSelectedClient={setSelectedClient}
+            selectedClient={selectedClient}
+            isLoading={isLoading}
+            personalInfo={personalInfo}
+          />
+        </Flex>
 
         {selectTicketId && (
           <ChatExtraInfo

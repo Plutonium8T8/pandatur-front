@@ -26,35 +26,6 @@
   border: 1px solid #ddd;
 }
 
-.message {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-}
-
-.message.received {
-  align-items: flex-start;
-  padding-right: 100px;
-}
-
-.message .text {
-  padding: 10px;
-  border-radius: 15px;
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-.message .text img {
-  max-height: 65vh;
-}
-
-.message-time {
-  font-size: 0.75em;
-  color: white;
-  margin-top: 3px;
-  text-align: right;
-}
-
 .manager-send-message-container .message-options label {
   color: black;
 }
@@ -163,16 +134,6 @@
   letter-spacing: 1px;
 }
 
-.message-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.message-row {
-  display: flex;
-  align-items: center;
-}
-
 .emoji-picker-popup {
   background: white;
   border: 1px solid #ccc;
@@ -181,47 +142,8 @@
   transition: opacity 0.2s;
 }
 
-.reaction-toggle-button {
-  display: flex;
-  cursor: pointer;
-  align-items: center;
-  justify-content: flex-end;
-  font-size: 18px;
-}
-
-.reaction-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-
-.reaction-buttons div {
-  cursor: pointer;
-  font-size: 18px;
-}
-
-.text img {
-  cursor: pointer;
-  width: auto;
-  background-color: white;
-  color: black;
-}
-
 .tabs {
   display: flex;
-}
-
-.image-preview-in-chat {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  margin: 5px 0;
-}
-
-.video-preview {
-  max-width: 100%;
-  height: auto;
 }
 
 .text-message {
@@ -277,16 +199,6 @@ input:checked + .slider:before {
 
 .hidden {
   display: none;
-}
-
-.time-messages {
-  color: #333;
-  font-weight: bold;
-}
-
-.client-name {
-  color: #0f824c77;
-  font-weight: bold;
 }
 
 .toggle-label {
@@ -352,14 +264,4 @@ input:checked + .slider:before {
 
 .chat-extra-info-scroll-area > div > div {
   height: calc(100% - 50px);
-}
-
-.message.sent {
-  align-items: flex-end;
-  padding-left: 100px;
-}
-
-.message.sent .text {
-  background-color: #0f824c;
-  color: #fff;
 }

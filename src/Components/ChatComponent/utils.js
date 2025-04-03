@@ -18,8 +18,8 @@ export const renderContent = (msg) => {
       return (
         <img
           src={msg.message}
-          alt="Изображение"
-          className="image-preview-in-chat"
+          alt=""
+          className="image-preview-in-chat | pointer"
           onError={(e) => {
             e.target.src =
               "https://via.placeholder.com/300?text=Ошибка+загрузки";
@@ -38,19 +38,14 @@ export const renderContent = (msg) => {
       );
     case "audio":
       return (
-        <audio controls className="audio-preview">
+        <audio controls>
           <source src={msg.message} type="audio/ogg" />
           {getLanguageByKey("Acest browser nu suporta audio")}
         </audio>
       );
     case "file":
       return (
-        <a
-          href={msg.message}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="file-link"
-        >
+        <a href={msg.message} target="_blank" rel="noopener noreferrer">
           {getLanguageByKey("Deschide file")}
         </a>
       );
