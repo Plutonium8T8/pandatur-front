@@ -41,7 +41,7 @@ const ModalIntervals = ({
   const [intervalsByDay, setIntervalsByDay] = useState({});
   const selectedEmployee = schedule[selected.employeeIndex];
   const selectedShifts = selectedEmployee?.shifts || [];
-
+  const [shouldRefresh, setShouldRefresh] = useState(false);
   const isAddOrCutDisabled = !startTime || !endTime || selectedDays.length === 0;
   const isDeleteDisabled = selectedDays.length === 0;
 
@@ -89,12 +89,28 @@ const ModalIntervals = ({
   const getWeekdays = () =>
     DAYS.filter((d) => selectedDays.includes(d.value)).map((d) => d.apiName);
 
+  const refreshIntervalsByDay = () => {
+    const updatedEmployee = schedule[selected.employeeIndex];
+    if (!updatedEmployee) return;
+
+    const updatedShifts = updatedEmployee.shifts || [];
+    const updated = {};
+
+    selectedDays.forEach((day) => {
+      const index = DAYS.findIndex((d) => d.value === day);
+      updated[day] = updatedShifts[index] || [];
+    });
+
+    setIntervalsByDay(updated);
+  };
+
   const handleRequest = async (apiMethod, payload) => {
     try {
       await apiMethod(payload);
       setStartTime("");
       setEndTime("");
-      fetchData();
+      await fetchData();
+      setShouldRefresh(true);
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
     }
@@ -116,11 +132,42 @@ const ModalIntervals = ({
       end: endTime,
     });
 
-  const deleteByDays = () =>
-    handleRequest(api.schedules.deleteWeekdays, {
+  useEffect(() => {
+    if (shouldRefresh) {
+      refreshIntervalsByDay();
+      setShouldRefresh(false);
+    }
+  }, [schedule, shouldRefresh]);
+
+  const deleteByDays = async () => {
+    const payload = {
       technician_ids: getTechnicianIds(),
       weekdays: getWeekdays(),
-    });
+    };
+
+    try {
+      await api.schedules.deleteWeekdays(payload);
+      setStartTime("");
+      setEndTime("");
+      fetchData();
+
+      const updated = { ...intervalsByDay };
+      getWeekdays().forEach((weekday) => {
+        const dayValue = DAYS.find((d) => d.apiName === weekday)?.value;
+        if (dayValue) delete updated[dayValue];
+      });
+      setIntervalsByDay(updated);
+      // и убираем эти дни из selectedDays
+      setSelectedDays((prev) =>
+        prev.filter((d) => !getWeekdays().includes(
+          DAYS.find((day) => day.value === d)?.apiName
+        ))
+      );
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    }
+  };
+
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
