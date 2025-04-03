@@ -6,6 +6,7 @@ import {
   TextInput,
   Button,
   ActionIcon,
+  Text,
 } from "@mantine/core";
 import { FaTrash, FaPlus, FaMinus } from "react-icons/fa";
 import { api } from "../../api";
@@ -34,26 +35,34 @@ const ModalIntervals = ({
   selectedTechnicians = [],
 }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [intervals, setIntervals] = useState([]);
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [selectedDays, setSelectedDays] = useState([]);
+  const [intervalsByDay, setIntervalsByDay] = useState({});
 
   const toggleDay = (day) => {
-    setSelectedDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day],
-    );
+    const updated = selectedDays.includes(day)
+      ? selectedDays.filter((d) => d !== day)
+      : [...selectedDays, day];
+    setSelectedDays(updated);
   };
 
   useEffect(() => {
-    if (opened && selected.employeeIndex !== null) {
-      const defaultDay = DAYS[selected.dayIndex]?.value;
-      setSelectedDays([defaultDay]);
-      const current =
-        schedule[selected.employeeIndex]?.shifts[selected.dayIndex] || [];
-      setIntervals([...current]);
-    }
-  }, [opened, selected, schedule]);
+    if (!opened || selected.employeeIndex === null) return;
+
+    const selectedEmployee = schedule[selected.employeeIndex];
+    const selectedShifts = selectedEmployee?.shifts || [];
+
+    const updatedIntervals = {};
+
+    DAYS.forEach((day, idx) => {
+      if (selectedDays.includes(day.value)) {
+        updatedIntervals[day.value] = selectedShifts[idx] || [];
+      }
+    });
+
+    setIntervalsByDay(updatedIntervals);
+  }, [opened, selected, selectedDays, schedule]);
 
   const getTechnicianIds = () =>
     selectedTechnicians.length > 0
@@ -74,40 +83,24 @@ const ModalIntervals = ({
     }
   };
 
-  const addInterval = () =>
-    handleRequest(api.schedules.addTimeframe, {
-      technician_ids: getTechnicianIds(),
-      weekdays: getWeekdays(),
-      start: startTime,
-      end: endTime,
-    });
+  const addInterval = () => handleRequest(api.schedules.addTimeframe, {
+    technician_ids: getTechnicianIds(),
+    weekdays: getWeekdays(),
+    start: startTime,
+    end: endTime,
+  });
 
-  const cutInterval = () =>
-    handleRequest(api.schedules.removeTimeframe, {
-      technician_ids: getTechnicianIds(),
-      weekdays: getWeekdays(),
-      start: startTime,
-      end: endTime,
-    });
+  const cutInterval = () => handleRequest(api.schedules.removeTimeframe, {
+    technician_ids: getTechnicianIds(),
+    weekdays: getWeekdays(),
+    start: startTime,
+    end: endTime,
+  });
 
-  const deleteByDays = () =>
-    handleRequest(api.schedules.deleteWeekdays, {
-      technician_ids: getTechnicianIds(),
-      weekdays: getWeekdays(),
-    });
-
-  const removeInterval = async (index) => {
-    const interval = intervals[index];
-    const weekday = DAYS[selected.dayIndex]?.apiName;
-
-    await handleRequest(api.schedules.removeTimeframe, {
-      technician_ids: [schedule[selected.employeeIndex].id],
-      weekdays: [weekday],
-      start: interval.start,
-      end: interval.end,
-    });
-    setIntervals((prev) => prev.filter((_, i) => i !== index));
-  };
+  const deleteByDays = () => handleRequest(api.schedules.deleteWeekdays, {
+    technician_ids: getTechnicianIds(),
+    weekdays: getWeekdays(),
+  });
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
@@ -153,7 +146,7 @@ const ModalIntervals = ({
                 setSelectedDays(
                   selectedDays.length === DAYS.length
                     ? []
-                    : DAYS.map((d) => d.value),
+                    : DAYS.map((d) => d.value)
                 );
               }}
               style={{ width: 65 }}
@@ -165,9 +158,7 @@ const ModalIntervals = ({
               <Button
                 key={day.value}
                 size="xs"
-                variant={
-                  selectedDays.includes(day.value) ? "filled" : "default"
-                }
+                variant={selectedDays.includes(day.value) ? "filled" : "default"}
                 onClick={() => toggleDay(day.value)}
                 style={{ width: 54 }}
               >
@@ -219,48 +210,49 @@ const ModalIntervals = ({
             </Group>
           </Group>
 
-          {selectedTechnicians.length <= 1 &&
-            intervals.length > 0 &&
-            selected.employeeIndex !== null && (
-              <div style={{ marginTop: 10, fontWeight: 500 }}>
-                {translations["Intervale pentru"][language]}{" "}
-                {schedule[selected.employeeIndex]?.name} (
-                {schedule[selected.employeeIndex]?.id})
-              </div>
-            )}
-
-          {selectedTechnicians.length <= 1 &&
-            intervals.map((interval, index) => (
-              <Group key={index} align="flex-end">
-                <TextInput
-                  type="time"
-                  label={translations["Start"][language]}
-                  value={interval.start}
-                  onChange={(e) => {
-                    const updated = [...intervals];
-                    updated[index].start = e.target.value;
-                    setIntervals(updated);
-                  }}
-                />
-                <TextInput
-                  type="time"
-                  label={translations["End"][language]}
-                  value={interval.end}
-                  onChange={(e) => {
-                    const updated = [...intervals];
-                    updated[index].end = e.target.value;
-                    setIntervals(updated);
-                  }}
-                />
-                <ActionIcon
-                  variant="light"
-                  color="red"
-                  onClick={() => removeInterval(index)}
-                >
-                  <FaTrash />
-                </ActionIcon>
-              </Group>
-            ))}
+          {selectedTechnicians.length <= 1 && selected.employeeIndex !== null &&
+            Object.entries(intervalsByDay).map(([dayKey, intervals]) => {
+              const dayLabel = DAYS.find(d => d.value === dayKey)?.label;
+              return (
+                <Stack key={dayKey} mt="md">
+                  <Text fw={600}>{dayLabel}</Text>
+                  {intervals.map((interval, index) => (
+                    <Group key={index} align="flex-end">
+                      <TextInput
+                        type="time"
+                        label={translations["Start"][language]}
+                        value={interval.start}
+                        onChange={(e) => {
+                          const updated = [...intervals];
+                          updated[index].start = e.target.value;
+                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
+                        }}
+                      />
+                      <TextInput
+                        type="time"
+                        label={translations["End"][language]}
+                        value={interval.end}
+                        onChange={(e) => {
+                          const updated = [...intervals];
+                          updated[index].end = e.target.value;
+                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
+                        }}
+                      />
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        onClick={() => {
+                          const updated = intervals.filter((_, i) => i !== index);
+                          setIntervalsByDay({ ...intervalsByDay, [dayKey]: updated });
+                        }}
+                      >
+                        <FaTrash />
+                      </ActionIcon>
+                    </Group>
+                  ))}
+                </Stack>
+              );
+            })}
 
           <Group mt="xl" grow>
             <Button onClick={onClose} variant="default">
