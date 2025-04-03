@@ -27,6 +27,14 @@ const ModalGroup = ({
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async () => {
+    if (!groupName.trim() || selectedUserIds.length === 0) {
+      enqueueSnackbar(
+        translations["Completați toate câmpurile obligatorii"][language],
+        { variant: "warning" },
+      );
+      return;
+    }
+
     try {
       if (isEditMode && initialData?.id) {
         const groupId = initialData.id;
