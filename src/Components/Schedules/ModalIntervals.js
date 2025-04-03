@@ -18,22 +18,10 @@ const language = localStorage.getItem("language") || "RO";
 const DAYS = [
   { label: translations["Mo"][language], value: "monday", apiName: "Monday" },
   { label: translations["Tu"][language], value: "tuesday", apiName: "Tuesday" },
-  {
-    label: translations["We"][language],
-    value: "wednesday",
-    apiName: "Wednesday",
-  },
-  {
-    label: translations["Th"][language],
-    value: "thursday",
-    apiName: "Thursday",
-  },
+  { label: translations["We"][language], value: "wednesday", apiName: "Wednesday" },
+  { label: translations["Th"][language], value: "thursday", apiName: "Thursday" },
   { label: translations["Fr"][language], value: "friday", apiName: "Friday" },
-  {
-    label: translations["Sa"][language],
-    value: "saturday",
-    apiName: "Saturday",
-  },
+  { label: translations["Sa"][language], value: "saturday", apiName: "Saturday" },
   { label: translations["Su"][language], value: "sunday", apiName: "Sunday" },
 ];
 
