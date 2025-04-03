@@ -23,7 +23,7 @@ const ModalGroup = ({
 }) => {
   const [groupName, setGroupName] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
-  const { technicians, loading, errors } = useGetTechniciansList();
+  const { technicians, loading } = useGetTechniciansList();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async () => {
