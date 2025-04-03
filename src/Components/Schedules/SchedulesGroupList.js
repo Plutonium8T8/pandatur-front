@@ -11,7 +11,6 @@ import {
   ActionIcon,
   ScrollArea,
 } from "@mantine/core";
-import { modals } from "@mantine/modals";
 import { groupSchedules } from "../../api/groupSchedules";
 import { api } from "../../api";
 import ScheduleView from "./ScheduleView";
@@ -19,6 +18,7 @@ import { useSnackbar } from "notistack";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { translations } from "../utils/translations";
 import ModalGroup from "./ModalGroup";
+import { useConfirmPopup } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -71,24 +71,16 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
     setInGroupView?.(false);
   };
 
-  const confirmDelete = (group) => {
-    modals.openConfirmModal({
-      centered: true,
-      title: translations["Confirmare ștergere"][language],
-      children: (
-        <Text size="sm">
-          {translations["Sunteți sigur că doriți să ștergeți grupul"][language]}
-          <b>{group.name}</b>?
-        </Text>
-      ),
-      labels: {
-        confirm: translations["Ștergeți"][language],
-        cancel: translations["Anulează"][language],
-      },
-      confirmProps: { color: "red" },
-      onConfirm: () => handleDelete(group.id),
-    });
-  };
+  const confirmDelete = useConfirmPopup({
+    subTitle: (
+      <Text size="sm">
+        {translations["Sunteți sigur că doriți să ștergeți grupul"][language]}{" "}
+        <b>{editingGroup?.name}</b>?
+      </Text>
+    ),
+    onConfirm: () => handleDelete(editingGroup?.id),
+    loading: false,
+  });
 
   const handleDelete = async (id) => {
     try {
@@ -227,7 +219,10 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
                     <ActionIcon
                       color="red"
                       variant="light"
-                      onClick={() => confirmDelete(group)}
+                      onClick={() => {
+                        setEditingGroup(group);
+                        confirmDelete(() => handleDelete(group.id));
+                      }}
                     >
                       <FaTrash />
                     </ActionIcon>

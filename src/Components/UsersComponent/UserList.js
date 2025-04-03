@@ -10,8 +10,8 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
-import { useModals } from "@mantine/modals";
 import GroupChangeModal from "./GroupChangeModal";
+import { useConfirmPopup } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -19,13 +19,11 @@ const UserList = ({
   users,
   loading,
   fetchUsers = () => {},
-  handleDeleteUser = () => {},
   openEditUser = () => {},
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
-  const modals = useModals();
 
   const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
   const allIds = users.map(extractId).filter(Boolean);
@@ -87,33 +85,30 @@ const UserList = ({
     }
   };
 
-  const handleDeleteSelected = () => {
-    modals.openConfirmModal({
-      centered: true,
-      title: translations["Confirmare ștergere"][language],
-      children:
-        translations["Sigur doriți să ștergeți utilizatorii selectați?"][
-          language
-        ],
-      labels: {
-        confirm: translations["Ștergeți"][language],
-        cancel: translations["Anulează"][language],
-      },
-      confirmProps: { color: "red" },
-      onConfirm: async () => {
-        try {
-          await api.users.deleteMultipleUsers({ user_ids: selectedIds });
-          enqueueSnackbar(translations["Utilizator șters"][language], {
-            variant: "success",
-          });
-          fetchUsers();
-          setSelectedIds([]);
-        } catch (err) {
-          enqueueSnackbar(translations["Eroare la ștergere"][language], {
-            variant: "error",
-          });
-        }
-      },
+  const confirmDeleteUsers = useConfirmPopup({
+    subTitle:
+      selectedIds.length > 1
+        ? translations["Sigur doriți să ștergeți utilizatorii selectați?"][
+            language
+          ]
+        : translations["Sigur doriți să ștergeți utilizatorul?"][language],
+    loading: false,
+  });
+
+  const handleDeleteUsersWithConfirm = (userIds) => {
+    confirmDeleteUsers(async () => {
+      try {
+        await api.users.deleteMultipleUsers({ user_ids: userIds });
+        enqueueSnackbar(translations["Utilizator șters"][language], {
+          variant: "success",
+        });
+        fetchUsers();
+        if (userIds.length > 1) setSelectedIds([]);
+      } catch (err) {
+        enqueueSnackbar(translations["Eroare la ștergere"][language], {
+          variant: "error",
+        });
+      }
     });
   };
 
@@ -243,7 +238,7 @@ const UserList = ({
 
             <Menu.Item
               leftSection={<IoTrash size={16} />}
-              onClick={() => handleDeleteUser(row.id)}
+              onClick={() => handleDeleteUsersWithConfirm([row.id])}
               color="red"
             >
               {translations["Ștergeți"][language]}
@@ -268,7 +263,11 @@ const UserList = ({
           <Button variant="light" onClick={() => setGroupModalOpen(true)}>
             {translations["Schimbă grupul"][language]}
           </Button>
-          <Button variant="light" color="red" onClick={handleDeleteSelected}>
+          <Button
+            variant="light"
+            color="red"
+            onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
+          >
             {translations["Șterge"][language]}
           </Button>
         </div>
@@ -278,7 +277,6 @@ const UserList = ({
         opened={groupModalOpen}
         onClose={() => setGroupModalOpen(false)}
         onConfirm={handleChangeGroup}
-        groupOptions={["IT", "Marketing", "HR", "Test"]}
       />
 
       <RcTable

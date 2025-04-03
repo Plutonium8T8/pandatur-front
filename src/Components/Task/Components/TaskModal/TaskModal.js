@@ -27,8 +27,7 @@ const TaskModal = ({
   const [ticketIds, setTicketIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const language = localStorage.getItem("language") || "RO";
-  const { technicians: userList, loading: loadingUsers } =
-    useGetTechniciansList();
+  const { technicians: userList } = useGetTechniciansList();
 
   useEffect(() => {
     if (!isOpen) return;

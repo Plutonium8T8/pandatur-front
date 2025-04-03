@@ -1775,6 +1775,10 @@ export const translations = {
     RO: "Eroare la încărcarea programului",
     RU: "Ошибка загрузки расписания",
   },
+  "Sigur doriți să ștergeți utilizatorul?": {
+    RO: "Sigur doriți să ștergeți utilizatorul?",
+    RU: "Вы уверены что хотите удалить пользователя?",
+  },
 };
 
 // import { translations } from '../utils/translations';

@@ -71,20 +71,6 @@ const UsersComponent = () => {
     }
   };
 
-  const handleDeleteUser = async (id) => {
-    try {
-      await api.users.deleteMultipleUsers({ user_ids: [id] });
-      enqueueSnackbar(translations["Utilizator șters"][language], {
-        variant: "success",
-      });
-      fetchUsers();
-    } catch (err) {
-      enqueueSnackbar(translations["Eroare la ștergere"][language], {
-        variant: "error",
-      });
-    }
-  };
-
   return (
     <div className="task-container">
       <Flex justify="space-between" align="center" mb="md">
@@ -118,7 +104,6 @@ const UsersComponent = () => {
           setEditUser(user);
           setOpened(true);
         }}
-        handleDeleteUser={handleDeleteUser}
       />
 
       <UserModal
