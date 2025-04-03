@@ -29,6 +29,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const [editOpened, setEditOpened] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
+  const confirmDelete = useConfirmPopup({ loading: false });
 
   const fetchData = async () => {
     try {
@@ -71,16 +72,10 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
     setInGroupView?.(false);
   };
 
-  const confirmDelete = useConfirmPopup({
-    subTitle: (
-      <Text size="sm">
-        {translations["Sunteți sigur că doriți să ștergeți grupul"][language]}{" "}
-        <b>{editingGroup?.name}</b>?
-      </Text>
-    ),
-    onConfirm: () => handleDelete(editingGroup?.id),
-    loading: false,
-  });
+  const handleClickDelete = (group) => {
+    setEditingGroup(group);
+    confirmDelete(() => handleDelete(group.id));
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -219,10 +214,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
                     <ActionIcon
                       color="red"
                       variant="light"
-                      onClick={() => {
-                        setEditingGroup(group);
-                        confirmDelete(() => handleDelete(group.id));
-                      }}
+                      onClick={() => handleClickDelete(group)}
                     >
                       <FaTrash />
                     </ActionIcon>
