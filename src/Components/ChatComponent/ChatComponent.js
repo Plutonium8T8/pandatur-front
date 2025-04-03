@@ -105,7 +105,7 @@ const ChatComponent = () => {
         )}
 
         <Flex pos="relative" w="50%">
-          <Box pos="absolute" left="10px" top="10px" style={{ zIndex: 999 }}>
+          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
             <ActionIcon
               variant="default"
               onClick={() => setIsChatListVisible((prev) => !prev)}
@@ -126,7 +126,7 @@ const ChatComponent = () => {
           />
         </Flex>
 
-        {true && (
+        {selectTicketId && (
           <ChatExtraInfo
             selectedClient={selectedClient}
             ticketId={ticketId}

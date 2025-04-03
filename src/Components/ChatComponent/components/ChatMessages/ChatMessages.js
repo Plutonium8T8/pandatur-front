@@ -14,6 +14,14 @@ import "./ChatMessages.css"
 
 const language = localStorage.getItem("language") || "RO"
 
+const parseDate = (dateString) => {
+  if (!dateString) return null
+  const [date, time] = dateString.split(" ")
+  if (!date || !time) return null
+  const [day, month, year] = date.split("-")
+  return new Date(`${year}-${month}-${day}T${time}`)
+}
+
 export const ChatMessages = ({
   selectTicketId,
   setSelectedClient,
@@ -24,8 +32,6 @@ export const ChatMessages = ({
   const { userId } = useUser()
   const { messages, setMessages, tickets } = useApp()
   const { enqueueSnackbar } = useSnackbar()
-
-  const [managerMessage, setManagerMessage] = useState("")
 
   const messageContainerRef = useRef(null)
   const [isUserAtBottom, setIsUserAtBottom] = useState(true)
@@ -51,14 +57,6 @@ export const ChatMessages = ({
     }
   }, [messages, selectTicketId])
 
-  const parseDate = (dateString) => {
-    if (!dateString) return null
-    const [date, time] = dateString.split(" ")
-    if (!date || !time) return null
-    const [day, month, year] = date.split("-")
-    return new Date(`${year}-${month}-${day}T${time}`)
-  }
-
   const uploadFile = async (file) => {
     const formData = new FormData()
     formData.append("file", file)
@@ -74,18 +72,14 @@ export const ChatMessages = ({
     }
   }
 
-  const sendMessage = async (selectedFile, platform) => {
-    if (!managerMessage.trim() && !selectedFile) {
-      return
-    }
-
+  const sendMessage = async (selectedFile, platform, inputValue) => {
     setLoadingMessage(true)
     try {
       const messageData = {
         sender_id: Number(userId),
         client_id: selectedClient,
         platform: platform,
-        message: managerMessage.trim(),
+        message: inputValue.trim(),
         media_type: null,
         media_url: ""
       }
@@ -118,10 +112,6 @@ export const ChatMessages = ({
       ])
 
       await apiUrl(messageData)
-
-      setManagerMessage("")
-
-      if (!selectedFile) setManagerMessage("")
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" })
     } finally {
@@ -258,14 +248,12 @@ export const ChatMessages = ({
         <Box p="24">
           <ChatInput
             loading={loadingMessage}
-            inputValue={managerMessage ?? ""}
-            onChangeTextArea={setManagerMessage}
             id={selectTicketId}
-            onSendMessage={() => {
+            onSendMessage={(value) => {
               if (!selectedClient) {
                 return
               }
-              sendMessage(null, selectedPlatform)
+              sendMessage(null, selectedPlatform, value)
             }}
             onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
             renderSelectUserPlatform={() => {
