@@ -46,11 +46,17 @@ const ModalIntervals = ({
   const isDeleteDisabled = selectedDays.length === 0;
 
   const toggleDay = (day) => {
-    setSelectedDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+    const updated = selectedDays.includes(day)
+      ? selectedDays.filter((d) => d !== day)
+      : [...selectedDays, day];
+
+    const sorted = updated.sort(
+      (a, b) =>
+        DAYS.findIndex((d) => d.value === a) -
+        DAYS.findIndex((d) => d.value === b)
     );
+
+    setSelectedDays(sorted);
   };
 
   useEffect(() => {
@@ -273,7 +279,6 @@ const ModalIntervals = ({
                                 end: interval.end,
                               });
 
-                              // обновляем локальное состояние
                               const updated = intervals.filter((_, i) => i !== index);
                               setIntervalsByDay((prev) => ({
                                 ...prev,
