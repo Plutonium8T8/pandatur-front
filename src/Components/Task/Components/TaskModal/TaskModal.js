@@ -1,11 +1,17 @@
-import React, { useState, useEffect } from "react"
-import { Modal, Textarea, Button, Select as MantineSelect } from "@mantine/core"
-import { DateTimePicker } from "@mantine/dates"
-import { useSnackbar } from "notistack"
-import { api } from "../../../../api"
-import IconSelect from "../../../IconSelect/IconSelect"
-import { TypeTask } from "../OptionsTaskType/OptionsTaskType"
-import { translations } from "../../../utils/translations"
+import React, { useState, useEffect } from "react";
+import {
+  Modal,
+  Textarea,
+  Button,
+  Select as MantineSelect,
+} from "@mantine/core";
+import { DateTimePicker } from "@mantine/dates";
+import { useSnackbar } from "notistack";
+import { api } from "../../../../api";
+import IconSelect from "../../../IconSelect/IconSelect";
+import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
+import { translations } from "../../../utils/translations";
+import { useGetTechniciansList } from "../../../../hooks";
 
 const TaskModal = ({
   isOpen,
@@ -13,21 +19,21 @@ const TaskModal = ({
   fetchTasks,
   selectedTask,
   defaultTicketId,
-  defaultCreatedBy
+  defaultCreatedBy,
 }) => {
-  const { enqueueSnackbar } = useSnackbar()
-  const [task, setTask] = useState({})
-  const [scheduledTime, setScheduledTime] = useState(null)
-  const [ticketIds, setTicketIds] = useState([])
-  const [userList, setUserList] = useState([])
-  const [loading, setLoading] = useState(false)
-  const language = localStorage.getItem("language") || "RO"
+  const { enqueueSnackbar } = useSnackbar();
+  const [task, setTask] = useState({});
+  const [scheduledTime, setScheduledTime] = useState(null);
+  const [ticketIds, setTicketIds] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const language = localStorage.getItem("language") || "RO";
+  const { technicians: userList, loading: loadingUsers } =
+    useGetTechniciansList();
 
   useEffect(() => {
-    if (!isOpen) return
+    if (!isOpen) return;
 
-    fetchTickets()
-    fetchUsers()
+    fetchTickets();
 
     if (selectedTask) {
       setTask({
@@ -38,10 +44,10 @@ const TaskModal = ({
         createdBy: selectedTask.created_by.toString(),
         createdFor: selectedTask.created_for?.toString() || "",
         priority: selectedTask.priority || "",
-        status_task: selectedTask.status_task || ""
-      })
+        status_task: selectedTask.status_task || "",
+      });
 
-      setScheduledTime(parseDate(selectedTask.scheduled_time))
+      setScheduledTime(parseDate(selectedTask.scheduled_time));
     } else {
       setTask({
         ticketId: defaultTicketId?.toString() || "",
@@ -51,12 +57,12 @@ const TaskModal = ({
         createdBy: defaultCreatedBy?.toString() || "",
         createdFor: "",
         priority: "",
-        status_task: ""
-      })
+        status_task: "",
+      });
 
-      setScheduledTime(null)
+      setScheduledTime(null);
     }
-  }, [isOpen, selectedTask])
+  }, [isOpen, selectedTask]);
 
   const handleClose = () => {
     setTask({
@@ -67,47 +73,28 @@ const TaskModal = ({
       createdBy: "",
       createdFor: "",
       priority: "",
-      status_task: ""
-    })
-    setScheduledTime(null)
-    onClose()
-  }
+      status_task: "",
+    });
+    setScheduledTime(null);
+    onClose();
+  };
 
   const fetchTickets = async () => {
     try {
-      const data = await api.tickets.list()
-      setTicketIds(data.map((ticket) => ticket.id.toString()))
+      const data = await api.tickets.list();
+      setTicketIds(data.map((ticket) => ticket.id.toString()));
     } catch (error) {
       enqueueSnackbar(
         translations["Eroare la încărcarea tichetelor"][language],
         {
-          variant: "error"
-        }
-      )
+          variant: "error",
+        },
+      );
     }
-  }
-
-  const fetchUsers = async () => {
-    try {
-      const usersData = await api.users.getTechnicianList()
-      setUserList(
-        usersData.map((user) => ({
-          value: user.id.id.toString(),
-          label: `${user.id.name || "N/A"} ${user.id.surname || "N/A"}`
-        }))
-      )
-    } catch (error) {
-      enqueueSnackbar(
-        translations["Eroare la încărcarea utilizatorilor"][language],
-        {
-          variant: "error"
-        }
-      )
-    }
-  }
+  };
 
   const handleTaskSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (
       !task.ticketId ||
       !scheduledTime ||
@@ -121,13 +108,13 @@ const TaskModal = ({
       enqueueSnackbar(
         translations["Toate câmpurile sunt obligatorii"][language],
         {
-          variant: "warning"
-        }
-      )
-      return
+          variant: "warning",
+        },
+      );
+      return;
     }
 
-    setLoading(true)
+    setLoading(true);
     try {
       const updatedTask = {
         ticket_id: task.ticketId,
@@ -137,42 +124,42 @@ const TaskModal = ({
         created_by: task.createdBy,
         created_for: task.createdFor,
         priority: task.priority,
-        status_task: task.status_task
-      }
+        status_task: task.status_task,
+      };
 
       if (selectedTask) {
-        await api.task.update({ id: selectedTask.id, ...updatedTask })
+        await api.task.update({ id: selectedTask.id, ...updatedTask });
         enqueueSnackbar(translations["Task actualizat cu succes!"][language], {
-          variant: "success"
-        })
+          variant: "success",
+        });
       } else {
-        await api.task.create(updatedTask)
+        await api.task.create(updatedTask);
         enqueueSnackbar(translations["Task creat cu succes!"][language], {
-          variant: "success"
-        })
+          variant: "success",
+        });
       }
 
-      fetchTasks()
-      handleClose()
+      fetchTasks();
+      handleClose();
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const parseDate = (dateString) => {
-    if (!dateString) return null
+    if (!dateString) return null;
 
-    const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})$/
-    const match = dateString.match(regex)
+    const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})$/;
+    const match = dateString.match(regex);
 
-    if (!match) return null
+    if (!match) return null;
 
-    const [, day, month, year, hours, minutes, seconds] = match
-    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`)
-  }
+    const [, day, month, year, hours, minutes, seconds] = match;
+    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+  };
 
   const formatDate = (date) => {
-    if (!(date instanceof Date) || isNaN(date)) return ""
+    if (!(date instanceof Date) || isNaN(date)) return "";
 
     return `${date.getDate().toString().padStart(2, "0")}-${(
       date.getMonth() + 1
@@ -184,8 +171,8 @@ const TaskModal = ({
       .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
       .getSeconds()
       .toString()
-      .padStart(2, "0")}`
-  }
+      .padStart(2, "0")}`;
+  };
 
   return (
     <Modal
@@ -309,7 +296,7 @@ const TaskModal = ({
         </div>
       </form>
     </Modal>
-  )
-}
+  );
+};
 
-export default TaskModal
+export default TaskModal;

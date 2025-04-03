@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Drawer, TextInput, MultiSelect, Button, Group } from "@mantine/core";
-import { api } from "../../api";
+import {
+  Drawer,
+  TextInput,
+  MultiSelect,
+  Button,
+  Group,
+  Loader,
+} from "@mantine/core";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
+import { useGetTechniciansList } from "../../hooks/useGetTechniciansList"; // путь поправь под свой проект
+import { api } from "../../api";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -14,30 +22,9 @@ const ModalGroup = ({
   isEditMode = false,
 }) => {
   const [groupName, setGroupName] = useState("");
-  const [users, setUsers] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const { technicians, loading, errors } = useGetTechniciansList();
   const { enqueueSnackbar } = useSnackbar();
-
-  const fetchUsers = async () => {
-    try {
-      const data = await api.users.getTechnicianList();
-      const parsed = data.map((item) => {
-        const user = item.id?.user;
-        return {
-          label: user?.username || "—",
-          value: user?.id?.toString(),
-        };
-      });
-      setUsers(parsed);
-    } catch (err) {
-      enqueueSnackbar(
-        translations["Eroare la încărcarea utilizatorilor"][language],
-        {
-          variant: "error",
-        },
-      );
-    }
-  };
 
   const handleSubmit = async () => {
     try {
@@ -89,8 +76,6 @@ const ModalGroup = ({
 
   useEffect(() => {
     if (opened) {
-      fetchUsers();
-
       if (isEditMode && initialData) {
         setGroupName(initialData.name || "");
         setSelectedUserIds(
@@ -124,12 +109,13 @@ const ModalGroup = ({
         mb="md"
       />
       <MultiSelect
-        data={users}
+        data={technicians}
         label={translations["Utilizatori"][language]}
         placeholder={translations["Selectează utilizator"][language]}
         value={selectedUserIds}
         onChange={setSelectedUserIds}
         searchable
+        rightSection={loading && <Loader size="xs" />}
       />
       <Group mt="md" position="right">
         <Button onClick={handleSubmit}>
