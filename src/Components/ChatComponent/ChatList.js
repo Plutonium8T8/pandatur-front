@@ -20,10 +20,10 @@ const parseCustomDate = (dateStr) => {
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
 const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
-  const { tickets, getClientMessagesSingle } = useApp();
-  const { userId } = useUser();
-  const [showMyTickets, setShowMyTickets] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const { tickets } = useApp()
+  const { userId } = useUser()
+  const [showMyTickets, setShowMyTickets] = useState(false)
+  const [searchQuery, setSearchQuery] = useState("")
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
@@ -48,17 +48,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
         });
       }
     }
-  }, [selectTicketId, tickets]);
-
-  useEffect(() => {
-    if (!selectTicketId) return;
-
-    setIsLoading(true);
-
-    getClientMessagesSingle(selectTicketId).finally(() => {
-      setIsLoading(false);
-    });
-  }, [selectTicketId]);
+  }, [selectTicketId, tickets])
 
   const handleTicketClick = (ticketId) => {
     console.log("🖱 Клик по тикету в списке:", ticketId);
