@@ -1,7 +1,7 @@
 import { Modal, Select, Button, Stack } from "@mantine/core";
 import { useState } from "react";
 import { groupUsersOptions } from "./GroupUsersOptions";
-import { translations } from "../utils/translations";
+import { translations } from "../../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
 
