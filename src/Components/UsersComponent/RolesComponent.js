@@ -13,9 +13,10 @@ import { FaHandshake } from "react-icons/fa"
 import { translations } from "../utils/translations"
 import { api } from "../../api"
 
+const language = localStorage.getItem("language") || "RO"
+
 const RolesComponent = ({ employee }) => {
   const [roles, setRoles] = useState([])
-  const language = localStorage.getItem("language") || "RO"
 
   useEffect(() => {
     fetchRoles()
@@ -72,6 +73,7 @@ const RolesComponent = ({ employee }) => {
     "NOTIFICATION",
     "TASK"
   ]
+
   const actions = ["READ", "WRITE", "ADMIN"]
 
   return (
