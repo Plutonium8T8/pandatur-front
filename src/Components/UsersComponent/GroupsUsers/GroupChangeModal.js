@@ -1,12 +1,28 @@
 import { Modal, Select, Button, Stack } from "@mantine/core";
-import { useState } from "react";
-import { groupUsersOptions } from "./GroupUsersOptions";
+import { useEffect, useState } from "react";
+import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
 
 const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
   const [group, setGroup] = useState("");
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const data = await api.user.getGroupsList();
+        setGroups(data);
+      } catch (err) {
+        console.error("Ошибка при загрузке групп", err);
+      }
+    };
+
+    if (opened) {
+      fetchGroups();
+    }
+  }, [opened]);
 
   const handleConfirm = () => {
     if (group) {
@@ -27,7 +43,7 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
         <Select
           label={translations["Alege grupul"][language]}
           placeholder={translations["Alege grupul"][language]}
-          data={groupUsersOptions.map((g) => ({ value: g, label: g }))}
+          data={groups.map((g) => ({ value: g.name, label: g.name }))}
           value={group}
           onChange={setGroup}
         />

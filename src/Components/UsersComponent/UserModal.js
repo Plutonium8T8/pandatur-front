@@ -8,12 +8,12 @@ import {
   Avatar,
   Group,
   Select,
-  PasswordInput
+  PasswordInput,
+  Loader,
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RolesComponent from "./Roles/RolesComponent";
-import { groupUsersOptions } from "./GroupsUsers/GroupUsersOptions";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 
@@ -33,6 +33,8 @@ const initialFormState = {
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [form, setForm] = useState(initialFormState);
+  const [groupsList, setGroupsList] = useState([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
 
   useEffect(() => {
     if (initialUser) {
@@ -53,6 +55,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm(initialFormState);
     }
   }, [initialUser, opened]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      setGroupsLoading(true);
+      try {
+        const data = await api.user.getGroupsList();
+        setGroupsList(data);
+      } catch (err) {
+        console.error("Ошибка при загрузке групп", err);
+      } finally {
+        setGroupsLoading(false);
+      }
+    };
+
+    if (opened) fetchGroups();
+  }, [opened]);
 
   const handleCreate = async () => {
     const {
@@ -222,14 +240,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name="new-password-field"
           />
 
-          <Select
-            label={translations["Grup utilizator"][language]}
-            placeholder={translations["Alege grupul"][language]}
-            data={groupUsersOptions.map((g) => ({ value: g, label: g }))}
-            value={groupUsersOptions.includes(form.groups) ? form.groups : null}
-            onChange={(value) => setForm({ ...form, groups: value || "" })}
-            required
-          />
+          {groupsLoading ? (
+            <Loader />
+          ) : (
+            <Select
+              label={translations["Grup utilizator"][language]}
+              placeholder={translations["Alege grupul"][language]}
+              data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
+              value={
+                groupsList.map((g) => g.name).includes(form.groups)
+                  ? form.groups
+                  : null
+              }
+              onChange={(value) => setForm({ ...form, groups: value || "" })}
+              required
+            />
+          )}
 
           <TextInput
             label={translations["Funcție"][language]}
