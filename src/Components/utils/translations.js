@@ -1829,7 +1829,31 @@ export const translations = {
   },
   "Fără intervale": {
     RO: "Fără intervale",
-    RU: "Без интервалов",
+    RU: "Без интервалов"
+  },
+  "Editează grupurile": {
+    RO: "Editează grupurile",
+    RU: "Редактировать группы"
+  },
+  "Grup nou": {
+    RO: "Grup nou",
+    RU: "Новая группа"
+  },
+  "Adaugă": {
+    RO: "Adaugă",
+    RU: "Добавить"
+  },
+  "Eroare la încărcarea grupurilor": {
+    RO: "Eroare la încărcarea grupurilor",
+    RU: "Ошибка при загрузке групп"
+  },
+  "Eroare la crearea grupului": {
+    RO: "Eroare la crearea grupului",
+    RU: "Ошибка при создании группы"
+  },
+  "Eroare la ștergerea grupului": {
+    RO: "Eroare la ștergerea grupului",
+    RU: "Ошибка при удалении группы"
   }
 };
 

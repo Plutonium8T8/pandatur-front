@@ -9,11 +9,20 @@ import {
 } from "@mantine/core";
 import { IoTrash } from "react-icons/io5";
 import { api } from "../../../api";
+import { translations } from "../../utils/translations";
+import { useConfirmPopup } from "../../../hooks/useConfirmPopup";
+import { getLanguageByKey } from "../../utils";
+
+const language = localStorage.getItem('language') || 'RO';
 
 const EditGroupsListModal = ({ opened, onClose }) => {
     const [groups, setGroups] = useState([]);
     const [newGroup, setNewGroup] = useState("");
     const [loading, setLoading] = useState(true);
+
+    const confirmDelete = useConfirmPopup({
+        subTitle: getLanguageByKey("Sigur doriți să ștergeți acest grup?"),
+    });
 
     const fetchGroups = async () => {
         setLoading(true);
@@ -21,7 +30,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             const data = await api.user.getGroupsList();
             setGroups(data);
         } catch (err) {
-            console.error("Ошибка при загрузке групп", err);
+            console.error(translations["Eroare la încărcarea grupurilor"]?.[language] || "Eroare", err);
         } finally {
             setLoading(false);
         }
@@ -35,18 +44,20 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 setGroups((prev) => [...prev, created]);
                 setNewGroup("");
             } catch (err) {
-                console.error("Ошибка при создании группы", err);
+                console.error(translations["Eroare la crearea grupului"]?.[language] || "Eroare", err);
             }
         }
     };
 
     const handleDelete = async (groupId) => {
-        try {
-            await api.user.deleteGroups(groupId);
-            setGroups((prev) => prev.filter((g) => g.id !== groupId));
-        } catch (err) {
-            console.error("Ошибка при удалении группы", err);
-        }
+        confirmDelete(async () => {
+            try {
+                await api.user.deleteGroups(groupId);
+                setGroups((prev) => prev.filter((g) => g.id !== groupId));
+            } catch (err) {
+                console.error(translations["Eroare la ștergerea grupului"]?.[language] || "Eroare", err);
+            }
+        });
     };
 
     useEffect(() => {
@@ -56,17 +67,23 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     }, [opened]);
 
     return (
-        <Modal opened={opened} onClose={onClose} title="Редактировать группы" size="md">
+        <Modal
+            opened={opened}
+            onClose={onClose}
+            title={translations["Editează grupurile"]?.[language]}
+            size="md"
+        >
             <Stack>
-
                 <Flex gap="sm" justify="space-between">
                     <TextInput
-                        placeholder="Новая группа"
+                        placeholder={translations["Grup nou"]?.[language]}
                         value={newGroup}
                         onChange={(e) => setNewGroup(e.target.value)}
                         fullWidth
                     />
-                    <Button onClick={handleAdd}>Добавить</Button>
+                    <Button onClick={handleAdd}>
+                        {translations["Adaugă"]?.[language]}
+                    </Button>
                 </Flex>
 
                 {loading ? (
@@ -99,15 +116,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                         </Flex>
                     ))
                 )}
-
-                <Flex justify="space-between" size="sm">
-                    <Button variant="light" onClick={onClose}>
-                        Отмена
-                    </Button>
-                    <Button onClick={onClose}>
-                        Закрыть
-                    </Button>
-                </Flex>
             </Stack>
         </Modal>
     );
