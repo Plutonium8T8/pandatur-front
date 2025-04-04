@@ -5,9 +5,9 @@ import {
     TextInput,
     Stack,
     Flex,
-    Loader,
+    Loader
 } from "@mantine/core";
-import { FaTrash } from "react-icons/fa";
+import { IoTrash } from "react-icons/io5";
 import { api } from "../../../api";
 
 const EditGroupsListModal = ({ opened, onClose }) => {
@@ -73,14 +73,34 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                     <Loader />
                 ) : (
                     groups.map((group) => (
-                        <Flex key={group.id} justify="space-between" align="center">
+                        <Flex
+                            key={group.id}
+                            justify="space-between"
+                            align="center"
+                            px="sm"
+                            py={6}
+                            style={{
+                                borderRadius: 4,
+                                transition: "background-color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                                e.currentTarget.style.backgroundColor = "#f8f9fa";
+                            }}
+                            onMouseLeave={(e) => {
+                                e.currentTarget.style.backgroundColor = "transparent";
+                            }}
+                        >
                             <span>{group.name}</span>
-                            <FaTrash onClick={() => handleDelete(group.id)} />
+                            <IoTrash
+                                color="red"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => handleDelete(group.id)}
+                            />
                         </Flex>
                     ))
                 )}
 
-                <Flex justify="space-between" mt="md">
+                <Flex justify="space-between" size="sm">
                     <Button variant="light" onClick={onClose}>
                         Отмена
                     </Button>

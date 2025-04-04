@@ -6,12 +6,13 @@ import { translations } from "../../utils/translations"
 import { Input, Button } from "@mantine/core"
 import "./TaskComponent.css"
 
+const language = localStorage.getItem("language") || "RO"
+
 const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
   const [tasks, setTasks] = useState([])
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedTask, setSelectedTask] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
-  const language = localStorage.getItem("language") || "RO"
 
   const fetchTasks = async () => {
     try {
