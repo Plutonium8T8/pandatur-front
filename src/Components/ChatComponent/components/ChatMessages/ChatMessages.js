@@ -37,8 +37,6 @@ export const ChatMessages = ({
   const [isUserAtBottom, setIsUserAtBottom] = useState(true)
   const [selectedPlatform, setSelectedPlatform] = useState("web")
   const [loadingMessage, setLoadingMessage] = useState(false)
-  const [openTasks, setOpenTasks] = useState(false)
-  const [taskCount, setTaskCount] = useState(0)
 
   const getLastClientWhoSentMessage = () => {
     if (!Array.isArray(messages) || messages.length === 0) return null
@@ -217,20 +215,6 @@ export const ChatMessages = ({
         }))
       })
 
-  const fetchTaskCount = async () => {
-    try {
-      const tasks = await api.task.getTaskByTicket(selectTicketId)
-      setTaskCount(tasks.length)
-    } catch (error) {
-      console.error(error)
-      setTaskCount(0)
-    }
-  }
-
-  useEffect(() => {
-    fetchTaskCount()
-  }, [selectTicketId])
-
   return (
     <Flex w="100%" direction="column" className="chat-area">
       <Flex
@@ -257,50 +241,44 @@ export const ChatMessages = ({
       </Flex>
 
       {selectTicketId && (
-        <TaskListOverlay
-          ticketId={selectTicketId}
-          userId={userId}
-          open={openTasks}
-          onCloseDrawer={() => setOpenTasks(false)}
-          fetchTaskCount={fetchTaskCount()}
-        />
+        <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
       {selectTicketId && (
-        <ChatInput
-          tasksCount={taskCount}
-          onOpenTaskDrawer={setOpenTasks}
-          loading={loadingMessage}
-          id={selectTicketId}
-          onSendMessage={(value) => {
-            if (!selectedClient) {
-              return
-            }
-            sendMessage(null, selectedPlatform, value)
-          }}
-          onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
-          renderSelectUserPlatform={() => {
-            return (
-              tickets &&
-              tickets.find((ticket) => ticket.id === selectTicketId)
-                ?.client_id && (
-                <Select
-                  size="md"
-                  w="100%"
-                  value={`${selectedClient}-${selectedPlatform}`}
-                  placeholder={translations["Alege client"][language]}
-                  data={usersOptions().flat()}
-                  onChange={(value) => {
-                    if (!value) return
-                    const [clientId, platform] = value.split("-")
-                    setSelectedClient(clientId)
-                    setSelectedPlatform(platform)
-                  }}
-                />
+        <Box p="24">
+          <ChatInput
+            loading={loadingMessage}
+            id={selectTicketId}
+            onSendMessage={(value) => {
+              if (!selectedClient) {
+                return
+              }
+              sendMessage(null, selectedPlatform, value)
+            }}
+            onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
+            renderSelectUserPlatform={() => {
+              return (
+                tickets &&
+                tickets.find((ticket) => ticket.id === selectTicketId)
+                  ?.client_id && (
+                  <Select
+                    size="md"
+                    w="100%"
+                    value={`${selectedClient}-${selectedPlatform}`}
+                    placeholder={translations["Alege client"][language]}
+                    data={usersOptions().flat()}
+                    onChange={(value) => {
+                      if (!value) return
+                      const [clientId, platform] = value.split("-")
+                      setSelectedClient(clientId)
+                      setSelectedPlatform(platform)
+                    }}
+                  />
+                )
               )
-            )
-          }}
-        />
+            }}
+          />
+        </Box>
       )}
     </Flex>
   )
