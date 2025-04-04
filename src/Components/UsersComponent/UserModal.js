@@ -12,13 +12,12 @@ import {
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
-import RolesComponent from "./RolesComponent";
-import { groupUsersOptions } from "./GroupUsersOptions";
+import RolesComponent from "./Roles/RolesComponent";
+import { groupUsersOptions } from "./GroupsUsers/GroupUsersOptions";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
-
 
 const initialFormState = {
   name: "",
@@ -33,7 +32,6 @@ const initialFormState = {
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState(initialFormState);
 
   useEffect(() => {

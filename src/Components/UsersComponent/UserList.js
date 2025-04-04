@@ -10,7 +10,7 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
-import GroupChangeModal from "./GroupChangeModal";
+import GroupChangeModal from "./GroupsUsers/GroupChangeModal";
 import { useConfirmPopup } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";

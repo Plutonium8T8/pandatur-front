@@ -10,8 +10,8 @@ import {
   Stack
 } from "@mantine/core"
 import { FaHandshake } from "react-icons/fa"
-import { translations } from "../utils/translations"
-import { api } from "../../api"
+import { translations } from "../../utils/translations"
+import { api } from "../../../api"
 
 const language = localStorage.getItem("language") || "RO"
 
