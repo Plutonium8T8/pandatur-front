@@ -1,8 +1,8 @@
-import { Flex, Text, Badge, DEFAULT_THEME } from "@mantine/core"
-import { getBrightByWorkflowType } from "./WorkflowTag"
-import { getLanguageByKey } from "../../utils"
+import { Flex, Text, Badge, DEFAULT_THEME } from "@mantine/core";
+import { getBrightByWorkflowType } from "./WorkflowTag";
+import { getLanguageByKey } from "../../utils";
 
-const { colors } = DEFAULT_THEME
+const { colors } = DEFAULT_THEME;
 
 export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
   return (
@@ -13,7 +13,7 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
       align="center"
       style={{
         backgroundColor: getBrightByWorkflowType(workflow, ""),
-        borderRadius: "50px"
+        borderRadius: "50px",
       }}
     >
       <Badge bg="white" c="white" size="lg">
@@ -22,7 +22,7 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
             {
               filteredTickets.filter(
                 (ticket) =>
-                  ticket.creation_date === ticket.last_interaction_date
+                  ticket.creation_date === ticket.last_interaction_date,
               ).length
             }
           </Text>
@@ -39,5 +39,5 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
         {getLanguageByKey(workflow)}
       </Text>
     </Flex>
-  )
-}
+  );
+};

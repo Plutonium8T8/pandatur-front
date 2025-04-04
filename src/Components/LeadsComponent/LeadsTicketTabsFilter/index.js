@@ -1,2 +1,2 @@
-export * from "./LeadsTicketTabsFilter"
-export * from "./utils"
+export * from "./LeadsTicketTabsFilter";
+export * from "./utils";

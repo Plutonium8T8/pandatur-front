@@ -1,18 +1,18 @@
-import { useEffect } from "react"
-import { Select, TextInput, Flex } from "@mantine/core"
-import { getLanguageByKey } from "../utils"
+import { useEffect } from "react";
+import { Select, TextInput, Flex } from "@mantine/core";
+import { getLanguageByKey } from "../utils";
 import {
   motivulRefuzuluiOptions,
-  evaluareOdihnaOptions
-} from "../../FormOptions"
+  evaluareOdihnaOptions,
+} from "../../FormOptions";
 
-const QUALITY_FORM_FILTER_ID = "QUALITY_FORM_FILTER_ID"
+const QUALITY_FORM_FILTER_ID = "QUALITY_FORM_FILTER_ID";
 
 export const QualityControlForm = ({
   onSubmit,
   data,
   renderFooterButtons,
-  formInstance
+  formInstance,
 }) => {
   useEffect(() => {
     if (data) {
@@ -21,17 +21,17 @@ export const QualityControlForm = ({
         evaluare_de_odihna: data.evaluare_de_odihna,
         urmatoarea_vacanta: data.urmatoarea_vacanta,
         manager: data.manager,
-        vacanta: data.vacanta
-      })
+        vacanta: data.vacanta,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={QUALITY_FORM_FILTER_ID}
         onSubmit={formInstance.onSubmit((values) => {
-          onSubmit(values, () => formInstance.reset())
+          onSubmit(values, () => formInstance.reset());
         })}
       >
         {
@@ -85,9 +85,9 @@ export const QualityControlForm = ({
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: formInstance.reset,
-          formId: QUALITY_FORM_FILTER_ID
+          formId: QUALITY_FORM_FILTER_ID,
         })}
       </Flex>
     </>
-  )
-}
+  );
+};

@@ -1,9 +1,9 @@
-import { Box, Flex, Image } from "@mantine/core"
-import { getLanguageByKey } from "../../utils"
-import { DateCell } from "../../DateCell"
-import { Empty } from "../../Empty"
+import { Box, Flex, Image } from "@mantine/core";
+import { getLanguageByKey } from "../../utils";
+import { DateCell } from "../../DateCell";
+import { Empty } from "../../Empty";
 
-const FALLBACK_IMAGE = "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp"
+const FALLBACK_IMAGE = "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
 
 export const Media = ({ messages }) => {
   return (
@@ -24,7 +24,7 @@ export const Media = ({ messages }) => {
                 fallbackSrc={FALLBACK_IMAGE}
                 alt=""
                 onClick={() => {
-                  window.open(msg.message, "_blank")
+                  window.open(msg.message, "_blank");
                 }}
               />
             ) : msg.mtype === "video" ? (
@@ -48,5 +48,5 @@ export const Media = ({ messages }) => {
         <Empty />
       )}
     </>
-  )
-}
+  );
+};

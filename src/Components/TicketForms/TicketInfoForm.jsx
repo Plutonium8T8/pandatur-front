@@ -1,8 +1,8 @@
-import { Select, Flex, NumberInput } from "@mantine/core"
-import { DatePickerInput } from "@mantine/dates"
-import { MdOutlineEuroSymbol } from "react-icons/md"
-import { useEffect } from "react"
-import { getLanguageByKey, parseServerDate } from "../utils"
+import { Select, Flex, NumberInput } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { MdOutlineEuroSymbol } from "react-icons/md";
+import { useEffect } from "react";
+import { getLanguageByKey, parseServerDate } from "../utils";
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -11,11 +11,11 @@ import {
   countryOptions,
   transportOptions,
   nameExcursionOptions,
-  purchaseProcessingOptions
-} from "../../FormOptions"
-import { DD_MM_YYYY } from "../../app-constants"
+  purchaseProcessingOptions,
+} from "../../FormOptions";
+import { DD_MM_YYYY } from "../../app-constants";
 
-const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
+const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
 
 export const TicketInfoForm = ({
   onSubmit,
@@ -24,9 +24,9 @@ export const TicketInfoForm = ({
   renderFooterButtons,
   setMinDate,
   formId,
-  formInstance
+  formInstance,
 }) => {
-  const idForm = formId || TICKET_FORM_FILTER_ID
+  const idForm = formId || TICKET_FORM_FILTER_ID;
 
   useEffect(() => {
     if (data) {
@@ -43,17 +43,17 @@ export const TicketInfoForm = ({
         tara: data.tara,
         tip_de_transport: data.tip_de_transport,
         denumirea_excursiei_turului: data.denumirea_excursiei_turului,
-        procesarea_achizitionarii: data.procesarea_achizitionarii
-      })
+        procesarea_achizitionarii: data.procesarea_achizitionarii,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={formInstance.onSubmit((values) =>
-          onSubmit(values, () => formInstance.reset())
+          onSubmit(values, () => formInstance.reset()),
         )}
       >
         <NumberInput
@@ -206,9 +206,9 @@ export const TicketInfoForm = ({
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: formInstance.reset,
-          formId: idForm
+          formId: idForm,
         })}
       </Flex>
     </>
-  )
-}
+  );
+};

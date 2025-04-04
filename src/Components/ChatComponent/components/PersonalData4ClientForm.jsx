@@ -1,29 +1,36 @@
-import { TextInput, Title, Box, NumberInput, Button, Flex } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { getLanguageByKey } from "../../utils"
+import {
+  TextInput,
+  Title,
+  Box,
+  NumberInput,
+  Button,
+  Flex,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { getLanguageByKey } from "../../utils";
 
 export const PersonalData4ClientForm = ({ loading, onSubmit, data }) => {
   const form = useForm({
-    mode: "uncontrolled"
-  })
+    mode: "uncontrolled",
+  });
 
   useEffect(() => {
     if (data) {
       form.setValues({
         name: data.name,
         surname: data.surname,
-        phone: data.phone
-      })
+        phone: data.phone,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <Box>
       <Title order={3}>{getLanguageByKey("Date personale")}</Title>
       <form
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <TextInput
@@ -58,5 +65,5 @@ export const PersonalData4ClientForm = ({ loading, onSubmit, data }) => {
         </Flex>
       </form>
     </Box>
-  )
-}
+  );
+};

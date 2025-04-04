@@ -1,4 +1,4 @@
-import { Modal, Text } from "@mantine/core"
+import { Modal, Text } from "@mantine/core";
 
 export const MantineModal = ({
   children,
@@ -15,7 +15,7 @@ export const MantineModal = ({
       opened={open}
       onClose={onClose}
       styles={{
-        body: { height: "700px" }
+        body: { height: "700px" },
       }}
       title={
         <Text size="xl" fw="bold">
@@ -26,5 +26,5 @@ export const MantineModal = ({
     >
       {children}
     </Modal>
-  )
-}
+  );
+};

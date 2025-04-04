@@ -1,15 +1,15 @@
-import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core"
-import { DatePickerInput } from "@mantine/dates"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { MdOutlineEuroSymbol } from "react-icons/md"
-import { getLanguageByKey } from "../../../utils"
+import { Select, Flex, NumberInput, MultiSelect } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { MdOutlineEuroSymbol } from "react-icons/md";
+import { getLanguageByKey } from "../../../utils";
 import {
   formatDateOrUndefined,
   formatNumericValue,
   convertDateToArray,
-  convertNumberRangeToSingleValue
-} from "../utils"
+  convertNumberRangeToSingleValue,
+} from "../utils";
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -18,11 +18,11 @@ import {
   countryOptions,
   transportOptions,
   nameExcursionOptions,
-  purchaseProcessingOptions
-} from "../../../../FormOptions"
-import { DD_MM_YYYY } from "../../../../app-constants"
+  purchaseProcessingOptions,
+} from "../../../../FormOptions";
+import { DD_MM_YYYY } from "../../../../app-constants";
 
-const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID"
+const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
 
 export const TicketInfoForm = ({
   onSubmit,
@@ -30,9 +30,9 @@ export const TicketInfoForm = ({
   hideDisabledInput,
   renderFooterButtons,
   setMinDate,
-  formId
+  formId,
 }) => {
-  const idForm = formId || TICKET_FORM_FILTER_ID
+  const idForm = formId || TICKET_FORM_FILTER_ID;
 
   const form = useForm({
     mode: "uncontrolled",
@@ -67,12 +67,12 @@ export const TicketInfoForm = ({
         tara: tara ?? undefined,
         tip_de_transport: tip_de_transport ?? undefined,
         denumirea_excursiei_turului: denumirea_excursiei_turului ?? undefined,
-        procesarea_achizitionarii: procesarea_achizitionarii ?? undefined
-      }
+        procesarea_achizitionarii: procesarea_achizitionarii ?? undefined,
+      };
 
-      return { ...formattedData, ...rest }
-    }
-  })
+      return { ...formattedData, ...rest };
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -89,17 +89,17 @@ export const TicketInfoForm = ({
         tara: data.tara,
         tip_de_transport: data.tip_de_transport,
         denumirea_excursiei_turului: data.denumirea_excursiei_turului,
-        procesarea_achizitionarii: data.procesarea_achizitionarii
-      })
+        procesarea_achizitionarii: data.procesarea_achizitionarii,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <NumberInput
@@ -257,5 +257,5 @@ export const TicketInfoForm = ({
         {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
-  )
-}
+  );
+};

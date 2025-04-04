@@ -1,14 +1,14 @@
-import { useState, useEffect } from "react"
-import { useForm } from "@mantine/form"
-import { formatDate } from "../Components/utils"
-import { getLanguageByKey } from "../Components/utils"
+import { useState, useEffect } from "react";
+import { useForm } from "@mantine/form";
+import { formatDate } from "../Components/utils";
+import { getLanguageByKey } from "../Components/utils";
 
 // TODO: Refactor this function in the future for better performance and readability
 
 export const useFormTicket = () => {
-  const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState()
-  const [hasErrorsContractForm, setHasErrorsContractForm] = useState()
-  const [hasErrorQualityControl, setHasErrorQualityControl] = useState()
+  const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState();
+  const [hasErrorsContractForm, setHasErrorsContractForm] = useState();
+  const [hasErrorQualityControl, setHasErrorQualityControl] = useState();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -26,7 +26,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
 
@@ -41,7 +41,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       marketing: (value, values) => {
@@ -55,7 +55,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       tipul_serviciului: (value, values) => {
@@ -68,7 +68,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       tara: (value, values) => {
@@ -81,7 +81,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       tip_de_transport: (value, values) => {
@@ -94,7 +94,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       denumirea_excursiei_turului: (value, values) => {
@@ -107,7 +107,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       procesarea_achizitionarii: (value, values) => {
@@ -119,7 +119,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       numar_de_contract: (value, values) => {
@@ -130,7 +130,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       data_contractului: (value, values) => {
@@ -141,7 +141,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       contract_trimis: (value, values) => {
@@ -152,7 +152,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       contract_semnat: (value, values) => {
@@ -163,7 +163,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       achitare_efectuata: (value, values) => {
@@ -173,7 +173,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       buget: (value, values) => {
@@ -182,7 +182,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       data_plecarii: (value, values) => {
@@ -191,7 +191,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       data_intoarcerii: (value, values) => {
@@ -200,7 +200,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       tour_operator: (value, values) => {
@@ -209,7 +209,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       numarul_cererii_de_la_operator: (value, values) => {
@@ -218,7 +218,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
 
@@ -228,7 +228,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       contract_arhivat: (value, values) => {
@@ -237,7 +237,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       statutul_platii: (value, values) => {
@@ -246,7 +246,7 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       pret_netto: (value, values) => {
@@ -255,19 +255,19 @@ export const useFormTicket = () => {
             values.workflow === "Realizat cu succes") &&
           !value
         ) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       control: (value, values) => {
         if (values.workflow === "Realizat cu succes" && !value) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
       },
       motivul_refuzului: (value, values) => {
         if (values.workflow === "Închis și nerealizat" && !value) {
-          return getLanguageByKey("workflow_change_field_required")
+          return getLanguageByKey("workflow_change_field_required");
         }
-      }
+      },
     },
 
     transformValues: ({
@@ -300,12 +300,12 @@ export const useFormTicket = () => {
         achitare_efectuata: String(achitare_efectuata ?? false),
         rezervare_confirmata: String(rezervare_confirmata ?? false),
         contract_arhivat: String(contract_arhivat ?? false),
-        control: String(control ?? false)
-      }
+        control: String(control ?? false),
+      };
 
-      return { ...formattedData, ...rest }
-    }
-  })
+      return { ...formattedData, ...rest };
+    },
+  });
 
   useEffect(() => {
     const {
@@ -331,13 +331,13 @@ export const useFormTicket = () => {
       numar_de_contract,
       data_contractului,
       contract_trimis,
-      contract_semnat
-    } = form.errors
+      contract_semnat,
+    } = form.errors;
 
     if (motivul_refuzului) {
-      setHasErrorQualityControl(true)
+      setHasErrorQualityControl(true);
     } else {
-      setHasErrorQualityControl(false)
+      setHasErrorQualityControl(false);
     }
 
     if (
@@ -352,12 +352,12 @@ export const useFormTicket = () => {
         tour_operator,
         data_contractului,
         contract_trimis,
-        contract_semnat
+        contract_semnat,
       ].some((value) => value)
     ) {
-      setHasErrorsContractForm(true)
+      setHasErrorsContractForm(true);
     } else {
-      setHasErrorsContractForm(false)
+      setHasErrorsContractForm(false);
     }
 
     if (
@@ -372,19 +372,19 @@ export const useFormTicket = () => {
         procesarea_achizitionarii,
         buget,
         data_plecarii,
-        data_intoarcerii
+        data_intoarcerii,
       ].some((value) => value)
     ) {
-      setHasErrorsTicketInfoForm(true)
+      setHasErrorsTicketInfoForm(true);
     } else {
-      setHasErrorsTicketInfoForm(false)
+      setHasErrorsTicketInfoForm(false);
     }
-  }, [form])
+  }, [form]);
 
   return {
     form,
     hasErrorsTicketInfoForm,
     hasErrorsContractForm,
-    hasErrorQualityControl
-  }
-}
+    hasErrorQualityControl,
+  };
+};

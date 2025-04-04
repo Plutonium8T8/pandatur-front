@@ -1,6 +1,6 @@
-import { TextInput, NumberInput, Button, Flex } from "@mantine/core"
-import { useField } from "@mantine/form"
-import { getLanguageByKey } from "../../utils"
+import { TextInput, NumberInput, Button, Flex } from "@mantine/core";
+import { useField } from "@mantine/form";
+import { getLanguageByKey } from "../../utils";
 
 export const Merge = ({ placeholder, value, onSubmit, loading }) => {
   const field = useField({
@@ -8,19 +8,19 @@ export const Merge = ({ placeholder, value, onSubmit, loading }) => {
     clearErrorOnChange: false,
     validate: (value) => {
       if (typeof value === "string" && value === "") {
-        return getLanguageByKey("ID-ul leadului este necesar")
+        return getLanguageByKey("ID-ul leadului este necesar");
       }
-      return null
-    }
-  })
+      return null;
+    },
+  });
 
   const triggerSubmit = async () => {
-    const validateField = await field.validate()
+    const validateField = await field.validate();
 
     if (validateField === null) {
-      onSubmit(field.getValue())
+      onSubmit(field.getValue());
     }
-  }
+  };
 
   return (
     <>
@@ -43,5 +43,5 @@ export const Merge = ({ placeholder, value, onSubmit, loading }) => {
         </Button>
       </Flex>
     </>
-  )
-}
+  );
+};

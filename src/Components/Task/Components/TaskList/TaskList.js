@@ -1,19 +1,19 @@
-import { useState, useMemo, useEffect } from "react"
-import { RcTable, HeaderCellRcTable } from "../../../RcTable"
-import { Checkbox } from "../../../Checkbox"
-import { translations } from "../../../utils/translations"
-import "./TaskList.css"
-import { TypeTask } from "../OptionsTaskType/OptionsTaskType"
-import { useSnackbar } from "notistack"
-import { api } from "../../../../api"
-import { Menu, Button } from "@mantine/core"
+import { useState, useMemo, useEffect } from "react";
+import { RcTable, HeaderCellRcTable } from "../../../RcTable";
+import { Checkbox } from "../../../Checkbox";
+import { translations } from "../../../utils/translations";
+import "./TaskList.css";
+import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
+import { useSnackbar } from "notistack";
+import { api } from "../../../../api";
+import { Menu, Button } from "@mantine/core";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
   IoTrash,
-  IoPencil
-} from "react-icons/io5"
-import { useConfirmPopup } from "../../../../hooks"
+  IoPencil,
+} from "react-icons/io5";
+import { useConfirmPopup } from "../../../../hooks";
 
 const TaskList = ({
   tasks,
@@ -21,63 +21,63 @@ const TaskList = ({
   userList = [],
   loading = false,
   openEditTask,
-  fetchTasks
+  fetchTasks,
 }) => {
-  const language = localStorage.getItem("language") || "RO"
-  const [order, setOrder] = useState("ASC")
-  const [selectedRow, setSelectedRow] = useState([])
-  const [, setColumn] = useState("")
-  const [openMenuId, setOpenMenuId] = useState(null)
-  const { enqueueSnackbar } = useSnackbar()
+  const language = localStorage.getItem("language") || "RO";
+  const [order, setOrder] = useState("ASC");
+  const [selectedRow, setSelectedRow] = useState([]);
+  const [, setColumn] = useState("");
+  const [openMenuId, setOpenMenuId] = useState(null);
+  const { enqueueSnackbar } = useSnackbar();
   const handleDeleteTaskById = useConfirmPopup({
-    subTitle: translations["Sigur doriți să ștergeți acest task?"][language]
-  })
+    subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
+  });
 
   const priorityColors = {
     Low: "#4CAF50",
     Medium: "#FF9800",
-    High: "#F44336"
-  }
+    High: "#F44336",
+  };
 
   const handleDeleteTask = (taskId) => {
     handleDeleteTaskById(async () => {
       try {
-        await api.task.delete({ id: taskId })
+        await api.task.delete({ id: taskId });
         enqueueSnackbar(translations["Task șters cu succes!"][language], {
-          variant: "success"
-        })
-        fetchTasks()
+          variant: "success",
+        });
+        fetchTasks();
       } catch (error) {
         enqueueSnackbar(
           translations["Eroare la ștergerea taskului"][language],
           {
-            variant: "error"
-          }
-        )
+            variant: "error",
+          },
+        );
       }
-    })
-  }
+    });
+  };
 
   const handleMarkTaskAsComplete = async (taskId) => {
     try {
       await api.task.update({
         id: taskId,
-        status: true
-      })
+        status: true,
+      });
 
       enqueueSnackbar(translations["Task marcat ca finalizat!"][language], {
-        variant: "success"
-      })
-      fetchTasks()
+        variant: "success",
+      });
+      fetchTasks();
     } catch (error) {
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului taskului"][language],
         {
-          variant: "error"
-        }
-      )
+          variant: "error",
+        },
+      );
     }
-  }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -86,15 +86,15 @@ const TaskList = ({
         !event.target.closest(".dropdown-menu") &&
         !event.target.closest(".action-button-task")
       ) {
-        setOpenMenuId(null)
+        setOpenMenuId(null);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [openMenuId])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openMenuId]);
 
   const columns = useMemo(
     () => [
@@ -109,11 +109,11 @@ const TaskList = ({
               setSelectedRow((prev) =>
                 prev.includes(row.id)
                   ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id]
-              )
+                  : [...prev, row.id],
+              );
             }}
           />
-        )
+        ),
       },
       {
         title: (
@@ -128,10 +128,10 @@ const TaskList = ({
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("id")
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"))
-          }
-        })
+            setColumn("id");
+            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
+          },
+        }),
       },
       {
         title: (
@@ -146,10 +146,10 @@ const TaskList = ({
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("ticket_id")
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"))
-          }
-        })
+            setColumn("ticket_id");
+            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
+          },
+        }),
       },
       {
         title: translations["Tipul Taskului"][language],
@@ -158,13 +158,13 @@ const TaskList = ({
         width: 180,
         align: "center",
         render: (taskType) => {
-          const taskObj = TypeTask.find((task) => task.name === taskType)
+          const taskObj = TypeTask.find((task) => task.name === taskType);
           return (
             <div className="task-type">
               {taskObj?.icon || "❓"} <span>{taskType}</span>
             </div>
-          )
-        }
+          );
+        },
       },
       {
         title: translations["Prioritate"][language],
@@ -178,19 +178,19 @@ const TaskList = ({
               backgroundColor: priorityColors[priority] || "#ccc",
               color: "#fff",
               padding: "4px 8px",
-              borderRadius: "4px"
+              borderRadius: "4px",
             }}
           >
             {priority}
           </span>
-        )
+        ),
       },
       {
         title: translations["Etapa Task"][language],
         dataIndex: "status_task",
         key: "status_task",
         width: 120,
-        align: "center"
+        align: "center",
       },
       {
         title: translations["Creat de"][language],
@@ -200,12 +200,12 @@ const TaskList = ({
         align: "center",
         render: (_, row) => {
           const creator = userList.find(
-            (user) => String(user.id) === String(row.created_by)
-          )
+            (user) => String(user.id) === String(row.created_by),
+          );
           return creator
             ? `${creator.name} ${creator.surname}`
-            : `ID: ${row.created_by}`
-        }
+            : `ID: ${row.created_by}`;
+        },
       },
       {
         title: translations["Pentru"][language],
@@ -215,19 +215,19 @@ const TaskList = ({
         align: "center",
         render: (_, row) => {
           const assignedUser = userList.find(
-            (user) => String(user.id) === String(row.created_for)
-          )
+            (user) => String(user.id) === String(row.created_for),
+          );
           return assignedUser
             ? `${assignedUser.name} ${assignedUser.surname}`
-            : `ID: ${row.created_for}`
-        }
+            : `ID: ${row.created_for}`;
+        },
       },
       {
         title: translations["Descriere"][language],
         dataIndex: "description",
         key: "description",
         width: 200,
-        align: "center"
+        align: "center",
       },
       {
         title: translations["Deadline"][language],
@@ -236,12 +236,12 @@ const TaskList = ({
         width: 180,
         align: "center",
         render: (date) => {
-          const [day, month, year, time] = date.split(/[-\s:]/)
-          const formattedDate = new Date(`${year}-${month}-${day}T${time}:00`)
+          const [day, month, year, time] = date.split(/[-\s:]/);
+          const formattedDate = new Date(`${year}-${month}-${day}T${time}:00`);
           return isNaN(formattedDate.getTime())
             ? "Invalid Date"
-            : formattedDate.toLocaleString()
-        }
+            : formattedDate.toLocaleString();
+        },
       },
       {
         title: translations["Status"][language],
@@ -255,7 +255,7 @@ const TaskList = ({
               ? translations["inactiv"][language]
               : translations["activ"][language]}
           </span>
-        )
+        ),
       },
       {
         title: translations["Acțiune"][language],
@@ -276,7 +276,7 @@ const TaskList = ({
                 leftSection={<IoCheckmarkCircle size={16} />}
                 onClick={() => {
                   if (!row.status) {
-                    handleMarkTaskAsComplete(row.id)
+                    handleMarkTaskAsComplete(row.id);
                   }
                 }}
                 disabled={row.status}
@@ -303,11 +303,11 @@ const TaskList = ({
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
-        )
-      }
+        ),
+      },
     ],
-    [language, userList, handleMarkAsSeenTask, order, selectedRow, openMenuId]
-  )
+    [language, userList, handleMarkAsSeenTask, order, selectedRow, openMenuId],
+  );
 
   return (
     <div style={{ margin: "10px" }}>
@@ -320,7 +320,7 @@ const TaskList = ({
         bordered
       />
     </div>
-  )
-}
+  );
+};
 
-export default TaskList
+export default TaskList;

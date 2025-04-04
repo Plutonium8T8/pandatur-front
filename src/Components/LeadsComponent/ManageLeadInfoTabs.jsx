@@ -1,88 +1,88 @@
-import { Tabs, Flex, Button, Text } from "@mantine/core"
-import { useSnackbar } from "notistack"
-import { useState, useEffect } from "react"
-import { getLanguageByKey, showServerError } from "../utils"
-import { api } from "../../api"
+import { Tabs, Flex, Button, Text } from "@mantine/core";
+import { useSnackbar } from "notistack";
+import { useState, useEffect } from "react";
+import { getLanguageByKey, showServerError } from "../utils";
+import { api } from "../../api";
 import {
   ContractForm,
   GeneralForm,
   TicketInfoForm,
-  QualityControlForm
-} from "../TicketForms"
-import { useFormTicket } from "../../hooks"
+  QualityControlForm,
+} from "../TicketForms";
+import { useFormTicket } from "../../hooks";
 
 export const ManageLeadInfoTabs = ({
   open,
   onClose,
   selectedTickets,
   fetchLeads,
-  id
+  id,
 }) => {
-  const { enqueueSnackbar } = useSnackbar()
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [loading, setLoading] = useState(false)
-  const [ticketInfo, setTicketInfo] = useState()
-  const [generalInfoLightTicket, setGeneralInfoLightTicket] = useState()
+  const [loading, setLoading] = useState(false);
+  const [ticketInfo, setTicketInfo] = useState();
+  const [generalInfoLightTicket, setGeneralInfoLightTicket] = useState();
 
   const {
     form,
     hasErrorsTicketInfoForm,
     hasErrorsContractForm,
-    hasErrorQualityControl
-  } = useFormTicket()
+    hasErrorQualityControl,
+  } = useFormTicket();
 
   const submit = async (values, callback) => {
     if (form.validate().hasErrors) {
       enqueueSnackbar(
         getLanguageByKey("please_complete_required_fields_for_workflow_change"),
         {
-          variant: "error"
-        }
-      )
-      return
+          variant: "error",
+        },
+      );
+      return;
     }
-    setLoading(true)
+    setLoading(true);
     try {
       await api.tickets.updateById({
         id: id ? [id] : selectedTickets,
-        ...values
-      })
-      onClose(true)
-      callback()
+        ...values,
+      });
+      onClose(true);
+      callback();
       enqueueSnackbar(
         getLanguageByKey("Datele au fost actualizate cu success"),
         {
-          variant: "success"
-        }
-      )
-      await fetchLeads()
+          variant: "success",
+        },
+      );
+      await fetchLeads();
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     const getTicketInfo = async (id) => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const lightTicket = await api.tickets.ticket.getLightById(id)
-        const ticketInfo = await api.tickets.ticket.getInfo(id)
-        setGeneralInfoLightTicket(lightTicket)
-        setTicketInfo(ticketInfo)
+        const lightTicket = await api.tickets.ticket.getLightById(id);
+        const ticketInfo = await api.tickets.ticket.getInfo(id);
+        setGeneralInfoLightTicket(lightTicket);
+        setTicketInfo(ticketInfo);
       } catch (error) {
-        enqueueSnackbar(showServerError(error), { variant: "error" })
+        enqueueSnackbar(showServerError(error), { variant: "error" });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (id) {
-      getTicketInfo(id)
+      getTicketInfo(id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [id]);
 
   return (
     <Tabs h="100%" defaultValue="general_info">
@@ -197,5 +197,5 @@ export const ManageLeadInfoTabs = ({
         </Flex>
       </Tabs.Panel>
     </Tabs>
-  )
-}
+  );
+};

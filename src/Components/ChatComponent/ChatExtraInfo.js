@@ -1,23 +1,23 @@
-import React, { useState, useEffect } from "react"
-import { enqueueSnackbar } from "notistack"
-import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core"
-import { getLanguageByKey, showServerError } from "../utils"
-import { PersonalData4ClientForm, Merge, Media } from "./components"
-import { api } from "../../api"
+import React, { useState, useEffect } from "react";
+import { enqueueSnackbar } from "notistack";
+import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
+import { getLanguageByKey, showServerError } from "../utils";
+import { PersonalData4ClientForm, Merge, Media } from "./components";
+import { api } from "../../api";
 import {
   ContractForm,
   QualityControlForm,
   InvoiceForm,
   GeneralForm,
-  TicketInfoForm
-} from "../TicketForms"
-import { useFormTicket } from "../../hooks"
+  TicketInfoForm,
+} from "../TicketForms";
+import { useFormTicket } from "../../hooks";
 
-const FORMAT_MEDIA = ["audio", "video", "image", "file"]
+const FORMAT_MEDIA = ["audio", "video", "image", "file"];
 
 const parseId = (id) => {
-  return Number(id.replace(/[{}]/g, "").trim())
-}
+  return Number(id.replace(/[{}]/g, "").trim());
+};
 
 const ChatExtraInfo = ({
   selectTicketId,
@@ -30,94 +30,94 @@ const ChatExtraInfo = ({
   ticketId,
   selectedClient,
   setTickets,
-  tickets
+  tickets,
 }) => {
-  const [extraInfo, setExtraInfo] = useState({})
-  const [isLoadingGeneral, setIsLoadingGeneral] = useState(false)
-  const [isLoadingPersonalDate, setIsLoadingPersonalDate] = useState(false)
-  const [isLoadingCombineLead, setIsLoadingCombineLead] = useState(false)
-  const [isLoadingCombineClient, setIsLoadingClient] = useState(false)
-  const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false)
+  const [extraInfo, setExtraInfo] = useState({});
+  const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
+  const [isLoadingPersonalDate, setIsLoadingPersonalDate] = useState(false);
+  const [isLoadingCombineLead, setIsLoadingCombineLead] = useState(false);
+  const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
+  const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
 
   const {
     form,
     hasErrorsTicketInfoForm,
     hasErrorsContractForm,
-    hasErrorQualityControl
-  } = useFormTicket()
+    hasErrorQualityControl,
+  } = useFormTicket();
 
   useEffect(() => {
     if (selectTicketId) {
-      fetchTicketExtraInfo(selectTicketId)
+      fetchTicketExtraInfo(selectTicketId);
     }
-  }, [selectTicketId])
+  }, [selectTicketId]);
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
       enqueueSnackbar(
         getLanguageByKey("please_complete_required_fields_for_workflow_change"),
         {
-          variant: "error"
-        }
-      )
-      return
+          variant: "error",
+        },
+      );
+      return;
     }
 
-    setIsLoadingGeneral(true)
+    setIsLoadingGeneral(true);
     try {
       await api.tickets.updateById({
         id: [selectTicketId],
-        ...values
-      })
+        ...values,
+      });
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         {
-          variant: "success"
-        }
-      )
+          variant: "success",
+        },
+      );
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     } finally {
-      setIsLoadingGeneral(false)
+      setIsLoadingGeneral(false);
     }
-  }
+  };
 
   const fetchTicketExtraInfo = async (ticketId) => {
     try {
-      const data = await api.tickets.ticket.getInfo(ticketId)
+      const data = await api.tickets.ticket.getInfo(ticketId);
       setExtraInfo((prev) => ({
         ...prev,
-        [ticketId]: data
-      }))
+        [ticketId]: data,
+      }));
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     }
-  }
+  };
 
   const handleFieldChange = (field, value) => {
     setExtraInfo((prevState) => ({
       ...prevState,
       [selectTicketId]: {
         ...prevState[selectTicketId],
-        [field]: value
-      }
-    }))
-  }
+        [field]: value,
+      },
+    }));
+  };
 
   const submitPersonalData = async (values) => {
-    const clientId = parseId(updatedTicket.client_id)
-    setIsLoadingPersonalDate(true)
+    const clientId = parseId(updatedTicket.client_id);
+    setIsLoadingPersonalDate(true);
     try {
-      const result = await api.users.updateExtended(clientId, values)
+      const result = await api.users.updateExtended(clientId, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
-        { variant: "success" }
-      )
+        { variant: "success" },
+      );
 
       setPersonalInfo((prev) => ({
         ...prev,
@@ -126,25 +126,25 @@ const ChatExtraInfo = ({
           name: result.name || "",
           surname: result.surname || "",
           address: result.address || "",
-          phone: result.phone || ""
-        }
-      }))
+          phone: result.phone || "",
+        },
+      }));
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     } finally {
-      setIsLoadingPersonalDate(false)
+      setIsLoadingPersonalDate(false);
     }
-  }
+  };
 
   useEffect(() => {
-    setExtraInfo({})
-  }, [selectTicketId])
+    setExtraInfo({});
+  }, [selectTicketId]);
 
   useEffect(() => {
-    const pretNetto = extraInfo[selectTicketId]?.pret_netto
-    const buget = extraInfo[selectTicketId]?.buget
+    const pretNetto = extraInfo[selectTicketId]?.pret_netto;
+    const buget = extraInfo[selectTicketId]?.buget;
 
     if (
       pretNetto !== "" &&
@@ -152,96 +152,96 @@ const ChatExtraInfo = ({
       pretNetto !== undefined &&
       buget !== undefined
     ) {
-      const newComision = parseFloat(buget) - parseFloat(pretNetto)
-      handleFieldChange("comission_companie", newComision.toFixed(2))
+      const newComision = parseFloat(buget) - parseFloat(pretNetto);
+      handleFieldChange("comission_companie", newComision.toFixed(2));
     }
   }, [
     extraInfo[selectTicketId]?.pret_netto,
     extraInfo[selectTicketId]?.buget,
-    selectTicketId
-  ])
+    selectTicketId,
+  ]);
 
   const mediaSources = messages.filter(
     (msg) =>
-      FORMAT_MEDIA.includes(msg.mtype) && msg.ticket_id === selectTicketId
-  )
+      FORMAT_MEDIA.includes(msg.mtype) && msg.ticket_id === selectTicketId,
+  );
 
   const mergeCLientsData = async (id) => {
-    const ticketOld = selectTicketId
+    const ticketOld = selectTicketId;
 
-    setIsLoadingCombineLead(true)
+    setIsLoadingCombineLead(true);
     try {
       await api.tickets.merge({
         ticket_old: ticketOld,
-        ticket_new: id
-      })
+        ticket_new: id,
+      });
       enqueueSnackbar(
         getLanguageByKey("Biletele au fost combinate cu succes"),
         {
-          variant: "success"
-        }
-      )
+          variant: "success",
+        },
+      );
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     } finally {
-      setIsLoadingCombineLead(false)
+      setIsLoadingCombineLead(false);
     }
-  }
+  };
 
   const mergeData = async (id) => {
-    const oldUserId = selectedClient
+    const oldUserId = selectedClient;
 
-    setIsLoadingClient(true)
+    setIsLoadingClient(true);
     try {
       await api.users.clientMerge({
         old_user_id: oldUserId,
-        new_user_id: id
-      })
+        new_user_id: id,
+      });
 
       enqueueSnackbar(
         getLanguageByKey("Utilizatorii au fost combinați cu succes"),
         {
-          variant: "success"
-        }
-      )
+          variant: "success",
+        },
+      );
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     } finally {
-      setIsLoadingClient(false)
+      setIsLoadingClient(false);
     }
-  }
+  };
 
   const saveTicketExtraDate = async (values) => {
-    setIsLoadingInfoTicket(true)
+    setIsLoadingInfoTicket(true);
     try {
-      await api.tickets.ticket.create(selectTicketId, values)
+      await api.tickets.ticket.create(selectTicketId, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
-        { variant: "success" }
-      )
+        { variant: "success" },
+      );
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     } finally {
-      setIsLoadingInfoTicket(false)
+      setIsLoadingInfoTicket(false);
     }
-  }
+  };
 
   useEffect(() => {
-    if (!selectedClient) return
+    if (!selectedClient) return;
 
-    const clientId = parseId(selectedClient)
+    const clientId = parseId(selectedClient);
 
     const clientData =
       tickets
         .find((ticket) => ticket.id === selectTicketId)
-        ?.clients?.find((client) => client.id === clientId) || {}
+        ?.clients?.find((client) => client.id === clientId) || {};
 
     if (clientData) {
       setPersonalInfo((prev) => ({
@@ -251,11 +251,11 @@ const ChatExtraInfo = ({
           name: clientData.name || "",
           surname: clientData.surname || "",
           address: clientData.address || "",
-          phone: clientData.phone || ""
-        }
-      }))
+          phone: clientData.phone || "",
+        },
+      }));
     }
-  }, [selectedClient, selectTicketId, tickets, setPersonalInfo])
+  }, [selectedClient, selectTicketId, tickets, setPersonalInfo]);
 
   return (
     <ScrollArea
@@ -421,7 +421,7 @@ const ChatExtraInfo = ({
         </Tabs.Panel>
       </Tabs>
     </ScrollArea>
-  )
-}
+  );
+};
 
-export default ChatExtraInfo
+export default ChatExtraInfo;

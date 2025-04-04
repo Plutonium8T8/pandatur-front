@@ -1,97 +1,99 @@
-import React, { useState, useEffect, useRef, useMemo } from "react"
-import { FixedSizeList } from "react-window"
-import { TextInput, Checkbox, Title, Flex, Box } from "@mantine/core"
-import { getLanguageByKey } from "../utils"
-import { useUser, useApp, useDOMElementHeight } from "../../hooks"
-import { ChatListItem } from "./components"
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { FixedSizeList } from "react-window";
+import { TextInput, Checkbox, Title, Flex, Box } from "@mantine/core";
+import { getLanguageByKey } from "../utils";
+import { useUser, useApp, useDOMElementHeight } from "../../hooks";
+import { ChatListItem } from "./components";
 
 const parseCustomDate = (dateStr) => {
-  if (!dateStr) return 0
+  if (!dateStr) return 0;
 
-  const [datePart, timePart] = dateStr.split(" ")
-  if (!datePart || !timePart) return 0
+  const [datePart, timePart] = dateStr.split(" ");
+  if (!datePart || !timePart) return 0;
 
-  const [day, month, year] = datePart.split("-").map(Number)
-  const [hours, minutes, seconds] = timePart.split(":").map(Number)
+  const [day, month, year] = datePart.split("-").map(Number);
+  const [hours, minutes, seconds] = timePart.split(":").map(Number);
 
-  return new Date(year, month - 1, day, hours, minutes, seconds).getTime()
-}
+  return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
+};
 
-const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent)
+const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ selectTicketId, setSelectTicketId }) => {
+const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   const { tickets } = useApp()
   const { userId } = useUser()
   const [showMyTickets, setShowMyTickets] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const chatListRef = useRef(null)
-  const wrapperChatItemRef = useRef(null)
-  const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef)
+  const chatListRef = useRef(null);
+  const wrapperChatItemRef = useRef(null);
+  const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
 
   // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
     if (chatListRef.current && selectTicketId) {
-      const container = chatListRef.current
+      const container = chatListRef.current;
       const selectedElement = container.querySelector(
-        `[data-ticket-id="${selectTicketId}"]`
-      )
+        `[data-ticket-id="${selectTicketId}"]`,
+      );
 
       if (selectedElement) {
-        const containerHeight = container.clientHeight
-        const itemTop = selectedElement.offsetTop
-        const itemHeight = selectedElement.clientHeight
-        const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2
+        const containerHeight = container.clientHeight;
+        const itemTop = selectedElement.offsetTop;
+        const itemHeight = selectedElement.clientHeight;
+        const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2;
 
         container.scrollTo({
-          top: scrollTop
-        })
+          top: scrollTop,
+        });
       }
     }
   }, [selectTicketId, tickets])
 
   const handleTicketClick = (ticketId) => {
-    console.log("🖱 Клик по тикету в списке:", ticketId)
+    console.log("🖱 Клик по тикету в списке:", ticketId);
 
-    if (selectTicketId === ticketId) return
+    if (selectTicketId === ticketId) return;
 
-    setSelectTicketId(ticketId)
-  }
+    setSelectTicketId(ticketId);
+  };
 
   const sortedTickets = useMemo(() => {
-    let filtered = [...tickets]
+    let filtered = [...tickets];
 
-    filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a))
+    filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
 
     if (showMyTickets) {
-      filtered = filtered.filter((ticket) => ticket.technician_id === userId)
+      filtered = filtered.filter((ticket) => ticket.technician_id === userId);
     }
 
     if (searchQuery) {
-      const lowerSearchQuery = searchQuery.toLowerCase()
+      const lowerSearchQuery = searchQuery.toLowerCase();
       filtered = filtered.filter((ticket) => {
-        const ticketId = ticket.id.toString().toLowerCase()
-        const ticketContact = ticket.contact ? ticket.contact.toLowerCase() : ""
+        const ticketId = ticket.id.toString().toLowerCase();
+        const ticketContact = ticket.contact
+          ? ticket.contact.toLowerCase()
+          : "";
         const tags = ticket.tags
           ? ticket.tags
               .replace(/[{}]/g, "")
               .split(",")
               .map((tag) => tag.trim().toLowerCase())
-          : []
+          : [];
 
         return (
           ticketId.includes(lowerSearchQuery) ||
           ticketContact.includes(lowerSearchQuery) ||
           tags.some((tag) => tag.includes(lowerSearchQuery))
-        )
-      })
+        );
+      });
     }
 
-    return filtered
-  }, [tickets, showMyTickets, searchQuery])
+    return filtered;
+  }, [tickets, showMyTickets, searchQuery]);
 
   const ChatItem = ({ index, style }) => {
-    const ticket = sortedTickets[index]
+    const ticket = sortedTickets[index];
 
     return (
       <ChatListItem
@@ -100,8 +102,8 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
         onHandleTicketClick={handleTicketClick}
         selectTicketId={selectTicketId}
       />
-    )
-  }
+    );
+  };
 
   return (
     <Box direction="column" w="20%" p="md" ref={chatListRef}>
@@ -131,7 +133,7 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
         </FixedSizeList>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default ChatList
+export default ChatList;

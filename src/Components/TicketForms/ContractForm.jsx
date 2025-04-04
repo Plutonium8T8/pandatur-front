@@ -1,14 +1,14 @@
-import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
-import { DatePickerInput } from "@mantine/dates"
-import { useEffect } from "react"
-import { MdOutlineEuroSymbol } from "react-icons/md"
-import { getLanguageByKey, parseServerDate } from "../utils"
-import { LabelSwitch } from "../LabelSwitch"
-import { paymentStatusOptions } from "../../FormOptions"
-import { DD_MM_YYYY } from "../../app-constants"
-import { useUser } from "../../hooks"
+import { TextInput, Select, NumberInput, Flex } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { useEffect } from "react";
+import { MdOutlineEuroSymbol } from "react-icons/md";
+import { getLanguageByKey, parseServerDate } from "../utils";
+import { LabelSwitch } from "../LabelSwitch";
+import { paymentStatusOptions } from "../../FormOptions";
+import { DD_MM_YYYY } from "../../app-constants";
+import { useUser } from "../../hooks";
 
-const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
+const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
 export const ContractForm = ({
   onSubmit,
@@ -17,11 +17,11 @@ export const ContractForm = ({
   renderFooterButtons,
   setMinDate,
   formId,
-  formInstance
+  formInstance,
 }) => {
-  const idForm = formId || CONTRACT_FORM_FILTER_ID
-  const { hasRole } = useUser()
-  const isAdmin = hasRole("ROLE_ADMIN")
+  const idForm = formId || CONTRACT_FORM_FILTER_ID;
+  const { hasRole } = useUser();
+  const isAdmin = hasRole("ROLE_ADMIN");
 
   useEffect(() => {
     if (data) {
@@ -41,17 +41,17 @@ export const ContractForm = ({
         avans_euro: data.avans_euro,
         pret_netto: data.pret_netto,
         achitat_client: data.achitat_client,
-        control: data.control
-      })
+        control: data.control,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={formInstance.onSubmit((values) => {
-          onSubmit(values, () => formInstance.reset())
+          onSubmit(values, () => formInstance.reset());
         })}
       >
         <TextInput
@@ -99,7 +99,7 @@ export const ContractForm = ({
           label={getLanguageByKey("Contract trimis")}
           key={formInstance.key("contract_trimis")}
           {...formInstance.getInputProps("contract_trimis", {
-            type: "checkbox"
+            type: "checkbox",
           })}
         />
 
@@ -108,7 +108,7 @@ export const ContractForm = ({
           label={getLanguageByKey("Contract semnat")}
           key={formInstance.key("contract_semnat")}
           {...formInstance.getInputProps("contract_semnat", {
-            type: "checkbox"
+            type: "checkbox",
           })}
         />
 
@@ -133,7 +133,7 @@ export const ContractForm = ({
           label={getLanguageByKey("Achitare efectuată")}
           key={formInstance.key("achitare_efectuata")}
           {...formInstance.getInputProps("achitare_efectuata", {
-            type: "checkbox"
+            type: "checkbox",
           })}
         />
 
@@ -142,7 +142,7 @@ export const ContractForm = ({
           label={getLanguageByKey("Rezervare confirmată")}
           key={formInstance.key("rezervare_confirmata")}
           {...formInstance.getInputProps("rezervare_confirmata", {
-            type: "checkbox"
+            type: "checkbox",
           })}
         />
 
@@ -151,7 +151,7 @@ export const ContractForm = ({
           label={getLanguageByKey("Contract arhivat")}
           key={formInstance.key("contract_arhivat")}
           {...formInstance.getInputProps("contract_arhivat", {
-            type: "checkbox"
+            type: "checkbox",
           })}
         />
 
@@ -245,9 +245,9 @@ export const ContractForm = ({
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: formInstance.reset,
-          formId: idForm
+          formId: idForm,
         })}
       </Flex>
     </>
-  )
-}
+  );
+};
