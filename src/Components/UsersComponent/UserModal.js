@@ -13,7 +13,7 @@ import {
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RolesComponent from "./RolesComponent";
-import { GroupUsersOptions } from "./GroupUsersOptions";
+import { groupUsersOptions } from "./GroupUsersOptions";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 
@@ -227,8 +227,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           <Select
             label={translations["Grup utilizator"][language]}
             placeholder={translations["Alege grupul"][language]}
-            data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
-            value={GroupUsersOptions.includes(form.groups) ? form.groups : null}
+            data={groupUsersOptions.map((g) => ({ value: g, label: g }))}
+            value={groupUsersOptions.includes(form.groups) ? form.groups : null}
             onChange={(value) => setForm({ ...form, groups: value || "" })}
             required
           />

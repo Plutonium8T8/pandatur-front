@@ -1,6 +1,6 @@
 import { Modal, Select, Button, Stack } from "@mantine/core";
 import { useState } from "react";
-import { GroupUsersOptions } from "./GroupUsersOptions";
+import { groupUsersOptions } from "./GroupUsersOptions";
 import { translations } from "../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
@@ -27,7 +27,7 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
         <Select
           label={translations["Alege grupul"][language]}
           placeholder={translations["Alege grupul"][language]}
-          data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
+          data={groupUsersOptions.map((g) => ({ value: g, label: g }))}
           value={group}
           onChange={setGroup}
         />

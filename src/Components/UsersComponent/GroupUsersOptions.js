@@ -1,4 +1,4 @@
-export const GroupUsersOptions = [
+export const groupUsersOptions = [
   "Admin",
   "Distribution",
   "Quality Department",
