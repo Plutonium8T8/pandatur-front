@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom"
-import { BsThreeDots, BsTagsFill } from "react-icons/bs"
-import { FaHeadphones, FaFingerprint } from "react-icons/fa6"
+import { Link } from "react-router-dom";
+import { BsThreeDots, BsTagsFill } from "react-icons/bs";
+import { FaHeadphones, FaFingerprint } from "react-icons/fa6";
 import {
   MdAccessTime,
   MdOutlineLocalPhone,
   MdModeEdit,
-  MdDelete
-} from "react-icons/md"
+  MdDelete,
+} from "react-icons/md";
 import {
   Image,
   Box,
@@ -16,32 +16,32 @@ import {
   Text,
   Divider,
   Menu,
-  ActionIcon
-} from "@mantine/core"
-import { parseTags } from "../../../stringUtils"
-import { parseServerDate, getLanguageByKey } from "../../utils"
-import { Tag } from "../../Tag"
-import { DEFAULT_PHOTO, DD_MM_YYYY, HH_mm } from "../../../app-constants"
+  ActionIcon,
+} from "@mantine/core";
+import { parseTags } from "../../../stringUtils";
+import { parseServerDate, getLanguageByKey } from "../../utils";
+import { Tag } from "../../Tag";
+import { DEFAULT_PHOTO, DD_MM_YYYY, HH_mm } from "../../../app-constants";
 
-const { colors } = DEFAULT_THEME
+const { colors } = DEFAULT_THEME;
 
 export const priorityTagColors = {
   joasă: "green",
   medie: "blue",
   înaltă: "yellow",
-  critică: "red"
-}
+  critică: "red",
+};
 
 export const TicketCard = ({
   ticket,
   onEditTicket,
   technicianList,
   onDeleteTicket,
-  technician
+  technician,
 }) => {
-  const tags = parseTags(ticket.tags)
+  const tags = parseTags(ticket.tags);
 
-  const firstClient = ticket.clients?.[0]
+  const firstClient = ticket.clients?.[0];
 
   return (
     <Link to={`/leads/${ticket.id}`}>
@@ -64,8 +64,8 @@ export const TicketCard = ({
 
         <Box
           onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
+            e.preventDefault();
+            e.stopPropagation();
           }}
           pos="absolute"
           right="16px"
@@ -129,11 +129,11 @@ export const TicketCard = ({
 
                   <Text size="xs">
                     {parseServerDate(ticket.last_interaction_date).format(
-                      DD_MM_YYYY
+                      DD_MM_YYYY,
                     )}
                     :{" "}
                     {parseServerDate(ticket.last_interaction_date).format(
-                      HH_mm
+                      HH_mm,
                     )}
                   </Text>
                 </Flex>
@@ -175,7 +175,7 @@ export const TicketCard = ({
                 h="100%"
                 style={{
                   background:
-                    "linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #ffffff 80%)"
+                    "linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #ffffff 80%)",
                 }}
               />
             </Flex>
@@ -195,5 +195,5 @@ export const TicketCard = ({
         </Box>
       </Card>
     </Link>
-  )
-}
+  );
+};

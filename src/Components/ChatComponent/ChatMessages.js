@@ -21,11 +21,11 @@ const ChatMessages = ({
   isLoading,
   personalInfo
 }) => {
-  const { userId } = useUser()
-  const { messages, setMessages, tickets } = useApp()
+  const { userId } = useUser();
+  const { messages, setMessages, tickets } = useApp();
 
-  const [managerMessage, setManagerMessage] = useState("")
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false)
+  const [managerMessage, setManagerMessage] = useState("");
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0
@@ -42,26 +42,27 @@ const ChatMessages = ({
   const [selectedTask, setSelectedTask] = useState(null)
 
   const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null
+    if (!Array.isArray(messages) || messages.length === 0) return null;
 
     const ticketMessages = messages
       .filter(
-        (msg) => msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1
+        (msg) =>
+          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
       )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent))
+      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
 
-    return ticketMessages.length > 0 ? ticketMessages[0].client_id : null
-  }
+    return ticketMessages.length > 0 ? ticketMessages[0].client_id : null;
+  };
 
   useEffect(() => {
-    const lastClient = getLastClientWhoSentMessage()
+    const lastClient = getLastClientWhoSentMessage();
     if (lastClient) {
       console.log(
-        `🔍 Последний клиент, который отправил сообщение: ${lastClient}`
-      )
-      setSelectedClient(String(lastClient))
+        `🔍 Последний клиент, который отправил сообщение: ${lastClient}`,
+      );
+      setSelectedClient(String(lastClient));
     }
-  }, [messages, selectTicketId])
+  }, [messages, selectTicketId]);
 
   const parseDate = (dateString) => {
     if (!dateString) return null
@@ -72,30 +73,30 @@ const ChatMessages = ({
   }
 
   const handleEmojiClick = (emojiObject) => {
-    setManagerMessage((prev) => prev + emojiObject.emoji)
-  }
+    setManagerMessage((prev) => prev + emojiObject.emoji);
+  };
 
   const uploadFile = async (file) => {
-    const formData = new FormData()
-    formData.append("file", file)
+    const formData = new FormData();
+    formData.append("file", file);
 
-    console.log("Подготовка к загрузке файла...")
-    console.log("FormData:", formData)
+    console.log("Подготовка к загрузке файла...");
+    console.log("FormData:", formData);
 
     try {
-      const data = await api.messages.upload(formData)
+      const data = await api.messages.upload(formData);
 
-      return data
+      return data;
     } catch (error) {
-      console.error("Ошибка загрузки файла:", error)
-      throw error
+      console.error("Ошибка загрузки файла:", error);
+      throw error;
     }
-  }
+  };
 
   const sendMessage = async (selectedFile, platform) => {
     if (!managerMessage.trim() && !selectedFile) {
-      console.error("Ошибка: Отправка пустого сообщения невозможна.")
-      return
+      console.error("Ошибка: Отправка пустого сообщения невозможна.");
+      return;
     }
 
     try {
@@ -105,186 +106,186 @@ const ChatMessages = ({
         platform: platform,
         message: managerMessage.trim(),
         media_type: null,
-        media_url: ""
-      }
+        media_url: "",
+      };
 
       if (selectedFile) {
-        console.log("Загрузка файла...")
-        const uploadResponse = await uploadFile(selectedFile)
+        console.log("Загрузка файла...");
+        const uploadResponse = await uploadFile(selectedFile);
 
         if (!uploadResponse || !uploadResponse.url) {
-          console.error("Ошибка загрузки файла")
-          return
+          console.error("Ошибка загрузки файла");
+          return;
         }
 
-        messageData.media_url = uploadResponse.url
-        messageData.media_type = getMediaType(selectedFile.type)
+        messageData.media_url = uploadResponse.url;
+        messageData.media_type = getMediaType(selectedFile.type);
       }
 
-      console.log("Отправляемые данные:", JSON.stringify(messageData, null, 2))
+      console.log("Отправляемые данные:", JSON.stringify(messageData, null, 2));
 
-      let apiUrl = api.messages.send.create
+      let apiUrl = api.messages.send.create;
 
       if (platform === "telegram") {
-        apiUrl = api.messages.send.telegram
+        apiUrl = api.messages.send.telegram;
       } else if (platform === "viber") {
-        apiUrl = api.messages.send.viber
+        apiUrl = api.messages.send.viber;
       }
 
-      console.log(`📡 Отправка сообщения через API: ${apiUrl}`)
+      console.log(`📡 Отправка сообщения через API: ${apiUrl}`);
 
-      setManagerMessage("")
+      setManagerMessage("");
 
-      await apiUrl(messageData)
+      await apiUrl(messageData);
 
       console.log(
         `✅ Сообщение успешно отправлено через API ${apiUrl}:`,
-        messageData
-      )
+        messageData,
+      );
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { ...messageData, seenAt: false }
-      ])
+        { ...messageData, seenAt: false },
+      ]);
 
-      if (!selectedFile) setManagerMessage("")
+      if (!selectedFile) setManagerMessage("");
     } catch (error) {
-      console.error("Ошибка отправки сообщения:", error)
+      console.error("Ошибка отправки сообщения:", error);
     }
   }
 
   const handleClick = () => {
     if (!selectedClient) {
-      console.error("⚠️ Ошибка: Клиент не выбран!")
-      return
+      console.error("⚠️ Ошибка: Клиент не выбран!");
+      return;
     }
-    sendMessage(null, selectedPlatform)
-  }
+    sendMessage(null, selectedPlatform);
+  };
 
   const handleFileSelect = async (e) => {
-    const selectedFile = e.target.files[0]
-    if (!selectedFile) return
+    const selectedFile = e.target.files[0];
+    if (!selectedFile) return;
 
     try {
-      await sendMessage(selectedFile, selectedPlatform)
+      await sendMessage(selectedFile, selectedPlatform);
     } catch (error) {
-      console.error("Ошибка обработки файла:", error)
+      console.error("Ошибка обработки файла:", error);
     }
-  }
+  };
 
   const handleEmojiClickButton = (event) => {
-    const rect = event.target.getBoundingClientRect()
-    const emojiPickerHeight = 450
+    const rect = event.target.getBoundingClientRect();
+    const emojiPickerHeight = 450;
 
     setEmojiPickerPosition({
       top: rect.top + window.scrollY - emojiPickerHeight,
-      left: rect.left + window.scrollX
-    })
+      left: rect.left + window.scrollX,
+    });
 
-    setShowEmojiPicker((prev) => !prev)
-  }
+    setShowEmojiPicker((prev) => !prev);
+  };
 
   const handleFileButtonClick = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click()
+      fileInputRef.current.click();
     }
-  }
+  };
 
   const handleSelectTemplateChange = (event) => {
-    const selectedKey = event.target.value
+    const selectedKey = event.target.value;
 
     if (selectedKey) {
-      setSelectedMessage(selectedKey)
-      setManagerMessage(templateOptions[selectedKey])
+      setSelectedMessage(selectedKey);
+      setManagerMessage(templateOptions[selectedKey]);
     } else {
-      setSelectedMessage(null)
-      setManagerMessage("")
+      setSelectedMessage(null);
+      setManagerMessage("");
     }
   }
 
   const handleScroll = () => {
     if (messageContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
-        messageContainerRef.current
-      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50)
+        messageContainerRef.current;
+      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
     }
-  }
+  };
 
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
-        top: messageContainerRef.current.scrollHeight
+        top: messageContainerRef.current.scrollHeight,
         // behavior: 'smooth',
-      })
+      });
     }
-  }, [messages, selectTicketId])
+  }, [messages, selectTicketId]);
 
   useEffect(() => {
-    const container = messageContainerRef.current
+    const container = messageContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll)
+      container.addEventListener("scroll", handleScroll);
     }
     return () => {
       if (container) {
-        container.removeEventListener("scroll", handleScroll)
+        container.removeEventListener("scroll", handleScroll);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const getClientPlatforms = () => {
-    const clientId = Number(selectedClient)
+    const clientId = Number(selectedClient);
     const clientMessages = messages.filter(
-      (msg) => Number(msg.client_id) === clientId
-    )
+      (msg) => Number(msg.client_id) === clientId,
+    );
 
     if (!clientMessages || clientMessages.length === 0) {
-      return ["web"]
+      return ["web"];
     }
 
     const uniquePlatforms = [
-      ...new Set(clientMessages.map((msg) => msg.platform))
-    ]
-    return uniquePlatforms.length > 0 ? uniquePlatforms : ["web"]
-  }
+      ...new Set(clientMessages.map((msg) => msg.platform)),
+    ];
+    return uniquePlatforms.length > 0 ? uniquePlatforms : ["web"];
+  };
   useEffect(() => {
-    const platforms = getClientPlatforms()
-    setSelectedPlatform(platforms[0] || "web")
-  }, [selectedClient, messages])
+    const platforms = getClientPlatforms();
+    setSelectedPlatform(platforms[0] || "web");
+  }, [selectedClient, messages]);
 
   const getLastMessagePlatform = (clientId) => {
-    if (!Array.isArray(messages) || messages.length === 0) return "web"
+    if (!Array.isArray(messages) || messages.length === 0) return "web";
 
     const clientMessages = messages
       .filter(
         (msg) =>
           Number(msg.client_id) === Number(clientId) &&
-          Number(msg.sender_id) !== 1
+          Number(msg.sender_id) !== 1,
       )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent))
+      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
 
-    return clientMessages.length > 0 ? clientMessages[0].platform : "web"
-  }
+    return clientMessages.length > 0 ? clientMessages[0].platform : "web";
+  };
 
   useEffect(() => {
     if (selectedClient) {
-      const lastPlatform = getLastMessagePlatform(selectedClient)
+      const lastPlatform = getLastMessagePlatform(selectedClient);
       console.log(
-        `🔍 Последняя платформа для клиента ${selectedClient}: ${lastPlatform}`
-      )
-      setSelectedPlatform(lastPlatform || "web")
+        `🔍 Последняя платформа для клиента ${selectedClient}: ${lastPlatform}`,
+      );
+      setSelectedPlatform(lastPlatform || "web");
     }
-  }, [selectedClient, messages])
+  }, [selectedClient, messages]);
 
   const fetchTasks = async () => {
-    const data = await api.task.getAllTasks()
-    setTasks(data)
-  }
+    const data = await api.task.getAllTasks();
+    setTasks(data);
+  };
 
   const openEditTask = (task) => {
-    console.log("Редактирование задачи:", task)
-    setSelectedTask(task)
-    setIsTaskModalOpen(true)
-  }
+    console.log("Редактирование задачи:", task);
+    setSelectedTask(task);
+    setIsTaskModalOpen(true);
+  };
 
   return (
     <Flex w="100%" direction="column" className="chat-area">
@@ -351,14 +352,14 @@ const ChatMessages = ({
                     position: "absolute",
                     top: emojiPickerPosition.top,
                     left: emojiPickerPosition.left,
-                    zIndex: 1000
+                    zIndex: 1000,
                   }}
                   onMouseEnter={() => setShowEmojiPicker(true)}
                   onMouseLeave={() => setShowEmojiPicker(false)}
                 >
                   <EmojiPicker onEmojiClick={handleEmojiClick} />
                 </div>,
-                document.body
+                document.body,
               )}
             <input
               type="file"
@@ -406,9 +407,9 @@ const ChatMessages = ({
                   className="task-select"
                   value={`${selectedClient}-${selectedPlatform}`}
                   onChange={(e) => {
-                    const [clientId, platform] = e.target.value.split("-")
-                    setSelectedClient(clientId)
-                    setSelectedPlatform(platform)
+                    const [clientId, platform] = e.target.value.split("-");
+                    setSelectedClient(clientId);
+                    setSelectedPlatform(platform);
                   }}
                 >
                   <option value="" disabled>
@@ -419,18 +420,18 @@ const ChatMessages = ({
                     .client_id.replace(/[{}]/g, "")
                     .split(",")
                     .map((id) => {
-                      const clientId = id.trim()
-                      const clientInfo = personalInfo[clientId] || {}
+                      const clientId = id.trim();
+                      const clientInfo = personalInfo[clientId] || {};
                       const fullName = clientInfo.name
                         ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-                        : `ID: ${clientId}`
+                        : `ID: ${clientId}`;
 
                       const clientMessages = messages.filter(
-                        (msg) => msg.client_id === Number(clientId)
-                      )
+                        (msg) => msg.client_id === Number(clientId),
+                      );
                       const uniquePlatforms = [
-                        ...new Set(clientMessages.map((msg) => msg.platform))
-                      ]
+                        ...new Set(clientMessages.map((msg) => msg.platform)),
+                      ];
 
                       return uniquePlatforms.map((platform) => (
                         <option
@@ -439,7 +440,7 @@ const ChatMessages = ({
                         >
                           {` ${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId} `}
                         </option>
-                      ))
+                      ));
                     })}
                 </select>
               </div>
@@ -447,7 +448,7 @@ const ChatMessages = ({
         </div>
       </div>
     </Flex>
-  )
-}
+  );
+};
 
-export default ChatMessages
+export default ChatMessages;

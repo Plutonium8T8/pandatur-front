@@ -1,27 +1,27 @@
-import { TextInput, Select, NumberInput, Flex } from "@mantine/core"
-import { DatePickerInput } from "@mantine/dates"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { MdOutlineEuroSymbol } from "react-icons/md"
-import { getLanguageByKey } from "../../../utils"
-import { LabelSwitch } from "../../../LabelSwitch"
-import { paymentStatusOptions } from "../../../../FormOptions"
-import { DD_MM_YYYY } from "../../../../app-constants"
-import { useUser } from "../../../../hooks"
+import { TextInput, Select, NumberInput, Flex } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { MdOutlineEuroSymbol } from "react-icons/md";
+import { getLanguageByKey } from "../../../utils";
+import { LabelSwitch } from "../../../LabelSwitch";
+import { paymentStatusOptions } from "../../../../FormOptions";
+import { DD_MM_YYYY } from "../../../../app-constants";
+import { useUser } from "../../../../hooks";
 import {
   formatDateOrUndefined,
   formatNumericValue,
   convertDateToArray,
-  convertNumberRangeToSingleValue
-} from "../utils"
+  convertNumberRangeToSingleValue,
+} from "../utils";
 
-const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID"
+const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
 const convertStringOrUndefined = (data) => {
   if (typeof data === "boolean") {
-    return String(data)
+    return String(data);
   }
-}
+};
 
 export const ContractForm = ({
   onSubmit,
@@ -29,11 +29,11 @@ export const ContractForm = ({
   hideDisabledInput,
   renderFooterButtons,
   setMinDate,
-  formId
+  formId,
 }) => {
-  const idForm = formId || CONTRACT_FORM_FILTER_ID
-  const { hasRole } = useUser()
-  const isAdmin = hasRole("ROLE_ADMIN")
+  const idForm = formId || CONTRACT_FORM_FILTER_ID;
+  const { hasRole } = useUser();
+  const isAdmin = hasRole("ROLE_ADMIN");
 
   const form = useForm({
     mode: "uncontrolled",
@@ -67,12 +67,12 @@ export const ContractForm = ({
         control: convertStringOrUndefined(control),
         avans_euro: formatNumericValue(avans_euro),
         achitat_client: formatNumericValue(achitat_client),
-        pret_netto: formatNumericValue(pret_netto)
-      }
+        pret_netto: formatNumericValue(pret_netto),
+      };
 
-      return { ...formattedData, ...rest }
-    }
-  })
+      return { ...formattedData, ...rest };
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -80,7 +80,7 @@ export const ContractForm = ({
         data_contractului: convertDateToArray(data.data_contractului),
         data_avansului: convertDateToArray(data.data_avansului),
         data_de_plata_integrala: convertDateToArray(
-          data.data_de_plata_integrala
+          data.data_de_plata_integrala,
         ),
         numar_de_contract: data.numar_de_contract,
         contract_trimis: data.contract_trimis,
@@ -94,17 +94,17 @@ export const ContractForm = ({
         avans_euro: convertNumberRangeToSingleValue(data.avans_euro),
         pret_netto: convertNumberRangeToSingleValue(data.pret_netto),
         achitat_client: convertNumberRangeToSingleValue(data.achitat_client),
-        control: data.control
-      })
+        control: data.control,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) => {
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset());
         })}
       >
         <TextInput
@@ -289,5 +289,5 @@ export const ContractForm = ({
         {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
-  )
-}
+  );
+};

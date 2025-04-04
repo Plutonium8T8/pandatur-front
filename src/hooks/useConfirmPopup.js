@@ -1,8 +1,8 @@
-import { openConfirmModal } from "@mantine/modals"
-import { Text, DEFAULT_THEME } from "@mantine/core"
-import { getLanguageByKey } from "../Components/utils"
+import { openConfirmModal } from "@mantine/modals";
+import { Text, DEFAULT_THEME } from "@mantine/core";
+import { getLanguageByKey } from "../Components/utils";
 
-const { colors } = DEFAULT_THEME
+const { colors } = DEFAULT_THEME;
 
 export const useConfirmPopup = ({ subTitle, onConfirm, loading }) => {
   return (callback) =>
@@ -16,9 +16,9 @@ export const useConfirmPopup = ({ subTitle, onConfirm, loading }) => {
       children: <Text>{subTitle}</Text>,
       labels: {
         confirm: getLanguageByKey("Șterge"),
-        cancel: getLanguageByKey("Anulează")
+        cancel: getLanguageByKey("Anulează"),
       },
       confirmProps: { color: colors.red[9], loading },
-      onConfirm: callback
-    })
-}
+      onConfirm: callback,
+    });
+};

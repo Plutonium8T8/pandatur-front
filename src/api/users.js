@@ -13,6 +13,15 @@ export const users = {
     return data
   },
 
+  createTechnicianUser: async (body) => {
+    const { data } = await baseAxios.post(
+      "/api/technician/profile/create",
+      body
+    )
+
+    return data
+  },
+
   getTechnicianById: async (id) => {
     const { data } = await baseAxios.get(`/api/users-technician/${id}`)
 
@@ -21,6 +30,27 @@ export const users = {
 
   updateTechnician: async (id, body) => {
     const { data } = await baseAxios.patch(`/api/users-technician/${id}`, body)
+
+    return data
+  },
+
+  updateMultipleTechnicians: async (body) => {
+    const { data } = await baseAxios.patch(
+      "/api/users-technician/update-multiple",
+      body
+    )
+
+    return data
+  },
+
+  updateUsersGroup: async (body) => {
+    const { data } = await baseAxios.patch("/api/user-groups/update", body)
+
+    return data
+  },
+
+  deleteMultipleUsers: async (body) => {
+    const { data } = await baseAxios.delete("/admin/users", { data: body })
 
     return data
   },

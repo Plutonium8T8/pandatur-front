@@ -1,22 +1,22 @@
-import { Select, TextInput, NumberInput, Flex } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { getLanguageByKey } from "../utils"
-import { valutaOptions, ibanOptions } from "../../FormOptions"
+import { Select, TextInput, NumberInput, Flex } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { getLanguageByKey } from "../utils";
+import { valutaOptions, ibanOptions } from "../../FormOptions";
 
-const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID"
+const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID";
 
 export const InvoiceForm = ({
   onSubmit,
   data,
   renderFooterButtons,
-  formId
+  formId,
 }) => {
-  const idForm = formId || INVOICE_FORM_FILTER_ID
+  const idForm = formId || INVOICE_FORM_FILTER_ID;
 
   const form = useForm({
-    mode: "uncontrolled"
-  })
+    mode: "uncontrolled",
+  });
 
   useEffect(() => {
     if (data) {
@@ -27,17 +27,17 @@ export const InvoiceForm = ({
         f_pret: data.f_pret,
         f_suma: data.f_suma,
         f_valuta_contului: data.f_valuta_contului,
-        iban: data.iban
-      })
+        iban: data.iban,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <TextInput
@@ -110,5 +110,5 @@ export const InvoiceForm = ({
         {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
-  )
-}
+  );
+};

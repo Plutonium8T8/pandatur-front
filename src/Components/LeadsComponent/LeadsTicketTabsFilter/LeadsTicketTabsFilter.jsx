@@ -1,10 +1,10 @@
-import { Tabs, Flex, Button, MultiSelect } from "@mantine/core"
-import { useState, useEffect } from "react"
-import { platformOptions } from "./utils"
-import { SelectWorkflow } from "./components"
-import { getLanguageByKey } from "../../utils"
-import { filteredWorkflows } from "../LeadsTicketTabsFilter/utils"
-import "./LeadsTicketTabsFilter.css"
+import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
+import { useState, useEffect } from "react";
+import { platformOptions } from "./utils";
+import { SelectWorkflow } from "./components";
+import { getLanguageByKey } from "../../utils";
+import { filteredWorkflows } from "../LeadsTicketTabsFilter/utils";
+import "./LeadsTicketTabsFilter.css";
 
 export const LeadsTicketTabsFilter = ({
   onClose,
@@ -13,17 +13,17 @@ export const LeadsTicketTabsFilter = ({
   loading,
   formIds,
   renderTicketForms,
-  systemWorkflow: baseSystemWorkflow
+  systemWorkflow: baseSystemWorkflow,
 }) => {
-  const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows)
+  const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows);
 
   const defaultTabValue = onApplyWorkflowFilters
     ? "filter_workflow"
-    : "filter_ticket"
+    : "filter_ticket";
 
   useEffect(() => {
-    setSystemWorkflow(baseSystemWorkflow)
-  }, [])
+    setSystemWorkflow(baseSystemWorkflow);
+  }, []);
 
   return (
     <Tabs
@@ -100,5 +100,5 @@ export const LeadsTicketTabsFilter = ({
         </Flex>
       </Tabs.Panel>
     </Tabs>
-  )
-}
+  );
+};

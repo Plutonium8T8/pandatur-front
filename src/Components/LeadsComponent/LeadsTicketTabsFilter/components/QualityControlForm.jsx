@@ -1,13 +1,13 @@
-import { useEffect } from "react"
-import { MultiSelect, TextInput, Flex } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { getLanguageByKey } from "../../../utils"
+import { useEffect } from "react";
+import { MultiSelect, TextInput, Flex } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { getLanguageByKey } from "../../../utils";
 import {
   motivulRefuzuluiOptions,
-  evaluareOdihnaOptions
-} from "../../../../FormOptions"
+  evaluareOdihnaOptions,
+} from "../../../../FormOptions";
 
-const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER"
+const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER";
 
 export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
   const form = useForm({
@@ -18,17 +18,17 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
       evaluare_de_odihna,
       urmatoarea_vacanta,
       manager,
-      vacanta
+      vacanta,
     }) => {
       return {
         motivul_refuzului: motivul_refuzului ?? undefined,
         evaluare_de_odihna: evaluare_de_odihna ?? undefined,
         urmatoarea_vacanta: urmatoarea_vacanta ?? undefined,
         manager: manager ?? undefined,
-        vacanta: vacanta ?? undefined
-      }
-    }
-  })
+        vacanta: vacanta ?? undefined,
+      };
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -37,17 +37,17 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
         evaluare_de_odihna: data.evaluare_de_odihna,
         urmatoarea_vacanta: data.urmatoarea_vacanta,
         manager: data.manager,
-        vacanta: data.vacanta
-      })
+        vacanta: data.vacanta,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={QUALITY_CONTROL_FORM_FILTER}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         {
@@ -101,9 +101,9 @@ export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: form.reset,
-          formId: QUALITY_CONTROL_FORM_FILTER
+          formId: QUALITY_CONTROL_FORM_FILTER,
         })}
       </Flex>
     </>
-  )
-}
+  );
+};

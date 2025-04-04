@@ -1,12 +1,12 @@
-import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { workflowOptions, priorityOptions } from "../../../../FormOptions"
-import { getLanguageByKey } from "../../../utils"
-import { useGetTechniciansList } from "../../../../hooks"
-import { filteredWorkflows } from "../utils"
+import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { workflowOptions, priorityOptions } from "../../../../FormOptions";
+import { getLanguageByKey } from "../../../utils";
+import { useGetTechniciansList } from "../../../../hooks";
+import { filteredWorkflows } from "../utils";
 
-const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID"
+const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
 export const BasicGeneralForm = ({
   onSubmit,
@@ -14,11 +14,11 @@ export const BasicGeneralForm = ({
   data,
   onClose,
   renderFooterButtons,
-  formId
+  formId,
 }) => {
-  const idForm = formId || GENERAL_FORM_FILTER_ID
+  const idForm = formId || GENERAL_FORM_FILTER_ID;
 
-  const { technicians } = useGetTechniciansList()
+  const { technicians } = useGetTechniciansList();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -29,10 +29,10 @@ export const BasicGeneralForm = ({
         priority: priority ?? undefined,
         contact: contact ?? undefined,
         tags: tags ?? undefined,
-        technician_id: technician_id ?? undefined
-      }
-    }
-  })
+        technician_id: technician_id ?? undefined,
+      };
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -41,17 +41,17 @@ export const BasicGeneralForm = ({
         priority: data.priority,
         contact: data.contact,
         tags: data.tags,
-        technician_id: data.technician_id
-      })
+        technician_id: data.technician_id,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <MultiSelect
@@ -85,7 +85,7 @@ export const BasicGeneralForm = ({
           mt="md"
           label={getLanguageByKey("Tag-uri")}
           placeholder={getLanguageByKey(
-            "Introdu tag-uri separate prin virgule"
+            "Introdu tag-uri separate prin virgule",
           )}
           key={form.key("tags")}
           {...form.getInputProps("tags")}
@@ -111,5 +111,5 @@ export const BasicGeneralForm = ({
         </Button>
       </Flex>
     </>
-  )
-}
+  );
+};

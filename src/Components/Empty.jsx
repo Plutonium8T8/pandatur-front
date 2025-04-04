@@ -1,6 +1,6 @@
-import { GoArchive } from "react-icons/go"
-import { Flex, Text, DEFAULT_THEME } from "@mantine/core"
-import { getLanguageByKey } from "./utils"
+import { GoArchive } from "react-icons/go";
+import { Flex, Text, DEFAULT_THEME } from "@mantine/core";
+import { getLanguageByKey } from "./utils";
 
 export const Empty = () => {
   return (
@@ -17,5 +17,5 @@ export const Empty = () => {
 
       <Text>{getLanguageByKey("Fără date media")}</Text>
     </Flex>
-  )
-}
+  );
+};

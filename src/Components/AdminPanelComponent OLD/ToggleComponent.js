@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import "./ModalWithToggles.css"
 import { FaHandshake } from "react-icons/fa"
-import UserGroupComponent from "./UserGroupComponent"
 import { translations } from "../utils/translations"
 import { api } from "../../api"
 
@@ -110,11 +109,6 @@ const ToggleComponent = ({ employee }) => {
             ))}
           </div>
         </div>
-        <UserGroupComponent
-          userId={employee.id}
-          roles={roles}
-          onChange={fetchRoles}
-        />
       </div>
     </div>
   )

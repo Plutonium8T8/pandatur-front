@@ -1,7 +1,7 @@
-import { Flex, Text, Switch } from "@mantine/core"
+import { Flex, Text, Switch } from "@mantine/core";
 
 export const LabelSwitch = ({ mt, label, ...props }) => {
-  const { error, ...rest } = props
+  const { error, ...rest } = props;
   return (
     <>
       <Flex align="center" justify="space-between" mt={mt}>
@@ -14,5 +14,5 @@ export const LabelSwitch = ({ mt, label, ...props }) => {
         </Text>
       )}
     </>
-  )
-}
+  );
+};

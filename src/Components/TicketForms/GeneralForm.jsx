@@ -4,33 +4,33 @@ import {
   Textarea,
   SegmentedControl,
   TagsInput,
-  Flex
-} from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
+  Flex,
+} from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
 import {
   workflowOptions,
   priorityOptions,
-  groupTitleOptions
-} from "../../FormOptions"
-import { getLanguageByKey } from "../utils"
-import { useGetTechniciansList } from "../../hooks"
-import { parseTags } from "../../stringUtils"
+  groupTitleOptions,
+} from "../../FormOptions";
+import { getLanguageByKey } from "../utils";
+import { useGetTechniciansList } from "../../hooks";
+import { parseTags } from "../../stringUtils";
 
-const GENERAL_FORM_ID = "GENERAL_FORM_ID"
+const GENERAL_FORM_ID = "GENERAL_FORM_ID";
 
 export const GeneralForm = ({
   onSubmit,
   data,
   onClose,
   renderFooterButtons,
-  formInstance
+  formInstance,
 }) => {
-  const { technicians } = useGetTechniciansList()
+  const { technicians } = useGetTechniciansList();
 
   const form = useForm({
-    mode: "uncontrolled"
-  })
+    mode: "uncontrolled",
+  });
 
   useEffect(() => {
     if (data) {
@@ -41,21 +41,21 @@ export const GeneralForm = ({
         priority: data.priority,
         contact: data.contact,
         group_title: data.group_title,
-        description: data.description
-      })
+        description: data.description,
+      });
     }
-  }, [data])
+  }, [data]);
 
   form.watch("workflow", ({ value }) => {
-    formInstance.setFieldValue("workflow", value)
-  })
+    formInstance.setFieldValue("workflow", value);
+  });
 
   return (
     <>
       <form
         id={GENERAL_FORM_ID}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <Select
@@ -89,7 +89,7 @@ export const GeneralForm = ({
           mt="md"
           label={getLanguageByKey("Tag-uri")}
           placeholder={getLanguageByKey(
-            "Introdu tag-uri separate prin virgule"
+            "Introdu tag-uri separate prin virgule",
           )}
           key={form.key("tags")}
           {...form.getInputProps("tags")}
@@ -99,7 +99,7 @@ export const GeneralForm = ({
           fullWidth
           data={groupTitleOptions.map((item) => ({
             value: item,
-            label: item
+            label: item,
           }))}
           mt="md"
           key={form.key("group_title")}
@@ -129,9 +129,9 @@ export const GeneralForm = ({
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: form.reset,
-          formId: GENERAL_FORM_ID
+          formId: GENERAL_FORM_ID,
         })}
       </Flex>
     </>
-  )
-}
+  );
+};

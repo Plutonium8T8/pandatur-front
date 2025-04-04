@@ -1,2 +1,2 @@
-export * from "./WorkflowColumn"
-export * from "./WorkflowTag"
+export * from "./WorkflowColumn";
+export * from "./WorkflowTag";

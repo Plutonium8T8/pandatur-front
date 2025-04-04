@@ -1,38 +1,38 @@
-import { useState, useEffect } from "react"
-import { Flex, Paper, ActionIcon, Text } from "@mantine/core"
-import { Link } from "react-router-dom"
-import { useSnackbar } from "notistack"
-import { MdDelete, MdEdit } from "react-icons/md"
-import { useParams, useNavigate } from "react-router-dom"
-import { Pagination } from "../../Pagination"
+import { useState, useEffect } from "react";
+import { Flex, Paper, ActionIcon, Text } from "@mantine/core";
+import { Link } from "react-router-dom";
+import { useSnackbar } from "notistack";
+import { MdDelete, MdEdit } from "react-icons/md";
+import { useParams, useNavigate } from "react-router-dom";
+import { Pagination } from "../../Pagination";
 import {
   getLanguageByKey,
   cleanValue,
   showServerError,
-  priorityTagColors
-} from "../../utils"
-import { TextEllipsis } from "../../TextEllipsis"
-import { Checkbox } from "../../Checkbox"
-import { Modal } from "../../Modal"
-import SingleChat from "../../ChatComponent/SingleChat"
-import { Tag } from "../../Tag"
-import { WorkflowTag } from "../../Workflow/components"
-import { RcTable } from "../../RcTable"
-import { api } from "../../../api"
-import { useConfirmPopup } from "../../../hooks"
-import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs"
-import { DateCell } from "../../DateCell"
-import { MantineModal } from "../../MantineModal"
-import "./LeadTable.css"
-import { parseTags } from "../../../stringUtils"
+  priorityTagColors,
+} from "../../utils";
+import { TextEllipsis } from "../../TextEllipsis";
+import { Checkbox } from "../../Checkbox";
+import { Modal } from "../../Modal";
+import SingleChat from "../../ChatComponent/SingleChat";
+import { Tag } from "../../Tag";
+import { WorkflowTag } from "../../Workflow/components";
+import { RcTable } from "../../RcTable";
+import { api } from "../../../api";
+import { useConfirmPopup } from "../../../hooks";
+import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
+import { DateCell } from "../../DateCell";
+import { MantineModal } from "../../MantineModal";
+import "./LeadTable.css";
+import { parseTags } from "../../../stringUtils";
 
 const renderTags = (tags) => {
-  const tagList = parseTags(tags)
-  const isTags = tagList.some(Boolean)
+  const tagList = parseTags(tags);
+  const isTags = tagList.some(Boolean);
   return isTags
     ? tagList.map((tag, index) => <Tag key={index}>{tag}</Tag>)
-    : "—"
-}
+    : "—";
+};
 
 export const LeadTable = ({
   selectedTickets,
@@ -43,34 +43,34 @@ export const LeadTable = ({
   currentPage,
 
   selectTicket,
-  fetchTickets
+  fetchTickets,
 }) => {
-  const { enqueueSnackbar } = useSnackbar()
-  const [isChatOpen, setIsChatOpen] = useState(false)
-  const [selectedTicketId, setSelectedTicketId] = useState(null)
-  const { ticketId } = useParams()
-  const navigate = useNavigate()
-  const [id, setId] = useState()
+  const { enqueueSnackbar } = useSnackbar();
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [selectedTicketId, setSelectedTicketId] = useState(null);
+  const { ticketId } = useParams();
+  const navigate = useNavigate();
+  const [id, setId] = useState();
 
   const deleteLead = useConfirmPopup({
-    subTitle: getLanguageByKey("confirm_delete_lead")
-  })
+    subTitle: getLanguageByKey("confirm_delete_lead"),
+  });
 
   const handleDeleteLead = (id) => {
     deleteLead(async () => {
       try {
-        await api.tickets.deleteById([id])
+        await api.tickets.deleteById([id]);
         enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
-          variant: "success"
-        })
-        fetchTickets()
+          variant: "success",
+        });
+        fetchTickets();
       } catch (error) {
         enqueueSnackbar(showServerError(error), {
-          variant: "error"
-        })
+          variant: "error",
+        });
       }
-    })
-  }
+    });
+  };
 
   const rcColumn = [
     {
@@ -84,8 +84,8 @@ export const LeadTable = ({
             checked={selectTicket.includes(id)}
             onChange={() => onSelectRow(id)}
           />
-        )
-      }
+        );
+      },
     },
     {
       title: "ID",
@@ -97,7 +97,7 @@ export const LeadTable = ({
         <Link to={`/leads/${id}`} className="row-id">
           #{id}
         </Link>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Nume"),
@@ -111,7 +111,7 @@ export const LeadTable = ({
             ? row.map((item) => cleanValue(item.name)).join(", ")
             : cleanValue()}
         </>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Prenume"),
@@ -125,7 +125,7 @@ export const LeadTable = ({
             ? row.map((item) => cleanValue(item.surname)).join(", ")
             : cleanValue()}
         </>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Email"),
@@ -139,7 +139,7 @@ export const LeadTable = ({
             ? row.map((item) => cleanValue(item.email)).join(", ")
             : cleanValue()}
         </>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Telefon"),
@@ -152,7 +152,7 @@ export const LeadTable = ({
             ? row.map((item) => cleanValue(item?.phone)).join(", ")
             : cleanValue()}
         </>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Descriere"),
@@ -164,7 +164,7 @@ export const LeadTable = ({
           <TextEllipsis rows={3}>{description}</TextEllipsis>
         ) : (
           cleanValue()
-        )
+        ),
     },
     {
       title: getLanguageByKey("Tag-uri"),
@@ -175,7 +175,7 @@ export const LeadTable = ({
         <Flex gap="8" wrap="wrap">
           {renderTags(tags)}
         </Flex>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Prioritate"),
@@ -184,27 +184,27 @@ export const LeadTable = ({
       width: 100,
       render: (priority) => (
         <Tag type={priorityTagColors[priority]}>{priority}</Tag>
-      )
+      ),
     },
     {
       title: getLanguageByKey("Workflow"),
       dataIndex: "workflow",
       align: "center",
       width: 150,
-      render: (workflow) => <WorkflowTag type={workflow} />
+      render: (workflow) => <WorkflowTag type={workflow} />,
     },
     {
       title: getLanguageByKey("Contact"),
       dataIndex: "contact",
       align: "center",
-      width: 200
+      width: 200,
     },
     {
       title: getLanguageByKey("Data de creare"),
       dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (creation_date) => <DateCell date={creation_date} />
+      render: (creation_date) => <DateCell date={creation_date} />,
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
@@ -213,42 +213,42 @@ export const LeadTable = ({
       width: 200,
       render: (last_interaction_date) => (
         <DateCell date={last_interaction_date} />
-      )
+      ),
     },
     {
       title: getLanguageByKey("Achitat client"),
       dataIndex: "achitat_client",
       align: "center",
       render: (achitat_client) => cleanValue(achitat_client),
-      width: 150
+      width: 150,
     },
     {
       title: getLanguageByKey("Avans în euro"),
       dataIndex: "avans_euro",
       align: "center",
       render: (avans_euro) => cleanValue(avans_euro),
-      width: 150
+      width: 150,
     },
     {
       title: getLanguageByKey("Comisionul companiei"),
       dataIndex: "comision_companie",
       align: "center",
       render: (comision_companie) => cleanValue(comision_companie),
-      width: 200
+      width: 200,
     },
     {
       title: getLanguageByKey("Buget"),
       dataIndex: "buget",
       align: "center",
       render: (buget) => cleanValue(buget),
-      width: 75
+      width: 75,
     },
     {
       title: getLanguageByKey("Data avansului"),
       dataIndex: "data_avansului",
       align: "center",
       width: 150,
-      render: (data_avansului) => <DateCell date={data_avansului} />
+      render: (data_avansului) => <DateCell date={data_avansului} />,
     },
     {
       title: getLanguageByKey("Data cererii de retur"),
@@ -257,14 +257,14 @@ export const LeadTable = ({
       width: 200,
       render: (data_cererii_de_retur) => (
         <DateCell date={data_cererii_de_retur} />
-      )
+      ),
     },
     {
       title: getLanguageByKey("Data contractului"),
       dataIndex: "data_contractului",
       align: "center",
       width: 200,
-      render: (data_contractului) => <DateCell date={data_contractului} />
+      render: (data_contractului) => <DateCell date={data_contractului} />,
     },
     {
       title: getLanguageByKey("Data de plată integrală"),
@@ -273,42 +273,42 @@ export const LeadTable = ({
       width: 200,
       render: (data_de_plata_integrala) => (
         <DateCell date={data_de_plata_integrala} />
-      )
+      ),
     },
     {
       title: getLanguageByKey("Data plecării"),
       dataIndex: "data_plecarii",
       align: "center",
       width: 200,
-      render: (data_plecarii) => <DateCell date={data_plecarii} />
+      render: (data_plecarii) => <DateCell date={data_plecarii} />,
     },
     {
       title: getLanguageByKey("Data întoarcerii"),
       dataIndex: "data_intoarcerii",
       align: "center",
       width: 200,
-      render: (data_intoarcerii) => <DateCell date={data_intoarcerii} />
+      render: (data_intoarcerii) => <DateCell date={data_intoarcerii} />,
     },
     {
       title: getLanguageByKey("Tipul de transport"),
       dataIndex: "tip_de_transport",
       align: "center",
       width: 150,
-      render: (tip_de_transport) => cleanValue(tip_de_transport)
+      render: (tip_de_transport) => cleanValue(tip_de_transport),
     },
     {
       title: getLanguageByKey("Vacanță"),
       dataIndex: "vacanta",
       align: "center",
       width: 200,
-      render: (vacanta) => cleanValue(vacanta)
+      render: (vacanta) => cleanValue(vacanta),
     },
     {
       title: getLanguageByKey("Valuta contului"),
       dataIndex: "f_valuta_contului",
       align: "center",
       width: 150,
-      render: (valuta_contului) => cleanValue(valuta_contului)
+      render: (valuta_contului) => cleanValue(valuta_contului),
     },
     {
       title: getLanguageByKey("Acțiune"),
@@ -326,21 +326,21 @@ export const LeadTable = ({
             </ActionIcon>
           </Flex>
         </Paper>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (ticketId) {
-      setSelectedTicketId(ticketId)
-      setIsChatOpen(true)
+      setSelectedTicketId(ticketId);
+      setIsChatOpen(true);
     }
-  }, [ticketId])
+  }, [ticketId]);
 
   const closeChatModal = () => {
-    setIsChatOpen(false)
-    navigate("/leads")
-  }
+    setIsChatOpen(false);
+    navigate("/leads");
+  };
 
   return (
     <>
@@ -394,5 +394,5 @@ export const LeadTable = ({
         />
       </MantineModal>
     </>
-  )
-}
+  );
+};

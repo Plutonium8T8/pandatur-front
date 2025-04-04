@@ -1,19 +1,19 @@
-import { Select, TextInput, NumberInput, Flex } from "@mantine/core"
-import { useForm } from "@mantine/form"
-import { useEffect } from "react"
-import { getLanguageByKey } from "../../../utils"
-import { valutaOptions, ibanOptions } from "../../../../FormOptions"
-import { formatNumericValue, convertNumberRangeToSingleValue } from "../utils"
+import { Select, TextInput, NumberInput, Flex } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useEffect } from "react";
+import { getLanguageByKey } from "../../../utils";
+import { valutaOptions, ibanOptions } from "../../../../FormOptions";
+import { formatNumericValue, convertNumberRangeToSingleValue } from "../utils";
 
-const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID"
+const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID";
 
 export const InvoiceForm = ({
   onSubmit,
   data,
   renderFooterButtons,
-  formId
+  formId,
 }) => {
-  const idForm = formId || INVOICE_FORM_FILTER_ID
+  const idForm = formId || INVOICE_FORM_FILTER_ID;
 
   const form = useForm({
     mode: "uncontrolled",
@@ -24,7 +24,7 @@ export const InvoiceForm = ({
       f_nr_factura,
       f_numarul,
       f_valuta_contului,
-      iban
+      iban,
     }) => {
       const formattedData = {
         f_serviciu: f_serviciu ?? undefined,
@@ -33,12 +33,12 @@ export const InvoiceForm = ({
         f_pret: formatNumericValue(f_pret),
         f_suma: formatNumericValue(f_suma),
         f_valuta_contului: f_valuta_contului ?? undefined,
-        iban: iban ?? undefined
-      }
+        iban: iban ?? undefined,
+      };
 
-      return formattedData
-    }
-  })
+      return formattedData;
+    },
+  });
 
   useEffect(() => {
     if (data) {
@@ -49,17 +49,17 @@ export const InvoiceForm = ({
         f_pret: convertNumberRangeToSingleValue(data.f_pret),
         f_suma: convertNumberRangeToSingleValue(data.f_suma),
         f_valuta_contului: data.f_valuta_contului,
-        iban: data.iban
-      })
+        iban: data.iban,
+      });
     }
-  }, [data])
+  }, [data]);
 
   return (
     <>
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset())
+          onSubmit(values, () => form.reset()),
         )}
       >
         <TextInput
@@ -132,5 +132,5 @@ export const InvoiceForm = ({
         {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
       </Flex>
     </>
-  )
-}
+  );
+};
