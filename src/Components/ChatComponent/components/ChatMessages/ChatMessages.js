@@ -242,7 +242,7 @@ export const ChatMessages = ({
         )}
       </Flex>
 
-      {selectTicketId && (
+      {selectTicketId && !isLoading && (
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
