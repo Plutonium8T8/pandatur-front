@@ -1,79 +1,80 @@
-import React, { useState, useEffect, useRef } from "react"
-import { Flex, Box, Select } from "@mantine/core"
-import { useSnackbar } from "notistack"
-import { useApp, useUser } from "../../../../hooks"
-import { api } from "../../../../api"
-import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay"
-import { translations } from "../../../utils/translations"
-import { getLanguageByKey, showServerError } from "../../../utils"
-import { Spin } from "../../../Spin"
-import { ChatInput } from ".."
-import { getMediaType } from "../../utils"
-import { GroupedMessages } from "../GroupedMessages"
-import "./ChatMessages.css"
+import React, { useState, useEffect, useRef } from "react";
+import { Flex, Select } from "@mantine/core";
+import { useSnackbar } from "notistack";
+import { useApp, useUser } from "../../../../hooks";
+import { api } from "../../../../api";
+import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
+import { translations } from "../../../utils/translations";
+import { getLanguageByKey, showServerError } from "../../../utils";
+import { Spin } from "../../../Spin";
+import { ChatInput } from "..";
+import { getMediaType } from "../../utils";
+import { GroupedMessages } from "../GroupedMessages";
+import "./ChatMessages.css";
 
-const language = localStorage.getItem("language") || "RO"
+const language = localStorage.getItem("language") || "RO";
 
 const parseDate = (dateString) => {
-  if (!dateString) return null
-  const [date, time] = dateString.split(" ")
-  if (!date || !time) return null
-  const [day, month, year] = date.split("-")
-  return new Date(`${year}-${month}-${day}T${time}`)
-}
+  if (!dateString) return null;
+  const [date, time] = dateString.split(" ");
+  if (!date || !time) return null;
+  const [day, month, year] = date.split("-");
+  return new Date(`${year}-${month}-${day}T${time}`);
+};
 
 export const ChatMessages = ({
   selectTicketId,
   setSelectedClient,
   selectedClient,
   isLoading,
-  personalInfo
+  personalInfo,
 }) => {
-  const { userId } = useUser()
-  const { messages, setMessages, tickets } = useApp()
-  const { enqueueSnackbar } = useSnackbar()
+  const { userId } = useUser();
+  const { messages, setMessages, tickets } = useApp();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const messageContainerRef = useRef(null)
-  const [isUserAtBottom, setIsUserAtBottom] = useState(true)
-  const [selectedPlatform, setSelectedPlatform] = useState("web")
-  const [loadingMessage, setLoadingMessage] = useState(false)
+  const messageContainerRef = useRef(null);
+  const [isUserAtBottom, setIsUserAtBottom] = useState(true);
+  const [selectedPlatform, setSelectedPlatform] = useState("web");
+  const [loadingMessage, setLoadingMessage] = useState(false);
 
   const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null
+    if (!Array.isArray(messages) || messages.length === 0) return null;
 
     const ticketMessages = messages
       .filter(
-        (msg) => msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1
+        (msg) =>
+          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
       )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent))
+      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
 
-    return ticketMessages.length > 0 ? ticketMessages[0].client_id : null
-  }
+    return ticketMessages.length > 0 ? ticketMessages[0].client_id : null;
+  };
 
   useEffect(() => {
-    const lastClient = getLastClientWhoSentMessage()
+    const lastClient = getLastClientWhoSentMessage();
     if (lastClient) {
-      setSelectedClient(String(lastClient))
+      setSelectedClient(String(lastClient));
     }
-  }, [messages, selectTicketId])
+  }, [messages, selectTicketId]);
 
   const uploadFile = async (file) => {
-    const formData = new FormData()
-    formData.append("file", file)
+    const formData = new FormData();
+    formData.append("file", file);
 
     try {
-      const data = await api.messages.upload(formData)
+      const data = await api.messages.upload(formData);
 
-      return data
+      return data;
     } catch (error) {
       enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
-        variant: "error"
-      })
+        variant: "error",
+      });
     }
-  }
+  };
 
   const sendMessage = async (selectedFile, platform, inputValue) => {
-    setLoadingMessage(true)
+    setLoadingMessage(true);
     try {
       const messageData = {
         sender_id: Number(userId),
@@ -81,114 +82,114 @@ export const ChatMessages = ({
         platform: platform,
         message: inputValue.trim(),
         media_type: null,
-        media_url: ""
-      }
+        media_url: "",
+      };
 
       if (selectedFile) {
-        const uploadResponse = await uploadFile(selectedFile)
+        const uploadResponse = await uploadFile(selectedFile);
 
         if (!uploadResponse || !uploadResponse.url) {
           enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
-            variant: "error"
-          })
-          return
+            variant: "error",
+          });
+          return;
         }
 
-        messageData.media_url = uploadResponse.url
-        messageData.media_type = getMediaType(selectedFile.type)
+        messageData.media_url = uploadResponse.url;
+        messageData.media_type = getMediaType(selectedFile.type);
       }
 
-      let apiUrl = api.messages.send.create
+      let apiUrl = api.messages.send.create;
 
       if (platform === "telegram") {
-        apiUrl = api.messages.send.telegram
+        apiUrl = api.messages.send.telegram;
       } else if (platform === "viber") {
-        apiUrl = api.messages.send.viber
+        apiUrl = api.messages.send.viber;
       }
 
       setMessages((prevMessages) => [
         ...prevMessages,
-        { ...messageData, seenAt: false }
-      ])
+        { ...messageData, seenAt: false },
+      ]);
 
-      await apiUrl(messageData)
+      await apiUrl(messageData);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
-      setLoadingMessage(false)
+      setLoadingMessage(false);
     }
-  }
+  };
 
   const handleScroll = () => {
     if (messageContainerRef.current) {
       const { scrollTop, scrollHeight, clientHeight } =
-        messageContainerRef.current
-      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50)
+        messageContainerRef.current;
+      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
     }
-  }
+  };
 
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
-        top: messageContainerRef.current.scrollHeight
+        top: messageContainerRef.current.scrollHeight,
         // behavior: 'smooth',
-      })
+      });
     }
-  }, [messages, selectTicketId])
+  }, [messages, selectTicketId]);
 
   useEffect(() => {
-    const container = messageContainerRef.current
+    const container = messageContainerRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll)
+      container.addEventListener("scroll", handleScroll);
     }
     return () => {
       if (container) {
-        container.removeEventListener("scroll", handleScroll)
+        container.removeEventListener("scroll", handleScroll);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const getClientPlatforms = () => {
-    const clientId = Number(selectedClient)
+    const clientId = Number(selectedClient);
     const clientMessages = messages.filter(
-      (msg) => Number(msg.client_id) === clientId
-    )
+      (msg) => Number(msg.client_id) === clientId,
+    );
 
     if (!clientMessages || clientMessages.length === 0) {
-      return ["web"]
+      return ["web"];
     }
 
     const uniquePlatforms = [
-      ...new Set(clientMessages.map((msg) => msg.platform))
-    ]
-    return uniquePlatforms.length > 0 ? uniquePlatforms : ["web"]
-  }
+      ...new Set(clientMessages.map((msg) => msg.platform)),
+    ];
+    return uniquePlatforms.length > 0 ? uniquePlatforms : ["web"];
+  };
   useEffect(() => {
-    const platforms = getClientPlatforms()
-    setSelectedPlatform(platforms[0] || "web")
-  }, [selectedClient, messages])
+    const platforms = getClientPlatforms();
+    setSelectedPlatform(platforms[0] || "web");
+  }, [selectedClient, messages]);
 
   const getLastMessagePlatform = (clientId) => {
-    if (!Array.isArray(messages) || messages.length === 0) return "web"
+    if (!Array.isArray(messages) || messages.length === 0) return "web";
 
     const clientMessages = messages
       .filter(
         (msg) =>
           Number(msg.client_id) === Number(clientId) &&
-          Number(msg.sender_id) !== 1
+          Number(msg.sender_id) !== 1,
       )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent))
+      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
 
-    return clientMessages.length > 0 ? clientMessages[0].platform : "web"
-  }
+    return clientMessages.length > 0 ? clientMessages[0].platform : "web";
+  };
 
   useEffect(() => {
     if (selectedClient) {
-      const lastPlatform = getLastMessagePlatform(selectedClient)
+      const lastPlatform = getLastMessagePlatform(selectedClient);
 
-      setSelectedPlatform(lastPlatform || "web")
+      setSelectedPlatform(lastPlatform || "web");
     }
-  }, [selectedClient, messages])
+  }, [selectedClient, messages]);
 
   // TODO: Please refactor me
   const usersOptions = () =>
@@ -197,23 +198,23 @@ export const ChatMessages = ({
       ?.client_id.replace(/[{}]/g, "")
       .split(",")
       .map((id) => {
-        const clientId = id.trim()
-        const clientInfo = personalInfo[clientId] || {}
+        const clientId = id.trim();
+        const clientInfo = personalInfo[clientId] || {};
         const fullName = clientInfo.name
           ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-          : `ID: ${clientId}`
+          : `ID: ${clientId}`;
 
         const platformsMessagesClient = messages.filter(
-          (msg) => msg.client_id === Number(clientId)
-        )
+          (msg) => msg.client_id === Number(clientId),
+        );
 
         return [
-          ...new Set(platformsMessagesClient.map((msg) => msg.platform))
+          ...new Set(platformsMessagesClient.map((msg) => msg.platform)),
         ].map((platform) => ({
           value: `${clientId}-${platform}`,
-          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId}`
-        }))
-      })
+          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId}`,
+        }));
+      });
 
   return (
     <Flex w="100%" direction="column" className="chat-area">
@@ -245,41 +246,39 @@ export const ChatMessages = ({
       )}
 
       {selectTicketId && (
-        <Box p="24">
-          <ChatInput
-            loading={loadingMessage}
-            id={selectTicketId}
-            onSendMessage={(value) => {
-              if (!selectedClient) {
-                return
-              }
-              sendMessage(null, selectedPlatform, value)
-            }}
-            onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
-            renderSelectUserPlatform={() => {
-              return (
-                tickets &&
-                tickets.find((ticket) => ticket.id === selectTicketId)
-                  ?.client_id && (
-                  <Select
-                    size="md"
-                    w="100%"
-                    value={`${selectedClient}-${selectedPlatform}`}
-                    placeholder={translations["Alege client"][language]}
-                    data={usersOptions().flat()}
-                    onChange={(value) => {
-                      if (!value) return
-                      const [clientId, platform] = value.split("-")
-                      setSelectedClient(clientId)
-                      setSelectedPlatform(platform)
-                    }}
-                  />
-                )
+        <ChatInput
+          loading={loadingMessage}
+          id={selectTicketId}
+          onSendMessage={(value) => {
+            if (!selectedClient) {
+              return;
+            }
+            sendMessage(null, selectedPlatform, value);
+          }}
+          onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
+          renderSelectUserPlatform={() => {
+            return (
+              tickets &&
+              tickets.find((ticket) => ticket.id === selectTicketId)
+                ?.client_id && (
+                <Select
+                  size="md"
+                  w="100%"
+                  value={`${selectedClient}-${selectedPlatform}`}
+                  placeholder={translations["Alege client"][language]}
+                  data={usersOptions().flat()}
+                  onChange={(value) => {
+                    if (!value) return;
+                    const [clientId, platform] = value.split("-");
+                    setSelectedClient(clientId);
+                    setSelectedPlatform(platform);
+                  }}
+                />
               )
-            }}
-          />
-        </Box>
+            );
+          }}
+        />
       )}
     </Flex>
-  )
-}
+  );
+};
