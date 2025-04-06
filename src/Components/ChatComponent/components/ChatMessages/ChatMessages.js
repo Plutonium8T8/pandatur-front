@@ -262,7 +262,6 @@ export const ChatMessages = ({
               tickets.find((ticket) => ticket.id === selectTicketId)
                 ?.client_id && (
                 <Select
-                  size="md"
                   w="100%"
                   value={`${selectedClient}-${selectedPlatform}`}
                   placeholder={translations["Alege client"][language]}
