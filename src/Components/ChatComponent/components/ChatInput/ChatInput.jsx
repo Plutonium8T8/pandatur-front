@@ -63,7 +63,7 @@ export const ChatInput = ({
 
   return (
     <>
-      <Box gap="xs" p="16px">
+      <Box p="16px">
         <Flex gap="xs" mb="xs">
           <Select
             w="100%"
@@ -104,12 +104,7 @@ export const ChatInput = ({
               {getLanguageByKey("Trimite")}
             </Button>
 
-            <Button
-              loading={loading}
-              size="input-md"
-              onClick={clearState}
-              variant="default"
-            >
+            <Button loading={loading} onClick={clearState} variant="default">
               {getLanguageByKey("Anulează")}
             </Button>
           </Flex>
