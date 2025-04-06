@@ -1,11 +1,13 @@
-import { Textarea, Flex, ActionIcon, Select, Box, Button } from "@mantine/core";
+import { Textarea, Flex, ActionIcon, Box, Button } from "@mantine/core";
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
+import { IoIosArrowDown } from "react-icons/io";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
+import { ComboSelect } from "../../../ComboSelect";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -17,7 +19,6 @@ export const ChatInput = ({
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0,
@@ -50,7 +51,6 @@ export const ChatInput = ({
 
   const clearState = () => {
     setMessage("");
-    setSelectedMessage(null);
   };
 
   const sendMessage = () => {
@@ -65,15 +65,16 @@ export const ChatInput = ({
     <>
       <Box p="16px">
         <Flex gap="xs" mb="xs">
-          <Select
-            w="100%"
-            clearable
-            placeholder={getLanguageByKey("select_message_template")}
-            onChange={(value) => {
-              setMessage(value ? templateOptions[value] : "");
-              setSelectedMessage(value);
-            }}
-            value={selectedMessage}
+          <ComboSelect
+            position="top"
+            renderTriggerButton={(closeDropdown) => (
+              <ActionIcon variant="default" onClick={closeDropdown}>
+                <IoIosArrowDown />
+              </ActionIcon>
+            )}
+            onChange={(value) =>
+              setMessage(value ? templateOptions[value] : "")
+            }
             data={Object.keys(templateOptions).map((key) => ({
               value: key,
               label: key,

@@ -3,7 +3,8 @@ import { Combobox, useCombobox } from "@mantine/core";
 export const ComboSelect = ({
   data,
   onChange,
-  renderTargetButton,
+  position,
+  renderTriggerButton,
   maxHeight = 200,
   width = 250,
 }) => {
@@ -21,13 +22,14 @@ export const ComboSelect = ({
     <Combobox
       store={combobox}
       width={width}
+      position={position}
       onOptionSubmit={(val) => {
         onChange(val);
         combobox.closeDropdown();
       }}
     >
       <Combobox.Target>
-        {renderTargetButton(combobox.toggleDropdown)}
+        {renderTriggerButton(combobox.toggleDropdown)}
       </Combobox.Target>
 
       <Combobox.Dropdown>
