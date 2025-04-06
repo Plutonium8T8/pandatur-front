@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Flex, Select } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
@@ -10,6 +10,7 @@ import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
 import { getMediaType } from "../../utils";
 import { GroupedMessages } from "../GroupedMessages";
+import { getFullName } from "../../../utils";
 import "./ChatMessages.css";
 
 const language = localStorage.getItem("language") || "RO";
@@ -200,9 +201,9 @@ export const ChatMessages = ({
       .map((id) => {
         const clientId = id.trim();
         const clientInfo = personalInfo[clientId] || {};
-        const fullName = clientInfo.name
-          ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-          : `ID: ${clientId}`;
+        const fullName =
+          getFullName(clientInfo?.name, clientInfo?.surname) ||
+          `ID: ${clientId}`;
 
         const platformsMessagesClient = messages.filter(
           (msg) => msg.client_id === Number(clientId),
@@ -212,7 +213,7 @@ export const ChatMessages = ({
           ...new Set(platformsMessagesClient.map((msg) => msg.platform)),
         ].map((platform) => ({
           value: `${clientId}-${platform}`,
-          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId}`,
+          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)}`,
         }));
       });
 
@@ -245,10 +246,9 @@ export const ChatMessages = ({
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
-      {selectTicketId && (
+      {selectTicketId && !isLoading && (
         <ChatInput
           loading={loadingMessage}
-          id={selectTicketId}
           onSendMessage={(value) => {
             if (!selectedClient) {
               return;
@@ -256,25 +256,12 @@ export const ChatMessages = ({
             sendMessage(null, selectedPlatform, value);
           }}
           onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
-          renderSelectUserPlatform={() => {
-            return (
-              tickets &&
-              tickets.find((ticket) => ticket.id === selectTicketId)
-                ?.client_id && (
-                <Select
-                  w="100%"
-                  value={`${selectedClient}-${selectedPlatform}`}
-                  placeholder={translations["Alege client"][language]}
-                  data={usersOptions().flat()}
-                  onChange={(value) => {
-                    if (!value) return;
-                    const [clientId, platform] = value.split("-");
-                    setSelectedClient(clientId);
-                    setSelectedPlatform(platform);
-                  }}
-                />
-              )
-            );
+          clientList={usersOptions().flat()}
+          onChangeClient={(value) => {
+            if (!value) return;
+            const [clientId, platform] = value.split("-");
+            setSelectedClient(clientId);
+            setSelectedPlatform(platform);
           }}
         />
       )}

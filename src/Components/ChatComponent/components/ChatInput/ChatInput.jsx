@@ -1,5 +1,5 @@
-import { Textarea, Flex, ActionIcon, Box, Button } from "@mantine/core";
-import { useState, useRef } from "react";
+import { Textarea, Flex, ActionIcon, Box, Button, Text } from "@mantine/core";
+import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
@@ -15,10 +15,13 @@ export const ChatInput = ({
   onHandleFileSelect,
   renderSelectUserPlatform,
   loading,
+  clientList,
+  onChangeClient,
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0,
@@ -61,14 +64,37 @@ export const ChatInput = ({
     }
   };
 
+  useEffect(() => {
+    setSelectedClient(clientList[0]?.label);
+  }, [clientList]);
+
   return (
     <>
       <Box p="16px">
-        <Flex gap="xs" mb="xs">
+        <Flex gap="xs" mb="xs" align="center">
           <ComboSelect
             position="top"
             renderTriggerButton={(closeDropdown) => (
-              <ActionIcon variant="default" onClick={closeDropdown}>
+              <Text
+                className="pointer"
+                c="blue "
+                td="underline"
+                onClick={closeDropdown}
+              >
+                {selectedClient ? `${selectedClient}:` : ""}
+              </Text>
+            )}
+            onChange={(value) => {
+              setSelectedClient(value);
+              onChangeClient(value);
+            }}
+            data={clientList}
+          />
+
+          <ComboSelect
+            position="top"
+            renderTriggerButton={(closeDropdown) => (
+              <ActionIcon size="xs" variant="default" onClick={closeDropdown}>
                 <IoIosArrowDown />
               </ActionIcon>
             )}
@@ -80,8 +106,6 @@ export const ChatInput = ({
               label: key,
             }))}
           />
-
-          {renderSelectUserPlatform()}
         </Flex>
         <Textarea
           autosize
