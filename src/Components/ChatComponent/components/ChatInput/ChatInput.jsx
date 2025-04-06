@@ -1,4 +1,4 @@
-import { Input, Flex, ActionIcon, Select } from "@mantine/core"
+import { Textarea, Flex, ActionIcon, Select } from "@mantine/core"
 import { useState, useRef } from "react"
 import { createPortal } from "react-dom"
 import EmojiPicker from "emoji-picker-react"
@@ -82,8 +82,10 @@ export const ChatInput = ({
         >
           <FaSmile />
         </ActionIcon>
-        <Input
-          size="md"
+        <Textarea
+          autosize
+          minRows={6}
+          maxRows={8}
           w="100%"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
