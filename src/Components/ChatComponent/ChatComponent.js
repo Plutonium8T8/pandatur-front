@@ -104,7 +104,7 @@ const ChatComponent = () => {
           />
         )}
 
-        <Flex pos="relative" w="50%">
+        <Flex pos="relative" style={{flex: "1 1 0"}}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
             <ActionIcon
               variant="default"
@@ -117,6 +117,7 @@ const ChatComponent = () => {
               )}
             </ActionIcon>
           </Box>
+          
           <ChatMessages
             selectTicketId={selectTicketId}
             setSelectedClient={setSelectedClient}
