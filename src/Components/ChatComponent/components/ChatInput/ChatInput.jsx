@@ -58,8 +58,8 @@ export const ChatInput = ({
   };
 
   return (
-    <Box p="16px">
-      <Flex gap="xs" align="start">
+    <>
+      <Flex gap="xs" p="16px">
         <Textarea
           autosize
           minRows={6}
@@ -146,6 +146,6 @@ export const ChatInput = ({
           </div>,
           document.body,
         )}
-    </Box>
+    </>
   );
 };
