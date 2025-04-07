@@ -14,11 +14,7 @@ export const users = {
   },
 
   createTechnicianUser: async (body) => {
-    const { data } = await baseAxios.post(
-      "/api/technician/profile/create",
-      body
-    )
-
+    const { data } = await baseAxios.post("/api/technician/profile/create", body)
     return data
   },
 
@@ -35,11 +31,7 @@ export const users = {
   },
 
   updateMultipleTechnicians: async (body) => {
-    const { data } = await baseAxios.patch(
-      "/api/users-technician/update-multiple",
-      body
-    )
-
+    const { data } = await baseAxios.patch("/api/users-technician/update-multiple", body)
     return data
   },
 
@@ -76,6 +68,28 @@ export const users = {
   clientMerge: async (body) => {
     const { data } = await baseAxios.patch("/api/users-client/merge", body)
 
+    return data
+  },
+
+  // ==== Permissions API ====
+
+  createPermissionGroup: async (body) => {
+    const { data } = await baseAxios.post("/api/user-groups/permissions", body)
+    return data
+  },
+
+  getAllPermissionGroups: async () => {
+    const { data } = await baseAxios.get("/api/user-groups/permissions")
+    return data
+  },
+
+  deletePermissionGroup: async (id) => {
+    const { data } = await baseAxios.delete(`/api/user-groups/permissions/${id}`)
+    return data
+  },
+
+  assignPermissionToUser: async (permissionId, userId) => {
+    const { data } = await baseAxios.post(`/api/user-groups/permissions/${permissionId}/assign/${userId}`)
     return data
   }
 }
