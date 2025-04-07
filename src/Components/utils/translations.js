@@ -1886,6 +1886,34 @@ export const translations = {
   "Alege grupul de permisiuni": {
     "RO": "Alege grupul de permisiuni",
     "RU": "Выберите группу разрешений"
+  },
+  "Grup de permisiuni actualizat cu succes": {
+    "RO": "Grup de permisiuni actualizat cu succes",
+    "RU": "Группа разрешений успешно обновлена"
+  },
+  "Eroare la salvarea grupului de permisiuni": {
+    "RO": "Eroare la salvarea grupului de permisiuni",
+    "RU": "Ошибка при сохранении группы разрешений"
+  },
+  "Grup șters cu succes": {
+    "RO": "Grup șters cu succes",
+    "RU": "Группа успешно удалена"
+  },
+  "Editează grup de permisiuni": {
+    "RO": "Editează grup de permisiuni",
+    "RU": "Редактировать группу разрешений"
+  },
+  "Salvează modificările": {
+    "RO": "Salvează modificările",
+    "RU": "Сохранить изменения"
+  },
+  "Șterge grupul": {
+    "RO": "Șterge grupul",
+    "RU": "Удалить группу"
+  },
+  "Eroare la încărcarea grupurilor existente": {
+    "RO": "Eroare la încărcarea grupurilor existente",
+    "RU": "Ошибка при загрузке существующих групп"
   }
 };
 
