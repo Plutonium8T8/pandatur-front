@@ -4,16 +4,14 @@ import {
     Button,
     Box,
     Text,
-    Switch,
     Stack,
-    Group,
     Divider,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
-import { categories, actions } from "../../utils/permissionConstants";
+import RoleMatrix from "./RoleMatrix";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -45,7 +43,9 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const toggleRole = (role) => {
         setSelectedRoles((prev) =>
-            prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role]
+            prev.includes(role)
+                ? prev.filter((r) => r !== role)
+                : [...prev, role]
         );
     };
 
@@ -78,7 +78,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const formatRoles = (roles) => {
         if (Array.isArray(roles)) return roles;
-        if (typeof roles === "object" && roles !== null) return Object.values(roles);
+        if (typeof roles === "object" && roles !== null)
+            return Object.values(roles);
         return [];
     };
 
@@ -110,23 +111,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     <Text fw={600} mb={4}>
                         {translations["Selectați permisiunile"][language]}
                     </Text>
-                    {categories.map((category) => (
-                        <Group key={category}>
-                            <Text w={100}>{category}</Text>
-                            {actions.map((action) => {
-                                const role = `${category}_${action}`;
-                                return (
-                                    <Switch
-                                        key={role}
-                                        label={action}
-                                        checked={selectedRoles.includes(role)}
-                                        onChange={() => toggleRole(role)}
-                                        size="xs"
-                                    />
-                                );
-                            })}
-                        </Group>
-                    ))}
+                    <RoleMatrix
+                        selectedRoles={selectedRoles}
+                        onToggle={toggleRole}
+                    />
                 </Box>
 
                 <Button onClick={handleCreate}>

@@ -9,6 +9,7 @@ import { FaHandshake } from "react-icons/fa"
 import { translations } from "../../utils/translations"
 import { api } from "../../../api"
 import RoleMatrix from "./RoleMatrix"
+import { categories, actions } from "../../utils/permissionConstants"
 
 const language = localStorage.getItem("language") || "RO"
 
@@ -58,10 +59,8 @@ const RolesComponent = ({ employee }) => {
 
   const isRoleActive = (role) => roles.includes(`ROLE_${role}`)
 
-  const selectedRoles = [
-    "CHAT", "LEAD", "DASHBOARD", "ACCOUNT", "NOTIFICATION", "TASK"
-  ].flatMap((category) =>
-    ["READ", "WRITE", "ADMIN"]
+  const selectedRoles = categories.flatMap((category) =>
+    actions
       .map((action) => `${category}_${action}`)
       .filter((role) => isRoleActive(role))
   )
