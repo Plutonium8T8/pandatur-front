@@ -6,6 +6,7 @@ import {
     Text,
     Stack,
     Divider,
+    Group,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
@@ -94,6 +95,25 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }
     };
 
+    const handleDelete = async () => {
+        if (!editingGroupId) return;
+
+        try {
+            await api.users.deletePermissionGroup(editingGroupId);
+            enqueueSnackbar(
+                translations["Grup șters cu succes"]?.[language] || "Grup șters",
+                { variant: "success" }
+            );
+            fetchExistingGroups();
+            resetForm();
+        } catch (err) {
+            enqueueSnackbar(
+                translations["Eroare la ștergerea grupului"]?.[language] || "Eroare la ștergere",
+                { variant: "error" }
+            );
+        }
+    };
+
     const formatRoles = (roles) => {
         if (Array.isArray(roles)) return roles;
         if (typeof roles === "object" && roles !== null)
@@ -140,11 +160,19 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     />
                 </Box>
 
-                <Button onClick={handleSubmit}>
-                    {editingGroupId
-                        ? translations["Salvează modificările"]?.[language] || "Salvează"
-                        : translations["Creează"][language]}
-                </Button>
+                <Group>
+                    <Button onClick={handleSubmit}>
+                        {editingGroupId
+                            ? translations["Salvează modificările"]?.[language] || "Salvează"
+                            : translations["Creează"][language]}
+                    </Button>
+
+                    {editingGroupId && (
+                        <Button color="red" onClick={handleDelete}>
+                            {translations["Șterge grupul"]?.[language] || "Șterge"}
+                        </Button>
+                    )}
+                </Group>
 
                 {existingGroups.length > 0 && (
                     <>
