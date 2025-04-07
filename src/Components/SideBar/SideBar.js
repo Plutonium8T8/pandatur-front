@@ -1,9 +1,6 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useApp } from "../../hooks";
-import { translations } from "../utils/translations";
-import "./SideBar.css";
-import LanguageToggle from "./LanguageToggle";
+import { useLocation } from "react-router-dom";
+import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
 import {
   FaUser,
   FaChartBar,
@@ -12,30 +9,29 @@ import {
   FaBell,
   FaClipboardList,
   FaSignOutAlt,
-  FaUserSecret,
   FaCalendar,
 } from "react-icons/fa";
+import { FaUsers } from "react-icons/fa6";
+import { Badge } from "@mantine/core";
+import { Link } from "react-router-dom";
 import { clearCookies } from "../../Components/utils/clearCookies";
 import { api } from "../../api";
 import { LoadingOverlay } from "../LoadingOverlay";
+import { useApp } from "../../hooks";
+import LanguageToggle from "./LanguageToggle";
+import { getLanguageByKey } from "../utils";
+import "./SideBar.css";
 
 const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { unreadCount } = useApp();
   const [loading, setLoading] = useState(false);
-
-  const language = localStorage.getItem("language") || "RO";
 
   const isActive = (page) => {
     if (page === "chat") {
       return location.pathname.startsWith("/chat");
     }
     return location.pathname === `/${page}`;
-  };
-
-  const handleNavigate = (page) => {
-    navigate(`/${page}`);
   };
 
   const logout = async () => {
@@ -52,78 +48,74 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
 
   return (
     <>
-      <div className="container-side-bar">
-        <div className="menu-side-bar">
-          <div className="container-item-menu">
-            <div
-              className={`menu-item ${isActive("account") ? "active" : ""}`}
-              onClick={onOpenAccount}
-            >
-              <FaUser size={24} />
-              <span>{translations["Account"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("users") ? "active" : ""}`}
-              onClick={() => handleNavigate("users")}
-            >
-              <FaUserSecret size={24} />
-              <span>{translations["Users"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("dashboard") ? "active" : ""}`}
-              onClick={() => handleNavigate("dashboard")}
-            >
-              <FaChartBar size={24} />
-              <span>{translations["Dashboard"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("leads") ? "active" : ""}`}
-              onClick={() => handleNavigate("leads")}
-            >
-              <FaClipboardList size={24} />
-              <span>{translations["Leads"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("chat") ? "active" : ""}`}
-              onClick={() => handleNavigate("chat")}
-            >
-              <FaComments size={24} />
-              <span>{translations["Chat"][language]}</span>
-              {unreadCount > 0 && (
-                <span className="unread-indicator">{unreadCount}</span>
-              )}
-            </div>
-            <div
-              className={`menu-item ${isActive("tasks") ? "active" : ""}`}
-              onClick={() => handleNavigate("tasks")}
-            >
-              <FaTasks size={24} />
-              <span>{translations["Taskuri"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("schedules") ? "active" : ""}`}
-              onClick={() => handleNavigate("schedules")}
-            >
-              <FaCalendar size={24} />
-              <span>{translations["schedules"][language]}</span>
-            </div>
-            <div
-              className={`menu-item ${isActive("notifications") ? "active" : ""}`}
-              onClick={onOpenNotifications}
-            >
-              <FaBell size={24} />
-              <span>{translations["Notificări"][language][1]}</span>
-            </div>
-            <div className={`menu-item `}>
-              <LanguageToggle />
-            </div>
-          </div>
-        </div>
-        <div className="menu-item" onClick={logout}>
-          <FaSignOutAlt size={24} />
-          <span>{translations["Log Out"][language]}</span>
-        </div>
-      </div>
+      <Sidebar backgroundColor="#1f2937">
+        <Menu>
+          <MenuItem onClick={onOpenAccount} icon={<FaUser />}>
+            {getLanguageByKey("Account")}
+          </MenuItem>
+          <MenuItem
+            active={isActive("users")}
+            icon={<FaUsers />}
+            component={<Link to="/users" />}
+          >
+            {getLanguageByKey("Users")}
+          </MenuItem>
+          <MenuItem
+            active={isActive("dashboard")}
+            icon={<FaChartBar />}
+            component={<Link to="/dashboard" />}
+          >
+            {getLanguageByKey("Dashboard")}
+          </MenuItem>
+          <MenuItem
+            active={isActive("leads")}
+            icon={<FaClipboardList />}
+            component={<Link to="/leads" />}
+          >
+            {getLanguageByKey("Leads")}
+          </MenuItem>
+          <MenuItem
+            suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
+            active={isActive("chat")}
+            icon={<FaComments />}
+            component={<Link to="/chat" />}
+          >
+            {getLanguageByKey("Chat")}
+          </MenuItem>
+
+          <MenuItem
+            active={isActive("tasks")}
+            icon={<FaTasks />}
+            component={<Link to="/tasks" />}
+          >
+            {getLanguageByKey("Taskuri")}
+          </MenuItem>
+          <MenuItem
+            active={isActive("schedules")}
+            icon={<FaCalendar />}
+            component={<Link to="/schedules" />}
+          >
+            {getLanguageByKey("schedules")}
+          </MenuItem>
+          <MenuItem onClick={onOpenNotifications} icon={<FaBell />}>
+            {getLanguageByKey("Notificări")[1]}
+          </MenuItem>
+          <MenuItem>
+            <LanguageToggle />
+          </MenuItem>
+        </Menu>
+
+        <Menu>
+          <MenuItem
+            icon={<FaSignOutAlt />}
+            onClick={logout}
+            active={isActive("notifications")}
+          >
+            {getLanguageByKey("Log Out")}
+          </MenuItem>
+        </Menu>
+      </Sidebar>
+
       {loading && <LoadingOverlay />}
     </>
   );
