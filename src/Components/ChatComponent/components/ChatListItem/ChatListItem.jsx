@@ -1,12 +1,7 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
-import dayjs from "dayjs";
-import {
-  DEFAULT_PHOTO,
-  HH_mm,
-  DD_MM_YYYY__HH_mm_ss,
-} from "../../../../app-constants";
+import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
-import { priorityTagColors } from "../../../utils";
+import { priorityTagColors, parseServerDate } from "../../../utils";
 import "./ChatListItem.css";
 
 export const ChatListItem = ({
@@ -15,6 +10,8 @@ export const ChatListItem = ({
   onHandleTicketClick,
   selectTicketId,
 }) => {
+  const formatDate = parseServerDate(chat.time_sent);
+
   return (
     <div style={style}>
       <Box
@@ -60,7 +57,7 @@ export const ChatListItem = ({
             </Text>
           </Box>
           <Text size="sm" c="dimmed">
-            {dayjs(chat.time_sent, DD_MM_YYYY__HH_mm_ss).format(HH_mm)}
+            {formatDate ? formatDate.format(HH_mm) : null}
           </Text>
         </Flex>
       </Box>
