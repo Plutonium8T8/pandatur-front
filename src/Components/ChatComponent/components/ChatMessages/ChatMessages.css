@@ -1,0 +1,19 @@
+.chat-area {
+  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
+}
+
+.chat-messages {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.empty-chat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  font-size: 24px;
+  letter-spacing: 1px;
+}

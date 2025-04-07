@@ -1,8 +1,10 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useUser } from "../hooks";
+import { useUser, useLocalStorage } from "../hooks";
 import { api } from "../api";
 import { showServerError } from "../Components/utils";
+
+const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
 export const AppContext = createContext();
 
@@ -38,6 +40,14 @@ export const AppProvider = ({ children }) => {
   const [unreadMessages, setUnreadMessages] = useState(new Map());
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
+  const { storage, changeLocalStorage } = useLocalStorage(
+    SIDEBAR_COLLAPSE,
+    "false",
+  );
+
+  const collapsed = () => {
+    changeLocalStorage(storage === "true" ? "false" : "true");
+  };
 
   useEffect(() => {
     let pingInterval;
@@ -434,6 +444,8 @@ export const AppProvider = ({ children }) => {
         socketRef,
         getClientMessagesSingle,
         spinnerTickets,
+        setIsCollapsed: collapsed,
+        isCollapsed: storage === "true",
       }}
     >
       {children}
