@@ -125,7 +125,7 @@ const TaskList = ({
         ),
         dataIndex: "id",
         key: "id",
-        width: 80,
+        width: 60,
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
