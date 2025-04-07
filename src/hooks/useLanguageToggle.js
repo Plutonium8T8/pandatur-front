@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useLocalStorage } from "../hooks";
+
+const LANGUAGE_LOCAL_STORAGE_KEY = "PANDA_TUR_LANGUAGE";
 
 export const LANGUAGES = {
   RO: {
@@ -12,23 +14,20 @@ export const LANGUAGES = {
 };
 
 export const useLanguageToggle = () => {
-  const [language, setLanguage] = useState("RO");
-
-  useEffect(() => {
-    const storedLanguage = localStorage.getItem("language") || "RO";
-    setLanguage(storedLanguage);
-  }, []);
+  const { storage, changeLocalStorage } = useLocalStorage(
+    LANGUAGE_LOCAL_STORAGE_KEY,
+    LANGUAGES.RO.label,
+  );
 
   const toggleLanguage = () => {
-    const newLanguage = language === "RO" ? "RU" : "RO";
-    setLanguage(newLanguage);
-    localStorage.setItem("language", newLanguage);
+    const newLanguage = storage === "RO" ? "RU" : "RO";
+    changeLocalStorage(newLanguage);
 
     window.location.reload();
   };
 
   return {
     toggleLanguage,
-    selectedLanguage: language,
+    selectedLanguage: storage || "RO",
   };
 };
