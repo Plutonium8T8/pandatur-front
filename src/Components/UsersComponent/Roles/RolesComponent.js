@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import {
   Box,
   Grid,
@@ -15,6 +15,17 @@ import { api } from "../../../api"
 
 const language = localStorage.getItem("language") || "RO"
 
+const categories = [
+  "CHAT",
+  "LEAD",
+  "DASHBOARD",
+  "ACCOUNT",
+  "NOTIFICATION",
+  "TASK"
+]
+
+const actions = ["READ", "WRITE", "ADMIN"]
+
 const RolesComponent = ({ employee }) => {
   const [roles, setRoles] = useState([])
 
@@ -22,14 +33,14 @@ const RolesComponent = ({ employee }) => {
     fetchRoles()
   }, [])
 
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       const data = await api.users.getById(employee.id)
       setRoles(data.roles)
     } catch (error) {
       console.error("Ошибка загрузки уведомлений:", error.message)
     }
-  }
+  }, [employee.id])
 
   const sendPermissionToServer = async (role) => {
     try {
@@ -64,17 +75,6 @@ const RolesComponent = ({ employee }) => {
   }
 
   const isRoleActive = (role) => roles.includes(role)
-
-  const categories = [
-    "CHAT",
-    "LEAD",
-    "DASHBOARD",
-    "ACCOUNT",
-    "NOTIFICATION",
-    "TASK"
-  ]
-
-  const actions = ["READ", "WRITE", "ADMIN"]
 
   return (
     <Box mt="lg">

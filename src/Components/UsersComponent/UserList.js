@@ -15,6 +15,8 @@ import { useConfirmPopup } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
+const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
+
 const UserList = ({
   users,
   loading,
@@ -25,7 +27,6 @@ const UserList = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
 
-  const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
   const allIds = users.map(extractId).filter(Boolean);
   const allSelected =
     allIds.length > 0 && allIds.every((id) => selectedIds.includes(id));
