@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
-import { Sidebar, Menu, MenuItem } from "react-pro-sidebar";
+import { Sidebar as BaseSideBar, Menu, MenuItem } from "react-pro-sidebar";
 import {
   FaUser,
   FaChartBar,
@@ -23,7 +23,7 @@ import "./SideBar.css";
 
 const LOGO = "https://pandatur.md/themes/pandatur/siteimg/logo.png";
 
-const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
+export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
   const { unreadCount } = useApp();
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
 
   return (
     <>
-      <Sidebar collapsed={isCollapsed} backgroundColor="#1f2937">
+      <BaseSideBar collapsed={isCollapsed} backgroundColor="#1f2937">
         <Menu>
           <MenuItem
             suffix={<FaBars />}
@@ -133,11 +133,9 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
             {getLanguageByKey("Log Out")}
           </MenuItem>
         </Menu>
-      </Sidebar>
+      </BaseSideBar>
 
       {loading && <LoadingOverlay />}
     </>
   );
 };
-
-export default CustomSidebar;

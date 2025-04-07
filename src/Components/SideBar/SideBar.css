@@ -15,15 +15,14 @@
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button:hover {
   background-color: #131820;
-  transition: 0.3s ease;
 }
 
-.ps-sidebar-container .ps-menuitem-root .ps-active {
+.ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active {
   background-color: #0f824c;
   color: white;
 }
 
-.ps-sidebar-container .ps-menuitem-root .ps-active:hover {
+.ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active:hover {
   background-color: #0f824c;
   color: white;
 }
