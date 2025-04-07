@@ -74,7 +74,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             if (editingGroupId) {
                 await api.users.updatePermissionGroup(editingGroupId, payload);
                 enqueueSnackbar(
-                    translations["Grup de permisiuni actualizat cu succes"]?.[language] || "Grup actualizat",
+                    translations["Grup de permisiuni actualizat cu succes"][language],
                     { variant: "success" }
                 );
             } else {
@@ -89,7 +89,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             resetForm();
         } catch (err) {
             enqueueSnackbar(
-                translations["Eroare la salvarea grupului de permisiuni"]?.[language] || "Eroare la salvare",
+                translations["Eroare la salvarea grupului de permisiuni"][language],
                 { variant: "error" }
             );
         }
@@ -101,14 +101,14 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         try {
             await api.users.deletePermissionGroup(editingGroupId);
             enqueueSnackbar(
-                translations["Grup șters cu succes"]?.[language] || "Grup șters",
+                translations["Grup șters cu succes"][language],
                 { variant: "success" }
             );
             fetchExistingGroups();
             resetForm();
         } catch (err) {
             enqueueSnackbar(
-                translations["Eroare la ștergerea grupului"]?.[language] || "Eroare la ștergere",
+                translations["Eroare la ștergerea grupului"][language],
                 { variant: "error" }
             );
         }
@@ -136,7 +136,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             onClose={onClose}
             title={
                 editingGroupId
-                    ? translations["Editează grup de permisiuni"]?.[language] || "Editează"
+                    ? translations["Editează grup de permisiuni"][language]
                     : translations["Creează grup de permisiuni"][language]
             }
             size="lg"
@@ -163,13 +163,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 <Group>
                     <Button onClick={handleSubmit}>
                         {editingGroupId
-                            ? translations["Salvează modificările"]?.[language] || "Salvează"
+                            ? translations["Salvează modificările"][language]
                             : translations["Creează"][language]}
                     </Button>
 
                     {editingGroupId && (
                         <Button color="red" onClick={handleDelete}>
-                            {translations["Șterge grupul"]?.[language] || "Șterge"}
+                            {translations["Șterge grupul"][language]}
                         </Button>
                     )}
                 </Group>
@@ -178,7 +178,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     <>
                         <Divider my="sm" />
                         <Text fw={600}>
-                            {translations["Grupuri existente"]?.[language] || "Grupuri existente"}
+                            {translations["Grupuri existente"][language]}
                         </Text>
                         <Stack spacing={4}>
                             {existingGroups.map((g) => (
