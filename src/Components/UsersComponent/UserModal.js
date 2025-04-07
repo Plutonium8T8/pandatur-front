@@ -1,3 +1,4 @@
+// импорт доп. API
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -28,12 +29,14 @@ const initialFormState = {
   job_title: "",
   status: false,
   groups: "",
+  permissionGroupId: null,
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [form, setForm] = useState(initialFormState);
   const [groupsList, setGroupsList] = useState([]);
+  const [permissionGroups, setPermissionGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
+        permissionGroupId: null,
       });
     } else {
       setForm(initialFormState);
@@ -60,8 +64,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     const fetchGroups = async () => {
       setGroupsLoading(true);
       try {
-        const data = await api.user.getGroupsList();
-        setGroupsList(data);
+        const [userGroups, permissions] = await Promise.all([
+          api.user.getGroupsList(),
+          api.users.getAllPermissionGroups(),
+        ]);
+        setGroupsList(userGroups);
+        setPermissionGroups(permissions);
       } catch (err) {
         console.error("Ошибка при загрузке групп", err);
       } finally {
@@ -82,6 +90,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       job_title,
       status,
       groups,
+      permissionGroupId,
     } = form;
 
     if (!initialUser) {
@@ -126,6 +135,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
+        if (permissionGroupId) {
+          await api.users.assignPermissionToUser(permissionGroupId, userId);
+        }
+
         enqueueSnackbar(
           translations["Utilizator actualizat cu succes"][language],
           { variant: "success" }
@@ -149,7 +162,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           groups: [groups],
         };
 
-        await api.users.createTechnicianUser(payload);
+        const { id: createdUser } = await api.users.createTechnicianUser(payload);
+
+        if (permissionGroupId) {
+          await api.users.assignPermissionToUser(
+            permissionGroupId,
+            createdUser?.user?.id
+          );
+        }
+
         enqueueSnackbar(
           translations["Utilizator creat cu succes"][language],
           { variant: "success" }
@@ -243,18 +264,35 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           {groupsLoading ? (
             <Loader />
           ) : (
-            <Select
-              label={translations["Grup utilizator"][language]}
-              placeholder={translations["Alege grupul"][language]}
-              data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
-              value={
-                groupsList.map((g) => g.name).includes(form.groups)
-                  ? form.groups
-                  : null
-              }
-              onChange={(value) => setForm({ ...form, groups: value || "" })}
-              required
-            />
+            <>
+              <Select
+                label={translations["Grup utilizator"][language]}
+                placeholder={translations["Alege grupul"][language]}
+                data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
+                value={
+                  groupsList.map((g) => g.name).includes(form.groups)
+                    ? form.groups
+                    : null
+                }
+                onChange={(value) =>
+                  setForm({ ...form, groups: value || "" })
+                }
+                required
+              />
+
+              <Select
+                label={translations["Grup permisiuni"][language]}
+                placeholder={translations["Alege grupul de permisiuni"][language]}
+                data={permissionGroups.map((g) => ({
+                  value: g.permission_id.toString(),
+                  label: g.permission_name,
+                }))}
+                value={form.permissionGroupId}
+                onChange={(value) =>
+                  setForm({ ...form, permissionGroupId: value })
+                }
+              />
+            </>
           )}
 
           <TextInput

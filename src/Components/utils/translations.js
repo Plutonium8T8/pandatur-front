@@ -1878,6 +1878,14 @@ export const translations = {
   "Grupuri existente": {
     "RO": "Grupuri existente",
     "RU": "Существующие группы"
+  },
+  "Grup permisiuni": {
+    "RO": "Grup permisiuni",
+    "RU": "Группа разрешений"
+  },
+  "Alege grupul de permisiuni": {
+    "RO": "Alege grupul de permisiuni",
+    "RU": "Выберите группу разрешений"
   }
 };
 

@@ -91,5 +91,10 @@ export const users = {
   assignPermissionToUser: async (permissionId, userId) => {
     const { data } = await baseAxios.post(`/api/user-groups/permissions/${permissionId}/assign/${userId}`)
     return data
+  },
+
+  updatePermissionGroup: async (id, body) => {
+    const { data } = await baseAxios.patch(`/api/user-groups/permissions/${id}`, body)
+    return data
   }
 }

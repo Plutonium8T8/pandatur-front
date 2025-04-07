@@ -19,16 +19,22 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const [groupName, setGroupName] = useState("");
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [existingGroups, setExistingGroups] = useState([]);
+    const [editingGroupId, setEditingGroupId] = useState(null);
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (opened) {
             fetchExistingGroups();
         } else {
-            setGroupName("");
-            setSelectedRoles([]);
+            resetForm();
         }
     }, [opened]);
+
+    const resetForm = () => {
+        setGroupName("");
+        setSelectedRoles([]);
+        setEditingGroupId(null);
+    };
 
     const fetchExistingGroups = async () => {
         try {
@@ -49,7 +55,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         );
     };
 
-    const handleCreate = async () => {
+    const handleSubmit = async () => {
         if (!groupName || selectedRoles.length === 0) {
             enqueueSnackbar(
                 translations["Completați toate câmpurile obligatorii"][language],
@@ -59,18 +65,30 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }
 
         try {
-            await api.users.createPermissionGroup({
+            const payload = {
                 name: groupName,
                 roles: selectedRoles.map((r) => "ROLE_" + r),
-            });
-            enqueueSnackbar(
-                translations["Grup de permisiuni creat cu succes"][language],
-                { variant: "success" }
-            );
+            };
+
+            if (editingGroupId) {
+                await api.users.updatePermissionGroup(editingGroupId, payload);
+                enqueueSnackbar(
+                    translations["Grup de permisiuni actualizat cu succes"]?.[language] || "Grup actualizat",
+                    { variant: "success" }
+                );
+            } else {
+                await api.users.createPermissionGroup(payload);
+                enqueueSnackbar(
+                    translations["Grup de permisiuni creat cu succes"][language],
+                    { variant: "success" }
+                );
+            }
+
             fetchExistingGroups();
+            resetForm();
         } catch (err) {
             enqueueSnackbar(
-                translations["Eroare la crearea grupului de permisiuni"][language],
+                translations["Eroare la salvarea grupului de permisiuni"]?.[language] || "Eroare la salvare",
                 { variant: "error" }
             );
         }
@@ -89,13 +107,18 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             .filter(Boolean);
         setSelectedRoles(rolesArray);
         setGroupName(group.permission_name);
+        setEditingGroupId(group.permission_id);
     };
 
     return (
         <Modal
             opened={opened}
             onClose={onClose}
-            title={translations["Creează grup de permisiuni"][language]}
+            title={
+                editingGroupId
+                    ? translations["Editează grup de permisiuni"]?.[language] || "Editează"
+                    : translations["Creează grup de permisiuni"][language]
+            }
             size="lg"
         >
             <Stack>
@@ -117,8 +140,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     />
                 </Box>
 
-                <Button onClick={handleCreate}>
-                    {translations["Creează"][language]}
+                <Button onClick={handleSubmit}>
+                    {editingGroupId
+                        ? translations["Salvează modificările"]?.[language] || "Salvează"
+                        : translations["Creează"][language]}
                 </Button>
 
                 {existingGroups.length > 0 && (
