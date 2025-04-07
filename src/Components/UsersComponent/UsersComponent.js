@@ -6,6 +6,7 @@ import UserList from "./UserList";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
 import EditGroupsListModal from "./GroupsUsers/EditGroupsListModal";
+import CreatePermissionGroupModal from "./Roles/CreatePermissionGroupModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -16,8 +17,9 @@ const UsersComponent = () => {
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const { enqueueSnackbar } = useSnackbar();
   const [editGroupsOpen, setEditGroupsOpen] = useState(false);
+  const [createPermissionModalOpen, setCreatePermissionModalOpen] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -43,7 +45,7 @@ const UsersComponent = () => {
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     } finally {
       setLoading(false);
@@ -63,8 +65,8 @@ const UsersComponent = () => {
         (user) =>
           user.name?.toLowerCase().includes(s) ||
           user.surname?.toLowerCase().includes(s) ||
-          user.email?.toLowerCase().includes(s),
-      ),
+          user.email?.toLowerCase().includes(s)
+      )
     );
   }, [search, users]);
 
@@ -83,7 +85,7 @@ const UsersComponent = () => {
               <Menu.Item onClick={() => setEditGroupsOpen(true)}>
                 {translations["Editează grupurile"]?.[language]}
               </Menu.Item>
-              <Menu.Item onClick={() => console.log("редactare roluri")}>
+              <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
                 {translations["Editează rolurile"]?.[language]}
               </Menu.Item>
             </Menu.Dropdown>
@@ -133,6 +135,10 @@ const UsersComponent = () => {
         onClose={() => setEditGroupsOpen(false)}
       />
 
+      <CreatePermissionGroupModal
+        opened={createPermissionModalOpen}
+        onClose={() => setCreatePermissionModalOpen(false)}
+      />
     </div>
   );
 };

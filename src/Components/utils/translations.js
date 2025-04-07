@@ -1846,6 +1846,26 @@ export const translations = {
   "Editează rolurile": {
     "RO": "Editează rolurile",
     "RU": "Редактировать роли"
+  },
+  "Creează grup de permisiuni": {
+    "RO": "Creează grup de permisiuni",
+    "RU": "Создать группу разрешений"
+  },
+  "Selectați permisiunile": {
+    "RO": "Selectați permisiunile",
+    "RU": "Выберите разрешения"
+  },
+  "Grup de permisiuni creat cu succes": {
+    "RO": "Grup de permisiuni creat cu succes",
+    "RU": "Группа разрешений успешно создана"
+  },
+  "Eroare la crearea grupului de permisiuni": {
+    "RO": "Eroare la crearea grupului de permisiuni",
+    "RU": "Ошибка при создании группы разрешений"
+  },
+  "Grupuri existente": {
+    "RO": "Grupuri existente",
+    "RU": "Существующие группы"
   }
 };
 
