@@ -280,6 +280,7 @@ const UserList = ({
       />
 
       <RcTable
+        rowKey={(row) => extractId(row)}
         columns={columns}
         data={users}
         loading={loading}

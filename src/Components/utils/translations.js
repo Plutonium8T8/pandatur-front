@@ -1842,6 +1842,10 @@ export const translations = {
   "Eroare la ștergerea grupului": {
     RO: "Eroare la ștergerea grupului",
     RU: "Ошибка при удалении группы"
+  },
+  "Editează rolurile": {
+    "RO": "Editează rolurile",
+    "RU": "Редактировать роли"
   }
 };
 

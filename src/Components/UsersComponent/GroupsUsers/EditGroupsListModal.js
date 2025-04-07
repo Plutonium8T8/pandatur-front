@@ -79,7 +79,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                         placeholder={translations["Grup nou"]?.[language]}
                         value={newGroup}
                         onChange={(e) => setNewGroup(e.target.value)}
-                        fullWidth
                     />
                     <Button onClick={handleAdd}>
                         {translations["Adaugă"]?.[language]}

@@ -81,10 +81,10 @@ const UsersComponent = () => {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item onClick={() => setEditGroupsOpen(true)}>
-                редактировать группы
+                {translations["Editează grupurile"]?.[language]}
               </Menu.Item>
-              <Menu.Item onClick={() => console.log("редактирование ролей")}>
-                редактировать роли
+              <Menu.Item onClick={() => console.log("редactare roluri")}>
+                {translations["Editează rolurile"]?.[language]}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
