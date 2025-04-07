@@ -1,17 +1,14 @@
 .chat-item {
-  cursor: pointer;
-  background-color: #f0f0f0;
   transition:
     background-color 0.3s,
     color 0.3s;
 }
 
 .chat-item.active {
-  background-color: #0f824c77;
-  color: #ffffff;
+  background-color: #eee;
 }
 
 .chat-item:hover {
-  background-color: #f1f5ff;
+  background-color: #eee;
   color: black;
 }
