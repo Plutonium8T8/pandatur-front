@@ -5,6 +5,10 @@
   color: white;
 }
 
+.ps-sidebar-container .logo-menu {
+  margin-bottom: 30px;
+}
+
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button {
   transition: 0.3s ease;
 }
