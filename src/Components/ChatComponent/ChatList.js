@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FixedSizeList } from "react-window";
-import { TextInput, Checkbox, Title, Flex, Box } from "@mantine/core";
+import { TextInput, Checkbox, Title, Flex, Box, Divider } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
@@ -108,8 +108,8 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   };
 
   return (
-    <Box direction="column" w="20%" pt="md" ref={chatListRef}>
-      <Flex direction="column" gap="xs" mb="xs">
+    <Box direction="column" w="20%" ref={chatListRef}>
+      <Flex direction="column" gap="xs" mb="xs" pl="24px" pr="16px">
         <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
         <Checkbox
@@ -124,6 +124,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
         />
       </Flex>
 
+      <Divider />
       <Box h="100%" ref={wrapperChatItemRef}>
         <FixedSizeList
           height={wrapperChatHeight}
