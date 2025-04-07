@@ -1,4 +1,4 @@
-import { Box, Grid, Text, Switch, Paper } from "@mantine/core";
+import { Grid, Text, Switch, Paper } from "@mantine/core";
 import { categories, actions } from "../../utils/permissionConstants";
 
 const RoleMatrix = ({ selectedRoles = [], onToggle }) => {

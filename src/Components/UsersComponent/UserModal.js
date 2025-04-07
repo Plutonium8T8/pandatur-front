@@ -76,7 +76,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         setGroupsList(userGroups);
         setPermissionGroups(permissions);
       } catch (err) {
-        console.error("Ошибка при загрузке групп", err);
+        console.error("error loading group", err);
       } finally {
         setGroupsLoading(false);
       }

@@ -15,7 +15,7 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
         const data = await api.user.getGroupsList();
         setGroups(data);
       } catch (err) {
-        console.error("Ошибка при загрузке групп", err);
+        console.error("error fetch roles", err);
       }
     };
 
