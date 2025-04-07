@@ -43,7 +43,7 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
         <Select
           label={translations["Alege grupul"][language]}
           placeholder={translations["Alege grupul"][language]}
-          data={groups.map((g) => ({ value: g.name, label: g.name }))}
+          data={groups.map((groups) => ({ value: groups.name, label: groups.name }))}
           value={group}
           onChange={setGroup}
         />
