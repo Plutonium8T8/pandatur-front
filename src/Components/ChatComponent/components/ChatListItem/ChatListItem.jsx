@@ -41,7 +41,7 @@ export const ChatListItem = ({
             fallbackSrc={DEFAULT_PHOTO}
           />
           <div>
-            <Text>{chat.contact}</Text>
+            <Text>{chat.contact ? chat.contact : "-"}</Text>
             <Flex gap="12">
               <Flex align="center" gap="4">
                 <FaFingerprint />
