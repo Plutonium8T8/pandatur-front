@@ -1,27 +1,39 @@
-import { Box, Group, Switch, Text } from "@mantine/core";
+import { Box, Grid, Text, Switch, Paper } from "@mantine/core";
 import { categories, actions } from "../../utils/permissionConstants";
 
 const RoleMatrix = ({ selectedRoles = [], onToggle }) => {
     return (
-        <Box>
+        <Paper withBorder p="sm" radius="md">
+            <Grid columns={actions.length + 1} gutter="xs" mb="xs" align="center">
+                <Grid.Col span={1}></Grid.Col>
+                {actions.map((action) => (
+                    <Grid.Col span={1} key={action}>
+                        <Text fw={500} ta="center">{action}</Text>
+                    </Grid.Col>
+                ))}
+            </Grid>
+
             {categories.map((category) => (
-                <Group key={category}>
-                    <Text w={100}>{category}</Text>
+                <Grid columns={actions.length + 1} gutter="xs" key={category} align="center">
+                    <Grid.Col span={1}>
+                        <Text fw={500}>{category}</Text>
+                    </Grid.Col>
                     {actions.map((action) => {
                         const role = `${category}_${action}`;
                         return (
-                            <Switch
-                                key={role}
-                                label={action}
-                                checked={selectedRoles.includes(role)}
-                                onChange={() => onToggle(role)}
-                                size="xs"
-                            />
+                            <Grid.Col span={1} key={role}>
+                                <Switch
+                                    checked={selectedRoles.includes(role)}
+                                    onChange={() => onToggle(role)}
+                                    size="md"
+                                    styles={{ body: { justifyContent: "center" } }}
+                                />
+                            </Grid.Col>
                         );
                     })}
-                </Group>
+                </Grid>
             ))}
-        </Box>
+        </Paper>
     );
 };
 
