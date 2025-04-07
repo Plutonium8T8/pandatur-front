@@ -13,7 +13,6 @@ import {
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
-import RolesComponent from "./Roles/RolesComponent";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
