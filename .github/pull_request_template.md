@@ -10,6 +10,8 @@
 
 <!-- Step-by-step instructions for how reviewers can verify these changes work as expected. -->
 
+## :📸 Relevant Screenshot
+
 ## 🔖 Further reading
 
 - [Trello task](link)
