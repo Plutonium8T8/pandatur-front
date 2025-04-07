@@ -12,7 +12,7 @@ import {
   FaCalendar,
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
-import { Badge, Image } from "@mantine/core";
+import { Badge, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { clearCookies } from "../../Components/utils/clearCookies";
 import { api } from "../../api";
@@ -51,20 +51,20 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
 
   return (
     <>
-      <Sidebar collapsed={isCollapsed} width="250px" backgroundColor="#1f2937">
+      <Sidebar collapsed={isCollapsed} backgroundColor="#1f2937">
         <Menu>
           <MenuItem
-            className="logo-menu"
-            component={<Link to="/leads" />}
-            icon={<Image src={LOGO} />}
-          >
-            PANDATUR CRM
-          </MenuItem>
-
-          <MenuItem
+            suffix={<FaBars />}
             onClick={() => setIsCollapsed((prev) => !prev)}
-            icon={<FaBars />}
-          />
+            className="logo-menu"
+            icon={isCollapsed && <FaBars />}
+          >
+            {!isCollapsed && (
+              <Flex ml="8px">
+                <img width="80px" height="100%" src={LOGO} alt="PANDATUR CRM" />
+              </Flex>
+            )}
+          </MenuItem>
 
           <MenuItem onClick={onOpenAccount} icon={<FaUser />}>
             {getLanguageByKey("Account")}
