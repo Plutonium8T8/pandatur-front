@@ -6,6 +6,6 @@
   /* TODO: Replace the hardcoded 90px width for the left sidebar with a dynamic calculation
            Reference: SideBar.js  
    */
-  width: calc(100% - 90px);
+  width: calc(100% - 250px);
   height: 100vh;
 }

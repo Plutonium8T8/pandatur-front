@@ -1,6 +1,6 @@
 .leads-header-container {
   position: fixed;
-  width: calc(100% - 90px);
+  width: calc(100% - 250px);
   background-color: #dfefd9f9;
   padding-inline: 20px;
   padding-block: 10px;
