@@ -1,4 +1,5 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
+import { FaFingerprint } from "react-icons/fa6";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
 import { priorityTagColors, parseServerDate } from "../../../utils";
@@ -40,9 +41,13 @@ export const ChatListItem = ({
             fallbackSrc={DEFAULT_PHOTO}
           />
           <div>
-            <Text>{chat.contact || "-"}</Text>
+            <Text>{chat.contact}</Text>
             <Flex gap="12">
-              <Text>{chat.id ? `#${chat.id}` : "-"}</Text>
+              <Flex align="center" gap="4">
+                <FaFingerprint />
+
+                <Text>{chat.id ? `${chat.id}` : "-"}</Text>
+              </Flex>
 
               <Divider orientation="vertical" />
               <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag>

@@ -21,7 +21,7 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
+const ChatList = ({ selectTicketId, setSelectTicketId }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(false);
@@ -109,7 +109,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
 
   return (
     <Box direction="column" w="20%" ref={chatListRef}>
-      <Flex direction="column" gap="xs" mb="xs" pl="24px" pr="16px">
+      <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
         <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
         <Checkbox
@@ -125,7 +125,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
       </Flex>
 
       <Divider />
-      <Box h="100%" ref={wrapperChatItemRef}>
+      <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
         <FixedSizeList
           height={wrapperChatHeight}
           itemCount={sortedTickets?.length || 0}
