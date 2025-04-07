@@ -1,6 +1,6 @@
 import { useLocalStorage } from "../hooks";
 
-const LANGUAGE_LOCAL_STORAGE_KEY = "PANDA_TUR_LANGUAGE";
+const LANGUAGE_LOCAL_STORAGE_KEY = "language";
 
 export const LANGUAGES = {
   RO: {
