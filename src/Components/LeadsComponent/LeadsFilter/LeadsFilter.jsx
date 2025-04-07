@@ -4,6 +4,7 @@ import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { IoMdAdd } from "react-icons/io";
 import { LuFilter } from "react-icons/lu";
 import { FaList } from "react-icons/fa6";
+import { useApp } from "../../../hooks";
 import { getLanguageByKey } from "../../utils";
 import "./LeadsFilter.css";
 import {
@@ -33,12 +34,14 @@ export const RefLeadsFilter = forwardRef(
     },
     ref,
   ) => {
+    const { isCollapsed } = useApp();
     return (
       <Flex
         ref={ref}
         justify="space-between"
         align="center"
         className="leads-header-container"
+        style={{ "--side-bar-width": isCollapsed ? "79px" : "249px" }}
       >
         <Flex align="center" gap="md">
           <Button

@@ -38,6 +38,7 @@ export const AppProvider = ({ children }) => {
   const [unreadMessages, setUnreadMessages] = useState(new Map());
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   useEffect(() => {
     let pingInterval;
@@ -434,6 +435,8 @@ export const AppProvider = ({ children }) => {
         socketRef,
         getClientMessagesSingle,
         spinnerTickets,
+        setIsCollapsed,
+        isCollapsed,
       }}
     >
       {children}

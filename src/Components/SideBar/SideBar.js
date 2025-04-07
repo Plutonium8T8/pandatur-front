@@ -25,9 +25,8 @@ const LOGO = "https://pandatur.md/themes/pandatur/siteimg/logo.png";
 
 export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
-  const { unreadCount } = useApp();
+  const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const [loading, setLoading] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const { toggleLanguage, selectedLanguage } = useLanguageToggle();
 
   const isActive = (page) => {
