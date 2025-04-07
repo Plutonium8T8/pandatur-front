@@ -13,11 +13,9 @@ import { useState, useEffect } from "react";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
+import { categories, actions } from "../../utils/permissionConstants";
 
 const language = localStorage.getItem("language") || "RO";
-
-const categories = ["CHAT", "LEAD", "DASHBOARD", "ACCOUNT", "NOTIFICATION", "TASK"];
-const actions = ["READ", "WRITE", "ADMIN"];
 
 const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const [groupName, setGroupName] = useState("");
@@ -26,7 +24,12 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
-        if (opened) fetchExistingGroups();
+        if (opened) {
+            fetchExistingGroups();
+        } else {
+            setGroupName("");
+            setSelectedRoles([]);
+        }
     }, [opened]);
 
     const fetchExistingGroups = async () => {
@@ -64,10 +67,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 translations["Grup de permisiuni creat cu succes"][language],
                 { variant: "success" }
             );
-            setGroupName("");
-            setSelectedRoles([]);
             fetchExistingGroups();
-            onClose();
         } catch (err) {
             enqueueSnackbar(
                 translations["Eroare la crearea grupului de permisiuni"][language],
@@ -78,10 +78,16 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const formatRoles = (roles) => {
         if (Array.isArray(roles)) return roles;
-        if (typeof roles === "object" && roles !== null) {
-            return Object.values(roles);
-        }
+        if (typeof roles === "object" && roles !== null) return Object.values(roles);
         return [];
+    };
+
+    const handleGroupClick = (group) => {
+        const rolesArray = formatRoles(group.roles)
+            .map((r) => r.replace(/^ROLE_/, ""))
+            .filter(Boolean);
+        setSelectedRoles(rolesArray);
+        setGroupName(group.permission_name);
     };
 
     return (
@@ -135,7 +141,24 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                         </Text>
                         <Stack spacing={4}>
                             {existingGroups.map((g) => (
-                                <Box key={g.permission_id}>
+                                <Box
+                                    key={g.permission_id}
+                                    onClick={() => handleGroupClick(g)}
+                                    style={{
+                                        cursor: "pointer",
+                                        padding: 8,
+                                        borderRadius: 4,
+                                        background: "#f8f9fa",
+                                        border: "1px solid #dee2e6",
+                                        transition: "background 0.2s",
+                                    }}
+                                    onMouseEnter={(e) =>
+                                        (e.currentTarget.style.background = "#f1f3f5")
+                                    }
+                                    onMouseLeave={(e) =>
+                                        (e.currentTarget.style.background = "#f8f9fa")
+                                    }
+                                >
                                     <Text fw={500}>{g.permission_name}</Text>
                                     <Text size="sm" c="dimmed">
                                         {formatRoles(g.roles).join(", ")}
