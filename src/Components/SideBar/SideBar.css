@@ -1,69 +1,25 @@
-.container-side-bar {
+.ps-sidebar-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #1f2937;
-  padding: 10px;
   color: white;
-  height: 100vh;
 }
 
-.menu-side-bar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.ps-sidebar-container .ps-menuitem-root .ps-menu-button {
+  transition: 0.3s ease;
 }
 
-.container-item-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.ps-sidebar-container .ps-menuitem-root .ps-menu-button:hover {
+  background-color: #131820;
+  transition: 0.3s ease;
 }
 
-.menu-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  cursor: pointer;
-  transition:
-    background-color 0.3s,
-    transform 0.3s;
-  border-radius: 8px;
-  width: 70px;
-  aspect-ratio: 1;
-  justify-content: center;
-}
-
-.menu-item span {
-  font-size: 12px;
-  margin-top: 5px;
-}
-
-.menu-item:hover {
-  background-color: #374151;
-  transform: scale(1.1);
-}
-
-.menu-item.active {
+.ps-sidebar-container .ps-menuitem-root .ps-active {
   background-color: #0f824c;
   color: white;
-  font-weight: bold;
-  transform: scale(1.15);
 }
 
-.unread-indicator {
-  display: inline-block;
-  background-color: red;
+.ps-sidebar-container .ps-menuitem-root .ps-active:hover {
+  background-color: #0f824c;
   color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 10px;
-  margin-top: 5px;
-  transition: border-radius 0.3s ease-in-out;
-}
-
-.language-toggle-button {
-  font-size: 32px;
 }
