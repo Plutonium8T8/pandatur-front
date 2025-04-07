@@ -83,10 +83,10 @@ const UsersComponent = () => {
             </Menu.Target>
             <Menu.Dropdown>
               <Menu.Item onClick={() => setEditGroupsOpen(true)}>
-                {translations["Editează grupurile"]?.[language]}
+                {translations["Editează grupurile"][language]}
               </Menu.Item>
               <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
-                {translations["Editează rolurile"]?.[language]}
+                {translations["Editează rolurile"][language]}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>
