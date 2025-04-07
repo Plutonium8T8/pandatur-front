@@ -47,7 +47,6 @@ export const AppProvider = ({ children }) => {
 
   const collapsed = () => {
     changeLocalStorage(storage === "true" ? "false" : "true");
-    // setIsCollapsed((prev) => !prev);
   };
 
   useEffect(() => {
