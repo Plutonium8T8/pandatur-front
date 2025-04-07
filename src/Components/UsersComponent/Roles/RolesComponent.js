@@ -21,7 +21,7 @@ const RolesComponent = ({ employee }) => {
       const data = await api.users.getById(employee.id)
       setRoles(data.roles)
     } catch (error) {
-      console.error("Ошибка загрузки ролей:", error.message)
+      console.error("error fetch roles:", error.message)
     }
   }, [employee.id])
 
@@ -37,7 +37,7 @@ const RolesComponent = ({ employee }) => {
       })
       fetchRoles()
     } catch (error) {
-      console.error(`Ошибка при добавлении роли "${role}":`, error)
+      console.error(`error add role "${role}":`, error)
     }
   }
 
@@ -49,7 +49,7 @@ const RolesComponent = ({ employee }) => {
       })
       fetchRoles()
     } catch (error) {
-      console.error(`Ошибка при удалении роли "${role}":`, error)
+      console.error(`error delete role "${role}":`, error)
     }
   }
 
