@@ -257,6 +257,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
               required
             />
           )}
+
           <TextInput
             type="email"
             label={translations["Email"][language]}
@@ -266,6 +267,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             autoComplete="off"
             required
           />
+
           <PasswordInput
             label={translations["password"][language]}
             placeholder={translations["password"][language]}
@@ -288,20 +290,25 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 onChange={(value) => setForm({ ...form, groups: value || "" })}
                 required
               />
-              <Select
-                label={translations["Grup permisiuni"][language]}
-                placeholder={translations["Alege grupul de permisiuni"][language]}
-                data={permissionGroups.map((g) => ({
-                  value: g.permission_id.toString(),
-                  label: g.permission_name,
-                }))}
-                value={form.permissionGroupId}
-                onChange={handleSelectPermissionGroup}
-              />
-              <RoleMatrix
-                selectedRoles={form.selectedRoles}
-                onToggle={toggleRole}
-              />
+
+              {initialUser && (
+                <>
+                  <Select
+                    label={translations["Grup permisiuni"][language]}
+                    placeholder={translations["Alege grupul de permisiuni"][language]}
+                    data={permissionGroups.map((g) => ({
+                      value: g.permission_id.toString(),
+                      label: g.permission_name,
+                    }))}
+                    value={form.permissionGroupId}
+                    onChange={handleSelectPermissionGroup}
+                  />
+                  <RoleMatrix
+                    selectedRoles={form.selectedRoles}
+                    onToggle={toggleRole}
+                  />
+                </>
+              )}
             </>
           )}
 
