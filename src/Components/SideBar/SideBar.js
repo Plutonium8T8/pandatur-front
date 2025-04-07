@@ -21,7 +21,7 @@ import { useApp, useLanguageToggle, LANGUAGES } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import "./SideBar.css";
 
-const LOGO = "https://pandatur.md/themes/pandatur/siteimg/logo.png";
+const LOGO = "/logo.png";
 
 export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
