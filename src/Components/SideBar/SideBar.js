@@ -12,7 +12,7 @@ import {
   FaCalendar,
 } from "react-icons/fa";
 import { FaUsers } from "react-icons/fa6";
-import { Badge } from "@mantine/core";
+import { Badge, Image } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { clearCookies } from "../../Components/utils/clearCookies";
 import { api } from "../../api";
@@ -20,6 +20,8 @@ import { LoadingOverlay } from "../LoadingOverlay";
 import { useApp, useLanguageToggle, LANGUAGES } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import "./SideBar.css";
+
+const LOGO = "https://pandatur.md/themes/pandatur/siteimg/logo.png";
 
 const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
@@ -50,6 +52,12 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
     <>
       <Sidebar backgroundColor="#1f2937">
         <Menu>
+          <MenuItem
+            component={<Link to="/leads" />}
+            icon={<Image src={LOGO} />}
+          >
+            PANDATUR CRM
+          </MenuItem>
           <MenuItem onClick={onOpenAccount} icon={<FaUser />}>
             {getLanguageByKey("Account")}
           </MenuItem>
