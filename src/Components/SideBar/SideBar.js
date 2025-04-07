@@ -17,8 +17,7 @@ import { Link } from "react-router-dom";
 import { clearCookies } from "../../Components/utils/clearCookies";
 import { api } from "../../api";
 import { LoadingOverlay } from "../LoadingOverlay";
-import { useApp } from "../../hooks";
-import LanguageToggle from "./LanguageToggle";
+import { useApp, useLanguageToggle, LANGUAGES } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import "./SideBar.css";
 
@@ -26,6 +25,7 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
   const location = useLocation();
   const { unreadCount } = useApp();
   const [loading, setLoading] = useState(false);
+  const { toggleLanguage, selectedLanguage } = useLanguageToggle();
 
   const isActive = (page) => {
     if (page === "chat") {
@@ -100,8 +100,11 @@ const CustomSidebar = ({ onOpenNotifications, onOpenAccount }) => {
           <MenuItem onClick={onOpenNotifications} icon={<FaBell />}>
             {getLanguageByKey("Notificări")[1]}
           </MenuItem>
-          <MenuItem>
-            <LanguageToggle />
+          <MenuItem
+            onClick={toggleLanguage}
+            icon={LANGUAGES[selectedLanguage].icon}
+          >
+            {LANGUAGES[selectedLanguage].label}
           </MenuItem>
         </Menu>
 
