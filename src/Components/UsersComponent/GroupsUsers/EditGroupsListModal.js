@@ -30,7 +30,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             const data = await api.user.getGroupsList();
             setGroups(data);
         } catch (err) {
-            console.error(translations["Eroare la încărcarea grupurilor"]?.[language] || "Eroare", err);
+            console.error(translations["Eroare la încărcarea grupurilor"][language], err);
         } finally {
             setLoading(false);
         }
@@ -44,7 +44,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 setGroups((prev) => [...prev, created]);
                 setNewGroup("");
             } catch (err) {
-                console.error(translations["Eroare la crearea grupului"]?.[language] || "Eroare", err);
+                console.error(translations["Eroare la crearea grupului"][language], err);
             }
         }
     };
@@ -55,7 +55,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 await api.user.deleteGroups(groupId);
                 setGroups((prev) => prev.filter((g) => g.id !== groupId));
             } catch (err) {
-                console.error(translations["Eroare la ștergerea grupului"]?.[language] || "Eroare", err);
+                console.error(translations["Eroare la ștergerea grupului"][language], err);
             }
         });
     };
@@ -70,18 +70,18 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         <Modal
             opened={opened}
             onClose={onClose}
-            title={translations["Editează grupurile"]?.[language]}
+            title={translations["Editează grupurile"][language]}
             size="md"
         >
             <Stack>
                 <Flex gap="sm" justify="space-between">
                     <TextInput
-                        placeholder={translations["Grup nou"]?.[language]}
+                        placeholder={translations["Grup nou"][language]}
                         value={newGroup}
                         onChange={(e) => setNewGroup(e.target.value)}
                     />
                     <Button onClick={handleAdd}>
-                        {translations["Adaugă"]?.[language]}
+                        {translations["Adaugă"][language]}
                     </Button>
                 </Flex>
 
