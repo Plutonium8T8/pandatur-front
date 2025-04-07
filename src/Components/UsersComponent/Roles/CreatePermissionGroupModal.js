@@ -42,7 +42,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             const data = await api.users.getAllPermissionGroups();
             setExistingGroups(data);
         } catch (error) {
-            enqueueSnackbar("Eroare la încărcarea grupurilor existente", {
+            enqueueSnackbar(
+                translations["Eroare la încărcarea grupurilor existente"][language], {
                 variant: "error",
             });
         }
