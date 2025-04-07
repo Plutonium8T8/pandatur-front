@@ -6,3 +6,5 @@ export * from "./useApp";
 export * from "./useGetTechniciansList";
 export * from "./useConfirmPopup";
 export * from "./useFormTicket";
+export * from "./useLanguageToggle";
+export * from "./useLocalStorage";

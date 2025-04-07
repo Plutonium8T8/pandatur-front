@@ -3,9 +3,7 @@
 }
 
 .page-content {
-  /* TODO: Replace the hardcoded 90px width for the left sidebar with a dynamic calculation
-           Reference: SideBar.js  
-   */
-  width: calc(100% - 90px);
   height: 100vh;
+  width: calc(100% - var(--side-bar-width));
+  overflow: hidden;
 }
