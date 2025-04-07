@@ -1,4 +1,3 @@
-// импорт доп. API
 import { useEffect, useState } from "react";
 import {
   Button,
@@ -15,6 +14,7 @@ import {
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RolesComponent from "./Roles/RolesComponent";
+import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 
@@ -30,6 +30,13 @@ const initialFormState = {
   status: false,
   groups: "",
   permissionGroupId: null,
+  selectedRoles: [],
+};
+
+const formatRoles = (roles) => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === "object" && roles !== null) return Object.values(roles);
+  return [];
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
@@ -42,18 +49,17 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   useEffect(() => {
     if (initialUser) {
       setForm({
+        ...initialFormState,
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
         email: initialUser.email || "",
-        password: "",
         job_title: initialUser.job_title || initialUser.jobTitle || "",
         status: Boolean(initialUser.status),
         groups:
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
-        permissionGroupId: null,
       });
     } else {
       setForm(initialFormState);
@@ -80,6 +86,29 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     if (opened) fetchGroups();
   }, [opened]);
 
+  const handleSelectPermissionGroup = (permissionGroupId) => {
+    const selected = permissionGroups.find(
+      (g) => g.permission_id.toString() === permissionGroupId
+    );
+    const roles = formatRoles(selected?.roles)
+      .map((r) => r.replace(/^ROLE_/, ""))
+      .filter(Boolean);
+    setForm((prev) => ({
+      ...prev,
+      permissionGroupId,
+      selectedRoles: roles,
+    }));
+  };
+
+  const toggleRole = (role) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedRoles: prev.selectedRoles.includes(role)
+        ? prev.selectedRoles.filter((r) => r !== role)
+        : [...prev.selectedRoles, role],
+    }));
+  };
+
   const handleCreate = async () => {
     const {
       name,
@@ -94,19 +123,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     } = form;
 
     if (!initialUser) {
-      if (
-        !name ||
-        !surname ||
-        !username ||
-        !email ||
-        !password ||
-        !job_title ||
-        !groups
-      ) {
-        enqueueSnackbar(
-          translations["Completați toate câmpurile obligatorii"][language],
-          { variant: "warning" }
-        );
+      if (!name || !surname || !username || !email || !password || !job_title || !groups) {
+        enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
+          variant: "warning",
+        });
         return;
       }
     }
@@ -139,10 +159,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           await api.users.assignPermissionToUser(permissionGroupId, userId);
         }
 
-        enqueueSnackbar(
-          translations["Utilizator actualizat cu succes"][language],
-          { variant: "success" }
-        );
+        enqueueSnackbar(translations["Utilizator actualizat cu succes"][language], {
+          variant: "success",
+        });
       } else {
         const payload = {
           user: {
@@ -171,10 +190,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           );
         }
 
-        enqueueSnackbar(
-          translations["Utilizator creat cu succes"][language],
-          { variant: "success" }
-        );
+        enqueueSnackbar(translations["Utilizator creat cu succes"][language], {
+          variant: "success",
+        });
       }
 
       setForm(initialFormState);
@@ -240,7 +258,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
               required
             />
           )}
-
           <TextInput
             type="email"
             label={translations["Email"][language]}
@@ -250,7 +267,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             autoComplete="off"
             required
           />
-
           <PasswordInput
             label={translations["password"][language]}
             placeholder={translations["password"][language]}
@@ -269,17 +285,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 label={translations["Grup utilizator"][language]}
                 placeholder={translations["Alege grupul"][language]}
                 data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
-                value={
-                  groupsList.map((g) => g.name).includes(form.groups)
-                    ? form.groups
-                    : null
-                }
-                onChange={(value) =>
-                  setForm({ ...form, groups: value || "" })
-                }
+                value={form.groups}
+                onChange={(value) => setForm({ ...form, groups: value || "" })}
                 required
               />
-
               <Select
                 label={translations["Grup permisiuni"][language]}
                 placeholder={translations["Alege grupul de permisiuni"][language]}
@@ -288,29 +297,21 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                   label: g.permission_name,
                 }))}
                 value={form.permissionGroupId}
-                onChange={(value) =>
-                  setForm({ ...form, permissionGroupId: value })
-                }
+                onChange={handleSelectPermissionGroup}
+              />
+              <RoleMatrix
+                selectedRoles={form.selectedRoles}
+                onToggle={toggleRole}
               />
             </>
           )}
 
           <TextInput
             label={translations["Funcție"][language]}
-            placeholder={translations["Funcție"][language]}
             value={form.job_title}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
             required
           />
-
-          {initialUser && (
-            <RolesComponent
-              employee={{
-                id: initialUser.id?.user?.id || initialUser.id,
-                name: initialUser.name,
-              }}
-            />
-          )}
 
           <Button fullWidth mt="sm" onClick={handleCreate}>
             {initialUser
