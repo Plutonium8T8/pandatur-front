@@ -60,11 +60,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <Button
-              leftSection={<IoMdAdd size={16} />}
-              className="task-add-button"
-              onClick={openNewTask}
-            >
+            <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}
             </Button>
           </>
