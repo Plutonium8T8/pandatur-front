@@ -150,14 +150,12 @@ export const Logs = ({ logList }) => {
   ];
 
   return (
-    <div style={{ overflow: "scroll", height: "100%" }}>
-      <RcTable
-        bordered
-        rowKey="id"
-        columns={rcColumn}
-        column={rcColumn}
-        data={logList}
-      />
-    </div>
+    <RcTable
+      bordered
+      rowKey="id"
+      columns={rcColumn}
+      column={rcColumn}
+      data={logList}
+    />
   );
 };

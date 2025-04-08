@@ -47,7 +47,7 @@ export const Logs = () => {
         <>
           <LogsComponent logList={logList} />
 
-          <Flex justify="center">
+          <Flex pt="20" justify="center">
             <Pagination
               total={pagination.totalPages}
               value={pagination.currentPage}
