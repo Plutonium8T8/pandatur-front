@@ -1,25 +1,25 @@
-import { useState, useEffect } from "react"
-import { api } from "../../api"
-import { enqueueSnackbar } from "notistack"
-import { showServerError, getLanguageByKey } from "../utils"
-import { Table } from "../Table"
-import { cleanValue } from "../utils"
-import { parseUserAgent } from "./utils"
-import { SpinnerRightBottom } from "../SpinnerRightBottom"
-import { Tag } from "../Tag"
-import { WorkflowTag } from "../WorkflowTag"
+import { useState, useEffect } from "react";
+import { api } from "../../api";
+import { enqueueSnackbar } from "notistack";
+import { showServerError, getLanguageByKey } from "../utils";
+import { Table } from "../Table";
+import { cleanValue } from "../utils";
+import { parseUserAgent } from "./utils";
+import { SpinnerRightBottom } from "../SpinnerRightBottom";
+import { Tag } from "../Tag";
+import { WorkflowTag } from "../Workflow/components";
 
 export const Logs = () => {
-  const [logList, setLogList] = useState([])
-  const [pagination, setPagination] = useState()
-  const [loading, setLoading] = useState(false)
+  const [logList, setLogList] = useState([]);
+  const [pagination, setPagination] = useState();
+  const [loading, setLoading] = useState(false);
 
   const columns = [
     {
       accessorKey: "id",
       header: () => <div className="text-center">ID</div>,
       accessorFn: ({ id }) => id,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
     {
       accessorKey: "user_identifier",
@@ -29,7 +29,7 @@ export const Logs = () => {
         </div>
       ),
       accessorFn: ({ user_identifier }) => user_identifier,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
     {
       accessorKey: "user_id",
@@ -39,7 +39,7 @@ export const Logs = () => {
         </div>
       ),
       accessorFn: ({ user_id }) => user_id,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
     {
       accessorKey: "activity_type",
@@ -47,7 +47,7 @@ export const Logs = () => {
         <div className="text-center">{getLanguageByKey("Tip activitate")}</div>
       ),
       accessorFn: ({ activity_type }) => activity_type,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
     {
       accessorKey: "ip_address",
@@ -55,7 +55,7 @@ export const Logs = () => {
         <div className="text-center">{getLanguageByKey("Adresă IP")}</div>
       ),
       accessorFn: ({ ip_address }) => ip_address,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
     {
       accessorKey: "timestamp",
@@ -65,7 +65,7 @@ export const Logs = () => {
         </div>
       ),
       accessorFn: ({ timestamp }) => timestamp,
-      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>
+      cell: ({ getValue }) => <div className="text-center">{getValue()}</div>,
     },
 
     {
@@ -76,7 +76,7 @@ export const Logs = () => {
         </div>
       ),
       accessorFn: ({ user_agent }) => user_agent,
-      cell: ({ getValue }) => cleanValue(parseUserAgent(getValue()).trim())
+      cell: ({ getValue }) => cleanValue(parseUserAgent(getValue()).trim()),
     },
     {
       accessorKey: "ticketID",
@@ -88,7 +88,7 @@ export const Logs = () => {
       accessorFn: ({ additional_data }) => additional_data?.ticket?.id,
       cell: ({ getValue }) => (
         <div className="text-center">{cleanValue(getValue())}</div>
-      )
+      ),
     },
     {
       accessorKey: "additional_data",
@@ -97,13 +97,13 @@ export const Logs = () => {
       ),
       accessorFn: ({ additional_data }) => additional_data?.data?.workflow,
       cell: ({ getValue }) => {
-        const value = getValue()
+        const value = getValue();
         return (
           <div className="text-center">
             {value ? <WorkflowTag type={value} /> : cleanValue()}
           </div>
-        )
-      }
+        );
+      },
     },
     {
       accessorKey: "creation_date",
@@ -114,7 +114,7 @@ export const Logs = () => {
         additional_data?.ticket?.creation_date,
       cell: ({ getValue }) => (
         <div className="text-center">{cleanValue(getValue())}</div>
-      )
+      ),
     },
     {
       accessorKey: "last_interaction_date",
@@ -127,7 +127,7 @@ export const Logs = () => {
         additional_data?.ticket?.last_interaction_date,
       cell: ({ getValue }) => (
         <div className="text-center">{cleanValue(getValue())}</div>
-      )
+      ),
     },
     {
       accessorKey: "status",
@@ -138,7 +138,7 @@ export const Logs = () => {
       ),
       accessorFn: ({ additional_data }) => additional_data?.ticket?.status,
       cell: ({ getValue }) => {
-        const value = getValue()
+        const value = getValue();
         return (
           <div className="text-center">
             {typeof value === "boolean" ? (
@@ -149,8 +149,8 @@ export const Logs = () => {
               cleanValue(value)
             )}
           </div>
-        )
-      }
+        );
+      },
     },
     {
       accessorKey: "priority",
@@ -160,31 +160,31 @@ export const Logs = () => {
       accessorFn: ({ additional_data }) => additional_data?.ticket?.priority,
       cell: ({ getValue }) => (
         <div className="text-center">{cleanValue(getValue())}</div>
-      )
-    }
-  ]
+      ),
+    },
+  ];
 
   useEffect(() => {
     const getLogList = async () => {
-      setLoading(true)
+      setLoading(true);
       try {
-        const logs = await api.activity.getLogs()
-        setLogList(logs.data)
+        const logs = await api.activity.getLogs();
+        setLogList(logs.data);
         setPagination({
           totalPages: logs.meta.totalPages,
-          currentPage: logs.meta.currentPage
-        })
+          currentPage: logs.meta.currentPage,
+        });
       } catch (error) {
-        enqueueSnackbar(showServerError(error), { variant: "error" })
+        enqueueSnackbar(showServerError(error), { variant: "error" });
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
-    getLogList()
-  }, [pagination?.currentPage])
+    };
+    getLogList();
+  }, [pagination?.currentPage]);
 
   if (loading) {
-    return <SpinnerRightBottom />
+    return <SpinnerRightBottom />;
   }
 
   return (
@@ -194,8 +194,8 @@ export const Logs = () => {
       pagination={{
         ...pagination,
         onPaginationChange: (page) =>
-          setPagination((prev) => ({ ...prev, currentPage: page }))
+          setPagination((prev) => ({ ...prev, currentPage: page })),
       }}
     />
-  )
-}
+  );
+};

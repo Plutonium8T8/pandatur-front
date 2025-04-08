@@ -1765,15 +1765,15 @@ export const translations = {
   },
   photo_or_video: {
     RO: "Foto sau video",
-    RU: "Фото или видео"
+    RU: "Фото или видео",
   },
   file_upload_failed: {
     RO: "Fișierul nu a fost încărcat. Vă rugăm să încercați din nou",
-    RU: "Файл не удалось загрузить. Пожалуйста, попробуйте снова"
+    RU: "Файл не удалось загрузить. Пожалуйста, попробуйте снова",
   },
   select_message_template: {
     RO: "Selectează un template de mesaj",
-    RU: "Выберите шаблон сообщения"
+    RU: "Выберите шаблон сообщения",
   },
   schedules: {
     RO: "Calendar",
@@ -1829,90 +1829,94 @@ export const translations = {
   },
   "Fără intervale": {
     RO: "Fără intervale",
-    RU: "Без интервалов"
+    RU: "Без интервалов",
   },
   "Editează grupurile": {
     RO: "Editează grupurile",
-    RU: "Редактировать группы"
+    RU: "Редактировать группы",
   },
   "Grup nou": {
     RO: "Grup nou",
-    RU: "Новая группа"
+    RU: "Новая группа",
   },
-  "Adaugă": {
+  Adaugă: {
     RO: "Adaugă",
-    RU: "Добавить"
+    RU: "Добавить",
   },
   "Eroare la încărcarea grupurilor": {
     RO: "Eroare la încărcarea grupurilor",
-    RU: "Ошибка при загрузке групп"
+    RU: "Ошибка при загрузке групп",
   },
   "Eroare la crearea grupului": {
     RO: "Eroare la crearea grupului",
-    RU: "Ошибка при создании группы"
+    RU: "Ошибка при создании группы",
   },
   "Eroare la ștergerea grupului": {
     RO: "Eroare la ștergerea grupului",
-    RU: "Ошибка при удалении группы"
+    RU: "Ошибка при удалении группы",
   },
   "Editează rolurile": {
-    "RO": "Editează rolurile",
-    "RU": "Редактировать роли"
+    RO: "Editează rolurile",
+    RU: "Редактировать роли",
   },
   "Creează grup de permisiuni": {
-    "RO": "Creează grup de permisiuni",
-    "RU": "Создать группу разрешений"
+    RO: "Creează grup de permisiuni",
+    RU: "Создать группу разрешений",
   },
   "Selectați permisiunile": {
-    "RO": "Selectați permisiunile",
-    "RU": "Выберите разрешения"
+    RO: "Selectați permisiunile",
+    RU: "Выберите разрешения",
   },
   "Grup de permisiuni creat cu succes": {
-    "RO": "Grup de permisiuni creat cu succes",
-    "RU": "Группа разрешений успешно создана"
+    RO: "Grup de permisiuni creat cu succes",
+    RU: "Группа разрешений успешно создана",
   },
   "Eroare la crearea grupului de permisiuni": {
-    "RO": "Eroare la crearea grupului de permisiuni",
-    "RU": "Ошибка при создании группы разрешений"
+    RO: "Eroare la crearea grupului de permisiuni",
+    RU: "Ошибка при создании группы разрешений",
   },
   "Grupuri existente": {
-    "RO": "Grupuri existente",
-    "RU": "Существующие группы"
+    RO: "Grupuri existente",
+    RU: "Существующие группы",
   },
   "Grup permisiuni": {
-    "RO": "Grup permisiuni",
-    "RU": "Группа разрешений"
+    RO: "Grup permisiuni",
+    RU: "Группа разрешений",
   },
   "Alege grupul de permisiuni": {
-    "RO": "Alege grupul de permisiuni",
-    "RU": "Выберите группу разрешений"
+    RO: "Alege grupul de permisiuni",
+    RU: "Выберите группу разрешений",
   },
   "Grup de permisiuni actualizat cu succes": {
-    "RO": "Grup de permisiuni actualizat cu succes",
-    "RU": "Группа разрешений успешно обновлена"
+    RO: "Grup de permisiuni actualizat cu succes",
+    RU: "Группа разрешений успешно обновлена",
   },
   "Eroare la salvarea grupului de permisiuni": {
-    "RO": "Eroare la salvarea grupului de permisiuni",
-    "RU": "Ошибка при сохранении группы разрешений"
+    RO: "Eroare la salvarea grupului de permisiuni",
+    RU: "Ошибка при сохранении группы разрешений",
   },
   "Grup șters cu succes": {
-    "RO": "Grup șters cu succes",
-    "RU": "Группа успешно удалена"
+    RO: "Grup șters cu succes",
+    RU: "Группа успешно удалена",
   },
   "Editează grup de permisiuni": {
-    "RO": "Editează grup de permisiuni",
-    "RU": "Редактировать группу разрешений"
+    RO: "Editează grup de permisiuni",
+    RU: "Редактировать группу разрешений",
   },
   "Salvează modificările": {
-    "RO": "Salvează modificările",
-    "RU": "Сохранить изменения"
+    RO: "Salvează modificările",
+    RU: "Сохранить изменения",
   },
   "Șterge grupul": {
-    "RO": "Șterge grupul",
-    "RU": "Удалить группу"
+    RO: "Șterge grupul",
+    RU: "Удалить группу",
   },
   "Eroare la încărcarea grupurilor existente": {
-    "RO": "Eroare la încărcarea grupurilor existente",
-    "RU": "Ошибка при загрузке существующих групп"
-  }
+    RO: "Eroare la încărcarea grupurilor existente",
+    RU: "Ошибка при загрузке существующих групп",
+  },
+  logs: {
+    RO: "Loguri",
+    RU: "Логи",
+  },
 };
