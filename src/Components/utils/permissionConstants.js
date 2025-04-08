@@ -1,12 +1,11 @@
 export const categories = [
     "USERS",
-    "CHAT",
-    "LEAD",
     "DASHBOARD",
-    "ACCOUNT",
-    "NOTIFICATION",
+    "LEAD",
+    "CHAT",
     "TASK",
     "CALENDAR",
+    "NOTIFICATION"
 ];
 
 export const actions = ["CREATE", "VIEW", "EDIT", "DELETE"];
