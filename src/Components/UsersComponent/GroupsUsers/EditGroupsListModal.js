@@ -103,9 +103,17 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 user_ids: current.user_ids.map(Number),
             });
 
-            enqueueSnackbar(translations["Grup actualizat cu succes"][language], { variant: "success" });
+            enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
+                variant: "success"
+            });
+
+            fetchGroups();
+
         } catch (err) {
-            enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], { variant: "error" });
+            console.error("Update error:", err);
+            enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
+                variant: "error"
+            });
         }
     };
 

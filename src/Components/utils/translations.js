@@ -1938,5 +1938,9 @@ export const translations = {
   "Sigur doriți să ștergeți acest grup?": {
     RO: "Sigur doriți să ștergeți acest grup?",
     RU: "Вы уверены, что хотите удалить эту группу?",
+  },
+  "Grup actualizat cu succes": {
+    RO: "Grup actualizat cu succes",
+    RU: "Группа успешно обновлена"
   }
 };
