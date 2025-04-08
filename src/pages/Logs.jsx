@@ -1,4 +1,4 @@
-import { Box, Flex } from "@mantine/core";
+import { Box, Flex, Pagination } from "@mantine/core";
 import { enqueueSnackbar } from "notistack";
 import { useState, useEffect } from "react";
 import { Logs as LogsComponent, PageHeader, Spin } from "../Components";
@@ -7,7 +7,9 @@ import { api } from "../api";
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);
-  const [pagination, setPagination] = useState();
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+  });
   const [loading, setLoading] = useState(false);
   const [totalItems, setTotalItems] = useState(0);
 
@@ -15,7 +17,9 @@ export const Logs = () => {
     const getLogList = async () => {
       setLoading(true);
       try {
-        const logs = await api.activity.getLogs();
+        const logs = await api.activity.getLogs({
+          page: pagination.currentPage,
+        });
         setLogList(logs.data);
         setTotalItems(logs.meta.totalItems);
         setPagination({
@@ -29,10 +33,10 @@ export const Logs = () => {
       }
     };
     getLogList();
-  }, [pagination?.currentPage]);
+  }, [pagination.currentPage]);
 
   return (
-    <Box h="calc(100% - (32px + 33px))" p="20px">
+    <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
       <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
 
       {loading ? (
@@ -40,7 +44,19 @@ export const Logs = () => {
           <Spin />
         </Flex>
       ) : (
-        <LogsComponent logList={logList} />
+        <>
+          <LogsComponent logList={logList} />
+
+          <Flex justify="center">
+            <Pagination
+              total={pagination.totalPages}
+              value={pagination.currentPage}
+              onChange={(page) =>
+                setPagination((prev) => ({ ...prev, currentPage: page }))
+              }
+            />
+          </Flex>
+        </>
       )}
     </Box>
   );
