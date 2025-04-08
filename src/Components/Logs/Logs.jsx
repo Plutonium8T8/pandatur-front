@@ -1,19 +1,11 @@
-import { useState, useEffect } from "react";
-import { api } from "../../api";
-import { enqueueSnackbar } from "notistack";
-import { showServerError, getLanguageByKey } from "../utils";
+import { getLanguageByKey } from "../utils";
 import { Table } from "../Table";
 import { cleanValue } from "../utils";
 import { parseUserAgent } from "./utils";
-import { SpinnerRightBottom } from "../SpinnerRightBottom";
 import { Tag } from "../Tag";
 import { WorkflowTag } from "../Workflow/components";
 
-export const Logs = () => {
-  const [logList, setLogList] = useState([]);
-  const [pagination, setPagination] = useState();
-  const [loading, setLoading] = useState(false);
-
+export const Logs = ({ logList }) => {
   const columns = [
     {
       accessorKey: "id",
@@ -164,38 +156,9 @@ export const Logs = () => {
     },
   ];
 
-  useEffect(() => {
-    const getLogList = async () => {
-      setLoading(true);
-      try {
-        const logs = await api.activity.getLogs();
-        setLogList(logs.data);
-        setPagination({
-          totalPages: logs.meta.totalPages,
-          currentPage: logs.meta.currentPage,
-        });
-      } catch (error) {
-        enqueueSnackbar(showServerError(error), { variant: "error" });
-      } finally {
-        setLoading(false);
-      }
-    };
-    getLogList();
-  }, [pagination?.currentPage]);
-
-  if (loading) {
-    return <SpinnerRightBottom />;
-  }
-
   return (
-    <Table
-      columns={columns}
-      data={logList}
-      pagination={{
-        ...pagination,
-        onPaginationChange: (page) =>
-          setPagination((prev) => ({ ...prev, currentPage: page })),
-      }}
-    />
+    <div style={{ overflow: "scroll", height: "100%" }}>
+      <Table columns={columns} data={logList} />
+    </div>
   );
 };

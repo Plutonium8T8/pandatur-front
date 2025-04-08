@@ -2,22 +2,22 @@
  * DEPRECATED
  * This table component is deprecated and will be removed
  */
-import { HeaderCell } from "./HeaderCell"
-import { RowCell } from "./RowCell"
+import { HeaderCell } from "./HeaderCell";
+import { RowCell } from "./RowCell";
 import {
   useReactTable,
   getCoreRowModel,
-  flexRender
-} from "@tanstack/react-table"
-import "./Table.css"
-import { Empty } from "../Empty"
+  flexRender,
+} from "@tanstack/react-table";
+import "./Table.css";
+import { Empty } from "../Empty";
 
-export const Table = ({ data, columns, loading, select, pagination }) => {
+export const Table = ({ data, columns, loading, select }) => {
   const { getHeaderGroups, getRowModel } = useReactTable({
     data,
     columns,
-    getCoreRowModel: getCoreRowModel()
-  })
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return (
     <div style={{ overflowX: "scroll" }}>
@@ -29,7 +29,7 @@ export const Table = ({ data, columns, loading, select, pagination }) => {
                 <HeaderCell key={i}>
                   {flexRender(
                     header.column.columnDef.header,
-                    header.getContext()
+                    header.getContext(),
                   )}
                 </HeaderCell>
               ))}
@@ -49,12 +49,12 @@ export const Table = ({ data, columns, loading, select, pagination }) => {
                     <RowCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </RowCell>
                   ))}
                 </tr>
-              )
+              );
             })
           ) : (
             <tr>
@@ -66,5 +66,5 @@ export const Table = ({ data, columns, loading, select, pagination }) => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
