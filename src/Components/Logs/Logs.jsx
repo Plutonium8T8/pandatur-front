@@ -1,6 +1,5 @@
-import { getLanguageByKey } from "../utils";
 import { Text, Box } from "@mantine/core";
-import { cleanValue, priorityTagColors } from "../utils";
+import { cleanValue, priorityTagColors, getLanguageByKey } from "../utils";
 import { Tag } from "../Tag";
 import { WorkflowTag } from "../Workflow/components";
 import { RcTable } from "../RcTable";
@@ -49,7 +48,6 @@ export const Logs = ({ logList }) => {
       title: getLanguageByKey("Data și ora log-ului"),
       dataIndex: "timestamp",
       align: "center",
-      render: (date) => date,
     },
     {
       width: 300,
