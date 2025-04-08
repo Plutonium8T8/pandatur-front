@@ -8,7 +8,7 @@ export const PageHeader = ({ title, count, extraInfo, ...props }) => {
           {title}
         </Text>
 
-        {count && (
+        {!!count && (
           <Badge size="lg" bg="#0f824c">
             {count}
           </Badge>
