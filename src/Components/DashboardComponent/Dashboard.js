@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { format } from "date-fns"
-import { useSnackbar } from "notistack"
-import GridLayout from "react-grid-layout"
-import "react-grid-layout/css/styles.css"
-import "react-resizable/css/styles.css"
-import "react-grid-layout/css/styles.css"
-import "react-resizable/css/styles.css"
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { format } from "date-fns";
+import { useSnackbar } from "notistack";
+import GridLayout from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -17,24 +17,25 @@ import {
   PointElement,
   LineElement,
   ArcElement,
-  RadialLinearScale
-} from "chart.js"
-import { Flex, Title as MantineTitle, Box } from "@mantine/core"
-import { useUser } from "../../hooks"
-import { api } from "../../api"
-import { Filter } from "./Filter"
+  RadialLinearScale,
+} from "chart.js";
+import { Flex } from "@mantine/core";
+import { useUser } from "../../hooks";
+import { api } from "../../api";
+import { Filter } from "./Filter";
 import {
   chartsMetadata,
   metricsDashboardCharts,
   normalizeUserGraphs,
   renderChart,
   chartComponents,
-  getLastItemId
-} from "./utils"
-import { showServerError, getLanguageByKey } from "../utils"
-import "./Dashboard.css"
-import { ISO_DATE } from "../../app-constants"
-import { Spin } from "../Spin"
+  getLastItemId,
+} from "./utils";
+import { showServerError, getLanguageByKey } from "../utils";
+import "./Dashboard.css";
+import { ISO_DATE } from "../../app-constants";
+import { Spin } from "../Spin";
+import { PageHeader } from "../PageHeader";
 
 ChartJS.register(
   CategoryScale,
@@ -46,106 +47,104 @@ ChartJS.register(
   PointElement,
   LineElement,
   ArcElement,
-  RadialLinearScale
-)
+  RadialLinearScale,
+);
 
-const THRESHOLD = 47
+const THRESHOLD = 47;
 
 const Dashboard = () => {
-  const [statistics, setStatistics] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [containerWidth, setContainerWidth] = useState(0)
-  const [selectedTechnicians, setSelectedTechnicians] = useState([])
-  const [layout, setLayout] = useState([])
-  const [dateRange, setDateRange] = useState([])
-  const { userId } = useUser()
-  const { enqueueSnackbar } = useSnackbar()
+  const [statistics, setStatistics] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [selectedTechnicians, setSelectedTechnicians] = useState([]);
+  const [layout, setLayout] = useState([]);
+  const [dateRange, setDateRange] = useState([]);
+  const { userId } = useUser();
+  const { enqueueSnackbar } = useSnackbar();
 
   const fetchStatistics = useCallback(async ({ dateRange, technicianId }) => {
-    setIsLoading(true)
-    const [start, end] = dateRange
+    setIsLoading(true);
+    const [start, end] = dateRange;
     try {
       const statsData = await api.dashboard.statistics(
         {
           start_date: start ? format(start, ISO_DATE) : null,
           end_date: end ? format(end, ISO_DATE) : null,
-          technician_id: technicianId
+          technician_id: technicianId,
         },
-        userId
-      )
+        userId,
+      );
 
-      const { user_graphs, ...charts } = statsData
+      const { user_graphs, ...charts } = statsData;
 
-      setLayout(normalizeUserGraphs(user_graphs))
-      setStatistics(charts)
+      setLayout(normalizeUserGraphs(user_graphs));
+      setStatistics(charts);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
   const changeGraphPosition = async (id, graphPositions) => {
     try {
       await api.dashboard.updateGraphById(id, {
         user_id: userId,
-        ...graphPositions
-      })
+        ...graphPositions,
+      });
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" })
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }
+  };
 
   const updateGraph = (movedGraph) => {
-    const chartId = layout.find(({ i }) => i === movedGraph.i)?.i
+    const chartId = layout.find(({ i }) => i === movedGraph.i)?.i;
 
     if (chartId) {
       changeGraphPosition(chartId, {
         x: movedGraph.x,
         y: movedGraph.y,
         w: movedGraph.w,
-        h: movedGraph.h
-      })
+        h: movedGraph.h,
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    const [start, end] = dateRange
+    const [start, end] = dateRange;
     if (!!start !== !!end) {
-      return
+      return;
     }
 
     fetchStatistics({
       dateRange,
-      technicianId: getLastItemId(selectedTechnicians)
-    })
-  }, [fetchStatistics, dateRange, selectedTechnicians])
+      technicianId: getLastItemId(selectedTechnicians),
+    });
+  }, [fetchStatistics, dateRange, selectedTechnicians]);
 
   useEffect(() => {
     const updateContainerDimensions = () => {
-      const container = document.querySelector(".page-content")
+      const container = document.querySelector(".page-content");
       if (container) {
-        setContainerWidth(container.offsetWidth - THRESHOLD)
+        setContainerWidth(container.offsetWidth - THRESHOLD);
       }
-    }
-    updateContainerDimensions()
-    window.addEventListener("resize", updateContainerDimensions)
-    return () => window.removeEventListener("resize", updateContainerDimensions)
-  }, [])
+    };
+    updateContainerDimensions();
+    window.addEventListener("resize", updateContainerDimensions);
+    return () =>
+      window.removeEventListener("resize", updateContainerDimensions);
+  }, []);
 
   const { cols, rowHeight } = useMemo(() => {
-    const cols = containerWidth > 1400 ? 6 : 4
-    const rowHeight = containerWidth / cols + 50
+    const cols = containerWidth > 1400 ? 6 : 4;
+    const rowHeight = containerWidth / cols + 50;
 
-    return { cols, rowHeight }
-  }, [containerWidth])
+    return { cols, rowHeight };
+  }, [containerWidth]);
 
   return (
     <div className="dashboard-container-wrapper">
-      <Box mb="16">
-        <MantineTitle order={2}>{getLanguageByKey("Dashboard")}</MantineTitle>
-      </Box>
-      <div className="dashboard-divider" />
+      <PageHeader title={getLanguageByKey("Dashboard")} />
 
       <Filter
         onSelectedTechnicians={setSelectedTechnicians}
@@ -173,27 +172,27 @@ const Dashboard = () => {
           onDragStop={(_, __, movedGraph) => updateGraph(movedGraph)}
         >
           {layout.map((graph) => {
-            const { label } = metricsDashboardCharts[graph.graphName]
-            const ChartComponent = chartComponents[graph.type]
-            const graphValue = statistics[graph.graphName].data
+            const { label } = metricsDashboardCharts[graph.graphName];
+            const ChartComponent = chartComponents[graph.type];
+            const graphValue = statistics[graph.graphName].data;
 
             if (graphValue?.length) {
-              const chartData = chartsMetadata(graphValue, label, graph.type)
+              const chartData = chartsMetadata(graphValue, label, graph.type);
 
               return renderChart({
                 Component: ChartComponent,
                 chartData,
                 chartLabel: label,
-                index: graph.i
-              })
+                index: graph.i,
+              });
             }
 
-            return null
+            return null;
           })}
         </GridLayout>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
