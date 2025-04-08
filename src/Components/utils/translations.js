@@ -1927,4 +1927,8 @@ export const translations = {
     RO: "Ultima interacțiune ticket",
     RU: "Последняя активность тикета",
   },
+  filter_by_group: {
+    RO: "Filtrare după grup lead",
+    RU: "Последнее взаимодействие",
+  },
 };

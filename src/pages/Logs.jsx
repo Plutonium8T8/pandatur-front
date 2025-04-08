@@ -10,7 +10,7 @@ export const Logs = () => {
   const [pagination, setPagination] = useState({
     currentPage: 1,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {

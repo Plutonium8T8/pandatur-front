@@ -149,13 +149,5 @@ export const Logs = ({ logList }) => {
     },
   ];
 
-  return (
-    <RcTable
-      bordered
-      rowKey="id"
-      columns={rcColumn}
-      column={rcColumn}
-      data={logList}
-    />
-  );
+  return <RcTable bordered rowKey="id" columns={rcColumn} data={logList} />;
 };
