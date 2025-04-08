@@ -1919,4 +1919,12 @@ export const translations = {
     RO: "Loguri",
     RU: "Логи",
   },
+  created_at_ticket: {
+    RO: "Data de creare ticket",
+    RU: "Дата создания тикета",
+  },
+  last_ticket_interaction: {
+    RO: "Ultima interacțiune ticket",
+    RU: "Последняя активность тикета",
+  },
 };
