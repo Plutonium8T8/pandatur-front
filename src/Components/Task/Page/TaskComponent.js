@@ -55,6 +55,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
         extraInfo={
           <>
             <Input
+              className="min-w-300"
               type="text"
               placeholder={translations["Cautare"][language]}
               value={searchQuery}

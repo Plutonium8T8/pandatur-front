@@ -96,6 +96,7 @@ const UsersComponent = () => {
               </Menu.Dropdown>
             </Menu>
             <TextInput
+              className="min-w-300"
               placeholder={translations["Căutare utilizator"][language]}
               value={search}
               onChange={(e) => setSearch(e.target.value)}

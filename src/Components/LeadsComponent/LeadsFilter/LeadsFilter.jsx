@@ -82,7 +82,7 @@ export const RefLeadsFilter = forwardRef(
                 placeholder={getLanguageByKey(
                   "Cauta dupa Lead, Client sau Tag",
                 )}
-                className="leads-header-filter-search"
+                className="min-w-300"
                 rightSectionPointerEvents="all"
                 rightSection={
                   searchTerm && (
@@ -115,7 +115,6 @@ export const RefLeadsFilter = forwardRef(
               />
 
               <Button
-                variant="outline"
                 onClick={openCreateTicketModal}
                 leftSection={<IoMdAdd size={16} />}
               >

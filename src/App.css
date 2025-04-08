@@ -139,7 +139,7 @@ a {
 .dashboard-container {
   margin-top: var(--leads-filter-height);
   height: calc(100% - var(--leads-filter-height));
-  padding: 20px;
+  padding: 10px 20px 20px 20px;
 }
 
 .container-select-priority-workflow {
@@ -481,4 +481,8 @@ input {
 
 .overflow-x-scroll {
   overflow-x: scroll;
+}
+
+.min-w-300 {
+  min-width: 350px;
 }
