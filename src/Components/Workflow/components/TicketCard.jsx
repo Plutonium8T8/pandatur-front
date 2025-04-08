@@ -146,7 +146,7 @@ export const TicketCard = ({
           <Flex direction="column" gap="8" mb="8">
             <Flex align="center" gap="8">
               <FaFingerprint />
-              <Text>{firstClient?.id}</Text>
+              <Text>{ticket.id}</Text>
             </Flex>
 
             {firstClient?.phone && (

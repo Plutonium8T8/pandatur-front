@@ -22,6 +22,7 @@ export const AppLayout = ({ children }) => {
       >
         {children}
       </div>
+      {/* TODO: Please check if this modal is still relevant. If it's no longer used or needed, please remove it  */}
       <UserPage
         isOpen={isAccountComponentOpen}
         onClose={() => setIsAccountComponentOpen(false)}

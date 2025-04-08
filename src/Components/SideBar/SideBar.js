@@ -66,9 +66,6 @@ export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
             )}
           </MenuItem>
 
-          <MenuItem onClick={onOpenAccount} icon={<FaUser />}>
-            {getLanguageByKey("Account")}
-          </MenuItem>
           <MenuItem
             active={isActive("users")}
             icon={<FaUsers />}
