@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Flex, Paper, ActionIcon, Text } from "@mantine/core";
+import { Flex, Paper, ActionIcon, Text, Checkbox } from "@mantine/core";
+import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { MdDelete, MdEdit } from "react-icons/md";
@@ -12,7 +13,6 @@ import {
   priorityTagColors,
 } from "../../utils";
 import { TextEllipsis } from "../../TextEllipsis";
-import { Checkbox } from "../../Checkbox";
 import { Modal } from "../../Modal";
 import SingleChat from "../../ChatComponent/SingleChat";
 import { Tag } from "../../Tag";
@@ -26,8 +26,10 @@ import { MantineModal } from "../../MantineModal";
 import "./LeadTable.css";
 import { parseTags } from "../../../stringUtils";
 
+const MAX_COUNT_SLICE = 2;
+
 const renderTags = (tags) => {
-  const tagList = parseTags(tags);
+  const tagList = parseTags(tags).slice(0, MAX_COUNT_SLICE);
   const isTags = tagList.some(Boolean);
   return isTags
     ? tagList.map((tag, index) => <Tag key={index}>{tag}</Tag>)
@@ -41,7 +43,6 @@ export const LeadTable = ({
   totalLeadsPages,
   onChangePagination,
   currentPage,
-
   selectTicket,
   fetchTickets,
 }) => {
@@ -80,10 +81,12 @@ export const LeadTable = ({
       align: "center",
       render: (id) => {
         return (
-          <Checkbox
-            checked={selectTicket.includes(id)}
-            onChange={() => onSelectRow(id)}
-          />
+          <Flex justify="center">
+            <Checkbox
+              checked={selectTicket.includes(id)}
+              onChange={() => onSelectRow(id)}
+            />
+          </Flex>
         );
       },
     },
@@ -95,64 +98,43 @@ export const LeadTable = ({
       width: 100,
       render: (id) => (
         <Link to={`/leads/${id}`} className="row-id">
-          #{id}
+          <Flex align="center" gap="8">
+            <FaFingerprint />
+            {id}
+          </Flex>
         </Link>
       ),
     },
     {
       title: getLanguageByKey("Nume"),
       key: "name",
-      dataIndex: "clients",
+      dataIndex: "name",
       width: 200,
       align: "center",
-      render: (row) => (
-        <>
-          {row?.length
-            ? row.map((item) => cleanValue(item.name)).join(", ")
-            : cleanValue()}
-        </>
-      ),
+      render: (name) => (name ? name : cleanValue()),
     },
     {
       title: getLanguageByKey("Prenume"),
       key: "surname",
-      dataIndex: "clients",
+      dataIndex: "surname",
       align: "center",
       width: 200,
-      render: (row) => (
-        <>
-          {row?.length
-            ? row.map((item) => cleanValue(item.surname)).join(", ")
-            : cleanValue()}
-        </>
-      ),
+      render: (surname) => (surname ? surname : cleanValue()),
     },
     {
       title: getLanguageByKey("Email"),
       key: "email",
-      dataIndex: "clients",
+      dataIndex: "email",
       align: "center",
       width: 200,
-      render: (row) => (
-        <>
-          {row?.length
-            ? row.map((item) => cleanValue(item.email)).join(", ")
-            : cleanValue()}
-        </>
-      ),
+      render: (email) => (email ? email : cleanValue()),
     },
     {
       title: getLanguageByKey("Telefon"),
-      dataIndex: "clients",
+      dataIndex: "phone",
       align: "center",
       width: 150,
-      render: (row) => (
-        <>
-          {row?.length
-            ? row.map((item) => cleanValue(item?.phone)).join(", ")
-            : cleanValue()}
-        </>
-      ),
+      render: (phone) => (phone ? phone : cleanValue()),
     },
     {
       title: getLanguageByKey("Descriere"),
