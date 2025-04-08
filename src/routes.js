@@ -1,51 +1,60 @@
-import Dashboard from "./Components/DashboardComponent/Dashboard"
-import Leads from "./Components/LeadsComponent/LeadsComponent"
-import ChatComponent from "./Components/ChatComponent/ChatComponent"
-import LoginForm from "./Components/LoginComponent/LoginForm"
-import UsersComponent from "./Components/UsersComponent/UsersComponent"
-import { NoAccess } from "./Components/NoAccess"
-import TaskPage from "./Components/Task/Page/TaskComponent"
-import Schedules from "./Components/Schedules/Schedules"
-import { Test } from "./Components/Test"
+import Dashboard from "./Components/DashboardComponent/Dashboard";
+import Leads from "./Components/LeadsComponent/LeadsComponent";
+import ChatComponent from "./Components/ChatComponent/ChatComponent";
+import LoginForm from "./Components/LoginComponent/LoginForm";
+import UsersComponent from "./Components/UsersComponent/UsersComponent";
+import { NoAccess } from "./Components/NoAccess";
+import TaskPage from "./Components/Task/Page/TaskComponent";
+import Schedules from "./Components/Schedules/Schedules";
+import { Test } from "./Components/Test";
+
+export const privatePaths = [
+  "dashboard",
+  "leads",
+  "chat",
+  "users",
+  "tasks",
+  "schedules",
+];
 
 export const publicRoutes = [
   {
     path: "/auth",
-    component: LoginForm
-  }
-]
+    component: LoginForm,
+  },
+];
 
 export const privateRoutes = (isAllowRole) => [
   {
     path: "/dashboard",
-    component: Dashboard
+    component: Dashboard,
   },
   {
     path: "/leads",
-    component: Leads
+    component: Leads,
   },
   {
     path: "/chat/:ticketId?",
-    component: ChatComponent
+    component: ChatComponent,
   },
   {
     path: "/users",
-    component: isAllowRole ? UsersComponent : NoAccess
+    component: isAllowRole ? UsersComponent : NoAccess,
   },
   {
     path: "/leads/:ticketId?",
-    component: Leads
+    component: Leads,
   },
   {
     path: "/tasks",
-    component: TaskPage
+    component: TaskPage,
   },
   {
     path: "/schedules",
-    component: Schedules
+    component: Schedules,
   },
   {
     path: "/test",
-    component: Test
-  }
-]
+    component: Test,
+  },
+];
