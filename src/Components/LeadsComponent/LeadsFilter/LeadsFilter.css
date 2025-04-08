@@ -1,11 +1,5 @@
 .leads-header-container {
   position: fixed;
   width: calc(100% - var(--side-bar-width));
-  background-color: #dfefd9f9;
-  padding-inline: 20px;
-  padding-block: 10px;
-}
-
-.leads-header-filter-search {
-  min-width: 350px;
+  padding: 20px 20px 0 20px;
 }

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { Divider } from "@mantine/core";
 import { useDOMElementHeight, useApp } from "../../hooks";
 import { priorityOptions } from "../../FormOptions/PriorityOption";
 import { workflowOptions } from "../../FormOptions/WorkFlowOption";
@@ -299,6 +300,8 @@ const Leads = () => {
         }}
         className="dashboard-container"
       >
+        <Divider mb="md" />
+
         {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />

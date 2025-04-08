@@ -1915,8 +1915,4 @@ export const translations = {
     RO: "Eroare la încărcarea grupurilor existente",
     RU: "Ошибка при загрузке существующих групп",
   },
-  logs: {
-    RO: "Loguri",
-    RU: "Логи",
-  },
 };
