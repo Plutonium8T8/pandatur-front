@@ -1,9 +1,9 @@
 .leads-header-container {
   position: fixed;
   width: calc(100% - var(--side-bar-width));
-  background-color: #dfefd9f9;
   padding-inline: 20px;
   padding-block: 10px;
+  border-bottom: 1px solid var(--mantine-color-dark-0);
 }
 
 .leads-header-filter-search {
