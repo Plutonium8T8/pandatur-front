@@ -5,20 +5,24 @@ import {
     TextInput,
     Stack,
     Flex,
-    Loader
+    Loader,
+    Paper,
+    Text
 } from "@mantine/core";
 import { IoTrash } from "react-icons/io5";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useConfirmPopup } from "../../../hooks/useConfirmPopup";
 import { getLanguageByKey } from "../../utils";
+import { useSnackbar } from "notistack";
 
-const language = localStorage.getItem('language') || 'RO';
+const language = localStorage.getItem("language") || "RO";
 
 const EditGroupsListModal = ({ opened, onClose }) => {
     const [groups, setGroups] = useState([]);
     const [newGroup, setNewGroup] = useState("");
     const [loading, setLoading] = useState(true);
+    const { enqueueSnackbar } = useSnackbar();
 
     const confirmDelete = useConfirmPopup({
         subTitle: getLanguageByKey("Sigur doriți să ștergeți acest grup?"),
@@ -28,9 +32,11 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         setLoading(true);
         try {
             const data = await api.user.getGroupsList();
-            setGroups(data);
+            setGroups(data.sort((a, b) => a.name.localeCompare(b.name)));
         } catch (err) {
-            console.error(translations["Eroare la încărcarea grupurilor"][language], err);
+            enqueueSnackbar(translations["Eroare la încărcarea grupurilor"][language], {
+                variant: "error"
+            });
         } finally {
             setLoading(false);
         }
@@ -41,10 +47,15 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         if (trimmed && !groups.find((g) => g.name === trimmed)) {
             try {
                 const created = await api.user.createGroup({ name: trimmed });
-                setGroups((prev) => [...prev, created]);
+                setGroups((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
                 setNewGroup("");
+                enqueueSnackbar(translations["Grup adăugat cu succes"][language], {
+                    variant: "success"
+                });
             } catch (err) {
-                console.error(translations["Eroare la crearea grupului"][language], err);
+                enqueueSnackbar(translations["Eroare la crearea grupului"][language], {
+                    variant: "error"
+                });
             }
         }
     };
@@ -54,8 +65,13 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             try {
                 await api.user.deleteGroups(groupId);
                 setGroups((prev) => prev.filter((g) => g.id !== groupId));
+                enqueueSnackbar(translations["Grup șters cu succes"][language], {
+                    variant: "success"
+                });
             } catch (err) {
-                console.error(translations["Eroare la ștergerea grupului"][language], err);
+                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
+                    variant: "error"
+                });
             }
         });
     };
@@ -74,45 +90,34 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             size="md"
         >
             <Stack>
-                <Flex gap="sm" justify="space-between">
+                {/* <Paper withBorder p="md" radius="md"> */}
+                <Flex gap="sm">
                     <TextInput
                         placeholder={translations["Grup nou"][language]}
                         value={newGroup}
                         onChange={(e) => setNewGroup(e.target.value)}
+                        style={{ flex: 1 }}
                     />
                     <Button onClick={handleAdd}>
                         {translations["Adaugă"][language]}
                     </Button>
                 </Flex>
+                {/* </Paper> */}
 
                 {loading ? (
                     <Loader />
                 ) : (
                     groups.map((group) => (
-                        <Flex
-                            key={group.id}
-                            justify="space-between"
-                            align="center"
-                            px="sm"
-                            py={6}
-                            style={{
-                                borderRadius: 4,
-                                transition: "background-color 0.2s",
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor = "#f8f9fa";
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor = "transparent";
-                            }}
-                        >
-                            <span>{group.name}</span>
-                            <IoTrash
-                                color="red"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => handleDelete(group.id)}
-                            />
-                        </Flex>
+                        <Paper key={group.id} withBorder p="sm" radius="md">
+                            <Flex justify="space-between" align="center">
+                                <Text>{group.name}</Text>
+                                <IoTrash
+                                    color="red"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => handleDelete(group.id)}
+                                />
+                            </Flex>
+                        </Paper>
                     ))
                 )}
             </Stack>
