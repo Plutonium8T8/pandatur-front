@@ -48,6 +48,9 @@ export const Logs = ({ logList }) => {
       title: getLanguageByKey("Data și ora log-ului"),
       dataIndex: "timestamp",
       align: "center",
+      render: (timestamp) => (
+        <DateCell gap="8" direction="row" date={timestamp} justify="center" />
+      ),
     },
     {
       width: 300,
