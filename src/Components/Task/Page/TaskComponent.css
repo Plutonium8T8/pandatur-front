@@ -31,14 +31,3 @@
   text-align: center;
   gap: 10px;
 }
-
-.task-add-button {
-  padding: 8px 15px;
-  font-size: 16px;
-  border: none;
-  background-color: #c9d357;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
