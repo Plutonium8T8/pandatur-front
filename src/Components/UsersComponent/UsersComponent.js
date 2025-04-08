@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { Text, TextInput, Button, Flex } from "@mantine/core";
+import { Text, TextInput, Button, Flex, Menu } from "@mantine/core";
 import { api } from "../../api";
 import UserModal from "./UserModal";
 import UserList from "./UserList";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
+import EditGroupsListModal from "./GroupsUsers/EditGroupsListModal";
+import CreatePermissionGroupModal from "./Roles/CreatePermissionGroupModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -15,29 +17,9 @@ const UsersComponent = () => {
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
   const [editUser, setEditUser] = useState(null);
+  const [editGroupsOpen, setEditGroupsOpen] = useState(false);
+  const [createPermissionModalOpen, setCreatePermissionModalOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (!search) return setFiltered(users);
-
-    const s = search.toLowerCase();
-    setFiltered(
-      users.filter(
-        (u) =>
-          u.fullName?.toLowerCase().includes(s) ||
-          u.groups?.some((g) =>
-            typeof g === "string"
-              ? g.toLowerCase().includes(s)
-              : g.name?.toLowerCase().includes(s),
-          ) ||
-          u.roles?.some((r) => r.role.toLowerCase().includes(s)),
-      ),
-    );
-  }, [search, users]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -46,7 +28,6 @@ const UsersComponent = () => {
       const normalized = data.map((item) => {
         const personal = item.id || {};
         const user = personal.user || {};
-
         return {
           id: personal.id,
           name: personal.name || "-",
@@ -64,12 +45,30 @@ const UsersComponent = () => {
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!search) return setFiltered(users);
+
+    const s = search.toLowerCase();
+    setFiltered(
+      users.filter(
+        (user) =>
+          user.name?.toLowerCase().includes(s) ||
+          user.surname?.toLowerCase().includes(s) ||
+          user.email?.toLowerCase().includes(s)
+      )
+    );
+  }, [search, users]);
 
   return (
     <div className="task-container">
@@ -77,14 +76,29 @@ const UsersComponent = () => {
         <Text size="lg" fw={700}>
           {translations["Utilizatori"][language]} ({filtered.length})
         </Text>
-        <Button
-          onClick={() => {
-            setEditUser(null);
-            setOpened(true);
-          }}
-        >
-          {translations["Adaugă utilizator"][language]}
-        </Button>
+        <Flex gap="sm">
+          <Menu shadow="md" width={200}>
+            <Menu.Target>
+              <Button variant="default">⋯</Button>
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item onClick={() => setEditGroupsOpen(true)}>
+                {translations["Editează grupurile"][language]}
+              </Menu.Item>
+              <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
+                {translations["Editează rolurile"][language]}
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+          <Button
+            onClick={() => {
+              setEditUser(null);
+              setOpened(true);
+            }}
+          >
+            {translations["Adaugă utilizator"][language]}
+          </Button>
+        </Flex>
       </Flex>
 
       <TextInput
@@ -114,6 +128,16 @@ const UsersComponent = () => {
         }}
         onUserCreated={fetchUsers}
         initialUser={editUser}
+      />
+
+      <EditGroupsListModal
+        opened={editGroupsOpen}
+        onClose={() => setEditGroupsOpen(false)}
+      />
+
+      <CreatePermissionGroupModal
+        opened={createPermissionModalOpen}
+        onClose={() => setCreatePermissionModalOpen(false)}
       />
     </div>
   );

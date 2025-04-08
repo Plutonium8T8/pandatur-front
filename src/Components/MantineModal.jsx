@@ -5,17 +5,18 @@ export const MantineModal = ({
   open,
   title,
   onClose,
-  footer,
+  height = "700px",
+  size = 700,
   ...props
 }) => {
   return (
     <Modal
       centered
-      size="700"
+      size={size}
       opened={open}
       onClose={onClose}
       styles={{
-        body: { height: "700px" },
+        body: { height: `${height}` },
       }}
       title={
         <Text size="xl" fw="bold">

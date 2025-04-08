@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react"
-import { useParams, useNavigate } from "react-router-dom"
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa"
-import { Flex, ActionIcon, Box } from "@mantine/core"
-import { useApp, useUser } from "../../hooks"
-import ChatExtraInfo from "./ChatExtraInfo"
-import ChatList from "./ChatList"
-import { ChatMessages } from "./components"
-import "./chat.css"
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { Flex, ActionIcon, Box } from "@mantine/core";
+import { useApp, useUser } from "../../hooks";
+import ChatExtraInfo from "./ChatExtraInfo";
+import ChatList from "./ChatList";
+import { ChatMessages } from "./components";
+import "./chat.css";
 
 const ChatComponent = () => {
   const {
@@ -15,11 +15,11 @@ const ChatComponent = () => {
     setTickets,
     messages,
     markMessagesAsRead,
-    getClientMessagesSingle
-  } = useApp()
-  const { ticketId } = useParams()
-  const navigate = useNavigate()
-  const { userId } = useUser()
+    getClientMessagesSingle,
+  } = useApp();
+  const { ticketId } = useParams();
+  const navigate = useNavigate();
+  const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
   );
@@ -29,7 +29,7 @@ const ChatComponent = () => {
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const updatedTicket =
-    tickets.find((ticket) => ticket.id === selectTicketId) || null
+    tickets.find((ticket) => ticket.id === selectTicketId) || null;
 
   useEffect(() => {
     if (!selectTicketId || !messages.length) return;
@@ -55,40 +55,40 @@ const ChatComponent = () => {
       setSelectTicketId(ticketId);
       navigate(`/chat/${ticketId}`);
     }
-  }
+  };
 
   useEffect(() => {
-    const newPersonalInfo = {}
+    const newPersonalInfo = {};
 
     tickets.forEach((ticket) => {
       if (ticket.clients && Array.isArray(ticket.clients)) {
         ticket.clients.forEach((client) => {
           newPersonalInfo[client.id] = {
             ...client,
-            photo: ticket?.photo_url
-          }
-        })
+            photo: ticket?.photo_url,
+          };
+        });
       }
-    })
+    });
 
-    setPersonalInfo(newPersonalInfo)
-  }, [tickets])
+    setPersonalInfo(newPersonalInfo);
+  }, [tickets]);
 
   useEffect(() => {
-    if (!selectTicketId) return
+    if (!selectTicketId) return;
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     getClientMessagesSingle(selectTicketId).finally(() => {
-      setIsLoading(false)
-    })
-  }, [selectTicketId])
+      setIsLoading(false);
+    });
+  }, [selectTicketId]);
 
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
-      setSelectTicketId(Number(ticketId))
+      setSelectTicketId(Number(ticketId));
     }
-  }, [ticketId])
+  }, [ticketId]);
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -104,7 +104,7 @@ const ChatComponent = () => {
           />
         )}
 
-        <Flex pos="relative" style={{flex: "1 1 0"}}>
+        <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
             <ActionIcon
               variant="default"
@@ -117,7 +117,7 @@ const ChatComponent = () => {
               )}
             </ActionIcon>
           </Box>
-          
+
           <ChatMessages
             selectTicketId={selectTicketId}
             setSelectedClient={setSelectedClient}
@@ -145,7 +145,7 @@ const ChatComponent = () => {
         )}
       </Flex>
     </Flex>
-  )
-}
+  );
+};
 
 export default ChatComponent;
