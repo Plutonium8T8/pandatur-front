@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import { Group, Button, Title } from "@mantine/core";
+import { Button } from "@mantine/core";
+import { IoMdAdd } from "react-icons/io";
 import SchedulesList from "./SchedulesGroupList";
 import { translations } from "../utils/translations";
 import ModalGroup from "./ModalGroup";
+import { PageHeader } from "../PageHeader";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -12,14 +14,20 @@ const Schedules = () => {
   const [inGroupView, setInGroupView] = useState(false);
 
   return (
-    <div style={{ padding: "10px 20px" }}>
+    <div style={{ padding: "20px" }}>
       {!inGroupView && (
-        <Group mb="md">
-          <Title order={2}>{translations["Orar"][language]}</Title>
-          <Button ml="auto" onClick={() => setOpened(true)}>
-            {translations["Adaugă grup"][language]}
-          </Button>
-        </Group>
+        <PageHeader
+          title={translations["Orar"][language]}
+          extraInfo={
+            <Button
+              leftSection={<IoMdAdd size={16} />}
+              ml="auto"
+              onClick={() => setOpened(true)}
+            >
+              {translations["Adaugă grup"][language]}
+            </Button>
+          }
+        />
       )}
 
       <SchedulesList reload={reload} setInGroupView={setInGroupView} />
