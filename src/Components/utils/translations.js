@@ -1919,4 +1919,24 @@ export const translations = {
     RO: "Filtrează după grup",
     RU: "Фильтровать по группе",
   },
+  "Team Lead": {
+    RO: "Team Lead",
+    RU: "Тимлид"
+  },
+  "Selectați Team Lead": {
+    RO: "Selectați Team Lead",
+    RU: "Выберите тимлида"
+  },
+  "Tehnicieni": {
+    RO: "Tehnicieni",
+    RU: "Техники"
+  },
+  "Alegeți tehnicienii": {
+    RO: "Alegeți tehnicienii",
+    RU: "Выберите техников"
+  },
+  "Sigur doriți să ștergeți acest grup?": {
+    RO: "Sigur doriți să ștergeți acest grup?",
+    RU: "Вы уверены, что хотите удалить эту группу?",
+  }
 };
