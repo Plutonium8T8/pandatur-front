@@ -7,15 +7,7 @@ import { NoAccess } from "./Components/NoAccess";
 import TaskPage from "./Components/Task/Page/TaskComponent";
 import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
-
-export const privatePaths = [
-  "dashboard",
-  "leads",
-  "chat",
-  "users",
-  "tasks",
-  "schedules",
-];
+import { Logs } from "./pages";
 
 export const publicRoutes = [
   {
@@ -52,6 +44,10 @@ export const privateRoutes = (isAllowRole) => [
   {
     path: "/schedules",
     component: Schedules,
+  },
+  {
+    path: "/logs",
+    component: Logs,
   },
   {
     path: "/test",

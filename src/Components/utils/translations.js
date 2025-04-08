@@ -1915,8 +1915,20 @@ export const translations = {
     RO: "Eroare la încărcarea grupurilor existente",
     RU: "Ошибка при загрузке существующих групп",
   },
+  logs: {
+    RO: "Loguri",
+    RU: "Логи",
+  },
+  created_at_ticket: {
+    RO: "Data de creare ticket",
+    RU: "Дата создания тикета",
+  },
+  last_ticket_interaction: {
+    RO: "Ultima interacțiune ticket",
+    RU: "Последняя активность тикета",
+  },
   filter_by_group: {
-    RO: "Filtrează după grup",
-    RU: "Фильтровать по группе",
+    RO: "Filtrare după grup lead",
+    RU: "Последнее взаимодействие",
   },
 };
