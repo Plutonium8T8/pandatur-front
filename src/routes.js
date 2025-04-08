@@ -9,6 +9,16 @@ import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
 import { Logs } from "./pages";
 
+export const privatePaths = [
+  "dashboard",
+  "leads",
+  "chat",
+  "users",
+  "tasks",
+  "schedules",
+  "logs",
+];
+
 export const publicRoutes = [
   {
     path: "/auth",
