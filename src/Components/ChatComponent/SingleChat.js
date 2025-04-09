@@ -1,11 +1,11 @@
+import { FaTimes } from "react-icons/fa";
 import React, { useState, useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import "./chat.css";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
-import { FaTimes } from "react-icons/fa";
 import { useUser, useApp } from "../../hooks";
 import { getMediaFileMessages } from "../utils";
+import "./chat.css";
 
 const SingleChat = ({ ticketId, onClose }) => {
   const {
