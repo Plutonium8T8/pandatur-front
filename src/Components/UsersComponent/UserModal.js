@@ -167,7 +167,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             username,
             email,
             password,
-            roles: ["ROLE_USER", "ROLE_TECHNICIAN"],
+            roles: [],
           },
           extended: {
             name,
