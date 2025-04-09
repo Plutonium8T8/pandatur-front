@@ -13,6 +13,7 @@ import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
+import { formatRoles } from "../../utils/formatRoles";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -113,13 +114,6 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 { variant: "error" }
             );
         }
-    };
-
-    const formatRoles = (roles) => {
-        if (Array.isArray(roles)) return roles;
-        if (typeof roles === "object" && roles !== null)
-            return Object.values(roles);
-        return [];
     };
 
     const handleGroupClick = (group) => {

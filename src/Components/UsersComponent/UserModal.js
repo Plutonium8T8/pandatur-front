@@ -15,6 +15,7 @@ import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
+import { formatRoles } from "../utils/formatRoles";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -29,12 +30,6 @@ const initialFormState = {
   groups: "",
   permissionGroupId: null,
   selectedRoles: [],
-};
-
-const formatRoles = (roles) => {
-  if (Array.isArray(roles)) return roles;
-  if (typeof roles === "object" && roles !== null) return Object.values(roles);
-  return [];
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
