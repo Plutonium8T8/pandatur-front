@@ -41,6 +41,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   useEffect(() => {
     if (initialUser) {
+      const permissionGroupId =
+        initialUser.permissions?.[0]?.id?.toString() || null;
+
+      const selectedRoles = initialUser.permissions?.[0]?.roles
+        ? formatRoles(initialUser.permissions[0].roles)
+          .map((r) => r.replace(/^ROLE_/, ""))
+          .filter(Boolean)
+        : [];
+
       setForm({
         ...initialFormState,
         name: initialUser.name || "",
@@ -53,10 +62,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
+        permissionGroupId,
+        selectedRoles,
       });
     } else {
       setForm(initialFormState);
     }
+    console.log("initial user infoooooooo", initialUser)
   }, [initialUser, opened]);
 
   useEffect(() => {
@@ -297,7 +309,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
-              {initialUser && permissionGroups.length > 0 && (
+              {permissionGroups.length > 0 && initialUser && (
                 <>
                   <Select
                     label={translations["Grup permisiuni"][language]}
@@ -309,10 +321,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                     value={form.permissionGroupId}
                     onChange={handleSelectPermissionGroup}
                   />
-                  <RoleMatrix
-                    selectedRoles={form.selectedRoles}
-                    onToggle={toggleRole}
-                  />
+
+                  {form.permissionGroupId && (
+                    <RoleMatrix
+                      selectedRoles={form.selectedRoles}
+                      onToggle={toggleRole}
+                    />
+                  )}
                 </>
               )}
             </>

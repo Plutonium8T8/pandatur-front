@@ -190,6 +190,16 @@ const UserList = ({
           : "—",
     },
     {
+      title: translations["Grup permisiuni"][language],
+      dataIndex: "permissions",
+      key: "permissions",
+      width: 200,
+      render: (permissions) =>
+        Array.isArray(permissions) && permissions.length > 0
+          ? permissions[0].name
+          : "—",
+    },
+    {
       title: translations["Funcție"][language],
       dataIndex: "job_title",
       key: "job_title",

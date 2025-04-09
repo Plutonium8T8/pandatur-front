@@ -49,6 +49,7 @@ const UsersComponent = () => {
           groups: item.groups || [],
           jobTitle: item.job_title,
           status: item.status,
+          permissions: item.permissions || [],
         };
       });
 
