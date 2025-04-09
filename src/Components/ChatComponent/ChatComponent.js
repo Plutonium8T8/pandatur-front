@@ -5,7 +5,11 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useUser } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { getMediaFileMessages } from "../utils";
+import {
+  getFullName,
+  capitalizeFirstLetter,
+  getMediaFileMessages,
+} from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
@@ -57,6 +61,17 @@ const ChatComponent = () => {
     }
   };
 
+  const usersTicket =
+    personalInfo.clients?.map(({ id, name, surname }) => {
+      const platformsMessagesClient = messages
+        .filter((msg) => msg.client_id === id)
+        .map(({ platform }) => platform);
+      return [...new Set(platformsMessagesClient)].map((platform) => ({
+        value: `${id}-${platform}`,
+        label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
+      }));
+    }) || [];
+
   useEffect(() => {
     if (!selectTicketId) return;
 
@@ -107,6 +122,7 @@ const ChatComponent = () => {
             selectedClient={selectedClient}
             isLoading={isLoading}
             personalInfo={personalInfo}
+            usersTicket={usersTicket.flat()}
           />
         </Flex>
 
