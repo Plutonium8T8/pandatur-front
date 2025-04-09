@@ -19,6 +19,7 @@ export const ChatListItem = ({
         py="10px"
         pr="16px"
         pl="24px"
+        w="100%"
         key={chat.id}
         className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
         onClick={() => onHandleTicketClick(chat.id)}
@@ -32,7 +33,7 @@ export const ChatListItem = ({
             </Badge>
           </Box>
         )}
-        <Flex gap="12" align="center">
+        <Flex gap="12" align="center" w="100%">
           <Image
             w={36}
             h={36}
@@ -40,8 +41,11 @@ export const ChatListItem = ({
             src={chat?.photo_url ? chat.photo_url : DEFAULT_PHOTO}
             fallbackSrc={DEFAULT_PHOTO}
           />
-          <div>
-            <Text>{chat.contact ? chat.contact : "-"}</Text>
+          <Box w="100%">
+            <Box w="75%">
+              <Text truncate>{chat.contact ? chat.contact : "-"}</Text>
+            </Box>
+
             <Flex gap="12">
               <Flex align="center" gap="4">
                 <FaFingerprint />
@@ -52,7 +56,7 @@ export const ChatListItem = ({
               <Divider orientation="vertical" />
               <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag>
             </Flex>
-          </div>
+          </Box>
         </Flex>
 
         <Flex justify="space-between" gap="6">
