@@ -10,6 +10,7 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaCalendar,
+  FaHistory,
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
 import { Badge, Flex } from "@mantine/core";
@@ -65,9 +66,6 @@ export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
             )}
           </MenuItem>
 
-          <MenuItem onClick={onOpenAccount} icon={<FaUser />}>
-            {getLanguageByKey("Account")}
-          </MenuItem>
           <MenuItem
             active={isActive("users")}
             icon={<FaUsers />}
@@ -111,6 +109,13 @@ export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
             component={<Link to="/schedules" />}
           >
             {getLanguageByKey("schedules")}
+          </MenuItem>
+          <MenuItem
+            active={isActive("logs")}
+            icon={<FaHistory />}
+            component={<Link to="/logs" />}
+          >
+            {getLanguageByKey("logs")}
           </MenuItem>
           <MenuItem onClick={onOpenNotifications} icon={<FaBell />}>
             {getLanguageByKey("Notificări")[1]}

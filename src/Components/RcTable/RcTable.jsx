@@ -1,5 +1,4 @@
 import Table from "rc-table";
-import { Pagination } from "../Pagination";
 import { Empty } from "../Empty";
 import "./RcTable.css";
 import { Spin } from "../Spin";
@@ -41,11 +40,6 @@ export const RcTable = ({
           {...props}
         />
       </div>
-      {!!pagination && (
-        <div className={`d-flex justify-content-${pagination?.position}`}>
-          {/* <Pagination {...restPagination} /> */}
-        </div>
-      )}
     </div>
   );
 };

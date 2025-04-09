@@ -12,13 +12,13 @@ const formattedDate = (date) => {
   };
 };
 
-export const DateCell = ({ date, gap, direction = "column" }) => {
+export const DateCell = ({ date, gap, direction = "column", ...props }) => {
   const { formateDate, formateTime } = formattedDate(date);
 
   return (
     <>
       {date ? (
-        <Flex direction={direction} gap={gap}>
+        <Flex direction={direction} gap={gap} {...props}>
           <Text>{formateDate}</Text>
           <Text>{formateTime}</Text>
         </Flex>
