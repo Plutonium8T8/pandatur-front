@@ -143,7 +143,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
                 {groups.map((group) => (
                     <Paper key={group.id} withBorder p="sm" radius="md">
-                        <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} style={{ cursor: "pointer" }}>
+                        <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} className="pointer">
                             <Text>{group.name}</Text>
                             <IoTrash
                                 color="red"

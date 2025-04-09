@@ -1,5 +1,13 @@
 import { useEffect, useState } from "react";
-import { TextInput, Button, Menu, ActionIcon } from "@mantine/core";
+import {
+  TextInput,
+  Button,
+  Menu,
+  ActionIcon,
+  Container,
+  Stack,
+  Paper,
+} from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { BsThreeDots } from "react-icons/bs";
 import { api } from "../../api";
@@ -49,7 +57,7 @@ const UsersComponent = () => {
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     } finally {
       setLoading(false);
@@ -62,72 +70,72 @@ const UsersComponent = () => {
 
   useEffect(() => {
     if (!search) return setFiltered(users);
-
     const s = search.toLowerCase();
     setFiltered(
       users.filter(
         (user) =>
           user.name?.toLowerCase().includes(s) ||
           user.surname?.toLowerCase().includes(s) ||
-          user.email?.toLowerCase().includes(s),
-      ),
+          user.email?.toLowerCase().includes(s)
+      )
     );
   }, [search, users]);
 
   return (
-    <div className="task-container">
-      <PageHeader
-        mb="md"
-        extraInfo={
-          <>
-            <Menu shadow="md" width={200}>
-              <Menu.Target>
-                <ActionIcon size="lg" variant="default">
-                  <BsThreeDots />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item onClick={() => setEditGroupsOpen(true)}>
-                  {translations["Editează grupurile"][language]}
-                </Menu.Item>
-                <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
-                  {translations["Editează rolurile"][language]}
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-            <TextInput
-              className="min-w-300"
-              placeholder={translations["Căutare utilizator"][language]}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoComplete="off"
-              name="search-user-field"
-            />
+    <Container size="xxl" bg="#f5f5f5" style={{ height: "100%" }}>
+      <Paper p="md" h="100%" bg="#f5f5f5" shadow="md">
+        <Stack>
+          <PageHeader
+            extraInfo={
+              <>
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon size="lg" variant="default">
+                      <BsThreeDots />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={() => setEditGroupsOpen(true)}>
+                      {translations["Editează grupurile"][language]}
+                    </Menu.Item>
+                    <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
+                      {translations["Editează rolurile"][language]}
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+                <TextInput
+                  className="min-w-300"
+                  placeholder={translations["Căutare utilizator"][language]}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  autoComplete="off"
+                />
+                <Button
+                  leftSection={<IoMdAdd size={16} />}
+                  onClick={() => {
+                    setEditUser(null);
+                    setOpened(true);
+                  }}
+                >
+                  {translations["Adaugă utilizator"][language]}
+                </Button>
+              </>
+            }
+            title={translations["Utilizatori"][language]}
+            count={filtered.length}
+          />
 
-            <Button
-              leftSection={<IoMdAdd size={16} />}
-              onClick={() => {
-                setEditUser(null);
-                setOpened(true);
-              }}
-            >
-              {translations["Adaugă utilizator"][language]}
-            </Button>
-          </>
-        }
-        title={translations["Utilizatori"][language]}
-        count={filtered.length}
-      />
-
-      <UserList
-        users={filtered}
-        loading={loading}
-        fetchUsers={fetchUsers}
-        openEditUser={(user) => {
-          setEditUser(user);
-          setOpened(true);
-        }}
-      />
+          <UserList
+            users={filtered}
+            loading={loading}
+            fetchUsers={fetchUsers}
+            openEditUser={(user) => {
+              setEditUser(user);
+              setOpened(true);
+            }}
+          />
+        </Stack>
+      </Paper>
 
       <UserModal
         opened={opened}
@@ -148,7 +156,7 @@ const UsersComponent = () => {
         opened={createPermissionModalOpen}
         onClose={() => setCreatePermissionModalOpen(false)}
       />
-    </div>
+    </Container>
   );
 };
 
