@@ -1958,5 +1958,13 @@ export const translations = {
   "Anuleazǎ": {
     RO: "Anuleazǎ",
     RU: "Отмена"
+  },
+  "Eroare la încărcarea grupurilor de utilizatori": {
+    "RO": "Eroare la încărcarea grupurilor de utilizatori",
+    "RU": "Ошибка при загрузке групп пользователей"
+  },
+  "Eroare la încărcarea grupurilor de permisiuni": {
+    "RO": "Eroare la încărcarea grupurilor de permisiuni",
+    "RU": "Ошибка при загрузке групп разрешений"
   }
 };

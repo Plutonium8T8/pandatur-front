@@ -9,7 +9,6 @@ import {
   Group,
   Select,
   PasswordInput,
-  Loader,
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
@@ -69,14 +68,28 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     const fetchGroups = async () => {
       setGroupsLoading(true);
       try {
-        const [userGroups, permissions] = await Promise.all([
-          api.user.getGroupsList(),
-          api.users.getAllPermissionGroups(),
-        ]);
-        setGroupsList(userGroups);
-        setPermissionGroups(permissions);
-      } catch (err) {
-        console.error("error loading group", err);
+        let userGroups = [];
+        let permissionGroups = [];
+
+        try {
+          userGroups = await api.user.getGroupsList();
+          setGroupsList(userGroups);
+        } catch (e) {
+          enqueueSnackbar(
+            translations["Eroare la încărcarea grupurilor de utilizatori"][language],
+            { variant: "error" }
+          );
+        }
+
+        try {
+          permissionGroups = await api.users.getAllPermissionGroups();
+          setPermissionGroups(permissionGroups);
+        } catch (e) {
+          enqueueSnackbar(
+            translations["Eroare la încărcarea grupurilor de permisiuni"][language],
+            { variant: "error" }
+          );
+        }
       } finally {
         setGroupsLoading(false);
       }
@@ -278,9 +291,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name="new-password-field"
           />
 
-          {groupsLoading ? (
-            <Loader />
-          ) : (
+          {groupsList.length > 0 && (
             <>
               <Select
                 label={translations["Grup utilizator"][language]}
@@ -291,7 +302,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
-              {initialUser && (
+              {initialUser && permissionGroups.length > 0 && (
                 <>
                   <Select
                     label={translations["Grup permisiuni"][language]}
