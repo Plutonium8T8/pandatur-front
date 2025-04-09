@@ -10,3 +10,4 @@ export * from "./priorityTagColors";
 export * from "./getFullName";
 export * from "./permissionConstants";
 export * from "./getMediaFileMessages";
+export * from "./capitalizeFirstLetter";
