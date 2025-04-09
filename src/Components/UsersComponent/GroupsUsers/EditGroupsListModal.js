@@ -5,7 +5,6 @@ import {
     TextInput,
     Stack,
     Flex,
-    Loader,
     Paper,
     Text,
     Select,
@@ -25,7 +24,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     const [groups, setGroups] = useState([]);
     const [newGroup, setNewGroup] = useState("");
     const [expandedGroupId, setExpandedGroupId] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [groupState, setGroupState] = useState({});
     const { enqueueSnackbar } = useSnackbar();
 
@@ -36,7 +34,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     const { technicians } = useGetTechniciansList();
 
     const fetchGroups = async () => {
-        setLoading(true);
         try {
             const data = await api.user.getGroupsList();
             setGroups(data.sort((a, b) => a.name.localeCompare(b.name)));
@@ -51,8 +48,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             setGroupState(initialState);
         } catch (err) {
             enqueueSnackbar(translations["Eroare la încărcarea grupurilor"][language], { variant: "error" });
-        } finally {
-            setLoading(false);
         }
     };
 
@@ -108,9 +103,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             });
 
             fetchGroups();
-
         } catch (err) {
-            console.error("Update error:", err);
             enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
                 variant: "error"
             });
@@ -148,67 +141,62 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                     </Button>
                 </Flex>
 
-                {loading ? (
-                    <Loader />
-                ) : (
-                    groups.map((group) => (
-                        <Paper key={group.id} withBorder p="sm" radius="md">
-                            <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} style={{ cursor: "pointer" }}>
-                                <Text>{group.name}</Text>
-                                <IoTrash
-                                    color="red"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(group.id);
-                                    }}
+                {groups.map((group) => (
+                    <Paper key={group.id} withBorder p="sm" radius="md">
+                        <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} style={{ cursor: "pointer" }}>
+                            <Text>{group.name}</Text>
+                            <IoTrash
+                                color="red"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(group.id);
+                                }}
+                            />
+                        </Flex>
+
+                        <Collapse in={expandedGroupId === group.id}>
+                            <Stack mt="sm">
+                                <Select
+                                    label={translations["Team Lead"][language]}
+                                    placeholder={translations["Selectați Team Lead"][language]}
+                                    data={technicians}
+                                    value={groupState[group.id]?.supervisor_id || null}
+                                    onChange={(val) =>
+                                        setGroupState((prev) => ({
+                                            ...prev,
+                                            [group.id]: {
+                                                ...prev[group.id],
+                                                supervisor_id: val || null,
+                                            },
+                                        }))
+                                    }
+                                    searchable
+                                    clearable
                                 />
-                            </Flex>
-
-                            <Collapse in={expandedGroupId === group.id}>
-                                <Stack mt="sm">
-                                    <Select
-                                        label={translations["Team Lead"][language]}
-                                        placeholder={translations["Selectați Team Lead"][language]}
-                                        data={technicians}
-                                        value={groupState[group.id]?.supervisor_id || null}
-                                        onChange={(val) =>
-                                            setGroupState((prev) => ({
-                                                ...prev,
-                                                [group.id]: {
-                                                    ...prev[group.id],
-                                                    supervisor_id: val || null,
-                                                },
-                                            }))
-                                        }
-                                        searchable
-                                        clearable
-                                    />
-                                    <MultiSelect
-                                        label={translations["Selectează operator"][language]}
-                                        placeholder={translations["Selectează operator"][language]}
-                                        data={technicians}
-                                        value={groupState[group.id]?.user_ids || []}
-                                        onChange={(val) =>
-                                            setGroupState((prev) => ({
-                                                ...prev,
-                                                [group.id]: {
-                                                    ...prev[group.id],
-                                                    user_ids: val,
-                                                },
-                                            }))
-                                        }
-                                        searchable
-                                        clearable
-                                    />
-                                    <Button onClick={() => handleSave(group.id, group.name)}>
-                                        {translations["Salvează"][language]}
-                                    </Button>
-                                </Stack>
-                            </Collapse>
-
-                        </Paper>
-                    ))
-                )}
+                                <MultiSelect
+                                    label={translations["Selectează operator"][language]}
+                                    placeholder={translations["Selectează operator"][language]}
+                                    data={technicians}
+                                    value={groupState[group.id]?.user_ids || []}
+                                    onChange={(val) =>
+                                        setGroupState((prev) => ({
+                                            ...prev,
+                                            [group.id]: {
+                                                ...prev[group.id],
+                                                user_ids: val,
+                                            },
+                                        }))
+                                    }
+                                    searchable
+                                    clearable
+                                />
+                                <Button onClick={() => handleSave(group.id, group.name)}>
+                                    {translations["Salvează"][language]}
+                                </Button>
+                            </Stack>
+                        </Collapse>
+                    </Paper>
+                ))}
             </Stack>
         </Modal>
     );
