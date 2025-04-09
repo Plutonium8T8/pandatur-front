@@ -169,9 +169,14 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     </Button>
 
                     {editingGroupId && (
-                        <Button color="red" onClick={handleDelete}>
-                            {translations["Șterge grupul"][language]}
-                        </Button>
+                        <>
+                            <Button color="red" onClick={handleDelete}>
+                                {translations["Șterge grupul"][language]}
+                            </Button>
+                            <Button variant="default" onClick={resetForm}>
+                                {translations["Anuleazǎ"][language]}
+                            </Button>
+                        </>
                     )}
                 </Group>
 
@@ -203,7 +208,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                 >
                                     <Text fw={500}>{g.permission_name}</Text>
                                     <Text size="sm" c="dimmed">
-                                        {formatRoles(g.roles).join(", ")}
+                                        {/* {formatRoles(g.roles).join(", ")} */}
                                     </Text>
                                 </Box>
                             ))}

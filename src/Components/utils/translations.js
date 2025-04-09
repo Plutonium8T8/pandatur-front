@@ -1954,5 +1954,9 @@ export const translations = {
   "Grup actualizat cu succes": {
     RO: "Grup actualizat cu succes",
     RU: "Группа успешно обновлена"
+  },
+  "Anuleazǎ": {
+    RO: "Anuleazǎ",
+    RU: "Отмена"
   }
 };
