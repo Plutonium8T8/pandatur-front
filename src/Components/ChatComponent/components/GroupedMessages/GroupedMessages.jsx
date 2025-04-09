@@ -85,9 +85,13 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
                 const isMessageSentByMe =
                   msg.sender_id === userId || msg.sender_id === 1;
                 return isMessageSentByMe ? (
-                  <SendedMessage msg={msg} />
+                  <SendedMessage key={msg.id} msg={msg} />
                 ) : (
-                  <ReceivedMessage msg={msg} personalInfo={personalInfo} />
+                  <ReceivedMessage
+                    key={msg.id}
+                    msg={msg}
+                    personalInfo={personalInfo}
+                  />
                 );
               })}
             </Flex>
