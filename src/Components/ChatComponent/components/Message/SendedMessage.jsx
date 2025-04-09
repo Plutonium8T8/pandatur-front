@@ -4,7 +4,7 @@ import { HH_mm } from "../../../../app-constants";
 import { parseServerDate } from "../../../utils";
 import "./Message.css";
 
-export const SendedMessage = ({ msg, personalInfo }) => {
+export const SendedMessage = ({ msg }) => {
   return (
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">

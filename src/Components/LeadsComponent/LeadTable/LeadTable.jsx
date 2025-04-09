@@ -1,10 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Flex, Paper, ActionIcon, Text, Checkbox } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { useParams, useNavigate } from "react-router-dom";
 import { Pagination } from "../../Pagination";
 import {
   getLanguageByKey,
@@ -13,8 +12,6 @@ import {
   priorityTagColors,
 } from "../../utils";
 import { TextEllipsis } from "../../TextEllipsis";
-import { Modal } from "../../Modal";
-import SingleChat from "../../ChatComponent/SingleChat";
 import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components";
 import { RcTable } from "../../RcTable";
@@ -47,10 +44,6 @@ export const LeadTable = ({
   fetchTickets,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [selectedTicketId, setSelectedTicketId] = useState(null);
-  const { ticketId } = useParams();
-  const navigate = useNavigate();
   const [id, setId] = useState();
 
   const deleteLead = useConfirmPopup({
@@ -312,18 +305,6 @@ export const LeadTable = ({
     },
   ];
 
-  useEffect(() => {
-    if (ticketId) {
-      setSelectedTicketId(ticketId);
-      setIsChatOpen(true);
-    }
-  }, [ticketId]);
-
-  const closeChatModal = () => {
-    setIsChatOpen(false);
-    navigate("/leads");
-  };
-
   return (
     <>
       <RcTable
@@ -343,20 +324,6 @@ export const LeadTable = ({
           />
         </Flex>
       )}
-
-      <Modal
-        open={isChatOpen}
-        onClose={closeChatModal}
-        title=""
-        width={1850}
-        height={1000}
-        footer={null}
-        showCloseButton={false}
-      >
-        {selectedTicketId && (
-          <SingleChat ticketId={selectedTicketId} onClose={closeChatModal} />
-        )}
-      </Modal>
 
       <MantineModal
         centered
