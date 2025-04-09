@@ -82,8 +82,8 @@ const UsersComponent = () => {
   }, [search, users]);
 
   return (
-    <Container size="xxl" bg="#f5f5f5" style={{ height: "100%" }}>
-      <Paper p="md" h="100%" bg="#f5f5f5" shadow="md">
+    <Container size="xxl" style={{ height: "100%" }}>
+      <Paper p="20" h="100%" bg="#f5f5f5" shadow="md">
         <Stack>
           <PageHeader
             extraInfo={
