@@ -5,13 +5,13 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useUser } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
+import { getMediaFileMessages } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
   const {
     tickets,
-    updateTicket,
     setTickets,
     messages,
     markMessagesAsRead,
@@ -28,9 +28,6 @@ const ChatComponent = () => {
   const [selectedClient, setSelectedClient] = useState("");
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
-  const updatedTicket =
-    tickets.find((ticket) => ticket.id === selectTicketId) || null;
-
   useEffect(() => {
     if (!selectTicketId || !messages.length) return;
 
@@ -42,37 +39,23 @@ const ChatComponent = () => {
     );
 
     if (unreadMessages.length > 0) {
-      console.log(
-        `🔵 ${unreadMessages.length} непрочитанных сообщений в тикете #${selectTicketId}, помечаем как прочитанные`,
-      );
       markMessagesAsRead(selectTicketId);
     }
   }, [selectTicketId, messages, userId]);
 
+  useEffect(() => {
+    const ticketById =
+      tickets.find((ticket) => ticket.id === selectTicketId) || {};
+
+    setPersonalInfo(ticketById);
+  }, [tickets, selectTicketId]);
+
   const handleSelectTicket = (ticketId) => {
-    console.log("🎯 Клик по тикету:", ticketId);
     if (selectTicketId !== ticketId) {
       setSelectTicketId(ticketId);
       navigate(`/chat/${ticketId}`);
     }
   };
-
-  useEffect(() => {
-    const newPersonalInfo = {};
-
-    tickets.forEach((ticket) => {
-      if (ticket.clients && Array.isArray(ticket.clients)) {
-        ticket.clients.forEach((client) => {
-          newPersonalInfo[client.id] = {
-            ...client,
-            photo: ticket?.photo_url,
-          };
-        });
-      }
-    });
-
-    setPersonalInfo(newPersonalInfo);
-  }, [tickets]);
 
   useEffect(() => {
     if (!selectTicketId) return;
@@ -132,15 +115,29 @@ const ChatComponent = () => {
             selectedClient={selectedClient}
             ticketId={ticketId}
             selectTicketId={selectTicketId}
-            setSelectTicketId={handleSelectTicket}
-            tickets={tickets}
-            updatedTicket={updatedTicket}
-            updateTicket={updateTicket}
-            setTickets={setTickets}
-            personalInfo={personalInfo}
-            setPersonalInfo={setPersonalInfo}
-            messages={messages}
-            isLoading={isLoading}
+            onUpdatePersonalInfo={(values) => {
+              const firstClient = personalInfo.clients[0];
+              const clients = (personalInfo.clients = [
+                { ...firstClient, ...values },
+                ...personalInfo.clients.slice(1),
+              ]);
+              setTickets((prev) =>
+                prev.map((ticket) =>
+                  ticket.id === personalInfo.id
+                    ? { ...ticket, ...personalInfo, clients }
+                    : ticket,
+                ),
+              );
+
+              setPersonalInfo((prev) => {
+                return {
+                  ...prev,
+                  clients: clients,
+                };
+              });
+            }}
+            updatedTicket={personalInfo}
+            mediaFiles={getMediaFileMessages(messages, selectTicketId)}
           />
         )}
       </Flex>

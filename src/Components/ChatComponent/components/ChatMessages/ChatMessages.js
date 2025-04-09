@@ -199,9 +199,10 @@ export const ChatMessages = ({
       .split(",")
       .map((id) => {
         const clientId = id.trim();
-        const clientInfo = personalInfo[clientId] || {};
-        const fullName = clientInfo.name
-          ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
+        const clientInfo = personalInfo?.clients?.[0];
+
+        const fullName = clientInfo?.name
+          ? `${clientInfo.name} ${personalInfo.surname || ""}`.trim()
           : `ID: ${clientId}`;
 
         const platformsMessagesClient = messages.filter(
