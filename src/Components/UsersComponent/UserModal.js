@@ -53,6 +53,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
+        permissionGroupId: initialUser.permissions?.[0]?.id?.toString() || null, // ✅ вот это добавь
       });
     } else {
       setForm(initialFormState);
@@ -94,6 +95,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   }, [opened]);
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
+    if (!permissionGroupId) {
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId: null,
+        selectedRoles: [],
+      }));
+      return;
+    }
+
     const selected = permissionGroups.find(
       (g) => g.permission_id.toString() === permissionGroupId
     );
@@ -299,6 +309,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
               {initialUser && permissionGroups.length > 0 && (
                 <>
+                  {console.log("permissionGroups:", permissionGroups)}
+
                   <Select
                     label={translations["Grup permisiuni"][language]}
                     placeholder={translations["Alege grupul de permisiuni"][language]}
@@ -306,9 +318,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                       value: g.permission_id.toString(),
                       label: g.permission_name,
                     }))}
-                    value={form.permissionGroupId}
-                    onChange={handleSelectPermissionGroup}
+                    value={form.permissionGroupId || null}
+                    onChange={(value) =>
+                      handleSelectPermissionGroup(value || null)
+                    }
                   />
+
                   <RoleMatrix
                     selectedRoles={form.selectedRoles}
                     onToggle={toggleRole}
