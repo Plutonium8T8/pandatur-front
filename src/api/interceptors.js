@@ -16,7 +16,7 @@ export const responseInterceptor = [
   (res) => res,
   async (err) => {
     if (STATUS_CODE.includes(err?.response?.status)) {
-      clearCookies()
+      // clearCookies()
     }
 
     return Promise.reject(err)

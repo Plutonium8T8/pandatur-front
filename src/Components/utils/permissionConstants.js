@@ -4,7 +4,7 @@ export const categories = [
     "LEAD",
     "DASHBOARD",
     "ACCOUNT",
-    "NOTIFICATION",
+    "NOTIFI",
     "TASK",
     "CALENDAR",
 ];
