@@ -44,15 +44,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const permissionGroupId =
         initialUser.permissions?.[0]?.id?.toString() || null;
 
-      let selectedRoles = [];
+      let userRoles = [];
+      let permissionRoles = [];
 
       try {
-        const rawRoles = initialUser?.id?.user?.roles;
-
+        const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
         if (rawRoles) {
           const parsed = JSON.parse(rawRoles);
           if (Array.isArray(parsed)) {
-            selectedRoles = parsed
+            userRoles = parsed
               .map((role) => role.replace(/^ROLE_/, ""))
               .filter(Boolean);
           }
@@ -61,22 +61,21 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         console.warn("Ошибка парсинга user.roles:", e);
       }
 
-      // Если роли из user пустые — пробуем из permission
-      if (
-        selectedRoles.length === 0 &&
-        initialUser?.permissions?.[0]?.roles
-      ) {
-        try {
-          const parsed = JSON.parse(initialUser.permissions[0].roles);
+      try {
+        const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
+        if (rawPermissionRoles) {
+          const parsed = JSON.parse(rawPermissionRoles);
           if (Array.isArray(parsed)) {
-            selectedRoles = parsed
+            permissionRoles = parsed
               .map((role) => role.replace(/^ROLE_/, ""))
               .filter(Boolean);
           }
-        } catch (e) {
-          console.warn("Ошибка парсинга permissions.roles:", e);
         }
+      } catch (e) {
+        console.warn("Ошибка парсинга permissions.roles:", e);
       }
+
+      const combinedRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
 
       setForm({
         ...initialFormState,
@@ -91,7 +90,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
         permissionGroupId,
-        selectedRoles,
+        selectedRoles: combinedRoles,
       });
     } else {
       setForm(initialFormState);
@@ -137,7 +136,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        selectedRoles: [],
+        selectedRoles: [...prev.selectedRoles], // сохраняем user.roles
       }));
     } else {
       handleSelectPermissionGroup(value);
@@ -145,17 +144,25 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   };
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
-    const selected = permissionGroups.find(
+    const selectedGroup = permissionGroups.find(
       (g) => g.permission_id.toString() === permissionGroupId
     );
-    const roles = formatRoles(selected?.roles)
+
+    const groupRoles = formatRoles(selectedGroup?.roles)
       .map((r) => r.replace(/^ROLE_/, ""))
       .filter(Boolean);
-    setForm((prev) => ({
-      ...prev,
-      permissionGroupId,
-      selectedRoles: roles,
-    }));
+
+    setForm((prev) => {
+      const combinedRoles = Array.from(
+        new Set([...prev.selectedRoles, ...groupRoles])
+      );
+
+      return {
+        ...prev,
+        permissionGroupId,
+        selectedRoles: combinedRoles,
+      };
+    });
   };
 
   const toggleRole = (role) => {
@@ -272,6 +279,28 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         translations["Eroare la salvarea utilizatorului"][language];
       enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
     }
+  };
+
+  const extractRolesFromUser = (user) => {
+    let userRoles = [];
+    let permissionRoles = [];
+
+    try {
+      const rawRoles = user?.id?.user?.roles;
+      userRoles = formatRoles(rawRoles);
+    } catch (e) {
+      console.warn("Ошибка парсинга user.roles", e);
+    }
+
+    try {
+      const rawPermissionRoles = user?.permissions?.[0]?.roles;
+      permissionRoles = formatRoles(rawPermissionRoles);
+    } catch (e) {
+      console.warn("Ошибка парсинга permissions.roles", e);
+    }
+
+    const allRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
+    return allRoles;
   };
 
   return (

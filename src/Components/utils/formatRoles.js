@@ -1,15 +1,22 @@
 export const formatRoles = (roles) => {
   try {
-    if (Array.isArray(roles)) return roles;
-    if (typeof roles === "string") {
-      const parsed = JSON.parse(roles);
-      return Array.isArray(parsed) ? parsed : [];
+    let parsed = [];
+
+    if (Array.isArray(roles)) {
+      parsed = roles;
+    } else if (typeof roles === "string") {
+      parsed = JSON.parse(roles);
+    } else if (typeof roles === "object" && roles !== null) {
+      parsed = Object.values(roles);
     }
-    if (typeof roles === "object" && roles !== null) {
-      return Object.values(roles);
-    }
+
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed
+      .map((r) => r.replace(/^ROLE_/, ""))
+      .filter(Boolean);
   } catch (e) {
-    console.warn("error parse", e);
+    console.warn("formatRoles parsing error:", e);
+    return [];
   }
-  return [];
 };

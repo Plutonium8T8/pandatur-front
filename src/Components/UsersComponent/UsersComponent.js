@@ -50,6 +50,7 @@ const UsersComponent = () => {
           jobTitle: item.job_title,
           status: item.status,
           permissions: item.permissions || [],
+          rawRoles: user.roles || "[]",
         };
       });
 
