@@ -166,7 +166,7 @@ export const ChatInput = ({
               {getLanguageByKey("Trimite")}
             </Button>
 
-            <Button loading={loading} onClick={clearState} variant="default">
+            <Button onClick={clearState} variant="default">
               {getLanguageByKey("Anulează")}
             </Button>
           </Flex>
