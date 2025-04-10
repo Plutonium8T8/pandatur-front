@@ -59,7 +59,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           }
         }
       } catch (e) {
-        console.warn("Ошибка парсинга user.roles:", e);
+        console.warn("error parsing user.roles:", e);
       }
 
       try {
@@ -73,7 +73,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           }
         }
       } catch (e) {
-        console.warn("Ошибка парсинга permissions.roles:", e);
+        console.warn("error parsing permissions.roles:", e);
       }
 
       const combinedRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
@@ -286,28 +286,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         translations["Eroare la salvarea utilizatorului"][language];
       enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
     }
-  };
-
-  const extractRolesFromUser = (user) => {
-    let userRoles = [];
-    let permissionRoles = [];
-
-    try {
-      const rawRoles = user?.id?.user?.roles;
-      userRoles = formatRoles(rawRoles);
-    } catch (e) {
-      console.warn("Ошибка парсинга user.roles", e);
-    }
-
-    try {
-      const rawPermissionRoles = user?.permissions?.[0]?.roles;
-      permissionRoles = formatRoles(rawPermissionRoles);
-    } catch (e) {
-      console.warn("Ошибка парсинга permissions.roles", e);
-    }
-
-    const allRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
-    return allRoles;
   };
 
   return (
