@@ -21,7 +21,10 @@ const platformIcons = {
 };
 
 export const ReceivedMessage = ({ personalInfo, msg }) => {
-  const firstClient = personalInfo?.clients?.[0];
+  const receivedMsj = personalInfo?.clients?.find(
+    ({ id }) => msg.client_id === id,
+  );
+
   return (
     <Flex w="100%">
       <Flex w="90%" direction="column" className="chat-message received">
@@ -31,7 +34,7 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
           <Flex miw="250px" direction="column" p="8" className="text">
             <Flex c={colors.gray[7]} align="center" gap="4">
               <Text size="sm" fw="bold">
-                {getFullName(firstClient?.name, firstClient?.surname) ||
+                {getFullName(receivedMsj?.name, receivedMsj?.surname) ||
                   `#${msg.client_id}`}
               </Text>
 

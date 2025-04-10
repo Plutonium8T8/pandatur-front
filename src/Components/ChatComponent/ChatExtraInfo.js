@@ -237,7 +237,7 @@ const ChatExtraInfo = ({
 
             <Merge
               loading={isLoadingCombineLead}
-              value={selectedUser.payload?.id}
+              value={ticketId}
               onSubmit={(values) => mergeClientsData(values)}
               placeholder={getLanguageByKey("Introduceți ID lead")}
             />
@@ -245,7 +245,7 @@ const ChatExtraInfo = ({
             <Box mt="md">
               <Merge
                 loading={isLoadingCombineClient}
-                value={ticketId}
+                value={selectedUser.payload?.id}
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => mergeData(values)}
               />
