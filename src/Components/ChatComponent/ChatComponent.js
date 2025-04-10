@@ -29,8 +29,10 @@ const ChatComponent = () => {
   );
   const [personalInfo, setPersonalInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedClient, setSelectedClient] = useState("");
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const [selectedClient, setSelectedClient] = useState("");
+  const [selectedUser, setSelectedUser] = useState();
+  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
   useEffect(() => {
     if (!selectTicketId || !messages.length) return;
@@ -51,7 +53,21 @@ const ChatComponent = () => {
     const ticketById =
       tickets.find((ticket) => ticket.id === selectTicketId) || {};
 
+    const users =
+      ticketById.clients?.map(({ id, name, surname }) => {
+        const platformsMessagesClient = messages
+          .filter((msg) => msg.client_id === id)
+          .map(({ platform }) => platform);
+        return [...new Set(platformsMessagesClient)].map((platform) => ({
+          value: `${id}-${platform}`,
+          label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
+          payload: { id, platform },
+        }));
+      }) || null;
+
+    setSelectedUser(ticketById.clients?.[0]);
     setPersonalInfo(ticketById);
+    setMessageSendersByPlatform(users ? users.flat() : users);
   }, [tickets, selectTicketId]);
 
   const handleSelectTicket = (ticketId) => {
@@ -60,17 +76,6 @@ const ChatComponent = () => {
       navigate(`/chat/${ticketId}`);
     }
   };
-
-  const usersTicket =
-    personalInfo.clients?.map(({ id, name, surname }) => {
-      const platformsMessagesClient = messages
-        .filter((msg) => msg.client_id === id)
-        .map(({ platform }) => platform);
-      return [...new Set(platformsMessagesClient)].map((platform) => ({
-        value: `${id}-${platform}`,
-        label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
-      }));
-    }) || [];
 
   useEffect(() => {
     if (!selectTicketId) return;
@@ -87,6 +92,14 @@ const ChatComponent = () => {
       setSelectTicketId(Number(ticketId));
     }
   }, [ticketId]);
+
+  const changeUser = (userId) => {
+    const selectedUserId = personalInfo.clients?.find(
+      ({ id }) => id === userId,
+    );
+
+    setSelectedUser(selectedUserId);
+  };
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -122,12 +135,14 @@ const ChatComponent = () => {
             selectedClient={selectedClient}
             isLoading={isLoading}
             personalInfo={personalInfo}
-            usersTicket={usersTicket.flat()}
+            messageSendersByPlatform={messageSendersByPlatform}
+            onChangeSelectedUser={changeUser}
           />
         </Flex>
 
         {selectTicketId && (
           <ChatExtraInfo
+            selectedUser={selectedUser}
             selectedClient={selectedClient}
             ticketId={ticketId}
             selectTicketId={selectTicketId}

@@ -13,10 +13,6 @@ import {
 } from "../TicketForms";
 import { useFormTicket } from "../../hooks";
 
-const parseId = (id) => {
-  return Number(id.replace(/[{}]/g, "").trim());
-};
-
 const ChatExtraInfo = ({
   selectTicketId,
   onUpdatePersonalInfo,
@@ -24,7 +20,7 @@ const ChatExtraInfo = ({
   ticketId,
   selectedClient,
   mediaFiles,
-  tickets,
+  selectedUser,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -91,10 +87,9 @@ const ChatExtraInfo = ({
   };
 
   const submitPersonalData = async (values) => {
-    const clientId = parseId(updatedTicket.client_id);
     setIsLoadingPersonalDate(true);
     try {
-      await api.users.updateExtended(clientId, values);
+      await api.users.updateExtended(selectedUser.id, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
@@ -234,7 +229,7 @@ const ChatExtraInfo = ({
 
             <PersonalData4ClientForm
               loading={isLoadingPersonalDate}
-              data={updatedTicket?.clients?.[0]}
+              data={selectedUser}
               onSubmit={(values) => {
                 submitPersonalData(values);
                 onUpdatePersonalInfo(values);

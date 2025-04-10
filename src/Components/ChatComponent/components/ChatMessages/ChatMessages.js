@@ -28,10 +28,12 @@ export const ChatMessages = ({
   selectedClient,
   isLoading,
   personalInfo,
-  usersTicket,
+  selectedUser,
+  messageSendersByPlatform,
+  onChangeSelectedUser,
 }) => {
   const { userId } = useUser();
-  const { messages, setMessages, tickets } = useApp();
+  const { messages, setMessages } = useApp();
   const { enqueueSnackbar } = useSnackbar();
 
   const messageContainerRef = useRef(null);
@@ -233,19 +235,19 @@ export const ChatMessages = ({
           onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
           renderSelectUserPlatform={() => {
             return (
-              tickets &&
-              tickets.find((ticket) => ticket.id === selectTicketId)
-                ?.client_id && (
+              messageSendersByPlatform && (
                 <Select
                   size="md"
                   w="100%"
                   value={`${selectedClient}-${selectedPlatform}`}
                   placeholder={translations["Alege client"][language]}
-                  data={usersTicket}
+                  data={messageSendersByPlatform}
                   onChange={(value) => {
                     if (!value) return;
                     const [clientId, platform] = value.split("-");
-                    setSelectedClient(clientId);
+                    const selectUserId = Number(clientId);
+
+                    onChangeSelectedUser(selectUserId);
                     setSelectedPlatform(platform);
                   }}
                 />

@@ -22,10 +22,10 @@ export const renderContent = (msg) => {
           src={msg.message}
           alt=""
           className="image-preview-in-chat | pointer"
-          onError={(e) => {
-            e.target.src =
-              "https://via.placeholder.com/300?text=Ошибка+загрузки";
-          }}
+          // onError={(e) => {
+          //   e.target.src =
+          //     "https://via.placeholder.com/300?text=Ошибка+загрузки";
+          // }}
           onClick={() => {
             window.open(msg.message, "_blank");
           }}
