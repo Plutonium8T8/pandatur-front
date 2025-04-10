@@ -1931,4 +1931,8 @@ export const translations = {
     RO: "Filtrare după grup lead",
     RU: "Последнее взаимодействие",
   },
+  no_messages: {
+    RO: "Nu există mesaje",
+    RU: "Нет сообщений",
+  },
 };
