@@ -16,7 +16,7 @@ const PermissionGroupAssignModal = ({ opened, onClose, onConfirm }) => {
     const fetchPermissionGroups = async () => {
       setLoading(true);
       try {
-        const data = await api.users.getAllPermissionGroups();
+        const data = await api.permissions.getAllPermissionGroups();
         setPermissionGroups(data);
       } catch (err) {
         enqueueSnackbar(

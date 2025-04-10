@@ -109,7 +109,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         }
 
         try {
-          permissionGroups = await api.users.getAllPermissionGroups();
+          permissionGroups = await api.permissions.getAllPermissionGroups();
           setPermissionGroups(permissionGroups);
         } catch (e) {
           enqueueSnackbar(
@@ -231,9 +231,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         const hadPermissionBefore = initialUser?.permissions?.length > 0;
 
         if (!permissionGroupId && hadPermissionBefore) {
-          await api.users.removePermissionFromTechnician(userId);
+          await api.permissions.removePermissionFromTechnician(userId);
         } else if (permissionGroupId) {
-          await api.users.assignPermissionToUser(permissionGroupId, userId);
+          await api.permissions.assignPermissionToUser(permissionGroupId, userId);
         }
 
         enqueueSnackbar(translations["Utilizator actualizat cu succes"][language], {
@@ -261,7 +261,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         const { id: createdUser } = await api.users.createTechnicianUser(payload);
 
         if (permissionGroupId) {
-          await api.users.assignPermissionToUser(
+          await api.permissions.assignPermissionToUser(
             permissionGroupId,
             createdUser?.user?.id
           );

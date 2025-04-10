@@ -136,7 +136,7 @@ const UserList = ({
 
   const handleAssignPermissionGroup = async (permissionGroupId) => {
     try {
-      await api.users.batchAssignPermissionGroup(permissionGroupId, selectedIds);
+      await api.permissions.batchAssignPermissionGroup(permissionGroupId, selectedIds);
       enqueueSnackbar(translations["Grup de permisiuni atribuit"][language], {
         variant: "success",
       });

@@ -11,6 +11,7 @@ import { notification } from "./notification"
 import { standalone } from "./standalone"
 import { activity } from "./activity"
 import { groupSchedules } from "./groupSchedules"
+import { permissions } from "./permissions"
 
 export const api = {
   auth,
@@ -25,5 +26,6 @@ export const api = {
   notification,
   standalone,
   activity,
-  groupSchedules
+  groupSchedules,
+  permissions
 }

@@ -45,7 +45,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const fetchExistingGroups = async () => {
         try {
-            const data = await api.users.getAllPermissionGroups();
+            const data = await api.permissions.getAllPermissionGroups();
             setExistingGroups(data);
         } catch (error) {
             enqueueSnackbar(
@@ -79,13 +79,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             };
 
             if (editingGroupId) {
-                await api.users.updatePermissionGroup(editingGroupId, payload);
+                await api.permissions.updatePermissionGroup(editingGroupId, payload);
                 enqueueSnackbar(
                     translations["Grup de permisiuni actualizat cu succes"][language],
                     { variant: "success" }
                 );
             } else {
-                await api.users.createPermissionGroup(payload);
+                await api.permissions.createPermissionGroup(payload);
                 enqueueSnackbar(
                     translations["Grup de permisiuni creat cu succes"][language],
                     { variant: "success" }
@@ -107,7 +107,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
         confirmDelete(async () => {
             try {
-                await api.users.deletePermissionGroup(editingGroupId);
+                await api.permissions.deletePermissionGroup(editingGroupId);
                 enqueueSnackbar(translations["Grup șters cu succes"][language], {
                     variant: "success",
                 });
