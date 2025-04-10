@@ -136,7 +136,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        selectedRoles: [...prev.selectedRoles], // сохраняем user.roles
+        selectedRoles: [...prev.selectedRoles],
       }));
     } else {
       handleSelectPermissionGroup(value);
@@ -224,7 +224,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
-        // 👉 Обработка удаления или назначения permission group
         const hadPermissionBefore = initialUser?.permissions?.length > 0;
 
         if (!permissionGroupId && hadPermissionBefore) {

@@ -9,7 +9,8 @@ import {
     Text,
     Select,
     MultiSelect,
-    Collapse
+    Collapse,
+    Loader,
 } from "@mantine/core";
 import { IoTrash } from "react-icons/io5";
 import { api } from "../../../api";
@@ -25,21 +26,23 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     const [newGroup, setNewGroup] = useState("");
     const [expandedGroupId, setExpandedGroupId] = useState(null);
     const [groupState, setGroupState] = useState({});
-    const { enqueueSnackbar } = useSnackbar();
+    const [loading, setLoading] = useState(false);
 
+    const { enqueueSnackbar } = useSnackbar();
     const confirmDelete = useConfirmPopup({
-        subTitle: translations["Sigur doriți să ștergeți acest grup?"][language]
+        subTitle: translations["Sigur doriți să ștergeți acest grup?"][language],
     });
 
     const { technicians } = useGetTechniciansList();
 
     const fetchGroups = async () => {
+        setLoading(true);
         try {
             const data = await api.user.getGroupsList();
             setGroups(data.sort((a, b) => a.name.localeCompare(b.name)));
 
             const initialState = {};
-            data.forEach(group => {
+            data.forEach((group) => {
                 initialState[group.id] = {
                     supervisor_id: group.supervisor_id?.toString() || null,
                     user_ids: group.users?.map(String) || [],
@@ -47,7 +50,11 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             });
             setGroupState(initialState);
         } catch (err) {
-            enqueueSnackbar(translations["Eroare la încărcarea grupurilor"][language], { variant: "error" });
+            enqueueSnackbar(translations["Eroare la încărcarea grupurilor"][language], {
+                variant: "error",
+            });
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -58,9 +65,13 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 const created = await api.user.createGroup({ group_name: trimmed });
                 setGroups((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
                 setNewGroup("");
-                enqueueSnackbar(translations["Grup adăugat cu succes"][language], { variant: "success" });
+                enqueueSnackbar(translations["Grup adăugat cu succes"][language], {
+                    variant: "success",
+                });
             } catch (err) {
-                enqueueSnackbar(translations["Eroare la crearea grupului"][language], { variant: "error" });
+                enqueueSnackbar(translations["Eroare la crearea grupului"][language], {
+                    variant: "error",
+                });
             }
         }
     };
@@ -70,9 +81,13 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             try {
                 await api.user.deleteGroups(groupId);
                 setGroups((prev) => prev.filter((g) => g.id !== groupId));
-                enqueueSnackbar(translations["Grup șters cu succes"][language], { variant: "success" });
+                enqueueSnackbar(translations["Grup șters cu succes"][language], {
+                    variant: "success",
+                });
             } catch (err) {
-                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], { variant: "error" });
+                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
+                    variant: "error",
+                });
             }
         });
     };
@@ -83,10 +98,9 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
     const handleSave = async (groupId, groupName) => {
         const current = groupState[groupId];
-
         if (!groupName || !current.supervisor_id || !current.user_ids.length) {
             enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
-                variant: "warning"
+                variant: "warning",
             });
             return;
         }
@@ -99,13 +113,13 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             });
 
             enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
-                variant: "success"
+                variant: "success",
             });
 
             fetchGroups();
         } catch (err) {
             enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
-                variant: "error"
+                variant: "error",
             });
         }
     };
@@ -135,68 +149,83 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                         value={newGroup}
                         onChange={(e) => setNewGroup(e.target.value)}
                         style={{ flex: 1 }}
+                        disabled={loading}
                     />
-                    <Button onClick={handleAdd}>
+                    <Button onClick={handleAdd} disabled={loading}>
                         {translations["Adaugă"][language]}
                     </Button>
                 </Flex>
 
-                {groups.map((group) => (
-                    <Paper key={group.id} withBorder p="sm" radius="md">
-                        <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} className="pointer">
-                            <Text>{group.name}</Text>
-                            <IoTrash
-                                color="red"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleDelete(group.id);
-                                }}
-                            />
-                        </Flex>
+                {loading && (
+                    <Flex justify="center" py="md">
+                        <Loader />
+                    </Flex>
+                )}
 
-                        <Collapse in={expandedGroupId === group.id}>
-                            <Stack mt="sm">
-                                <Select
-                                    label={translations["Team Lead"][language]}
-                                    placeholder={translations["Selectați Team Lead"][language]}
-                                    data={technicians}
-                                    value={groupState[group.id]?.supervisor_id || null}
-                                    onChange={(val) =>
-                                        setGroupState((prev) => ({
-                                            ...prev,
-                                            [group.id]: {
-                                                ...prev[group.id],
-                                                supervisor_id: val || null,
-                                            },
-                                        }))
-                                    }
-                                    searchable
-                                    clearable
+                {!loading &&
+                    groups.map((group) => (
+                        <Paper key={group.id} withBorder p="sm" radius="md">
+                            <Flex
+                                justify="space-between"
+                                align="center"
+                                onClick={() => handleGroupToggle(group.id)}
+                                className="pointer"
+                            >
+                                <Text>{group.name}</Text>
+                                <IoTrash
+                                    color="red"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleDelete(group.id);
+                                    }}
                                 />
-                                <MultiSelect
-                                    label={translations["Selectează operator"][language]}
-                                    placeholder={translations["Selectează operator"][language]}
-                                    data={technicians}
-                                    value={groupState[group.id]?.user_ids || []}
-                                    onChange={(val) =>
-                                        setGroupState((prev) => ({
-                                            ...prev,
-                                            [group.id]: {
-                                                ...prev[group.id],
-                                                user_ids: val,
-                                            },
-                                        }))
-                                    }
-                                    searchable
-                                    clearable
-                                />
-                                <Button onClick={() => handleSave(group.id, group.name)}>
-                                    {translations["Salvează"][language]}
-                                </Button>
-                            </Stack>
-                        </Collapse>
-                    </Paper>
-                ))}
+                            </Flex>
+
+                            <Collapse in={expandedGroupId === group.id}>
+                                <Stack mt="sm">
+                                    <Select
+                                        label={translations["Team Lead"][language]}
+                                        placeholder={translations["Selectați Team Lead"][language]}
+                                        data={technicians}
+                                        value={groupState[group.id]?.supervisor_id || null}
+                                        onChange={(val) =>
+                                            setGroupState((prev) => ({
+                                                ...prev,
+                                                [group.id]: {
+                                                    ...prev[group.id],
+                                                    supervisor_id: val || null,
+                                                },
+                                            }))
+                                        }
+                                        searchable
+                                        clearable
+                                        disabled={loading}
+                                    />
+                                    <MultiSelect
+                                        label={translations["Selectează operator"][language]}
+                                        placeholder={translations["Selectează operator"][language]}
+                                        data={technicians}
+                                        value={groupState[group.id]?.user_ids || []}
+                                        onChange={(val) =>
+                                            setGroupState((prev) => ({
+                                                ...prev,
+                                                [group.id]: {
+                                                    ...prev[group.id],
+                                                    user_ids: val,
+                                                },
+                                            }))
+                                        }
+                                        searchable
+                                        clearable
+                                        disabled={loading}
+                                    />
+                                    <Button onClick={() => handleSave(group.id, group.name)} disabled={loading}>
+                                        {translations["Salvează"][language]}
+                                    </Button>
+                                </Stack>
+                            </Collapse>
+                        </Paper>
+                    ))}
             </Stack>
         </Modal>
     );

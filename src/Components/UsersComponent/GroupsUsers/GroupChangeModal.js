@@ -1,4 +1,4 @@
-import { Modal, Select, Button, Stack } from "@mantine/core";
+import { Modal, Select, Button, Stack, Loader } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
@@ -10,9 +10,11 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [group, setGroup] = useState("");
   const [groups, setGroups] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
+      setLoading(true);
       try {
         const data = await api.user.getGroupsList();
         setGroups(data);
@@ -22,6 +24,8 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
           translations["Eroare la încărcarea grupurilor de utilizatori"][language],
           { variant: "error" }
         );
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -52,9 +56,11 @@ const GroupChangeModal = ({ opened, onClose, onConfirm }) => {
           data={groups.map((g) => ({ value: g.name, label: g.name }))}
           value={group}
           onChange={setGroup}
+          rightSection={loading ? <Loader size={16} /> : null}
+          disabled={loading}
         />
 
-        <Button onClick={handleConfirm} disabled={!group}>
+        <Button onClick={handleConfirm} disabled={!group || loading} loading={loading}>
           {translations["Confirma"][language]}
         </Button>
       </Stack>
