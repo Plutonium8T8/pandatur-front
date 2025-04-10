@@ -13,24 +13,13 @@ import {
 } from "../TicketForms";
 import { useFormTicket } from "../../hooks";
 
-const FORMAT_MEDIA = ["audio", "video", "image", "file"];
-
-const parseId = (id) => {
-  return Number(id.replace(/[{}]/g, "").trim());
-};
-
 const ChatExtraInfo = ({
   selectTicketId,
-  personalInfo = {},
-  setPersonalInfo,
-  messages = [],
+  onUpdatePersonalInfo,
   updatedTicket,
-  updateTicket,
-  isLoading,
   ticketId,
-  selectedClient,
-  setTickets,
-  tickets,
+  mediaFiles,
+  selectedUser,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -87,10 +76,8 @@ const ChatExtraInfo = ({
   const fetchTicketExtraInfo = async (ticketId) => {
     try {
       const data = await api.tickets.ticket.getInfo(ticketId);
-      setExtraInfo((prev) => ({
-        ...prev,
-        [ticketId]: data,
-      }));
+
+      setExtraInfo(data);
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
         variant: "error",
@@ -98,37 +85,15 @@ const ChatExtraInfo = ({
     }
   };
 
-  const handleFieldChange = (field, value) => {
-    setExtraInfo((prevState) => ({
-      ...prevState,
-      [selectTicketId]: {
-        ...prevState[selectTicketId],
-        [field]: value,
-      },
-    }));
-  };
-
   const submitPersonalData = async (values) => {
-    const clientId = parseId(updatedTicket.client_id);
     setIsLoadingPersonalDate(true);
     try {
-      const result = await api.users.updateExtended(clientId, values);
+      await api.users.updateExtended(selectedUser.payload?.id, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" },
       );
-
-      setPersonalInfo((prev) => ({
-        ...prev,
-        [clientId]: {
-          ...prev[clientId],
-          name: result.name || "",
-          surname: result.surname || "",
-          address: result.address || "",
-          phone: result.phone || "",
-        },
-      }));
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
         variant: "error",
@@ -138,35 +103,7 @@ const ChatExtraInfo = ({
     }
   };
 
-  useEffect(() => {
-    setExtraInfo({});
-  }, [selectTicketId]);
-
-  useEffect(() => {
-    const pretNetto = extraInfo[selectTicketId]?.pret_netto;
-    const buget = extraInfo[selectTicketId]?.buget;
-
-    if (
-      pretNetto !== "" &&
-      buget !== "" &&
-      pretNetto !== undefined &&
-      buget !== undefined
-    ) {
-      const newComision = parseFloat(buget) - parseFloat(pretNetto);
-      handleFieldChange("comission_companie", newComision.toFixed(2));
-    }
-  }, [
-    extraInfo[selectTicketId]?.pret_netto,
-    extraInfo[selectTicketId]?.buget,
-    selectTicketId,
-  ]);
-
-  const mediaSources = messages.filter(
-    (msg) =>
-      FORMAT_MEDIA.includes(msg.mtype) && msg.ticket_id === selectTicketId,
-  );
-
-  const mergeCLientsData = async (id) => {
+  const mergeClientsData = async (id) => {
     const ticketOld = selectTicketId;
 
     setIsLoadingCombineLead(true);
@@ -191,12 +128,10 @@ const ChatExtraInfo = ({
   };
 
   const mergeData = async (id) => {
-    const oldUserId = selectedClient;
-
     setIsLoadingClient(true);
     try {
       await api.users.clientMerge({
-        old_user_id: oldUserId,
+        old_user_id: selectedUser.payload?.id,
         new_user_id: id,
       });
 
@@ -232,30 +167,6 @@ const ChatExtraInfo = ({
       setIsLoadingInfoTicket(false);
     }
   };
-
-  useEffect(() => {
-    if (!selectedClient) return;
-
-    const clientId = parseId(selectedClient);
-
-    const clientData =
-      tickets
-        .find((ticket) => ticket.id === selectTicketId)
-        ?.clients?.find((client) => client.id === clientId) || {};
-
-    if (clientData) {
-      setPersonalInfo((prev) => ({
-        ...prev,
-        [clientId]: {
-          ...prev[clientId],
-          name: clientData.name || "",
-          surname: clientData.surname || "",
-          address: clientData.address || "",
-          phone: clientData.phone || "",
-        },
-      }));
-    }
-  }, [selectedClient, selectTicketId, tickets, setPersonalInfo]);
 
   return (
     <ScrollArea
@@ -315,23 +226,26 @@ const ChatExtraInfo = ({
 
             <PersonalData4ClientForm
               loading={isLoadingPersonalDate}
-              data={personalInfo[selectedClient]}
-              onSubmit={(values) => submitPersonalData(values)}
+              data={selectedUser.payload}
+              onSubmit={(values) => {
+                submitPersonalData(values);
+                onUpdatePersonalInfo(values);
+              }}
             />
 
             <Divider my="md" />
 
             <Merge
               loading={isLoadingCombineLead}
-              value={selectedClient}
-              onSubmit={(values) => mergeCLientsData(values)}
+              value={ticketId}
+              onSubmit={(values) => mergeClientsData(values)}
               placeholder={getLanguageByKey("Introduceți ID lead")}
             />
 
             <Box mt="md">
               <Merge
                 loading={isLoadingCombineClient}
-                value={ticketId}
+                value={selectedUser.payload?.id}
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => mergeData(values)}
               />
@@ -343,7 +257,7 @@ const ChatExtraInfo = ({
           <Box p="md">
             <TicketInfoForm
               formInstance={form}
-              data={extraInfo[selectTicketId]}
+              data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
                 <Button
@@ -362,7 +276,7 @@ const ChatExtraInfo = ({
           <Box p="md">
             <ContractForm
               formInstance={form}
-              data={extraInfo[selectTicketId]}
+              data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
                 <Button
@@ -380,7 +294,7 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="invoice">
           <Box p="md">
             <InvoiceForm
-              data={extraInfo[selectTicketId]}
+              data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
                 <Button
@@ -397,7 +311,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="media" h="100%">
           <Box p="md" h="100%">
-            <Media messages={mediaSources} />
+            <Media messages={mediaFiles} />
           </Box>
         </Tabs.Panel>
 
@@ -405,7 +319,7 @@ const ChatExtraInfo = ({
           <Box p="md">
             <QualityControlForm
               formInstance={form}
-              data={extraInfo[selectTicketId]}
+              data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
               renderFooterButtons={({ formId }) => (
                 <Button

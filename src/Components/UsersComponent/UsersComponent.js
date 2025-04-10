@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { Text, TextInput, Button, Flex } from "@mantine/core";
+import { TextInput, Button, Menu, ActionIcon } from "@mantine/core";
+import { IoMdAdd } from "react-icons/io";
+import { BsThreeDots } from "react-icons/bs";
 import { api } from "../../api";
 import UserModal from "./UserModal";
 import UserList from "./UserList";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
+import EditGroupsListModal from "./GroupsUsers/EditGroupsListModal";
+import CreatePermissionGroupModal from "./Roles/CreatePermissionGroupModal";
+import { PageHeader } from "../PageHeader";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -15,29 +20,10 @@ const UsersComponent = () => {
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
   const [editUser, setEditUser] = useState(null);
+  const [editGroupsOpen, setEditGroupsOpen] = useState(false);
+  const [createPermissionModalOpen, setCreatePermissionModalOpen] =
+    useState(false);
   const { enqueueSnackbar } = useSnackbar();
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    if (!search) return setFiltered(users);
-
-    const s = search.toLowerCase();
-    setFiltered(
-      users.filter(
-        (u) =>
-          u.fullName?.toLowerCase().includes(s) ||
-          u.groups?.some((g) =>
-            typeof g === "string"
-              ? g.toLowerCase().includes(s)
-              : g.name?.toLowerCase().includes(s),
-          ) ||
-          u.roles?.some((r) => r.role.toLowerCase().includes(s)),
-      ),
-    );
-  }, [search, users]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -46,7 +32,6 @@ const UsersComponent = () => {
       const normalized = data.map((item) => {
         const personal = item.id || {};
         const user = personal.user || {};
-
         return {
           id: personal.id,
           name: personal.name || "-",
@@ -71,29 +56,67 @@ const UsersComponent = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!search) return setFiltered(users);
+
+    const s = search.toLowerCase();
+    setFiltered(
+      users.filter(
+        (user) =>
+          user.name?.toLowerCase().includes(s) ||
+          user.surname?.toLowerCase().includes(s) ||
+          user.email?.toLowerCase().includes(s),
+      ),
+    );
+  }, [search, users]);
+
   return (
     <div className="task-container">
-      <Flex justify="space-between" align="center" mb="md">
-        <Text size="lg" fw={700}>
-          {translations["Utilizatori"][language]} ({filtered.length})
-        </Text>
-        <Button
-          onClick={() => {
-            setEditUser(null);
-            setOpened(true);
-          }}
-        >
-          {translations["Adaugă utilizator"][language]}
-        </Button>
-      </Flex>
-
-      <TextInput
-        placeholder={translations["Căutare utilizator"][language]}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
+      <PageHeader
         mb="md"
-        autoComplete="off"
-        name="search-user-field"
+        extraInfo={
+          <>
+            <Menu shadow="md" width={200}>
+              <Menu.Target>
+                <ActionIcon size="lg" variant="default">
+                  <BsThreeDots />
+                </ActionIcon>
+              </Menu.Target>
+              <Menu.Dropdown>
+                <Menu.Item onClick={() => setEditGroupsOpen(true)}>
+                  {translations["Editează grupurile"][language]}
+                </Menu.Item>
+                <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
+                  {translations["Editează rolurile"][language]}
+                </Menu.Item>
+              </Menu.Dropdown>
+            </Menu>
+            <TextInput
+              className="min-w-300"
+              placeholder={translations["Căutare utilizator"][language]}
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              autoComplete="off"
+              name="search-user-field"
+            />
+
+            <Button
+              leftSection={<IoMdAdd size={16} />}
+              onClick={() => {
+                setEditUser(null);
+                setOpened(true);
+              }}
+            >
+              {translations["Adaugă utilizator"][language]}
+            </Button>
+          </>
+        }
+        title={translations["Utilizatori"][language]}
+        count={filtered.length}
       />
 
       <UserList
@@ -114,6 +137,16 @@ const UsersComponent = () => {
         }}
         onUserCreated={fetchUsers}
         initialUser={editUser}
+      />
+
+      <EditGroupsListModal
+        opened={editGroupsOpen}
+        onClose={() => setEditGroupsOpen(false)}
+      />
+
+      <CreatePermissionGroupModal
+        opened={createPermissionModalOpen}
+        onClose={() => setCreatePermissionModalOpen(false)}
       />
     </div>
   );

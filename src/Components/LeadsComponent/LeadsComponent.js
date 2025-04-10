@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
+import { Divider } from "@mantine/core";
 import { useDOMElementHeight, useApp } from "../../hooks";
 import { priorityOptions } from "../../FormOptions/PriorityOption";
 import { workflowOptions } from "../../FormOptions/WorkFlowOption";
@@ -9,7 +10,6 @@ import { LeadTable } from "./LeadTable";
 import { useDebounce, useConfirmPopup } from "../../hooks";
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
 import { api } from "../../api";
-import { Modal } from "../Modal";
 import SingleChat from "../ChatComponent/SingleChat";
 import { Spin } from "../Spin";
 import { RefLeadsFilter } from "./LeadsFilter";
@@ -300,6 +300,8 @@ const Leads = () => {
         }}
         className="dashboard-container"
       >
+        <Divider mb="md" />
+
         {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
@@ -330,18 +332,14 @@ const Leads = () => {
 
       {spinnerTickets && <SpinnerRightBottom />}
 
-      <Modal
-        open={isChatOpen}
+      <MantineModal
+        fullScreen
+        open={isChatOpen && ticketId}
         onClose={closeChatModal}
-        width={1850}
-        height={1000}
-        footer={null}
-        showCloseButton={false}
+        height="calc(100% - 60px)"
       >
-        {ticketId && (
-          <SingleChat ticketId={ticketId} onClose={closeChatModal} />
-        )}
-      </Modal>
+        <SingleChat ticketId={ticketId} onClose={closeChatModal} />
+      </MantineModal>
 
       {isOpenAddLeadModal && (
         <TicketModal

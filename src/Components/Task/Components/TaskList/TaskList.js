@@ -15,6 +15,14 @@ import {
 } from "react-icons/io5";
 import { useConfirmPopup } from "../../../../hooks";
 
+const language = localStorage.getItem("language") || "RO";
+
+const priorityColors = {
+  Low: "#4CAF50",
+  Medium: "#FF9800",
+  High: "#F44336",
+};
+
 const TaskList = ({
   tasks,
   handleMarkAsSeenTask,
@@ -23,7 +31,6 @@ const TaskList = ({
   openEditTask,
   fetchTasks,
 }) => {
-  const language = localStorage.getItem("language") || "RO";
   const [order, setOrder] = useState("ASC");
   const [selectedRow, setSelectedRow] = useState([]);
   const [, setColumn] = useState("");
@@ -32,12 +39,6 @@ const TaskList = ({
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
   });
-
-  const priorityColors = {
-    Low: "#4CAF50",
-    Medium: "#FF9800",
-    High: "#F44336",
-  };
 
   const handleDeleteTask = (taskId) => {
     handleDeleteTaskById(async () => {
@@ -124,7 +125,7 @@ const TaskList = ({
         ),
         dataIndex: "id",
         key: "id",
-        width: 80,
+        width: 60,
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
@@ -194,33 +195,19 @@ const TaskList = ({
       },
       {
         title: translations["Creat de"][language],
-        dataIndex: "created_by",
-        key: "created_by",
+        dataIndex: "creator_by_full_name",
+        key: "creator_by_full_name",
         width: 150,
         align: "center",
-        render: (_, row) => {
-          const creator = userList.find(
-            (user) => String(user.id) === String(row.created_by),
-          );
-          return creator
-            ? `${creator.name} ${creator.surname}`
-            : `ID: ${row.created_by}`;
-        },
+        render: (_, row) => row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
         title: translations["Pentru"][language],
-        dataIndex: "created_for",
-        key: "created_for",
+        dataIndex: "created_for_full_name",
+        key: "created_for_full_name",
         width: 150,
         align: "center",
-        render: (_, row) => {
-          const assignedUser = userList.find(
-            (user) => String(user.id) === String(row.created_for),
-          );
-          return assignedUser
-            ? `${assignedUser.name} ${assignedUser.surname}`
-            : `ID: ${row.created_for}`;
-        },
+        render: (_, row) => row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: translations["Descriere"][language],

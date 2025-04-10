@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FixedSizeList } from "react-window";
-import { TextInput, Checkbox, Title, Flex, Box } from "@mantine/core";
+import { TextInput, Checkbox, Title, Flex, Box, Divider } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
+
+const CHAT_ITEM_HEIGHT = 94;
 
 const parseCustomDate = (dateStr) => {
   if (!dateStr) return 0;
@@ -19,11 +21,11 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
-  const { tickets } = useApp()
-  const { userId } = useUser()
-  const [showMyTickets, setShowMyTickets] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
+const ChatList = ({ selectTicketId, setSelectTicketId }) => {
+  const { tickets } = useApp();
+  const { userId } = useUser();
+  const [showMyTickets, setShowMyTickets] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
@@ -48,7 +50,7 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
         });
       }
     }
-  }, [selectTicketId, tickets])
+  }, [selectTicketId, tickets]);
 
   const handleTicketClick = (ticketId) => {
     console.log("🖱 Клик по тикету в списке:", ticketId);
@@ -106,8 +108,8 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
   };
 
   return (
-    <Box direction="column" w="20%" p="md" ref={chatListRef}>
-      <Flex direction="column" gap="xs" mb="xs">
+    <Box direction="column" w="20%" ref={chatListRef}>
+      <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
         <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
         <Checkbox
@@ -122,11 +124,12 @@ const ChatList = ({ setIsLoading, selectTicketId, setSelectTicketId }) => {
         />
       </Flex>
 
-      <Box h="100%" ref={wrapperChatItemRef}>
+      <Divider />
+      <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
         <FixedSizeList
           height={wrapperChatHeight}
           itemCount={sortedTickets?.length || 0}
-          itemSize={110}
+          itemSize={CHAT_ITEM_HEIGHT}
           width="100%"
         >
           {ChatItem}

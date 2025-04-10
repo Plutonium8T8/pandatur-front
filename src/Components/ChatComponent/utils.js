@@ -1,3 +1,5 @@
+import { FaRegFileLines } from "react-icons/fa6";
+import { Flex, Text } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 
 export const getMediaType = (mimeType) => {
@@ -20,9 +22,10 @@ export const renderContent = (msg) => {
           src={msg.message}
           alt=""
           className="image-preview-in-chat | pointer"
-          onError={(e) => {
-            e.target.src = "https://via.placeholder.com/300?text=Ошибка+загрузки";
-          }}
+          // onError={(e) => {
+          //   e.target.src =
+          //     "https://via.placeholder.com/300?text=Ошибка+загрузки";
+          // }}
           onClick={() => {
             window.open(msg.message, "_blank");
           }}
@@ -45,10 +48,16 @@ export const renderContent = (msg) => {
     case "file":
       return (
         <a href={msg.message} target="_blank" rel="noopener noreferrer">
-          {getLanguageByKey("Deschide file")}
+          <Flex c="black">
+            <FaRegFileLines size="24px" />
+          </Flex>
         </a>
       );
     default:
-      return <div className="text-message">{msg.message}</div>;
+      return (
+        <Text style={{ whiteSpace: "pre-line" }} truncate>
+          {msg.message}
+        </Text>
+      );
   }
 };

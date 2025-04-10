@@ -13,12 +13,12 @@ export const user = {
     return data
   },
 
-  assignGroups: async (groupId, userId) => {
+  assignGroups: async (user_ids, group_name) => {
     const { data } = await baseAxios.patch(
-      `api/user-groups/${groupId}/assign/${userId}`
-    )
-
-    return data
+      "/api/user-groups/update",
+      { user_ids, group_name }
+    );
+    return data;
   },
 
   deleteGroups: async (id) => {

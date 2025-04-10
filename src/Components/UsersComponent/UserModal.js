@@ -8,17 +8,16 @@ import {
   Avatar,
   Group,
   Select,
-  PasswordInput
+  PasswordInput,
+  Loader,
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
-import RolesComponent from "./RolesComponent";
-import { GroupUsersOptions } from "./GroupUsersOptions";
+import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
-
 
 const initialFormState = {
   name: "",
@@ -29,21 +28,31 @@ const initialFormState = {
   job_title: "",
   status: false,
   groups: "",
+  permissionGroupId: null,
+  selectedRoles: [],
+};
+
+const formatRoles = (roles) => {
+  if (Array.isArray(roles)) return roles;
+  if (typeof roles === "object" && roles !== null) return Object.values(roles);
+  return [];
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
-  const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState(initialFormState);
+  const [groupsList, setGroupsList] = useState([]);
+  const [permissionGroups, setPermissionGroups] = useState([]);
+  const [groupsLoading, setGroupsLoading] = useState(false);
 
   useEffect(() => {
     if (initialUser) {
       setForm({
+        ...initialFormState,
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
         email: initialUser.email || "",
-        password: "",
         job_title: initialUser.job_title || initialUser.jobTitle || "",
         status: Boolean(initialUser.status),
         groups:
@@ -56,6 +65,49 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     }
   }, [initialUser, opened]);
 
+  useEffect(() => {
+    const fetchGroups = async () => {
+      setGroupsLoading(true);
+      try {
+        const [userGroups, permissions] = await Promise.all([
+          api.user.getGroupsList(),
+          api.users.getAllPermissionGroups(),
+        ]);
+        setGroupsList(userGroups);
+        setPermissionGroups(permissions);
+      } catch (err) {
+        console.error("error loading group", err);
+      } finally {
+        setGroupsLoading(false);
+      }
+    };
+
+    if (opened) fetchGroups();
+  }, [opened]);
+
+  const handleSelectPermissionGroup = (permissionGroupId) => {
+    const selected = permissionGroups.find(
+      (g) => g.permission_id.toString() === permissionGroupId
+    );
+    const roles = formatRoles(selected?.roles)
+      .map((r) => r.replace(/^ROLE_/, ""))
+      .filter(Boolean);
+    setForm((prev) => ({
+      ...prev,
+      permissionGroupId,
+      selectedRoles: roles,
+    }));
+  };
+
+  const toggleRole = (role) => {
+    setForm((prev) => ({
+      ...prev,
+      selectedRoles: prev.selectedRoles.includes(role)
+        ? prev.selectedRoles.filter((r) => r !== role)
+        : [...prev.selectedRoles, role],
+    }));
+  };
+
   const handleCreate = async () => {
     const {
       name,
@@ -66,22 +118,14 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       job_title,
       status,
       groups,
+      permissionGroupId,
     } = form;
 
     if (!initialUser) {
-      if (
-        !name ||
-        !surname ||
-        !username ||
-        !email ||
-        !password ||
-        !job_title ||
-        !groups
-      ) {
-        enqueueSnackbar(
-          translations["Completați toate câmpurile obligatorii"][language],
-          { variant: "warning" }
-        );
+      if (!name || !surname || !username || !email || !password || !job_title || !groups) {
+        enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
+          variant: "warning",
+        });
         return;
       }
     }
@@ -110,10 +154,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
-        enqueueSnackbar(
-          translations["Utilizator actualizat cu succes"][language],
-          { variant: "success" }
-        );
+        if (permissionGroupId) {
+          await api.users.assignPermissionToUser(permissionGroupId, userId);
+        }
+
+        enqueueSnackbar(translations["Utilizator actualizat cu succes"][language], {
+          variant: "success",
+        });
       } else {
         const payload = {
           user: {
@@ -133,11 +180,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           groups: [groups],
         };
 
-        await api.users.createTechnicianUser(payload);
-        enqueueSnackbar(
-          translations["Utilizator creat cu succes"][language],
-          { variant: "success" }
-        );
+        const { id: createdUser } = await api.users.createTechnicianUser(payload);
+
+        if (permissionGroupId) {
+          await api.users.assignPermissionToUser(
+            permissionGroupId,
+            createdUser?.user?.id
+          );
+        }
+
+        enqueueSnackbar(translations["Utilizator creat cu succes"][language], {
+          variant: "success",
+        });
       }
 
       setForm(initialFormState);
@@ -224,31 +278,46 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name="new-password-field"
           />
 
-          <Select
-            label={translations["Grup utilizator"][language]}
-            placeholder={translations["Alege grupul"][language]}
-            data={GroupUsersOptions.map((g) => ({ value: g, label: g }))}
-            value={GroupUsersOptions.includes(form.groups) ? form.groups : null}
-            onChange={(value) => setForm({ ...form, groups: value || "" })}
-            required
-          />
+          {groupsLoading ? (
+            <Loader />
+          ) : (
+            <>
+              <Select
+                label={translations["Grup utilizator"][language]}
+                placeholder={translations["Alege grupul"][language]}
+                data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
+                value={form.groups}
+                onChange={(value) => setForm({ ...form, groups: value || "" })}
+                required
+              />
+
+              {initialUser && (
+                <>
+                  <Select
+                    label={translations["Grup permisiuni"][language]}
+                    placeholder={translations["Alege grupul de permisiuni"][language]}
+                    data={permissionGroups.map((g) => ({
+                      value: g.permission_id.toString(),
+                      label: g.permission_name,
+                    }))}
+                    value={form.permissionGroupId}
+                    onChange={handleSelectPermissionGroup}
+                  />
+                  <RoleMatrix
+                    selectedRoles={form.selectedRoles}
+                    onToggle={toggleRole}
+                  />
+                </>
+              )}
+            </>
+          )}
 
           <TextInput
             label={translations["Funcție"][language]}
-            placeholder={translations["Funcție"][language]}
             value={form.job_title}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
             required
           />
-
-          {initialUser && (
-            <RolesComponent
-              employee={{
-                id: initialUser.id?.user?.id || initialUser.id,
-                name: initialUser.name,
-              }}
-            />
-          )}
 
           <Button fullWidth mt="sm" onClick={handleCreate}>
             {initialUser
