@@ -215,7 +215,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           }),
           api.users.updateUser(userId, {
             email,
-            roles: selectedRoles.map((r) => `ROLE_${r}`),
+            roles: selectedRoles
+              .filter((r) => !permissionGroupRoles.includes(r))
+              .map((r) => `ROLE_${r}`),
           }),
         ]);
 
