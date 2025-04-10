@@ -28,6 +28,7 @@ export const ChatMessages = ({
   selectedClient,
   isLoading,
   personalInfo,
+  usersTicket,
 }) => {
   const { userId } = useUser();
   const { messages, setMessages, tickets } = useApp();
@@ -132,7 +133,6 @@ export const ChatMessages = ({
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
         top: messageContainerRef.current.scrollHeight,
-        // behavior: 'smooth',
       });
     }
   }, [messages, selectTicketId]);
@@ -191,31 +191,6 @@ export const ChatMessages = ({
     }
   }, [selectedClient, messages]);
 
-  // TODO: Please refactor me
-  const usersOptions = () =>
-    tickets
-      .find((ticket) => ticket.id === selectTicketId)
-      ?.client_id.replace(/[{}]/g, "")
-      .split(",")
-      .map((id) => {
-        const clientId = id.trim();
-        const clientInfo = personalInfo[clientId] || {};
-        const fullName = clientInfo.name
-          ? `${clientInfo.name} ${clientInfo.surname || ""}`.trim()
-          : `ID: ${clientId}`;
-
-        const platformsMessagesClient = messages.filter(
-          (msg) => msg.client_id === Number(clientId),
-        );
-
-        return [
-          ...new Set(platformsMessagesClient.map((msg) => msg.platform)),
-        ].map((platform) => ({
-          value: `${clientId}-${platform}`,
-          label: `${fullName} | ${platform.charAt(0).toUpperCase() + platform.slice(1)} | ID: ${clientId}`,
-        }));
-      });
-
   return (
     <Flex w="100%" direction="column" className="chat-area">
       <Flex
@@ -266,7 +241,7 @@ export const ChatMessages = ({
                   w="100%"
                   value={`${selectedClient}-${selectedPlatform}`}
                   placeholder={translations["Alege client"][language]}
-                  data={usersOptions().flat()}
+                  data={usersTicket}
                   onChange={(value) => {
                     if (!value) return;
                     const [clientId, platform] = value.split("-");

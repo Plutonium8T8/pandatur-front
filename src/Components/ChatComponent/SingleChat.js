@@ -1,86 +1,72 @@
-import React, { useState, useEffect } from "react"
-import { Flex, ActionIcon, Box } from "@mantine/core"
-import "./chat.css"
-import ChatExtraInfo from "./ChatExtraInfo"
-import ChatList from "./ChatList"
-import { ChatMessages } from "./components"
-import { FaTimes } from "react-icons/fa"
-import { useUser, useApp } from "../../hooks"
+import { FaTimes } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Flex, ActionIcon, Box } from "@mantine/core";
+import ChatExtraInfo from "./ChatExtraInfo";
+import { ChatMessages } from "./components";
+import { useUser, useApp } from "../../hooks";
+import { getMediaFileMessages } from "../utils";
+import "./chat.css";
 
 const SingleChat = ({ ticketId, onClose }) => {
   const {
     tickets,
-    updateTicket,
     setTickets,
     messages,
     markMessagesAsRead,
-    getClientMessagesSingle
-  } = useApp()
-  const { userId } = useUser()
+    getClientMessagesSingle,
+  } = useApp();
+  const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(
-    ticketId ? Number(ticketId) : null
-  )
-  const [personalInfo, setPersonalInfo] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [selectedClient, setSelectedClient] = useState("")
-  const [isChatListVisible, setIsChatListVisible] = useState(false)
+    ticketId ? Number(ticketId) : null,
+  );
+  const [personalInfo, setPersonalInfo] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedClient, setSelectedClient] = useState("");
 
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
-      setSelectTicketId(Number(ticketId))
+      setSelectTicketId(Number(ticketId));
     }
-  }, [ticketId])
+  }, [ticketId]);
 
   useEffect(() => {
     if (selectTicketId) {
-      console.log(`📡 Загружаем сообщения для тикета ${selectTicketId}`)
-      setIsLoading(true)
-      getClientMessagesSingle(selectTicketId).finally(() => setIsLoading(false))
+      setIsLoading(true);
+      getClientMessagesSingle(selectTicketId).finally(() =>
+        setIsLoading(false),
+      );
     }
-  }, [selectTicketId])
+  }, [selectTicketId]);
 
   useEffect(() => {
-    if (!selectTicketId || !messages.length) return
+    if (!selectTicketId || !messages.length) return;
 
     const unreadMessages = messages.filter(
       (msg) =>
         msg.ticket_id === selectTicketId &&
         msg.seen_by === "{}" &&
-        msg.sender_id !== userId
-    )
+        msg.sender_id !== userId,
+    );
 
     if (unreadMessages.length > 0) {
-      markMessagesAsRead(selectTicketId)
+      markMessagesAsRead(selectTicketId);
     }
-  }, [selectTicketId, messages, userId])
+  }, [selectTicketId, messages, userId]);
 
-  const handleSelectTicket = (ticketId) => {
-    if (selectTicketId !== ticketId) {
-      setSelectTicketId(ticketId)
-      console.log(`📡 Запрос сообщений для тикета ${ticketId}`)
-      setIsLoading(true)
-      getClientMessagesSingle(ticketId).finally(() => setIsLoading(false))
-    }
-  }
+  useEffect(() => {
+    const updatedTicket =
+      tickets.find((ticket) => ticket?.id === selectTicketId) || {};
 
-  const updatedTicket =
-    tickets.find((ticket) => ticket.id === selectTicketId) || null
+    setPersonalInfo(updatedTicket);
+  }, [tickets, selectTicketId]);
 
   return (
-    <div className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}>
+    <div className="chat-container">
       <Box pos="absolute" left="20px" top="20px">
         <ActionIcon onClick={onClose} variant="default">
           <FaTimes />
         </ActionIcon>
       </Box>
-
-      {isChatListVisible && (
-        <ChatList
-          setIsLoading={setIsLoading}
-          selectTicketId={selectTicketId}
-          setSelectTicketId={handleSelectTicket}
-        />
-      )}
 
       <Flex w="70%">
         <ChatMessages
@@ -89,7 +75,6 @@ const SingleChat = ({ ticketId, onClose }) => {
           selectedClient={selectedClient}
           isLoading={isLoading}
           personalInfo={personalInfo}
-          setPersonalInfo={setPersonalInfo}
         />
       </Flex>
 
@@ -97,18 +82,33 @@ const SingleChat = ({ ticketId, onClose }) => {
         selectedClient={selectedClient}
         ticketId={ticketId}
         selectTicketId={selectTicketId}
-        setSelectTicketId={handleSelectTicket}
         tickets={tickets}
-        updatedTicket={updatedTicket}
-        updateTicket={updateTicket}
-        setTickets={setTickets}
-        personalInfo={personalInfo}
-        setPersonalInfo={setPersonalInfo}
-        messages={messages}
-        isLoading={isLoading}
+        updatedTicket={personalInfo}
+        onUpdatePersonalInfo={(values) => {
+          const firstClient = personalInfo.clients[0];
+          const clients = (personalInfo.clients = [
+            { ...firstClient, ...values },
+            ...personalInfo.clients.slice(1),
+          ]);
+          setTickets((prev) =>
+            prev.map((ticket) =>
+              ticket.id === personalInfo.id
+                ? { ...ticket, ...personalInfo, clients }
+                : ticket,
+            ),
+          );
+
+          setPersonalInfo((prev) => {
+            return {
+              ...prev,
+              clients: clients,
+            };
+          });
+        }}
+        mediaFiles={getMediaFileMessages(messages, selectTicketId)}
       />
     </div>
-  )
-}
+  );
+};
 
-export default SingleChat
+export default SingleChat;
