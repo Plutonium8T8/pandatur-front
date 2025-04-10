@@ -1966,5 +1966,13 @@ export const translations = {
   "Eroare la încărcarea grupurilor de permisiuni": {
     "RO": "Eroare la încărcarea grupurilor de permisiuni",
     "RU": "Ошибка при загрузке групп разрешений"
+  },
+  "Permisiunile au fost eliminate cu succes": {
+    "RO": "Permisiunile au fost eliminate cu succes",
+    "RU": "Успешно удалено"
+  },
+  "Eroare la eliminarea permisiunilor": {
+    "RO": "Eroare la eliminarea permisiunilor",
+    "RU": "Ошибка при удалении"
   }
 };

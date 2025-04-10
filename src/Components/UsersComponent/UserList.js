@@ -158,7 +158,7 @@ const UserList = ({
       title: translations["ID"][language],
       dataIndex: "id",
       key: "id",
-      width: 100,
+      width: 90,
       render: (id) => id,
     },
     {

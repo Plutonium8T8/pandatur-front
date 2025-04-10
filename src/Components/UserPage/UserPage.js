@@ -104,7 +104,7 @@ const UserPage = ({ isOpen, onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await api.users.updateUsernameAndEmail(userId, {
+      await api.users.updateUser(userId, {
         email: users.email,
         username: users.username
       })

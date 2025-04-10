@@ -59,7 +59,7 @@ export const users = {
     return data
   },
 
-  updateUsernameAndEmail: async (id, body) => {
+  updateUser: async (id, body) => {
     const { data } = await baseAxios.patch(`/api/users/${id}`, body)
 
     return data
@@ -96,5 +96,10 @@ export const users = {
   updatePermissionGroup: async (id, body) => {
     const { data } = await baseAxios.patch(`/api/user-groups/permissions/${id}`, body)
     return data
+  },
+
+  removePermissionFromTechnician: async (userId) => {
+    const { data } = await baseAxios.delete(`/api/user-groups/permissions/technician/${userId}`);
+    return data;
   }
 }

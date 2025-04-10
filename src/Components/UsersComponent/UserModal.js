@@ -44,11 +44,39 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const permissionGroupId =
         initialUser.permissions?.[0]?.id?.toString() || null;
 
-      const selectedRoles = initialUser.permissions?.[0]?.roles
-        ? formatRoles(initialUser.permissions[0].roles)
-          .map((r) => r.replace(/^ROLE_/, ""))
-          .filter(Boolean)
-        : [];
+      let selectedRoles = [];
+
+      try {
+        const rawRoles = initialUser?.id?.user?.roles;
+
+        if (rawRoles) {
+          const parsed = JSON.parse(rawRoles);
+          if (Array.isArray(parsed)) {
+            selectedRoles = parsed
+              .map((role) => role.replace(/^ROLE_/, ""))
+              .filter(Boolean);
+          }
+        }
+      } catch (e) {
+        console.warn("Ошибка парсинга user.roles:", e);
+      }
+
+      // Если роли из user пустые — пробуем из permission
+      if (
+        selectedRoles.length === 0 &&
+        initialUser?.permissions?.[0]?.roles
+      ) {
+        try {
+          const parsed = JSON.parse(initialUser.permissions[0].roles);
+          if (Array.isArray(parsed)) {
+            selectedRoles = parsed
+              .map((role) => role.replace(/^ROLE_/, ""))
+              .filter(Boolean);
+          }
+        } catch (e) {
+          console.warn("Ошибка парсинга permissions.roles:", e);
+        }
+      }
 
       setForm({
         ...initialFormState,
@@ -68,7 +96,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     } else {
       setForm(initialFormState);
     }
-    console.log("initial user infoooooooo", initialUser)
   }, [initialUser, opened]);
 
   useEffect(() => {
@@ -105,6 +132,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     if (opened) fetchGroups();
   }, [opened]);
 
+  const handlePermissionGroupChange = (value) => {
+    if (!value) {
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId: null,
+        selectedRoles: [],
+      }));
+    } else {
+      handleSelectPermissionGroup(value);
+    }
+  };
+
   const handleSelectPermissionGroup = (permissionGroupId) => {
     const selected = permissionGroups.find(
       (g) => g.permission_id.toString() === permissionGroupId
@@ -139,6 +178,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       status,
       groups,
       permissionGroupId,
+      selectedRoles,
     } = form;
 
     if (!initialUser) {
@@ -164,7 +204,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name,
             surname,
           }),
-          api.users.updateUsernameAndEmail(userId, { email }),
+          api.users.updateUser(userId, {
+            email,
+            roles: selectedRoles.map((r) => `ROLE_${r}`),
+          }),
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
@@ -174,7 +217,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
-        if (permissionGroupId) {
+        // 👉 Обработка удаления или назначения permission group
+        const hadPermissionBefore = initialUser?.permissions?.length > 0;
+
+        if (!permissionGroupId && hadPermissionBefore) {
+          await api.users.removePermissionFromTechnician(userId);
+        } else if (permissionGroupId) {
           await api.users.assignPermissionToUser(permissionGroupId, userId);
         }
 
@@ -309,25 +357,26 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
-              {permissionGroups.length > 0 && initialUser && (
+              {initialUser && (
                 <>
-                  <Select
-                    label={translations["Grup permisiuni"][language]}
-                    placeholder={translations["Alege grupul de permisiuni"][language]}
-                    data={permissionGroups.map((g) => ({
-                      value: g.permission_id.toString(),
-                      label: g.permission_name,
-                    }))}
-                    value={form.permissionGroupId}
-                    onChange={handleSelectPermissionGroup}
-                  />
-
-                  {form.permissionGroupId && (
-                    <RoleMatrix
-                      selectedRoles={form.selectedRoles}
-                      onToggle={toggleRole}
+                  {permissionGroups.length > 0 && (
+                    <Select
+                      clearable
+                      label={translations["Grup permisiuni"][language]}
+                      placeholder={translations["Alege grupul de permisiuni"][language]}
+                      data={permissionGroups.map((g) => ({
+                        value: g.permission_id.toString(),
+                        label: g.permission_name,
+                      }))}
+                      value={form.permissionGroupId}
+                      onChange={handlePermissionGroupChange}
                     />
                   )}
+
+                  <RoleMatrix
+                    selectedRoles={form.selectedRoles}
+                    onToggle={toggleRole}
+                  />
                 </>
               )}
             </>
