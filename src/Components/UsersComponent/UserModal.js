@@ -59,7 +59,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           }
         }
       } catch (e) {
-        console.warn("error parsing user.roles:", e);
+        console.warn("Ошибка парсинга user.roles:", e);
       }
 
       try {
@@ -70,10 +70,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             permissionRoles = parsed
               .map((role) => role.replace(/^ROLE_/, ""))
               .filter(Boolean);
+            setPermissionGroupRoles(permissionRoles);
           }
         }
       } catch (e) {
-        console.warn("error parsing permissions.roles:", e);
+        console.warn("Ошибка парсинга permissions.roles:", e);
       }
 
       const combinedRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
@@ -95,6 +96,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       });
     } else {
       setForm(initialFormState);
+      setPermissionGroupRoles([]);
     }
   }, [initialUser, opened]);
 
