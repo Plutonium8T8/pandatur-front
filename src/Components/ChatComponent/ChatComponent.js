@@ -13,6 +13,14 @@ import {
 import { ChatMessages } from "./components";
 import "./chat.css";
 
+const parseDate = (dateString) => {
+  if (!dateString) return null;
+  const [date, time] = dateString.split(" ");
+  if (!date || !time) return null;
+  const [day, month, year] = date.split("-");
+  return new Date(`${year}-${month}-${day}T${time}`);
+};
+
 const ChatComponent = () => {
   const {
     tickets,
@@ -30,9 +38,21 @@ const ChatComponent = () => {
   const [personalInfo, setPersonalInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const [selectedClient, setSelectedClient] = useState("");
-  const [selectedUser, setSelectedUser] = useState();
+  const [selectedUser, setSelectedUser] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
+
+  const getLastClientWhoSentMessage = () => {
+    if (!Array.isArray(messages) || messages.length === 0) return null;
+
+    const ticketMessages = messages
+      .filter(
+        (msg) =>
+          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
+      )
+      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
+
+    return ticketMessages.length > 0 ? ticketMessages[0] : null;
+  };
 
   useEffect(() => {
     if (!selectTicketId || !messages.length) return;
@@ -50,24 +70,39 @@ const ChatComponent = () => {
   }, [selectTicketId, messages, userId]);
 
   useEffect(() => {
+    const lastMessage = getLastClientWhoSentMessage();
+
     const ticketById =
       tickets.find((ticket) => ticket.id === selectTicketId) || {};
 
     const users =
-      ticketById.clients?.map(({ id, name, surname }) => {
-        const platformsMessagesClient = messages
-          .filter((msg) => msg.client_id === id)
-          .map(({ platform }) => platform);
-        return [...new Set(platformsMessagesClient)].map((platform) => ({
-          value: `${id}-${platform}`,
-          label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
-          payload: { id, platform },
-        }));
-      }) || null;
+      ticketById.clients
+        ?.map(({ id, name, surname, phone }) => {
+          const platformsMessagesClient = messages
+            .filter((msg) => msg.client_id === id)
+            .map(({ platform }) => platform);
+          return [...new Set(platformsMessagesClient)].map((platform) => ({
+            value: `${id}-${platform}`,
+            label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
+            payload: { id, platform, name, surname, phone },
+          }));
+        })
+        ?.flat() || [];
 
-    setSelectedUser(ticketById.clients?.[0]);
+    if (lastMessage) {
+      const { platform, client_id } = lastMessage;
+
+      const selectedUser = users.find(
+        ({ payload }) =>
+          payload.id === client_id && payload.platform === platform,
+      );
+      setSelectedUser(selectedUser || {});
+    } else {
+      setSelectedUser(users[0] || {});
+    }
+
     setPersonalInfo(ticketById);
-    setMessageSendersByPlatform(users ? users.flat() : users);
+    setMessageSendersByPlatform(users);
   }, [tickets, selectTicketId]);
 
   const handleSelectTicket = (ticketId) => {
@@ -93,12 +128,12 @@ const ChatComponent = () => {
     }
   }, [ticketId]);
 
-  const changeUser = (userId) => {
-    const selectedUserId = personalInfo.clients?.find(
-      ({ id }) => id === userId,
+  const changeUser = (userId, platform) => {
+    const user = messageSendersByPlatform.find(
+      ({ payload }) => payload.id === userId && payload.platform === platform,
     );
 
-    setSelectedUser(selectedUserId);
+    setSelectedUser(user);
   };
 
   return (
@@ -131,8 +166,7 @@ const ChatComponent = () => {
 
           <ChatMessages
             selectTicketId={selectTicketId}
-            setSelectedClient={setSelectedClient}
-            selectedClient={selectedClient}
+            selectedClient={selectedUser}
             isLoading={isLoading}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform}
@@ -143,7 +177,6 @@ const ChatComponent = () => {
         {selectTicketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
-            selectedClient={selectedClient}
             ticketId={ticketId}
             selectTicketId={selectTicketId}
             onUpdatePersonalInfo={(values) => {
