@@ -1,4 +1,6 @@
-import { Combobox, useCombobox } from "@mantine/core";
+import { Combobox, useCombobox, Group } from "@mantine/core";
+import { useState } from "react";
+import { FaCheck } from "react-icons/fa6";
 
 export const ComboSelect = ({
   data,
@@ -7,24 +9,23 @@ export const ComboSelect = ({
   renderTriggerButton,
   maxHeight = 200,
   width = 250,
+  currentValue,
 }) => {
+  const [selectedItem, setSelectedItem] = useState();
+
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
-  const options = data.map(({ value, label }) => (
-    <Combobox.Option value={value} key={value}>
-      {label}
-    </Combobox.Option>
-  ));
-
   return (
     <Combobox
+      value={selectedItem}
       store={combobox}
       width={width}
       position={position}
-      onOptionSubmit={(val) => {
-        onChange(val);
+      onOptionSubmit={(value) => {
+        setSelectedItem(value);
+        onChange(value);
         combobox.closeDropdown();
       }}
     >
@@ -34,7 +35,16 @@ export const ComboSelect = ({
 
       <Combobox.Dropdown>
         <Combobox.Options mah={maxHeight} style={{ overflowY: "auto" }}>
-          {options}
+          {data.map(({ value, label }) => {
+            return (
+              <Combobox.Option active={true} value={value} key={value}>
+                <Group>
+                  {value === selectedItem && <FaCheck />}
+                  {label}
+                </Group>
+              </Combobox.Option>
+            );
+          })}
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

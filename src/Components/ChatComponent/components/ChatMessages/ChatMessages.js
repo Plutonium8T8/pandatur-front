@@ -10,7 +10,6 @@ import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
 import { getMediaType } from "../../utils";
 import { GroupedMessages } from "../GroupedMessages";
-import { getFullName } from "../../../utils";
 import "./ChatMessages.css";
 
 const language = localStorage.getItem("language") || "RO";
@@ -152,6 +151,8 @@ export const ChatMessages = ({
 
       {selectTicketId && !isLoading && (
         <ChatInput
+          clientList={messageSendersByPlatform}
+          currentClient={selectedClient}
           loading={loadingMessage}
           onSendMessage={(value) => {
             if (!selectedClient) {
@@ -162,25 +163,12 @@ export const ChatMessages = ({
           onHandleFileSelect={(file) =>
             sendMessage(file, selectedClient.payload?.platform)
           }
-          renderSelectUserPlatform={() => {
-            return (
-              messageSendersByPlatform && (
-                <Select
-                  size="md"
-                  w="100%"
-                  value={`${selectedClient.payload?.id}-${selectedClient.payload?.platform}`}
-                  placeholder={translations["Alege client"][language]}
-                  data={messageSendersByPlatform}
-                  onChange={(value) => {
-                    if (!value) return;
-                    const [clientId, platform] = value.split("-");
-                    const selectUserId = Number(clientId);
+          onChangeClient={(value) => {
+            if (!value) return;
+            const [clientId, platform] = value.split("-");
+            const selectUserId = Number(clientId);
 
-                    onChangeSelectedUser(selectUserId, platform);
-                  }}
-                />
-              )
-            );
+            onChangeSelectedUser(selectUserId, platform);
           }}
         />
       )}

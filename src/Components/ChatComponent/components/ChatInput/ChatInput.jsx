@@ -1,11 +1,16 @@
 import { Textarea, Flex, ActionIcon, Box, Button, Text } from "@mantine/core";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
 import { IoIosArrowDown } from "react-icons/io";
 import { RiAttachment2 } from "react-icons/ri";
-import { getLanguageByKey } from "../../../utils";
+import { FaFingerprint } from "react-icons/fa6";
+import {
+  getLanguageByKey,
+  socialMediaIcons,
+  getFullName,
+} from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
 import { ComboSelect } from "../../../ComboSelect";
 import "./ChatInput.css";
@@ -13,10 +18,10 @@ import "./ChatInput.css";
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
-  renderSelectUserPlatform,
   loading,
   clientList,
   onChangeClient,
+  currentClient,
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
@@ -26,6 +31,29 @@ export const ChatInput = ({
     top: 0,
     left: 0,
   });
+
+  const userList = useMemo(() => {
+    return clientList?.map(({ payload, value }) => {
+      const fullName = getFullName(payload.name, payload.surname);
+
+      return {
+        value,
+        label: (
+          <Flex align="center" gap="8">
+            <Flex align="center" gap="4">
+              {!fullName && <FaFingerprint size="12" />}
+              {fullName || payload.id}
+            </Flex>
+            {socialMediaIcons[payload?.platform]}
+          </Flex>
+        ),
+        payload: {
+          id: payload.id,
+          platform: payload.platform,
+        },
+      };
+    });
+  }, [clientList]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -65,8 +93,14 @@ export const ChatInput = ({
   };
 
   useEffect(() => {
-    setSelectedClient(clientList[0]?.label);
-  }, [clientList]);
+    setSelectedClient(
+      userList.find(
+        ({ payload }) =>
+          payload.id === currentClient.payload?.id &&
+          payload.platform === currentClient.payload?.platform,
+      ),
+    );
+  }, [currentClient, userList]);
 
   return (
     <>
@@ -81,18 +115,21 @@ export const ChatInput = ({
                 td="underline"
                 onClick={closeDropdown}
               >
-                {selectedClient ? `${selectedClient}:` : ""}
+                {selectedClient?.label ? selectedClient?.label : ""}
               </Text>
             )}
             onChange={(value) => {
-              setSelectedClient(value);
+              setSelectedClient(
+                userList.find((client) => client.value === value),
+              );
               onChangeClient(value);
             }}
-            data={clientList}
+            data={userList}
           />
 
           <ComboSelect
             position="top"
+            currentValue={currentClient.value}
             renderTriggerButton={(closeDropdown) => (
               <ActionIcon size="xs" variant="default" onClick={closeDropdown}>
                 <IoIosArrowDown />
