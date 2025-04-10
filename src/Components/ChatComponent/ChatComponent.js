@@ -5,11 +5,7 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useUser } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import {
-  getFullName,
-  capitalizeFirstLetter,
-  getMediaFileMessages,
-} from "../utils";
+import { getMediaFileMessages, normalizeUsersAndPlatforms } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
@@ -70,24 +66,22 @@ const ChatComponent = () => {
   }, [selectTicketId, messages, userId]);
 
   useEffect(() => {
+    const ticketById =
+      tickets.find((ticket) => ticket.id === selectTicketId) || {};
+
+    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
+
+    setPersonalInfo(ticketById);
+    setMessageSendersByPlatform(users);
+  }, [tickets, selectTicketId]);
+
+  useEffect(() => {
     const lastMessage = getLastClientWhoSentMessage();
 
     const ticketById =
       tickets.find((ticket) => ticket.id === selectTicketId) || {};
 
-    const users =
-      ticketById.clients
-        ?.map(({ id, name, surname, phone }) => {
-          const platformsMessagesClient = messages
-            .filter((msg) => msg.client_id === id)
-            .map(({ platform }) => platform);
-          return [...new Set(platformsMessagesClient)].map((platform) => ({
-            value: `${id}-${platform}`,
-            label: `${getFullName(name, surname) || `#${id}`} - ${capitalizeFirstLetter(platform)}`,
-            payload: { id, platform, name, surname, phone },
-          }));
-        })
-        ?.flat() || [];
+    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
 
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
@@ -100,10 +94,7 @@ const ChatComponent = () => {
     } else {
       setSelectedUser(users[0] || {});
     }
-
-    setPersonalInfo(ticketById);
-    setMessageSendersByPlatform(users);
-  }, [tickets, selectTicketId]);
+  }, [selectTicketId, messages]);
 
   const handleSelectTicket = (ticketId) => {
     if (selectTicketId !== ticketId) {
