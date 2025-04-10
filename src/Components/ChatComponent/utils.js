@@ -1,5 +1,5 @@
 import { FaRegFileLines } from "react-icons/fa6";
-import { Flex } from "@mantine/core";
+import { Flex, Text } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 
 export const getMediaType = (mimeType) => {
@@ -54,6 +54,10 @@ export const renderContent = (msg) => {
         </a>
       );
     default:
-      return <div style={{ whiteSpace: "pre-line" }}>{msg.message}</div>;
+      return (
+        <Text style={{ whiteSpace: "pre-line" }} truncate>
+          {msg.message}
+        </Text>
+      );
   }
 };
