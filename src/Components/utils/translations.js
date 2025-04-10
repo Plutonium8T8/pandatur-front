@@ -1974,5 +1974,21 @@ export const translations = {
   "Eroare la eliminarea permisiunilor": {
     "RO": "Eroare la eliminarea permisiunilor",
     "RU": "Ошибка при удалении"
+  },
+  "Schimbǎ grup de permisiuni": {
+    "RO": "Schimbǎ grup de permisiuni",
+    "RU": "Сменить группу с правами"
+  },
+  "Grup de permisiuni atribuit": {
+    "RO": "Grup de permisiuni atribuit",
+    "RU": "Группа разрешений успешно назначена"
+  },
+  "Eroare la atribuirea grupului": {
+    "RO": "Eroare la atribuirea grupului",
+    "RU": "Ошибка при назначении группы разрешений"
+  },
+  "Atribuiți grupul de permisiuni": {
+    "RO": "Atribuiți grupul de permisiuni",
+    "RU": "Назначить группу разрешений"
   }
 };

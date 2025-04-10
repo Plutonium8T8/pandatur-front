@@ -12,6 +12,7 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 import GroupChangeModal from "./GroupsUsers/GroupChangeModal";
 import { useConfirmPopup } from "../../hooks";
+import PermissionGroupAssignModal from "./Roles/PermissionGroupAssignModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -26,6 +27,7 @@ const UserList = ({
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false);
 
   const allIds = users.map(extractId).filter(Boolean);
   const allSelected =
@@ -129,6 +131,21 @@ const UserList = ({
         translations["Eroare la actualizarea grupului"][language],
         { variant: "error" },
       );
+    }
+  };
+
+  const handleAssignPermissionGroup = async (permissionGroupId) => {
+    try {
+      await api.users.batchAssignPermissionGroup(permissionGroupId, selectedIds);
+      enqueueSnackbar(translations["Grup de permisiuni atribuit"][language], {
+        variant: "success",
+      });
+      fetchUsers();
+      setSelectedIds([]);
+    } catch (err) {
+      enqueueSnackbar(translations["Eroare la atribuirea grupului"][language], {
+        variant: "error",
+      });
     }
   };
 
@@ -274,6 +291,9 @@ const UserList = ({
           <Button variant="light" onClick={() => setGroupModalOpen(true)}>
             {translations["Schimbă grupul"][language]}
           </Button>
+          <Button variant="light" color="grape" onClick={() => setPermissionModalOpen(true)}>
+            {translations["Schimbǎ grup de permisiuni"][language]}
+          </Button>
           <Button
             variant="light"
             color="red"
@@ -288,6 +308,12 @@ const UserList = ({
         opened={groupModalOpen}
         onClose={() => setGroupModalOpen(false)}
         onConfirm={handleChangeGroup}
+      />
+
+      <PermissionGroupAssignModal
+        opened={permissionModalOpen}
+        onClose={() => setPermissionModalOpen(false)}
+        onConfirm={handleAssignPermissionGroup}
       />
 
       <RcTable
