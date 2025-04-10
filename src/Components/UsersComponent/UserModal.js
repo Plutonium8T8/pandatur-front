@@ -38,6 +38,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [groupsList, setGroupsList] = useState([]);
   const [permissionGroups, setPermissionGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
+  const [permissionGroupRoles, setPermissionGroupRoles] = useState([]);
 
   useEffect(() => {
     if (initialUser) {
@@ -131,18 +132,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     if (opened) fetchGroups();
   }, [opened]);
 
-  const handlePermissionGroupChange = (value) => {
-    if (!value) {
-      setForm((prev) => ({
-        ...prev,
-        permissionGroupId: null,
-        selectedRoles: [...prev.selectedRoles],
-      }));
-    } else {
-      handleSelectPermissionGroup(value);
-    }
-  };
-
   const handleSelectPermissionGroup = (permissionGroupId) => {
     const selectedGroup = permissionGroups.find(
       (g) => g.permission_id.toString() === permissionGroupId
@@ -152,10 +141,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       .map((r) => r.replace(/^ROLE_/, ""))
       .filter(Boolean);
 
+    setPermissionGroupRoles(groupRoles);
+
     setForm((prev) => {
-      const combinedRoles = Array.from(
-        new Set([...prev.selectedRoles, ...groupRoles])
+      const customRoles = prev.selectedRoles.filter(
+        (role) => !permissionGroupRoles.includes(role)
       );
+      const combinedRoles = Array.from(new Set([...customRoles, ...groupRoles]));
 
       return {
         ...prev,
@@ -163,6 +155,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         selectedRoles: combinedRoles,
       };
     });
+  };
+
+  const handlePermissionGroupChange = (value) => {
+    if (!value) {
+      const removedRoles = [...permissionGroupRoles];
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId: null,
+        selectedRoles: prev.selectedRoles.filter(
+          (role) => !removedRoles.includes(role)
+        ),
+      }));
+      setPermissionGroupRoles([]);
+    } else {
+      handleSelectPermissionGroup(value);
+    }
   };
 
   const toggleRole = (role) => {
