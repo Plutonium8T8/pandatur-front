@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Button,
   Drawer,
@@ -39,48 +39,40 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [permissionGroups, setPermissionGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [permissionGroupRoles, setPermissionGroupRoles] = useState([]);
+  const permissionGroupInitialRolesRef = useRef([]);
+  const [customRoles, setCustomRoles] = useState([]);
 
   useEffect(() => {
     if (initialUser) {
-      const permissionGroupId =
-        initialUser.permissions?.[0]?.id?.toString() || null;
-
+      const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
       let userRoles = [];
       let permissionRoles = [];
 
       try {
         const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
-        if (rawRoles) {
-          const parsed = JSON.parse(rawRoles);
-          if (Array.isArray(parsed)) {
-            userRoles = parsed
-              .map((role) => role.replace(/^ROLE_/, ""))
-              .filter(Boolean);
-          }
+        const parsed = JSON.parse(rawRoles);
+        if (Array.isArray(parsed)) {
+          userRoles = parsed.map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
         }
-      } catch (e) {
-        console.warn("Ошибка парсинга user.roles:", e);
-      }
+      } catch { }
 
       try {
         const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
-        if (rawPermissionRoles) {
-          const parsed = JSON.parse(rawPermissionRoles);
-          if (Array.isArray(parsed)) {
-            permissionRoles = parsed
-              .map((role) => role.replace(/^ROLE_/, ""))
-              .filter(Boolean);
-            setPermissionGroupRoles(permissionRoles);
-          }
+        const parsed = JSON.parse(rawPermissionRoles);
+        if (Array.isArray(parsed)) {
+          permissionRoles = parsed.map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
+          setPermissionGroupRoles(permissionRoles);
+          permissionGroupInitialRolesRef.current = permissionRoles;
         }
-      } catch (e) {
-        console.warn("Ошибка парсинга permissions.roles:", e);
-      }
+      } catch { }
 
-      const combinedRoles = Array.from(new Set([...userRoles, ...permissionRoles]));
+      const onlyCustom = userRoles.filter((r) => !permissionRoles.includes(r));
+      setCustomRoles(onlyCustom);
 
-      setForm({
-        ...initialFormState,
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId,
+        selectedRoles: Array.from(new Set([...onlyCustom, ...permissionRoles])),
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
@@ -91,11 +83,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
-        permissionGroupId,
-        selectedRoles: combinedRoles,
-      });
+      }));
     } else {
       setForm(initialFormState);
+      setCustomRoles([]);
       setPermissionGroupRoles([]);
     }
   }, [initialUser, opened]);
@@ -143,31 +134,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       .map((r) => r.replace(/^ROLE_/, ""))
       .filter(Boolean);
 
+    permissionGroupInitialRolesRef.current = groupRoles;
     setPermissionGroupRoles(groupRoles);
 
-    setForm((prev) => {
-      const customRoles = prev.selectedRoles.filter(
-        (role) => !permissionGroupRoles.includes(role)
-      );
-      const combinedRoles = Array.from(new Set([...customRoles, ...groupRoles]));
-
-      return {
-        ...prev,
-        permissionGroupId,
-        selectedRoles: combinedRoles,
-      };
-    });
+    setForm((prev) => ({
+      ...prev,
+      permissionGroupId,
+      selectedRoles: Array.from(new Set([...customRoles, ...groupRoles])),
+    }));
   };
 
   const handlePermissionGroupChange = (value) => {
     if (!value) {
-      const removedRoles = [...permissionGroupRoles];
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        selectedRoles: prev.selectedRoles.filter(
-          (role) => !removedRoles.includes(role)
-        ),
+        selectedRoles: customRoles,
       }));
       setPermissionGroupRoles([]);
     } else {
@@ -176,12 +158,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   };
 
   const toggleRole = (role) => {
-    setForm((prev) => ({
-      ...prev,
-      selectedRoles: prev.selectedRoles.includes(role)
+    setCustomRoles((prev) =>
+      prev.includes(role)
+        ? prev.filter((r) => r !== role)
+        : [...prev, role]
+    );
+
+    setForm((prev) => {
+      const nextRoles = prev.selectedRoles.includes(role)
         ? prev.selectedRoles.filter((r) => r !== role)
-        : [...prev.selectedRoles, role],
-    }));
+        : [...prev.selectedRoles, role];
+
+      return {
+        ...prev,
+        selectedRoles: nextRoles,
+      };
+    });
   };
 
   const handleCreate = async () => {
