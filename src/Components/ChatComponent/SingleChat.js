@@ -4,7 +4,7 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useUser, useApp } from "../../hooks";
-import { getMediaFileMessages } from "../utils";
+import { getMediaFileMessages, normalizeUsersAndPlatforms } from "../utils";
 import "./chat.css";
 
 const SingleChat = ({ ticketId, onClose }) => {
@@ -21,7 +21,8 @@ const SingleChat = ({ ticketId, onClose }) => {
   );
   const [personalInfo, setPersonalInfo] = useState({});
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedClient, setSelectedClient] = useState("");
+  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
+  const [selectedUser, setSelectedUser] = useState({});
 
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
@@ -57,8 +58,19 @@ const SingleChat = ({ ticketId, onClose }) => {
     const updatedTicket =
       tickets.find((ticket) => ticket?.id === selectTicketId) || {};
 
+    const users = normalizeUsersAndPlatforms(updatedTicket.clients, messages);
+
     setPersonalInfo(updatedTicket);
+    setMessageSendersByPlatform(users);
   }, [tickets, selectTicketId]);
+
+  const changeUser = (userId, platform) => {
+    const user = messageSendersByPlatform.find(
+      ({ payload }) => payload.id === userId && payload.platform === platform,
+    );
+
+    setSelectedUser(user);
+  };
 
   return (
     <div className="chat-container">
@@ -70,26 +82,27 @@ const SingleChat = ({ ticketId, onClose }) => {
 
       <Flex w="70%">
         <ChatMessages
+          selectedClient={selectedUser}
           selectTicketId={selectTicketId}
-          setSelectedClient={setSelectedClient}
-          selectedClient={selectedClient}
           isLoading={isLoading}
           personalInfo={personalInfo}
+          messageSendersByPlatform={messageSendersByPlatform}
+          onChangeSelectedUser={changeUser}
         />
       </Flex>
 
       <ChatExtraInfo
-        selectedClient={selectedClient}
+        selectedUser={selectedUser}
         ticketId={ticketId}
         selectTicketId={selectTicketId}
-        tickets={tickets}
         updatedTicket={personalInfo}
         onUpdatePersonalInfo={(values) => {
-          const firstClient = personalInfo.clients[0];
+          const firstClient = personalInfo.clients?.[0];
           const clients = (personalInfo.clients = [
             { ...firstClient, ...values },
             ...personalInfo.clients.slice(1),
           ]);
+
           setTickets((prev) =>
             prev.map((ticket) =>
               ticket.id === personalInfo.id
