@@ -1,11 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
-import { RcTable, HeaderCellRcTable } from "../../../RcTable";
-import { Checkbox } from "../../../Checkbox";
-import { translations } from "../../../utils/translations";
+import { RcTable, HeaderCellRcTable } from "../../RcTable";
+import { Checkbox } from "../../Checkbox";
+import { translations } from "../../utils/translations";
 import "./TaskList.css";
-import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
+import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
-import { api } from "../../../../api";
+import { api } from "../../../api";
 import { Menu, Button } from "@mantine/core";
 import {
   IoEllipsisHorizontal,
@@ -13,7 +13,8 @@ import {
   IoTrash,
   IoPencil,
 } from "react-icons/io5";
-import { useConfirmPopup } from "../../../../hooks";
+import { useConfirmPopup } from "../../../hooks";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -24,7 +25,7 @@ const priorityColors = {
 };
 
 const TaskList = ({
-  tasks,
+  tasks = [],
   handleMarkAsSeenTask,
   userList = [],
   loading = false,
@@ -32,8 +33,8 @@ const TaskList = ({
   fetchTasks,
 }) => {
   const [order, setOrder] = useState("ASC");
+  const [sortColumn, setSortColumn] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
-  const [, setColumn] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
   const handleDeleteTaskById = useConfirmPopup({
@@ -51,9 +52,7 @@ const TaskList = ({
       } catch (error) {
         enqueueSnackbar(
           translations["Eroare la ștergerea taskului"][language],
-          {
-            variant: "error",
-          },
+          { variant: "error" }
         );
       }
     });
@@ -61,11 +60,7 @@ const TaskList = ({
 
   const handleMarkTaskAsComplete = async (taskId) => {
     try {
-      await api.task.update({
-        id: taskId,
-        status: true,
-      });
-
+      await api.task.update({ id: taskId, status: true });
       enqueueSnackbar(translations["Task marcat ca finalizat!"][language], {
         variant: "success",
       });
@@ -73,9 +68,7 @@ const TaskList = ({
     } catch (error) {
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului taskului"][language],
-        {
-          variant: "error",
-        },
+        { variant: "error" }
       );
     }
   };
@@ -97,6 +90,28 @@ const TaskList = ({
     };
   }, [openMenuId]);
 
+  const sortedTasks = useMemo(() => {
+    if (!Array.isArray(tasks)) return [];
+
+    if (!sortColumn) return tasks;
+
+    return [...tasks].sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      if (sortColumn === "scheduled_time") {
+        valA = dayjs(valA).valueOf();
+        valB = dayjs(valB).valueOf();
+      }
+
+      const comparison = String(valA).localeCompare(String(valB), undefined, {
+        numeric: true,
+      });
+
+      return order === "ASC" ? comparison : -comparison;
+    });
+  }, [tasks, sortColumn, order]);
+
   const columns = useMemo(
     () => [
       {
@@ -110,7 +125,7 @@ const TaskList = ({
               setSelectedRow((prev) =>
                 prev.includes(row.id)
                   ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id],
+                  : [...prev, row.id]
               );
             }}
           />
@@ -129,7 +144,7 @@ const TaskList = ({
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("id");
+            setSortColumn("id");
             setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
           },
         }),
@@ -147,7 +162,7 @@ const TaskList = ({
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("ticket_id");
+            setSortColumn("ticket_id");
             setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
           },
         }),
@@ -199,7 +214,8 @@ const TaskList = ({
         key: "creator_by_full_name",
         width: 150,
         align: "center",
-        render: (_, row) => row.creator_by_full_name || `ID: ${row.created_by}`,
+        render: (_, row) =>
+          row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
         title: translations["Pentru"][language],
@@ -207,7 +223,8 @@ const TaskList = ({
         key: "created_for_full_name",
         width: 150,
         align: "center",
-        render: (_, row) => row.created_for_full_name || `ID: ${row.created_for}`,
+        render: (_, row) =>
+          row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: translations["Descriere"][language],
@@ -217,17 +234,27 @@ const TaskList = ({
         align: "center",
       },
       {
-        title: translations["Deadline"][language],
+        title: (
+          <HeaderCellRcTable
+            title={translations["Deadline"][language]}
+            order={order}
+          />
+        ),
         dataIndex: "scheduled_time",
         key: "scheduled_time",
         width: 180,
         align: "center",
+        onHeaderCell: () => ({
+          onClick: () => {
+            setSortColumn("scheduled_time");
+            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
+          },
+        }),
         render: (date) => {
-          const [day, month, year, time] = date.split(/[-\s:]/);
-          const formattedDate = new Date(`${year}-${month}-${day}T${time}:00`);
-          return isNaN(formattedDate.getTime())
-            ? "Invalid Date"
-            : formattedDate.toLocaleString();
+          const parsed = dayjs(date);
+          return parsed.isValid()
+            ? parsed.format("DD.MM.YYYY HH:mm")
+            : "Invalid Date";
         },
       },
       {
@@ -293,7 +320,7 @@ const TaskList = ({
         ),
       },
     ],
-    [language, userList, handleMarkAsSeenTask, order, selectedRow, openMenuId],
+    [language, userList, handleMarkAsSeenTask, order, sortColumn, selectedRow, openMenuId]
   );
 
   return (
@@ -301,7 +328,7 @@ const TaskList = ({
       <RcTable
         rowKey={({ id }) => id}
         columns={columns}
-        data={tasks}
+        data={sortedTasks}
         selectedRow={selectedRow}
         loading={loading}
         bordered

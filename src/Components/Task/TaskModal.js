@@ -7,11 +7,11 @@ import {
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useSnackbar } from "notistack";
-import { api } from "../../../../api";
-import IconSelect from "../../../IconSelect/IconSelect";
-import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
-import { translations } from "../../../utils/translations";
-import { useGetTechniciansList } from "../../../../hooks";
+import { api } from "../../api";
+import IconSelect from "../IconSelect/IconSelect";
+import { TypeTask } from "./OptionsTaskType";
+import { translations } from "../utils/translations";
+import { useGetTechniciansList } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -166,12 +166,12 @@ const TaskModal = ({
     )
       .toString()
       .padStart(2, "0")}-${date.getFullYear()} ${date
-      .getHours()
-      .toString()
-      .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
-      .getSeconds()
-      .toString()
-      .padStart(2, "0")}`;
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
+          .getSeconds()
+          .toString()
+          .padStart(2, "0")}`;
   };
 
   return (

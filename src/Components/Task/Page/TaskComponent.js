@@ -1,35 +1,41 @@
 import React, { useState, useEffect } from "react";
-import TaskModal from "../Components/TaskModal/TaskModal";
-import TaskList from "../Components/TaskList/TaskList";
+import {
+  Button,
+  TextInput,
+  SegmentedControl,
+  Box,
+  Group,
+  Tooltip,
+} from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
-import { Input, Button, SegmentedControl } from "@mantine/core";
+import TaskModal from "../TaskModal";
+import TaskList from "../TaskList/TaskList";
+import TaskColumnsView from "../TaskColumnsView";
 import { PageHeader } from "../../PageHeader";
-import "./TaskComponent.css";
-import dayjs from "dayjs";
+import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { FaList } from "react-icons/fa6";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
+const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) => {
   const [tasks, setTasks] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState("list"); // list | columns
+  const [viewMode, setViewMode] = useState("list");
 
   const fetchTasks = async () => {
     try {
-      let data;
-      if (selectTicketId) {
-        data = await api.task.getTaskByTicket(selectTicketId);
-      } else {
-        data = await api.task.getAllTasks();
-      }
-      setTasks(data);
+      const data = selectTicketId
+        ? await api.task.getTaskByTicket(selectTicketId)
+        : await api.task.getAllTasks();
+      setTasks(Array.isArray(data) ? data : []);
       updateTaskCount();
     } catch (error) {
       console.error("Ошибка загрузки задач:", error);
+      setTasks([]);
     }
   };
 
@@ -47,96 +53,70 @@ const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
     setIsModalOpen(true);
   };
 
-  const filteredTasks = tasks.filter((task) =>
-    task.task_type.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const TaskColumnsView = ({ tasks }) => {
-    const now = dayjs();
-    const grouped = {
-      overdue: [],
-      today: [],
-      tomorrow: [],
-    };
-
-    tasks.forEach((task) => {
-      const deadline = dayjs(task.scheduled_time);
-      if (deadline.isBefore(now, "day")) grouped.overdue.push(task);
-      else if (deadline.isSame(now, "day")) grouped.today.push(task);
-      else if (deadline.isSame(now.add(1, "day"), "day")) grouped.tomorrow.push(task);
-    });
-
-    return (
-      <div className="columns-view">
-        {["overdue", "today", "tomorrow"].map((key) => (
-          <div className="column" key={key}>
-            <div className="column-header">
-              {key === "overdue" && "OVERDUE TASKS"}
-              {key === "today" && "TO-DO TODAY"}
-              {key === "tomorrow" && "TO-DO TOMORROW"}
-            </div>
-            <div className="column-tasks">
-              {grouped[key].map((task) => (
-                <div
-                  className="task-card"
-                  key={task.id}
-                  onClick={() => openEditTask(task)}
-                >
-                  <div className="task-title">{task.task_type}</div>
-                  <div className="task-date">
-                    {dayjs(task.scheduled_time).format("DD.MM.YYYY HH:mm")}
-                  </div>
-                  <div className="task-desc">{task.description}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  };
+  const filteredTasks = Array.isArray(tasks)
+    ? tasks.filter((task) =>
+      (task.task_type || "").toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    : [];
 
   return (
-    <div className="task-container">
+    <Box p="md">
       <PageHeader
+        title={translations["Tasks"][language]}
+        count={filteredTasks.length}
         extraInfo={
-          <>
+          <Group gap="sm">
             <SegmentedControl
               value={viewMode}
               onChange={setViewMode}
               data={[
-                { label: "Listă", value: "list" },
-                { label: "Coloane", value: "columns" },
+                {
+                  value: "list",
+                  label: (
+                    <Tooltip label={translations["listView"][language]}>
+                      <span>
+                        <FaList size={16} />
+                      </span>
+                    </Tooltip>
+                  ),
+                },
+                {
+                  value: "columns",
+                  label: (
+                    <Tooltip label={translations["columnView"][language]}>
+                      <span>
+                        <TbLayoutKanbanFilled size={18} />
+                      </span>
+                    </Tooltip>
+                  ),
+                },
               ]}
-              className="mr-2"
             />
-            <Input
-              className="min-w-300"
-              type="text"
+            <TextInput
               placeholder={translations["Cautare"][language]}
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.currentTarget.value)}
+              w={200}
             />
             <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}
             </Button>
-          </>
+          </Group>
         }
-        title={translations["Tasks"][language]}
-        count={filteredTasks.length}
       />
 
-      <div className="task-list-container">
-        {viewMode === "list" ? (
-          <TaskList
-            tasks={filteredTasks}
-            openEditTask={openEditTask}
-            fetchTasks={fetchTasks}
-          />
-        ) : (
-          <TaskColumnsView tasks={filteredTasks} />
-        )}
-      </div>
+      {viewMode === "list" ? (
+        <TaskList
+          tasks={filteredTasks}
+          openEditTask={openEditTask}
+          fetchTasks={fetchTasks}
+        />
+      ) : (
+        <TaskColumnsView
+          tasks={filteredTasks}
+          onEdit={openEditTask}
+        />
+      )}
 
       <TaskModal
         isOpen={isModalOpen}
@@ -146,7 +126,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount, userId }) => {
         defaultTicketId={selectTicketId}
         defaultCreatedBy={userId}
       />
-    </div>
+    </Box>
   );
 };
 

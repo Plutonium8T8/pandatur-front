@@ -3,7 +3,7 @@ import { Flex } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
-import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { translations } from "../../../utils/translations";
 import { getLanguageByKey, showServerError } from "../../../utils";
 import { Spin } from "../../../Spin";

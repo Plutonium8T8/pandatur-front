@@ -1511,7 +1511,7 @@ export const translations = {
     RO: "Taskuri",
     RU: "Задачи",
   },
-  "Нет задач, создать?": {
+  "noTasksCreate": {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?",
   },
@@ -2015,4 +2015,28 @@ export const translations = {
     RO: "Nu există mesaje",
     RU: "Нет сообщений",
   },
+  "overdueTasks": {
+    RO: "Taskuri Expirate",
+    RU: "Просроченные задачи"
+  },
+  "todayTasks": {
+    RO: "Taskuri pentru azi",
+    RU: "Задачи на сегодня"
+  },
+  "tomorrowTasks": {
+    RO: "Taskuri pentru mâine",
+    RU: "Задачи на завтра"
+  },
+  "noTasks": {
+    RO: "Nu sunt taskuri",
+    RU: "Нет задач"
+  },
+  listView: {
+    RO: "Vizualizare listă",
+    RU: "Список",
+  },
+  columnView: {
+    RO: "Vizualizare pe coloane",
+    RU: "Колонки",
+  }
 };
