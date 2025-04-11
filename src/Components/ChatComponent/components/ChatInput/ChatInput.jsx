@@ -130,10 +130,10 @@ export const ChatInput = ({
               style={{ display: "none" }}
             />
             <ActionIcon c="black" bg="white" onClick={handleFileButtonClick}>
-              <RiAttachment2 />
+              <RiAttachment2 size={20} />
             </ActionIcon>
             <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
-              <LuSmile />
+              <LuSmile size={20} />
             </ActionIcon>
           </Flex>
         </Flex>
