@@ -67,7 +67,9 @@ export const ChatInput = ({
     <>
       <Box p="16px">
         <Flex w="100%" gap="xs" mb="xs" align="center">
-          <Flex>{socialMediaIcons[currentClient.payload?.platform]}</Flex>
+          {currentClient.payload?.platform && (
+            <Flex>{socialMediaIcons[currentClient.payload?.platform]}</Flex>
+          )}
           <Select
             className="w-full"
             onChange={(value) => {
