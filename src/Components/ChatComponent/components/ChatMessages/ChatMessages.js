@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex } from "@mantine/core";
 import { useSnackbar } from "notistack";
-import { useApp, useUser } from "../../../../hooks";
+import { useApp, useUser, useGetTechniciansList } from "../../../../hooks";
 import { api } from "../../../../api";
 import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
 import { translations } from "../../../utils/translations";
@@ -25,6 +25,8 @@ export const ChatMessages = ({
   const { userId } = useUser();
   const { messages, setMessages } = useApp();
   const { enqueueSnackbar } = useSnackbar();
+  const { technicians } = useGetTechniciansList();
+  const technician = technicians.find(({ value }) => Number(value) === userId);
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
@@ -55,6 +57,11 @@ export const ChatMessages = ({
         message: inputValue.trim(),
         media_type: null,
         media_url: "",
+<<<<<<< Updated upstream
+=======
+        isError: false,
+        technician,
+>>>>>>> Stashed changes
       };
 
       if (selectedFile) {
