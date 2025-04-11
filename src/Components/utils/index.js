@@ -13,3 +13,4 @@ export * from "./getMediaFileMessages";
 export * from "./capitalizeFirstLetter";
 export * from "./formatRoles";
 export * from "./normalizeUsersAndPlatforms";
+export * from "./socialMediaIcons";

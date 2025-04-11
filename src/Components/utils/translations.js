@@ -2003,4 +2003,16 @@ export const translations = {
     "RO": "Nu există grupuri de permisiuni",
     "RU": "Нет групп с правами"
   }
+  lead: {
+    RO: "Lead",
+    RU: "Лид",
+  },
+  quality: {
+    RO: "Calitate",
+    RU: "Качество",
+  },
+  no_messages: {
+    RO: "Nu există mesaje",
+    RU: "Нет сообщений",
+  },
 };
