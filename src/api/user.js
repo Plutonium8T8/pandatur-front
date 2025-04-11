@@ -1,27 +1,33 @@
-import { baseAxios } from "./baseAxios"
+import { baseAxios } from "./baseAxios";
 
 export const user = {
   getGroupsList: async () => {
-    const { data } = await baseAxios.get("/api/user-groups")
-
-    return data
+    const { data } = await baseAxios.get("/api/user-groups");
+    return data;
   },
 
   createGroup: async (body) => {
-    const { data } = await baseAxios.post("/api/user-groups", body)
-
-    return data
+    const { data } = await baseAxios.post("/api/user-groups", body);
+    return data;
   },
 
-  assignGroups: async (user_ids, group_name) => {
-    const { data } = await baseAxios.patch(
-      "/api/user-groups/update",
-      { user_ids, group_name }
-    );
+  updateGroupByName: async (body) => {
+    const { data } = await baseAxios.patch("/api/user-groups/update", body);
     return data;
   },
 
   deleteGroups: async (id) => {
-    await baseAxios.delete(`api/user-groups/${id}`)
+    const { data } = await baseAxios.delete(`/api/user-groups/${id}`);
+    return data;
+  },
+
+  assignTechnicianToGroup: async (groupId, userId) => {
+    const { data } = await baseAxios.post(`/api/user-groups/${groupId}/assign/${userId}`);
+    return data;
+  },
+
+  removeTechnicianFromGroup: async (groupId, userId) => {
+    const { data } = await baseAxios.delete(`/api/user-groups/${groupId}/remove/${userId}`);
+    return data;
   }
-}
+};

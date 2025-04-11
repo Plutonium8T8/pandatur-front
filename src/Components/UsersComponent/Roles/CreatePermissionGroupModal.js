@@ -13,6 +13,8 @@ import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
+import { formatRoles } from "../../utils/formatRoles";
+import { useConfirmPopup } from "../../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -22,6 +24,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const [existingGroups, setExistingGroups] = useState([]);
     const [editingGroupId, setEditingGroupId] = useState(null);
     const { enqueueSnackbar } = useSnackbar();
+
+    const confirmDelete = useConfirmPopup({
+        subTitle: translations["Sigur doriți să ștergeți acest grup?"][language],
+    });
 
     useEffect(() => {
         if (opened) {
@@ -39,13 +45,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const fetchExistingGroups = async () => {
         try {
-            const data = await api.users.getAllPermissionGroups();
+            const data = await api.permissions.getAllPermissionGroups();
             setExistingGroups(data);
         } catch (error) {
             enqueueSnackbar(
-                translations["Eroare la încărcarea grupurilor existente"][language], {
-                variant: "error",
-            });
+                translations["Eroare la încărcarea grupurilor existente"][language],
+                { variant: "error" }
+            );
         }
     };
 
@@ -73,13 +79,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             };
 
             if (editingGroupId) {
-                await api.users.updatePermissionGroup(editingGroupId, payload);
+                await api.permissions.updatePermissionGroup(editingGroupId, payload);
                 enqueueSnackbar(
                     translations["Grup de permisiuni actualizat cu succes"][language],
                     { variant: "success" }
                 );
             } else {
-                await api.users.createPermissionGroup(payload);
+                await api.permissions.createPermissionGroup(payload);
                 enqueueSnackbar(
                     translations["Grup de permisiuni creat cu succes"][language],
                     { variant: "success" }
@@ -96,30 +102,23 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }
     };
 
-    const handleDelete = async () => {
+    const handleDelete = () => {
         if (!editingGroupId) return;
 
-        try {
-            await api.users.deletePermissionGroup(editingGroupId);
-            enqueueSnackbar(
-                translations["Grup șters cu succes"][language],
-                { variant: "success" }
-            );
-            fetchExistingGroups();
-            resetForm();
-        } catch (err) {
-            enqueueSnackbar(
-                translations["Eroare la ștergerea grupului"][language],
-                { variant: "error" }
-            );
-        }
-    };
-
-    const formatRoles = (roles) => {
-        if (Array.isArray(roles)) return roles;
-        if (typeof roles === "object" && roles !== null)
-            return Object.values(roles);
-        return [];
+        confirmDelete(async () => {
+            try {
+                await api.permissions.deletePermissionGroup(editingGroupId);
+                enqueueSnackbar(translations["Grup șters cu succes"][language], {
+                    variant: "success",
+                });
+                fetchExistingGroups();
+                resetForm();
+            } catch (err) {
+                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
+                    variant: "error",
+                });
+            }
+        });
     };
 
     const handleGroupClick = (group) => {
@@ -155,10 +154,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     <Text fw={600} mb={4}>
                         {translations["Selectați permisiunile"][language]}
                     </Text>
-                    <RoleMatrix
-                        selectedRoles={selectedRoles}
-                        onToggle={toggleRole}
-                    />
+                    <RoleMatrix selectedRoles={selectedRoles} onToggle={toggleRole} />
                 </Box>
 
                 <Group>
@@ -169,9 +165,14 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     </Button>
 
                     {editingGroupId && (
-                        <Button color="red" onClick={handleDelete}>
-                            {translations["Șterge grupul"][language]}
-                        </Button>
+                        <>
+                            <Button color="red" onClick={handleDelete}>
+                                {translations["Șterge grupul"][language]}
+                            </Button>
+                            <Button variant="default" onClick={resetForm}>
+                                {translations["Anuleazǎ"][language]}
+                            </Button>
+                        </>
                     )}
                 </Group>
 
@@ -202,9 +203,6 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                     }
                                 >
                                     <Text fw={500}>{g.permission_name}</Text>
-                                    <Text size="sm" c="dimmed">
-                                        {formatRoles(g.roles).join(", ")}
-                                    </Text>
                                 </Box>
                             ))}
                         </Stack>

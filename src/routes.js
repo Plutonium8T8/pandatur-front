@@ -41,7 +41,8 @@ export const privateRoutes = (isAllowRole) => [
   },
   {
     path: "/users",
-    component: isAllowRole ? UsersComponent : NoAccess,
+    // component: isAllowRole ? UsersComponent : NoAccess
+    component: UsersComponent
   },
   {
     path: "/leads/:ticketId?",

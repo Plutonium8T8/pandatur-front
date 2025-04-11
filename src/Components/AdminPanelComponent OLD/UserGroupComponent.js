@@ -35,9 +35,6 @@ const UserGroupComponent = ({ onChange, userId, roles }) => {
     fetchUserGroups()
   }, [])
 
-  /**
-   * Create and add a new user group with roles.
-   */
   const addUserGroup = async (name) => {
     try {
       const newUserGroup = await api.user.createGroup({ name, roles })
