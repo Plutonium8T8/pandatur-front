@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { MdOutlineAirplaneTicket } from "react-icons/md";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
 import { getLanguageByKey, showServerError } from "../utils";
@@ -178,11 +179,12 @@ const ChatExtraInfo = ({
       <Tabs defaultValue="general" h="100%">
         <Tabs.List>
           <Tabs.Tab value="general">
-            <Text>{getLanguageByKey("General")}</Text>
+            <Text size="xs">{getLanguageByKey("General")}</Text>
           </Tabs.Tab>
           <Tabs.Tab value="info">
             <Box w="100">
               <Text
+                size="xs"
                 c={hasErrorsTicketInfoForm ? "red" : "black"}
                 truncate="end"
               >
@@ -191,19 +193,19 @@ const ChatExtraInfo = ({
             </Box>
           </Tabs.Tab>
           <Tabs.Tab value="contract">
-            <Text c={hasErrorsContractForm ? "red" : "black"}>
+            <Text size="xs" c={hasErrorsContractForm ? "red" : "black"}>
               {getLanguageByKey("Contract")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab value="invoice">
-            <Text>{getLanguageByKey("Invoice")}</Text>
+            <Text size="xs">{getLanguageByKey("Invoice")}</Text>
           </Tabs.Tab>
           <Tabs.Tab h="100%" value="media">
-            <Text>{getLanguageByKey("Media")}</Text>
+            <Text size="xs">{getLanguageByKey("Media")}</Text>
           </Tabs.Tab>
 
           <Tabs.Tab value="quality_control">
-            <Text c={hasErrorQualityControl ? "red" : "black"}>
+            <Text size="xs" c={hasErrorQualityControl ? "red" : "black"}>
               {getLanguageByKey("Control calitate")}
             </Text>
           </Tabs.Tab>
