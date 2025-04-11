@@ -2002,7 +2002,7 @@ export const translations = {
   "Nu există grupuri de permisiuni": {
     "RO": "Nu există grupuri de permisiuni",
     "RU": "Нет групп с правами"
-  }
+  },
   lead: {
     RO: "Lead",
     RU: "Лид",
