@@ -13,18 +13,13 @@ import {
 } from "../TicketForms";
 import { useFormTicket } from "../../hooks";
 
-const parseId = (id) => {
-  return Number(id.replace(/[{}]/g, "").trim());
-};
-
 const ChatExtraInfo = ({
   selectTicketId,
   onUpdatePersonalInfo,
   updatedTicket,
   ticketId,
-  selectedClient,
   mediaFiles,
-  tickets,
+  selectedUser,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -91,10 +86,9 @@ const ChatExtraInfo = ({
   };
 
   const submitPersonalData = async (values) => {
-    const clientId = parseId(updatedTicket.client_id);
     setIsLoadingPersonalDate(true);
     try {
-      await api.users.updateExtended(clientId, values);
+      await api.users.updateExtended(selectedUser.payload?.id, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
@@ -134,12 +128,10 @@ const ChatExtraInfo = ({
   };
 
   const mergeData = async (id) => {
-    const oldUserId = selectedClient;
-
     setIsLoadingClient(true);
     try {
       await api.users.clientMerge({
-        old_user_id: oldUserId,
+        old_user_id: selectedUser.payload?.id,
         new_user_id: id,
       });
 
@@ -234,7 +226,7 @@ const ChatExtraInfo = ({
 
             <PersonalData4ClientForm
               loading={isLoadingPersonalDate}
-              data={updatedTicket?.clients?.[0]}
+              data={selectedUser.payload}
               onSubmit={(values) => {
                 submitPersonalData(values);
                 onUpdatePersonalInfo(values);
@@ -245,7 +237,7 @@ const ChatExtraInfo = ({
 
             <Merge
               loading={isLoadingCombineLead}
-              value={selectedClient}
+              value={ticketId}
               onSubmit={(values) => mergeClientsData(values)}
               placeholder={getLanguageByKey("Introduceți ID lead")}
             />
@@ -253,7 +245,7 @@ const ChatExtraInfo = ({
             <Box mt="md">
               <Merge
                 loading={isLoadingCombineClient}
-                value={ticketId}
+                value={selectedUser.payload?.id}
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => mergeData(values)}
               />

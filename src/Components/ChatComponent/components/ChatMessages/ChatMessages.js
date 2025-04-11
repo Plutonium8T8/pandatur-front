@@ -14,50 +14,21 @@ import "./ChatMessages.css";
 
 const language = localStorage.getItem("language") || "RO";
 
-const parseDate = (dateString) => {
-  if (!dateString) return null;
-  const [date, time] = dateString.split(" ");
-  if (!date || !time) return null;
-  const [day, month, year] = date.split("-");
-  return new Date(`${year}-${month}-${day}T${time}`);
-};
-
 export const ChatMessages = ({
   selectTicketId,
-  setSelectedClient,
   selectedClient,
   isLoading,
   personalInfo,
-  usersTicket,
+  messageSendersByPlatform,
+  onChangeSelectedUser,
 }) => {
   const { userId } = useUser();
-  const { messages, setMessages, tickets } = useApp();
+  const { messages, setMessages } = useApp();
   const { enqueueSnackbar } = useSnackbar();
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
-  const [selectedPlatform, setSelectedPlatform] = useState("web");
   const [loadingMessage, setLoadingMessage] = useState(false);
-
-  const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null;
-
-    const ticketMessages = messages
-      .filter(
-        (msg) =>
-          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return ticketMessages.length > 0 ? ticketMessages[0].client_id : null;
-  };
-
-  useEffect(() => {
-    const lastClient = getLastClientWhoSentMessage();
-    if (lastClient) {
-      setSelectedClient(String(lastClient));
-    }
-  }, [messages, selectTicketId]);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -79,7 +50,7 @@ export const ChatMessages = ({
     try {
       const messageData = {
         sender_id: Number(userId),
-        client_id: selectedClient,
+        client_id: selectedClient.payload?.id,
         platform: platform,
         message: inputValue.trim(),
         media_type: null,
@@ -149,48 +120,6 @@ export const ChatMessages = ({
     };
   }, []);
 
-  const getClientPlatforms = () => {
-    const clientId = Number(selectedClient);
-    const clientMessages = messages.filter(
-      (msg) => Number(msg.client_id) === clientId,
-    );
-
-    if (!clientMessages || clientMessages.length === 0) {
-      return ["web"];
-    }
-
-    const uniquePlatforms = [
-      ...new Set(clientMessages.map((msg) => msg.platform)),
-    ];
-    return uniquePlatforms.length > 0 ? uniquePlatforms : ["web"];
-  };
-  useEffect(() => {
-    const platforms = getClientPlatforms();
-    setSelectedPlatform(platforms[0] || "web");
-  }, [selectedClient, messages]);
-
-  const getLastMessagePlatform = (clientId) => {
-    if (!Array.isArray(messages) || messages.length === 0) return "web";
-
-    const clientMessages = messages
-      .filter(
-        (msg) =>
-          Number(msg.client_id) === Number(clientId) &&
-          Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return clientMessages.length > 0 ? clientMessages[0].platform : "web";
-  };
-
-  useEffect(() => {
-    if (selectedClient) {
-      const lastPlatform = getLastMessagePlatform(selectedClient);
-
-      setSelectedPlatform(lastPlatform || "web");
-    }
-  }, [selectedClient, messages]);
-
   return (
     <Flex w="100%" direction="column" className="chat-area">
       <Flex
@@ -228,25 +157,26 @@ export const ChatMessages = ({
             if (!selectedClient) {
               return;
             }
-            sendMessage(null, selectedPlatform, value);
+            sendMessage(null, selectedClient.payload?.platform, value);
           }}
-          onHandleFileSelect={(file) => sendMessage(file, selectedPlatform)}
+          onHandleFileSelect={(file) =>
+            sendMessage(file, selectedClient.payload?.platform)
+          }
           renderSelectUserPlatform={() => {
             return (
-              tickets &&
-              tickets.find((ticket) => ticket.id === selectTicketId)
-                ?.client_id && (
+              messageSendersByPlatform && (
                 <Select
                   size="md"
                   w="100%"
-                  value={`${selectedClient}-${selectedPlatform}`}
+                  value={`${selectedClient.payload?.id}-${selectedClient.payload?.platform}`}
                   placeholder={translations["Alege client"][language]}
-                  data={usersTicket}
+                  data={messageSendersByPlatform}
                   onChange={(value) => {
                     if (!value) return;
                     const [clientId, platform] = value.split("-");
-                    setSelectedClient(clientId);
-                    setSelectedPlatform(platform);
+                    const selectUserId = Number(clientId);
+
+                    onChangeSelectedUser(selectUserId, platform);
                   }}
                 />
               )
