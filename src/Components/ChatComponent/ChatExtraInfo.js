@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { MdOutlineAirplaneTicket } from "react-icons/md";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
 import { getLanguageByKey, showServerError } from "../utils";
@@ -183,14 +182,14 @@ const ChatExtraInfo = ({
               {getLanguageByKey("General")}
             </Text>
           </Tabs.Tab>
-          <Tabs.Tab value="ticket">
+          <Tabs.Tab value="lead">
             <Text
               fw={700}
               size="sm"
               c={hasErrorsTicketInfoForm ? "red" : "black"}
               truncate="end"
             >
-              {getLanguageByKey("ticket")}
+              {getLanguageByKey("lead")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab value="contract">
@@ -268,7 +267,7 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
 
-        <Tabs.Panel value="ticket">
+        <Tabs.Panel value="lead">
           <Box p="md">
             <TicketInfoForm
               formInstance={form}
