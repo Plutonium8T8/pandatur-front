@@ -8,9 +8,11 @@ export const SendedMessage = ({ msg }) => {
   return (
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">
-        <Flex justify="end" gap="8">
+        <Flex w="100%" justify="end" gap="8">
           <Flex
-            style={{ border: msg.isError ? "1px solid red" : "none" }}
+            style={{
+              border: msg.isError ? "1px solid red" : "none",
+            }}
             miw="250px"
             direction="column"
             p="8"
