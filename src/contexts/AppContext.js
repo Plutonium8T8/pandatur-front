@@ -275,7 +275,7 @@ export const AppProvider = ({ children }) => {
           sender_id,
         } = message.data;
 
-        setMessages((prevMessages) => [...prevMessages, message.data]);
+        // setMessages((prevMessages) => [...prevMessages, message.data]);
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
