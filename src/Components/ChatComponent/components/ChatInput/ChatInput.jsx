@@ -11,8 +11,14 @@ import "./ChatInput.css";
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
+<<<<<<< HEAD
   renderSelectUserPlatform,
   loading,
+=======
+  clientList,
+  onChangeClient,
+  currentClient,
+>>>>>>> e9d8a85 (refactor: optimistic update for chat messages)
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
@@ -70,6 +76,7 @@ export const ChatInput = ({
           placeholder={getLanguageByKey("Introduceți mesaj")}
         />
 
+<<<<<<< HEAD
         <Box>
           <Flex justify="space-between" mb="10px">
             <ActionIcon
@@ -80,6 +87,19 @@ export const ChatInput = ({
             >
               <FaPaperPlane />
             </ActionIcon>
+=======
+        <Flex align="center" justify="space-between">
+          <Flex gap="xs">
+            <Button disabled={!message} variant="filled" onClick={sendMessage}>
+              {getLanguageByKey("Trimite")}
+            </Button>
+
+            <Button onClick={clearState} variant="default">
+              {getLanguageByKey("Anulează")}
+            </Button>
+          </Flex>
+          <Flex>
+>>>>>>> e9d8a85 (refactor: optimistic update for chat messages)
             <input
               type="file"
               accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
