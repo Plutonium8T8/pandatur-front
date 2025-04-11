@@ -42,29 +42,34 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const permissionGroupInitialRolesRef = useRef([]);
   const [customRoles, setCustomRoles] = useState([]);
 
+  const safeParseJson = (str) => {
+    try {
+      const parsed = JSON.parse(str);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (err) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("error JSON.parse:", err, str);
+      }
+      return [];
+    }
+  };
+
   useEffect(() => {
     if (initialUser) {
       const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
-      let userRoles = [];
-      let permissionRoles = [];
 
-      try {
-        const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
-        const parsed = JSON.parse(rawRoles);
-        if (Array.isArray(parsed)) {
-          userRoles = parsed.map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
-        }
-      } catch { }
+      const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
+      const userRoles = safeParseJson(rawRoles)
+        .map((r) => r.replace(/^ROLE_/, ""))
+        .filter(Boolean);
 
-      try {
-        const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
-        const parsed = JSON.parse(rawPermissionRoles);
-        if (Array.isArray(parsed)) {
-          permissionRoles = parsed.map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
-          setPermissionGroupRoles(permissionRoles);
-          permissionGroupInitialRolesRef.current = permissionRoles;
-        }
-      } catch { }
+      const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
+      const permissionRoles = safeParseJson(rawPermissionRoles)
+        .map((r) => r.replace(/^ROLE_/, ""))
+        .filter(Boolean);
+
+      setPermissionGroupRoles(permissionRoles);
+      permissionGroupInitialRolesRef.current = permissionRoles;
 
       const onlyCustom = userRoles.filter((r) => !permissionRoles.includes(r));
       setCustomRoles(onlyCustom);
