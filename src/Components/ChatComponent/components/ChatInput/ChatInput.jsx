@@ -18,6 +18,7 @@ import "./ChatInput.css";
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
+  loading,
   clientList,
   onChangeClient,
   currentClient,
@@ -156,7 +157,12 @@ export const ChatInput = ({
 
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
-            <Button disabled={!message} variant="filled" onClick={sendMessage}>
+            <Button
+              disabled={!message}
+              variant="filled"
+              loading={loading}
+              onClick={sendMessage}
+            >
               {getLanguageByKey("Trimite")}
             </Button>
 

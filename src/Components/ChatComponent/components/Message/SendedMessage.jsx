@@ -9,13 +9,7 @@ export const SendedMessage = ({ msg }) => {
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
-          <Flex
-            style={{ border: msg.isError ? "1px solid red" : "none" }}
-            miw="250px"
-            direction="column"
-            p="8"
-            className="text"
-          >
+          <Flex miw="250px" direction="column" p="8" className="text">
             {renderContent(msg)}
 
             <Text size="sm" ta="end">

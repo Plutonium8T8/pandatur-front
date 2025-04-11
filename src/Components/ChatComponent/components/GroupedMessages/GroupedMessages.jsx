@@ -2,15 +2,18 @@ import { Flex, Badge, DEFAULT_THEME, Divider } from "@mantine/core";
 import { useUser, useApp } from "../../../../hooks";
 import { DD_MM_YYYY } from "../../../../app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
-import {
-  parseServerDate,
-  getFullName,
-  getLanguageByKey,
-  parseDate,
-} from "../../../utils";
+import { parseServerDate, getFullName, getLanguageByKey } from "../../../utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
+
+const parseDate = (dateString) => {
+  if (!dateString) return null;
+  const [date, time] = dateString.split(" ");
+  if (!date || !time) return null;
+  const [day, month, year] = date.split("-");
+  return new Date(`${year}-${month}-${day}T${time}`);
+};
 
 export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { userId } = useUser();

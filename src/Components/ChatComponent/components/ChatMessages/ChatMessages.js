@@ -10,8 +10,6 @@ import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
 import { getMediaType } from "../../utils";
 import { GroupedMessages } from "../GroupedMessages";
-import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
-import dayjs from "dayjs";
 import "./ChatMessages.css";
 
 const language = localStorage.getItem("language") || "RO";
@@ -30,6 +28,7 @@ export const ChatMessages = ({
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState(false);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -47,6 +46,7 @@ export const ChatMessages = ({
   };
 
   const sendMessage = async (selectedFile, platform, inputValue) => {
+    setLoadingMessage(true);
     try {
       const messageData = {
         sender_id: Number(userId),
@@ -54,16 +54,8 @@ export const ChatMessages = ({
         platform: platform,
         message: inputValue.trim(),
         media_type: null,
-        ticket_id: selectTicketId,
-        time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
         media_url: "",
-        isError: false,
       };
-
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...messageData, seenAt: false },
-      ]);
 
       if (selectedFile) {
         const uploadResponse = await uploadFile(selectedFile);
@@ -87,25 +79,16 @@ export const ChatMessages = ({
         apiUrl = api.messages.send.viber;
       }
 
-      await apiUrl(messageData);
-    } catch (error) {
-      const messageData = {
-        sender_id: Number(userId),
-        client_id: selectedClient.payload?.id,
-        platform: platform,
-        message: inputValue.trim(),
-        media_type: null,
-        ticket_id: selectTicketId,
-        time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
-        media_url: "",
-        isError: true,
-      };
-
       setMessages((prevMessages) => [
         ...prevMessages,
         { ...messageData, seenAt: false },
       ]);
+
+      await apiUrl(messageData);
+    } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
+    } finally {
+      setLoadingMessage(false);
     }
   };
 
@@ -170,6 +153,7 @@ export const ChatMessages = ({
         <ChatInput
           clientList={messageSendersByPlatform}
           currentClient={selectedClient}
+          loading={loadingMessage}
           onSendMessage={(value) => {
             if (!selectedClient) {
               return;
