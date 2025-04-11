@@ -179,34 +179,47 @@ const ChatExtraInfo = ({
       <Tabs defaultValue="general" h="100%">
         <Tabs.List>
           <Tabs.Tab value="general">
-            <Text size="xs">{getLanguageByKey("General")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("General")}
+            </Text>
           </Tabs.Tab>
-          <Tabs.Tab value="info">
-            <Box w="100">
-              <Text
-                size="xs"
-                c={hasErrorsTicketInfoForm ? "red" : "black"}
-                truncate="end"
-              >
-                {getLanguageByKey("Informații despre tichet")}
-              </Text>
-            </Box>
+          <Tabs.Tab value="ticket">
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorsTicketInfoForm ? "red" : "black"}
+              truncate="end"
+            >
+              {getLanguageByKey("ticket")}
+            </Text>
           </Tabs.Tab>
           <Tabs.Tab value="contract">
-            <Text size="xs" c={hasErrorsContractForm ? "red" : "black"}>
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorsContractForm ? "red" : "black"}
+            >
               {getLanguageByKey("Contract")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab value="invoice">
-            <Text size="xs">{getLanguageByKey("Invoice")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("Invoice")}
+            </Text>
           </Tabs.Tab>
           <Tabs.Tab h="100%" value="media">
-            <Text size="xs">{getLanguageByKey("Media")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("Media")}
+            </Text>
           </Tabs.Tab>
 
           <Tabs.Tab value="quality_control">
-            <Text size="xs" c={hasErrorQualityControl ? "red" : "black"}>
-              {getLanguageByKey("Control calitate")}
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorQualityControl ? "red" : "black"}
+            >
+              {getLanguageByKey("quality")}
             </Text>
           </Tabs.Tab>
         </Tabs.List>
@@ -255,7 +268,7 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
 
-        <Tabs.Panel value="info">
+        <Tabs.Panel value="ticket">
           <Box p="md">
             <TicketInfoForm
               formInstance={form}

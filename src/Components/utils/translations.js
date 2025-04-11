@@ -1931,4 +1931,12 @@ export const translations = {
     RO: "Filtrare după grup lead",
     RU: "Последнее взаимодействие",
   },
+  ticket: {
+    RO: "Ticket",
+    RU: "Заявка",
+  },
+  quality: {
+    RO: "Calitate",
+    RU: "Качество",
+  },
 };
