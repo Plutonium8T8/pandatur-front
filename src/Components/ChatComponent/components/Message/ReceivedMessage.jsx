@@ -1,24 +1,9 @@
 import { Flex, Text, Avatar, DEFAULT_THEME } from "@mantine/core";
-import {
-  FaFacebook,
-  FaViber,
-  FaInstagram,
-  FaWhatsapp,
-  FaTelegram,
-} from "react-icons/fa";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
-import { getFullName, parseServerDate } from "../../../utils";
+import { getFullName, parseServerDate, socialMediaIcons } from "../../../utils";
 import { renderContent } from "../../utils";
 
 const { colors } = DEFAULT_THEME;
-
-const platformIcons = {
-  facebook: <FaFacebook />,
-  instagram: <FaInstagram />,
-  whatsapp: <FaWhatsapp />,
-  viber: <FaViber />,
-  telegram: <FaTelegram />,
-};
 
 export const ReceivedMessage = ({ personalInfo, msg }) => {
   const receivedMsj = personalInfo?.clients?.find(
@@ -38,7 +23,7 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
                   `#${msg.client_id}`}
               </Text>
 
-              {platformIcons[msg.platform] || null}
+              {socialMediaIcons[msg.platform] || null}
             </Flex>
 
             {renderContent(msg)}

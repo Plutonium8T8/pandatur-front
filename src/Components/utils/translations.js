@@ -1931,4 +1931,16 @@ export const translations = {
     RO: "Filtrare după grup lead",
     RU: "Последнее взаимодействие",
   },
+  lead: {
+    RO: "Lead",
+    RU: "Лид",
+  },
+  quality: {
+    RO: "Calitate",
+    RU: "Качество",
+  },
+  no_messages: {
+    RO: "Nu există mesaje",
+    RU: "Нет сообщений",
+  },
 };

@@ -1,33 +1,57 @@
-import { Textarea, Flex, ActionIcon, Select, Box } from "@mantine/core";
-import { useState, useRef } from "react";
+import { Textarea, Flex, ActionIcon, Box, Button, Text } from "@mantine/core";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
-import { FaPaperPlane, FaSmile } from "react-icons/fa";
-import { FaFile } from "react-icons/fa6";
-import { getLanguageByKey } from "../../../utils";
+import { LuSmile } from "react-icons/lu";
+import { IoIosArrowDown } from "react-icons/io";
+import { RiAttachment2 } from "react-icons/ri";
+import { FaFingerprint } from "react-icons/fa6";
+import {
+  getLanguageByKey,
+  socialMediaIcons,
+  getFullName,
+} from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
+import { ComboSelect } from "../../../ComboSelect";
 import "./ChatInput.css";
 
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
-<<<<<<< HEAD
-  renderSelectUserPlatform,
-  loading,
-=======
   clientList,
   onChangeClient,
   currentClient,
->>>>>>> e9d8a85 (refactor: optimistic update for chat messages)
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState(null);
+  const [selectedClient, setSelectedClient] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0,
   });
+
+  const userList = useMemo(() => {
+    return clientList?.map(({ payload, value }) => {
+      const fullName = getFullName(payload.name, payload.surname);
+      return {
+        value,
+        label: (
+          <Flex align="center" gap="8">
+            <Flex align="center" gap="4">
+              {!fullName && <FaFingerprint size="12" />}
+              {fullName || payload.id}
+            </Flex>
+            {socialMediaIcons[payload?.platform]}
+          </Flex>
+        ),
+        payload: {
+          id: payload.id,
+          platform: payload.platform,
+        },
+      };
+    });
+  }, [clientList]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -42,109 +66,116 @@ export const ChatInput = ({
   };
 
   const handleFileButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
   const handleFile = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-
     onHandleFileSelect(selectedFile);
   };
 
-  const sendMessage = () => {
-    if (message?.trim()) {
-      onSendMessage(message);
+  const clearState = () => {
+    setMessage("");
+  };
 
-      setMessage("");
-      setSelectedMessage(null);
+  const sendMessage = () => {
+    if (message.trim()) {
+      onSendMessage(message);
+      clearState();
     }
   };
 
+  useEffect(() => {
+    setSelectedClient(
+      userList.find(
+        ({ payload }) =>
+          payload.id === currentClient.payload?.id &&
+          payload.platform === currentClient.payload?.platform,
+      ) || null,
+    );
+  }, [currentClient, userList]);
+
   return (
-    <>
-      <Flex gap="xs" p="16px">
-        <Textarea
-          autosize
-          minRows={6}
-          maxRows={8}
-          w="100%"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          placeholder={getLanguageByKey("Introduceți mesaj")}
+    <Box p="16px">
+      <Flex gap="xs" mb="xs" align="center">
+        <ComboSelect
+          position="top"
+          renderTriggerButton={(closeDropdown) => (
+            <Text
+              className="pointer"
+              c="blue"
+              td="underline"
+              onClick={closeDropdown}
+            >
+              {selectedClient?.label || ""}
+            </Text>
+          )}
+          onChange={(value) => {
+            const selected = userList.find((client) => client.value === value);
+            setSelectedClient(selected);
+            onChangeClient(value);
+          }}
+          data={userList}
         />
 
-<<<<<<< HEAD
-        <Box>
-          <Flex justify="space-between" mb="10px">
-            <ActionIcon
-              loading={loading}
-              size="input-md"
-              onClick={sendMessage}
-              variant="default"
-            >
-              <FaPaperPlane />
+        <ComboSelect
+          position="top"
+          currentValue={currentClient.value}
+          renderTriggerButton={(closeDropdown) => (
+            <ActionIcon size="xs" variant="default" onClick={closeDropdown}>
+              <IoIosArrowDown />
             </ActionIcon>
-=======
-        <Flex align="center" justify="space-between">
-          <Flex gap="xs">
-            <Button disabled={!message} variant="filled" onClick={sendMessage}>
-              {getLanguageByKey("Trimite")}
-            </Button>
+          )}
+          onChange={(value) => setMessage(value ? templateOptions[value] : "")}
+          data={Object.keys(templateOptions).map((key) => ({
+            value: key,
+            label: key,
+          }))}
+        />
+      </Flex>
 
-            <Button onClick={clearState} variant="default">
-              {getLanguageByKey("Anulează")}
-            </Button>
-          </Flex>
-          <Flex>
->>>>>>> e9d8a85 (refactor: optimistic update for chat messages)
-            <input
-              type="file"
-              accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
-              onChange={handleFile}
-              ref={fileInputRef}
-              style={{ display: "none" }}
-            />
-            <ActionIcon
-              size="input-md"
-              onClick={handleFileButtonClick}
-              variant="default"
-            >
-              <FaFile />
-            </ActionIcon>
+      <Textarea
+        autosize
+        minRows={6}
+        maxRows={8}
+        w="100%"
+        mb="xs"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder={getLanguageByKey("Introduceți mesaj")}
+      />
 
-            <ActionIcon
-              size="input-md"
-              onClick={handleEmojiClickButton}
-              variant="default"
-            >
-              <FaSmile />
-            </ActionIcon>
-          </Flex>
+      <Flex align="center" justify="space-between">
+        <Flex gap="xs">
+          <Button
+            disabled={!message.trim()}
+            variant="filled"
+            onClick={sendMessage}
+          >
+            {getLanguageByKey("Trimite")}
+          </Button>
 
-          <Box>
-            <Select
-              mb="10px"
-              size="md"
-              w="100%"
-              clearable
-              placeholder={getLanguageByKey("select_message_template")}
-              onChange={(value) => {
-                setMessage(value ? templateOptions[value] : "");
-                setSelectedMessage(value);
-              }}
-              value={selectedMessage}
-              data={Object.keys(templateOptions).map((key) => ({
-                value: key,
-                label: key,
-              }))}
-            />
+          <Button onClick={clearState} variant="default">
+            {getLanguageByKey("Anulează")}
+          </Button>
+        </Flex>
 
-            {renderSelectUserPlatform()}
-          </Box>
-        </Box>
+        <Flex gap="xs">
+          <input
+            type="file"
+            accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
+            onChange={handleFile}
+            ref={fileInputRef}
+            style={{ display: "none" }}
+          />
+          <ActionIcon c="black" bg="white" onClick={handleFileButtonClick}>
+            <RiAttachment2 />
+          </ActionIcon>
+          <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
+            <LuSmile />
+          </ActionIcon>
+        </Flex>
       </Flex>
 
       {showEmojiPicker &&
@@ -166,6 +197,6 @@ export const ChatInput = ({
           </div>,
           document.body,
         )}
-    </>
+    </Box>
   );
 };

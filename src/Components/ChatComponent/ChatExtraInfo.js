@@ -178,33 +178,47 @@ const ChatExtraInfo = ({
       <Tabs defaultValue="general" h="100%">
         <Tabs.List>
           <Tabs.Tab value="general">
-            <Text>{getLanguageByKey("General")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("General")}
+            </Text>
           </Tabs.Tab>
-          <Tabs.Tab value="info">
-            <Box w="100">
-              <Text
-                c={hasErrorsTicketInfoForm ? "red" : "black"}
-                truncate="end"
-              >
-                {getLanguageByKey("Informații despre tichet")}
-              </Text>
-            </Box>
+          <Tabs.Tab value="lead">
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorsTicketInfoForm ? "red" : "black"}
+              truncate="end"
+            >
+              {getLanguageByKey("lead")}
+            </Text>
           </Tabs.Tab>
           <Tabs.Tab value="contract">
-            <Text c={hasErrorsContractForm ? "red" : "black"}>
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorsContractForm ? "red" : "black"}
+            >
               {getLanguageByKey("Contract")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab value="invoice">
-            <Text>{getLanguageByKey("Invoice")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("Invoice")}
+            </Text>
           </Tabs.Tab>
           <Tabs.Tab h="100%" value="media">
-            <Text>{getLanguageByKey("Media")}</Text>
+            <Text fw={700} size="sm">
+              {getLanguageByKey("Media")}
+            </Text>
           </Tabs.Tab>
 
           <Tabs.Tab value="quality_control">
-            <Text c={hasErrorQualityControl ? "red" : "black"}>
-              {getLanguageByKey("Control calitate")}
+            <Text
+              fw={700}
+              size="sm"
+              c={hasErrorQualityControl ? "red" : "black"}
+            >
+              {getLanguageByKey("quality")}
             </Text>
           </Tabs.Tab>
         </Tabs.List>
@@ -229,7 +243,7 @@ const ChatExtraInfo = ({
               data={selectedUser.payload}
               onSubmit={(values) => {
                 submitPersonalData(values);
-                onUpdatePersonalInfo(values);
+                onUpdatePersonalInfo(selectedUser.payload, values);
               }}
             />
 
@@ -253,7 +267,7 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
 
-        <Tabs.Panel value="info">
+        <Tabs.Panel value="lead">
           <Box p="md">
             <TicketInfoForm
               formInstance={form}

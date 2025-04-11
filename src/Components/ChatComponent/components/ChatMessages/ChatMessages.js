@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Flex, Select } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
@@ -162,19 +162,15 @@ export const ChatMessages = ({
         )}
       </Flex>
 
-      {selectTicketId && (
+      {selectTicketId && !isLoading && (
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
-      {selectTicketId && (
+      {selectTicketId && !isLoading && (
         <ChatInput
-<<<<<<< HEAD
-          loading={loadingMessage}
           id={selectTicketId}
-=======
           clientList={messageSendersByPlatform}
           currentClient={selectedClient}
->>>>>>> e9d8a85 (refactor: optimistic update for chat messages)
           onSendMessage={(value) => {
             if (!selectedClient) {
               return;
@@ -184,25 +180,12 @@ export const ChatMessages = ({
           onHandleFileSelect={(file) =>
             sendMessage(file, selectedClient.payload?.platform)
           }
-          renderSelectUserPlatform={() => {
-            return (
-              messageSendersByPlatform && (
-                <Select
-                  size="md"
-                  w="100%"
-                  value={`${selectedClient.payload?.id}-${selectedClient.payload?.platform}`}
-                  placeholder={translations["Alege client"][language]}
-                  data={messageSendersByPlatform}
-                  onChange={(value) => {
-                    if (!value) return;
-                    const [clientId, platform] = value.split("-");
-                    const selectUserId = Number(clientId);
+          onChangeClient={(value) => {
+            if (!value) return;
+            const [clientId, platform] = value.split("-");
+            const selectUserId = Number(clientId);
 
-                    onChangeSelectedUser(selectUserId, platform);
-                  }}
-                />
-              )
-            );
+            onChangeSelectedUser(selectUserId, platform);
           }}
         />
       )}
