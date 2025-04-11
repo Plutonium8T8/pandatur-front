@@ -1,6 +1,8 @@
 import { FaRegFileLines } from "react-icons/fa6";
-import { Flex, Text, Box } from "@mantine/core";
+import { Flex, Text, Box, Image } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
+
+const BROKEN_PHOTO = "/broken.png";
 
 const STORAGE_URL = "https://storage.googleapis.com";
 const PDF_FILE = [".pdf"];
@@ -31,14 +33,12 @@ export const renderContent = (msg) => {
   switch (msg.mtype) {
     case "image":
       return (
-        <img
+        <Image
+          fallbackSrc={BROKEN_PHOTO}
+          my="5"
+          radius="md"
           src={msg.message}
-          alt=""
-          className="image-preview-in-chat | pointer"
-          // onError={(e) => {
-          //   e.target.src =
-          //     "https://via.placeholder.com/300?text=Ошибка+загрузки";
-          // }}
+          className="pointer"
           onClick={() => {
             window.open(msg.message, "_blank");
           }}
