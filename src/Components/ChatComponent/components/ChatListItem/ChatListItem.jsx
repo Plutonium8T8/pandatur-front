@@ -1,6 +1,7 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
+import { IoIosVideocam } from "react-icons/io";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
@@ -15,14 +16,17 @@ import "./ChatListItem.css";
 
 const HTTPS = "https://";
 const VOICE_MESSAGES_URL = "https://sipuni.com";
-const FORMAT_FILE_JPG = ".jpg";
-const FORMAT_FILE_PGN = ".png";
-const FORMAT_FILE_VIDEO = ".mp4";
+
+const [FORMAT_FILE_JPG, FORMAT_FILE_PNG, FORMAT_FILE_VIDEO] = [
+  ".jpg",
+  ".png",
+  ".mp4",
+];
 
 const isPhoto = (msj) => {
   return (
     msj.startsWith(HTTPS) &&
-    (msj.endsWith(FORMAT_FILE_JPG) || msj.endsWith(FORMAT_FILE_PGN))
+    (msj.endsWith(FORMAT_FILE_JPG) || msj.endsWith(FORMAT_FILE_PNG))
   );
 };
 
@@ -55,6 +59,17 @@ const renderMsjType = (msj) => {
         <TbPhoto />
         <Text h="20px" size="sm">
           {getLanguageByKey("photo")}
+        </Text>
+      </Flex>
+    );
+  }
+
+  if (msj.startsWith(HTTPS) && msj.endsWith(FORMAT_FILE_VIDEO)) {
+    return (
+      <Flex c="dimmed" align="center" gap="8">
+        <IoIosVideocam />
+        <Text h="20px" size="sm">
+          {getLanguageByKey("video")}
         </Text>
       </Flex>
     );

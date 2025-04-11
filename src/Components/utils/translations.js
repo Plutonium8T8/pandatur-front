@@ -2027,4 +2027,8 @@ export const translations = {
     RO: "Poză",
     RU: "Фото",
   },
+  video: {
+    RO: "Video",
+    RU: "Видео",
+  },
 };
