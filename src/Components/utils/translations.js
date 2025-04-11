@@ -1939,4 +1939,8 @@ export const translations = {
     RO: "Calitate",
     RU: "Качество",
   },
+  no_messages: {
+    RO: "Nu există mesaje",
+    RU: "Нет сообщений",
+  },
 };
