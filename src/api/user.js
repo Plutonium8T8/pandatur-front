@@ -6,21 +6,13 @@ export const user = {
     return data;
   },
 
-  createGroup: async ({ group_name, supervisor_id, user_ids }) => {
-    const { data } = await baseAxios.post("/api/user-groups", {
-      group_name,
-      supervisor_id,
-      user_ids
-    });
+  createGroup: async (body) => {
+    const { data } = await baseAxios.post("/api/user-groups", body);
     return data;
   },
 
-  updateGroupByName: async ({ group_name, supervisor_id, user_ids }) => {
-    const { data } = await baseAxios.patch("/api/user-groups/update", {
-      group_name,
-      supervisor_id,
-      user_ids
-    });
+  updateGroupByName: async (body) => {
+    const { data } = await baseAxios.patch("/api/user-groups/update", body);
     return data;
   },
 
