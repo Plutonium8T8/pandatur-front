@@ -6,80 +6,50 @@ import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
+import { MEDIA_TYPE } from "../../utils";
 import {
   priorityTagColors,
   parseServerDate,
   getLanguageByKey,
-  isStoreFile,
 } from "../../../utils";
 import "./ChatListItem.css";
 
-const HTTPS = "https://";
-const VOICE_MESSAGES_URL = "https://sipuni.com";
+const MESSAGE_INDICATOR = {
+  [MEDIA_TYPE.IMAGE]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <TbPhoto />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("photo")}
+      </Text>
+    </Flex>
+  ),
 
-const [FORMAT_FILE_JPG, FORMAT_FILE_PNG, FORMAT_FILE_VIDEO] = [
-  ".jpg",
-  ".png",
-  ".mp4",
-];
+  [MEDIA_TYPE.VIDEO]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <IoIosVideocam />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("video")}
+      </Text>
+    </Flex>
+  ),
 
-const isPhoto = (msj) => {
-  return (
-    msj.startsWith(HTTPS) &&
-    (msj.endsWith(FORMAT_FILE_JPG) || msj.endsWith(FORMAT_FILE_PNG))
-  );
-};
+  [MEDIA_TYPE.AUDIO]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <HiSpeakerWave />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("audio")}
+      </Text>
+    </Flex>
+  ),
 
-const renderMsjType = (msj) => {
-  if (msj.startsWith(VOICE_MESSAGES_URL)) {
-    return (
-      <Flex c="dimmed" align="center" gap="8">
-        <HiSpeakerWave />
-        <Text h="20px" size="sm">
-          {getLanguageByKey("audio")}
-        </Text>
-      </Flex>
-    );
-  }
-
-  if (isStoreFile(msj)) {
-    return (
-      <Flex c="dimmed" align="center" gap="8">
-        <GrAttachment />
-        <Text h="20px" size="sm">
-          {getLanguageByKey("file")}
-        </Text>
-      </Flex>
-    );
-  }
-
-  if (isPhoto(msj)) {
-    return (
-      <Flex c="dimmed" align="center" gap="8">
-        <TbPhoto />
-        <Text h="20px" size="sm">
-          {getLanguageByKey("photo")}
-        </Text>
-      </Flex>
-    );
-  }
-
-  if (msj.startsWith(HTTPS) && msj.endsWith(FORMAT_FILE_VIDEO)) {
-    return (
-      <Flex c="dimmed" align="center" gap="8">
-        <IoIosVideocam />
-        <Text h="20px" size="sm">
-          {getLanguageByKey("video")}
-        </Text>
-      </Flex>
-    );
-  }
-
-  return (
-    <Text h="20px" c="dimmed" size="sm" truncate>
-      {msj}
-    </Text>
-  );
+  [MEDIA_TYPE.FILE]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <GrAttachment />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("file")}
+      </Text>
+    </Flex>
+  ),
 };
 
 export const ChatListItem = ({
@@ -136,7 +106,11 @@ export const ChatListItem = ({
 
         <Flex justify="space-between" gap="6">
           <Box mt="4px" w="80%">
-            {renderMsjType(chat.last_message)}
+            {MESSAGE_INDICATOR[chat.last_message_type] || (
+              <Text h="20px" c="dimmed" size="sm" truncate>
+                {chat.last_message}
+              </Text>
+            )}
           </Box>
           <Text size="sm" c="dimmed">
             {formatDate ? formatDate.format(HH_mm) : null}
