@@ -243,7 +243,7 @@ const ChatExtraInfo = ({
               data={selectedUser.payload}
               onSubmit={(values) => {
                 submitPersonalData(values);
-                onUpdatePersonalInfo(values);
+                onUpdatePersonalInfo(selectedUser.payload, values);
               }}
             />
 

@@ -12,3 +12,4 @@ export * from "./permissionConstants";
 export * from "./getMediaFileMessages";
 export * from "./capitalizeFirstLetter";
 export * from "./normalizeUsersAndPlatforms";
+export * from "./socialMediaIcons";

@@ -5,17 +5,14 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useUser } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { getMediaFileMessages, normalizeUsersAndPlatforms } from "../utils";
+import {
+  getMediaFileMessages,
+  normalizeUsersAndPlatforms,
+  getFullName,
+  parseDate,
+} from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
-
-const parseDate = (dateString) => {
-  if (!dateString) return null;
-  const [date, time] = dateString.split(" ");
-  if (!date || !time) return null;
-  const [day, month, year] = date.split("-");
-  return new Date(`${year}-${month}-${day}T${time}`);
-};
 
 const ChatComponent = () => {
   const {
@@ -78,23 +75,18 @@ const ChatComponent = () => {
   useEffect(() => {
     const lastMessage = getLastClientWhoSentMessage();
 
-    const ticketById =
-      tickets.find((ticket) => ticket.id === selectTicketId) || {};
-
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
-
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
 
-      const selectedUser = users.find(
+      const selectedUser = messageSendersByPlatform.find(
         ({ payload }) =>
           payload.id === client_id && payload.platform === platform,
       );
       setSelectedUser(selectedUser || {});
     } else {
-      setSelectedUser(users[0] || {});
+      setSelectedUser(messageSendersByPlatform?.[0] || {});
     }
-  }, [selectTicketId, messages]);
+  }, [selectTicketId, messages, messageSendersByPlatform]);
 
   const handleSelectTicket = (ticketId) => {
     if (selectTicketId !== ticketId) {
@@ -160,7 +152,7 @@ const ChatComponent = () => {
             selectedClient={selectedUser}
             isLoading={isLoading}
             personalInfo={personalInfo}
-            messageSendersByPlatform={messageSendersByPlatform}
+            messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
           />
         </Flex>
@@ -170,16 +162,39 @@ const ChatComponent = () => {
             selectedUser={selectedUser}
             ticketId={ticketId}
             selectTicketId={selectTicketId}
-            onUpdatePersonalInfo={(values) => {
-              const firstClient = personalInfo.clients[0];
-              const clients = (personalInfo.clients = [
-                { ...firstClient, ...values },
-                ...personalInfo.clients.slice(1),
-              ]);
+            onUpdatePersonalInfo={(payload, values) => {
+              const clientTicketList = personalInfo.clients.map((client) =>
+                client.id === payload.id
+                  ? {
+                      ...client,
+                      ...values,
+                    }
+                  : client,
+              );
+
+              setSelectedUser((prev) => ({
+                ...prev,
+                label: getFullName(values.name, values.surname),
+                payload: { ...prev.payload, ...values },
+              }));
+
+              setMessageSendersByPlatform((prev) =>
+                prev.map((clientMsj) =>
+                  clientMsj.id === payload.id &&
+                  clientMsj.platform === payload.platform
+                    ? {
+                        ...clientMsj,
+                        label: getFullName(values.name, values.surname),
+                        payload: { ...payload, ...values },
+                      }
+                    : clientMsj,
+                ),
+              );
+
               setTickets((prev) =>
                 prev.map((ticket) =>
                   ticket.id === personalInfo.id
-                    ? { ...ticket, ...personalInfo, clients }
+                    ? { ...ticket, ...personalInfo, clients: clientTicketList }
                     : ticket,
                 ),
               );
@@ -187,7 +202,7 @@ const ChatComponent = () => {
               setPersonalInfo((prev) => {
                 return {
                   ...prev,
-                  clients: clients,
+                  clients: clientTicketList,
                 };
               });
             }}
