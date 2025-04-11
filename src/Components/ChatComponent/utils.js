@@ -1,11 +1,8 @@
 import { FaRegFileLines } from "react-icons/fa6";
 import { Flex, Text, Box, Image } from "@mantine/core";
-import { getLanguageByKey } from "../utils";
+import { getLanguageByKey, isStoreFile } from "../utils";
 
 const BROKEN_PHOTO = "/broken.png";
-
-const STORAGE_URL = "https://storage.googleapis.com";
-const PDF_FILE = [".pdf"];
 
 export const getMediaType = (mimeType) => {
   if (mimeType.startsWith("image/")) return "image";
@@ -62,9 +59,8 @@ export const renderContent = (msg) => {
       return renderFile(msg.message);
     default:
       const { message } = msg;
-      const isFile =
-        message.startsWith(STORAGE_URL) && message.endsWith(PDF_FILE);
-      return isFile ? (
+
+      return isStoreFile(message) ? (
         renderFile(message)
       ) : (
         <Box maw="600px" w="100%">

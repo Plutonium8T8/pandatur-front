@@ -1,9 +1,71 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
+import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
+import { TbPhoto } from "react-icons/tb";
+import { GrAttachment } from "react-icons/gr";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
-import { priorityTagColors, parseServerDate } from "../../../utils";
+import {
+  priorityTagColors,
+  parseServerDate,
+  getLanguageByKey,
+  isStoreFile,
+} from "../../../utils";
 import "./ChatListItem.css";
+
+const HTTPS = "https://";
+const VOICE_MESSAGES_URL = "https://sipuni.com";
+const FORMAT_FILE_JPG = ".jpg";
+const FORMAT_FILE_PGN = ".png";
+const FORMAT_FILE_VIDEO = ".mp4";
+
+const isPhoto = (msj) => {
+  return (
+    msj.startsWith(HTTPS) &&
+    (msj.endsWith(FORMAT_FILE_JPG) || msj.endsWith(FORMAT_FILE_PGN))
+  );
+};
+
+const renderMsjType = (msj) => {
+  if (msj.startsWith(VOICE_MESSAGES_URL)) {
+    return (
+      <Flex c="dimmed" align="center" gap="8">
+        <HiSpeakerWave />
+        <Text h="20px" size="sm">
+          {getLanguageByKey("audio")}
+        </Text>
+      </Flex>
+    );
+  }
+
+  if (isStoreFile(msj)) {
+    return (
+      <Flex c="dimmed" align="center" gap="8">
+        <GrAttachment />
+        <Text h="20px" size="sm">
+          {getLanguageByKey("file")}
+        </Text>
+      </Flex>
+    );
+  }
+
+  if (isPhoto(msj)) {
+    return (
+      <Flex c="dimmed" align="center" gap="8">
+        <TbPhoto />
+        <Text h="20px" size="sm">
+          {getLanguageByKey("photo")}
+        </Text>
+      </Flex>
+    );
+  }
+
+  return (
+    <Text h="20px" c="dimmed" size="sm" truncate>
+      {msj}
+    </Text>
+  );
+};
 
 export const ChatListItem = ({
   chat,
@@ -59,9 +121,7 @@ export const ChatListItem = ({
 
         <Flex justify="space-between" gap="6">
           <Box mt="4px" w="80%">
-            <Text h="20px" c="dimmed" size="sm" truncate>
-              {chat.last_message}
-            </Text>
+            {renderMsjType(chat.last_message)}
           </Box>
           <Text size="sm" c="dimmed">
             {formatDate ? formatDate.format(HH_mm) : null}

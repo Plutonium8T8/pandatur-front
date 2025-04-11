@@ -1933,19 +1933,19 @@ export const translations = {
   },
   "Team Lead": {
     RO: "Team Lead",
-    RU: "Тимлид"
+    RU: "Тимлид",
   },
   "Selectați Team Lead": {
     RO: "Selectați Team Lead",
-    RU: "Выберите тимлида"
+    RU: "Выберите тимлида",
   },
-  "Tehnicieni": {
+  Tehnicieni: {
     RO: "Tehnicieni",
-    RU: "Техники"
+    RU: "Техники",
   },
   "Alegeți tehnicienii": {
     RO: "Alegeți tehnicienii",
-    RU: "Выберите техников"
+    RU: "Выберите техников",
   },
   "Sigur doriți să ștergeți acest grup?": {
     RO: "Sigur doriți să ștergeți acest grup?",
@@ -1953,55 +1953,55 @@ export const translations = {
   },
   "Grup actualizat cu succes": {
     RO: "Grup actualizat cu succes",
-    RU: "Группа успешно обновлена"
+    RU: "Группа успешно обновлена",
   },
-  "Anuleazǎ": {
+  Anuleazǎ: {
     RO: "Anuleazǎ",
-    RU: "Отмена"
+    RU: "Отмена",
   },
   "Eroare la încărcarea grupurilor de utilizatori": {
-    "RO": "Eroare la încărcarea grupurilor de utilizatori",
-    "RU": "Ошибка при загрузке групп пользователей"
+    RO: "Eroare la încărcarea grupurilor de utilizatori",
+    RU: "Ошибка при загрузке групп пользователей",
   },
   "Eroare la încărcarea grupurilor de permisiuni": {
-    "RO": "Eroare la încărcarea grupurilor de permisiuni",
-    "RU": "Ошибка при загрузке групп разрешений"
+    RO: "Eroare la încărcarea grupurilor de permisiuni",
+    RU: "Ошибка при загрузке групп разрешений",
   },
   "Permisiunile au fost eliminate cu succes": {
-    "RO": "Permisiunile au fost eliminate cu succes",
-    "RU": "Успешно удалено"
+    RO: "Permisiunile au fost eliminate cu succes",
+    RU: "Успешно удалено",
   },
   "Eroare la eliminarea permisiunilor": {
-    "RO": "Eroare la eliminarea permisiunilor",
-    "RU": "Ошибка при удалении"
+    RO: "Eroare la eliminarea permisiunilor",
+    RU: "Ошибка при удалении",
   },
   "Schimbǎ grup de permisiuni": {
-    "RO": "Schimbǎ grup de permisiuni",
-    "RU": "Сменить группу с правами"
+    RO: "Schimbǎ grup de permisiuni",
+    RU: "Сменить группу с правами",
   },
   "Grup de permisiuni atribuit": {
-    "RO": "Grup de permisiuni atribuit",
-    "RU": "Группа разрешений успешно назначена"
+    RO: "Grup de permisiuni atribuit",
+    RU: "Группа разрешений успешно назначена",
   },
   "Eroare la atribuirea grupului": {
-    "RO": "Eroare la atribuirea grupului",
-    "RU": "Ошибка при назначении группы разрешений"
+    RO: "Eroare la atribuirea grupului",
+    RU: "Ошибка при назначении группы разрешений",
   },
   "Atribuiți grupul de permisiuni": {
-    "RO": "Atribuiți grupul de permisiuni",
-    "RU": "Назначить группу разрешений"
+    RO: "Atribuiți grupul de permisiuni",
+    RU: "Назначить группу разрешений",
   },
   "Nu există grupuri": {
-    "RO": "Nu există grupuri",
-    "RU": "Нет групп"
+    RO: "Nu există grupuri",
+    RU: "Нет групп",
   },
   "Grup adăugat cu succes": {
-    "RO": "Grup adăugat cu succes",
-    "RU": "Ошибка при добавлении"
+    RO: "Grup adăugat cu succes",
+    RU: "Ошибка при добавлении",
   },
   "Nu există grupuri de permisiuni": {
-    "RO": "Nu există grupuri de permisiuni",
-    "RU": "Нет групп с правами"
+    RO: "Nu există grupuri de permisiuni",
+    RU: "Нет групп с правами",
   },
   lead: {
     RO: "Lead",
@@ -2014,5 +2014,17 @@ export const translations = {
   no_messages: {
     RO: "Nu există mesaje",
     RU: "Нет сообщений",
+  },
+  audio: {
+    RO: "Audio",
+    RU: "Аудио",
+  },
+  file: {
+    RO: "Fișier",
+    RU: "Файл",
+  },
+  photo: {
+    RO: "Poză",
+    RU: "Фото",
   },
 };
