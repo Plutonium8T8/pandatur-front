@@ -1990,5 +1990,17 @@ export const translations = {
   "Atribuiți grupul de permisiuni": {
     "RO": "Atribuiți grupul de permisiuni",
     "RU": "Назначить группу разрешений"
+  },
+  "Nu există grupuri": {
+    "RO": "Nu există grupuri",
+    "RU": "Нет групп"
+  },
+  "Grup adăugat cu succes": {
+    "RO": "Grup adăugat cu succes",
+    "RU": "Ошибка при добавлении"
+  },
+  "Nu există grupuri de permisiuni": {
+    "RO": "Nu există grupuri de permisiuni",
+    "RU": "Нет групп с правами"
   }
 };

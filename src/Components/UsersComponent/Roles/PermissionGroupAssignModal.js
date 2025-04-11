@@ -1,4 +1,4 @@
-import { Modal, Select, Button, Stack, Loader } from "@mantine/core";
+import { Modal, Select, Button, Stack, Loader, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
@@ -11,6 +11,11 @@ const PermissionGroupAssignModal = ({ opened, onClose, onConfirm }) => {
   const [permissionGroup, setPermissionGroup] = useState("");
   const [permissionGroups, setPermissionGroups] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const handleClose = () => {
+    setPermissionGroup("");
+    onClose();
+  };
 
   useEffect(() => {
     const fetchPermissionGroups = async () => {
@@ -42,7 +47,7 @@ const PermissionGroupAssignModal = ({ opened, onClose, onConfirm }) => {
   return (
     <Modal
       opened={opened}
-      onClose={onClose}
+      onClose={handleClose}
       title={translations["Atribuiți grupul de permisiuni"][language]}
       centered
     >
@@ -59,6 +64,12 @@ const PermissionGroupAssignModal = ({ opened, onClose, onConfirm }) => {
           rightSection={loading ? <Loader size={16} /> : null}
           disabled={loading}
         />
+
+        {!loading && permissionGroups.length === 0 && (
+          <Text align="center">
+            {translations["Nu există grupuri de permisiuni"][language]}
+          </Text>
+        )}
 
         <Button
           onClick={handleConfirm}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import {
   TextInput,
   Button,
@@ -23,17 +23,15 @@ const language = localStorage.getItem("language") || "RO";
 
 const UsersComponent = () => {
   const [users, setUsers] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
   const [editUser, setEditUser] = useState(null);
   const [editGroupsOpen, setEditGroupsOpen] = useState(false);
-  const [createPermissionModalOpen, setCreatePermissionModalOpen] =
-    useState(false);
+  const [createPermissionModalOpen, setCreatePermissionModalOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.users.getTechnicianList();
@@ -55,7 +53,6 @@ const UsersComponent = () => {
       });
 
       setUsers(normalized);
-      setFiltered(normalized);
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
@@ -64,24 +61,22 @@ const UsersComponent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  useEffect(() => {
-    if (!search) return setFiltered(users);
+  const filtered = useMemo(() => {
+    if (!search) return users;
     const s = search.toLowerCase();
-    setFiltered(
-      users.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(s) ||
-          user.surname?.toLowerCase().includes(s) ||
-          user.email?.toLowerCase().includes(s)
-      )
+    return users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(s) ||
+        user.surname?.toLowerCase().includes(s) ||
+        user.email?.toLowerCase().includes(s)
     );
-  }, [search, users]);
+  }, [users, search]);
 
   return (
     <Container size="xxl" style={{ height: "100%" }}>

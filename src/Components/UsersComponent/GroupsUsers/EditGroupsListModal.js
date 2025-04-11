@@ -27,8 +27,8 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     const [expandedGroupId, setExpandedGroupId] = useState(null);
     const [groupState, setGroupState] = useState({});
     const [loading, setLoading] = useState(false);
-
     const { enqueueSnackbar } = useSnackbar();
+
     const confirmDelete = useConfirmPopup({
         subTitle: translations["Sigur doriți să ștergeți acest grup?"][language],
     });
@@ -151,7 +151,10 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                         style={{ flex: 1 }}
                         disabled={loading}
                     />
-                    <Button onClick={handleAdd} disabled={loading}>
+                    <Button
+                        onClick={handleAdd}
+                        disabled={loading || !newGroup.trim() || groups.some(g => g.name === newGroup.trim())}
+                    >
                         {translations["Adaugă"][language]}
                     </Button>
                 </Flex>
@@ -160,6 +163,10 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                     <Flex justify="center" py="md">
                         <Loader />
                     </Flex>
+                )}
+
+                {!loading && groups.length === 0 && (
+                    <Text align="center">{translations["Nu există grupuri"][language]}</Text>
                 )}
 
                 {!loading &&
