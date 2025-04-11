@@ -32,6 +32,18 @@ const initialFormState = {
   selectedRoles: [],
 };
 
+const safeParseJson = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("error JSON.parse:", err, str);
+    }
+    return [];
+  }
+};
+
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [form, setForm] = useState(initialFormState);
@@ -41,18 +53,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [permissionGroupRoles, setPermissionGroupRoles] = useState([]);
   const permissionGroupInitialRolesRef = useRef([]);
   const [customRoles, setCustomRoles] = useState([]);
-
-  const safeParseJson = (str) => {
-    try {
-      const parsed = JSON.parse(str);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch (err) {
-      if (process.env.NODE_ENV === "development") {
-        console.warn("error JSON.parse:", err, str);
-      }
-      return [];
-    }
-  };
 
   useEffect(() => {
     if (initialUser) {
