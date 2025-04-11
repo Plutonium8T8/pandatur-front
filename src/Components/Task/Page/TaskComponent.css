@@ -31,3 +31,54 @@
   text-align: center;
   gap: 10px;
 }
+
+.columns-view {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.column {
+  flex: 1;
+  background-color: #0e1e2e;
+  border-radius: 6px;
+  padding: 12px;
+  min-height: 400px;
+}
+
+.column-header {
+  font-weight: bold;
+  color: white;
+  margin-bottom: 8px;
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 4px;
+}
+
+.task-card {
+  background-color: #1b2d40;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 8px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.task-card:hover {
+  background-color: #284461;
+}
+
+.task-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.task-date {
+  font-size: 12px;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+
+.task-desc {
+  font-size: 14px;
+}
