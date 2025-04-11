@@ -15,9 +15,8 @@ import {
 import { IoTrash } from "react-icons/io5";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
-import { useConfirmPopup } from "../../../hooks";
+import { useConfirmPopup, useGetTechniciansList } from "../../../hooks";
 import { useSnackbar } from "notistack";
-import { useGetTechniciansList } from "../../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
