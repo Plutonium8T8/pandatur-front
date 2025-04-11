@@ -1,12 +1,25 @@
 import { FaRegFileLines } from "react-icons/fa6";
-import { Flex, Text } from "@mantine/core";
+import { Flex, Text, Box } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
+
+const STORAGE_URL = "https://storage.googleapis.com";
+const PDF_FILE = [".pdf"];
 
 export const getMediaType = (mimeType) => {
   if (mimeType.startsWith("image/")) return "image";
   if (mimeType.startsWith("video/")) return "video";
   if (mimeType.startsWith("audio/")) return "audio";
   return "file";
+};
+
+const renderFile = (source) => {
+  return (
+    <a href={source} target="_blank" rel="noopener noreferrer">
+      <Flex c="black">
+        <FaRegFileLines size="24px" />
+      </Flex>
+    </a>
+  );
 };
 
 export const renderContent = (msg) => {
@@ -46,18 +59,22 @@ export const renderContent = (msg) => {
         </audio>
       );
     case "file":
-      return (
-        <a href={msg.message} target="_blank" rel="noopener noreferrer">
-          <Flex c="black">
-            <FaRegFileLines size="24px" />
-          </Flex>
-        </a>
-      );
+      return renderFile(msg.message);
     default:
-      return (
-        <Text style={{ whiteSpace: "pre-line" }} truncate>
-          {msg.message}
-        </Text>
+      const { message } = msg;
+      const isFile =
+        message.startsWith(STORAGE_URL) && message.endsWith(PDF_FILE);
+      return isFile ? (
+        renderFile(message)
+      ) : (
+        <Box maw="600px" w="100%">
+          <Text
+            style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}
+            truncate
+          >
+            {message}
+          </Text>
+        </Box>
       );
   }
 };
