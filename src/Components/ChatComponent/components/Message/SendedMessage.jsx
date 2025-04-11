@@ -9,7 +9,18 @@ export const SendedMessage = ({ msg }) => {
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
+<<<<<<< Updated upstream
           <Flex miw="250px" direction="column" p="8" className="text">
+=======
+          <Flex
+            style={{ border: msg.isError ? "1px solid red" : "none" }}
+            miw="250px"
+            direction="column"
+            p="8"
+            className="text"
+          >
+            <Text>{msg.technician?.label}</Text>
+>>>>>>> Stashed changes
             {renderContent(msg)}
 
             <Text size="sm" ta="end">
