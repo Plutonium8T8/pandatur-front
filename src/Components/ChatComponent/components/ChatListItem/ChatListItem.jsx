@@ -1,9 +1,56 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
+import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
+import { IoIosVideocam } from "react-icons/io";
+import { TbPhoto } from "react-icons/tb";
+import { GrAttachment } from "react-icons/gr";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
-import { priorityTagColors, parseServerDate } from "../../../utils";
+import { MEDIA_TYPE } from "../../utils";
+import {
+  priorityTagColors,
+  parseServerDate,
+  getLanguageByKey,
+} from "../../../utils";
 import "./ChatListItem.css";
+
+const MESSAGE_INDICATOR = {
+  [MEDIA_TYPE.IMAGE]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <TbPhoto />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("photo")}
+      </Text>
+    </Flex>
+  ),
+
+  [MEDIA_TYPE.VIDEO]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <IoIosVideocam />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("video")}
+      </Text>
+    </Flex>
+  ),
+
+  [MEDIA_TYPE.AUDIO]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <HiSpeakerWave />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("audio")}
+      </Text>
+    </Flex>
+  ),
+
+  [MEDIA_TYPE.FILE]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <GrAttachment />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("file")}
+      </Text>
+    </Flex>
+  ),
+};
 
 export const ChatListItem = ({
   chat,
@@ -59,9 +106,11 @@ export const ChatListItem = ({
 
         <Flex justify="space-between" gap="6">
           <Box mt="4px" w="80%">
-            <Text h="20px" c="dimmed" size="sm" truncate>
-              {chat.last_message}
-            </Text>
+            {MESSAGE_INDICATOR[chat.last_message_type] || (
+              <Text h="20px" c="dimmed" size="sm" truncate>
+                {chat.last_message}
+              </Text>
+            )}
           </Box>
           <Text size="sm" c="dimmed">
             {formatDate ? formatDate.format(HH_mm) : null}
