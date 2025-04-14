@@ -2,6 +2,7 @@ import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
 import { IoIosVideocam } from "react-icons/io";
+import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
@@ -47,6 +48,14 @@ const MESSAGE_INDICATOR = {
       <GrAttachment />
       <Text h="20px" size="sm">
         {getLanguageByKey("file")}
+      </Text>
+    </Flex>
+  ),
+  [MEDIA_TYPE.URL]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <FiLink2 />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("link")}
       </Text>
     </Flex>
   ),

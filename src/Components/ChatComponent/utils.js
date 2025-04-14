@@ -9,6 +9,7 @@ export const MEDIA_TYPE = {
   VIDEO: "video",
   AUDIO: "audio",
   FILE: "file",
+  URL: "url"
 };
 
 export const getMediaType = (mimeType) => {
