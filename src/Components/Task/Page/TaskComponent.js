@@ -55,7 +55,9 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
 
   const filteredTasks = Array.isArray(tasks)
     ? tasks.filter((task) =>
-      (task.task_type || "").toLowerCase().includes(searchQuery.toLowerCase())
+      (task?.task_type || "")
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
     )
     : [];
 
