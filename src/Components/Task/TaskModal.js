@@ -101,12 +101,12 @@ const TaskModal = ({
     if (
       !task.ticketId ||
       !scheduledTime ||
-      !task.description ||
       !task.createdBy ||
       !task.createdFor ||
-      !task.taskType ||
-      !task.priority ||
-      !task.status_task
+      !task.taskType
+      // !task.description ||
+      // !task.priority ||
+      // !task.status_task
     ) {
       enqueueSnackbar(translations["Toate câmpurile sunt obligatorii"][language], {
         variant: "warning",

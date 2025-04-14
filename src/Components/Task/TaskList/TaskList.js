@@ -161,24 +161,6 @@ const TaskList = ({
         ),
       },
       {
-        title: (
-          <HeaderCellRcTable
-            title={translations["Lead ID"][language]}
-            order={order}
-          />
-        ),
-        dataIndex: "ticket_id",
-        key: "ticket_id",
-        width: 120,
-        align: "center",
-        onHeaderCell: () => ({
-          onClick: () => {
-            setSortColumn("ticket_id");
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
-          },
-        }),
-      },
-      {
         title: translations["Tipul Taskului"][language],
         dataIndex: "task_type",
         key: "task_type",
@@ -262,11 +244,22 @@ const TaskList = ({
           },
         }),
         render: (date) => {
-          const parsed = dayjs(date);
-          return parsed.isValid()
-            ? parsed.format("DD.MM.YYYY HH:mm")
-            : "Invalid Date";
-        },
+          const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
+          if (!parsed.isValid()) return "Invalid Date";
+
+          const today = dayjs().startOf("day");
+          const isToday = parsed.isSame(today, "day");
+          const isPast = parsed.isBefore(today);
+
+          const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
+          const fontWeight = isPast || isToday ? 600 : 400;
+
+          return (
+            <span style={{ color, fontWeight }}>
+              {parsed.format("DD.MM.YYYY HH:mm")}
+            </span>
+          );
+        }
       },
       {
         title: translations["Status"][language],
