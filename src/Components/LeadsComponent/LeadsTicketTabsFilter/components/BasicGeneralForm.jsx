@@ -107,7 +107,7 @@ export const BasicGeneralForm = ({
           {getLanguageByKey("Închide")}
         </Button>
         <Button loading={loading} type="submit" form={idForm}>
-          {getLanguageByKey("Trimite")}
+          {getLanguageByKey("Aplică")}
         </Button>
       </Flex>
     </>

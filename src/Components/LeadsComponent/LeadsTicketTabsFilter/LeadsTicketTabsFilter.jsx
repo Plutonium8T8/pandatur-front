@@ -68,7 +68,7 @@ export const LeadsTicketTabsFilter = ({
                 loading={loading}
                 onClick={() => onApplyWorkflowFilters(systemWorkflow)}
               >
-                {getLanguageByKey("Trimite")}
+                {getLanguageByKey("Aplică")}
               </Button>
             </Flex>
           </Flex>
@@ -94,7 +94,7 @@ export const LeadsTicketTabsFilter = ({
               {getLanguageByKey("Închide")}
             </Button>
             <Button disabled variant="filled">
-              {getLanguageByKey("Trimite")}
+              {getLanguageByKey("Aplică")}
             </Button>
           </Flex>
         </Flex>
