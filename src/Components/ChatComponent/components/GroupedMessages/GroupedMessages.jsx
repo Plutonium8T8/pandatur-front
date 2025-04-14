@@ -1,4 +1,4 @@
-import { Flex, Badge, DEFAULT_THEME, Divider } from "@mantine/core";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useUser, useApp } from "../../../../hooks";
 import { DD_MM_YYYY } from "../../../../app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
@@ -56,48 +56,57 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   });
 
   return (
-    <Flex direction="column" gap="xl">
-      {groupedMessages.map(({ date, clientId, messages }, index) => {
-        const clientInfo = personalInfo?.clients?.[0] || {};
+    <Flex h="100%" direction="column" gap="xl">
+      {groupedMessages.length ? (
+        groupedMessages.map(({ date, clientId, messages }, index) => {
+          const clientInfo = personalInfo?.clients?.[0] || {};
 
-        const clientName =
-          getFullName(clientInfo.name, clientInfo.surname) || `ID: ${clientId}`;
+          const clientName =
+            getFullName(clientInfo.name, clientInfo.surname) ||
+            `ID: ${clientId}`;
 
-        return (
-          <Flex direction="column" gap="md" key={index}>
-            <Divider
-              label={
+          return (
+            <Flex direction="column" gap="md" key={index}>
+              <Divider
+                label={
+                  <Badge c="black" size="lg" bg={colors.gray[2]}>
+                    {date}
+                  </Badge>
+                }
+                labelPosition="center"
+              />
+
+              <Flex justify="center">
                 <Badge c="black" size="lg" bg={colors.gray[2]}>
-                  {date}
+                  {getLanguageByKey("Mesajele clientului")} #{clientId} -{" "}
+                  {clientName}
                 </Badge>
-              }
-              labelPosition="center"
-            />
-
-            <Flex justify="center">
-              <Badge c="black" size="lg" bg={colors.gray[2]}>
-                {getLanguageByKey("Mesajele clientului")} #{clientId} -{" "}
-                {clientName}
-              </Badge>
+              </Flex>
+              <Flex direction="column" gap="xs">
+                {messages.map((msg) => {
+                  const isMessageSentByMe =
+                    msg.sender_id === userId || msg.sender_id === 1;
+                  return isMessageSentByMe ? (
+                    <SendedMessage key={msg.id} msg={msg} />
+                  ) : (
+                    <ReceivedMessage
+                      key={msg.id}
+                      msg={msg}
+                      personalInfo={personalInfo}
+                    />
+                  );
+                })}
+              </Flex>
             </Flex>
-            <Flex direction="column" gap="xs">
-              {messages.map((msg) => {
-                const isMessageSentByMe =
-                  msg.sender_id === userId || msg.sender_id === 1;
-                return isMessageSentByMe ? (
-                  <SendedMessage key={msg.id} msg={msg} />
-                ) : (
-                  <ReceivedMessage
-                    key={msg.id}
-                    msg={msg}
-                    personalInfo={personalInfo}
-                  />
-                );
-              })}
-            </Flex>
-          </Flex>
-        );
-      })}
+          );
+        })
+      ) : (
+        <Flex h="100%" align="center" justify="center">
+          <Text c="dimmed">
+            {getLanguageByKey("noConversationStartedForThisTicket")}
+          </Text>
+        </Flex>
+      )}
     </Flex>
   );
 };
