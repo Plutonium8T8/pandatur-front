@@ -193,12 +193,12 @@ const TaskModal = ({
           />
 
           <IconSelect
-            options={TypeTask} // массив объектов с name и icon
-            label={translations["Alege tip task"][language]} // текст метки
-            placeholder={translations["Alege tip task"][language]} // плейсхолдер, если не выбрано
-            value={task.taskType} // текущее выбранное значение (name из options)
-            onChange={(value) => setTask((prev) => ({ ...prev, taskType: value }))} // обновление значения
-            required // обязательное поле (добавляет * и проверку)
+            options={TypeTask}
+            label={translations["Alege tip task"][language]}
+            value={task.taskType}
+            onChange={(value) => setTask((prev) => ({ ...prev, taskType: value }))}
+            required
+            placeholder={translations["Alege tip task"][language]}
           />
 
           <Grid>

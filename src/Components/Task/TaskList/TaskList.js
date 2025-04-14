@@ -7,6 +7,8 @@ import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
 import { Menu, Button } from "@mantine/core";
+import { MantineModal } from "../../MantineModal";
+import SingleChat from "../../ChatComponent/SingleChat";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -37,6 +39,7 @@ const TaskList = ({
   const [selectedRow, setSelectedRow] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
+  const [openedTicketId, setOpenedTicketId] = useState(null);
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
   });
@@ -134,20 +137,28 @@ const TaskList = ({
       {
         title: (
           <HeaderCellRcTable
-            title={translations["ID"][language]}
+            title={translations["Lead ID"][language]}
             order={order}
           />
         ),
-        dataIndex: "id",
-        key: "id",
-        width: 60,
+        dataIndex: "ticket_id",
+        key: "ticket_id",
+        width: 120,
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setSortColumn("id");
+            setSortColumn("ticket_id");
             setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
           },
         }),
+        render: (ticketId) => (
+          <span
+            style={{ color: "#1971c2", cursor: "pointer", textDecoration: "underline" }}
+            onClick={() => setOpenedTicketId(ticketId)}
+          >
+            {ticketId}
+          </span>
+        ),
       },
       {
         title: (
@@ -333,6 +344,17 @@ const TaskList = ({
         loading={loading}
         bordered
       />
+      <MantineModal
+        fullScreen
+        open={!!openedTicketId}
+        onClose={() => setOpenedTicketId(null)}
+        height="calc(100% - 60px)"
+      >
+        <SingleChat
+          ticketId={openedTicketId}
+          onClose={() => setOpenedTicketId(null)}
+        />
+      </MantineModal>
     </div>
   );
 };

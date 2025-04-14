@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 
-const IconSelect = ({ options, value, onChange, label = "Select", required }) => {
+const IconSelect = ({
+  options,
+  value,
+  onChange,
+  label = "Select",
+  placeholder = "Alege opțiune",
+  required = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const selected = options.find((item) => item.name === value);
 
@@ -18,7 +25,10 @@ const IconSelect = ({ options, value, onChange, label = "Select", required }) =>
             marginBottom: 6,
           }}
         >
-          {label} {required && "*"}
+          {label}
+          {required && (
+            <span style={{ color: "red", marginLeft: 4 }}>*</span>
+          )}
         </label>
       )}
 
@@ -41,7 +51,7 @@ const IconSelect = ({ options, value, onChange, label = "Select", required }) =>
             <span>{selected.name}</span>
           </div>
         ) : (
-          <span style={{ color: "#999" }}>Alege opțiune</span>
+          <span style={{ color: "#999" }}>{placeholder}</span>
         )}
         <span style={{ fontSize: 12, marginLeft: "auto" }}>▾</span>
       </div>
