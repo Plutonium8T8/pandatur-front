@@ -1,12 +1,32 @@
 import { FaRegFileLines } from "react-icons/fa6";
-import { Flex, Text } from "@mantine/core";
-import { getLanguageByKey } from "../utils";
+import { Flex, Text, Box, Image } from "@mantine/core";
+import { getLanguageByKey, isStoreFile } from "../utils";
+
+const BROKEN_PHOTO = "/broken.png";
+
+export const MEDIA_TYPE = {
+  IMAGE: "image",
+  VIDEO: "video",
+  AUDIO: "audio",
+  FILE: "file",
+  URL: "url"
+};
 
 export const getMediaType = (mimeType) => {
-  if (mimeType.startsWith("image/")) return "image";
-  if (mimeType.startsWith("video/")) return "video";
-  if (mimeType.startsWith("audio/")) return "audio";
+  if (mimeType.startsWith("image/")) return MEDIA_TYPE.IMAGE;
+  if (mimeType.startsWith("video/")) return MEDIA_TYPE.VIDEO;
+  if (mimeType.startsWith("audio/")) return MEDIA_TYPE.AUDIO;
   return "file";
+};
+
+const renderFile = (source) => {
+  return (
+    <a href={source} target="_blank" rel="noopener noreferrer">
+      <Flex c="black">
+        <FaRegFileLines size="24px" />
+      </Flex>
+    </a>
+  );
 };
 
 export const renderContent = (msg) => {
@@ -16,48 +36,49 @@ export const renderContent = (msg) => {
     );
   }
   switch (msg.mtype) {
-    case "image":
+    case MEDIA_TYPE.IMAGE:
       return (
-        <img
+        <Image
+          fallbackSrc={BROKEN_PHOTO}
+          my="5"
+          radius="md"
           src={msg.message}
-          alt=""
-          className="image-preview-in-chat | pointer"
-          // onError={(e) => {
-          //   e.target.src =
-          //     "https://via.placeholder.com/300?text=Ошибка+загрузки";
-          // }}
+          className="pointer"
           onClick={() => {
             window.open(msg.message, "_blank");
           }}
         />
       );
-    case "video":
+    case MEDIA_TYPE.VIDEO:
       return (
         <video controls className="video-preview">
           <source src={msg.message} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
       );
-    case "audio":
+    case MEDIA_TYPE.AUDIO:
       return (
         <audio controls>
           <source src={msg.message} type="audio/ogg" />
           {getLanguageByKey("Acest browser nu suporta audio")}
         </audio>
       );
-    case "file":
-      return (
-        <a href={msg.message} target="_blank" rel="noopener noreferrer">
-          <Flex c="black">
-            <FaRegFileLines size="24px" />
-          </Flex>
-        </a>
-      );
+    case MEDIA_TYPE.FILE:
+      return renderFile(msg.message);
     default:
-      return (
-        <Text style={{ whiteSpace: "pre-line" }} truncate>
-          {msg.message}
-        </Text>
+      const { message } = msg;
+
+      return isStoreFile(message) ? (
+        renderFile(message)
+      ) : (
+        <Box maw="600px" w="100%">
+          <Text
+            style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}
+            truncate
+          >
+            {message}
+          </Text>
+        </Box>
       );
   }
 };

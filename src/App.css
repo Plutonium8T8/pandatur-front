@@ -486,3 +486,7 @@ input {
 .min-w-300 {
   min-width: 350px;
 }
+
+.w-full {
+  width: 100%;
+}

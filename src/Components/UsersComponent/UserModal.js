@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   Button,
   Drawer,
@@ -9,13 +9,13 @@ import {
   Group,
   Select,
   PasswordInput,
-  Loader,
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
+import { formatRoles } from "../utils/formatRoles";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -32,10 +32,16 @@ const initialFormState = {
   selectedRoles: [],
 };
 
-const formatRoles = (roles) => {
-  if (Array.isArray(roles)) return roles;
-  if (typeof roles === "object" && roles !== null) return Object.values(roles);
-  return [];
+const safeParseJson = (str) => {
+  try {
+    const parsed = JSON.parse(str);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    if (process.env.NODE_ENV === "development") {
+      console.warn("error JSON.parse:", err, str);
+    }
+    return [];
+  }
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
@@ -44,11 +50,34 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [groupsList, setGroupsList] = useState([]);
   const [permissionGroups, setPermissionGroups] = useState([]);
   const [groupsLoading, setGroupsLoading] = useState(false);
+  const [permissionGroupRoles, setPermissionGroupRoles] = useState([]);
+  const permissionGroupInitialRolesRef = useRef([]);
+  const [customRoles, setCustomRoles] = useState([]);
 
   useEffect(() => {
     if (initialUser) {
-      setForm({
-        ...initialFormState,
+      const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
+
+      const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
+      const userRoles = safeParseJson(rawRoles)
+        .map((r) => r.replace(/^ROLE_/, ""))
+        .filter(Boolean);
+
+      const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
+      const permissionRoles = safeParseJson(rawPermissionRoles)
+        .map((r) => r.replace(/^ROLE_/, ""))
+        .filter(Boolean);
+
+      setPermissionGroupRoles(permissionRoles);
+      permissionGroupInitialRolesRef.current = permissionRoles;
+
+      const onlyCustom = userRoles.filter((r) => !permissionRoles.includes(r));
+      setCustomRoles(onlyCustom);
+
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId,
+        selectedRoles: Array.from(new Set([...onlyCustom, ...permissionRoles])),
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
@@ -59,9 +88,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           typeof initialUser.groups?.[0] === "string"
             ? initialUser.groups[0]
             : initialUser.groups?.[0]?.name || "",
-      });
+      }));
     } else {
       setForm(initialFormState);
+      setCustomRoles([]);
+      setPermissionGroupRoles([]);
     }
   }, [initialUser, opened]);
 
@@ -69,14 +100,28 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     const fetchGroups = async () => {
       setGroupsLoading(true);
       try {
-        const [userGroups, permissions] = await Promise.all([
-          api.user.getGroupsList(),
-          api.users.getAllPermissionGroups(),
-        ]);
-        setGroupsList(userGroups);
-        setPermissionGroups(permissions);
-      } catch (err) {
-        console.error("error loading group", err);
+        let userGroups = [];
+        let permissionGroups = [];
+
+        try {
+          userGroups = await api.user.getGroupsList();
+          setGroupsList(userGroups);
+        } catch (e) {
+          enqueueSnackbar(
+            translations["Eroare la încărcarea grupurilor de utilizatori"][language],
+            { variant: "error" }
+          );
+        }
+
+        try {
+          permissionGroups = await api.permissions.getAllPermissionGroups();
+          setPermissionGroups(permissionGroups);
+        } catch (e) {
+          enqueueSnackbar(
+            translations["Eroare la încărcarea grupurilor de permisiuni"][language],
+            { variant: "error" }
+          );
+        }
       } finally {
         setGroupsLoading(false);
       }
@@ -86,26 +131,54 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   }, [opened]);
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
-    const selected = permissionGroups.find(
+    const selectedGroup = permissionGroups.find(
       (g) => g.permission_id.toString() === permissionGroupId
     );
-    const roles = formatRoles(selected?.roles)
+
+    const groupRoles = formatRoles(selectedGroup?.roles)
       .map((r) => r.replace(/^ROLE_/, ""))
       .filter(Boolean);
+
+    permissionGroupInitialRolesRef.current = groupRoles;
+    setPermissionGroupRoles(groupRoles);
+
     setForm((prev) => ({
       ...prev,
       permissionGroupId,
-      selectedRoles: roles,
+      selectedRoles: Array.from(new Set([...customRoles, ...groupRoles])),
     }));
   };
 
+  const handlePermissionGroupChange = (value) => {
+    if (!value) {
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId: null,
+        selectedRoles: customRoles,
+      }));
+      setPermissionGroupRoles([]);
+    } else {
+      handleSelectPermissionGroup(value);
+    }
+  };
+
   const toggleRole = (role) => {
-    setForm((prev) => ({
-      ...prev,
-      selectedRoles: prev.selectedRoles.includes(role)
+    setCustomRoles((prev) =>
+      prev.includes(role)
+        ? prev.filter((r) => r !== role)
+        : [...prev, role]
+    );
+
+    setForm((prev) => {
+      const nextRoles = prev.selectedRoles.includes(role)
         ? prev.selectedRoles.filter((r) => r !== role)
-        : [...prev.selectedRoles, role],
-    }));
+        : [...prev.selectedRoles, role];
+
+      return {
+        ...prev,
+        selectedRoles: nextRoles,
+      };
+    });
   };
 
   const handleCreate = async () => {
@@ -119,6 +192,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       status,
       groups,
       permissionGroupId,
+      selectedRoles,
     } = form;
 
     if (!initialUser) {
@@ -144,7 +218,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name,
             surname,
           }),
-          api.users.updateUsernameAndEmail(userId, { email }),
+          api.users.updateUser(userId, {
+            email,
+            roles: selectedRoles
+              .filter((r) => !permissionGroupRoles.includes(r))
+              .map((r) => `ROLE_${r}`),
+          }),
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
@@ -154,8 +233,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
-        if (permissionGroupId) {
-          await api.users.assignPermissionToUser(permissionGroupId, userId);
+        const hadPermissionBefore = initialUser?.permissions?.length > 0;
+
+        if (!permissionGroupId && hadPermissionBefore) {
+          await api.permissions.removePermissionFromTechnician(userId);
+        } else if (permissionGroupId) {
+          await api.permissions.assignPermissionToUser(permissionGroupId, userId);
         }
 
         enqueueSnackbar(translations["Utilizator actualizat cu succes"][language], {
@@ -167,7 +250,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             username,
             email,
             password,
-            roles: ["ROLE_USER", "ROLE_TECHNICIAN"],
+            roles: [],
           },
           extended: {
             name,
@@ -183,7 +266,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         const { id: createdUser } = await api.users.createTechnicianUser(payload);
 
         if (permissionGroupId) {
-          await api.users.assignPermissionToUser(
+          await api.permissions.assignPermissionToUser(
             permissionGroupId,
             createdUser?.user?.id
           );
@@ -278,9 +361,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name="new-password-field"
           />
 
-          {groupsLoading ? (
-            <Loader />
-          ) : (
+          {groupsList.length > 0 && (
             <>
               <Select
                 label={translations["Grup utilizator"][language]}
@@ -293,16 +374,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
               {initialUser && (
                 <>
-                  <Select
-                    label={translations["Grup permisiuni"][language]}
-                    placeholder={translations["Alege grupul de permisiuni"][language]}
-                    data={permissionGroups.map((g) => ({
-                      value: g.permission_id.toString(),
-                      label: g.permission_name,
-                    }))}
-                    value={form.permissionGroupId}
-                    onChange={handleSelectPermissionGroup}
-                  />
+                  {permissionGroups.length > 0 && (
+                    <Select
+                      clearable
+                      label={translations["Grup permisiuni"][language]}
+                      placeholder={translations["Alege grupul de permisiuni"][language]}
+                      data={permissionGroups.map((g) => ({
+                        value: g.permission_id.toString(),
+                        label: g.permission_name,
+                      }))}
+                      value={form.permissionGroupId}
+                      onChange={handlePermissionGroupChange}
+                    />
+                  )}
+
                   <RoleMatrix
                     selectedRoles={form.selectedRoles}
                     onToggle={toggleRole}

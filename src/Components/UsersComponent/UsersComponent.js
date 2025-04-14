@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { TextInput, Button, Menu, ActionIcon } from "@mantine/core";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { TextInput, Button, Menu, ActionIcon, Container } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { BsThreeDots } from "react-icons/bs";
 import { api } from "../../api";
@@ -15,7 +15,6 @@ const language = localStorage.getItem("language") || "RO";
 
 const UsersComponent = () => {
   const [users, setUsers] = useState([]);
-  const [filtered, setFiltered] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [opened, setOpened] = useState(false);
@@ -25,7 +24,7 @@ const UsersComponent = () => {
     useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
       const data = await api.users.getTechnicianList();
@@ -41,11 +40,12 @@ const UsersComponent = () => {
           groups: item.groups || [],
           jobTitle: item.job_title,
           status: item.status,
+          permissions: item.permissions || [],
+          rawRoles: user.roles || "[]",
         };
       });
 
       setUsers(normalized);
-      setFiltered(normalized);
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
@@ -54,30 +54,26 @@ const UsersComponent = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     fetchUsers();
-  }, []);
+  }, [fetchUsers]);
 
-  useEffect(() => {
-    if (!search) return setFiltered(users);
-
+  const filtered = useMemo(() => {
+    if (!search) return users;
     const s = search.toLowerCase();
-    setFiltered(
-      users.filter(
-        (user) =>
-          user.name?.toLowerCase().includes(s) ||
-          user.surname?.toLowerCase().includes(s) ||
-          user.email?.toLowerCase().includes(s),
-      ),
+    return users.filter(
+      (user) =>
+        user.name?.toLowerCase().includes(s) ||
+        user.surname?.toLowerCase().includes(s) ||
+        user.email?.toLowerCase().includes(s),
     );
-  }, [search, users]);
+  }, [users, search]);
 
   return (
-    <div className="task-container">
+    <Container p="20" size="xxl" style={{ height: "100%" }}>
       <PageHeader
-        mb="md"
         extraInfo={
           <>
             <Menu shadow="md" width={200}>
@@ -101,9 +97,7 @@ const UsersComponent = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               autoComplete="off"
-              name="search-user-field"
             />
-
             <Button
               leftSection={<IoMdAdd size={16} />}
               onClick={() => {
@@ -148,7 +142,7 @@ const UsersComponent = () => {
         opened={createPermissionModalOpen}
         onClose={() => setCreatePermissionModalOpen(false)}
       />
-    </div>
+    </Container>
   );
 };
 

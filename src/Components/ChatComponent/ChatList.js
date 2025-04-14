@@ -52,14 +52,6 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
     }
   }, [selectTicketId, tickets]);
 
-  const handleTicketClick = (ticketId) => {
-    console.log("🖱 Клик по тикету в списке:", ticketId);
-
-    if (selectTicketId === ticketId) return;
-
-    setSelectTicketId(ticketId);
-  };
-
   const sortedTickets = useMemo(() => {
     let filtered = [...tickets];
 
@@ -101,7 +93,6 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
       <ChatListItem
         chat={ticket}
         style={style}
-        onHandleTicketClick={handleTicketClick}
         selectTicketId={selectTicketId}
       />
     );

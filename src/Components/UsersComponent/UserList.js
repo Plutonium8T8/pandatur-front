@@ -12,6 +12,7 @@ import { useSnackbar } from "notistack";
 import { useState } from "react";
 import GroupChangeModal from "./GroupsUsers/GroupChangeModal";
 import { useConfirmPopup } from "../../hooks";
+import PermissionGroupAssignModal from "./Roles/PermissionGroupAssignModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -26,6 +27,7 @@ const UserList = ({
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
+  const [permissionModalOpen, setPermissionModalOpen] = useState(false);
 
   const allIds = users.map(extractId).filter(Boolean);
   const allSelected =
@@ -132,6 +134,21 @@ const UserList = ({
     }
   };
 
+  const handleAssignPermissionGroup = async (permissionGroupId) => {
+    try {
+      await api.permissions.batchAssignPermissionGroup(permissionGroupId, selectedIds);
+      enqueueSnackbar(translations["Grup de permisiuni atribuit"][language], {
+        variant: "success",
+      });
+      fetchUsers();
+      setSelectedIds([]);
+    } catch (err) {
+      enqueueSnackbar(translations["Eroare la atribuirea grupului"][language], {
+        variant: "error",
+      });
+    }
+  };
+
   const columns = [
     {
       title: (
@@ -158,7 +175,7 @@ const UserList = ({
       title: translations["ID"][language],
       dataIndex: "id",
       key: "id",
-      width: 100,
+      width: 90,
       render: (id) => id,
     },
     {
@@ -187,6 +204,16 @@ const UserList = ({
       render: (groups) =>
         Array.isArray(groups)
           ? groups.map((g) => (typeof g === "string" ? g : g.name)).join(", ")
+          : "—",
+    },
+    {
+      title: translations["Grup permisiuni"][language],
+      dataIndex: "permissions",
+      key: "permissions",
+      width: 200,
+      render: (permissions) =>
+        Array.isArray(permissions) && permissions.length > 0
+          ? permissions[0].name
           : "—",
     },
     {
@@ -264,6 +291,9 @@ const UserList = ({
           <Button variant="light" onClick={() => setGroupModalOpen(true)}>
             {translations["Schimbă grupul"][language]}
           </Button>
+          <Button variant="light" color="grape" onClick={() => setPermissionModalOpen(true)}>
+            {translations["Schimbǎ grup de permisiuni"][language]}
+          </Button>
           <Button
             variant="light"
             color="red"
@@ -280,6 +310,12 @@ const UserList = ({
         onConfirm={handleChangeGroup}
       />
 
+      <PermissionGroupAssignModal
+        opened={permissionModalOpen}
+        onClose={() => setPermissionModalOpen(false)}
+        onConfirm={handleAssignPermissionGroup}
+      />
+
       <RcTable
         rowKey={(row) => extractId(row)}
         columns={columns}
@@ -288,7 +324,7 @@ const UserList = ({
         bordered
         selectedRow={[]}
         pagination={false}
-        scroll={{ y: "calc(100vh - 300px)" }}
+        scroll={{ y: "calc(100vh - 200px)" }}
       />
     </>
   );

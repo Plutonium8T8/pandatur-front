@@ -26,7 +26,6 @@ export const AppProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
-  const [unreadMessages, setUnreadMessages] = useState(new Map());
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
   const { storage, changeLocalStorage } = useLocalStorage(
@@ -109,18 +108,7 @@ export const AppProvider = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const unread = messages.filter(
-      (msg) =>
-        msg.seen_by != null &&
-        msg.seen_by === "{}" &&
-        msg.sender_id !== 1 &&
-        msg.sender_id !== userId,
-    );
-    setUnreadCount(unread.length);
-  }, [messages]);
-
-  const markMessagesAsRead = (ticketId) => {
+  const markMessagesAsRead = (ticketId, count) => {
     if (!ticketId) return;
 
     const socketInstance = socketRef.current;
@@ -138,21 +126,13 @@ export const AppProvider = ({ children }) => {
       }),
     );
 
-    setUnreadMessages((prevUnread) => {
-      const updatedUnread = new Map(prevUnread);
-      updatedUnread.forEach((msg, msgId) => {
-        if (msg.ticket_id === ticketId) {
-          updatedUnread.delete(msgId);
-        }
-      });
-      return updatedUnread;
-    });
-
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
         ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket,
       ),
     );
+
+    setUnreadCount((prev) => prev - count);
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
@@ -177,6 +157,13 @@ export const AppProvider = ({ children }) => {
         setSpinnerTickets(false);
         return;
       }
+
+      const totalUnread = data.tickets.reduce(
+        (sum, ticket) => sum + ticket.unseen_count,
+        0,
+      );
+
+      setUnreadCount((prev) => prev + totalUnread);
 
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => [...prev, ...processedTickets]);
@@ -211,6 +198,8 @@ export const AppProvider = ({ children }) => {
         }
       });
 
+      setUnreadCount((prev) => prev + ticket?.unseen_count || 0);
+
       return ticket;
     } catch (error) {
       console.error("Ticket request error:", error);
@@ -233,7 +222,6 @@ export const AppProvider = ({ children }) => {
   };
 
   const getClientMessagesSingle = async (ticket_id) => {
-    console.log("Updating messages for ticket:", ticket_id);
     try {
       const data = await api.messages.messagesTicketById(ticket_id);
 
@@ -245,18 +233,6 @@ export const AppProvider = ({ children }) => {
 
           return [...otherMessages, ...data];
         });
-
-        const unseenMessages = data.filter(
-          (msg) => msg.seen_by === "{}" && msg.sender_id !== userId,
-        );
-
-        setTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket.id === ticket_id
-              ? { ...ticket, unseen_count: unseenMessages.length }
-              : ticket,
-          ),
-        );
       }
     } catch (error) {
       console.error("error request messages:", error.message);
@@ -274,6 +250,10 @@ export const AppProvider = ({ children }) => {
           time_sent,
           sender_id,
         } = message.data;
+
+        setUnreadCount((prev) => prev + 1);
+
+        setUnreadCount((prev) => prev + 1);
 
         // setMessages((prevMessages) => [...prevMessages, message.data]);
 
@@ -293,22 +273,6 @@ export const AppProvider = ({ children }) => {
           ),
         );
 
-        setUnreadMessages((prevUnread) => {
-          const updatedUnread = new Map(prevUnread);
-
-          if (ticket_id === selectTicketId) {
-            updatedUnread.forEach((msg, msgId) => {
-              if (msg.ticket_id === ticket_id) {
-                updatedUnread.delete(msgId);
-              }
-            });
-          } else if (sender_id !== userId) {
-            updatedUnread.set(message.data.id, message.data);
-          }
-
-          return updatedUnread;
-        });
-
         break;
       }
       case "seen": {
@@ -318,16 +282,6 @@ export const AppProvider = ({ children }) => {
           return prevMessages.map((msg) =>
             msg.ticket_id === ticket_id ? { ...msg, seen_at } : msg,
           );
-        });
-
-        setUnreadMessages((prevUnreadMessages) => {
-          const updatedUnreadMap = new Map(prevUnreadMessages);
-          updatedUnreadMap.forEach((msg, msgId) => {
-            if (msg.ticket_id === ticket_id) {
-              updatedUnreadMap.delete(msgId);
-            }
-          });
-          return updatedUnreadMap;
         });
 
         setTickets((prevTickets) =>
@@ -375,15 +329,6 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     fetchTickets();
   }, []);
-
-  useEffect(() => {
-    const totalUnread = tickets.reduce(
-      (sum, ticket) => sum + ticket.unseen_count,
-      0,
-    );
-
-    setUnreadCount(totalUnread);
-  }, [tickets, unreadMessages]);
 
   return (
     <AppContext.Provider

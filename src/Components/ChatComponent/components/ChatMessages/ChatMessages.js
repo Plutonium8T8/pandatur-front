@@ -16,6 +16,7 @@ import "./ChatMessages.css";
 
 const language = localStorage.getItem("language") || "RO";
 
+// TODO: Add loading from `AppContext`
 export const ChatMessages = ({
   selectTicketId,
   selectedClient,
