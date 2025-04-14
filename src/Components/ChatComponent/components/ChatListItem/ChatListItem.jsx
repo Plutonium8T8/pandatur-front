@@ -95,19 +95,23 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         pos="relative"
       >
         {chat.unseen_count > 0 && (
-          <Box pos="absolute" right="16px">
-            <ActionIcon
-              variant="default"
-              onClick={() => {
-                console.log("chat", chat);
-                markMessagesAsRead(chat.id, chat.unseen_count);
-              }}
-            >
-              <IoMdEye />
-            </ActionIcon>
-            <Badge size="md" bg="red" circle>
-              {chat.unseen_count}
-            </Badge>
+          <Box pos="absolute" right="16px" className="right">
+            <Box pos="relative" w="fit-content" h="fit-content">
+              <Badge size="md" bg="red" circle className="right-count">
+                {chat.unseen_count}
+              </Badge>
+
+              <Flex
+                p="4"
+                pos="absolute"
+                top="50%"
+                left="50%"
+                className="mark-seen-message-button | pointer"
+                onClick={() => markMessagesAsRead(chat.id, chat.unseen_count)}
+              >
+                <IoMdEye className="pointer" />
+              </Flex>
+            </Box>
           </Box>
         )}
         <Flex gap="12" align="center" w="100%">
