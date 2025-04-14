@@ -12,7 +12,7 @@ import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
 import { api } from "../../api";
 import SingleChat from "../ChatComponent/SingleChat";
 import { Spin } from "../Spin";
-import { RefLeadsFilter } from "./LeadsFilter";
+import { RefLeadsHeader } from "./LeadsHeader";
 import TicketModal from "./TicketModal/TicketModalComponent";
 import "../../App.css";
 import "../SnackBarComponent/SnackBarComponent.css";
@@ -35,10 +35,10 @@ const getTicketsIds = (ticketList) => {
 };
 
 const Leads = () => {
-  const refLeadsFilter = useRef();
+  const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const leadsFilterHeight = useDOMElementHeight(refLeadsFilter);
+  const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
   const { tickets, setTickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
@@ -273,9 +273,9 @@ const Leads = () => {
 
   return (
     <>
-      <RefLeadsFilter
+      <RefLeadsHeader
         onChangeViewMode={setViewMode}
-        ref={refLeadsFilter}
+        ref={refLeadsHeader}
         openCreateTicketModal={openCreateTicketModal}
         setSearchTerm={setSearchTerm}
         searchTerm={searchTerm}
