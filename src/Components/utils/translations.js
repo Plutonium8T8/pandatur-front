@@ -2035,4 +2035,8 @@ export const translations = {
     RO: "Link",
     RU: "Ссылка",
   },
+  selectUser: {
+    RO: "Select user",
+    RU: "Выбрать пользователя",
+  },
 };
