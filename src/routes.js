@@ -3,7 +3,6 @@ import Leads from "./Components/LeadsComponent/LeadsComponent";
 import ChatComponent from "./Components/ChatComponent/ChatComponent";
 import LoginForm from "./Components/LoginComponent/LoginForm";
 import UsersComponent from "./Components/UsersComponent/UsersComponent";
-import { NoAccess } from "./Components/NoAccess";
 import TaskPage from "./Components/Task/Page/TaskComponent";
 import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
@@ -42,7 +41,7 @@ export const privateRoutes = (isAllowRole) => [
   {
     path: "/users",
     // component: isAllowRole ? UsersComponent : NoAccess
-    component: UsersComponent
+    component: UsersComponent,
   },
   {
     path: "/leads/:ticketId?",

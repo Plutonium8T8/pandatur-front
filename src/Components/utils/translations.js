@@ -2031,4 +2031,8 @@ export const translations = {
     RO: "Video",
     RU: "Видео",
   },
+  selectUser: {
+    RO: "Select user",
+    RU: "Выбрать пользователя",
+  },
 };

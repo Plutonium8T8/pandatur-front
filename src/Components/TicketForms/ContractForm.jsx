@@ -10,6 +10,12 @@ import { useUser } from "../../hooks";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
+const calculateCompanyCommission = (budget, netPrice) => {
+  const isSetBudgetAndNetPrice = budget && netPrice;
+
+  return isSetBudgetAndNetPrice ? budget - netPrice : undefined;
+};
+
 export const ContractForm = ({
   onSubmit,
   data,
@@ -42,6 +48,9 @@ export const ContractForm = ({
         pret_netto: data.pret_netto,
         achitat_client: data.achitat_client,
         control: data.control,
+        comision_companie:
+          data.comision_companie ??
+          calculateCompanyCommission(data.budget, data.pret_netto),
       });
     }
   }, [data]);
@@ -220,6 +229,8 @@ export const ContractForm = ({
             leftSection={<MdOutlineEuroSymbol />}
             label={getLanguageByKey("Comision companie")}
             placeholder={`${getLanguageByKey("Comision companie")} €`}
+            key={formInstance.key("comision_companie")}
+            {...formInstance.getInputProps("comision_companie")}
           />
         )}
 
