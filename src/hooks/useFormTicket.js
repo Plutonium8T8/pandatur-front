@@ -3,8 +3,6 @@ import { useForm } from "@mantine/form";
 import { formatDate } from "../Components/utils";
 import { getLanguageByKey } from "../Components/utils";
 
-// TODO: Refactor this function in the future for better performance and readability
-
 export const useFormTicket = () => {
   const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState();
   const [hasErrorsContractForm, setHasErrorsContractForm] = useState();
@@ -12,6 +10,17 @@ export const useFormTicket = () => {
 
   const form = useForm({
     mode: "uncontrolled",
+
+    onValuesChange: (values) => {
+      const budget = values.buget;
+      const netPrice = values.pret_netto;
+      const isSetBudgetNetPrice = budget && netPrice;
+      form.isTouched("buget") && form.isTouched("pret_netto");
+      if (isSetBudgetNetPrice) {
+        const companyCommission = budget - netPrice;
+        form.setFieldValue("comision_companie", companyCommission);
+      }
+    },
 
     validate: {
       sursa_lead: (value, values) => {

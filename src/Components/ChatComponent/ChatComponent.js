@@ -64,7 +64,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     const ticketById =
-      tickets.find((ticket) => ticket.id === selectTicketId) || {};
+      tickets?.find((ticket) => ticket.id === selectTicketId) || {};
 
     const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
 
@@ -78,7 +78,7 @@ const ChatComponent = () => {
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
 
-      const selectedUser = messageSendersByPlatform.find(
+      const selectedUser = messageSendersByPlatform?.find(
         ({ payload }) =>
           payload.id === client_id && payload.platform === platform,
       );
@@ -112,7 +112,7 @@ const ChatComponent = () => {
   }, [ticketId]);
 
   const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform.find(
+    const user = messageSendersByPlatform?.find(
       ({ payload }) => payload.id === userId && payload.platform === platform,
     );
 
