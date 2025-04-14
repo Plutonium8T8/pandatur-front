@@ -2,11 +2,9 @@ import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Sidebar as BaseSideBar, Menu, MenuItem } from "react-pro-sidebar";
 import {
-  FaUser,
   FaChartBar,
   FaTasks,
   FaComments,
-  FaBell,
   FaClipboardList,
   FaSignOutAlt,
   FaCalendar,
@@ -24,7 +22,7 @@ import "./SideBar.css";
 
 const LOGO = "/logo.png";
 
-export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
+export const SideBar = ({ onOpenAccount }) => {
   const location = useLocation();
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const [loading, setLoading] = useState(false);
@@ -117,9 +115,7 @@ export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
           >
             {getLanguageByKey("logs")}
           </MenuItem>
-          <MenuItem onClick={onOpenNotifications} icon={<FaBell />}>
-            {getLanguageByKey("Notificări")[1]}
-          </MenuItem>
+
           <MenuItem
             onClick={toggleLanguage}
             icon={LANGUAGES[selectedLanguage].icon}
@@ -129,11 +125,7 @@ export const SideBar = ({ onOpenNotifications, onOpenAccount }) => {
         </Menu>
 
         <Menu>
-          <MenuItem
-            icon={<FaSignOutAlt />}
-            onClick={logout}
-            active={isActive("notifications")}
-          >
+          <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
             {getLanguageByKey("Log Out")}
           </MenuItem>
         </Menu>
