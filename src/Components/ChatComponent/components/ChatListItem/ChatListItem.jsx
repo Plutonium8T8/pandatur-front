@@ -1,10 +1,21 @@
-import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  Image,
+  Text,
+  Badge,
+  Divider,
+  ActionIcon,
+} from "@mantine/core";
+import { IoMdEye } from "react-icons/io";
+import { useNavigate } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
 import { IoIosVideocam } from "react-icons/io";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
+import { useApp } from "../../../../hooks";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
 import { MEDIA_TYPE } from "../../utils";
@@ -61,13 +72,15 @@ const MESSAGE_INDICATOR = {
   ),
 };
 
-export const ChatListItem = ({
-  chat,
-  style,
-  onHandleTicketClick,
-  selectTicketId,
-}) => {
+export const ChatListItem = ({ chat, style, selectTicketId }) => {
+  const navigate = useNavigate();
+  const { markMessagesAsRead, getClientMessagesSingle } = useApp();
   const formatDate = parseServerDate(chat.time_sent);
+
+  const choseChat = async (id) => {
+    await getClientMessagesSingle(id);
+    navigate(`/chat/${id}`);
+  };
 
   return (
     <div style={style}>
@@ -77,12 +90,21 @@ export const ChatListItem = ({
         pl="24px"
         key={chat.id}
         className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
-        onClick={() => onHandleTicketClick(chat.id)}
+        onClick={() => choseChat(chat.id)}
         data-ticket-id={chat.id}
         pos="relative"
       >
         {chat.unseen_count > 0 && (
           <Box pos="absolute" right="16px">
+            <ActionIcon
+              variant="default"
+              onClick={() => {
+                console.log("chat", chat);
+                markMessagesAsRead(chat.id, chat.unseen_count);
+              }}
+            >
+              <IoMdEye />
+            </ActionIcon>
             <Badge size="md" bg="red" circle>
               {chat.unseen_count}
             </Badge>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useUser } from "../../hooks";
+import { useApp } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
 import {
@@ -15,21 +15,12 @@ import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const {
-    tickets,
-    setTickets,
-    messages,
-    markMessagesAsRead,
-    getClientMessagesSingle,
-  } = useApp();
+  const { tickets, setTickets, messages } = useApp();
   const { ticketId } = useParams();
-  const navigate = useNavigate();
-  const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
   );
   const [personalInfo, setPersonalInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [isChatListVisible, setIsChatListVisible] = useState(true);
   const [selectedUser, setSelectedUser] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
@@ -46,21 +37,6 @@ const ChatComponent = () => {
 
     return ticketMessages.length > 0 ? ticketMessages[0] : null;
   };
-
-  useEffect(() => {
-    if (!selectTicketId || !messages.length) return;
-
-    const unreadMessages = messages.filter(
-      (msg) =>
-        msg.ticket_id === selectTicketId &&
-        msg.seen_by === "{}" &&
-        msg.sender_id !== userId,
-    );
-
-    if (unreadMessages.length > 0) {
-      markMessagesAsRead(selectTicketId);
-    }
-  }, [selectTicketId, messages, userId]);
 
   useEffect(() => {
     const ticketById =
@@ -88,23 +64,6 @@ const ChatComponent = () => {
     }
   }, [selectTicketId, messages, messageSendersByPlatform]);
 
-  const handleSelectTicket = (ticketId) => {
-    if (selectTicketId !== ticketId) {
-      setSelectTicketId(ticketId);
-      navigate(`/chat/${ticketId}`);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectTicketId) return;
-
-    setIsLoading(true);
-
-    getClientMessagesSingle(selectTicketId).finally(() => {
-      setIsLoading(false);
-    });
-  }, [selectTicketId]);
-
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
       setSelectTicketId(Number(ticketId));
@@ -126,12 +85,7 @@ const ChatComponent = () => {
         h="100%"
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        {isChatListVisible && (
-          <ChatList
-            selectTicketId={selectTicketId}
-            setSelectTicketId={handleSelectTicket}
-          />
-        )}
+        {isChatListVisible && <ChatList selectTicketId={selectTicketId} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
@@ -150,7 +104,6 @@ const ChatComponent = () => {
           <ChatMessages
             selectTicketId={selectTicketId}
             selectedClient={selectedUser}
-            isLoading={isLoading}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
