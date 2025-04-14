@@ -4,6 +4,9 @@ import {
   Textarea,
   Button,
   Select as MantineSelect,
+  Group,
+  Stack,
+  Grid,
 } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useSnackbar } from "notistack";
@@ -84,12 +87,9 @@ const TaskModal = ({
       const data = await api.tickets.list();
       setTicketIds(data.map((ticket) => ticket.id.toString()));
     } catch (error) {
-      enqueueSnackbar(
-        translations["Eroare la încărcarea tichetelor"][language],
-        {
-          variant: "error",
-        },
-      );
+      enqueueSnackbar(translations["Eroare la încărcarea tichetelor"][language], {
+        variant: "error",
+      });
     }
   };
 
@@ -105,12 +105,9 @@ const TaskModal = ({
       !task.priority ||
       !task.status_task
     ) {
-      enqueueSnackbar(
-        translations["Toate câmpurile sunt obligatorii"][language],
-        {
-          variant: "warning",
-        },
-      );
+      enqueueSnackbar(translations["Toate câmpurile sunt obligatorii"][language], {
+        variant: "warning",
+      });
       return;
     }
 
@@ -148,19 +145,15 @@ const TaskModal = ({
 
   const parseDate = (dateString) => {
     if (!dateString) return null;
-
     const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})$/;
     const match = dateString.match(regex);
-
     if (!match) return null;
-
     const [, day, month, year, hours, minutes, seconds] = match;
     return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
   };
 
   const formatDate = (date) => {
     if (!(date instanceof Date) || isNaN(date)) return "";
-
     return `${date.getDate().toString().padStart(2, "0")}-${(
       date.getMonth() + 1
     )
@@ -186,114 +179,115 @@ const TaskModal = ({
       centered
       size="xl"
     >
-      <form onSubmit={handleTaskSubmit} className="task-form">
-        <MantineSelect
-          label={translations["Lead ID"][language]}
-          data={ticketIds}
-          value={task.ticketId}
-          onChange={(value) =>
-            setTask((prev) => ({ ...prev, ticketId: value }))
-          }
-          searchable
-          placeholder={translations["Lead ID"][language]}
-          required
-          clearable
-          mb="md"
-          disabled={!!defaultTicketId}
-        />
+      <form onSubmit={handleTaskSubmit}>
+        <Stack spacing="md">
+          <MantineSelect
+            label={translations["Lead ID"][language]}
+            data={ticketIds}
+            value={task.ticketId}
+            onChange={(value) => setTask((prev) => ({ ...prev, ticketId: value }))}
+            searchable
+            placeholder={translations["Lead ID"][language]}
+            required
+            disabled={!!defaultTicketId}
+          />
 
-        <IconSelect
-          options={TypeTask}
-          label="Alege tip task"
-          id="task-select"
-          value={task.taskType}
-          onChange={(value) =>
-            setTask((prev) => ({ ...prev, taskType: value }))
-          }
-          placeholder="Alege tip task"
-          required
-        />
+          <IconSelect
+            options={TypeTask}
+            label={translations["Alege tip task"][language]}
+            id="task-select"
+            value={task.taskType}
+            onChange={(value) => setTask((prev) => ({ ...prev, taskType: value }))}
+            placeholder={translations["Alege tip task"][language]}
+            required
+          />
 
-        <MantineSelect
-          label={translations["Prioritate"][language]}
-          data={["Low", "Medium", "High"]}
-          value={task.priority}
-          onChange={(value) => setTask({ ...task, priority: value })}
-          placeholder={translations["Prioritate"][language]}
-          required
-          searchable
-          mt="md"
-        />
+          <Grid>
+            <Grid.Col span={6}>
+              <MantineSelect
+                label={translations["Prioritate"][language]}
+                data={["Low", "Medium", "High"]}
+                value={task.priority}
+                onChange={(value) => setTask({ ...task, priority: value })}
+                placeholder={translations["Prioritate"][language]}
+                required
+                searchable
+              />
+            </Grid.Col>
 
-        <MantineSelect
-          label={translations["Status"][language]}
-          data={["To Do", "In Progress", "Done", "Overdue"]}
-          value={task.status_task}
-          onChange={(value) => setTask({ ...task, status_task: value })}
-          placeholder={translations["Status"][language]}
-          required
-          searchable
-          mt="md"
-        />
+            <Grid.Col span={6}>
+              <MantineSelect
+                label={translations["Status"][language]}
+                data={["To Do", "In Progress", "Done", "Overdue"]}
+                value={task.status_task}
+                onChange={(value) => setTask({ ...task, status_task: value })}
+                placeholder={translations["Status"][language]}
+                required
+                searchable
+              />
+            </Grid.Col>
+          </Grid>
 
-        <DateTimePicker
-          label={translations["Deadline"][language]}
-          value={scheduledTime}
-          onChange={setScheduledTime}
-          placeholder={translations["Deadline"][language]}
-          minDate={new Date()}
-          required
-          clearable
-          mt="md"
-        />
+          <DateTimePicker
+            label={translations["Deadline"][language]}
+            value={scheduledTime}
+            onChange={setScheduledTime}
+            placeholder={translations["Deadline"][language]}
+            minDate={new Date()}
+            required
+            clearable
+          />
 
-        <Textarea
-          label={translations["Descriere task"][language]}
-          name="description"
-          value={task.description}
-          onChange={(e) => setTask({ ...task, description: e.target.value })}
-          placeholder={translations["Descriere task"][language]}
-          required
-          autosize
-          minRows={3}
-          maxRows={6}
-          mt="md"
-        />
+          <Textarea
+            label={translations["Descriere task"][language]}
+            name="description"
+            value={task.description}
+            onChange={(e) => setTask({ ...task, description: e.target.value })}
+            placeholder={translations["Descriere task"][language]}
+            required
+            autosize
+            minRows={3}
+            maxRows={6}
+          />
 
-        <MantineSelect
-          label={translations["Pentru"][language]}
-          data={userList}
-          value={task.createdFor}
-          onChange={(value) => setTask({ ...task, createdFor: value })}
-          placeholder={translations["Pentru"][language]}
-          required
-          searchable
-          mt="md"
-        />
+          <Grid>
+            <Grid.Col span={6}>
+              <MantineSelect
+                label={translations["Pentru"][language]}
+                data={userList}
+                value={task.createdFor}
+                onChange={(value) => setTask({ ...task, createdFor: value })}
+                placeholder={translations["Pentru"][language]}
+                required
+                searchable
+              />
+            </Grid.Col>
 
-        <MantineSelect
-          label={translations["De la utilizatorul"][language]}
-          data={userList}
-          value={task.createdBy ? task.createdBy.toString() : ""}
-          onChange={(value) =>
-            setTask((prev) => ({ ...prev, createdBy: value }))
-          }
-          placeholder={translations["De la utilizatorul"][language]}
-          required
-          searchable
-          mt="md"
-          disabled={!!defaultCreatedBy}
-        />
-        <div style={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button type="submit" loading={loading} mt="md">
-            {selectedTask
-              ? translations["Editare Task"][language]
-              : translations["Adaugă task"][language]}
-          </Button>
-          <Button variant="outline" onClick={onClose} mt="md" ml="md">
-            {translations["Anulare"][language]}
-          </Button>
-        </div>
+            <Grid.Col span={6}>
+              <MantineSelect
+                label={translations["De la utilizatorul"][language]}
+                data={userList}
+                value={task.createdBy}
+                onChange={(value) => setTask((prev) => ({ ...prev, createdBy: value }))}
+                placeholder={translations["De la utilizatorul"][language]}
+                required
+                searchable
+                disabled={!!defaultCreatedBy}
+              />
+            </Grid.Col>
+          </Grid>
+
+          <Group position="right" mt="md">
+            <Button variant="outline" onClick={onClose}>
+              {translations["Anulare"][language]}
+            </Button>
+            <Button type="submit" loading={loading}>
+              {selectedTask
+                ? translations["Editare Task"][language]
+                : translations["Adaugă task"][language]}
+            </Button>
+          </Group>
+        </Stack>
       </form>
     </Modal>
   );
