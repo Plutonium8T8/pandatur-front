@@ -7,13 +7,19 @@ const { colors } = DEFAULT_THEME;
 export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
   return (
     <Flex
+      pos="absolute"
+      top={0}
+      left={0}
+      right={0}
+      w="100%"
       p="8"
-      pr="md"
+      pr="16"
       justify="space-between"
       align="center"
       style={{
         backgroundColor: getBrightByWorkflowType(workflow, ""),
         borderRadius: "50px",
+        zIndex: 1,
       }}
     >
       <Badge bg="white" c="white" size="lg">
