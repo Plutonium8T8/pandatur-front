@@ -15,6 +15,8 @@ import IconSelect from "../IconSelect/IconSelect";
 import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { useGetTechniciansList } from "../../hooks";
+import dayjs from "dayjs";
+import { useUser } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -32,7 +34,8 @@ const TaskModal = ({
   const [ticketIds, setTicketIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const { technicians: userList } = useGetTechniciansList();
-
+  const { userId } = useUser();
+  const now = dayjs();
   useEffect(() => {
     if (!isOpen) return;
 
@@ -57,7 +60,7 @@ const TaskModal = ({
         scheduledTime: "",
         description: "",
         taskType: "",
-        createdBy: defaultCreatedBy?.toString() || "",
+        createdBy: userId?.toString() || "",
         createdFor: "",
         priority: "",
         status_task: "",
@@ -167,6 +170,10 @@ const TaskModal = ({
           .padStart(2, "0")}`;
   };
 
+  const handleQuickSelect = (offsetDays) => {
+    setScheduledTime(now.add(offsetDays, "day").set("hour", 12).set("minute", 0).toDate());
+  };
+
   return (
     <Modal
       opened={isOpen}
@@ -236,6 +243,18 @@ const TaskModal = ({
             required
             clearable
           />
+
+          <Group spacing="xl" mb="xs">
+            <Button size="xs" variant="light" onClick={() => handleQuickSelect(0)}>
+              Сегодня
+            </Button>
+            <Button size="xs" variant="light" onClick={() => handleQuickSelect(1)}>
+              Завтра
+            </Button>
+            <Button size="xs" variant="light" onClick={() => handleQuickSelect(7)}>
+              Через неделю
+            </Button>
+          </Group>
 
           <Textarea
             label={translations["Descriere task"][language]}
