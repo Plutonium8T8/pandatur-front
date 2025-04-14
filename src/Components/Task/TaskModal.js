@@ -193,13 +193,12 @@ const TaskModal = ({
           />
 
           <IconSelect
-            options={TypeTask}
-            label={translations["Alege tip task"][language]}
-            id="task-select"
-            value={task.taskType}
-            onChange={(value) => setTask((prev) => ({ ...prev, taskType: value }))}
-            placeholder={translations["Alege tip task"][language]}
-            required
+            options={TypeTask} // массив объектов с name и icon
+            label={translations["Alege tip task"][language]} // текст метки
+            placeholder={translations["Alege tip task"][language]} // плейсхолдер, если не выбрано
+            value={task.taskType} // текущее выбранное значение (name из options)
+            onChange={(value) => setTask((prev) => ({ ...prev, taskType: value }))} // обновление значения
+            required // обязательное поле (добавляет * и проверку)
           />
 
           <Grid>
@@ -244,24 +243,12 @@ const TaskModal = ({
             value={task.description}
             onChange={(e) => setTask({ ...task, description: e.target.value })}
             placeholder={translations["Descriere task"][language]}
-            required
             autosize
             minRows={3}
             maxRows={6}
           />
 
           <Grid>
-            <Grid.Col span={6}>
-              <MantineSelect
-                label={translations["Pentru"][language]}
-                data={userList}
-                value={task.createdFor}
-                onChange={(value) => setTask({ ...task, createdFor: value })}
-                placeholder={translations["Pentru"][language]}
-                required
-                searchable
-              />
-            </Grid.Col>
 
             <Grid.Col span={6}>
               <MantineSelect
@@ -275,6 +262,19 @@ const TaskModal = ({
                 disabled={!!defaultCreatedBy}
               />
             </Grid.Col>
+
+            <Grid.Col span={6}>
+              <MantineSelect
+                label={translations["Pentru"][language]}
+                data={userList}
+                value={task.createdFor}
+                onChange={(value) => setTask({ ...task, createdFor: value })}
+                placeholder={translations["Pentru"][language]}
+                required
+                searchable
+              />
+            </Grid.Col>
+
           </Grid>
 
           <Group position="right" mt="md">
