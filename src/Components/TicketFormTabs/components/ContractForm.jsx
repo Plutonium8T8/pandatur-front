@@ -13,7 +13,7 @@ import {
   formatNumericValue,
   convertDateToArray,
   convertNumberRangeToSingleValue,
-} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
+} from "../../LeadsComponent/utils";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 

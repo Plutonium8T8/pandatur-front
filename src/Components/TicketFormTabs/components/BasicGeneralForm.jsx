@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { workflowOptions, priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
-import { filteredWorkflows } from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
+import { filteredWorkflows } from "../../LeadsComponent/utils";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
