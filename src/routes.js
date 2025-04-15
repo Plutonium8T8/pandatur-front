@@ -3,7 +3,7 @@ import Leads from "./Components/LeadsComponent/LeadsComponent";
 import ChatComponent from "./Components/ChatComponent/ChatComponent";
 import LoginForm from "./Components/LoginComponent/LoginForm";
 import UsersComponent from "./Components/UsersComponent/UsersComponent";
-import TaskPage from "./Components/Task/Page/TaskComponent";
+import TaskPage from "./Components/Task/TaskPage";
 import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
 import { Logs } from "./pages";
@@ -48,7 +48,7 @@ export const privateRoutes = (isAllowRole) => [
     component: Leads,
   },
   {
-    path: "/tasks",
+    path: "/tasks/:ticketId?",
     component: TaskPage,
   },
   {

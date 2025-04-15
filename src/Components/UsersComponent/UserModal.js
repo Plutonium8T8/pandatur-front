@@ -220,6 +220,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           }),
           api.users.updateUser(userId, {
             email,
+            ...(password ? { password } : {}),
             roles: selectedRoles
               .filter((r) => !permissionGroupRoles.includes(r))
               .map((r) => `ROLE_${r}`),

@@ -9,6 +9,7 @@ import { api } from "../../../api";
 import { Menu, Button } from "@mantine/core";
 import { MantineModal } from "../../MantineModal";
 import SingleChat from "../../ChatComponent/SingleChat";
+import { Link } from "react-router-dom";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -205,12 +206,16 @@ const TaskList = ({
           },
         }),
         render: (ticketId) => (
-          <span
-            style={{ color: "#1971c2", cursor: "pointer", textDecoration: "underline" }}
-            onClick={() => setOpenedTicketId(ticketId)}
+          <Link
+            to={`/tasks/${ticketId}`}
+            style={{
+              color: "#1971c2",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
           >
             {ticketId}
-          </span>
+          </Link>
         ),
       },
       {
@@ -311,17 +316,6 @@ const TaskList = ({
         loading={loading}
         bordered
       />
-      <MantineModal
-        fullScreen
-        open={!!openedTicketId}
-        onClose={() => setOpenedTicketId(null)}
-        height="calc(100% - 60px)"
-      >
-        <SingleChat
-          ticketId={openedTicketId}
-          onClose={() => setOpenedTicketId(null)}
-        />
-      </MantineModal>
     </div>
   );
 };

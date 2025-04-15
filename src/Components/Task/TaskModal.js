@@ -48,9 +48,7 @@ const TaskModal = ({
         description: selectedTask.description || "",
         taskType: selectedTask.task_type || "",
         createdBy: selectedTask.created_by.toString(),
-        createdFor: selectedTask.created_for?.toString() || "",
-        // priority: selectedTask.priority || "",
-        // status_task: selectedTask.status_task || "",
+        createdFor: selectedTask.created_for?.toString() || ""
       });
 
       setScheduledTime(parseDate(selectedTask.scheduled_time));
@@ -61,9 +59,7 @@ const TaskModal = ({
         description: "",
         taskType: "",
         createdBy: userId?.toString() || "",
-        createdFor: "",
-        // priority: "",
-        // status_task: "",
+        createdFor: ""
       });
 
       setScheduledTime(null);
@@ -77,9 +73,7 @@ const TaskModal = ({
       description: "",
       taskType: "",
       createdBy: "",
-      createdFor: "",
-      // priority: "",
-      // status_task: "",
+      createdFor: ""
     });
     setScheduledTime(null);
     onClose();
@@ -104,9 +98,6 @@ const TaskModal = ({
       !task.createdBy ||
       !task.createdFor ||
       !task.taskType
-      // !task.description ||
-      // !task.priority ||
-      // !task.status_task
     ) {
       enqueueSnackbar(translations["Toate câmpurile sunt obligatorii"][language], {
         variant: "warning",
@@ -122,9 +113,7 @@ const TaskModal = ({
         description: task.description,
         task_type: task.taskType,
         created_by: task.createdBy,
-        created_for: task.createdFor,
-        // priority: task.priority,
-        // status_task: task.status_task,
+        created_for: task.createdFor
       };
 
       if (selectedTask) {
@@ -242,7 +231,6 @@ const TaskModal = ({
           />
 
           <Grid>
-
             <Grid.Col span={6}>
               <MantineSelect
                 label={translations["De la utilizatorul"][language]}
@@ -267,7 +255,6 @@ const TaskModal = ({
                 searchable
               />
             </Grid.Col>
-
           </Grid>
 
           <Group position="right" mt="md">
