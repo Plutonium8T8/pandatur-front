@@ -11,7 +11,6 @@ import "./ChatInput.css";
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
-  loading,
   clientList,
   onChangeClient,
   currentClient,
@@ -38,15 +37,12 @@ export const ChatInput = ({
   };
 
   const handleFileButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
   const handleFile = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-
     onHandleFileSelect(selectedFile);
   };
 
@@ -56,9 +52,8 @@ export const ChatInput = ({
   };
 
   const sendMessage = () => {
-    if (message?.trim()) {
+    if (message.trim()) {
       onSendMessage(message);
-
       clearState();
     }
   };
@@ -111,9 +106,8 @@ export const ChatInput = ({
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
             <Button
-              disabled={!message}
+              disabled={!message.trim()}
               variant="filled"
-              loading={loading}
               onClick={sendMessage}
             >
               {getLanguageByKey("Trimite")}

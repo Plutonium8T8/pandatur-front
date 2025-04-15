@@ -1,15 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import { useSnackbar } from "notistack";
+import dayjs from "dayjs";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
 import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
-import { getLanguageByKey, showServerError } from "../../../utils";
+import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
 import { getMediaType } from "../../utils";
 import { GroupedMessages } from "../GroupedMessages";
+import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
 import "./ChatMessages.css";
+
+const getSendedMessage = (msj, currentMsj, statusMessage) => {
+  return msj.sender_id === currentMsj.sender_id &&
+    msj.message === currentMsj.message &&
+    msj.time_sent === currentMsj.time_sent
+    ? { ...msj, messageStatus: statusMessage }
+    : msj;
+};
 
 // TODO: Add loading from `AppContext`
 export const ChatMessages = ({
@@ -26,7 +36,6 @@ export const ChatMessages = ({
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState(false);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -43,17 +52,12 @@ export const ChatMessages = ({
     }
   };
 
-  const sendMessage = async (selectedFile, platform, inputValue) => {
-    setLoadingMessage(true);
+  const sendMessage = async (selectedFile, metadataMsj, platform) => {
     try {
-      const messageData = {
-        sender_id: Number(userId),
-        client_id: selectedClient.payload?.id,
-        platform: platform,
-        message: inputValue.trim(),
-        media_type: null,
-        media_url: "",
-      };
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...metadataMsj, seenAt: false },
+      ]);
 
       if (selectedFile) {
         const uploadResponse = await uploadFile(selectedFile);
@@ -65,8 +69,8 @@ export const ChatMessages = ({
           return;
         }
 
-        messageData.media_url = uploadResponse.url;
-        messageData.media_type = getMediaType(selectedFile.type);
+        metadataMsj["media_url"] = uploadResponse.url;
+        metadataMsj["media_type"] = getMediaType(selectedFile.type);
       }
 
       let apiUrl = api.messages.send.create;
@@ -77,16 +81,19 @@ export const ChatMessages = ({
         apiUrl = api.messages.send.viber;
       }
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...messageData, seenAt: false },
-      ]);
+      await apiUrl(metadataMsj);
 
-      await apiUrl(messageData);
+      setMessages((prev) => {
+        return prev.map((msj) =>
+          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
+        );
+      });
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    } finally {
-      setLoadingMessage(false);
+      setMessages((prev) => {
+        return prev.map((msj) =>
+          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
+        );
+      });
     }
   };
 
@@ -151,14 +158,26 @@ export const ChatMessages = ({
 
       {selectTicketId && !isLoading && (
         <ChatInput
+          id={selectTicketId}
           clientList={messageSendersByPlatform}
           currentClient={selectedClient}
-          loading={loadingMessage}
           onSendMessage={(value) => {
             if (!selectedClient) {
               return;
             }
-            sendMessage(null, selectedClient.payload?.platform, value);
+            sendMessage(
+              null,
+              {
+                sender_id: Number(userId),
+                client_id: selectedClient.payload?.id,
+                platform: selectedClient.payload?.platform,
+                message: value.trim(),
+                ticket_id: selectTicketId,
+                time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
+                messageStatus: MESSAGES_STATUS.PENDING,
+              },
+              selectedClient.payload?.platform,
+            );
           }}
           onHandleFileSelect={(file) =>
             sendMessage(file, selectedClient.payload?.platform)

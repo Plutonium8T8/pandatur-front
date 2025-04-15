@@ -15,3 +15,4 @@ export * from "./formatRoles";
 export * from "./normalizeUsersAndPlatforms";
 export * from "./socialMediaIcons";
 export * from "./isStoreFile";
+export * from "./messageStatus";
