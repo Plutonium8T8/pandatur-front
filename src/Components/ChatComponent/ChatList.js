@@ -95,16 +95,11 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
     }
   }, [selectTicketId, tickets]);
 
+  // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
     let filtered = [...tickets];
 
     filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-
-    if (filteredTicketIds === null) return filtered;
-    if (filteredTicketIds.length === 0) return [];
-    filtered = filtered.filter((ticket) =>
-      filteredTicketIds.includes(ticket.id),
-    );
 
     if (showMyTickets) {
       filtered = filtered.filter((ticket) => ticket.technician_id === userId);
@@ -132,6 +127,12 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
       });
     }
 
+    if (filteredTicketIds === null) return filtered;
+    if (filteredTicketIds.length === 0) return [];
+    filtered = filtered.filter((ticket) =>
+      filteredTicketIds.includes(ticket.id),
+    );
+
     return filtered;
   }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
 
@@ -154,9 +155,8 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
-              {!!sortedTickets.length && (
-                <Badge bg="#0f824c">{sortedTickets.length}</Badge>
-              )}
+
+              <Badge bg="#0f824c">{sortedTickets.length}</Badge>
             </Flex>
 
             <ActionIcon
