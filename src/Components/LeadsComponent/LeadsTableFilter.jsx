@@ -1,8 +1,7 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
-import { getLanguageByKey } from "../../utils";
-import { TicketFormTabs } from "../../TicketFormTabs";
-import { platformOptions } from "../utils";
-import "./LeadsTableFilter.css";
+import { getLanguageByKey } from "../utils";
+import { TicketFormTabs } from "../TicketFormTabs";
+import { platformOptions } from "./utils";
 
 export const LeadsTableFilter = ({
   onClose,

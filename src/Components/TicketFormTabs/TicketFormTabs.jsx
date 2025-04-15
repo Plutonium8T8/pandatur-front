@@ -7,6 +7,7 @@ import {
   QualityControlForm,
   BasicGeneralForm,
 } from "./components";
+import "./TicketFormTabs.css";
 
 const renderResetButton = (resetForm) => {
   return (
@@ -31,7 +32,12 @@ export const TicketFormTabs = ({
   orientation = "vertical",
 }) => {
   return (
-    <Tabs defaultValue="filter_general_info" orientation={orientation}>
+    <Tabs
+      h="100%"
+      defaultValue="filter_general_info"
+      orientation={orientation}
+      className="leads-modal-filter-tabs"
+    >
       <Tabs.List>
         <Tabs.Tab value="filter_general_info">
           {getLanguageByKey("Informații generale")}
