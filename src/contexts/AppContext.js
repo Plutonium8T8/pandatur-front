@@ -253,9 +253,11 @@ export const AppProvider = ({ children }) => {
 
         setUnreadCount((prev) => prev + 1);
 
-        setUnreadCount((prev) => prev + 1);
+        const senderId = message.data.sender_id;
 
-        // setMessages((prevMessages) => [...prevMessages, message.data]);
+        if (Number(senderId) !== userId) {
+          setMessages((prevMessages) => [...prevMessages, message.data]);
+        }
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
