@@ -1,10 +1,13 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core";
-import { getLanguageByKey } from "../../../utils";
-import { TicketInfoForm } from "./TicketInfoForm";
-import { ContractForm } from "./ContractForm";
-import { InvoiceForm } from "./InvoiceForm";
-import { QualityControlForm } from "./QualityControlForm";
-import { BasicGeneralForm } from "./BasicGeneralForm";
+import { getLanguageByKey } from "../utils";
+import {
+  TicketInfoForm,
+  ContractForm,
+  InvoiceForm,
+  QualityControlForm,
+  BasicGeneralForm,
+} from "./components";
+import "./TicketFormTabs.css";
 
 const renderResetButton = (resetForm) => {
   return (
@@ -14,15 +17,27 @@ const renderResetButton = (resetForm) => {
   );
 };
 
-export const TicketTabs = ({
+const formIds = {
+  general: "generalForm",
+  ticketInfo: "ticketInfoForm",
+  contract: "contractForm",
+  invoice: "invoiceForm",
+};
+
+export const TicketFormTabs = ({
   onClose,
   onSubmit,
   loading,
-  formIds,
   initialData,
+  orientation = "vertical",
 }) => {
   return (
-    <Tabs defaultValue="filter_general_info" orientation="vertical">
+    <Tabs
+      h="100%"
+      defaultValue="filter_general_info"
+      orientation={orientation}
+      className="leads-modal-filter-tabs"
+    >
       <Tabs.List>
         <Tabs.Tab value="filter_general_info">
           {getLanguageByKey("Informații generale")}
@@ -53,7 +68,7 @@ export const TicketTabs = ({
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
-            formId={formIds?.generalFormID}
+            formId={formIds.general}
           />
         </Flex>
       </Tabs.Panel>
@@ -70,11 +85,11 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
-            formId={formIds?.ticketInfoFormID}
+            formId={formIds.ticketInfo}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -91,11 +106,11 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
-            formId={formIds?.contractFormID}
+            formId={formIds.contract}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -113,11 +128,11 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
-            formId={formIds?.invoiceFormID}
+            formId={formIds.invoice}
           />
         </Flex>
       </Tabs.Panel>
@@ -134,7 +149,7 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
