@@ -20,12 +20,6 @@ import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
-const priorityColors = {
-  Low: "#4CAF50",
-  Medium: "#FF9800",
-  High: "#F44336",
-};
-
 const TaskList = ({
   tasks = [],
   handleMarkAsSeenTask,
@@ -103,8 +97,14 @@ const TaskList = ({
       let valB = b[sortColumn];
 
       if (sortColumn === "scheduled_time") {
-        valA = dayjs(valA).valueOf();
-        valB = dayjs(valB).valueOf();
+        const dateA = dayjs(valA, "DD-MM-YYYY HH:mm:ss");
+        const dateB = dayjs(valB, "DD-MM-YYYY HH:mm:ss");
+
+        if (!dateA.isValid() || !dateB.isValid()) return 0;
+
+        return order === "ASC"
+          ? dateA.valueOf() - dateB.valueOf()
+          : dateB.valueOf() - dateA.valueOf();
       }
 
       const comparison = String(valA).localeCompare(String(valB), undefined, {
@@ -133,6 +133,59 @@ const TaskList = ({
             }}
           />
         ),
+      },
+      {
+        title: (
+          <HeaderCellRcTable
+            title={translations["Deadline"][language]}
+            order={order}
+          />
+        ),
+        dataIndex: "scheduled_time",
+        key: "scheduled_time",
+        width: 180,
+        align: "center",
+        onHeaderCell: () => ({
+          onClick: () => {
+            setSortColumn("scheduled_time");
+            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
+          },
+        }),
+        render: (date) => {
+          const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
+          if (!parsed.isValid()) return "Invalid Date";
+
+          const today = dayjs().startOf("day");
+          const isToday = parsed.isSame(today, "day");
+          const isPast = parsed.isBefore(today);
+
+          const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
+          const fontWeight = isPast || isToday ? 600 : 400;
+
+          return (
+            <span style={{ color, fontWeight }}>
+              {parsed.format("DD.MM.YYYY HH:mm")}
+            </span>
+          );
+        }
+      },
+      {
+        title: translations["Creat de"][language],
+        dataIndex: "creator_by_full_name",
+        key: "creator_by_full_name",
+        width: 150,
+        align: "center",
+        render: (_, row) =>
+          row.creator_by_full_name || `ID: ${row.created_by}`,
+      },
+      {
+        title: translations["Pentru"][language],
+        dataIndex: "created_for_full_name",
+        key: "created_for_full_name",
+        width: 150,
+        align: "center",
+        render: (_, row) =>
+          row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: (
@@ -176,90 +229,11 @@ const TaskList = ({
         },
       },
       {
-        title: translations["Prioritate"][language],
-        dataIndex: "priority",
-        key: "priority",
-        width: 120,
-        align: "center",
-        render: (priority) => (
-          <span
-            style={{
-              backgroundColor: priorityColors[priority] || "#ccc",
-              color: "#fff",
-              padding: "4px 8px",
-              borderRadius: "4px",
-            }}
-          >
-            {priority}
-          </span>
-        ),
-      },
-      {
-        title: translations["Etapa Task"][language],
-        dataIndex: "status_task",
-        key: "status_task",
-        width: 120,
-        align: "center",
-      },
-      {
-        title: translations["Creat de"][language],
-        dataIndex: "creator_by_full_name",
-        key: "creator_by_full_name",
-        width: 150,
-        align: "center",
-        render: (_, row) =>
-          row.creator_by_full_name || `ID: ${row.created_by}`,
-      },
-      {
-        title: translations["Pentru"][language],
-        dataIndex: "created_for_full_name",
-        key: "created_for_full_name",
-        width: 150,
-        align: "center",
-        render: (_, row) =>
-          row.created_for_full_name || `ID: ${row.created_for}`,
-      },
-      {
         title: translations["Descriere"][language],
         dataIndex: "description",
         key: "description",
         width: 200,
         align: "center",
-      },
-      {
-        title: (
-          <HeaderCellRcTable
-            title={translations["Deadline"][language]}
-            order={order}
-          />
-        ),
-        dataIndex: "scheduled_time",
-        key: "scheduled_time",
-        width: 180,
-        align: "center",
-        onHeaderCell: () => ({
-          onClick: () => {
-            setSortColumn("scheduled_time");
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
-          },
-        }),
-        render: (date) => {
-          const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
-          if (!parsed.isValid()) return "Invalid Date";
-
-          const today = dayjs().startOf("day");
-          const isToday = parsed.isSame(today, "day");
-          const isPast = parsed.isBefore(today);
-
-          const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
-          const fontWeight = isPast || isToday ? 600 : 400;
-
-          return (
-            <span style={{ color, fontWeight }}>
-              {parsed.format("DD.MM.YYYY HH:mm")}
-            </span>
-          );
-        }
       },
       {
         title: translations["Status"][language],

@@ -88,10 +88,12 @@ const SingleChat = ({ ticketId, onClose }) => {
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
 
-      const selectedUser = messageSendersByPlatform.find(
-        ({ payload }) =>
-          payload.id === client_id && payload.platform === platform,
-      );
+      const selectedUser = Array.isArray(messageSendersByPlatform)
+        ? messageSendersByPlatform.find(
+          ({ payload }) =>
+            payload.id === client_id && payload.platform === platform,
+        )
+        : null;
       setSelectedUser(selectedUser || {});
     } else {
       setSelectedUser(messageSendersByPlatform?.[0] || {});
@@ -134,9 +136,9 @@ const SingleChat = ({ ticketId, onClose }) => {
           const clientTicketList = personalInfo.clients.map((client) =>
             client.id === payload.id
               ? {
-                  ...client,
-                  ...values,
-                }
+                ...client,
+                ...values,
+              }
               : client,
           );
 
@@ -149,12 +151,12 @@ const SingleChat = ({ ticketId, onClose }) => {
           setMessageSendersByPlatform((prev) =>
             prev.map((clientMsj) =>
               clientMsj.id === payload.id &&
-              clientMsj.platform === payload.platform
+                clientMsj.platform === payload.platform
                 ? {
-                    ...clientMsj,
-                    label: getFullName(values.name, values.surname),
-                    payload: { ...payload, ...values },
-                  }
+                  ...clientMsj,
+                  label: getFullName(values.name, values.surname),
+                  payload: { ...payload, ...values },
+                }
                 : clientMsj,
             ),
           );

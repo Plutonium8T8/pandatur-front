@@ -49,8 +49,8 @@ const TaskModal = ({
         taskType: selectedTask.task_type || "",
         createdBy: selectedTask.created_by.toString(),
         createdFor: selectedTask.created_for?.toString() || "",
-        priority: selectedTask.priority || "",
-        status_task: selectedTask.status_task || "",
+        // priority: selectedTask.priority || "",
+        // status_task: selectedTask.status_task || "",
       });
 
       setScheduledTime(parseDate(selectedTask.scheduled_time));
@@ -62,8 +62,8 @@ const TaskModal = ({
         taskType: "",
         createdBy: userId?.toString() || "",
         createdFor: "",
-        priority: "",
-        status_task: "",
+        // priority: "",
+        // status_task: "",
       });
 
       setScheduledTime(null);
@@ -78,8 +78,8 @@ const TaskModal = ({
       taskType: "",
       createdBy: "",
       createdFor: "",
-      priority: "",
-      status_task: "",
+      // priority: "",
+      // status_task: "",
     });
     setScheduledTime(null);
     onClose();
@@ -123,8 +123,8 @@ const TaskModal = ({
         task_type: task.taskType,
         created_by: task.createdBy,
         created_for: task.createdFor,
-        priority: task.priority,
-        status_task: task.status_task,
+        // priority: task.priority,
+        // status_task: task.status_task,
       };
 
       if (selectedTask) {
@@ -207,32 +207,6 @@ const TaskModal = ({
             required
             placeholder={translations["Alege tip task"][language]}
           />
-
-          <Grid>
-            <Grid.Col span={6}>
-              <MantineSelect
-                label={translations["Prioritate"][language]}
-                data={["Low", "Medium", "High"]}
-                value={task.priority}
-                onChange={(value) => setTask({ ...task, priority: value })}
-                placeholder={translations["Prioritate"][language]}
-                required
-                searchable
-              />
-            </Grid.Col>
-
-            <Grid.Col span={6}>
-              <MantineSelect
-                label={translations["Status"][language]}
-                data={["To Do", "In Progress", "Done", "Overdue"]}
-                value={task.status_task}
-                onChange={(value) => setTask({ ...task, status_task: value })}
-                placeholder={translations["Status"][language]}
-                required
-                searchable
-              />
-            </Grid.Col>
-          </Grid>
 
           <DateTimePicker
             label={translations["Deadline"][language]}
