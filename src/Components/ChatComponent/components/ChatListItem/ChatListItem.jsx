@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  Image,
-  Text,
-  Badge,
-  Divider,
-  ActionIcon,
-} from "@mantine/core";
+import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
 import { IoMdEye } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
