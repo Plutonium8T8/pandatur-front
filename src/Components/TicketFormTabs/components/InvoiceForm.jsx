@@ -1,9 +1,12 @@
 import { Select, TextInput, NumberInput, Flex } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
-import { getLanguageByKey } from "../../../utils";
-import { valutaOptions, ibanOptions } from "../../../../FormOptions";
-import { formatNumericValue, convertNumberRangeToSingleValue } from "../utils";
+import { getLanguageByKey } from "../../utils";
+import { valutaOptions, ibanOptions } from "../../../FormOptions";
+import {
+  formatNumericValue,
+  convertNumberRangeToSingleValue,
+} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
 
 const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID";
 

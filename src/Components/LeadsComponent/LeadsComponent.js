@@ -21,7 +21,7 @@ import { MantineModal } from "../MantineModal";
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
 import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils";
 import { WorkflowColumns } from "../Workflow";
-import { TicketTabs } from "./LeadsTicketTabsFilter/components";
+import { TicketFormTabs } from "../TicketFormTabs";
 import { filteredWorkflows } from "./LeadsTicketTabsFilter/utils";
 
 const SORT_BY = "creation_date";
@@ -370,7 +370,7 @@ const Leads = () => {
         <LeadsTicketTabsFilter
           systemWorkflow={selectedWorkflow}
           renderTicketForms={() => (
-            <TicketTabs
+            <TicketFormTabs
               initialData={lightTicketFilters}
               formIds={formIDsKanban}
               onClose={() => setIsOpenKanbanFilterModal(false)}
@@ -399,7 +399,7 @@ const Leads = () => {
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
           renderTicketForms={() => (
-            <TicketTabs
+            <TicketFormTabs
               initialData={hardTicketFilters}
               formIds={formIDsKanban}
               onClose={() => setIsOpenKanbanFilterModal(false)}

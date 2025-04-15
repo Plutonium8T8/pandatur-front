@@ -3,13 +3,13 @@ import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
-import { getLanguageByKey } from "../../../utils";
+import { getLanguageByKey } from "../../utils";
 import {
   formatDateOrUndefined,
   formatNumericValue,
   convertDateToArray,
   convertNumberRangeToSingleValue,
-} from "../utils";
+} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
 import {
   sourceOfLeadOptions,
   promoOptions,
@@ -19,8 +19,8 @@ import {
   transportOptions,
   nameExcursionOptions,
   purchaseProcessingOptions,
-} from "../../../../FormOptions";
-import { DD_MM_YYYY } from "../../../../app-constants";
+} from "../../../FormOptions";
+import { DD_MM_YYYY } from "../../../app-constants";
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
 

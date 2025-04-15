@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { MultiSelect, TextInput, Flex } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { getLanguageByKey } from "../../../utils";
+import { getLanguageByKey } from "../../utils";
 import {
   motivulRefuzuluiOptions,
   evaluareOdihnaOptions,
-} from "../../../../FormOptions";
+} from "../../../FormOptions";
 
 const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER";
 
