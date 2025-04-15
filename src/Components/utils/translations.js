@@ -2063,4 +2063,16 @@ export const translations = {
     RO: "Select user",
     RU: "Выбрать пользователя",
   },
+  today: {
+    "RO": "Astăzi",
+    "RU": "Сегодня"
+  },
+  tomorrow: {
+    "RO": "Mâine",
+    "RU": "Завтра"
+  },
+  inAWeek: {
+    "RO": "Peste o săptămână",
+    "RU": "Через неделю"
+  }
 };

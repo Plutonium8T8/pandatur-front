@@ -209,13 +209,13 @@ const TaskModal = ({
 
           <Group spacing="xl" mb="xs">
             <Button size="xs" variant="light" onClick={() => handleQuickSelect(0)}>
-              Сегодня
+              {translations["today"][language]}
             </Button>
             <Button size="xs" variant="light" onClick={() => handleQuickSelect(1)}>
-              Завтра
+              {translations["tomorrow"][language]}
             </Button>
             <Button size="xs" variant="light" onClick={() => handleQuickSelect(7)}>
-              Через неделю
+              {translations["inAWeek"][language]}
             </Button>
           </Group>
 
@@ -257,7 +257,7 @@ const TaskModal = ({
             </Grid.Col>
           </Grid>
 
-          <Group position="right" mt="md">
+          <Group justify="flex-end" mt="md">
             <Button variant="outline" onClick={onClose}>
               {translations["Anulare"][language]}
             </Button>
