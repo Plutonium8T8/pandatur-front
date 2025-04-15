@@ -156,7 +156,7 @@ const Leads = () => {
   ) => {
     try {
       setLoading(true);
-      const hardTicket = await api.tickets.filters({
+      const tickets = await api.tickets.filters({
         page,
         sort_by: sortBy,
         order: order,
@@ -165,7 +165,7 @@ const Leads = () => {
         group_title,
       });
 
-      cb(hardTicket);
+      cb(tickets);
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {

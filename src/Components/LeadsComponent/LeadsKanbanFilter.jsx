@@ -1,10 +1,9 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { SelectWorkflow } from "../../SelectWorkflow";
-import { getLanguageByKey } from "../../utils";
-import { TicketFormTabs } from "../../TicketFormTabs";
-import { platformOptions, filteredWorkflows } from "../utils";
-import "./LeadsKanbanFilter.css";
+import { SelectWorkflow } from "../SelectWorkflow";
+import { getLanguageByKey } from "../utils";
+import { TicketFormTabs } from "../TicketFormTabs";
+import { platformOptions, filteredWorkflows } from "./utils";
 
 export const LeadsKanbanFilter = ({
   onClose,

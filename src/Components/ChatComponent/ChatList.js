@@ -9,12 +9,19 @@ import {
   Box,
   Divider,
   ActionIcon,
+  Badge,
 } from "@mantine/core";
-import { getLanguageByKey } from "../utils";
+import { useSnackbar } from "notistack";
+import { getLanguageByKey, showServerError } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
+import { api } from "../../api";
+
+const SORT_BY = "creation_date";
+const ORDER = "DESC";
+const LIGHT_TICKET = "light";
 
 const CHAT_ITEM_HEIGHT = 94;
 
@@ -38,10 +45,34 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredTicketIds, setFilteredTicketIds] = useState(null);
+  const [lightTicketFilters, setLightTicketFilters] = useState({});
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
+
+  const filterChatList = async (attributes) => {
+    setIsLoading(true);
+    try {
+      const lightTickets = await api.tickets.filters({
+        sort_by: SORT_BY,
+        order: ORDER,
+        type: LIGHT_TICKET,
+        attributes,
+      });
+
+      setOpenFilter(false);
+      setLightTicketFilters(attributes);
+      setFilteredTicketIds(lightTickets.data.map(({ id }) => id));
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
@@ -68,6 +99,12 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
     let filtered = [...tickets];
 
     filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
+
+    if (filteredTicketIds === null) return filtered;
+    if (filteredTicketIds.length === 0) return [];
+    filtered = filtered.filter((ticket) =>
+      filteredTicketIds.includes(ticket.id),
+    );
 
     if (showMyTickets) {
       filtered = filtered.filter((ticket) => ticket.technician_id === userId);
@@ -96,7 +133,7 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
     }
 
     return filtered;
-  }, [tickets, showMyTickets, searchQuery]);
+  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
@@ -115,7 +152,12 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
       <Box direction="column" w="20%" ref={chatListRef}>
         <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
           <Flex align="center" justify="space-between">
-            <Title order={3}>{getLanguageByKey("Chat")}</Title>
+            <Flex align="center" gap={8}>
+              <Title order={3}>{getLanguageByKey("Chat")}</Title>
+              {!!sortedTickets.length && (
+                <Badge bg="#0f824c">{sortedTickets.length}</Badge>
+              )}
+            </Flex>
 
             <ActionIcon
               variant="default"
@@ -157,10 +199,11 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
         onClose={() => setOpenFilter(false)}
       >
         <TicketFormTabs
+          initialData={lightTicketFilters}
           orientation="horizontal"
           onClose={() => setOpenFilter(false)}
-          onSubmit={() => {}}
-          loading={false}
+          onSubmit={(filters) => filterChatList(filters)}
+          loading={isLoading}
         />
       </MantineModal>
     </>
