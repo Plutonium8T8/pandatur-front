@@ -6,7 +6,10 @@
   border-spacing: 0;
 }
 
-.table thead {
+.table .rc-table-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   background-color: #fafafa;
 }
 
@@ -67,6 +70,7 @@
 .rc-table-scroll-container {
   max-height: calc(100vh - 170px);
   overflow-y: auto;
+  position: relative;
 }
 
 .table-container-custom {

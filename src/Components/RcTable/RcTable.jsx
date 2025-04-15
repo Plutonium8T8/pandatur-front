@@ -36,7 +36,7 @@ export const RcTable = ({
           }
           columns={columns}
           data={data}
-          scroll={{ x: "100%" }}
+          scroll={{ x: "100%", y: "100%" }}
           {...props}
         />
       </div>
