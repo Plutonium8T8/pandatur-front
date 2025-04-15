@@ -15,7 +15,7 @@ import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const { tickets, setTickets, messages } = useApp();
+  const { tickets, setTickets, messages, getClientMessagesSingle } = useApp();
   const { ticketId } = useParams();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
@@ -67,6 +67,12 @@ const ChatComponent = () => {
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
       setSelectTicketId(Number(ticketId));
+    }
+  }, [ticketId]);
+
+  useEffect(() => {
+    if (ticketId && !messages?.length) {
+      getClientMessagesSingle(Number(ticketId));
     }
   }, [ticketId]);
 
