@@ -2039,8 +2039,8 @@ export const translations = {
     RO: "Select user",
     RU: "Выбрать пользователя",
   },
-  noConversationStartedForThisTicket: {
-    RO: "Nu a fost inițiată nicio conversație pentru acest ticket",
-    RU: "Выбрать пользоваДля этого тикета ещё не начат разговортеля",
+  noConversationStartedForThisLead: {
+    RO: "Nu a fost inițiată nicio conversație pentru acest lead",
+    RU: "Для этого лида не было начато ни одного разговора",
   },
 };

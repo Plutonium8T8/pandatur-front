@@ -70,7 +70,7 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
@@ -91,7 +91,7 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
@@ -113,7 +113,7 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}
@@ -134,7 +134,7 @@ export const TicketTabs = ({
                   {getLanguageByKey("Închide")}
                 </Button>
                 <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
+                  {getLanguageByKey("Aplică")}
                 </Button>
               </>
             )}

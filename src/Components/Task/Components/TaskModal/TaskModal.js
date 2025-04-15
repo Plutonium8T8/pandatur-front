@@ -98,7 +98,6 @@ const TaskModal = ({
     if (
       !task.ticketId ||
       !scheduledTime ||
-      !task.description ||
       !task.createdBy ||
       !task.createdFor ||
       !task.taskType ||
@@ -253,7 +252,6 @@ const TaskModal = ({
           value={task.description}
           onChange={(e) => setTask({ ...task, description: e.target.value })}
           placeholder={translations["Descriere task"][language]}
-          required
           autosize
           minRows={3}
           maxRows={6}

@@ -18,7 +18,7 @@ import { getLanguageByKey } from "../../utils";
 import { PageHeader } from "../../PageHeader";
 import "./LeadsFilter.css";
 
-export const RefLeadsFilter = forwardRef(
+export const RefLeadsHeader = forwardRef(
   (
     {
       openCreateTicketModal,

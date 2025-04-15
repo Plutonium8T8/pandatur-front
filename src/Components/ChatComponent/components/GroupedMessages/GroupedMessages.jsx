@@ -2,18 +2,15 @@ import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useUser, useApp } from "../../../../hooks";
 import { DD_MM_YYYY } from "../../../../app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
-import { parseServerDate, getFullName, getLanguageByKey } from "../../../utils";
+import {
+  parseServerDate,
+  getFullName,
+  getLanguageByKey,
+  parseDate,
+} from "../../../utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
-
-const parseDate = (dateString) => {
-  if (!dateString) return null;
-  const [date, time] = dateString.split(" ");
-  if (!date || !time) return null;
-  const [day, month, year] = date.split("-");
-  return new Date(`${year}-${month}-${day}T${time}`);
-};
 
 export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { userId } = useUser();
@@ -58,7 +55,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   return (
     <Flex h="100%" direction="column" gap="xl">
       {groupedMessages.length ? (
-        groupedMessages.map(({ date, clientId, messages }, index) => {
+        groupedMessages.map(({ date, clientId, messages }) => {
           const clientInfo = personalInfo?.clients?.[0] || {};
 
           const clientName =
@@ -66,7 +63,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
             `ID: ${clientId}`;
 
           return (
-            <Flex direction="column" gap="md" key={index}>
+            <Flex direction="column" gap="md" key={date}>
               <Divider
                 label={
                   <Badge c="black" size="lg" bg={colors.gray[2]}>
@@ -103,7 +100,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
       ) : (
         <Flex h="100%" align="center" justify="center">
           <Text c="dimmed">
-            {getLanguageByKey("noConversationStartedForThisTicket")}
+            {getLanguageByKey("noConversationStartedForThisLead")}
           </Text>
         </Flex>
       )}
