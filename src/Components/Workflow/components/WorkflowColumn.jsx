@@ -115,7 +115,6 @@ export const WorkflowColumn = ({
       <div style={style}>
         <div ref={rowRef}>
           <TicketCard
-            key={ticket.id}
             ticket={ticket}
             onEditTicket={onEditTicket}
             technician={technician}
