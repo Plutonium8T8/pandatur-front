@@ -1,9 +1,21 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FixedSizeList } from "react-window";
-import { TextInput, Checkbox, Title, Flex, Box, Divider } from "@mantine/core";
+import { LuFilter } from "react-icons/lu";
+import {
+  TextInput,
+  Checkbox,
+  Title,
+  Flex,
+  Box,
+  Divider,
+  ActionIcon,
+} from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
+import { MantineModal } from "../MantineModal";
+import { LeadsTicketTabsFilter } from "../LeadsComponent/LeadsTicketTabsFilter";
+import { TicketFormTabs } from "../index";
 
 const CHAT_ITEM_HEIGHT = 94;
 
@@ -26,6 +38,7 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
   const { userId } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [openFilter, setOpenFilter] = useState(false);
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
@@ -99,34 +112,67 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
   };
 
   return (
-    <Box direction="column" w="20%" ref={chatListRef}>
-      <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
-        <Title order={3}>{getLanguageByKey("Chat")}</Title>
+    <>
+      <Box direction="column" w="20%" ref={chatListRef}>
+        <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
+          <Flex align="center" justify="space-between">
+            <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
-        <Checkbox
-          label={getLanguageByKey("Leadurile mele")}
-          onChange={(e) => setShowMyTickets(e.target.checked)}
-          checked={showMyTickets}
-        />
+            <ActionIcon
+              variant="default"
+              size="24"
+              onClick={() => setOpenFilter(true)}
+            >
+              <LuFilter size={12} />
+            </ActionIcon>
+          </Flex>
 
-        <TextInput
-          placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
-          onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
-        />
-      </Flex>
+          <Checkbox
+            label={getLanguageByKey("Leadurile mele")}
+            onChange={(e) => setShowMyTickets(e.target.checked)}
+            checked={showMyTickets}
+          />
 
-      <Divider />
-      <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
-        <FixedSizeList
-          height={wrapperChatHeight}
-          itemCount={sortedTickets?.length || 0}
-          itemSize={CHAT_ITEM_HEIGHT}
-          width="100%"
-        >
-          {ChatItem}
-        </FixedSizeList>
+          <TextInput
+            placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+            onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
+          />
+        </Flex>
+
+        <Divider />
+        <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
+          <FixedSizeList
+            height={wrapperChatHeight}
+            itemCount={sortedTickets?.length || 0}
+            itemSize={CHAT_ITEM_HEIGHT}
+            width="100%"
+          >
+            {ChatItem}
+          </FixedSizeList>
+        </Box>
       </Box>
-    </Box>
+
+      <MantineModal
+        title={getLanguageByKey("Filtrează tichete")}
+        open={openFilter}
+        onClose={() => setOpenFilter(false)}
+      >
+        <LeadsTicketTabsFilter
+          // formIds={formIDsList}
+          // loading={loading}
+          onClose={() => setOpenFilter(false)}
+          renderTicketForms={() => (
+            <TicketFormTabs
+              // initialData={hardTicketFilters}
+              // formIds={formIDsKanban}
+              onClose={() => setOpenFilter(false)}
+              // onSubmit={handleApplyFiltersHardTicket}
+              // loading={loading}
+            />
+          )}
+        />
+      </MantineModal>
+    </>
   );
 };
 

@@ -3,17 +3,17 @@ import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
-import { getLanguageByKey } from "../../../utils";
-import { LabelSwitch } from "../../../LabelSwitch";
-import { paymentStatusOptions } from "../../../../FormOptions";
-import { DD_MM_YYYY } from "../../../../app-constants";
-import { useUser } from "../../../../hooks";
+import { getLanguageByKey } from "../../utils";
+import { LabelSwitch } from "../../LabelSwitch";
+import { paymentStatusOptions } from "../../../FormOptions";
+import { DD_MM_YYYY } from "../../../app-constants";
+import { useUser } from "../../../hooks";
 import {
   formatDateOrUndefined,
   formatNumericValue,
   convertDateToArray,
   convertNumberRangeToSingleValue,
-} from "../utils";
+} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 

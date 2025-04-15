@@ -1,7 +1,7 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { platformOptions } from "./utils";
-import { SelectWorkflow } from "./components";
+import { SelectWorkflow } from "../../SelectWorkflow";
 import { getLanguageByKey } from "../../utils";
 import { filteredWorkflows } from "../LeadsTicketTabsFilter/utils";
 import "./LeadsTicketTabsFilter.css";

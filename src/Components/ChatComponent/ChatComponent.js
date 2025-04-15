@@ -88,7 +88,7 @@ const ChatComponent = () => {
         {isChatListVisible && <ChatList selectTicketId={selectTicketId} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
-          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
+          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>
             <ActionIcon
               variant="default"
               onClick={() => setIsChatListVisible((prev) => !prev)}

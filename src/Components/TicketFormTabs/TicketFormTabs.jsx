@@ -1,10 +1,12 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core";
-import { getLanguageByKey } from "../../../utils";
-import { TicketInfoForm } from "./TicketInfoForm";
-import { ContractForm } from "./ContractForm";
-import { InvoiceForm } from "./InvoiceForm";
-import { QualityControlForm } from "./QualityControlForm";
-import { BasicGeneralForm } from "./BasicGeneralForm";
+import { getLanguageByKey } from "../utils";
+import {
+  TicketInfoForm,
+  ContractForm,
+  InvoiceForm,
+  QualityControlForm,
+  BasicGeneralForm,
+} from "./components";
 
 const renderResetButton = (resetForm) => {
   return (
@@ -14,15 +16,16 @@ const renderResetButton = (resetForm) => {
   );
 };
 
-export const TicketTabs = ({
+export const TicketFormTabs = ({
   onClose,
   onSubmit,
   loading,
   formIds,
   initialData,
+  orientation = "vertical",
 }) => {
   return (
-    <Tabs defaultValue="filter_general_info" orientation="vertical">
+    <Tabs defaultValue="filter_general_info" orientation={orientation}>
       <Tabs.List>
         <Tabs.Tab value="filter_general_info">
           {getLanguageByKey("Informații generale")}
