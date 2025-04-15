@@ -74,7 +74,7 @@ const SingleChat = ({ ticketId, onClose }) => {
 
   useEffect(() => {
     const updatedTicket =
-      tickets.find((ticket) => ticket?.id === selectTicketId) || {};
+      tickets?.find((ticket) => ticket?.id === selectTicketId) || {};
 
     const users = normalizeUsersAndPlatforms(updatedTicket.clients, messages);
 
@@ -101,7 +101,7 @@ const SingleChat = ({ ticketId, onClose }) => {
   }, [selectTicketId, messages, messageSendersByPlatform]);
 
   const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform.find(
+    const user = messageSendersByPlatform?.find(
       ({ payload }) => payload.id === userId && payload.platform === platform,
     );
 

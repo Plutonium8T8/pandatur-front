@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Flex } from "@mantine/core";
+import { Flex, Text } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
-import TaskListOverlay from "../../../Task/TaskListOverlay";
-import { translations } from "../../../utils/translations";
+import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
 import { getLanguageByKey, showServerError } from "../../../utils";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
@@ -12,8 +11,7 @@ import { getMediaType } from "../../utils";
 import { GroupedMessages } from "../GroupedMessages";
 import "./ChatMessages.css";
 
-const language = localStorage.getItem("language") || "RO";
-
+// TODO: Add loading from `AppContext`
 export const ChatMessages = ({
   selectTicketId,
   selectedClient,
@@ -139,9 +137,11 @@ export const ChatMessages = ({
             selectTicketId={selectTicketId}
           />
         ) : (
-          <div className="empty-chat">
-            <p>{translations["Alege lead"][language]}</p>
-          </div>
+          <Flex h="100%" align="center" justify="center">
+            <Text size="lg" c="dimmed">
+              {getLanguageByKey("Alege lead")}
+            </Text>
+          </Flex>
         )}
       </Flex>
 

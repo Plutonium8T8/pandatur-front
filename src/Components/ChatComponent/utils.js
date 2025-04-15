@@ -1,16 +1,21 @@
 import { FaRegFileLines } from "react-icons/fa6";
 import { Flex, Text, Box, Image } from "@mantine/core";
-import { getLanguageByKey } from "../utils";
+import { getLanguageByKey, isStoreFile } from "../utils";
 
 const BROKEN_PHOTO = "/broken.png";
 
-const STORAGE_URL = "https://storage.googleapis.com";
-const PDF_FILE = [".pdf"];
+export const MEDIA_TYPE = {
+  IMAGE: "image",
+  VIDEO: "video",
+  AUDIO: "audio",
+  FILE: "file",
+  URL: "url"
+};
 
 export const getMediaType = (mimeType) => {
-  if (mimeType.startsWith("image/")) return "image";
-  if (mimeType.startsWith("video/")) return "video";
-  if (mimeType.startsWith("audio/")) return "audio";
+  if (mimeType.startsWith("image/")) return MEDIA_TYPE.IMAGE;
+  if (mimeType.startsWith("video/")) return MEDIA_TYPE.VIDEO;
+  if (mimeType.startsWith("audio/")) return MEDIA_TYPE.AUDIO;
   return "file";
 };
 
@@ -31,7 +36,7 @@ export const renderContent = (msg) => {
     );
   }
   switch (msg.mtype) {
-    case "image":
+    case MEDIA_TYPE.IMAGE:
       return (
         <Image
           fallbackSrc={BROKEN_PHOTO}
@@ -44,27 +49,26 @@ export const renderContent = (msg) => {
           }}
         />
       );
-    case "video":
+    case MEDIA_TYPE.VIDEO:
       return (
         <video controls className="video-preview">
           <source src={msg.message} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
       );
-    case "audio":
+    case MEDIA_TYPE.AUDIO:
       return (
         <audio controls>
           <source src={msg.message} type="audio/ogg" />
           {getLanguageByKey("Acest browser nu suporta audio")}
         </audio>
       );
-    case "file":
+    case MEDIA_TYPE.FILE:
       return renderFile(msg.message);
     default:
       const { message } = msg;
-      const isFile =
-        message.startsWith(STORAGE_URL) && message.endsWith(PDF_FILE);
-      return isFile ? (
+
+      return isStoreFile(message) ? (
         renderFile(message)
       ) : (
         <Box maw="600px" w="100%">
