@@ -205,6 +205,7 @@ const TaskList = ({
         render: (ticketId) => (
           <Link
             to={`/tasks/${ticketId}`}
+            onClick={(e) => e.stopPropagation()}
             style={{
               color: "#1971c2",
               textDecoration: "underline",
@@ -312,6 +313,9 @@ const TaskList = ({
         selectedRow={selectedRow}
         loading={loading}
         bordered
+        onRow={(record) => ({
+          onClick: () => openEditTask(record),
+        })}
       />
     </div>
   );

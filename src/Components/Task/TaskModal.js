@@ -15,9 +15,8 @@ import IconSelect from "../IconSelect/IconSelect";
 import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { parseDate, formatDate } from "../utils/date";
-import { useGetTechniciansList } from "../../hooks";
+import { useGetTechniciansList, useUser } from "../../hooks";
 import dayjs from "dayjs";
-import { useUser } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
