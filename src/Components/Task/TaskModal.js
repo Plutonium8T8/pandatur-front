@@ -14,6 +14,7 @@ import { api } from "../../api";
 import IconSelect from "../IconSelect/IconSelect";
 import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
+import { parseDateTask, formatDateTask } from "../utils/date";
 import { useGetTechniciansList } from "../../hooks";
 import dayjs from "dayjs";
 import { useUser } from "../../hooks";
@@ -36,6 +37,7 @@ const TaskModal = ({
   const { technicians: userList } = useGetTechniciansList();
   const { userId } = useUser();
   const now = dayjs();
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -51,7 +53,7 @@ const TaskModal = ({
         createdFor: selectedTask.created_for?.toString() || ""
       });
 
-      setScheduledTime(parseDate(selectedTask.scheduled_time));
+      setScheduledTime(parseDateTask(selectedTask.scheduled_time));
     } else {
       setTask({
         ticketId: defaultTicketId?.toString() || "",
@@ -109,11 +111,13 @@ const TaskModal = ({
     try {
       const updatedTask = {
         ticket_id: task.ticketId,
-        scheduled_time: formatDate(scheduledTime),
+        scheduled_time: formatDateTask(scheduledTime),
         description: task.description,
         task_type: task.taskType,
         created_by: task.createdBy,
-        created_for: task.createdFor
+        created_for: task.createdFor,
+        priority: "",
+        status_task: ""
       };
 
       if (selectedTask) {
@@ -133,30 +137,6 @@ const TaskModal = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const parseDate = (dateString) => {
-    if (!dateString) return null;
-    const regex = /^(\d{2})-(\d{2})-(\d{4}) (\d{2}):(\d{2}):(\d{2})$/;
-    const match = dateString.match(regex);
-    if (!match) return null;
-    const [, day, month, year, hours, minutes, seconds] = match;
-    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
-  };
-
-  const formatDate = (date) => {
-    if (!(date instanceof Date) || isNaN(date)) return "";
-    return `${date.getDate().toString().padStart(2, "0")}-${(
-      date.getMonth() + 1
-    )
-      .toString()
-      .padStart(2, "0")}-${date.getFullYear()} ${date
-        .getHours()
-        .toString()
-        .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
-          .getSeconds()
-          .toString()
-          .padStart(2, "0")}`;
   };
 
   const handleQuickSelect = (offsetDays) => {
