@@ -14,7 +14,7 @@ import { api } from "../../api";
 import IconSelect from "../IconSelect/IconSelect";
 import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
-import { parseDateTask, formatDateTask } from "../utils/date";
+import { parseDate, formatDate } from "../utils/date";
 import { useGetTechniciansList } from "../../hooks";
 import dayjs from "dayjs";
 import { useUser } from "../../hooks";
@@ -53,7 +53,7 @@ const TaskModal = ({
         createdFor: selectedTask.created_for?.toString() || ""
       });
 
-      setScheduledTime(parseDateTask(selectedTask.scheduled_time));
+      setScheduledTime(parseDate(selectedTask.scheduled_time));
     } else {
       setTask({
         ticketId: defaultTicketId?.toString() || "",
@@ -111,7 +111,7 @@ const TaskModal = ({
     try {
       const updatedTask = {
         ticket_id: task.ticketId,
-        scheduled_time: formatDateTask(scheduledTime),
+        scheduled_time: formatDate(scheduledTime),
         description: task.description,
         task_type: task.taskType,
         created_by: task.createdBy,
