@@ -1,25 +1,19 @@
 import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
 import { useState, useEffect } from "react";
-import { platformOptions } from "./utils";
-import { SelectWorkflow } from "./components";
-import { getLanguageByKey } from "../../utils";
-import { filteredWorkflows } from "../LeadsTicketTabsFilter/utils";
-import "./LeadsTicketTabsFilter.css";
+import { SelectWorkflow } from "../SelectWorkflow";
+import { getLanguageByKey } from "../utils";
+import { TicketFormTabs } from "../TicketFormTabs";
+import { platformOptions, filteredWorkflows } from "./utils";
 
-export const LeadsTicketTabsFilter = ({
+export const LeadsKanbanFilter = ({
   onClose,
   onApplyWorkflowFilters,
-  resetTicketsFilters,
   loading,
-  formIds,
-  renderTicketForms,
   systemWorkflow: baseSystemWorkflow,
+  initialData,
+  onSubmitTicket,
 }) => {
   const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows);
-
-  const defaultTabValue = onApplyWorkflowFilters
-    ? "filter_workflow"
-    : "filter_ticket";
 
   useEffect(() => {
     setSystemWorkflow(baseSystemWorkflow);
@@ -29,7 +23,7 @@ export const LeadsTicketTabsFilter = ({
     <Tabs
       h="100%"
       className="leads-modal-filter-tabs"
-      defaultValue={defaultTabValue}
+      defaultValue="filter_workflow"
     >
       <Tabs.List>
         {onApplyWorkflowFilters && (
@@ -76,7 +70,12 @@ export const LeadsTicketTabsFilter = ({
       )}
 
       <Tabs.Panel value="filter_ticket" pt="xs">
-        {renderTicketForms?.()}
+        <TicketFormTabs
+          initialData={initialData}
+          onClose={onClose}
+          onSubmit={onSubmitTicket}
+          loading={loading}
+        />
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_message" pt="xs">
