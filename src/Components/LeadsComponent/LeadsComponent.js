@@ -5,7 +5,6 @@ import { Divider } from "@mantine/core";
 import { useDOMElementHeight, useApp } from "../../hooks";
 import { priorityOptions } from "../../FormOptions/PriorityOption";
 import { workflowOptions } from "../../FormOptions/WorkFlowOption";
-// import { LeadsTicketTabsFilter } from "./LeadsTicketTabsFilter";
 import { LeadTable } from "./LeadTable";
 import { useDebounce, useConfirmPopup } from "../../hooks";
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
@@ -21,8 +20,6 @@ import { MantineModal } from "../MantineModal";
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
 import { VIEW_MODE, filteredWorkflows } from "./utils";
 import { WorkflowColumns } from "../Workflow";
-// import { TicketFormTabs } from "../TicketFormTabs";
-// import { filteredWorkflows } from "./LeadsTicketTabsFilter/utils";
 import { LeadsKanbanFilter } from "./LeadsKanbanFilter";
 import { LeadsTableFilter } from "./LeadsTableFilter";
 
@@ -395,25 +392,6 @@ const Leads = () => {
           onSubmitTicket={handleApplyFiltersHardTicket}
         />
       </MantineModal>
-
-      {/* <MantineModal
-        title={getLanguageByKey("Filtrează tichete")}
-        open={isOpenListFilterModal}
-        onClose={() => setIsOpenListFilterModal(false)}
-      >
-        <LeadsTicketTabsFilter
-          loading={loading}
-          onClose={() => setIsOpenListFilterModal(false)}
-          renderTicketForms={() => (
-            <TicketFormTabs
-              initialData={hardTicketFilters}
-              onClose={() => setIsOpenKanbanFilterModal(false)}
-              onSubmit={handleApplyFiltersHardTicket}
-              loading={loading}
-            />
-          )}
-        />
-      </MantineModal> */}
 
       <MantineModal
         open={isModalOpen}
