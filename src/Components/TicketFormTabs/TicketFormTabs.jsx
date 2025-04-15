@@ -16,11 +16,17 @@ const renderResetButton = (resetForm) => {
   );
 };
 
+const formIds = {
+  general: "generalForm",
+  ticketInfo: "ticketInfoForm",
+  contract: "contractForm",
+  invoice: "invoiceForm",
+};
+
 export const TicketFormTabs = ({
   onClose,
   onSubmit,
   loading,
-  formIds,
   initialData,
   orientation = "vertical",
 }) => {
@@ -56,7 +62,7 @@ export const TicketFormTabs = ({
             onClose={onClose}
             onSubmit={onSubmit}
             renderFooterButtons={renderResetButton}
-            formId={formIds?.generalFormID}
+            formId={formIds.general}
           />
         </Flex>
       </Tabs.Panel>
@@ -77,7 +83,7 @@ export const TicketFormTabs = ({
                 </Button>
               </>
             )}
-            formId={formIds?.ticketInfoFormID}
+            formId={formIds.ticketInfo}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -98,7 +104,7 @@ export const TicketFormTabs = ({
                 </Button>
               </>
             )}
-            formId={formIds?.contractFormID}
+            formId={formIds.contract}
           />
         </ScrollArea>
       </Tabs.Panel>
@@ -120,7 +126,7 @@ export const TicketFormTabs = ({
                 </Button>
               </>
             )}
-            formId={formIds?.invoiceFormID}
+            formId={formIds.invoice}
           />
         </Flex>
       </Tabs.Panel>

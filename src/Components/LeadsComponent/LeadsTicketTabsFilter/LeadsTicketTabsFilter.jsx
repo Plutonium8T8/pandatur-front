@@ -11,7 +11,6 @@ export const LeadsTicketTabsFilter = ({
   onApplyWorkflowFilters,
   resetTicketsFilters,
   loading,
-  formIds,
   renderTicketForms,
   systemWorkflow: baseSystemWorkflow,
 }) => {
