@@ -19,7 +19,7 @@ import "../SnackBarComponent/SnackBarComponent.css";
 import { SpinnerRightBottom } from "../SpinnerRightBottom";
 import { MantineModal } from "../MantineModal";
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
-import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils";
+import { VIEW_MODE } from "./utils";
 import { WorkflowColumns } from "../Workflow";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { filteredWorkflows } from "./LeadsTicketTabsFilter/utils";
@@ -372,13 +372,11 @@ const Leads = () => {
           renderTicketForms={() => (
             <TicketFormTabs
               initialData={lightTicketFilters}
-              formIds={formIDsKanban}
               onClose={() => setIsOpenKanbanFilterModal(false)}
               onSubmit={handleApplyFilterLightTicket}
               loading={loading}
             />
           )}
-          formIds={formIDsKanban}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(workflows) => {
@@ -395,13 +393,11 @@ const Leads = () => {
         onClose={() => setIsOpenListFilterModal(false)}
       >
         <LeadsTicketTabsFilter
-          formIds={formIDsList}
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
           renderTicketForms={() => (
             <TicketFormTabs
               initialData={hardTicketFilters}
-              formIds={formIDsKanban}
               onClose={() => setIsOpenKanbanFilterModal(false)}
               onSubmit={handleApplyFiltersHardTicket}
               loading={loading}
