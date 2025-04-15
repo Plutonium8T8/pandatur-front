@@ -13,7 +13,8 @@ const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
             shadow="xs"
             p="xl"
             radius="md"
-            style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%" }}
+            h="100%"
+            style={{ flex: 1, display: "flex", flexDirection: "column" }}
         >
             <Text fw={600} size="md" mb="xs">
                 {translations[titleKey][language]} — {tasksList.length}

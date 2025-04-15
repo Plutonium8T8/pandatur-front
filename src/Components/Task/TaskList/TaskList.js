@@ -7,8 +7,6 @@ import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
 import { Menu, Button } from "@mantine/core";
-import { MantineModal } from "../../MantineModal";
-import SingleChat from "../../ChatComponent/SingleChat";
 import { Link } from "react-router-dom";
 import {
   IoEllipsisHorizontal,
@@ -34,7 +32,6 @@ const TaskList = ({
   const [selectedRow, setSelectedRow] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
-  const [openedTicketId, setOpenedTicketId] = useState(null);
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
   });

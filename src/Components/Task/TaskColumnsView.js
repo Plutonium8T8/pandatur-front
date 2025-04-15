@@ -33,16 +33,9 @@ const TaskColumnsView = ({ tasks = [], onEdit }) => {
     const { grouped, now } = groupTasksByDate(tasks);
 
     return (
-        <Box
-            mt="md"
-            style={{
-                display: "flex",
-                gap: 16,
-                height: "85vh",
-            }}
-        >
+        <Box mt="md" display="flex" gap="md" h="85vh">
             {TASK_GROUPS.map((key) => (
-                <Box key={key} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                <Box key={key} flex={1} display="flex" flexDirection="column">
                     <TaskColumn
                         titleKey={`${key}Tasks`}
                         tasksList={grouped[key]}
