@@ -6,7 +6,7 @@ import { valutaOptions, ibanOptions } from "../../../FormOptions";
 import {
   formatNumericValue,
   convertNumberRangeToSingleValue,
-} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
+} from "../../LeadsComponent/utils";
 
 const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID";
 

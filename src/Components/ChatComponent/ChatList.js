@@ -14,8 +14,7 @@ import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
-import { LeadsTicketTabsFilter } from "../LeadsComponent/LeadsTicketTabsFilter";
-import { TicketFormTabs } from "../index";
+import { TicketFormTabs } from "../TicketFormTabs";
 
 const CHAT_ITEM_HEIGHT = 94;
 
@@ -157,19 +156,11 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
         open={openFilter}
         onClose={() => setOpenFilter(false)}
       >
-        <LeadsTicketTabsFilter
-          // formIds={formIDsList}
-          // loading={loading}
+        <TicketFormTabs
+          orientation="horizontal"
           onClose={() => setOpenFilter(false)}
-          renderTicketForms={() => (
-            <TicketFormTabs
-              // initialData={hardTicketFilters}
-              // formIds={formIDsKanban}
-              onClose={() => setOpenFilter(false)}
-              // onSubmit={handleApplyFiltersHardTicket}
-              // loading={loading}
-            />
-          )}
+          onSubmit={() => {}}
+          loading={false}
         />
       </MantineModal>
     </>

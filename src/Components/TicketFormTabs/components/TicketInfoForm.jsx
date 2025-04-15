@@ -9,7 +9,7 @@ import {
   formatNumericValue,
   convertDateToArray,
   convertNumberRangeToSingleValue,
-} from "../../LeadsComponent/LeadsTicketTabsFilter/utils";
+} from "../../LeadsComponent/utils";
 import {
   sourceOfLeadOptions,
   promoOptions,
