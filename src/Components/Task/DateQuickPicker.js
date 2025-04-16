@@ -13,8 +13,8 @@ import { translations } from "../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
 
-const applyOffset = (base, offset = {}) => {
-    let result = base;
+const applyTimeOffset = (baseDate, offset = {}) => {
+    let result = baseDate;
     if (offset.minutes) result = result.add(offset.minutes, "minute");
     if (offset.hours) result = result.add(offset.hours, "hour");
     if (offset.days) result = result.add(offset.days, "day");
@@ -22,7 +22,7 @@ const applyOffset = (base, offset = {}) => {
     return result;
 };
 
-const quickOptions = [
+const quickTimeOptions = [
     { label: "In 15 minutes", offset: { minutes: 15 } },
     { label: "In 30 minutes", offset: { minutes: 30 } },
     { label: "In an hour", offset: { hours: 1 } },
@@ -36,58 +36,53 @@ const quickOptions = [
 ];
 
 const DateQuickInput = ({ value, onChange }) => {
-    const [opened, setOpened] = useState(false);
-    const [dateInput, setDateInput] = useState("");
-    const [timeInput, setTimeInput] = useState("");
-    const [initialized, setInitialized] = useState(false);
+    const [isPopoverOpen, setIsPopoverOpen] = useState(false);
+    const [dateString, setDateString] = useState("");
+    const [timeString, setTimeString] = useState("");
+    const [isInitialized, setIsInitialized] = useState(false);
 
-    const time = timeInput || "00:00";
-    const parsedCurrent = parseDate(`${dateInput.replace(/\./g, "-")} ${time}:00`);
-    const formatted = parsedCurrent ? formatDate(parsedCurrent) : "";
+    const fallbackTime = timeString || "00:00";
+    const currentParsedDate = parseDate(`${dateString.replace(/\./g, "-")} ${fallbackTime}:00`);
+    const displayValue = currentParsedDate ? formatDate(currentParsedDate) : "";
 
-    // init from value
     useEffect(() => {
-        if (!initialized && value) {
-            const initial = dayjs(value);
-            setDateInput(initial.format("DD.MM.YYYY"));
-            setTimeInput(initial.format("HH:mm"));
-            setInitialized(true);
+        if (!isInitialized && value) {
+            const initialDate = dayjs(value);
+            setDateString(initialDate.format("DD.MM.YYYY"));
+            setTimeString(initialDate.format("HH:mm"));
+            setIsInitialized(true);
         }
-    }, [value, initialized]);
+    }, [value, isInitialized]);
 
-    // propagate changes
     useEffect(() => {
-        if (!dateInput) return;
-        const normalized = `${dateInput.replace(/\./g, "-")} ${time}:00`;
-        const parsed = parseDate(normalized);
+        if (!dateString) return;
+        const dateToParse = `${dateString.replace(/\./g, "-")} ${fallbackTime}:00`;
+        const parsed = parseDate(dateToParse);
         if (parsed && onChange) {
             onChange(parsed);
         }
-    }, [dateInput, timeInput]);
+    }, [dateString, timeString]);
 
-    const handleOptionClick = (option) => {
-        let d;
-        if (option.custom) {
-            d = option.custom();
-        } else {
-            const now = dayjs();
-            const base = parsedCurrent && dayjs(parsedCurrent).isAfter(now)
-                ? dayjs(parsedCurrent)
-                : now;
-            d = applyOffset(base, option.offset);
-        }
+    const handleQuickOptionClick = (option) => {
+        const now = dayjs();
+        const isFuture = currentParsedDate && dayjs(currentParsedDate).isAfter(now);
+        const baseDate = isFuture ? dayjs(currentParsedDate) : now;
 
-        setDateInput(d.format("DD.MM.YYYY"));
-        setTimeInput(d.format("HH:mm"));
+        const resultDate = option.custom
+            ? option.custom()
+            : applyTimeOffset(baseDate, option.offset);
+
+        setDateString(resultDate.format("DD.MM.YYYY"));
+        setTimeString(resultDate.format("HH:mm"));
     };
 
     return (
-        <Popover opened={opened} onChange={setOpened} position="bottom-start" shadow="md">
+        <Popover opened={isPopoverOpen} onChange={setIsPopoverOpen} position="bottom-start" shadow="md">
             <Popover.Target>
                 <TextInput
-                    value={formatted}
+                    value={displayValue}
                     readOnly
-                    onClick={() => setOpened(true)}
+                    onClick={() => setIsPopoverOpen(true)}
                     label={translations["Deadline"][language]}
                     placeholder={translations["Deadline"][language]}
                 />
@@ -96,13 +91,13 @@ const DateQuickInput = ({ value, onChange }) => {
             <Popover.Dropdown>
                 <Flex gap="md" align="flex-start">
                     <Stack gap="xs" w={180}>
-                        {quickOptions.map((option) => (
+                        {quickTimeOptions.map((option) => (
                             <Button
                                 key={option.label}
                                 fullWidth
                                 variant="subtle"
                                 color="gray"
-                                onClick={() => handleOptionClick(option)}
+                                onClick={() => handleQuickOptionClick(option)}
                                 style={{ justifyContent: "flex-start" }}
                             >
                                 {option.label}
@@ -113,19 +108,21 @@ const DateQuickInput = ({ value, onChange }) => {
                     <Stack gap="xs">
                         <TextInput
                             label="Data"
-                            value={dateInput}
-                            onChange={(e) => setDateInput(e.currentTarget.value)}
+                            value={dateString}
+                            onChange={(e) => setDateString(e.currentTarget.value)}
                             placeholder="dd.mm.yyyy"
                         />
                         <TimeInput
                             label="Ora"
-                            value={timeInput}
-                            onChange={(e) => setTimeInput(e.currentTarget.value)}
+                            value={timeString}
+                            onChange={(e) => setTimeString(e.currentTarget.value)}
                         />
                         <DatePicker
-                            value={parsedCurrent || new Date()}
-                            onChange={(d) => {
-                                if (d) setDateInput(dayjs(d).format("DD.MM.YYYY"));
+                            value={currentParsedDate || new Date()}
+                            onChange={(date) => {
+                                if (date) {
+                                    setDateString(dayjs(date).format("DD.MM.YYYY"));
+                                }
                             }}
                             size="md"
                             minDate={new Date()}
