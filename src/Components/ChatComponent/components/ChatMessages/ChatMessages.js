@@ -4,7 +4,7 @@ import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
-import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
@@ -172,9 +172,9 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !messages.loading && (
+      {/* {selectTicketId && !messages.loading && (
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
-      )}
+      )} */}
 
       {selectTicketId && !messages.loading && (
         <ChatInput
