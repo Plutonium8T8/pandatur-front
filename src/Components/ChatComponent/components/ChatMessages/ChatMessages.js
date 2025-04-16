@@ -161,7 +161,7 @@ export const ChatMessages = ({
           clientList={messageSendersByPlatform}
           currentClient={selectedClient}
           onSendMessage={(value) => {
-            if (!selectedClient) {
+            if (!selectedClient.payload) {
               return;
             }
             sendMessage(

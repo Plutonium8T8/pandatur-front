@@ -106,7 +106,7 @@ export const ChatInput = ({
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
             <Button
-              disabled={!message.trim()}
+              disabled={!message.trim() || !currentClient.payload}
               variant="filled"
               onClick={sendMessage}
             >
