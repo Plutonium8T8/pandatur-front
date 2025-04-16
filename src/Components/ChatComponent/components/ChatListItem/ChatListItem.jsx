@@ -66,11 +66,11 @@ const MESSAGE_INDICATOR = {
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const navigate = useNavigate();
-  const { markMessagesAsRead, getClientMessagesSingle } = useApp();
+  const { markMessagesAsRead, messages } = useApp();
   const formatDate = parseServerDate(chat.time_sent);
 
   const choseChat = async (id) => {
-    await getClientMessagesSingle(id);
+    await messages.getUserMessages(id);
     navigate(`/chat/${id}`);
   };
 

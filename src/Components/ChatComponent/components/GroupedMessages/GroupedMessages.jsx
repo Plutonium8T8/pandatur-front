@@ -17,7 +17,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { messages } = useApp();
 
   // TODO: Please refactor me
-  const sortedMessages = messages
+  const sortedMessages = messages.list
     .filter((msg) => msg.ticket_id === selectTicketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
 
