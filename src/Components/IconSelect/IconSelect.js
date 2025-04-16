@@ -36,7 +36,7 @@ const IconSelect = ({
         onClick={() => setIsOpen(!isOpen)}
         style={{
           border: "1px solid #ccc",
-          padding: "8px 12px",
+          padding: "5px 12px",
           borderRadius: 6,
           background: "#fff",
           cursor: "pointer",
