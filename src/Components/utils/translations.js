@@ -2043,4 +2043,8 @@ export const translations = {
     RO: "Nu a fost inițiată nicio conversație pentru acest lead",
     RU: "Для этого лида не было начато ни одного разговора",
   },
+  loadMessagesError: {
+    RO: "A apărut o eroare la încărcarea mesajelor",
+    RU: "Произошла ошибка при загрузке сообщений",
+  },
 };
