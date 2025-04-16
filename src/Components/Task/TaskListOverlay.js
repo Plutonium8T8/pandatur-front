@@ -1,38 +1,36 @@
 import { useState, useEffect } from "react";
-import { Paper, Text, Badge, Box } from "@mantine/core";
-import TaskComponent from "./TaskComponent";
+import { Paper, Text, Badge, Box, Group, Stack } from "@mantine/core";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
 const TaskListOverlay = ({ ticketId, userId }) => {
-  const [taskCount, setTaskCount] = useState(0);
+  const [tasks, setTasks] = useState([]);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [hasTasks, setHasTasks] = useState(false);
 
-  const fetchTaskCount = async () => {
+  const fetchTasks = async () => {
     try {
-      if (ticketId) {
-        const tasks = await api.task.getTaskByTicket(ticketId);
-        setTaskCount(tasks.length);
-        setHasTasks(tasks.length > 0);
-      } else {
-        setTaskCount(0);
-        setHasTasks(false);
+      if (!ticketId) {
+        setTasks([]);
+        return;
       }
+
+      const res = await api.task.getTaskByTicket(ticketId);
+      const taskArray = Array.isArray(res?.data) ? res.data : res;
+      setTasks(taskArray);
     } catch (error) {
-      console.error(error);
-      setTaskCount(0);
-      setHasTasks(false);
+      console.error("Ошибка загрузки задач:", error);
+      setTasks([]);
     }
   };
 
   useEffect(() => {
-    fetchTaskCount();
+    fetchTasks();
   }, [ticketId, refreshKey]);
 
-  if (!hasTasks) return null;
+  if (tasks.length === 0) return null;
 
   return (
     <Box
@@ -49,8 +47,24 @@ const TaskListOverlay = ({ ticketId, userId }) => {
       <Paper shadow="sm" radius="md" p="md" withBorder>
         <Box mb="xs" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
           <Text fw={600}>{translations["Tasks"][language]}</Text>
-          <Badge color="blue">{taskCount}</Badge>
+          <Badge color="blue">{tasks.length}</Badge>
         </Box>
+
+        <Stack spacing="sm">
+          {tasks.map((task) => (
+            <Box key={task.id} style={{ border: "1px solid #2c2e33", borderRadius: 8, padding: 8 }}>
+              <Group justify="space-between" align="center">
+                <Text fw={500}>{task.task_type}</Text>
+                <Text size="sm" c="dimmed">
+                  {task.created_for_full_name}
+                </Text>
+              </Group>
+              <Text size="sm" mt={4}>
+                {dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").format("DD.MM.YYYY HH:mm")}
+              </Text>
+            </Box>
+          ))}
+        </Stack>
       </Paper>
     </Box>
   );
