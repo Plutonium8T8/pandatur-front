@@ -1,4 +1,12 @@
-import { Textarea, Flex, ActionIcon, Box, Button, Select } from "@mantine/core";
+import {
+  Textarea,
+  Flex,
+  ActionIcon,
+  Box,
+  Button,
+  Select,
+  Loader,
+} from "@mantine/core";
 import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
@@ -6,6 +14,7 @@ import { LuSmile } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
+import { useApp } from "../../../../hooks";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -15,6 +24,7 @@ export const ChatInput = ({
   onChangeClient,
   currentClient,
 }) => {
+  const { spinnerTickets, ticketError } = useApp();
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -65,18 +75,25 @@ export const ChatInput = ({
           {socialMediaIcons[currentClient.payload?.platform] && (
             <Flex>{socialMediaIcons[currentClient.payload?.platform]}</Flex>
           )}
-          <Select
-            className="w-full"
-            onChange={(value) => {
-              onChangeClient(value);
-            }}
-            placeholder={getLanguageByKey("selectUser")}
-            value={currentClient.value}
-            data={clientList.map((user) => ({
-              value: user.value,
-              label: user.label,
-            }))}
-          />
+          {spinnerTickets ? (
+            <Loader size="xs" />
+          ) : (
+            <Select
+              className="w-full"
+              error={ticketError}
+              onChange={(value) => {
+                onChangeClient(value);
+              }}
+              placeholder={getLanguageByKey(
+                ticketError ? "somethingWentWrong" : "selectUser",
+              )}
+              value={currentClient.value}
+              data={clientList.map((user) => ({
+                value: user.value,
+                label: user.label,
+              }))}
+            />
+          )}
 
           <Select
             onChange={(value) => {
