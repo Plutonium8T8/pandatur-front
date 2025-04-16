@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useUser, useLocalStorage } from "../hooks";
+import { useUser, useLocalStorage, useMessages } from "../hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "../Components/utils";
 
@@ -20,9 +20,20 @@ const normalizeLightTickets = (tickets) => {
 };
 
 export const AppProvider = ({ children }) => {
+  const {
+    messages,
+    getUserMessages,
+    markMessageRead,
+    updateMessage,
+    markMessageSeen,
+    setMessages,
+    lastMessage,
+    loading,
+    mediaFiles,
+    error,
+  } = useMessages();
   const socketRef = useRef(null);
   const [tickets, setTickets] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
@@ -113,18 +124,7 @@ export const AppProvider = ({ children }) => {
 
     const socketInstance = socketRef.current;
 
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) => {
-        if (msg.ticket_id === ticketId) {
-          return {
-            ...msg,
-            seen_by: JSON.stringify({ [userId]: true }),
-            seen_at: new Date().toISOString(),
-          };
-        }
-        return msg;
-      }),
-    );
+    markMessageRead(ticketId);
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
@@ -221,24 +221,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const getClientMessagesSingle = async (ticket_id) => {
-    try {
-      const data = await api.messages.messagesTicketById(ticket_id);
-
-      if (Array.isArray(data)) {
-        setMessages((prevMessages) => {
-          const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== ticket_id,
-          );
-
-          return [...otherMessages, ...data];
-        });
-      }
-    } catch (error) {
-      console.error("error request messages:", error.message);
-    }
-  };
-
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case "message": {
@@ -253,7 +235,11 @@ export const AppProvider = ({ children }) => {
 
         setUnreadCount((prev) => prev + 1);
 
-        setMessages((prevMessages) => [...prevMessages, message.data]);
+        const senderId = message.data.sender_id;
+
+        if (Number(senderId) !== userId) {
+          updateMessage(message);
+        }
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -276,11 +262,7 @@ export const AppProvider = ({ children }) => {
       case "seen": {
         const { ticket_id, seen_at } = message.data;
 
-        setMessages((prevMessages) => {
-          return prevMessages.map((msg) =>
-            msg.ticket_id === ticket_id ? { ...msg, seen_at } : msg,
-          );
-        });
+        markMessageSeen(ticket_id, seen_at);
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -331,18 +313,24 @@ export const AppProvider = ({ children }) => {
   return (
     <AppContext.Provider
       value={{
+        messages: {
+          list: messages,
+          lastMessage,
+          loading,
+          mediaFiles,
+          error,
+          getUserMessages,
+          setMessages,
+        },
         tickets,
         setTickets,
         selectTicketId,
         setSelectTicketId,
-        messages,
-        setMessages,
         unreadCount,
         markMessagesAsRead,
         updateTicket,
         fetchTickets,
         socketRef,
-        getClientMessagesSingle,
         spinnerTickets,
         setIsCollapsed: collapsed,
         isCollapsed: storage === "true",

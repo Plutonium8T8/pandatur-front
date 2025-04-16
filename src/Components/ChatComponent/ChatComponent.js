@@ -5,12 +5,7 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import {
-  getMediaFileMessages,
-  normalizeUsersAndPlatforms,
-  getFullName,
-  parseDate,
-} from "../utils";
+import { normalizeUsersAndPlatforms, getFullName } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
@@ -25,31 +20,18 @@ const ChatComponent = () => {
   const [selectedUser, setSelectedUser] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
-  const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null;
-
-    const ticketMessages = messages
-      .filter(
-        (msg) =>
-          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return ticketMessages.length > 0 ? ticketMessages[0] : null;
-  };
-
   useEffect(() => {
     const ticketById =
       tickets?.find((ticket) => ticket.id === selectTicketId) || {};
 
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
+    const users = normalizeUsersAndPlatforms(ticketById.clients, messages.list);
 
     setPersonalInfo(ticketById);
     setMessageSendersByPlatform(users);
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
-    const lastMessage = getLastClientWhoSentMessage();
+    const { lastMessage } = messages;
 
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
@@ -67,6 +49,12 @@ const ChatComponent = () => {
   useEffect(() => {
     if (ticketId && Number(ticketId) !== selectTicketId) {
       setSelectTicketId(Number(ticketId));
+    }
+  }, [ticketId]);
+
+  useEffect(() => {
+    if (ticketId && !messages?.list.length) {
+      messages.getUserMessages(Number(ticketId));
     }
   }, [ticketId]);
 
@@ -88,7 +76,7 @@ const ChatComponent = () => {
         {isChatListVisible && <ChatList selectTicketId={selectTicketId} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
-          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
+          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>
             <ActionIcon
               variant="default"
               onClick={() => setIsChatListVisible((prev) => !prev)}
@@ -160,7 +148,7 @@ const ChatComponent = () => {
               });
             }}
             updatedTicket={personalInfo}
-            mediaFiles={getMediaFileMessages(messages, selectTicketId)}
+            mediaFiles={messages.mediaFiles}
           />
         )}
       </Flex>

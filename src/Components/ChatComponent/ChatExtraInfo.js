@@ -259,7 +259,7 @@ const ChatExtraInfo = ({
             <Box mt="md">
               <Merge
                 loading={isLoadingCombineClient}
-                value={selectedUser.payload?.id}
+                value={selectedUser.payload?.id || ""}
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => mergeData(values)}
               />

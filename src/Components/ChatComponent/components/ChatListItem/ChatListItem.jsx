@@ -1,12 +1,4 @@
-import {
-  Box,
-  Flex,
-  Image,
-  Text,
-  Badge,
-  Divider,
-  ActionIcon,
-} from "@mantine/core";
+import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
 import { IoMdEye } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
@@ -74,11 +66,11 @@ const MESSAGE_INDICATOR = {
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const navigate = useNavigate();
-  const { markMessagesAsRead, getClientMessagesSingle } = useApp();
+  const { markMessagesAsRead, messages } = useApp();
   const formatDate = parseServerDate(chat.time_sent);
 
   const choseChat = async (id) => {
-    await getClientMessagesSingle(id);
+    await messages.getUserMessages(id);
     navigate(`/chat/${id}`);
   };
 

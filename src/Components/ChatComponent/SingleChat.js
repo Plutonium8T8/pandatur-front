@@ -4,28 +4,16 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useUser, useApp } from "../../hooks";
-import {
-  getMediaFileMessages,
-  normalizeUsersAndPlatforms,
-  getFullName,
-  parseDate,
-} from "../utils";
+import { normalizeUsersAndPlatforms, getFullName } from "../utils";
 import "./chat.css";
 
 const SingleChat = ({ ticketId, onClose }) => {
-  const {
-    tickets,
-    setTickets,
-    messages,
-    markMessagesAsRead,
-    getClientMessagesSingle,
-  } = useApp();
+  const { tickets, setTickets, messages, markMessagesAsRead } = useApp();
   const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
   );
   const [personalInfo, setPersonalInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
   const [selectedUser, setSelectedUser] = useState({});
 
@@ -36,18 +24,9 @@ const SingleChat = ({ ticketId, onClose }) => {
   }, [ticketId]);
 
   useEffect(() => {
-    if (selectTicketId) {
-      setIsLoading(true);
-      getClientMessagesSingle(selectTicketId).finally(() =>
-        setIsLoading(false),
-      );
-    }
-  }, [selectTicketId]);
+    if (!selectTicketId || !messages.list.length) return;
 
-  useEffect(() => {
-    if (!selectTicketId || !messages.length) return;
-
-    const unreadMessages = messages.filter(
+    const unreadMessages = messages.list.filter(
       (msg) =>
         msg.ticket_id === selectTicketId &&
         msg.seen_by === "{}" &&
@@ -57,34 +36,29 @@ const SingleChat = ({ ticketId, onClose }) => {
     if (unreadMessages.length > 0) {
       markMessagesAsRead(selectTicketId);
     }
-  }, [selectTicketId, messages, userId]);
-
-  const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null;
-
-    const ticketMessages = messages
-      .filter(
-        (msg) =>
-          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return ticketMessages.length > 0 ? ticketMessages[0] : null;
-  };
+  }, [selectTicketId, messages.list, userId]);
 
   useEffect(() => {
     const updatedTicket =
       tickets?.find((ticket) => ticket?.id === selectTicketId) || {};
 
-    const users = normalizeUsersAndPlatforms(updatedTicket.clients, messages);
+    const users = normalizeUsersAndPlatforms(
+      updatedTicket.clients,
+      messages.list,
+    );
 
     setPersonalInfo(updatedTicket);
     setMessageSendersByPlatform(users);
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
-    const lastMessage = getLastClientWhoSentMessage();
+    if (ticketId && !messages?.list.length) {
+      messages.getUserMessages(Number(ticketId));
+    }
+  }, [ticketId]);
 
+  useEffect(() => {
+    const { lastMessage } = messages;
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
 
@@ -120,7 +94,6 @@ const SingleChat = ({ ticketId, onClose }) => {
         <ChatMessages
           selectedClient={selectedUser}
           selectTicketId={selectTicketId}
-          isLoading={isLoading}
           personalInfo={personalInfo}
           messageSendersByPlatform={messageSendersByPlatform || []}
           onChangeSelectedUser={changeUser}
@@ -176,7 +149,7 @@ const SingleChat = ({ ticketId, onClose }) => {
             };
           });
         }}
-        mediaFiles={getMediaFileMessages(messages, selectTicketId)}
+        mediaFiles={messages.mediaFiles}
       />
     </div>
   );
