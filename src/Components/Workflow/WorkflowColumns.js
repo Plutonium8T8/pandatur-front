@@ -15,27 +15,34 @@ export const WorkflowColumns = ({
   const { isCollapsed } = useApp();
 
   const wrapperColumnRef = useRef(null);
-  const isScrollRight = useRef(false);
+  const isScrollRight = useRef({});
 
   const leftSpace = isCollapsed ? 79 : 249;
 
   useEffect(() => {
     wrapperColumnRef.current.addEventListener("mouseleave", () => {
-      isScrollRight.current = false;
+      isScrollRight.current.isScrollRight = false;
     });
 
     wrapperColumnRef.current.addEventListener("mousemove", (e) => {
-      if (!isScrollRight.current) return;
+      if (!isScrollRight.current.isScrollRight) return;
       e.preventDefault();
-      wrapperColumnRef.current.scrollLeft = e.pageX - leftSpace;
+
+      const x = e.pageX - wrapperColumnRef.current.scrollLeft;
+      const walk = x - isScrollRight.current.startX;
+      wrapperColumnRef.current.scrollLeft = walk;
     });
 
     wrapperColumnRef.current.addEventListener("mouseup", () => {
-      isScrollRight.current = false;
+      isScrollRight.current.isScrollRight = false;
     });
 
     wrapperColumnRef.current.addEventListener("mousedown", (e) => {
-      isScrollRight.current = true;
+      isScrollRight.current = {
+        isScrollRight: true,
+        startX: e.pageX - leftSpace,
+        scrollLeft: wrapperColumnRef.current.scrollLeft,
+      };
     });
   }, []);
 
@@ -46,6 +53,7 @@ export const WorkflowColumns = ({
       w="100%"
       h="100%"
       className="overflow-x-scroll"
+      style={{ cursor: "grab" }}
     >
       {workflowOptions
         .filter((workflow) => selectedWorkflow.includes(workflow))
