@@ -6,15 +6,15 @@ import {
     Stack,
     TextInput,
 } from "@mantine/core";
-import { DatePicker, TimeInput } from "@mantine/dates";
-import dayjs from "dayjs";
 import {
     parseDate,
     formatDate,
     applyOffset,
     quickOptions,
 } from "../utils/date";
+import { DatePicker, TimeInput } from "@mantine/dates";
 import { translations } from "../utils/translations";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
