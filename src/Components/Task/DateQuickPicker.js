@@ -8,31 +8,15 @@ import {
 } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
-import { parseDate, formatDate } from "../utils";
+import {
+    parseDate,
+    formatDate,
+    applyOffset,
+    quickOptions,
+} from "../utils/date";
 import { translations } from "../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
-
-const applyOffset = (base, offset = {}) => {
-    let updated = base;
-    if (offset.minutes) updated = updated.add(offset.minutes, "minute");
-    if (offset.hours) updated = updated.add(offset.hours, "hour");
-    if (offset.days) updated = updated.add(offset.days, "day");
-    if (offset.years) updated = updated.add(offset.years, "year");
-    return updated;
-};
-
-const quickOptions = [
-    { label: "In 15 minutes", offset: { minutes: 15 } },
-    { label: "In 30 minutes", offset: { minutes: 30 } },
-    { label: "In an hour", offset: { hours: 1 } },
-    { label: "Today", custom: () => dayjs() },
-    { label: "Tomorrow", custom: () => dayjs().add(1, "day") },
-    { label: "This week", custom: () => dayjs().endOf("week") },
-    { label: "In 7 days", offset: { days: 7 } },
-    { label: "In 30 days", offset: { days: 30 } },
-    { label: "In 1 year", offset: { years: 1 } },
-];
 
 const DateQuickInput = ({ value, onChange }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
@@ -41,9 +25,9 @@ const DateQuickInput = ({ value, onChange }) => {
     const [initialized, setInitialized] = useState(false);
 
     const safeTime = time || "00:00";
-    const combinedString = `${date.replace(/\./g, "-")} ${safeTime}:00`;
-    const parsedDate = parseDate(combinedString);
-    const formattedDisplay = parsedDate ? formatDate(parsedDate) : "";
+    const combined = `${date.replace(/\./g, "-")} ${safeTime}:00`;
+    const parsedDate = parseDate(combined);
+    const display = parsedDate ? formatDate(parsedDate) : "";
 
     useEffect(() => {
         if (!initialized && value) {
@@ -81,7 +65,7 @@ const DateQuickInput = ({ value, onChange }) => {
         >
             <Popover.Target>
                 <TextInput
-                    value={formattedDisplay}
+                    value={display}
                     readOnly
                     onClick={() => setPopoverOpen(true)}
                     label={translations["Deadline"][language]}
@@ -121,9 +105,7 @@ const DateQuickInput = ({ value, onChange }) => {
                         <DatePicker
                             value={parsedDate || new Date()}
                             onChange={(d) => {
-                                if (d) {
-                                    setDate(dayjs(d).format("DD.MM.YYYY"));
-                                }
+                                if (d) setDate(dayjs(d).format("DD.MM.YYYY"));
                             }}
                             size="md"
                             minDate={new Date()}

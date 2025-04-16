@@ -31,7 +31,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
       const data = selectTicketId
         ? await api.task.getTaskByTicket(selectTicketId)
         : await api.task.getAllTasks();
-      setTasks(Array.isArray(data) ? data : []);
+      setTasks(Array.isArray(data?.data) ? data.data : []);
       updateTaskCount();
     } catch (error) {
       console.error("Ошибка загрузки задач:", error);

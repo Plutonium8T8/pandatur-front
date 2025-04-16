@@ -2070,5 +2070,41 @@ export const translations = {
   inAWeek: {
     "RO": "Peste o săptămână",
     "RU": "Через неделю"
+  },
+  in15Min: {
+    RO: "Peste 15 minute",
+    RU: "Через 15 минут"
+  },
+  in30Min: {
+    RO: "Peste 30 minute",
+    RU: "Через 30 минут"
+  },
+  in1Hour: {
+    RO: "Peste o oră",
+    RU: "Через час"
+  },
+  today: {
+    RO: "Astăzi",
+    RU: "Сегодня"
+  },
+  tomorrow: {
+    RO: "Mâine",
+    RU: "Завтра"
+  },
+  thisWeek: {
+    RO: "Săptămâna aceasta",
+    RU: "На этой неделе"
+  },
+  inAWeek: {
+    RO: "Peste o săptămână",
+    RU: "Через неделю"
+  },
+  in30Days: {
+    RO: "Peste 30 de zile",
+    RU: "Через 30 дней"
+  },
+  in1Year: {
+    RO: "Peste un an",
+    RU: "Через год"
   }
 };
