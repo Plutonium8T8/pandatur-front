@@ -1,12 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { RcTable, HeaderCellRcTable } from "../../RcTable";
+import { FaFingerprint } from "react-icons/fa6";
 import { Checkbox } from "../../Checkbox";
 import { translations } from "../../utils/translations";
 import "./TaskList.css";
 import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
-import { Menu, Button } from "@mantine/core";
+import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import {
   IoEllipsisHorizontal,
@@ -209,13 +210,11 @@ const TaskList = ({
           <Link
             to={`/tasks/${ticketId}`}
             onClick={(e) => e.stopPropagation()}
-            style={{
-              color: "#1971c2",
-              textDecoration: "underline",
-              cursor: "pointer",
-            }}
           >
-            {ticketId}
+            <Flex justify="center" gap="8">
+              <FaFingerprint />
+              {ticketId}
+            </Flex>
           </Link>
         ),
       },

@@ -1,7 +1,8 @@
 import React from "react";
-import { Paper, Text, Box } from "@mantine/core";
+import { Paper, Text, Box, Flex } from "@mantine/core";
 import { TypeTask } from "./OptionsTaskType";
 import { Link } from "react-router-dom";
+import { FaFingerprint } from "react-icons/fa6";
 
 const getColor = (deadline, now) => {
     if (deadline.isBefore(now, "day")) return "red";
@@ -25,20 +26,12 @@ const TaskCard = ({ task, deadline, now, onClick }) => {
             <Box
                 component={Link}
                 to={`/tasks/${task.ticket_id}`}
-                style={{
-                    background: "#e0e0e0",
-                    display: "inline-block",
-                    padding: "2px 8px",
-                    borderRadius: "8px",
-                    fontSize: "12px",
-                    marginBottom: 6,
-                    color: "#1971c2",
-                    fontWeight: 600,
-                    textDecoration: "underline",
-                }}
                 onClick={(e) => e.stopPropagation()}
             >
-                Ticket ID: {task.ticket_id}
+                <Flex align="center" gap="8">
+                    <FaFingerprint />
+                    {task.ticket_id}
+                </Flex>
             </Box>
 
             <Box style={{ display: "flex", alignItems: "center", gap: 8 }}>

@@ -76,7 +76,9 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
                   value: "list",
                   label: (
                     <Tooltip label={translations["listView"][language]}>
-                      <FaList size={16} />
+                      <span>
+                        <FaList size={16} />
+                      </span>
                     </Tooltip>
                   ),
                 },
@@ -84,7 +86,9 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
                   value: "columns",
                   label: (
                     <Tooltip label={translations["columnView"][language]}>
-                      <TbLayoutKanbanFilled size={16} />
+                      <span>
+                        <TbLayoutKanbanFilled size={16} />
+                      </span>
                     </Tooltip>
                   ),
                 },

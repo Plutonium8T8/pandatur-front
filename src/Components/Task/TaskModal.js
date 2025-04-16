@@ -17,6 +17,7 @@ import { translations } from "../utils/translations";
 import { parseDate, formatDate } from "../utils/date";
 import { useGetTechniciansList, useUser } from "../../hooks";
 import dayjs from "dayjs";
+import { MantineModal } from "../MantineModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -143,16 +144,15 @@ const TaskModal = ({
   };
 
   return (
-    <Modal
-      opened={isOpen}
+    <MantineModal
+      open={isOpen}
       onClose={handleClose}
+      height=""
       title={
         selectedTask
           ? translations["Editare Task"][language]
           : translations["Creare Task"][language]
       }
-      centered
-      size="xl"
     >
       <form onSubmit={handleTaskSubmit}>
         <Stack spacing="md">
@@ -248,7 +248,7 @@ const TaskModal = ({
           </Group>
         </Stack>
       </form>
-    </Modal>
+    </MantineModal >
   );
 };
 
