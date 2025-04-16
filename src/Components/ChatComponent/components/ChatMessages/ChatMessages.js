@@ -149,15 +149,15 @@ export const ChatMessages = ({
           selectTicketId={selectTicketId}
         />
       );
-    } else {
-      return (
-        <Flex h="100%" align="center" justify="center">
-          <Text size="lg" c="dimmed">
-            {getLanguageByKey("Alege lead")}
-          </Text>
-        </Flex>
-      );
     }
+
+    return (
+      <Flex h="100%" align="center" justify="center">
+        <Text size="lg" c="dimmed">
+          {getLanguageByKey("Alege lead")}
+        </Text>
+      </Flex>
+    );
   };
 
   return (
