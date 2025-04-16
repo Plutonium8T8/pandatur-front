@@ -40,6 +40,8 @@ const ChatComponent = () => {
 
   useEffect(() => {
     if (ticketId) {
+      setSelectedUser({});
+      setMessageSendersByPlatform([]);
       if (Number(ticketId) !== selectTicketId) {
         setSelectTicketId(Number(ticketId));
       }

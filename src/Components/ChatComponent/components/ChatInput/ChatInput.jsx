@@ -87,7 +87,6 @@ export const ChatInput = ({
               placeholder={getLanguageByKey(
                 ticketError ? "somethingWentWrong" : "selectUser",
               )}
-              value={currentClient.value}
               data={clientList.map((user) => ({
                 value: user.value,
                 label: user.label,
