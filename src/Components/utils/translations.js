@@ -734,9 +734,9 @@ export const translations = {
     RO: "Ultima platformă",
     RU: "Последнея платформа",
   },
-  "Creat de": {
-    RO: "Creat de utilizatorul",
-    RU: "Создан пользователем",
+  "Autor": {
+    RO: "Autor",
+    RU: "Автор",
   },
   "Alege utilizator": {
     RO: "Alege utilizator",
@@ -1322,9 +1322,9 @@ export const translations = {
     RO: "Descriere task",
     RU: "Описание задачи",
   },
-  Pentru: {
-    RO: "Pentru",
-    RU: "Для",
+  "For": {
+    RO: "Responsabil",
+    RU: "Ответственный",
   },
   "Selectează utilizator": {
     RO: "Selectează utilizator",

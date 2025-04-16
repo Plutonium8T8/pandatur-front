@@ -76,9 +76,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
                   value: "list",
                   label: (
                     <Tooltip label={translations["listView"][language]}>
-                      <span>
-                        <FaList size={16} />
-                      </span>
+                      <FaList size={16} />
                     </Tooltip>
                   ),
                 },
@@ -86,9 +84,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
                   value: "columns",
                   label: (
                     <Tooltip label={translations["columnView"][language]}>
-                      <span>
-                        <TbLayoutKanbanFilled size={18} />
-                      </span>
+                      <TbLayoutKanbanFilled size={16} />
                     </Tooltip>
                   ),
                 },
@@ -98,7 +94,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
               placeholder={translations["Cautare"][language]}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.currentTarget.value)}
-              w={200}
+              w={350}
             />
             <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}

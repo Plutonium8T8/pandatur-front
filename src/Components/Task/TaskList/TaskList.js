@@ -120,16 +120,19 @@ const TaskList = ({
         key: "checkbox",
         align: "center",
         render: (row) => (
-          <Checkbox
-            checked={selectedRow.includes(row.id)}
-            onChange={() => {
-              setSelectedRow((prev) =>
-                prev.includes(row.id)
-                  ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id]
-              );
-            }}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={selectedRow.includes(row.id)}
+              onChange={(e) => {
+                e.stopPropagation();
+                setSelectedRow((prev) =>
+                  prev.includes(row.id)
+                    ? prev.filter((id) => id !== row.id)
+                    : [...prev, row.id]
+                );
+              }}
+            />
+          </div>
         ),
       },
       {
@@ -168,7 +171,7 @@ const TaskList = ({
         }
       },
       {
-        title: translations["Creat de"][language],
+        title: translations["Autor"][language],
         dataIndex: "creator_by_full_name",
         key: "creator_by_full_name",
         width: 150,
@@ -177,7 +180,7 @@ const TaskList = ({
           row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
-        title: translations["Pentru"][language],
+        title: translations["For"][language],
         dataIndex: "created_for_full_name",
         key: "created_for_full_name",
         width: 150,
@@ -261,23 +264,23 @@ const TaskList = ({
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <Button variant="default" className="action-button-task">
-                <IoEllipsisHorizontal size={18} />
-              </Button>
+              <div
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button variant="default" className="action-button-task">
+                  <IoEllipsisHorizontal size={18} />
+                </Button>
+              </div>
             </Menu.Target>
 
-            <Menu.Dropdown>
+            <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
               <Menu.Item
                 leftSection={<IoCheckmarkCircle size={16} />}
                 onClick={() => {
-                  if (!row.status) {
-                    handleMarkTaskAsComplete(row.id);
-                  }
+                  if (!row.status) handleMarkTaskAsComplete(row.id);
                 }}
                 disabled={row.status}
-                style={
-                  row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}
-                }
+                style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
               >
                 {translations["Finalizați"][language]}
               </Menu.Item>
