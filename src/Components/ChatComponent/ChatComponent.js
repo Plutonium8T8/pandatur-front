@@ -20,6 +20,14 @@ const ChatComponent = () => {
   const [selectedUser, setSelectedUser] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
+  const changeUser = (userId, platform) => {
+    const user = messageSendersByPlatform?.find(
+      ({ payload }) => payload.id === userId && payload.platform === platform,
+    );
+
+    setSelectedUser(user);
+  };
+
   useEffect(() => {
     const ticketById =
       tickets?.find((ticket) => ticket.id === selectTicketId) || {};
@@ -31,40 +39,16 @@ const ChatComponent = () => {
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
-    const { lastMessage } = messages;
+    if (ticketId) {
+      if (Number(ticketId) !== selectTicketId) {
+        setSelectTicketId(Number(ticketId));
+      }
 
-    if (lastMessage) {
-      const { platform, client_id } = lastMessage;
-
-      const selectedUser = messageSendersByPlatform?.find(
-        ({ payload }) =>
-          payload.id === client_id && payload.platform === platform,
-      );
-      setSelectedUser(selectedUser || {});
-    } else {
-      setSelectedUser(messageSendersByPlatform?.[0] || {});
-    }
-  }, [selectTicketId, messages, messageSendersByPlatform]);
-
-  useEffect(() => {
-    if (ticketId && Number(ticketId) !== selectTicketId) {
-      setSelectTicketId(Number(ticketId));
+      if (!messages?.list.length) {
+        messages.getUserMessages(Number(ticketId));
+      }
     }
   }, [ticketId]);
-
-  useEffect(() => {
-    if (ticketId && !messages?.list.length) {
-      messages.getUserMessages(Number(ticketId));
-    }
-  }, [ticketId]);
-
-  const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform?.find(
-      ({ payload }) => payload.id === userId && payload.platform === platform,
-    );
-
-    setSelectedUser(user);
-  };
 
   return (
     <Flex h="100%" className="chat-wrapper">
