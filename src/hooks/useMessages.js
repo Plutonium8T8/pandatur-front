@@ -4,12 +4,19 @@ import { api } from "../api";
 import { useUser } from "../hooks";
 import { parseDate, showServerError } from "../Components/utils";
 
+const FORMAT_MEDIA = ["audio", "video", "image", "file"];
+
+export const getMediaFileMessages = (messageList) => {
+  return messageList.filter((msg) => FORMAT_MEDIA.includes(msg.mtype));
+};
+
 export const useMessages = () => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastMessage, setLastMessage] = useState();
+  const [mediaFiles, setMediaFiles] = useState([]);
   const { userId } = useUser();
 
   const getUserMessages = async (ticket_id) => {
@@ -33,6 +40,7 @@ export const useMessages = () => {
           [];
 
         setLastMessage(lastMessage[0]);
+        setMediaFiles(getMediaFileMessages(data));
       }
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -72,6 +80,7 @@ export const useMessages = () => {
     messages,
     lastMessage,
     loading,
+    mediaFiles,
     getUserMessages,
     markMessageRead,
     updateMessage,

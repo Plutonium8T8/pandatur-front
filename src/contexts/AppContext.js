@@ -29,6 +29,7 @@ export const AppProvider = ({ children }) => {
     setMessages,
     lastMessage,
     loading,
+    mediaFiles,
   } = useMessages();
   const socketRef = useRef(null);
   const [tickets, setTickets] = useState([]);
@@ -315,6 +316,7 @@ export const AppProvider = ({ children }) => {
           list: messages,
           lastMessage,
           loading,
+          mediaFiles,
           getUserMessages,
           setMessages,
         },

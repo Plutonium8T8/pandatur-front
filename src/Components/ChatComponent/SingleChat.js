@@ -4,11 +4,7 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useUser, useApp } from "../../hooks";
-import {
-  getMediaFileMessages,
-  normalizeUsersAndPlatforms,
-  getFullName,
-} from "../utils";
+import { normalizeUsersAndPlatforms, getFullName } from "../utils";
 import "./chat.css";
 
 const SingleChat = ({ ticketId, onClose }) => {
@@ -28,9 +24,9 @@ const SingleChat = ({ ticketId, onClose }) => {
   }, [ticketId]);
 
   useEffect(() => {
-    if (!selectTicketId || !messages.length) return;
+    if (!selectTicketId || !messages.list.length) return;
 
-    const unreadMessages = messages.filter(
+    const unreadMessages = messages.list.filter(
       (msg) =>
         msg.ticket_id === selectTicketId &&
         msg.seen_by === "{}" &&
@@ -40,7 +36,7 @@ const SingleChat = ({ ticketId, onClose }) => {
     if (unreadMessages.length > 0) {
       markMessagesAsRead(selectTicketId);
     }
-  }, [selectTicketId, messages, userId]);
+  }, [selectTicketId, messages.list, userId]);
 
   useEffect(() => {
     const updatedTicket =
@@ -145,7 +141,7 @@ const SingleChat = ({ ticketId, onClose }) => {
             };
           });
         }}
-        mediaFiles={getMediaFileMessages(messages, selectTicketId)}
+        mediaFiles={messages.mediaFiles}
       />
     </div>
   );
