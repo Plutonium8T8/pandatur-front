@@ -5,20 +5,12 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import {
-  getMediaFileMessages,
-  normalizeUsersAndPlatforms,
-  getFullName,
-} from "../utils";
+import { normalizeUsersAndPlatforms, getFullName } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const {
-    tickets,
-    setTickets,
-    messages,
-  } = useApp();
+  const { tickets, setTickets, messages } = useApp();
   const { ticketId } = useParams();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
@@ -156,7 +148,7 @@ const ChatComponent = () => {
               });
             }}
             updatedTicket={personalInfo}
-            mediaFiles={getMediaFileMessages(messages.list, selectTicketId)}
+            mediaFiles={messages.mediaFiles}
           />
         )}
       </Flex>
