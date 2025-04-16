@@ -9,13 +9,16 @@ import {
   getMediaFileMessages,
   normalizeUsersAndPlatforms,
   getFullName,
-  parseDate,
 } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const { tickets, setTickets, messages, getClientMessagesSingle } = useApp();
+  const {
+    tickets,
+    setTickets,
+    messages,
+  } = useApp();
   const { ticketId } = useParams();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
@@ -25,31 +28,18 @@ const ChatComponent = () => {
   const [selectedUser, setSelectedUser] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
-  const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null;
-
-    const ticketMessages = messages
-      .filter(
-        (msg) =>
-          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return ticketMessages.length > 0 ? ticketMessages[0] : null;
-  };
-
   useEffect(() => {
     const ticketById =
       tickets?.find((ticket) => ticket.id === selectTicketId) || {};
 
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
+    const users = normalizeUsersAndPlatforms(ticketById.clients, messages.list);
 
     setPersonalInfo(ticketById);
     setMessageSendersByPlatform(users);
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
-    const lastMessage = getLastClientWhoSentMessage();
+    const { lastMessage } = messages;
 
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
@@ -71,8 +61,8 @@ const ChatComponent = () => {
   }, [ticketId]);
 
   useEffect(() => {
-    if (ticketId && !messages?.length) {
-      getClientMessagesSingle(Number(ticketId));
+    if (ticketId && !messages?.list.length) {
+      messages.getUserMessages(Number(ticketId));
     }
   }, [ticketId]);
 
@@ -166,7 +156,7 @@ const ChatComponent = () => {
               });
             }}
             updatedTicket={personalInfo}
-            mediaFiles={getMediaFileMessages(messages, selectTicketId)}
+            mediaFiles={getMediaFileMessages(messages.list, selectTicketId)}
           />
         )}
       </Flex>

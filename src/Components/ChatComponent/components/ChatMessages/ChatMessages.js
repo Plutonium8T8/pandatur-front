@@ -32,6 +32,7 @@ export const ChatMessages = ({
 }) => {
   const { userId } = useUser();
   const { messages, setMessages } = useApp();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const messageContainerRef = useRef(null);
