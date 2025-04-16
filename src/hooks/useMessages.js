@@ -19,15 +19,15 @@ export const useMessages = () => {
   const [mediaFiles, setMediaFiles] = useState([]);
   const { userId } = useUser();
 
-  const getUserMessages = async (ticket_id) => {
+  const getUserMessages = async (id) => {
     setLoading(true);
     try {
-      const data = await api.messages.messagesTicketById(ticket_id);
+      const data = await api.messages.messagesTicketById(id);
 
       if (Array.isArray(data)) {
         setMessages((prevMessages) => {
           const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== ticket_id,
+            (msg) => msg.ticket_id !== id,
           );
 
           return [...otherMessages, ...data];
