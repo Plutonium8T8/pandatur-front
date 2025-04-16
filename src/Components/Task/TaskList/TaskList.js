@@ -213,7 +213,7 @@ const TaskList = ({
             to={`/tasks/${ticketId}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <Flex justify="center" gap="8">
+            <Flex justify="center" gap="8" align="center">
               <FaFingerprint />
               {ticketId}
             </Flex>
