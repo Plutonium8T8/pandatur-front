@@ -172,9 +172,9 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !messages.loading && (
+      {/* {selectTicketId && !messages.loading && (
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
-      )}
+      )} */}
 
       {selectTicketId && !messages.loading && (
         <ChatInput
