@@ -312,11 +312,11 @@ export const AppProvider = ({ children }) => {
     <AppContext.Provider
       value={{
         messages: {
-          getUserMessages,
           list: messages,
-          setMessages,
           lastMessage,
           loading,
+          getUserMessages,
+          setMessages,
         },
         tickets,
         setTickets,

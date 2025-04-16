@@ -21,17 +21,15 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
     : msj;
 };
 
-// TODO: Add loading from `AppContext`
 export const ChatMessages = ({
   selectTicketId,
   selectedClient,
-  isLoading,
   personalInfo,
   messageSendersByPlatform,
   onChangeSelectedUser,
 }) => {
   const { userId } = useUser();
-  const { messages, setMessages } = useApp();
+  const { messages } = useApp();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -55,7 +53,7 @@ export const ChatMessages = ({
 
   const sendMessage = async (selectedFile, metadataMsj, platform) => {
     try {
-      setMessages((prevMessages) => [
+      messages.setMessages((prevMessages) => [
         ...prevMessages,
         { ...metadataMsj, seenAt: false },
       ]);
@@ -84,13 +82,13 @@ export const ChatMessages = ({
 
       await apiUrl(metadataMsj);
 
-      setMessages((prev) => {
+      messages.setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
         );
       });
     } catch (error) {
-      setMessages((prev) => {
+      messages.setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
         );
@@ -135,7 +133,7 @@ export const ChatMessages = ({
         className="chat-messages"
         ref={messageContainerRef}
       >
-        {isLoading ? (
+        {messages.loading ? (
           <Flex h="100%" align="center" justify="center">
             <Spin />
           </Flex>
@@ -153,11 +151,11 @@ export const ChatMessages = ({
         )}
       </Flex>
 
-      {selectTicketId && !isLoading && (
+      {selectTicketId && !messages.loading && (
         <TaskListOverlay ticketId={selectTicketId} userId={userId} />
       )}
 
-      {selectTicketId && !isLoading && (
+      {selectTicketId && !messages.loading && (
         <ChatInput
           id={selectTicketId}
           clientList={messageSendersByPlatform}
