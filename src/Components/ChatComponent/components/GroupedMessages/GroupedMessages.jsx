@@ -53,7 +53,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   });
 
   return (
-    <Flex h="100%" direction="column" gap="xl">
+    <Flex direction="column" gap="xl" h="100%">
       {groupedMessages.length ? (
         groupedMessages.map(({ date, clientId, messages }) => {
           const clientInfo = personalInfo?.clients?.[0] || {};
@@ -63,7 +63,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
             `ID: ${clientId}`;
 
           return (
-            <Flex direction="column" gap="md" key={date}>
+            <Flex pb="md" direction="column" gap="md" key={date}>
               <Divider
                 label={
                   <Badge c="black" size="lg" bg={colors.gray[2]}>

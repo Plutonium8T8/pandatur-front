@@ -70,7 +70,7 @@ export const ChatInput = ({
 
   return (
     <>
-      <Box p="16px">
+      <Box className="chat-input" p="16px">
         <Flex w="100%" gap="xs" mb="xs" align="center">
           {socialMediaIcons[currentClient.payload?.platform] && (
             <Flex>{socialMediaIcons[currentClient.payload?.platform]}</Flex>
