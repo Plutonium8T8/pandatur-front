@@ -26,24 +26,16 @@ export const useMessages = () => {
     try {
       const data = await api.messages.messagesTicketById(id);
 
-      if (Array.isArray(data)) {
-        setMessages((prevMessages) => {
-          const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== id,
-          );
+      setMessages(data);
 
-          return [...otherMessages, ...data];
-        });
+      const lastMessage =
+        data
+          .filter(({ sender_id }) => sender_id !== 1 && sender_id !== userId)
+          .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent)) ||
+        [];
 
-        const lastMessage =
-          data
-            .filter(({ sender_id }) => sender_id !== 1 && sender_id !== userId)
-            .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent)) ||
-          [];
-
-        setLastMessage(lastMessage[0]);
-        setMediaFiles(getMediaFileMessages(data));
-      }
+      setLastMessage(lastMessage[0]);
+      setMediaFiles(getMediaFileMessages(data));
     } catch (error) {
       const e = showServerError(error);
       setError(e);

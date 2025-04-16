@@ -109,7 +109,7 @@ export const ChatMessages = ({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages, selectTicketId]);
+  }, [messages.list, selectTicketId]);
 
   useEffect(() => {
     const container = messageContainerRef.current;
