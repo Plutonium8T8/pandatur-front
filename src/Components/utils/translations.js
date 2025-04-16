@@ -734,9 +734,9 @@ export const translations = {
     RO: "Ultima platformă",
     RU: "Последнея платформа",
   },
-  "Creat de": {
-    RO: "Creat de utilizatorul",
-    RU: "Создан пользователем",
+  "Autor": {
+    RO: "Autor",
+    RU: "Автор",
   },
   "Alege utilizator": {
     RO: "Alege utilizator",
@@ -1322,17 +1322,13 @@ export const translations = {
     RO: "Descriere task",
     RU: "Описание задачи",
   },
-  Pentru: {
-    RO: "Pentru",
-    RU: "Для",
+  "For": {
+    RO: "Responsabil",
+    RU: "Ответственный",
   },
   "Selectează utilizator": {
     RO: "Selectează utilizator",
     RU: "Выберите пользователя",
-  },
-  "De la utilizatorul": {
-    RO: "De la utilizatorul",
-    RU: "От пользователя",
   },
   "Adaugă task": {
     RO: "Adaugă task",
@@ -1511,7 +1507,7 @@ export const translations = {
     RO: "Taskuri",
     RU: "Задачи",
   },
-  "Нет задач, создать?": {
+  "noTasksCreate": {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?",
   },
@@ -2015,6 +2011,30 @@ export const translations = {
     RO: "Nu există mesaje",
     RU: "Нет сообщений",
   },
+  "overdueTasks": {
+    RO: "Taskuri Expirate",
+    RU: "Просроченные задачи"
+  },
+  "todayTasks": {
+    RO: "Taskuri pentru azi",
+    RU: "Задачи на сегодня"
+  },
+  "tomorrowTasks": {
+    RO: "Taskuri pentru mâine",
+    RU: "Задачи на завтра"
+  },
+  "noTasks": {
+    RO: "Nu sunt taskuri",
+    RU: "Нет задач"
+  },
+  listView: {
+    RO: "Vizualizare listă",
+    RU: "Список",
+  },
+  columnView: {
+    RO: "Vizualizare pe coloane",
+    RU: "Колонки",
+  },
   audio: {
     RO: "Audio",
     RU: "Аудио",
@@ -2038,6 +2058,50 @@ export const translations = {
   selectUser: {
     RO: "Select user",
     RU: "Выбрать пользователя",
+  },
+  today: {
+    "RO": "Astăzi",
+    "RU": "Сегодня"
+  },
+  tomorrow: {
+    "RO": "Mâine",
+    "RU": "Завтра"
+  },
+  inAWeek: {
+    "RO": "Peste o săptămână",
+    "RU": "Через неделю"
+  },
+  in15Min: {
+    RO: "Peste 15 minute",
+    RU: "Через 15 минут"
+  },
+  in30Min: {
+    RO: "Peste 30 minute",
+    RU: "Через 30 минут"
+  },
+  in1Hour: {
+    RO: "Peste o oră",
+    RU: "Через час"
+  },
+  thisWeek: {
+    RO: "Săptămâna aceasta",
+    RU: "На этой неделе"
+  },
+  in30Days: {
+    RO: "Peste 30 de zile",
+    RU: "Через 30 дней"
+  },
+  in1Year: {
+    RO: "Peste un an",
+    RU: "Через год"
+  },
+  Date: {
+    RO: "Data",
+    RU: "Дата"
+  },
+  Hour: {
+    RO: "Ora",
+    RU: "Часы"
   },
   noConversationStartedForThisLead: {
     RO: "Nu a fost inițiată nicio conversație pentru acest lead",

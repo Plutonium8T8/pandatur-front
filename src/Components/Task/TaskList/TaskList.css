@@ -1,0 +1,59 @@
+.action-button-task {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  transition: background 0.3s ease;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  width: 180px;
+  z-index: 10;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.activ {
+  background-color: #4caf50;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.inactiv {
+  background-color: #f44336;
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.task-type {
+  display: flex;
+  gap: 4px;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+  padding: 10;
+}

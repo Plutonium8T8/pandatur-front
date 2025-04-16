@@ -1,30 +1,28 @@
 import { useState, useMemo, useEffect } from "react";
-import { RcTable, HeaderCellRcTable } from "../../../RcTable";
-import { Checkbox } from "../../../Checkbox";
-import { translations } from "../../../utils/translations";
-import "./TaskList.css";
-import { TypeTask } from "../OptionsTaskType/OptionsTaskType";
+import { RcTable, HeaderCellRcTable } from "../../RcTable";
+import { FaFingerprint } from "react-icons/fa6";
+import { Checkbox } from "../../Checkbox";
+import { translations } from "../../utils/translations";
+import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
-import { api } from "../../../../api";
-import { Menu, Button } from "@mantine/core";
+import { api } from "../../../api";
+import { Menu, Button, Flex } from "@mantine/core";
+import { Link } from "react-router-dom";
+import { Tag } from "../../Tag";
+import { useConfirmPopup } from "../../../hooks";
+import dayjs from "dayjs";
+import "./TaskList.css";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
   IoTrash,
   IoPencil,
 } from "react-icons/io5";
-import { useConfirmPopup } from "../../../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
-const priorityColors = {
-  Low: "#4CAF50",
-  Medium: "#FF9800",
-  High: "#F44336",
-};
-
 const TaskList = ({
-  tasks,
+  tasks = [],
   handleMarkAsSeenTask,
   userList = [],
   loading = false,
@@ -32,8 +30,8 @@ const TaskList = ({
   fetchTasks,
 }) => {
   const [order, setOrder] = useState("ASC");
+  const [sortColumn, setSortColumn] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
-  const [, setColumn] = useState("");
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
   const handleDeleteTaskById = useConfirmPopup({
@@ -51,9 +49,7 @@ const TaskList = ({
       } catch (error) {
         enqueueSnackbar(
           translations["Eroare la ștergerea taskului"][language],
-          {
-            variant: "error",
-          },
+          { variant: "error" }
         );
       }
     });
@@ -61,11 +57,7 @@ const TaskList = ({
 
   const handleMarkTaskAsComplete = async (taskId) => {
     try {
-      await api.task.update({
-        id: taskId,
-        status: true,
-      });
-
+      await api.task.update({ id: taskId, status: true });
       enqueueSnackbar(translations["Task marcat ca finalizat!"][language], {
         variant: "success",
       });
@@ -73,9 +65,7 @@ const TaskList = ({
     } catch (error) {
       enqueueSnackbar(
         translations["Eroare la actualizarea statusului taskului"][language],
-        {
-          variant: "error",
-        },
+        { variant: "error" }
       );
     }
   };
@@ -97,6 +87,34 @@ const TaskList = ({
     };
   }, [openMenuId]);
 
+  const sortedTasks = useMemo(() => {
+    if (!Array.isArray(tasks)) return [];
+
+    if (!sortColumn) return tasks;
+
+    return [...tasks].sort((a, b) => {
+      let valA = a[sortColumn];
+      let valB = b[sortColumn];
+
+      if (sortColumn === "scheduled_time") {
+        const dateA = dayjs(valA, "DD-MM-YYYY HH:mm:ss");
+        const dateB = dayjs(valB, "DD-MM-YYYY HH:mm:ss");
+
+        if (!dateA.isValid() || !dateB.isValid()) return 0;
+
+        return order === "ASC"
+          ? dateA.valueOf() - dateB.valueOf()
+          : dateB.valueOf() - dateA.valueOf();
+      }
+
+      const comparison = String(valA).localeCompare(String(valB), undefined, {
+        numeric: true,
+      });
+
+      return order === "ASC" ? comparison : -comparison;
+    });
+  }, [tasks, sortColumn, order]);
+
   const columns = useMemo(
     () => [
       {
@@ -104,35 +122,73 @@ const TaskList = ({
         key: "checkbox",
         align: "center",
         render: (row) => (
-          <Checkbox
-            checked={selectedRow.includes(row.id)}
-            onChange={() => {
-              setSelectedRow((prev) =>
-                prev.includes(row.id)
-                  ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id],
-              );
-            }}
-          />
+          <div onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={selectedRow.includes(row.id)}
+              onChange={(e) => {
+                e.stopPropagation();
+                setSelectedRow((prev) =>
+                  prev.includes(row.id)
+                    ? prev.filter((id) => id !== row.id)
+                    : [...prev, row.id]
+                );
+              }}
+            />
+          </div>
         ),
       },
       {
         title: (
           <HeaderCellRcTable
-            title={translations["ID"][language]}
+            title={translations["Deadline"][language]}
             order={order}
           />
         ),
-        dataIndex: "id",
-        key: "id",
-        width: 60,
+        dataIndex: "scheduled_time",
+        key: "scheduled_time",
+        width: 180,
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("id");
+            setSortColumn("scheduled_time");
             setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
           },
         }),
+        render: (date) => {
+          const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
+          if (!parsed.isValid()) return "Invalid Date";
+
+          const today = dayjs().startOf("day");
+          const isToday = parsed.isSame(today, "day");
+          const isPast = parsed.isBefore(today);
+
+          const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
+          const fontWeight = isPast || isToday ? 600 : 400;
+
+          return (
+            <span style={{ color, fontWeight }}>
+              {parsed.format("DD.MM.YYYY HH:mm")}
+            </span>
+          );
+        }
+      },
+      {
+        title: translations["Autor"][language],
+        dataIndex: "creator_by_full_name",
+        key: "creator_by_full_name",
+        width: 150,
+        align: "center",
+        render: (_, row) =>
+          row.creator_by_full_name || `ID: ${row.created_by}`,
+      },
+      {
+        title: translations["For"][language],
+        dataIndex: "created_for_full_name",
+        key: "created_for_full_name",
+        width: 150,
+        align: "center",
+        render: (_, row) =>
+          row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: (
@@ -147,10 +203,21 @@ const TaskList = ({
         align: "center",
         onHeaderCell: () => ({
           onClick: () => {
-            setColumn("ticket_id");
+            setSortColumn("ticket_id");
             setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
           },
         }),
+        render: (ticketId) => (
+          <Link
+            to={`/tasks/${ticketId}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Flex justify="center" gap="8" align="center">
+              <FaFingerprint />
+              {ticketId}
+            </Flex>
+          </Link>
+        ),
       },
       {
         title: translations["Tipul Taskului"][language],
@@ -161,53 +228,11 @@ const TaskList = ({
         render: (taskType) => {
           const taskObj = TypeTask.find((task) => task.name === taskType);
           return (
-            <div className="task-type">
-              {taskObj?.icon || "❓"} <span>{taskType}</span>
-            </div>
+            <Tag type="processing" fontSize={16}>
+              {taskObj?.icon || "❓"} {taskType}
+            </Tag>
           );
         },
-      },
-      {
-        title: translations["Prioritate"][language],
-        dataIndex: "priority",
-        key: "priority",
-        width: 120,
-        align: "center",
-        render: (priority) => (
-          <span
-            style={{
-              backgroundColor: priorityColors[priority] || "#ccc",
-              color: "#fff",
-              padding: "4px 8px",
-              borderRadius: "4px",
-            }}
-          >
-            {priority}
-          </span>
-        ),
-      },
-      {
-        title: translations["Etapa Task"][language],
-        dataIndex: "status_task",
-        key: "status_task",
-        width: 120,
-        align: "center",
-      },
-      {
-        title: translations["Creat de"][language],
-        dataIndex: "creator_by_full_name",
-        key: "creator_by_full_name",
-        width: 150,
-        align: "center",
-        render: (_, row) => row.creator_by_full_name || `ID: ${row.created_by}`,
-      },
-      {
-        title: translations["Pentru"][language],
-        dataIndex: "created_for_full_name",
-        key: "created_for_full_name",
-        width: 150,
-        align: "center",
-        render: (_, row) => row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: translations["Descriere"][language],
@@ -217,59 +242,45 @@ const TaskList = ({
         align: "center",
       },
       {
-        title: translations["Deadline"][language],
-        dataIndex: "scheduled_time",
-        key: "scheduled_time",
-        width: 180,
-        align: "center",
-        render: (date) => {
-          const [day, month, year, time] = date.split(/[-\s:]/);
-          const formattedDate = new Date(`${year}-${month}-${day}T${time}:00`);
-          return isNaN(formattedDate.getTime())
-            ? "Invalid Date"
-            : formattedDate.toLocaleString();
-        },
-      },
-      {
         title: translations["Status"][language],
         dataIndex: "status",
         key: "status",
         width: 120,
         align: "center",
         render: (status) => (
-          <span className={status ? "inactiv" : "activ"}>
+          <Tag type={status ? "danger" : "success"}>
             {status
               ? translations["inactiv"][language]
               : translations["activ"][language]}
-          </span>
+          </Tag>
         ),
       },
       {
         title: translations["Acțiune"][language],
         dataIndex: "action",
         key: "action",
-        width: 150,
+        width: 70,
         align: "center",
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <Button variant="default" className="action-button-task">
-                <IoEllipsisHorizontal size={18} />
-              </Button>
+              <div
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Button variant="default" className="action-button-task">
+                  <IoEllipsisHorizontal size={18} />
+                </Button>
+              </div>
             </Menu.Target>
 
-            <Menu.Dropdown>
+            <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
               <Menu.Item
                 leftSection={<IoCheckmarkCircle size={16} />}
                 onClick={() => {
-                  if (!row.status) {
-                    handleMarkTaskAsComplete(row.id);
-                  }
+                  if (!row.status) handleMarkTaskAsComplete(row.id);
                 }}
                 disabled={row.status}
-                style={
-                  row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}
-                }
+                style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
               >
                 {translations["Finalizați"][language]}
               </Menu.Item>
@@ -293,7 +304,7 @@ const TaskList = ({
         ),
       },
     ],
-    [language, userList, handleMarkAsSeenTask, order, selectedRow, openMenuId],
+    [language, userList, handleMarkAsSeenTask, order, sortColumn, selectedRow, openMenuId]
   );
 
   return (
@@ -301,10 +312,13 @@ const TaskList = ({
       <RcTable
         rowKey={({ id }) => id}
         columns={columns}
-        data={tasks}
+        data={sortedTasks}
         selectedRow={selectedRow}
         loading={loading}
         bordered
+        onRow={(record) => ({
+          onClick: () => openEditTask(record),
+        })}
       />
     </div>
   );

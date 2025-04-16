@@ -3,7 +3,6 @@ export const categories = [
     "CHAT",
     "LEAD",
     "DASHBOARD",
-    "ACCOUNT",
     "NOTIFI",
     "TASK",
     "CALENDAR",
