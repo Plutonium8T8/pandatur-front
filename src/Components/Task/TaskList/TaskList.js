@@ -260,7 +260,7 @@ const TaskList = ({
         title: translations["Acțiune"][language],
         dataIndex: "action",
         key: "action",
-        width: 150,
+        width: 70,
         align: "center",
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">

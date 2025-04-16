@@ -212,11 +212,11 @@ const TaskModal = ({
           <Grid>
             <Grid.Col span={6}>
               <MantineSelect
-                label={translations["De la utilizatorul"][language]}
+                label={translations["Autor"][language]}
                 data={userList}
                 value={task.createdBy}
                 onChange={(value) => setTask((prev) => ({ ...prev, createdBy: value }))}
-                placeholder={translations["De la utilizatorul"][language]}
+                placeholder={translations["Autor"][language]}
                 required
                 searchable
                 disabled={!!defaultCreatedBy}
