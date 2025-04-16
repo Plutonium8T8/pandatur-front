@@ -2047,4 +2047,8 @@ export const translations = {
     RO: "A apărut o eroare la încărcarea mesajelor",
     RU: "Произошла ошибка при загрузке сообщений",
   },
+  somethingWentWrong: {
+    RO: "Ceva nu a funcționat bine",
+    RU: "Что-то работает неправильно",
+  },
 };
