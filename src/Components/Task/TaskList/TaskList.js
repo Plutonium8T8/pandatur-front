@@ -229,9 +229,9 @@ const TaskList = ({
         render: (taskType) => {
           const taskObj = TypeTask.find((task) => task.name === taskType);
           return (
-            <div className="task-type">
-              {taskObj?.icon || "❓"} <span>{taskType}</span>
-            </div>
+            <Tag type="processing" fontSize={16}>
+              {taskObj?.icon || "❓"} {taskType}
+            </Tag>
           );
         },
       },
