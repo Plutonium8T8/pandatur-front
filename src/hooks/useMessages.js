@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { useUser } from "../hooks";
-import { parseDate } from "../Components/utils";
+import { parseDate, showServerError } from "../Components/utils";
 
 export const useMessages = () => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastMessage, setLastMessage] = useState();
@@ -32,7 +35,7 @@ export const useMessages = () => {
         setLastMessage(lastMessage[0]);
       }
     } catch (error) {
-      console.error("error request messages:", error.message);
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
       setLoading(false);
     }
