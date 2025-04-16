@@ -52,7 +52,7 @@ const SingleChat = ({ ticketId, onClose }) => {
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
-    if (ticketId && !messages?.list.length) {
+    if (ticketId) {
       messages.getUserMessages(Number(ticketId));
     }
   }, [ticketId]);
