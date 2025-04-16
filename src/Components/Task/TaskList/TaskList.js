@@ -9,16 +9,15 @@ import { api } from "../../../api";
 import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
+import { useConfirmPopup } from "../../../hooks";
+import dayjs from "dayjs";
 import "./TaskList.css";
-
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
   IoTrash,
   IoPencil,
 } from "react-icons/io5";
-import { useConfirmPopup } from "../../../hooks";
-import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
