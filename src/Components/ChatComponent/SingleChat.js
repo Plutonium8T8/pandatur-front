@@ -52,6 +52,12 @@ const SingleChat = ({ ticketId, onClose }) => {
   }, [tickets, selectTicketId]);
 
   useEffect(() => {
+    if (ticketId && !messages?.list.length) {
+      messages.getUserMessages(Number(ticketId));
+    }
+  }, [ticketId]);
+
+  useEffect(() => {
     const { lastMessage } = messages;
     if (lastMessage) {
       const { platform, client_id } = lastMessage;
