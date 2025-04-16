@@ -3,12 +3,14 @@ import { RcTable, HeaderCellRcTable } from "../../RcTable";
 import { FaFingerprint } from "react-icons/fa6";
 import { Checkbox } from "../../Checkbox";
 import { translations } from "../../utils/translations";
-import "./TaskList.css";
 import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
 import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
+import { Tag } from "../../Tag";
+import "./TaskList.css";
+
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -247,11 +249,11 @@ const TaskList = ({
         width: 120,
         align: "center",
         render: (status) => (
-          <span className={status ? "inactiv" : "activ"}>
+          <Tag type={status ? "danger" : "success"}>
             {status
               ? translations["inactiv"][language]
               : translations["activ"][language]}
-          </span>
+          </Tag>
         ),
       },
       {
