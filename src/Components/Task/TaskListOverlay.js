@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Drawer, Button } from "@mantine/core";
-import TaskComponent from "./Page/TaskComponent";
+import TaskComponent from "./TaskComponent";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 

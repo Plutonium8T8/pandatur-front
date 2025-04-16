@@ -3,7 +3,7 @@ import Leads from "./Components/LeadsComponent/LeadsComponent";
 import ChatComponent from "./Components/ChatComponent/ChatComponent";
 import LoginForm from "./Components/LoginComponent/LoginForm";
 import UsersComponent from "./Components/UsersComponent/UsersComponent";
-import TaskPage from "./Components/Task/TaskPage";
+import TaskPage from "./Components/Task/Page/TaskPage";
 import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
 import { Logs } from "./pages";

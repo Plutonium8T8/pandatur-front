@@ -8,12 +8,12 @@ import {
   Tooltip,
 } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import { api } from "../../../api";
-import { translations } from "../../utils/translations";
-import TaskModal from "../TaskModal";
-import TaskList from "../TaskList/TaskList";
-import TaskColumnsView from "../TaskColumnsView";
-import { PageHeader } from "../../PageHeader";
+import { api } from "../../api";
+import { translations } from "../utils/translations";
+import TaskModal from "./TaskModal";
+import TaskList from "./TaskList/TaskList";
+import TaskColumnsView from "./TaskColumnsView";
+import { PageHeader } from "../PageHeader";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { FaList } from "react-icons/fa6";
 

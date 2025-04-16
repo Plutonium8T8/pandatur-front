@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import {
-  Modal,
   Textarea,
   Button,
   Select as MantineSelect,
@@ -8,7 +7,7 @@ import {
   Stack,
   Grid,
 } from "@mantine/core";
-import { DateTimePicker } from "@mantine/dates";
+import DateQuickInput from "./DateQuickPicker";
 import { useSnackbar } from "notistack";
 import { api } from "../../api";
 import IconSelect from "../IconSelect/IconSelect";
@@ -16,7 +15,6 @@ import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { parseDate, formatDate } from "../utils/date";
 import { useGetTechniciansList, useUser } from "../../hooks";
-import dayjs from "dayjs";
 import { MantineModal } from "../MantineModal";
 
 const language = localStorage.getItem("language") || "RO";
@@ -36,7 +34,6 @@ const TaskModal = ({
   const [loading, setLoading] = useState(false);
   const { technicians: userList } = useGetTechniciansList();
   const { userId } = useUser();
-  const now = dayjs();
 
   useEffect(() => {
     if (!isOpen) return;
@@ -45,23 +42,21 @@ const TaskModal = ({
 
     if (selectedTask) {
       setTask({
-        ticketId: selectedTask.ticket_id.toString(),
-        scheduledTime: selectedTask.scheduled_time || "",
+        ticketId: selectedTask.ticket_id?.toString() || "",
         description: selectedTask.description || "",
         taskType: selectedTask.task_type || "",
-        createdBy: selectedTask.created_by.toString(),
-        createdFor: selectedTask.created_for?.toString() || ""
+        createdBy: selectedTask.created_by?.toString() || "",
+        createdFor: selectedTask.created_for?.toString() || "",
       });
 
       setScheduledTime(parseDate(selectedTask.scheduled_time));
     } else {
       setTask({
         ticketId: defaultTicketId?.toString() || "",
-        scheduledTime: "",
         description: "",
         taskType: "",
         createdBy: userId?.toString() || "",
-        createdFor: ""
+        createdFor: "",
       });
 
       setScheduledTime(null);
@@ -71,11 +66,10 @@ const TaskModal = ({
   const handleClose = () => {
     setTask({
       ticketId: "",
-      scheduledTime: "",
       description: "",
       taskType: "",
       createdBy: "",
-      createdFor: ""
+      createdFor: "",
     });
     setScheduledTime(null);
     onClose();
@@ -117,7 +111,7 @@ const TaskModal = ({
         created_by: task.createdBy,
         created_for: task.createdFor,
         priority: "",
-        status_task: ""
+        status_task: "",
       };
 
       if (selectedTask) {
@@ -137,10 +131,6 @@ const TaskModal = ({
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleQuickSelect = (offsetDays) => {
-    setScheduledTime(now.add(offsetDays, "day").set("hour", 12).set("minute", 0).toDate());
   };
 
   return (
@@ -176,33 +166,13 @@ const TaskModal = ({
             placeholder={translations["Alege tip task"][language]}
           />
 
-          <DateTimePicker
-            label={translations["Deadline"][language]}
-            value={scheduledTime}
-            onChange={setScheduledTime}
-            placeholder={translations["Deadline"][language]}
-            minDate={new Date()}
-            required
-            clearable
-          />
-
-          <Group spacing="xl" mb="xs">
-            <Button size="xs" variant="light" onClick={() => handleQuickSelect(0)}>
-              {translations["today"][language]}
-            </Button>
-            <Button size="xs" variant="light" onClick={() => handleQuickSelect(1)}>
-              {translations["tomorrow"][language]}
-            </Button>
-            <Button size="xs" variant="light" onClick={() => handleQuickSelect(7)}>
-              {translations["inAWeek"][language]}
-            </Button>
-          </Group>
+          <DateQuickInput value={scheduledTime} onChange={setScheduledTime} />
 
           <Textarea
             label={translations["Descriere task"][language]}
             name="description"
             value={task.description}
-            onChange={(e) => setTask({ ...task, description: e.target.value })}
+            onChange={(e) => setTask((prev) => ({ ...prev, description: e.target.value }))}
             placeholder={translations["Descriere task"][language]}
             autosize
             minRows={3}
@@ -228,7 +198,7 @@ const TaskModal = ({
                 label={translations["For"][language]}
                 data={userList}
                 value={task.createdFor}
-                onChange={(value) => setTask({ ...task, createdFor: value })}
+                onChange={(value) => setTask((prev) => ({ ...prev, createdFor: value }))}
                 placeholder={translations["For"][language]}
                 required
                 searchable
@@ -248,7 +218,7 @@ const TaskModal = ({
           </Group>
         </Stack>
       </form>
-    </MantineModal >
+    </MantineModal>
   );
 };
 
