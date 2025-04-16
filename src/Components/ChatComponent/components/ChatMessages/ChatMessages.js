@@ -5,8 +5,6 @@ import dayjs from "dayjs";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
-import { getLanguageByKey, showServerError } from "../../../utils";
-import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
 import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
