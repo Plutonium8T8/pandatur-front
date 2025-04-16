@@ -92,13 +92,13 @@ const DateQuickInput = ({ value, onChange }) => {
 
                     <Stack gap="xs">
                         <TextInput
-                            label="Data"
+                            label={translations["Date"][language]}
                             value={date}
                             onChange={(e) => setDate(e.currentTarget.value)}
                             placeholder="dd.mm.yyyy"
                         />
                         <TimeInput
-                            label="Ora"
+                            label={translations["Hour"][language]}
                             value={time}
                             onChange={(e) => setTime(e.currentTarget.value)}
                         />

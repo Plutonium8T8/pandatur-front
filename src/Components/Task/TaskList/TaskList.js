@@ -269,7 +269,8 @@ const TaskList = ({
               >
                 <Button variant="default" className="action-button-task">
                   <IoEllipsisHorizontal size={18} />
-                </Button>              </div>
+                </Button>
+              </div>
             </Menu.Target>
 
             <Menu.Dropdown onClick={(e) => e.stopPropagation()}>

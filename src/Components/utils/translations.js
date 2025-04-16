@@ -2083,21 +2083,9 @@ export const translations = {
     RO: "Peste o oră",
     RU: "Через час"
   },
-  today: {
-    RO: "Astăzi",
-    RU: "Сегодня"
-  },
-  tomorrow: {
-    RO: "Mâine",
-    RU: "Завтра"
-  },
   thisWeek: {
     RO: "Săptămâna aceasta",
     RU: "На этой неделе"
-  },
-  inAWeek: {
-    RO: "Peste o săptămână",
-    RU: "Через неделю"
   },
   in30Days: {
     RO: "Peste 30 de zile",
@@ -2106,5 +2094,13 @@ export const translations = {
   in1Year: {
     RO: "Peste un an",
     RU: "Через год"
-  }
+  },
+  Date: {
+    RO: "Data",
+    RU: "Дата"
+  },
+  Hour: {
+    RO: "Ora",
+    RU: "Часы"
+  },
 };
