@@ -124,6 +124,42 @@ export const ChatMessages = ({
     };
   }, []);
 
+  const renderMessagesContent = () => {
+    if (messages.error) {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Text size="lg" c="red">
+            {getLanguageByKey("loadMessagesError")}
+          </Text>
+        </Flex>
+      );
+    }
+    if (messages.loading) {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Spin />
+        </Flex>
+      );
+    }
+
+    if (selectTicketId) {
+      return (
+        <GroupedMessages
+          personalInfo={personalInfo}
+          selectTicketId={selectTicketId}
+        />
+      );
+    } else {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Text size="lg" c="dimmed">
+            {getLanguageByKey("Alege lead")}
+          </Text>
+        </Flex>
+      );
+    }
+  };
+
   return (
     <Flex w="100%" direction="column" className="chat-area">
       <Flex
@@ -133,22 +169,7 @@ export const ChatMessages = ({
         className="chat-messages"
         ref={messageContainerRef}
       >
-        {messages.loading ? (
-          <Flex h="100%" align="center" justify="center">
-            <Spin />
-          </Flex>
-        ) : selectTicketId ? (
-          <GroupedMessages
-            personalInfo={personalInfo}
-            selectTicketId={selectTicketId}
-          />
-        ) : (
-          <Flex h="100%" align="center" justify="center">
-            <Text size="lg" c="dimmed">
-              {getLanguageByKey("Alege lead")}
-            </Text>
-          </Flex>
-        )}
+        {renderMessagesContent()}
       </Flex>
 
       {selectTicketId && !messages.loading && (
