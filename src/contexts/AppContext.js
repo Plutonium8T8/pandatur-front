@@ -39,6 +39,7 @@ export const AppProvider = ({ children }) => {
   const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
+  const [ticketError, setTicketError] = useState("");
   const { storage, changeLocalStorage } = useLocalStorage(
     SIDEBAR_COLLAPSE,
     "false",
@@ -151,6 +152,7 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page) => {
     try {
+      setTicketError(false);
       const data = await api.tickets.getLightList({ page: page });
 
       if (page >= data.total_pages) {
@@ -172,6 +174,8 @@ export const AppProvider = ({ children }) => {
 
       getTicketsListRecursively(page + 1);
     } catch (error) {
+      setSpinnerTickets(false);
+      setTicketError(true);
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
@@ -334,6 +338,7 @@ export const AppProvider = ({ children }) => {
         spinnerTickets,
         setIsCollapsed: collapsed,
         isCollapsed: storage === "true",
+        ticketError,
       }}
     >
       {children}
