@@ -2119,4 +2119,8 @@ export const translations = {
     RO: "Selectează toate",
     RU: "Выбрать все",
   },
+  "AddResult": {
+    RO: "Adaugă rezultat",
+    RU: "Введите результат",
+  }
 };

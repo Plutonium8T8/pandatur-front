@@ -49,6 +49,7 @@ const TaskListOverlay = ({ ticketId }) => {
           description: t.description || "",
           scheduled_time: parseDate(t.scheduled_time),
           created_for: t.created_for?.toString(),
+          created_by: t.created_by?.toString() || "",
         };
       });
       setTaskEdits(edits);
@@ -152,7 +153,7 @@ const TaskListOverlay = ({ ticketId }) => {
         <Divider my="sm" />
         <TextInput
           label={translations["Descriere task"][language]}
-          placeholder={translations["Adaugă rezultat"]?.[language] || "Add result"}
+          placeholder={translations["AddResult"][language]}
           value={taskEdits[id]?.description || ""}
           onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
           mb="xs"
