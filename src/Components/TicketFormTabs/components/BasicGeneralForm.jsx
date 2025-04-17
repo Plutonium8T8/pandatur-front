@@ -34,6 +34,14 @@ export const BasicGeneralForm = ({
     },
   });
 
+  form.watch("workflow", ({ value }) => {
+    if (value.includes(getLanguageByKey("selectAll"))) {
+      form.setFieldValue("workflow", workflowOptions);
+    } else {
+      form.setFieldValue("workflow", value);
+    }
+  });
+
   useEffect(() => {
     if (data) {
       form.setValues({
@@ -57,7 +65,7 @@ export const BasicGeneralForm = ({
         <MultiSelect
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={workflowOptions}
+          data={[getLanguageByKey("selectAll"), ...workflowOptions]}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
