@@ -17,7 +17,6 @@ import {
 import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa6";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
-import dayjs from "dayjs";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
 import DateQuickInput from "./DateQuickPicker";
