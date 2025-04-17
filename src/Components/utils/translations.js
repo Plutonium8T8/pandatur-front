@@ -1322,7 +1322,7 @@ export const translations = {
     RO: "Descriere task",
     RU: "Описание задачи",
   },
-  For: {
+  Responsabil: {
     RO: "Responsabil",
     RU: "Ответственный",
   },

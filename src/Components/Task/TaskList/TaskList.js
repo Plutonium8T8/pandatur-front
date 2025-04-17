@@ -182,7 +182,7 @@ const TaskList = ({
           row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
-        title: translations["For"][language],
+        title: translations["Responsabil"][language],
         dataIndex: "created_for_full_name",
         key: "created_for_full_name",
         width: 150,

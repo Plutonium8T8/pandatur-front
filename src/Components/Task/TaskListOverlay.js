@@ -19,6 +19,10 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import dayjs from "dayjs";
 import { TypeTask } from "./OptionsTaskType";
+import { formatDate, parseDate } from "../utils/date";
+import DateQuickInput from "./DateQuickPicker";
+import { useGetTechniciansList } from "../../hooks";
+import IconSelect from "../IconSelect/IconSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -27,6 +31,8 @@ const TaskListOverlay = ({ ticketId }) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
+  const [editingDeadlineId, setEditingDeadlineId] = useState(null);
+  const { technicians: users } = useGetTechniciansList();
 
   const fetchTasks = async () => {
     try {
@@ -34,12 +40,14 @@ const TaskListOverlay = ({ ticketId }) => {
       const res = await api.task.getTaskByTicket(ticketId);
       const taskArray = Array.isArray(res?.data) ? res.data : res;
       setTasks(taskArray);
-      // Инициализируем локальное состояние редактирования
+
       const edits = {};
       taskArray.forEach((t) => {
         edits[t.id] = {
           task_type: t.task_type,
           description: t.description || "",
+          scheduled_time: parseDate(t.scheduled_time),
+          created_for: t.created_for?.toString(),
         };
       });
       setTaskEdits(edits);
@@ -70,8 +78,10 @@ const TaskListOverlay = ({ ticketId }) => {
       await api.task.update({
         id: taskId,
         ...changes,
+        scheduled_time: formatDate(changes.scheduled_time),
       });
       fetchTasks();
+      setEditingDeadlineId(null);
     } catch (error) {
       console.error("Error updating task", error);
     }
@@ -103,7 +113,6 @@ const TaskListOverlay = ({ ticketId }) => {
           <Stack spacing="xs">
             {tasks.map((task) => {
               const isOpen = expandedCard === task.id;
-              const scheduled = dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").format("DD.MM.YYYY");
 
               return (
                 <Card key={task.id} withBorder radius="md" shadow="xs" p="sm">
@@ -118,7 +127,8 @@ const TaskListOverlay = ({ ticketId }) => {
                       </Group>
                       <Group gap="xs">
                         <Text size="sm" c="dimmed">
-                          {scheduled} • {task.created_for_full_name}
+                          {dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").format("DD.MM.YYYY")} •{" "}
+                          {task.created_for_full_name}
                         </Text>
                         {isOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
                       </Group>
@@ -127,6 +137,7 @@ const TaskListOverlay = ({ ticketId }) => {
 
                   <Collapse in={isOpen}>
                     <Divider my="sm" />
+
                     <TextInput
                       placeholder={translations["Adaugă rezultat"]?.[language] || "Add result"}
                       value={taskEdits[task.id]?.description || ""}
@@ -134,15 +145,39 @@ const TaskListOverlay = ({ ticketId }) => {
                         updateTaskField(task.id, "description", e.currentTarget.value)
                       }
                       mb="xs"
+                      label={translations["Descriere task"][language]}
                     />
-                    <Group gap="xs">
-                      <Select
-                        data={TypeTask.map((t) => ({ label: t.name, value: t.name }))}
+
+                    <Group gap="xs" align="end">
+                      <IconSelect
+                        options={TypeTask}
                         value={taskEdits[task.id]?.task_type}
                         onChange={(value) => updateTaskField(task.id, "task_type", value)}
-                        w={150}
+                        label={translations["Alege tip task"][language]}
+                        placeholder={translations["Alege tip task"][language]}
                       />
-                      <Button variant="light" size="xs" onClick={() => handleUpdateTask(task.id)}>
+
+                      <DateQuickInput
+                        value={taskEdits[task.id]?.scheduled_time}
+                        onChange={(value) =>
+                          updateTaskField(task.id, "scheduled_time", value)
+                        }
+                      />
+
+                      <Select
+                        data={users.map((u) => ({ label: u.label, value: u.value }))}
+                        value={taskEdits[task.id]?.created_for}
+                        onChange={(value) => updateTaskField(task.id, "created_for", value)}
+                        w={180}
+                        placeholder={translations["Responsabil"][language]}
+                        label={translations["Responsabil"][language]}
+                      />
+
+                      <Button
+                        variant="light"
+                        size="s"
+                        onClick={() => handleUpdateTask(task.id)}
+                      >
                         {translations["Save"]?.[language] || "Save"}
                       </Button>
                     </Group>

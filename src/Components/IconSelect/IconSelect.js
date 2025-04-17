@@ -12,7 +12,7 @@ const IconSelect = ({
   const selected = options.find((item) => item.name === value);
 
   return (
-    <div style={{ position: "relative", width: 300}}>
+    <div style={{ position: "relative", width: 250 }}>
       {label && (
         <label
           style={{
@@ -21,8 +21,7 @@ const IconSelect = ({
             wordBreak: "break-word",
             cursor: "default",
             WebkitTapHighlightColor: "transparent",
-            fontSize: "var(--input-label-size, var(--mantine-font-size-sm))",
-            marginBottom: 6,
+            fontSize: "var(--input-label-size, var(--mantine-font-size-sm))"
           }}
         >
           {label}
@@ -35,9 +34,9 @@ const IconSelect = ({
       <div
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          border: "1px solid #ccc",
+          border: "1px solid #ced4da",
           padding: "5px 12px",
-          borderRadius: 6,
+          borderRadius: "0.25rem",
           background: "#fff",
           cursor: "pointer",
           display: "flex",
@@ -70,7 +69,6 @@ const IconSelect = ({
             zIndex: 10,
             maxHeight: 250,
             overflowY: "auto",
-            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
           }}
         >
           {options.map((item) => (
