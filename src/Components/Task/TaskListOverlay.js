@@ -51,7 +51,8 @@ const TaskListOverlay = ({ ticketId }) => {
     if (!ticketId) return setTasks([]);
     try {
       const res = await api.task.getTaskByTicket(ticketId);
-      const taskArray = Array.isArray(res?.data) ? res.data : res;
+      const taskArray = (Array.isArray(res?.data) ? res.data : res).filter(t => !t.status);
+
       setTasks(taskArray);
       const edits = {};
       taskArray.forEach((t) => {
