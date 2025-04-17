@@ -2119,4 +2119,8 @@ export const translations = {
     RO: "Selectează toate",
     RU: "Выбрать все",
   },
+  call: {
+    RO: "Apel",
+    RU: "Звонок",
+  },
 };

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
 import { IoIosVideocam } from "react-icons/io";
+import { IoCall } from "react-icons/io5";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
@@ -59,6 +60,14 @@ const MESSAGE_INDICATOR = {
       <FiLink2 />
       <Text h="20px" size="sm">
         {getLanguageByKey("link")}
+      </Text>
+    </Flex>
+  ),
+  [MEDIA_TYPE.CALL]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <IoCall />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("call")}
       </Text>
     </Flex>
   ),

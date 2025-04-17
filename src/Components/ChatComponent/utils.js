@@ -9,7 +9,8 @@ export const MEDIA_TYPE = {
   VIDEO: "video",
   AUDIO: "audio",
   FILE: "file",
-  URL: "url"
+  URL: "url",
+  CALL: "call",
 };
 
 export const getMediaType = (mimeType) => {
@@ -65,6 +66,14 @@ export const renderContent = (msg) => {
       );
     case MEDIA_TYPE.FILE:
       return renderFile(msg.message);
+
+    case MEDIA_TYPE.CALL:
+      return (
+        <audio controls>
+          <source src={msg.message} type="audio/ogg" />
+          {getLanguageByKey("Acest browser nu suporta audio")}
+        </audio>
+      );
     default:
       const { message } = msg;
 
