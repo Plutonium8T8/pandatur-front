@@ -7,11 +7,12 @@ const IconSelect = ({
   label = "Select",
   placeholder = "Alege opțiune",
   required = false,
+  disabled = false,
 }) => {
   const selected = options.find((item) => item.name === value);
 
   return (
-    <div style={{ width: 250 }}>
+    <div style={{ width: 250, opacity: disabled ? 0.6 : 1, pointerEvents: disabled ? "none" : "auto" }}>
       {label && (
         <label
           style={{
@@ -39,6 +40,7 @@ const IconSelect = ({
         currentValue={value}
         onChange={onChange}
         width={250}
+        disabled={disabled}
         renderTriggerButton={(toggleDropdown) => (
           <div
             onClick={toggleDropdown}

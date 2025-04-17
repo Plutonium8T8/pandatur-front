@@ -2122,5 +2122,9 @@ export const translations = {
   "AddResult": {
     RO: "Adaugă rezultat",
     RU: "Введите результат",
+  },
+  "Save": {
+    RO: "Salveazǎ",
+    RU: "Сохранить",
   }
 };

@@ -14,7 +14,7 @@ import {
   Select,
   ActionIcon,
 } from "@mantine/core";
-import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa6";
+import { FaChevronDown, FaChevronUp, FaPlus, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
@@ -31,6 +31,7 @@ const TaskListOverlay = ({ ticketId }) => {
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
   const [creatingTask, setCreatingTask] = useState(false);
+  const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
   const { userId } = useUser();
 
@@ -40,7 +41,6 @@ const TaskListOverlay = ({ ticketId }) => {
       const res = await api.task.getTaskByTicket(ticketId);
       const taskArray = Array.isArray(res?.data) ? res.data : res;
       setTasks(taskArray);
-
       const edits = {};
       taskArray.forEach((t) => {
         edits[t.id] = {
@@ -75,16 +75,13 @@ const TaskListOverlay = ({ ticketId }) => {
   const handleUpdateTask = async (taskId) => {
     const changes = taskEdits[taskId];
     if (!changes) return;
-    try {
-      await api.task.update({
-        id: taskId,
-        ...changes,
-        scheduled_time: formatDate(changes.scheduled_time),
-      });
-      fetchTasks();
-    } catch (error) {
-      console.error("Error updating task", error);
-    }
+    await api.task.update({
+      id: taskId,
+      ...changes,
+      scheduled_time: formatDate(changes.scheduled_time),
+    });
+    setEditMode((prev) => ({ ...prev, [taskId]: false }));
+    fetchTasks();
   };
 
   const handleStartCreatingTask = () => {
@@ -105,106 +102,151 @@ const TaskListOverlay = ({ ticketId }) => {
     const newTask = taskEdits["new"];
     if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) return;
 
-    try {
-      await api.task.create({
-        ...newTask,
-        scheduled_time: formatDate(newTask.scheduled_time),
-        ticket_id: ticketId,
-        priority: "",
-        status_task: "",
-      });
-      setCreatingTask(false);
-      fetchTasks();
-    } catch (error) {
-      console.error("Error creating task", error);
-    }
+    await api.task.create({
+      ...newTask,
+      scheduled_time: formatDate(newTask.scheduled_time),
+      ticket_id: ticketId,
+      priority: "",
+      status_task: "",
+    });
+    setCreatingTask(false);
+    fetchTasks();
   };
 
+  const handleDeleteTask = async (id) => {
+    await api.task.delete({ id });
+    fetchTasks();
+  };
+  
   const getTaskIcon = (type) => {
     const match = TypeTask.find((t) => t.name === type);
     return match?.icon || null;
   };
 
-  const renderTaskForm = (id, isNew = false) => (
-    <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
-      {!isNew && (
-        <Box
-          onClick={() => setExpandedCard(expandedCard === id ? null : id)}
-          style={{ cursor: "pointer" }}
-        >
-          <Group justify="space-between" align="center">
-            <Group gap="xs">
-              {getTaskIcon(taskEdits[id]?.task_type)}
-              <Text fw={500}>{taskEdits[id]?.task_type}</Text>
-            </Group>
-            <Group gap="xs">
-              <Text size="sm" c="dimmed">
-                {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
-                {tasks.find((t) => t.id === id)?.created_for_full_name}
-              </Text>
-              {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
-            </Group>
-          </Group>
-        </Box>
-      )}
+  const handleMarkDone = async (id) => {
+    await api.task.update({ id, status: true });
+    fetchTasks();
+  };
 
-      <Collapse in={isNew || expandedCard === id}>
-        <Divider my="sm" />
-        <TextInput
-          label={translations["Descriere task"][language]}
-          placeholder={translations["AddResult"][language]}
-          value={taskEdits[id]?.description || ""}
-          onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
-          mb="xs"
-        />
-        <Group gap="xs" align="end">
-          <IconSelect
-            options={TypeTask}
-            value={taskEdits[id]?.task_type}
-            onChange={(value) => updateTaskField(id, "task_type", value)}
-            label={translations["Alege tip task"][language]}
+  const renderTaskForm = (id, isNew = false) => {
+    const isEditing = isNew || editMode[id];
+    return (
+      <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
+        {!isNew && (
+          <Box
+            onClick={() => setExpandedCard(expandedCard === id ? null : id)}
+            style={{ cursor: "pointer" }}
+          >
+            <Group justify="space-between" align="center">
+              <Group gap="xs">
+                {getTaskIcon(taskEdits[id]?.task_type)}
+                <Text fw={500}>{taskEdits[id]?.task_type}</Text>
+              </Group>
+              <Group gap="xs">
+                <Text size="sm" c="dimmed">
+                  {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
+                  {tasks.find((t) => t.id === id)?.created_for_full_name}
+                </Text>
+                {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
+              </Group>
+            </Group>
+          </Box>
+        )}
+
+        <Collapse in={isNew || expandedCard === id}>
+          <Divider my="sm" />
+
+          <Group gap="xs" align="end">
+            <IconSelect
+              options={TypeTask}
+              value={taskEdits[id]?.task_type}
+              onChange={(value) => updateTaskField(id, "task_type", value)}
+              label={translations["Alege tip task"][language]}
+              disabled={!isEditing}
+            />
+            <DateQuickInput
+              value={taskEdits[id]?.scheduled_time}
+              onChange={(value) => updateTaskField(id, "scheduled_time", value)}
+              disabled={!isEditing}
+            />
+            <Select
+              data={users}
+              value={taskEdits[id]?.created_by}
+              onChange={(value) => updateTaskField(id, "created_by", value)}
+              w={180}
+              label={translations["Autor"][language]}
+              disabled={!isEditing}
+            />
+            <Select
+              data={users}
+              value={taskEdits[id]?.created_for}
+              onChange={(value) => updateTaskField(id, "created_for", value)}
+              w={180}
+              label={translations["Responsabil"][language]}
+              disabled={!isEditing}
+            />
+
+            {isNew ? (
+              <>
+                <Button size="xs" onClick={handleCreateTask}>
+                  {translations["Adaugă task"][language]}
+                </Button>
+                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)}>
+                  {translations["Anulare"][language]}
+                </Button>
+              </>
+            ) : isEditing ? (
+              <>
+                <Button size="xs" onClick={() => handleUpdateTask(id)} variant="filled">
+                  {translations["Save"][language]}
+                </Button>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="gray"
+                  onClick={() => setEditMode((prev) => ({ ...prev, [id]: false }))}
+                >
+                  {translations["Anulare"][language]}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="xs" onClick={() => handleMarkDone(id)} leftSection={<FaCheck />}>
+                  {translations["Done"][language]}
+                </Button>
+                <Button
+                  size="xs"
+                  variant="light"
+                  onClick={() => setEditMode((prev) => ({ ...prev, [id]: true }))}
+                  leftSection={<FaPencil />}
+                >
+                  {translations["Editare Task"][language]}
+                </Button>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="red"
+                  onClick={() => handleDeleteTask(id)}
+                  leftSection={<FaTrash />}
+                >
+                  {translations["Șterge"][language]}
+                </Button>
+              </>
+            )}
+          </Group>
+
+          <TextInput
+            label={translations["Descriere task"][language]}
+            placeholder={translations["AddResult"][language]}
+            value={taskEdits[id]?.description || ""}
+            onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
+            mb="xs"
           />
-          <DateQuickInput
-            value={taskEdits[id]?.scheduled_time}
-            onChange={(value) => updateTaskField(id, "scheduled_time", value)}
-          />
-          <Select
-            data={users.map((u) => ({ label: u.label, value: u.value }))}
-            value={taskEdits[id]?.created_by}
-            onChange={(value) => updateTaskField(id, "created_by", value)}
-            w={180}
-            label={translations["Autor"][language]}
-          />
-          <Select
-            data={users.map((u) => ({ label: u.label, value: u.value }))}
-            value={taskEdits[id]?.created_for}
-            onChange={(value) => updateTaskField(id, "created_for", value)}
-            w={180}
-            label={translations["Responsabil"][language]}
-          />
-          {isNew ? (
-            <>
-              <Button size="xs" onClick={handleCreateTask} variant="filled">
-                {translations["Adaugă task"]?.[language] || "Adaugă"}
-              </Button>
-              <Button
-                size="xs"
-                variant="subtle"
-                color="gray"
-                onClick={() => setCreatingTask(false)}
-              >
-                {translations["Anulare"]?.[language] || "Cancel"}
-              </Button>
-            </>
-          ) : (
-            <Button size="xs" onClick={() => handleUpdateTask(id)} variant="light">
-              {translations["Save"]?.[language] || "Save"}
-            </Button>
-          )}
-        </Group>
-      </Collapse>
-    </Card>
-  );
+
+        </Collapse>
+      </Card>
+    );
+  };
 
   return (
     <Box pos="relative" p="xs" w="100%">
@@ -212,11 +254,9 @@ const TaskListOverlay = ({ ticketId }) => {
         <Group justify="space-between" mb="sm">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color="green">
-              {tasks.length}
-            </Badge>
+            <Badge size="sm" color="green">{tasks.length}</Badge>
           </Group>
-          <ActionIcon variant="light" onClick={() => setListCollapsed((prev) => !prev)}>
+          <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
             {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
           </ActionIcon>
         </Group>
@@ -224,18 +264,16 @@ const TaskListOverlay = ({ ticketId }) => {
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs">
             {tasks.map((task) => renderTaskForm(task.id))}
-            {creatingTask
-              ? renderTaskForm("new", true)
-              : (
-                <Button
-                  leftSection={<FaPlus size={12} />}
-                  variant="light"
-                  size="xs"
-                  onClick={handleStartCreatingTask}
-                >
-                  {translations["New Task"]?.[language] || "New Task"}
-                </Button>
-              )}
+            {creatingTask ? renderTaskForm("new", true) : (
+              <Button
+                leftSection={<FaPlus size={12} />}
+                variant="light"
+                size="xs"
+                onClick={handleStartCreatingTask}
+              >
+                {translations["New Task"][language]}
+              </Button>
+            )}
           </Stack>
         </Collapse>
       </Paper>
