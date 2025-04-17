@@ -14,7 +14,7 @@ import {
   Select,
   ActionIcon,
 } from "@mantine/core";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { FaChevronDown, FaChevronUp, FaPlus } from "react-icons/fa6";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import dayjs from "dayjs";
@@ -32,6 +32,7 @@ const TaskListOverlay = ({ ticketId }) => {
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
   const [editingDeadlineId, setEditingDeadlineId] = useState(null);
+  const [creatingTask, setCreatingTask] = useState(false);
   const { technicians: users } = useGetTechniciansList();
 
   const fetchTasks = async () => {
@@ -87,12 +88,29 @@ const TaskListOverlay = ({ ticketId }) => {
     }
   };
 
+  const handleCreateTask = async () => {
+    const newTask = taskEdits["new"];
+    if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time) return;
+
+    try {
+      await api.task.create({
+        ...newTask,
+        scheduled_time: formatDate(newTask.scheduled_time),
+        ticket_id: ticketId,
+        priority: "",
+        status_task: "",
+      });
+      setCreatingTask(false);
+      fetchTasks();
+    } catch (error) {
+      console.error("Error creating task", error);
+    }
+  };
+
   const getTaskIcon = (type) => {
     const match = TypeTask.find((t) => t.name === type);
     return match?.icon || null;
   };
-
-  if (tasks.length === 0) return null;
 
   return (
     <Box pos="relative" p="xs" w="100%">
@@ -137,7 +155,6 @@ const TaskListOverlay = ({ ticketId }) => {
 
                   <Collapse in={isOpen}>
                     <Divider my="sm" />
-
                     <TextInput
                       placeholder={translations["Adaugă rezultat"]?.[language] || "Add result"}
                       value={taskEdits[task.id]?.description || ""}
@@ -147,7 +164,6 @@ const TaskListOverlay = ({ ticketId }) => {
                       mb="xs"
                       label={translations["Descriere task"][language]}
                     />
-
                     <Group gap="xs" align="end">
                       <IconSelect
                         options={TypeTask}
@@ -156,14 +172,10 @@ const TaskListOverlay = ({ ticketId }) => {
                         label={translations["Alege tip task"][language]}
                         placeholder={translations["Alege tip task"][language]}
                       />
-
                       <DateQuickInput
                         value={taskEdits[task.id]?.scheduled_time}
-                        onChange={(value) =>
-                          updateTaskField(task.id, "scheduled_time", value)
-                        }
+                        onChange={(value) => updateTaskField(task.id, "scheduled_time", value)}
                       />
-
                       <Select
                         data={users.map((u) => ({ label: u.label, value: u.value }))}
                         value={taskEdits[task.id]?.created_for}
@@ -172,7 +184,6 @@ const TaskListOverlay = ({ ticketId }) => {
                         placeholder={translations["Responsabil"][language]}
                         label={translations["Responsabil"][language]}
                       />
-
                       <Button
                         variant="light"
                         size="s"
@@ -185,6 +196,60 @@ const TaskListOverlay = ({ ticketId }) => {
                 </Card>
               );
             })}
+
+            {creatingTask ? (
+              <Card withBorder radius="md" shadow="xs" p="sm">
+                <Group align="end" gap="xs">
+                  <IconSelect
+                    options={TypeTask}
+                    value={taskEdits["new"]?.task_type}
+                    onChange={(value) => updateTaskField("new", "task_type", value)}
+                    label={translations["Alege tip task"][language]}
+                  />
+                  <DateQuickInput
+                    value={taskEdits["new"]?.scheduled_time}
+                    onChange={(value) => updateTaskField("new", "scheduled_time", value)}
+                  />
+                  <Select
+                    data={users.map((u) => ({ label: u.label, value: u.value }))}
+                    value={taskEdits["new"]?.created_for}
+                    onChange={(value) => updateTaskField("new", "created_for", value)}
+                    w={180}
+                    label={translations["Responsabil"][language]}
+                  />
+                  <Button size="xs" onClick={handleCreateTask} variant="filled">
+                    {translations["Adaugă task"]?.[language] || "Adaugă"}
+                  </Button>
+                  <Button
+                    size="xs"
+                    variant="subtle"
+                    color="gray"
+                    onClick={() => setCreatingTask(false)}
+                  >
+                    {translations["Anulare"]?.[language] || "Cancel"}
+                  </Button>
+                </Group>
+              </Card>
+            ) : (
+              <Button
+                leftSection={<FaPlus size={12} />}
+                variant="light"
+                size="xs"
+                onClick={() => {
+                  setCreatingTask(true);
+                  setTaskEdits((prev) => ({
+                    ...prev,
+                    new: {
+                      task_type: "",
+                      scheduled_time: null,
+                      created_for: "",
+                    },
+                  }));
+                }}
+              >
+                {translations["New Task"]?.[language] || "New Task"}
+              </Button>
+            )}
           </Stack>
         </Collapse>
       </Paper>
