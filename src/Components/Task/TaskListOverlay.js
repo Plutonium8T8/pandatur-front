@@ -89,6 +89,20 @@ const TaskListOverlay = ({ ticketId }) => {
     }
   };
 
+  const handleStartCreatingTask = () => {
+    setCreatingTask(true);
+    setTaskEdits((prev) => ({
+      ...prev,
+      new: {
+        task_type: "",
+        scheduled_time: null,
+        created_for: "",
+        created_by: userId?.toString() || "",
+        description: "",
+      },
+    }));
+  };
+  
   const handleCreateTask = async () => {
     const newTask = taskEdits["new"];
     if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) return;
@@ -146,7 +160,7 @@ const TaskListOverlay = ({ ticketId }) => {
                       </Group>
                       <Group gap="xs">
                         <Text size="sm" c="dimmed">
-                          {dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").format("DD.MM.YYYY")} •{" "}
+                          {dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").format("DD.MM.YYYY")} {" "}
                           {task.created_for_full_name}
                         </Text>
                         {isOpen ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
@@ -200,61 +214,61 @@ const TaskListOverlay = ({ ticketId }) => {
 
             {creatingTask ? (
               <Card withBorder radius="md" shadow="xs" p="sm">
-                <Group align="end" gap="xs">
-                  <IconSelect
-                    options={TypeTask}
-                    value={taskEdits["new"]?.task_type}
-                    onChange={(value) => updateTaskField("new", "task_type", value)}
-                    label={translations["Alege tip task"][language]}
+                <Stack gap="xs">
+                  <TextInput
+                    label={translations["Descriere task"][language]}
+                    placeholder={translations["Adaugă rezultat"]?.[language] || "Add result"}
+                    value={taskEdits["new"]?.description || ""}
+                    onChange={(e) =>
+                      updateTaskField("new", "description", e.currentTarget.value)
+                    }
                   />
-                  <DateQuickInput
-                    value={taskEdits["new"]?.scheduled_time}
-                    onChange={(value) => updateTaskField("new", "scheduled_time", value)}
-                  />
-                  <Select
-                    data={users.map((u) => ({ label: u.label, value: u.value }))}
-                    value={taskEdits["new"]?.created_by}
-                    onChange={(value) => updateTaskField("new", "created_by", value)}
-                    w={180}
-                    label={translations["Autor"][language]}
-                  />
-                  <Select
-                    data={users.map((u) => ({ label: u.label, value: u.value }))}
-                    value={taskEdits["new"]?.created_for}
-                    onChange={(value) => updateTaskField("new", "created_for", value)}
-                    w={180}
-                    label={translations["Responsabil"][language]}
-                  />
-                  <Button size="xs" onClick={handleCreateTask} variant="filled">
-                    {translations["Adaugă task"]?.[language] || "Adaugă"}
-                  </Button>
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    color="gray"
-                    onClick={() => setCreatingTask(false)}
-                  >
-                    {translations["Anulare"]?.[language] || "Cancel"}
-                  </Button>
-                </Group>
+
+                  <Group align="end" gap="xs">
+                    <IconSelect
+                      options={TypeTask}
+                      value={taskEdits["new"]?.task_type}
+                      onChange={(value) => updateTaskField("new", "task_type", value)}
+                      label={translations["Alege tip task"][language]}
+                    />
+                    <DateQuickInput
+                      value={taskEdits["new"]?.scheduled_time}
+                      onChange={(value) => updateTaskField("new", "scheduled_time", value)}
+                    />
+                    <Select
+                      data={users.map((u) => ({ label: u.label, value: u.value }))}
+                      value={taskEdits["new"]?.created_by}
+                      onChange={(value) => updateTaskField("new", "created_by", value)}
+                      w={180}
+                      label={translations["Autor"][language]}
+                    />
+                    <Select
+                      data={users.map((u) => ({ label: u.label, value: u.value }))}
+                      value={taskEdits["new"]?.created_for}
+                      onChange={(value) => updateTaskField("new", "created_for", value)}
+                      w={180}
+                      label={translations["Responsabil"][language]}
+                    />
+                    <Button size="xs" onClick={handleCreateTask} variant="filled">
+                      {translations["Adaugă task"]?.[language] || "Adaugă"}
+                    </Button>
+                    <Button
+                      size="xs"
+                      variant="subtle"
+                      color="gray"
+                      onClick={() => setCreatingTask(false)}
+                    >
+                      {translations["Anulare"]?.[language] || "Cancel"}
+                    </Button>
+                  </Group>
+                </Stack>
               </Card>
             ) : (
               <Button
                 leftSection={<FaPlus size={12} />}
                 variant="light"
                 size="xs"
-                onClick={() => {
-                  setCreatingTask(true);
-                  setTaskEdits((prev) => ({
-                    ...prev,
-                    new: {
-                      task_type: "",
-                      scheduled_time: null,
-                      created_for: "",
-                      created_by: userId?.toString() || "",
-                    },
-                  }));
-                }}
+                onClick={handleStartCreatingTask}
               >
                 {translations["New Task"]?.[language] || "New Task"}
               </Button>
