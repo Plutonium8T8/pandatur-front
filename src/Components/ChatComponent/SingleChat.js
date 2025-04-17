@@ -1,41 +1,25 @@
 import { FaTimes } from "react-icons/fa";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
-import { useApp } from "../../hooks";
-import { normalizeUsersAndPlatforms, getFullName } from "../utils";
+import { useApp, useFetchTicketChat } from "../../hooks";
+import { getFullName } from "../utils";
 import "./chat.css";
 
 const SingleChat = ({ id, onClose }) => {
-  const { tickets, setTickets, messages } = useApp();
+  const { setTickets, messages } = useApp();
 
-  const [personalInfo, setPersonalInfo] = useState({});
-  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
-  const [selectedUser, setSelectedUser] = useState({});
-
-  const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform?.find(
-      ({ payload }) => payload.id === userId && payload.platform === platform,
-    );
-
-    setSelectedUser(user);
-  };
-
-  useEffect(() => {
-    if (id) {
-      const updatedTicket =
-        tickets?.find((ticket) => ticket?.id === Number(id)) || {};
-
-      const users = normalizeUsersAndPlatforms(
-        updatedTicket.clients,
-        messages.list,
-      );
-
-      setPersonalInfo(updatedTicket);
-      setMessageSendersByPlatform(users);
-    }
-  }, [tickets, id]);
+  const {
+    personalInfo,
+    messageSendersByPlatform,
+    loading,
+    selectedUser,
+    changeUser,
+    setPersonalInfo,
+    setMessageSendersByPlatform,
+    setSelectedUser,
+  } = useFetchTicketChat(id);
 
   useEffect(() => {
     if (id) {
@@ -58,6 +42,7 @@ const SingleChat = ({ id, onClose }) => {
           personalInfo={personalInfo}
           messageSendersByPlatform={messageSendersByPlatform || []}
           onChangeSelectedUser={changeUser}
+          loading={loading}
         />
       </Flex>
 

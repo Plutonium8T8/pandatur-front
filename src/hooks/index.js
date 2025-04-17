@@ -9,3 +9,4 @@ export * from "./useFormTicket";
 export * from "./useLanguageToggle";
 export * from "./useLocalStorage";
 export * from "./useMessages";
+export * from "./useFetchTicketChat";

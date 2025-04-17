@@ -11,7 +11,7 @@ export * from "./getFullName";
 export * from "./permissionConstants";
 export * from "./capitalizeFirstLetter";
 export * from "./formatRoles";
-export * from "./normalizeUsersAndPlatforms";
 export * from "./socialMediaIcons";
 export * from "./isStoreFile";
 export * from "./messageStatus";
+export * from "./extractNumbers";

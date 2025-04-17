@@ -2,41 +2,31 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp } from "../../hooks";
+import { useApp, useFetchTicketChat } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { normalizeUsersAndPlatforms, getFullName } from "../utils";
+import { getFullName } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const { tickets, setTickets, messages } = useApp();
+  const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
   );
-  const [personalInfo, setPersonalInfo] = useState({});
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const [selectedUser, setSelectedUser] = useState({});
-  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
-  const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform?.find(
-      ({ payload }) => payload.id === userId && payload.platform === platform,
-    );
-
-    setSelectedUser(user);
-  };
-
-  useEffect(() => {
-    const ticketById =
-      tickets?.find((ticket) => ticket.id === selectTicketId) || {};
-
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages.list);
-
-    setPersonalInfo(ticketById);
-    setMessageSendersByPlatform(users);
-  }, [tickets, selectTicketId]);
+  const {
+    personalInfo,
+    messageSendersByPlatform,
+    loading,
+    selectedUser,
+    changeUser,
+    setPersonalInfo,
+    setMessageSendersByPlatform,
+    setSelectedUser,
+  } = useFetchTicketChat(ticketId);
 
   useEffect(() => {
     if (ticketId) {
@@ -79,10 +69,11 @@ const ChatComponent = () => {
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
+            loading={loading}
           />
         </Flex>
 
-        {selectTicketId && (
+        {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
             ticketId={ticketId}

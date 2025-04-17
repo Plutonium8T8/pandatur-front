@@ -26,6 +26,7 @@ export const ChatMessages = ({
   personalInfo,
   messageSendersByPlatform,
   onChangeSelectedUser,
+  loading,
 }) => {
   const { userId } = useUser();
   const { messages } = useApp();
@@ -177,6 +178,7 @@ export const ChatMessages = ({
 
       {selectTicketId && !messages.loading && (
         <ChatInput
+          loading={loading}
           id={selectTicketId}
           clientList={messageSendersByPlatform}
           currentClient={selectedClient}
