@@ -139,7 +139,8 @@ const TaskListOverlay = ({ ticketId }) => {
             </Group>
             <Group gap="xs">
               <Text size="sm" c="dimmed">
-                {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")} {tasks.find((t) => t.id === id)?.created_for_full_name}
+                {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
+                {tasks.find((t) => t.id === id)?.created_for_full_name}
               </Text>
               {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
             </Group>
@@ -167,39 +168,31 @@ const TaskListOverlay = ({ ticketId }) => {
             value={taskEdits[id]?.scheduled_time}
             onChange={(value) => updateTaskField(id, "scheduled_time", value)}
           />
-          {!isNew && (
-            <Select
-              data={users.map((u) => ({ label: u.label, value: u.value }))}
-              value={taskEdits[id]?.created_for}
-              onChange={(value) => updateTaskField(id, "created_for", value)}
-              w={180}
-              label={translations["Responsabil"][language]}
-            />
-          )}
-          {isNew && (
-            <>
-              <Select
-                data={users.map((u) => ({ label: u.label, value: u.value }))}
-                value={taskEdits[id]?.created_by}
-                onChange={(value) => updateTaskField(id, "created_by", value)}
-                w={180}
-                label={translations["Autor"][language]}
-              />
-              <Select
-                data={users.map((u) => ({ label: u.label, value: u.value }))}
-                value={taskEdits[id]?.created_for}
-                onChange={(value) => updateTaskField(id, "created_for", value)}
-                w={180}
-                label={translations["Responsabil"][language]}
-              />
-            </>
-          )}
+          <Select
+            data={users.map((u) => ({ label: u.label, value: u.value }))}
+            value={taskEdits[id]?.created_by}
+            onChange={(value) => updateTaskField(id, "created_by", value)}
+            w={180}
+            label={translations["Autor"][language]}
+          />
+          <Select
+            data={users.map((u) => ({ label: u.label, value: u.value }))}
+            value={taskEdits[id]?.created_for}
+            onChange={(value) => updateTaskField(id, "created_for", value)}
+            w={180}
+            label={translations["Responsabil"][language]}
+          />
           {isNew ? (
             <>
               <Button size="xs" onClick={handleCreateTask} variant="filled">
                 {translations["Adaugă task"]?.[language] || "Adaugă"}
               </Button>
-              <Button size="xs" variant="subtle" color="gray" onClick={() => setCreatingTask(false)}>
+              <Button
+                size="xs"
+                variant="subtle"
+                color="gray"
+                onClick={() => setCreatingTask(false)}
+              >
                 {translations["Anulare"]?.[language] || "Cancel"}
               </Button>
             </>
