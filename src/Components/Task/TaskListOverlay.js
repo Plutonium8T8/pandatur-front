@@ -14,7 +14,14 @@ import {
   Select,
   ActionIcon,
 } from "@mantine/core";
-import { FaChevronDown, FaChevronUp, FaPlus, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
+import {
+  FaChevronDown,
+  FaChevronUp,
+  FaPlus,
+  FaTrash,
+  FaCheck,
+  FaPencil,
+} from "react-icons/fa6";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
@@ -22,6 +29,7 @@ import { formatDate, parseDate } from "../utils/date";
 import DateQuickInput from "./DateQuickPicker";
 import { useGetTechniciansList, useUser } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
+import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -35,9 +43,13 @@ const TaskListOverlay = ({ ticketId }) => {
   const { technicians: users } = useGetTechniciansList();
   const { userId } = useUser();
 
+  const confirmDelete = useConfirmPopup({
+    subTitle: translations["Confirmare ștergere"][language],
+  });
+
   const fetchTasks = async () => {
+    if (!ticketId) return setTasks([]);
     try {
-      if (!ticketId) return setTasks([]);
       const res = await api.task.getTaskByTicket(ticketId);
       const taskArray = Array.isArray(res?.data) ? res.data : res;
       setTasks(taskArray);
@@ -84,20 +96,6 @@ const TaskListOverlay = ({ ticketId }) => {
     fetchTasks();
   };
 
-  const handleStartCreatingTask = () => {
-    setCreatingTask(true);
-    setTaskEdits((prev) => ({
-      ...prev,
-      new: {
-        task_type: "",
-        scheduled_time: null,
-        created_for: "",
-        created_by: userId?.toString() || "",
-        description: "",
-      },
-    }));
-  };
-
   const handleCreateTask = async () => {
     const newTask = taskEdits["new"];
     if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) return;
@@ -113,14 +111,24 @@ const TaskListOverlay = ({ ticketId }) => {
     fetchTasks();
   };
 
-  const handleDeleteTask = async (id) => {
-    await api.task.delete({ id });
-    fetchTasks();
+  const handleStartCreatingTask = () => {
+    setCreatingTask(true);
+    setTaskEdits((prev) => ({
+      ...prev,
+      new: {
+        task_type: "",
+        scheduled_time: null,
+        created_for: "",
+        created_by: userId?.toString() || "",
+        description: "",
+      },
+    }));
   };
-  
-  const getTaskIcon = (type) => {
-    const match = TypeTask.find((t) => t.name === type);
-    return match?.icon || null;
+
+  const handleDeleteTask = (id) => {
+    confirmDelete(() =>
+      api.task.delete({ id }).then(() => fetchTasks())
+    );
   };
 
   const handleMarkDone = async (id) => {
@@ -128,8 +136,14 @@ const TaskListOverlay = ({ ticketId }) => {
     fetchTasks();
   };
 
+  const getTaskIcon = (type) => {
+    const match = TypeTask.find((t) => t.name === type);
+    return match?.icon || null;
+  };
+
   const renderTaskForm = (id, isNew = false) => {
     const isEditing = isNew || editMode[id];
+
     return (
       <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
         {!isNew && (
@@ -185,13 +199,16 @@ const TaskListOverlay = ({ ticketId }) => {
               label={translations["Responsabil"][language]}
               disabled={!isEditing}
             />
-
             {isNew ? (
               <>
                 <Button size="xs" onClick={handleCreateTask}>
                   {translations["Adaugă task"][language]}
                 </Button>
-                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)}>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  onClick={() => setCreatingTask(false)}
+                >
                   {translations["Anulare"][language]}
                 </Button>
               </>
@@ -203,7 +220,6 @@ const TaskListOverlay = ({ ticketId }) => {
                 <Button
                   size="xs"
                   variant="subtle"
-                  color="gray"
                   onClick={() => setEditMode((prev) => ({ ...prev, [id]: false }))}
                 >
                   {translations["Anulare"][language]}
@@ -211,7 +227,12 @@ const TaskListOverlay = ({ ticketId }) => {
               </>
             ) : (
               <>
-                <Button size="xs" onClick={() => handleMarkDone(id)} leftSection={<FaCheck />}>
+                <Button
+                  size="xs"
+                  variant="filled"
+                  onClick={() => handleMarkDone(id)}
+                  leftSection={<FaCheck />}
+                >
                   {translations["Done"][language]}
                 </Button>
                 <Button
@@ -242,11 +263,12 @@ const TaskListOverlay = ({ ticketId }) => {
             onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
             mb="xs"
           />
-
         </Collapse>
       </Card>
     );
   };
+
+  if (!creatingTask && tasks.length === 0) return null;
 
   return (
     <Box pos="relative" p="xs" w="100%">
