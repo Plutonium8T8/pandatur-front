@@ -12,7 +12,7 @@ const IconSelect = ({
   const selected = options.find((item) => item.name === value);
 
   return (
-    <div style={{ position: "relative", width: 300, fontFamily: "sans-serif" }}>
+    <div style={{ position: "relative", width: 300}}>
       {label && (
         <label
           style={{
