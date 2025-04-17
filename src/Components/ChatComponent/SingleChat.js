@@ -52,6 +52,8 @@ const SingleChat = ({ id, onClose }) => {
         selectTicketId={id}
         updatedTicket={personalInfo}
         onUpdatePersonalInfo={(payload, values) => {
+          const identifier =
+            getFullName(values.name, values.surname) || `#${payload.id}`;
           const clientTicketList = personalInfo.clients.map((client) =>
             client.id === payload.id
               ? {
@@ -63,21 +65,21 @@ const SingleChat = ({ id, onClose }) => {
 
           setSelectedUser((prev) => ({
             ...prev,
-            label: getFullName(values.name, values.surname),
+            label: identifier,
             payload: { ...prev.payload, ...values },
           }));
 
           setMessageSendersByPlatform((prev) =>
-            prev.map((clientMsj) =>
-              clientMsj.id === payload.id &&
-              clientMsj.platform === payload.platform
+            prev.map((client) => {
+              return client.payload.id === payload.id &&
+                client.payload.platform === payload.platform
                 ? {
-                    ...clientMsj,
-                    label: getFullName(values.name, values.surname),
+                    ...client,
+                    label: `${identifier} - ${payload.platform}`,
                     payload: { ...payload, ...values },
                   }
-                : clientMsj,
-            ),
+                : client;
+            }),
           );
 
           setTickets((prev) =>
