@@ -8,10 +8,15 @@ import {
 } from "../Components/utils";
 import { useApp } from "../hooks";
 
+const OMITTED_PLATFORM = "sipuni";
+
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
     return Object.entries(platforms)
-      .filter(([, platformValue]) => Boolean(platformValue))
+      .filter(
+        ([platform, platformValue]) =>
+          Boolean(platformValue) && platform !== OMITTED_PLATFORM,
+      )
       .map(([platform, platformValue]) => {
         const identifier = getFullName(id.name, id.surname) || `#${id.id}`;
         return {
