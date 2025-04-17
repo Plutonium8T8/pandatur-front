@@ -199,6 +199,17 @@ const TaskListOverlay = ({ ticketId }) => {
               label={translations["Responsabil"][language]}
               disabled={!isEditing}
             />
+          </Group>
+
+          <TextInput
+            label={translations["Descriere task"][language]}
+            placeholder={translations["AddResult"][language]}
+            value={taskEdits[id]?.description || ""}
+            onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
+            mb="xs"
+          />
+
+          <Group gap="xs" mt="xs">
             {isNew ? (
               <>
                 <Button size="xs" onClick={handleCreateTask}>
@@ -255,14 +266,6 @@ const TaskListOverlay = ({ ticketId }) => {
               </>
             )}
           </Group>
-
-          <TextInput
-            label={translations["Descriere task"][language]}
-            placeholder={translations["AddResult"][language]}
-            value={taskEdits[id]?.description || ""}
-            onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
-            mb="xs"
-          />
         </Collapse>
       </Card>
     );
