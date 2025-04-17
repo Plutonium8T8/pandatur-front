@@ -7,7 +7,7 @@ import { api } from "../../../../api";
 import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "..";
-import { getMediaType } from "../../utils";
+import { getMediaType } from "../../renderContent";
 import { GroupedMessages } from "../GroupedMessages";
 import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
 import "./ChatMessages.css";

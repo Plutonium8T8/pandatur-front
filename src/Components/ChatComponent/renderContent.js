@@ -1,6 +1,7 @@
 import { FaRegFileLines } from "react-icons/fa6";
 import { Flex, Text, Box, Image } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
+import { Audio } from "../Audio";
 
 const BROKEN_PHOTO = "/broken.png";
 
@@ -58,22 +59,10 @@ export const renderContent = (msg) => {
         </video>
       );
     case MEDIA_TYPE.AUDIO:
-      return (
-        <audio controls>
-          <source src={msg.message} type="audio/ogg" />
-          {getLanguageByKey("Acest browser nu suporta audio")}
-        </audio>
-      );
+      return <Audio src={msg.message} />;
     case MEDIA_TYPE.FILE:
       return renderFile(msg.message);
 
-    case MEDIA_TYPE.CALL:
-      return (
-        <audio controls>
-          <source src={msg.message} type="audio/ogg" />
-          {getLanguageByKey("Acest browser nu suporta audio")}
-        </audio>
-      );
     default:
       const { message } = msg;
 

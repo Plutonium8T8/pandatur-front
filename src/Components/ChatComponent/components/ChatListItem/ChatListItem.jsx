@@ -11,7 +11,7 @@ import { GrAttachment } from "react-icons/gr";
 import { useApp } from "../../../../hooks";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { Tag } from "../../../Tag";
-import { MEDIA_TYPE } from "../../utils";
+import { MEDIA_TYPE } from "../../renderContent";
 import {
   priorityTagColors,
   parseServerDate,
