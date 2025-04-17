@@ -17,6 +17,7 @@ const normalizeClients = (clientList) => {
         return {
           label: `${identifier} - ${platform}`,
           value: `${id.id}-${platform}`,
+
           payload: {
             id: id.id,
             platform,
