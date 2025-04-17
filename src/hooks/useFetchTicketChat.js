@@ -11,7 +11,7 @@ import { useApp } from "../hooks";
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
     return Object.entries(platforms)
-      .filter(([platform, platformValue]) => Boolean(platformValue))
+      .filter(([, platformValue]) => Boolean(platformValue))
       .map(([platform, platformValue]) => {
         const identifier = getFullName(id.name, id.surname) || `#${id.id}`;
         return {
