@@ -21,7 +21,7 @@ import dayjs from "dayjs";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
 import DateQuickInput from "./DateQuickPicker";
-import { useGetTechniciansList } from "../../hooks";
+import { useGetTechniciansList, useUser } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 
 const language = localStorage.getItem("language") || "RO";
@@ -34,6 +34,7 @@ const TaskListOverlay = ({ ticketId }) => {
   const [editingDeadlineId, setEditingDeadlineId] = useState(null);
   const [creatingTask, setCreatingTask] = useState(false);
   const { technicians: users } = useGetTechniciansList();
+  const { userId } = useUser();
 
   const fetchTasks = async () => {
     try {
@@ -90,7 +91,7 @@ const TaskListOverlay = ({ ticketId }) => {
 
   const handleCreateTask = async () => {
     const newTask = taskEdits["new"];
-    if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time) return;
+    if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) return;
 
     try {
       await api.task.create({
@@ -114,11 +115,11 @@ const TaskListOverlay = ({ ticketId }) => {
 
   return (
     <Box pos="relative" p="xs" w="100%">
-      <Paper shadow="xs" radius="md" withBorder p="md">
+      <Paper shadow="xs" radius="md" withBorder p="xs">
         <Group justify="space-between" mb="sm">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color="blue">
+            <Badge size="sm" color="green">
               {tasks.length}
             </Badge>
           </Group>
@@ -212,6 +213,13 @@ const TaskListOverlay = ({ ticketId }) => {
                   />
                   <Select
                     data={users.map((u) => ({ label: u.label, value: u.value }))}
+                    value={taskEdits["new"]?.created_by}
+                    onChange={(value) => updateTaskField("new", "created_by", value)}
+                    w={180}
+                    label={translations["Autor"][language]}
+                  />
+                  <Select
+                    data={users.map((u) => ({ label: u.label, value: u.value }))}
                     value={taskEdits["new"]?.created_for}
                     onChange={(value) => updateTaskField("new", "created_for", value)}
                     w={180}
@@ -243,6 +251,7 @@ const TaskListOverlay = ({ ticketId }) => {
                       task_type: "",
                       scheduled_time: null,
                       created_for: "",
+                      created_by: userId?.toString() || "",
                     },
                   }));
                 }}
