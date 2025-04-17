@@ -42,7 +42,7 @@ const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 const ChatList = ({ selectTicketId, setSelectTicketId }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
-  const [showMyTickets, setShowMyTickets] = useState(false);
+  const [showMyTickets, setShowMyTickets] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
