@@ -2,8 +2,7 @@ import { Box, Flex, Image } from "@mantine/core";
 import { getLanguageByKey } from "../../utils";
 import { DateCell } from "../../DateCell";
 import { Empty } from "../../Empty";
-
-const FALLBACK_IMAGE = "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
+import { FALLBACK_IMAGE } from "../../../app-constants";
 
 export const Media = ({ messages }) => {
   return (
