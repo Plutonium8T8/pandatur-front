@@ -2123,4 +2123,12 @@ export const translations = {
     RO: "Apel",
     RU: "Звонок",
   },
+  callFrom: {
+    RO: "De la",
+    RU: "От",
+  },
+  callTo: {
+    RO: "către",
+    RU: "k",
+  },
 };
