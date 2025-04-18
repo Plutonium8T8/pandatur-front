@@ -2,9 +2,16 @@ import { useState } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { useUser } from "../hooks";
+import { MEDIA_TYPE } from "../Components/ChatComponent/renderContent";
 import { parseDate, showServerError } from "../Components/utils";
 
-const FORMAT_MEDIA = ["audio", "video", "image", "file"];
+const FORMAT_MEDIA = [
+  MEDIA_TYPE.AUDIO,
+  MEDIA_TYPE.VIDEO,
+  MEDIA_TYPE.IMAGE,
+  MEDIA_TYPE.FILE,
+  MEDIA_TYPE.CALL,
+];
 
 const getMediaFileMessages = (messageList) => {
   return messageList.filter((msg) => FORMAT_MEDIA.includes(msg.mtype));
