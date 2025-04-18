@@ -2,7 +2,7 @@ import { Flex, Text } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { IoMdCheckmark } from "react-icons/io";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
-import { renderContent } from "../../utils";
+import { renderContent } from "../../renderContent";
 import { HH_mm } from "../../../../app-constants";
 import { parseServerDate, MESSAGES_STATUS } from "../../../utils";
 import "./Message.css";

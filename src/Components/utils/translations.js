@@ -2119,6 +2119,18 @@ export const translations = {
     RO: "Selectează toate",
     RU: "Выбрать все",
   },
+  call: {
+    RO: "Apel",
+    RU: "Звонок",
+  },
+  callFrom: {
+    RO: "De la",
+    RU: "От",
+  },
+  callTo: {
+    RO: "către",
+    RU: "k",
+  },
   AddResult: {
     RO: "Adaugă rezultat",
     RU: "Введите результат",

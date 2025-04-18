@@ -44,7 +44,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
       lastClientId = currentClientId;
       groupedMessages.push({
         date: messageDate,
-        clientId: currentClientId,
+        clientId: Number(currentClientId),
         messages: [msg],
       });
     } else {
@@ -56,14 +56,14 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
     <Flex direction="column" gap="xl" h="100%">
       {groupedMessages.length ? (
         groupedMessages.map(({ date, clientId, messages }) => {
-          const clientInfo = personalInfo?.clients?.[0] || {};
+          const clientInfo =
+            personalInfo?.clients?.find(({ id }) => id === clientId) || {};
 
           const clientName =
-            getFullName(clientInfo.name, clientInfo.surname) ||
-            `ID: ${clientId}`;
+            getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
 
           return (
-            <Flex pb="md" direction="column" gap="md" key={date}>
+            <Flex pb="xs" direction="column" gap="md" key={date}>
               <Divider
                 label={
                   <Badge c="black" size="lg" bg={colors.gray[2]}>
@@ -75,8 +75,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
 
               <Flex justify="center">
                 <Badge c="black" size="lg" bg={colors.gray[2]}>
-                  {getLanguageByKey("Mesajele clientului")} #{clientId} -{" "}
-                  {clientName}
+                  {getLanguageByKey("Mesajele clientului")}: {clientName}
                 </Badge>
               </Flex>
               <Flex direction="column" gap="xs">
