@@ -163,7 +163,7 @@ const TaskList = ({
           const isPast = parsed.isBefore(today);
 
           const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
-          const fontWeight = isPast || isToday ? 600 : 400;
+          const fontWeight = isPast || isToday ? 500 : 500;
 
           return (
             <span style={{ color, fontWeight }}>
