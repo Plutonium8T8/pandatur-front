@@ -1,4 +1,4 @@
-import { Flex, Text, Avatar, DEFAULT_THEME } from "@mantine/core";
+import { Flex, Text, Image, DEFAULT_THEME } from "@mantine/core";
 import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
 import { getFullName, parseServerDate, socialMediaIcons } from "../../../utils";
 import { renderContent, MEDIA_TYPE } from "../../renderContent";
@@ -24,7 +24,13 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
       ) : (
         <Flex w="90%" direction="column" className="chat-message received">
           <Flex gap="8">
-            <Avatar src={personalInfo?.photo_url || DEFAULT_PHOTO} />
+            <Image
+              w={36}
+              h={36}
+              radius="50%"
+              src={personalInfo?.photo_url}
+              fallbackSrc={DEFAULT_PHOTO}
+            />
 
             <Flex miw="250px" direction="column" p="8" className="text">
               <Flex c={colors.gray[7]} align="center" gap="4">
