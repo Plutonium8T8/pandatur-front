@@ -2,6 +2,7 @@ import { Text, Box, Image, DEFAULT_THEME } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
 import { File } from "../File";
+import { MEDIA_TYPE } from "../../app-constants";
 
 const BROKEN_PHOTO = "/broken.png";
 
@@ -9,15 +10,6 @@ const { colors } = DEFAULT_THEME;
 
 const spliceMessage = (message) => {
   return `${message.slice(0, 15)}...`;
-};
-
-export const MEDIA_TYPE = {
-  IMAGE: "image",
-  VIDEO: "video",
-  AUDIO: "audio",
-  FILE: "file",
-  URL: "url",
-  CALL: "call",
 };
 
 export const getMediaType = (mimeType) => {

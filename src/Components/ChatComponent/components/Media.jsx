@@ -1,8 +1,7 @@
 import { Box, Flex, Image, Badge, DEFAULT_THEME } from "@mantine/core";
 import { getLanguageByKey, formattedDate } from "../../utils";
-import { MEDIA_TYPE } from "../renderContent";
 import { Empty } from "../../Empty";
-import { FALLBACK_IMAGE } from "../../../app-constants";
+import { FALLBACK_IMAGE, MEDIA_TYPE } from "../../../app-constants";
 import { File } from "../../File";
 import { Audio } from "../../Audio";
 

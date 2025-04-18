@@ -9,3 +9,12 @@ export const DEFAULT_PHOTO =
 
 export const FALLBACK_IMAGE =
   "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
+
+export const MEDIA_TYPE = {
+  IMAGE: "image",
+  VIDEO: "video",
+  AUDIO: "audio",
+  FILE: "file",
+  URL: "url",
+  CALL: "call",
+};
