@@ -47,7 +47,11 @@ export const Logs = () => {
         <>
           <LogsComponent logList={logList} />
 
-          <Flex pt="20" justify="center">
+          <Flex
+            pt="20"
+            justify="center"
+            style={{ borderTop: "1px solid var(--mantine-color-gray-4)" }}
+          >
             <Pagination
               total={pagination.totalPages}
               value={pagination.currentPage}
