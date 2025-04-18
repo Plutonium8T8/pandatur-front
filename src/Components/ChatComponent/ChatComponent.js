@@ -43,7 +43,7 @@ const ChatComponent = () => {
 
   /**
    *
-   * @param {number} id
+   * @param {number} mergedTicketId
    */
   const fetchTicketLight = async (mergedTicketId) => {
     try {
