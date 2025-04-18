@@ -26,7 +26,7 @@ import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
 import DateQuickInput from "./DateQuickPicker";
-import { useGetTechniciansList, useUser } from "../../hooks";
+import { useGetTechniciansList } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
