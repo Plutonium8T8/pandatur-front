@@ -30,7 +30,7 @@ import { useGetTechniciansList } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
-import { UserContext } from "../../contexts";
+import { useUser } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -41,7 +41,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [taskEdits, setTaskEdits] = useState({});
   const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
-  const { userId } = useContext(UserContext);
+  const { userId } = useUser();
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
