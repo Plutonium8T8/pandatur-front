@@ -2,20 +2,21 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
+import { useSnackbar } from "notistack";
 import { useApp, useFetchTicketChat } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { getFullName } from "../utils";
+import { getFullName, showServerError } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
   const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
-  const [selectTicketId, setSelectTicketId] = useState(
-    ticketId ? Number(ticketId) : null,
-  );
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const { enqueueSnackbar } = useSnackbar();
+
+  const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
   const {
     personalInfo,
@@ -26,21 +27,32 @@ const ChatComponent = () => {
     setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
+    getTicket,
   } = useFetchTicketChat(ticketId);
 
   useEffect(() => {
     if (ticketId) {
       setSelectedUser({});
       setMessageSendersByPlatform([]);
-      if (Number(ticketId) !== selectTicketId) {
-        setSelectTicketId(Number(ticketId));
-      }
 
       if (!messages?.list.length) {
         messages.getUserMessages(Number(ticketId));
       }
     }
   }, [ticketId]);
+
+  /**
+   *
+   * @param {number} mergedTicketId
+   */
+  const fetchTicketLight = async (mergedTicketId) => {
+    try {
+      await Promise.all([getTicket(), messages.getUserMessages(ticketId)]);
+      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    }
+  };
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -49,7 +61,7 @@ const ChatComponent = () => {
         h="100%"
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        {isChatListVisible && <ChatList selectTicketId={selectTicketId} />}
+        {isChatListVisible && <ChatList selectTicketId={ticketIdToNumber} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>
@@ -66,7 +78,7 @@ const ChatComponent = () => {
           </Box>
 
           <ChatMessages
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             selectedClient={selectedUser}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
@@ -78,8 +90,9 @@ const ChatComponent = () => {
         {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
+            fetchTicketLight={fetchTicketLight}
             ticketId={ticketId}
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             onUpdatePersonalInfo={(payload, values) => {
               const identifier =
                 getFullName(values.name, values.surname) || `#${payload.id}`;

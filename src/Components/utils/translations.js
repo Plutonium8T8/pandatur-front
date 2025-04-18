@@ -2119,12 +2119,32 @@ export const translations = {
     RO: "Selectează toate",
     RU: "Выбрать все",
   },
-  "AddResult": {
+  call: {
+    RO: "Apel",
+    RU: "Звонок",
+  },
+  callFrom: {
+    RO: "De la",
+    RU: "От",
+  },
+  callTo: {
+    RO: "către",
+    RU: "k",
+  },
+  AddResult: {
     RO: "Adaugă rezultat",
     RU: "Введите результат",
   },
-  "Save": {
+  Save: {
     RO: "Salveazǎ",
     RU: "Сохранить",
-  }
+  },
+  combineTickets: {
+    RO: "Combină lead",
+    RU: "СохранОбъединение тикетовить",
+  },
+  combineClient: {
+    RO: "Combină client",
+    RU: "Объединить лид",
+  },
 };

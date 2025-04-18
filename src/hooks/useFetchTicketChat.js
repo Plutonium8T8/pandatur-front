@@ -48,44 +48,44 @@ export const useFetchTicketChat = (id) => {
     setSelectedUser(user);
   };
 
-  useEffect(() => {
-    const getLightTicketInfo = async () => {
-      const { lastMessage } = messages;
-      setLoading(true);
-      try {
-        const ticket = await api.tickets.ticket.getLightById(id);
-        setPersonalInfo(ticket);
-        const clientList = extractNumbers(ticket.client_id);
-        const clients = await Promise.all(
-          clientList.map((clientId) => api.users.getUsersClientById(clientId)),
-        );
+  const getLightTicketInfo = async () => {
+    const { lastMessage } = messages;
+    setLoading(true);
+    try {
+      const ticket = await api.tickets.ticket.getLightById(id);
+      setPersonalInfo(ticket);
+      const clientList = extractNumbers(ticket.client_id);
+      const clients = await Promise.all(
+        clientList.map((clientId) => api.users.getUsersClientById(clientId)),
+      );
 
-        const clientsPlatform = normalizeClients(clients) || [];
+      const clientsPlatform = normalizeClients(clients) || [];
 
-        if (lastMessage) {
-          const { client_id, platform } = lastMessage;
+      if (lastMessage) {
+        const { client_id, platform } = lastMessage;
 
-          const currentClient =
-            clientsPlatform.find(
-              ({ payload }) =>
-                payload.id === client_id && payload.platform === platform,
-            ) || {};
+        const currentClient =
+          clientsPlatform.find(
+            ({ payload }) =>
+              payload.id === client_id && payload.platform === platform,
+          ) || {};
 
-          setSelectedUser(currentClient || {});
-        } else {
-          setSelectedUser(clientsPlatform[0] || {});
-        }
-
-        setMessageSendersByPlatform(normalizeClients(clients) || []);
-      } catch (e) {
-        enqueueSnackbar(showServerError(e), {
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
+        setSelectedUser(currentClient || {});
+      } else {
+        setSelectedUser(clientsPlatform[0] || {});
       }
-    };
 
+      setMessageSendersByPlatform(normalizeClients(clients) || []);
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), {
+        variant: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     if (id) {
       getLightTicketInfo();
     }
@@ -100,5 +100,6 @@ export const useFetchTicketChat = (id) => {
     setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
+    getTicket: getLightTicketInfo,
   };
 };

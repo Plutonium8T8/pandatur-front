@@ -20,6 +20,7 @@ const ChatExtraInfo = ({
   ticketId,
   mediaFiles,
   selectedUser,
+  fetchTicketLight,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -103,7 +104,12 @@ const ChatExtraInfo = ({
     }
   };
 
-  const mergeClientsData = async (id) => {
+  /**
+   *
+   * @param {number} id
+   * @param {() => void} resetField
+   */
+  const mergeClientsData = async (id, resetField) => {
     const ticketOld = selectTicketId;
 
     setIsLoadingCombineLead(true);
@@ -112,6 +118,11 @@ const ChatExtraInfo = ({
         ticket_old: ticketOld,
         ticket_new: id,
       });
+
+      await fetchTicketLight(id);
+
+      resetField();
+
       enqueueSnackbar(
         getLanguageByKey("Biletele au fost combinate cu succes"),
         {
@@ -250,14 +261,18 @@ const ChatExtraInfo = ({
             <Divider my="md" />
 
             <Merge
+              buttonText={getLanguageByKey("combineTickets")}
               loading={isLoadingCombineLead}
               value={ticketId || ""}
-              onSubmit={(values) => mergeClientsData(values)}
+              onSubmit={(values, resetField) =>
+                mergeClientsData(values, resetField)
+              }
               placeholder={getLanguageByKey("Introduceți ID lead")}
             />
 
             <Box mt="md">
               <Merge
+                buttonText={getLanguageByKey("combineClient")}
                 loading={isLoadingCombineClient}
                 value={selectedUser.payload?.id || ""}
                 placeholder={getLanguageByKey("Introduceți ID client")}
