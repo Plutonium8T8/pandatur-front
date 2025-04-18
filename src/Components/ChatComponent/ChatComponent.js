@@ -2,41 +2,31 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp } from "../../hooks";
+import { useApp, useFetchTicketChat } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { normalizeUsersAndPlatforms, getFullName } from "../utils";
+import { getFullName } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const { tickets, setTickets, messages } = useApp();
+  const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
   const [selectTicketId, setSelectTicketId] = useState(
     ticketId ? Number(ticketId) : null,
   );
-  const [personalInfo, setPersonalInfo] = useState({});
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const [selectedUser, setSelectedUser] = useState({});
-  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
 
-  const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform?.find(
-      ({ payload }) => payload.id === userId && payload.platform === platform,
-    );
-
-    setSelectedUser(user);
-  };
-
-  useEffect(() => {
-    const ticketById =
-      tickets?.find((ticket) => ticket.id === selectTicketId) || {};
-
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages.list);
-
-    setPersonalInfo(ticketById);
-    setMessageSendersByPlatform(users);
-  }, [tickets, selectTicketId]);
+  const {
+    personalInfo,
+    messageSendersByPlatform,
+    loading,
+    selectedUser,
+    changeUser,
+    setPersonalInfo,
+    setMessageSendersByPlatform,
+    setSelectedUser,
+  } = useFetchTicketChat(ticketId);
 
   useEffect(() => {
     if (ticketId) {
@@ -81,15 +71,18 @@ const ChatComponent = () => {
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
+            loading={loading}
           />
         </Flex>
 
-        {selectTicketId && (
+        {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
             ticketId={ticketId}
             selectTicketId={selectTicketId}
             onUpdatePersonalInfo={(payload, values) => {
+              const identifier =
+                getFullName(values.name, values.surname) || `#${payload.id}`;
               const clientTicketList = personalInfo.clients.map((client) =>
                 client.id === payload.id
                   ? {
@@ -101,21 +94,21 @@ const ChatComponent = () => {
 
               setSelectedUser((prev) => ({
                 ...prev,
-                label: getFullName(values.name, values.surname),
+                label: identifier,
                 payload: { ...prev.payload, ...values },
               }));
 
               setMessageSendersByPlatform((prev) =>
-                prev.map((clientMsj) =>
-                  clientMsj.id === payload.id &&
-                  clientMsj.platform === payload.platform
+                prev.map((client) => {
+                  return client.payload.id === payload.id &&
+                    client.payload.platform === payload.platform
                     ? {
-                        ...clientMsj,
-                        label: getFullName(values.name, values.surname),
+                        ...client,
+                        label: `${identifier} - ${payload.platform}`,
                         payload: { ...payload, ...values },
                       }
-                    : clientMsj,
-                ),
+                    : client;
+                }),
               );
 
               setTickets((prev) =>

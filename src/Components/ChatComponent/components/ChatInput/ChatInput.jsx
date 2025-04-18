@@ -14,7 +14,6 @@ import { LuSmile } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
-import { useApp } from "../../../../hooks";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -23,8 +22,8 @@ export const ChatInput = ({
   clientList,
   onChangeClient,
   currentClient,
+  loading,
 }) => {
-  const { spinnerTickets, ticketError } = useApp();
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -72,25 +71,20 @@ export const ChatInput = ({
     <>
       <Box className="chat-input" p="16px">
         <Flex w="100%" gap="xs" mb="xs" align="center">
-          {socialMediaIcons[currentClient.payload?.platform] && (
-            <Flex>{socialMediaIcons[currentClient.payload?.platform]}</Flex>
+          {socialMediaIcons[currentClient?.payload?.platform] && (
+            <Flex>{socialMediaIcons[currentClient.payload.platform]}</Flex>
           )}
-          {spinnerTickets ? (
+          {loading ? (
             <Loader size="xs" />
           ) : (
             <Select
               className="w-full"
-              error={ticketError}
               onChange={(value) => {
                 onChangeClient(value);
               }}
-              placeholder={getLanguageByKey(
-                ticketError ? "somethingWentWrong" : "selectUser",
-              )}
-              data={clientList.map((user) => ({
-                value: user.value,
-                label: user.label,
-              }))}
+              placeholder={getLanguageByKey("selectUser")}
+              value={currentClient?.value}
+              data={clientList}
             />
           )}
 
@@ -122,7 +116,11 @@ export const ChatInput = ({
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
             <Button
-              disabled={!message.trim() || !currentClient.payload}
+              disabled={
+                !message.trim() ||
+                !currentClient?.payload ||
+                currentClient.payload.platform === "sipuni"
+              }
               variant="filled"
               onClick={sendMessage}
             >
