@@ -267,7 +267,7 @@ const TaskList = ({
               <div
                 onClick={(e) => e.stopPropagation()}
               >
-                <Button variant="default" className="action-button-task">
+                <Button variant="default" className="action-button-task" size="xs" p="xs">
                   <IoEllipsisHorizontal size={18} />
                 </Button>
               </div>

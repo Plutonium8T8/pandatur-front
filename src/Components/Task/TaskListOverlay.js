@@ -30,6 +30,7 @@ import DateQuickInput from "./DateQuickPicker";
 import { useGetTechniciansList, useUser } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -51,7 +52,13 @@ const TaskListOverlay = ({ ticketId }) => {
     if (!ticketId) return setTasks([]);
     try {
       const res = await api.task.getTaskByTicket(ticketId);
-      const taskArray = (Array.isArray(res?.data) ? res.data : res).filter(t => !t.status);
+
+      const taskArray = (Array.isArray(res?.data) ? res.data : res)
+        .filter(t => t.ticket_id === ticketId && !t.status)
+        .sort((a, b) =>
+          dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
+          dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
+        );
 
       setTasks(taskArray);
       const edits = {};
@@ -158,7 +165,12 @@ const TaskListOverlay = ({ ticketId }) => {
                 <Text fw={500}>{taskEdits[id]?.task_type}</Text>
               </Group>
               <Group gap="xs">
-                <Text size="sm" c="dimmed">
+                <Text
+                  size="sm"
+                  style={{
+                    color: new Date(taskEdits[id]?.scheduled_time) < new Date() ? "red" : undefined,
+                  }}
+                >
                   {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
