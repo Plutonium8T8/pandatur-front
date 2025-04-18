@@ -179,7 +179,14 @@ export const LeadTable = ({
       dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (creation_date) => <DateCell date={creation_date} />,
+      render: (creation_date) => (
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={creation_date}
+        />
+      ),
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
@@ -187,7 +194,12 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (last_interaction_date) => (
-        <DateCell date={last_interaction_date} />
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={last_interaction_date}
+        />
       ),
     },
     {
@@ -223,7 +235,14 @@ export const LeadTable = ({
       dataIndex: "data_avansului",
       align: "center",
       width: 150,
-      render: (data_avansului) => <DateCell date={data_avansului} />,
+      render: (data_avansului) => (
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_avansului}
+        />
+      ),
     },
     {
       title: getLanguageByKey("Data cererii de retur"),
@@ -231,7 +250,12 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_cererii_de_retur) => (
-        <DateCell date={data_cererii_de_retur} />
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_cererii_de_retur}
+        />
       ),
     },
     {
@@ -239,7 +263,14 @@ export const LeadTable = ({
       dataIndex: "data_contractului",
       align: "center",
       width: 200,
-      render: (data_contractului) => <DateCell date={data_contractului} />,
+      render: (data_contractului) => (
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_contractului}
+        />
+      ),
     },
     {
       title: getLanguageByKey("Data de plată integrală"),
@@ -247,7 +278,12 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_de_plata_integrala) => (
-        <DateCell date={data_de_plata_integrala} />
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_de_plata_integrala}
+        />
       ),
     },
     {
@@ -255,14 +291,28 @@ export const LeadTable = ({
       dataIndex: "data_plecarii",
       align: "center",
       width: 200,
-      render: (data_plecarii) => <DateCell date={data_plecarii} />,
+      render: (data_plecarii) => (
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_plecarii}
+        />
+      ),
     },
     {
       title: getLanguageByKey("Data întoarcerii"),
       dataIndex: "data_intoarcerii",
       align: "center",
       width: 200,
-      render: (data_intoarcerii) => <DateCell date={data_intoarcerii} />,
+      render: (data_intoarcerii) => (
+        <DateCell
+          gap={4}
+          direction="row"
+          justify="center"
+          date={data_intoarcerii}
+        />
+      ),
     },
     {
       title: getLanguageByKey("Tipul de transport"),
