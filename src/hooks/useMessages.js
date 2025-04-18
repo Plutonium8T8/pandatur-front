@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { useUser } from "../hooks";
-import { MEDIA_TYPE } from "../Components/ChatComponent/renderContent";
 import { parseDate, showServerError } from "../Components/utils";
+import { MEDIA_TYPE } from "../app-constants";
 
 const FORMAT_MEDIA = [
   MEDIA_TYPE.AUDIO,
