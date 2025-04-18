@@ -9,6 +9,7 @@ export const MantineModal = ({
   size = 700,
   ...props
 }) => {
+  const { style, ...rest } = props;
   return (
     <Modal
       centered
@@ -16,14 +17,16 @@ export const MantineModal = ({
       opened={open}
       onClose={onClose}
       styles={{
-        body: { height: `${height}` },
+        body: { height: `${height}`, ...style },
       }}
       title={
-        <Text size="xl" fw="bold">
-          {title}
-        </Text>
+        title && (
+          <Text size="xl" fw="bold">
+            {title}
+          </Text>
+        )
       }
-      {...props}
+      {...rest}
     >
       {children}
     </Modal>
