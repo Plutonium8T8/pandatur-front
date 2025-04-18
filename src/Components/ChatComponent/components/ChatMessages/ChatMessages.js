@@ -36,6 +36,7 @@ export const ChatMessages = ({
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
+  const [creatingTask, setCreatingTask] = useState(false);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -175,12 +176,18 @@ export const ChatMessages = ({
 
       {selectTicketId && !messages.loading && (
         <>
-          <TaskListOverlay ticketId={selectTicketId} userId={userId} />
+          <TaskListOverlay
+            ticketId={selectTicketId}
+            userId={userId}
+            creatingTask={creatingTask}
+            setCreatingTask={setCreatingTask}
+          />
           <ChatInput
             loading={loading}
             id={selectTicketId}
             clientList={messageSendersByPlatform}
             currentClient={selectedClient}
+            onCreateTask={() => { setCreatingTask(true); }}
             onSendMessage={(value) => {
               if (!selectedClient.payload) {
                 return;
