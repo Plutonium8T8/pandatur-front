@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Text,
@@ -31,6 +31,7 @@ import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
 import { useUser } from "../../hooks";
+import { useSnackbar } from "notistack";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -42,6 +43,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
   const { userId } = useUser();
+  const { enqueueSnackbar } = useSnackbar();
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
@@ -111,40 +113,67 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const handleUpdateTask = async (taskId) => {
     const changes = taskEdits[taskId];
     if (!changes) return;
-    await api.task.update({
-      id: taskId,
-      ...changes,
-      scheduled_time: formatDate(changes.scheduled_time),
-    });
-    setEditMode((prev) => ({ ...prev, [taskId]: false }));
-    fetchTasks();
+
+    try {
+      await api.task.update({
+        id: taskId,
+        ...changes,
+        scheduled_time: formatDate(changes.scheduled_time),
+      });
+      enqueueSnackbar(translations["taskUpdated"][language],
+        { variant: "success" });
+      setEditMode((prev) => ({ ...prev, [taskId]: false }));
+      fetchTasks();
+    } catch (err) {
+      enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
+    }
   };
 
   const handleCreateTask = async () => {
     const newTask = taskEdits["new"];
-    if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) return;
+    if (!newTask?.task_type || !newTask?.created_for || !newTask?.scheduled_time || !newTask?.created_by) {
+      enqueueSnackbar(translations["completeAllFields"][language], { variant: "warning" });
+      return;
+    }
 
-    await api.task.create({
-      ...newTask,
-      description: newTask.description || "",
-      scheduled_time: formatDate(newTask.scheduled_time),
-      ticket_id: ticketId,
-      priority: "",
-      status_task: "",
-    });
-    setCreatingTask(false);
-    fetchTasks();
+    try {
+      await api.task.create({
+        ...newTask,
+        description: newTask.description || "",
+        scheduled_time: formatDate(newTask.scheduled_time),
+        ticket_id: ticketId,
+        priority: "",
+        status_task: "",
+      });
+      enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
+      setCreatingTask(false);
+      fetchTasks();
+    } catch (err) {
+      enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
+    }
   };
 
   const handleDeleteTask = (id) => {
     confirmDelete(() =>
-      api.task.delete({ id }).then(() => fetchTasks())
+      api.task.delete({ id })
+        .then(() => {
+          enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
+          fetchTasks();
+        })
+        .catch(() => {
+          enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
+        })
     );
   };
 
   const handleMarkDone = async (id) => {
-    await api.task.update({ id, status: true });
-    fetchTasks();
+    try {
+      await api.task.update({ id, status: true });
+      enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
+      fetchTasks();
+    } catch (err) {
+      enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
+    }
   };
 
   const getTaskIcon = (type) => {
@@ -193,6 +222,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               onChange={(value) => updateTaskField(id, "task_type", value)}
               label={translations["Alege tip task"][language]}
               disabled={!isEditing}
+              required
             />
             <DateQuickInput
               value={taskEdits[id]?.scheduled_time}
@@ -207,6 +237,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               label={translations["Autor"][language]}
               placeholder={translations["Autor"][language]}
               disabled={!isEditing}
+              required
             />
             <Select
               data={users}
@@ -216,6 +247,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               label={translations["Responsabil"][language]}
               disabled={!isEditing}
               placeholder={translations["Responsabil"][language]}
+              required
             />
           </Group>
 
