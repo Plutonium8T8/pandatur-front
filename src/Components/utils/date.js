@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { DD_MM_YYYY__HH_mm_ss } from "../../app-constants";
+import { DD_MM_YYYY__HH_mm_ss, DD_MM_YYYY, HH_mm } from "../../app-constants";
 import { translations } from "./translations";
 
 const language = localStorage.getItem("language") || "RO";
@@ -37,9 +37,24 @@ export const quickOptions = [
   { label: translations["in30Min"][language], offset: { minutes: 30 } },
   { label: translations["in1Hour"][language], offset: { hours: 1 } },
   { label: translations["today"][language], custom: () => dayjs() },
-  { label: translations["tomorrow"][language], custom: () => dayjs().add(1, "day") },
-  { label: translations["thisWeek"][language], custom: () => dayjs().endOf("week") },
+  {
+    label: translations["tomorrow"][language],
+    custom: () => dayjs().add(1, "day"),
+  },
+  {
+    label: translations["thisWeek"][language],
+    custom: () => dayjs().endOf("week"),
+  },
   { label: translations["inAWeek"][language], offset: { days: 7 } },
   { label: translations["in30Days"][language], offset: { days: 30 } },
   { label: translations["in1Year"][language], offset: { years: 1 } },
 ];
+
+export const formattedDate = (date) => {
+  const parsedDate = dayjs(date, DD_MM_YYYY__HH_mm_ss);
+
+  return {
+    formateDate: parsedDate.format(DD_MM_YYYY),
+    formateTime: parsedDate.format(HH_mm),
+  };
+};
