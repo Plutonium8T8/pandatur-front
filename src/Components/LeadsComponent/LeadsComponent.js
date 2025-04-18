@@ -332,10 +332,12 @@ const Leads = () => {
       {spinnerTickets && <SpinnerRightBottom />}
 
       <MantineModal
+        title={false}
         fullScreen
         open={isChatOpen && ticketId}
-        onClose={closeChatModal}
-        height="calc(100% - 60px)"
+        withCloseButton={false}
+        style={{ padding: 0 }}
+        height="100%"
       >
         <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>

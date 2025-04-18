@@ -1,4 +1,4 @@
-import { FaTimes } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import React, { useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
@@ -29,9 +29,9 @@ const SingleChat = ({ id, onClose }) => {
 
   return (
     <div className="chat-container">
-      <Box pos="absolute" left="20px" top="20px">
+      <Box pos="absolute" left="10px" top="16px">
         <ActionIcon onClick={onClose} variant="default">
-          <FaTimes />
+          <FaArrowLeft size="12" />
         </ActionIcon>
       </Box>
 
