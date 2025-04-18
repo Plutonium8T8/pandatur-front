@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   Paper,
   Text,
@@ -30,6 +30,7 @@ import { useGetTechniciansList } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
+import { UserContext } from "../../contexts";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -40,6 +41,8 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [taskEdits, setTaskEdits] = useState({});
   const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
+  const { userId } = useContext(UserContext);
+
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
   });
@@ -80,8 +83,18 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   useEffect(() => {
     if (creatingTask) {
       setListCollapsed(false);
+      setTaskEdits((prev) => ({
+        ...prev,
+        new: {
+          task_type: "",
+          scheduled_time: null,
+          created_for: "",
+          created_by: userId?.toString() || "",
+          description: "",
+        },
+      }));
     }
-  }, [creatingTask]);
+  }, [creatingTask, userId]);
 
   if (!creatingTask && tasks.length === 0) return null;
 
