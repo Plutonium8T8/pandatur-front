@@ -1,4 +1,5 @@
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
+import { useCallback } from "react";
 import { useUser, useApp } from "../../../../hooks";
 import { DD_MM_YYYY } from "../../../../app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
@@ -12,9 +13,22 @@ import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
+export const GroupedMessages = ({
+  personalInfo,
+  selectTicketId,
+  technicians,
+}) => {
   const { userId } = useUser();
   const { messages } = useApp();
+
+  const getTechnician = useCallback(
+    (id) => {
+      return technicians?.find(({ value }) => {
+        return Number(value) === id;
+      });
+    },
+    [technicians],
+  );
 
   // TODO: Please refactor me
   const sortedMessages = messages.list
@@ -84,7 +98,11 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
                   const isMessageSentByMe =
                     msg.sender_id === userId || msg.sender_id === 1;
                   return isMessageSentByMe ? (
-                    <SendedMessage key={msg.id} msg={msg} />
+                    <SendedMessage
+                      key={msg.id}
+                      msg={msg}
+                      technician={getTechnician(msg.sender_id)}
+                    />
                   ) : (
                     <ReceivedMessage
                       key={msg.id}
