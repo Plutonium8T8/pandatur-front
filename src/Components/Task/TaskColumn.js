@@ -7,6 +7,8 @@ import { translations } from "../utils/translations";
 const language = localStorage.getItem("language") || "RO";
 
 const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
+    const activeTasks = tasksList.filter((task) => task.status !== true);
+    
     return (
         <Paper
             withBorder
@@ -17,17 +19,17 @@ const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
             style={{ flex: 1, display: "flex", flexDirection: "column" }}
         >
             <Text fw={600} size="md" mb="xs">
-                {translations[titleKey][language]} — {tasksList.length}
+                {translations[titleKey][language]} — {activeTasks.length}
             </Text>
 
             <ScrollArea style={{ flex: 1 }}>
                 <Stack gap="sm">
-                    {tasksList.length === 0 ? (
+                    {activeTasks.length === 0 ? (
                         <Text c="dimmed" size="sm">
                             {translations["noTasks"][language]}
                         </Text>
                     ) : (
-                        tasksList.map((task) => {
+                        activeTasks.map((task) => {
                             const deadline = dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss");
                             return (
                                 <TaskCard
