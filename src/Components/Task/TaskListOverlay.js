@@ -192,6 +192,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               onChange={(value) => updateTaskField(id, "created_by", value)}
               w={180}
               label={translations["Autor"][language]}
+              placeholder={translations["Autor"][language]}
               disabled={!isEditing}
             />
             <Select
@@ -201,6 +202,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               w={180}
               label={translations["Responsabil"][language]}
               disabled={!isEditing}
+              placeholder={translations["Responsabil"][language]}
             />
           </Group>
 
