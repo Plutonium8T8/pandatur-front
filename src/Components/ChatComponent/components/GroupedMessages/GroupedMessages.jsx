@@ -99,7 +99,7 @@ export const GroupedMessages = ({
                     msg.sender_id === userId || msg.sender_id === 1;
                   return isMessageSentByMe ? (
                     <SendedMessage
-                      key={msg.id}
+                      key={msg.id || msg.time_sent}
                       msg={msg}
                       technician={getTechnician(msg.sender_id)}
                     />
