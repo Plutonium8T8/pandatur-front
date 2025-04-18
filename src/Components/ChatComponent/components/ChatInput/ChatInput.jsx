@@ -14,6 +14,7 @@ import { LuSmile } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
+import { FaPlus } from "react-icons/fa6";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -23,6 +24,7 @@ export const ChatInput = ({
   onChangeClient,
   currentClient,
   loading,
+  onCreateTask,
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
@@ -144,6 +146,14 @@ export const ChatInput = ({
             </ActionIcon>
             <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
               <LuSmile size={20} />
+            </ActionIcon>
+            <ActionIcon
+              onClick={onCreateTask}
+              c="black"
+              bg="white"
+              title={getLanguageByKey("New Task")}
+            >
+              <FaPlus size={20} />
             </ActionIcon>
           </Flex>
         </Flex>

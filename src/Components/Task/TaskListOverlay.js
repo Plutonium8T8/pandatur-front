@@ -34,14 +34,14 @@ import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskListOverlay = ({ ticketId }) => {
+const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [tasks, setTasks] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
-  const [creatingTask, setCreatingTask] = useState(false);
   const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
+  const [initialized, setInitialized] = useState(false);
   const { userId } = useUser();
 
   const confirmDelete = useConfirmPopup({
@@ -81,6 +81,24 @@ const TaskListOverlay = ({ ticketId }) => {
   useEffect(() => {
     fetchTasks();
   }, [ticketId]);
+
+  useEffect(() => {
+    if (!initialized && tasks.length === 0) {
+      setCreatingTask(true);
+      setListCollapsed(true);
+      setTaskEdits((prev) => ({
+        ...prev,
+        new: {
+          task_type: "",
+          scheduled_time: null,
+          created_for: "",
+          created_by: userId?.toString() || "",
+          description: "",
+        },
+      }));
+      setInitialized(true);
+    }
+  }, [tasks.length, initialized, userId]);
 
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({
@@ -180,7 +198,7 @@ const TaskListOverlay = ({ ticketId }) => {
           </Box>
         )}
 
-        <Collapse in={isNew || expandedCard === id}>
+        <Collapse in={isNew ? creatingTask : expandedCard === id}>
           <Divider my="sm" />
 
           <Group gap="xs" align="end">
@@ -304,16 +322,7 @@ const TaskListOverlay = ({ ticketId }) => {
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs">
             {tasks.map((task) => renderTaskForm(task.id))}
-            {creatingTask ? renderTaskForm("new", true) : (
-              <Button
-                leftSection={<FaPlus size={12} />}
-                variant="light"
-                size="xs"
-                onClick={handleStartCreatingTask}
-              >
-                {translations["New Task"][language]}
-              </Button>
-            )}
+            {creatingTask && renderTaskForm("new", true)}
           </Stack>
         </Collapse>
       </Paper>
