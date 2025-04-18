@@ -337,7 +337,7 @@ const Leads = () => {
         onClose={closeChatModal}
         height="calc(100% - 60px)"
       >
-        <SingleChat ticketId={ticketId} onClose={closeChatModal} />
+        <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
       {isOpenAddLeadModal && (
