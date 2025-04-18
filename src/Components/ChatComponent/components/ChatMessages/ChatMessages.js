@@ -187,7 +187,7 @@ export const ChatMessages = ({
             id={selectTicketId}
             clientList={messageSendersByPlatform}
             currentClient={selectedClient}
-            onCreateTask={() => { setCreatingTask(true); }}
+            onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {
               if (!selectedClient.payload) {
                 return;
