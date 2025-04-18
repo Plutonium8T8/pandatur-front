@@ -28,6 +28,7 @@ export const ChatMessages = ({
   messageSendersByPlatform,
   onChangeSelectedUser,
   loading,
+  technicians,
 }) => {
   const { userId } = useUser();
   const { messages } = useApp();
@@ -149,6 +150,7 @@ export const ChatMessages = ({
         <GroupedMessages
           personalInfo={personalInfo}
           selectTicketId={selectTicketId}
+          technicians={technicians}
         />
       );
     }

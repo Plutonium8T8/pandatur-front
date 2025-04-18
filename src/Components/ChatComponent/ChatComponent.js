@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useSnackbar } from "notistack";
-import { useApp, useFetchTicketChat } from "../../hooks";
+import { useApp, useFetchTicketChat, useGetTechniciansList } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
 import { getFullName, showServerError } from "../utils";
@@ -11,10 +11,12 @@ import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
+  const { enqueueSnackbar } = useSnackbar();
   const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
+  const { technicians } = useGetTechniciansList();
+
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const { enqueueSnackbar } = useSnackbar();
 
   const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
@@ -84,6 +86,7 @@ const ChatComponent = () => {
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
             loading={loading}
+            technicians={technicians}
           />
         </Flex>
 
