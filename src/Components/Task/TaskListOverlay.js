@@ -215,11 +215,12 @@ const TaskListOverlay = ({ ticketId }) => {
           </Group>
 
           <TextInput
-            label={translations["Descriere task"][language]}
+            label={translations["AddResult"][language]}
             placeholder={translations["AddResult"][language]}
             value={taskEdits[id]?.description || ""}
             onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
             mb="xs"
+            mt="xs"
           />
 
           <Group gap="xs" mt="xs">
@@ -256,6 +257,7 @@ const TaskListOverlay = ({ ticketId }) => {
                   variant="filled"
                   onClick={() => handleMarkDone(id)}
                   leftSection={<FaCheck />}
+                  disabled={!taskEdits[id]?.description?.trim()}
                 >
                   {translations["Done"][language]}
                 </Button>
