@@ -1322,7 +1322,7 @@ export const translations = {
     RO: "Descriere task",
     RU: "Описание задачи",
   },
-  For: {
+  Responsabil: {
     RO: "Responsabil",
     RU: "Ответственный",
   },
@@ -2119,4 +2119,12 @@ export const translations = {
     RO: "Selectează toate",
     RU: "Выбрать все",
   },
+  "AddResult": {
+    RO: "Adaugă rezultat",
+    RU: "Введите результат",
+  },
+  "Save": {
+    RO: "Salveazǎ",
+    RU: "Сохранить",
+  }
 };
