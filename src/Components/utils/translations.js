@@ -2147,4 +2147,40 @@ export const translations = {
     RO: "Combină client",
     RU: "Объединить лид",
   },
+  taskAdded: {
+    RO: "Task adăugat cu succes",
+    RU: "Задача успешно добавлена",
+  },
+  taskUpdated: {
+    RO: "Task actualizat сu succes",
+    RU: "Задача обновлена",
+  },
+  taskDeleted: {
+    RO: "Task șters cu succes",
+    RU: "Задача удалена",
+  },
+  taskCompleted: {
+    RO: "Task finalizat cu succes",
+    RU: "Задача завершена",
+  },
+  errorAddingTask: {
+    RO: "Eroare la adăugarea taskului",
+    RU: "Ошибка при добавлении задачи",
+  },
+  errorUpdatingTask: {
+    RO: "Eroare la actualizarea taskului",
+    RU: "Ошибка при обновлении задачи",
+  },
+  errorDeletingTask: {
+    RO: "Eroare la ștergerea taskului",
+    RU: "Ошибка при удалении задачи",
+  },
+  errorCompletingTask: {
+    RO: "Eroare la finalizarea taskului",
+    RU: "Ошибка при завершении задачи",
+  },
+  completeAllFields: {
+    RO: "Completați toate câmpurile obligatorii",
+    RU: "Заполните все обязательные поля",
+  }
 };
