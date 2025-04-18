@@ -54,8 +54,13 @@ export const Media = ({ messages }) => {
       {messages.length ? (
         messages.map((msg, index) => {
           return (
-            <Flex direction="column" align="center" mt="md" key={index}>
-              <Box mt="5" mb="5" ta="center">
+            <Flex
+              direction="column"
+              align="center"
+              mt={index ? "md" : "0"}
+              key={msg.id}
+            >
+              <Box mb="5" ta="center">
                 <Badge c="black" size="lg" bg={colors.gray[2]}>
                   {getTimeFormat(msg.time_sent)}
                 </Badge>
