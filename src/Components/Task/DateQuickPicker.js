@@ -18,7 +18,7 @@ import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
-const DateQuickInput = ({ value, onChange }) => {
+const DateQuickInput = ({ value, onChange, disabled = false }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
@@ -39,7 +39,7 @@ const DateQuickInput = ({ value, onChange }) => {
     }, [value, initialized]);
 
     useEffect(() => {
-        if (!date) return;
+        if (!date || disabled) return;
         const parsed = parseDate(`${date.replace(/\./g, "-")} ${safeTime}:00`);
         if (parsed && onChange) {
             onChange(parsed);
@@ -47,6 +47,7 @@ const DateQuickInput = ({ value, onChange }) => {
     }, [date, time]);
 
     const handleQuickSelect = (option) => {
+        if (disabled) return;
         const now = dayjs();
         const isFuture = parsedDate && dayjs(parsedDate).isAfter(now);
         const base = isFuture ? dayjs(parsedDate) : now;
@@ -62,14 +63,16 @@ const DateQuickInput = ({ value, onChange }) => {
             onChange={setPopoverOpen}
             position="bottom-start"
             shadow="md"
+            disabled={disabled}
         >
             <Popover.Target>
                 <TextInput
                     value={display}
                     readOnly
-                    onClick={() => setPopoverOpen(true)}
+                    onClick={() => !disabled && setPopoverOpen(true)}
                     label={translations["Deadline"][language]}
                     placeholder={translations["Deadline"][language]}
+                    disabled={disabled}
                 />
             </Popover.Target>
 
@@ -84,6 +87,7 @@ const DateQuickInput = ({ value, onChange }) => {
                                 color="gray"
                                 onClick={() => handleQuickSelect(option)}
                                 style={{ justifyContent: "flex-start" }}
+                                disabled={disabled}
                             >
                                 {option.label}
                             </Button>
@@ -96,11 +100,13 @@ const DateQuickInput = ({ value, onChange }) => {
                             value={date}
                             onChange={(e) => setDate(e.currentTarget.value)}
                             placeholder="dd.mm.yyyy"
+                            disabled={disabled}
                         />
                         <TimeInput
                             label={translations["Hour"][language]}
                             value={time}
                             onChange={(e) => setTime(e.currentTarget.value)}
+                            disabled={disabled}
                         />
                         <DatePicker
                             value={parsedDate || new Date()}
@@ -109,6 +115,7 @@ const DateQuickInput = ({ value, onChange }) => {
                             }}
                             size="md"
                             minDate={new Date()}
+                            disabled={disabled}
                         />
                     </Stack>
                 </Flex>

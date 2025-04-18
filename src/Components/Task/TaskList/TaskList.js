@@ -163,7 +163,7 @@ const TaskList = ({
           const isPast = parsed.isBefore(today);
 
           const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
-          const fontWeight = isPast || isToday ? 600 : 400;
+          const fontWeight = isPast || isToday ? 500 : 500;
 
           return (
             <span style={{ color, fontWeight }}>
@@ -182,7 +182,7 @@ const TaskList = ({
           row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
-        title: translations["For"][language],
+        title: translations["Responsabil"][language],
         dataIndex: "created_for_full_name",
         key: "created_for_full_name",
         width: 150,
@@ -267,7 +267,7 @@ const TaskList = ({
               <div
                 onClick={(e) => e.stopPropagation()}
               >
-                <Button variant="default" className="action-button-task">
+                <Button variant="default" className="action-button-task" size="xs" p="xs">
                   <IoEllipsisHorizontal size={18} />
                 </Button>
               </div>

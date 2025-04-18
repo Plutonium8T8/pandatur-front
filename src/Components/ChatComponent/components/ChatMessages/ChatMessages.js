@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
 import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "../ChatInput";
 import { getMediaType } from "../../renderContent";
@@ -172,45 +173,44 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {/* {selectTicketId && !messages.loading && (
-        <TaskListOverlay ticketId={selectTicketId} userId={userId} />
-      )} */}
-
       {selectTicketId && !messages.loading && (
-        <ChatInput
-          loading={loading}
-          id={selectTicketId}
-          clientList={messageSendersByPlatform}
-          currentClient={selectedClient}
-          onSendMessage={(value) => {
-            if (!selectedClient.payload) {
-              return;
+        <>
+          <TaskListOverlay ticketId={selectTicketId} userId={userId} />
+          <ChatInput
+            loading={loading}
+            id={selectTicketId}
+            clientList={messageSendersByPlatform}
+            currentClient={selectedClient}
+            onSendMessage={(value) => {
+              if (!selectedClient.payload) {
+                return;
+              }
+              sendMessage(
+                null,
+                {
+                  sender_id: Number(userId),
+                  client_id: selectedClient.payload?.id,
+                  platform: selectedClient.payload?.platform,
+                  message: value.trim(),
+                  ticket_id: selectTicketId,
+                  time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
+                  messageStatus: MESSAGES_STATUS.PENDING,
+                },
+                selectedClient.payload?.platform,
+              );
+            }}
+            onHandleFileSelect={(file) =>
+              sendMessage(file, selectedClient.payload?.platform)
             }
-            sendMessage(
-              null,
-              {
-                sender_id: Number(userId),
-                client_id: selectedClient.payload?.id,
-                platform: selectedClient.payload?.platform,
-                message: value.trim(),
-                ticket_id: selectTicketId,
-                time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
-                messageStatus: MESSAGES_STATUS.PENDING,
-              },
-              selectedClient.payload?.platform,
-            );
-          }}
-          onHandleFileSelect={(file) =>
-            sendMessage(file, selectedClient.payload?.platform)
-          }
-          onChangeClient={(value) => {
-            if (!value) return;
-            const [clientId, platform] = value.split("-");
-            const selectUserId = Number(clientId);
+            onChangeClient={(value) => {
+              if (!value) return;
+              const [clientId, platform] = value.split("-");
+              const selectUserId = Number(clientId);
 
-            onChangeSelectedUser(selectUserId, platform);
-          }}
-        />
+              onChangeSelectedUser(selectUserId, platform);
+            }}
+          />
+        </>
       )}
     </Flex>
   );
