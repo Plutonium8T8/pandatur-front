@@ -12,10 +12,9 @@ import "./chat.css";
 const ChatComponent = () => {
   const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
-  const [selectTicketId, setSelectTicketId] = useState(
-    ticketId ? Number(ticketId) : null,
-  );
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+
+  const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
   const {
     personalInfo,
@@ -26,21 +25,29 @@ const ChatComponent = () => {
     setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
+    getTicket,
   } = useFetchTicketChat(ticketId);
 
   useEffect(() => {
     if (ticketId) {
       setSelectedUser({});
       setMessageSendersByPlatform([]);
-      if (Number(ticketId) !== selectTicketId) {
-        setSelectTicketId(Number(ticketId));
-      }
 
       if (!messages?.list.length) {
         messages.getUserMessages(Number(ticketId));
       }
     }
   }, [ticketId]);
+
+  /**
+   *
+   * @param {number} id
+   */
+  const fetchTicketLight = async (mergedTicketId) => {
+    await getTicket();
+
+    setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+  };
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -49,7 +56,7 @@ const ChatComponent = () => {
         h="100%"
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        {isChatListVisible && <ChatList selectTicketId={selectTicketId} />}
+        {isChatListVisible && <ChatList selectTicketId={ticketIdToNumber} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>
@@ -66,7 +73,7 @@ const ChatComponent = () => {
           </Box>
 
           <ChatMessages
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             selectedClient={selectedUser}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
@@ -78,8 +85,9 @@ const ChatComponent = () => {
         {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
+            fetchTicketLight={fetchTicketLight}
             ticketId={ticketId}
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             onUpdatePersonalInfo={(payload, values) => {
               const identifier =
                 getFullName(values.name, values.surname) || `#${payload.id}`;

@@ -39,7 +39,7 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ selectTicketId, setSelectTicketId }) => {
+const ChatList = ({ selectTicketId }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(true);

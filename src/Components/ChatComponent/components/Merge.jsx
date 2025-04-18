@@ -2,7 +2,13 @@ import { TextInput, NumberInput, Button, Flex } from "@mantine/core";
 import { useField } from "@mantine/form";
 import { getLanguageByKey } from "../../utils";
 
-export const Merge = ({ placeholder, value, onSubmit, loading }) => {
+export const Merge = ({
+  placeholder,
+  value,
+  onSubmit,
+  loading,
+  buttonText,
+}) => {
   const field = useField({
     initialValue: "",
     clearErrorOnChange: false,
@@ -18,7 +24,7 @@ export const Merge = ({ placeholder, value, onSubmit, loading }) => {
     const validateField = await field.validate();
 
     if (validateField === null) {
-      onSubmit(field.getValue());
+      onSubmit(field.getValue(), field.reset);
     }
   };
 
@@ -39,7 +45,7 @@ export const Merge = ({ placeholder, value, onSubmit, loading }) => {
 
       <Flex justify="end">
         <Button mt="md" onClick={triggerSubmit} loading={loading}>
-          {getLanguageByKey("Combina")}
+          {buttonText}
         </Button>
       </Flex>
     </>
