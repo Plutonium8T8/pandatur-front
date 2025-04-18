@@ -40,9 +40,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [taskEdits, setTaskEdits] = useState({});
   const [editMode, setEditMode] = useState({});
   const { technicians: users } = useGetTechniciansList();
-  const [initialized, setInitialized] = useState(false);
-  const { userId } = useUser();
-
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
   });
@@ -51,15 +48,14 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     if (!ticketId) return setTasks([]);
     try {
       const res = await api.task.getTaskByTicket(ticketId);
-
       const taskArray = (Array.isArray(res?.data) ? res.data : res)
         .filter(t => t.ticket_id === ticketId && !t.status)
         .sort((a, b) =>
           dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
           dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
         );
-
       setTasks(taskArray);
+
       const edits = {};
       taskArray.forEach((t) => {
         edits[t.id] = {
@@ -82,22 +78,12 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   }, [ticketId]);
 
   useEffect(() => {
-    if (!initialized && tasks.length === 0) {
-      setCreatingTask(true);
-      setListCollapsed(true);
-      setTaskEdits((prev) => ({
-        ...prev,
-        new: {
-          task_type: "",
-          scheduled_time: null,
-          created_for: "",
-          created_by: userId?.toString() || "",
-          description: "",
-        },
-      }));
-      setInitialized(true);
+    if (creatingTask) {
+      setListCollapsed(false);
     }
-  }, [tasks.length, initialized, userId]);
+  }, [creatingTask]);
+
+  if (!creatingTask && tasks.length === 0) return null;
 
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({
@@ -289,8 +275,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       </Card>
     );
   };
-
-  if (!creatingTask && tasks.length === 0) return null;
 
   return (
     <Box pos="relative" p="xs" w="100%">
