@@ -5,24 +5,24 @@ import SingleChat from "../../ChatComponent/SingleChat";
 import { MantineModal } from "../../MantineModal";
 
 const TaskPage = () => {
-    const { ticketId } = useParams();
-    const navigate = useNavigate();
+  const { ticketId } = useParams();
+  const navigate = useNavigate();
 
-    const handleCloseModal = () => navigate("/tasks");
+  const handleCloseModal = () => navigate("/tasks");
 
-    return (
-        <>
-            <TaskComponent />
-            <MantineModal
-                fullScreen
-                open={!!ticketId}
-                onClose={handleCloseModal}
-                height="calc(100% - 60px)"
-            >
-                <SingleChat ticketId={ticketId} onClose={handleCloseModal} />
-            </MantineModal>
-        </>
-    );
+  return (
+    <>
+      <TaskComponent />
+      <MantineModal
+        fullScreen
+        open={!!ticketId}
+        onClose={handleCloseModal}
+        height="calc(100% - 60px)"
+      >
+        <SingleChat id={ticketId} onClose={handleCloseModal} />
+      </MantineModal>
+    </>
+  );
 };
 
 export default TaskPage;

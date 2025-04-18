@@ -6,7 +6,7 @@ import { parseDate, showServerError } from "../Components/utils";
 
 const FORMAT_MEDIA = ["audio", "video", "image", "file"];
 
-export const getMediaFileMessages = (messageList) => {
+const getMediaFileMessages = (messageList) => {
   return messageList.filter((msg) => FORMAT_MEDIA.includes(msg.mtype));
 };
 
@@ -17,37 +17,25 @@ export const useMessages = () => {
   const [loading, setLoading] = useState(false);
   const [lastMessage, setLastMessage] = useState();
   const [mediaFiles, setMediaFiles] = useState([]);
-  const [error, setError] = useState(null);
   const { userId } = useUser();
 
   const getUserMessages = async (id) => {
     setLoading(true);
-    setError(null);
     try {
       const data = await api.messages.messagesTicketById(id);
 
-      if (Array.isArray(data)) {
-        setMessages((prevMessages) => {
-          const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== id,
-          );
+      setMessages(data);
 
-          return [...otherMessages, ...data];
-        });
+      const lastMessage =
+        data
+          .filter(({ sender_id }) => sender_id !== 1 && sender_id !== userId)
+          .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent)) ||
+        [];
 
-        const lastMessage =
-          data
-            .filter(({ sender_id }) => sender_id !== 1 && sender_id !== userId)
-            .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent)) ||
-          [];
-
-        setLastMessage(lastMessage[0]);
-        setMediaFiles(getMediaFileMessages(data));
-      }
+      setLastMessage(lastMessage[0]);
+      setMediaFiles(getMediaFileMessages(data));
     } catch (error) {
-      const e = showServerError(error);
-      setError(e);
-      enqueueSnackbar(e, { variant: "error" });
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
       setLoading(false);
     }
@@ -85,7 +73,6 @@ export const useMessages = () => {
     lastMessage,
     loading,
     mediaFiles,
-    error,
     getUserMessages,
     markMessageRead,
     updateMessage,
