@@ -63,7 +63,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
             `ID: ${clientId}`;
 
           return (
-            <Flex pb="md" direction="column" gap="md" key={date}>
+            <Flex direction="column" gap="md" key={date}>
               <Divider
                 label={
                   <Badge c="black" size="lg" bg={colors.gray[2]}>
