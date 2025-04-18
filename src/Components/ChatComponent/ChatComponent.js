@@ -2,10 +2,11 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
+import { useSnackbar } from "notistack";
 import { useApp, useFetchTicketChat } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import { getFullName } from "../utils";
+import { getFullName, showServerError } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
@@ -13,6 +14,7 @@ const ChatComponent = () => {
   const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const { enqueueSnackbar } = useSnackbar();
 
   const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
@@ -44,9 +46,12 @@ const ChatComponent = () => {
    * @param {number} id
    */
   const fetchTicketLight = async (mergedTicketId) => {
-    await getTicket();
-
-    setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    try {
+      await Promise.all([getTicket(), messages.getUserMessages(ticketId)]);
+      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    }
   };
 
   return (

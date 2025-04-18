@@ -46,6 +46,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
         date: messageDate,
         clientId: Number(currentClientId),
         messages: [msg],
+        id: crypto.randomUUID(),
       });
     } else {
       lastGroup.messages.push(msg);
@@ -55,7 +56,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   return (
     <Flex direction="column" gap="xl" h="100%">
       {groupedMessages.length ? (
-        groupedMessages.map(({ date, clientId, messages }) => {
+        groupedMessages.map(({ date, clientId, messages, id }) => {
           const clientInfo =
             personalInfo?.clients?.find(({ id }) => id === clientId) || {};
 
@@ -63,7 +64,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
             getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
 
           return (
-            <Flex pb="xs" direction="column" gap="md" key={date}>
+            <Flex pb="xs" direction="column" gap="md" key={id}>
               <Divider
                 label={
                   <Badge c="black" size="lg" bg={colors.gray[2]}>
