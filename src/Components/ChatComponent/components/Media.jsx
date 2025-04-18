@@ -1,8 +1,8 @@
 import { Box, Flex, Image, Badge, DEFAULT_THEME } from "@mantine/core";
 import { getLanguageByKey, formattedDate } from "../../utils";
-import { MEDIA_TYPE } from "../renderContent";
 import { Empty } from "../../Empty";
-import { FALLBACK_IMAGE } from "../../../app-constants";
+import { FALLBACK_IMAGE, MEDIA_TYPE } from "../../../app-constants";
+import { File } from "../../File";
 import { Audio } from "../../Audio";
 
 const { colors } = DEFAULT_THEME;
@@ -24,7 +24,6 @@ const renderMediaContent = (type, message) => {
         radius="md"
         src={message}
         fallbackSrc={FALLBACK_IMAGE}
-        alt=""
         onClick={() => {
           window.open(message, "_blank");
         }}
@@ -38,9 +37,11 @@ const renderMediaContent = (type, message) => {
     ),
     [MEDIA_TYPE.AUDIO]: <Audio src={message} />,
     [MEDIA_TYPE.FILE]: (
-      <a href={message} target="_blank" rel="noopener noreferrer">
-        {getLanguageByKey("Deschide file")}
-      </a>
+      <File
+        bg={colors.gray[2]}
+        src={message}
+        label={`${message.slice(0, 15)}...`}
+      />
     ),
     [MEDIA_TYPE.CALL]: <Audio src={message} />,
   };

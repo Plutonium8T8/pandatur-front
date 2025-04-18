@@ -1,17 +1,15 @@
-import { FaRegFileLines } from "react-icons/fa6";
-import { Flex, Text, Box, Image } from "@mantine/core";
+import { Text, Box, Image, DEFAULT_THEME } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
+import { File } from "../File";
+import { MEDIA_TYPE } from "../../app-constants";
 
 const BROKEN_PHOTO = "/broken.png";
 
-export const MEDIA_TYPE = {
-  IMAGE: "image",
-  VIDEO: "video",
-  AUDIO: "audio",
-  FILE: "file",
-  URL: "url",
-  CALL: "call",
+const { colors } = DEFAULT_THEME;
+
+const spliceMessage = (message) => {
+  return `${message.slice(0, 15)}...`;
 };
 
 export const getMediaType = (mimeType) => {
@@ -19,16 +17,6 @@ export const getMediaType = (mimeType) => {
   if (mimeType.startsWith("video/")) return MEDIA_TYPE.VIDEO;
   if (mimeType.startsWith("audio/")) return MEDIA_TYPE.AUDIO;
   return "file";
-};
-
-const renderFile = (source) => {
-  return (
-    <a href={source} target="_blank" rel="noopener noreferrer">
-      <Flex c="black">
-        <FaRegFileLines size="24px" />
-      </Flex>
-    </a>
-  );
 };
 
 export const renderContent = (msg) => {
@@ -61,13 +49,23 @@ export const renderContent = (msg) => {
     case MEDIA_TYPE.AUDIO:
       return <Audio src={msg.message} />;
     case MEDIA_TYPE.FILE:
-      return renderFile(msg.message);
+      return (
+        <File
+          bg={colors.gray[4]}
+          label={spliceMessage(msg.message)}
+          src={msg.message}
+        />
+      );
 
     default:
       const { message } = msg;
 
       return isStoreFile(message) ? (
-        renderFile(message)
+        <File
+          bg={colors.gray[4]}
+          label={spliceMessage(message)}
+          src={message}
+        />
       ) : (
         <Box maw="600px" w="100%">
           <Text

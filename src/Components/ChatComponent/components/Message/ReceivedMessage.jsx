@@ -1,7 +1,7 @@
 import { Flex, Text, Image, DEFAULT_THEME } from "@mantine/core";
-import { DEFAULT_PHOTO, HH_mm } from "../../../../app-constants";
+import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "../../../../app-constants";
 import { getFullName, parseServerDate, socialMediaIcons } from "../../../utils";
-import { renderContent, MEDIA_TYPE } from "../../renderContent";
+import { renderContent } from "../../renderContent";
 import { Call } from "./Call";
 
 const { colors } = DEFAULT_THEME;
