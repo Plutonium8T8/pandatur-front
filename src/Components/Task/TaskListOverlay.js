@@ -17,7 +17,6 @@ import {
 import {
   FaChevronDown,
   FaChevronUp,
-  FaPlus,
   FaTrash,
   FaCheck,
   FaPencil,
@@ -128,6 +127,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
 
     await api.task.create({
       ...newTask,
+      description: newTask.description || "",
       scheduled_time: formatDate(newTask.scheduled_time),
       ticket_id: ticketId,
       priority: "",
@@ -135,20 +135,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     });
     setCreatingTask(false);
     fetchTasks();
-  };
-
-  const handleStartCreatingTask = () => {
-    setCreatingTask(true);
-    setTaskEdits((prev) => ({
-      ...prev,
-      new: {
-        task_type: "",
-        scheduled_time: null,
-        created_for: "",
-        created_by: userId?.toString() || "",
-        description: "",
-      },
-    }));
   };
 
   const handleDeleteTask = (id) => {
