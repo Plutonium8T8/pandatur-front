@@ -164,7 +164,7 @@ export const TicketCard = ({
               </Box>
               <Flex gap="4px" style={{ overflow: "hidden" }}>
                 {tags.map((tag) => (
-                  <Tag>{tag}</Tag>
+                  <Tag key={tag}>{tag}</Tag>
                 ))}
               </Flex>
 

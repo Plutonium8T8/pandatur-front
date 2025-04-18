@@ -1,9 +1,27 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { FixedSizeList } from "react-window";
-import { TextInput, Checkbox, Title, Flex, Box, Divider } from "@mantine/core";
-import { getLanguageByKey } from "../utils";
+import { LuFilter } from "react-icons/lu";
+import {
+  TextInput,
+  Checkbox,
+  Title,
+  Flex,
+  Box,
+  Divider,
+  ActionIcon,
+  Badge,
+} from "@mantine/core";
+import { useSnackbar } from "notistack";
+import { getLanguageByKey, showServerError } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
+import { MantineModal } from "../MantineModal";
+import { TicketFormTabs } from "../TicketFormTabs";
+import { api } from "../../api";
+
+const SORT_BY = "creation_date";
+const ORDER = "DESC";
+const LIGHT_TICKET = "light";
 
 const CHAT_ITEM_HEIGHT = 94;
 
@@ -21,15 +39,40 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ selectTicketId, setSelectTicketId }) => {
+const ChatList = ({ selectTicketId }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
-  const [showMyTickets, setShowMyTickets] = useState(false);
+  const [showMyTickets, setShowMyTickets] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [openFilter, setOpenFilter] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredTicketIds, setFilteredTicketIds] = useState(null);
+  const [lightTicketFilters, setLightTicketFilters] = useState({});
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
+
+  const filterChatList = async (attributes) => {
+    setIsLoading(true);
+    try {
+      const lightTickets = await api.tickets.filters({
+        sort_by: SORT_BY,
+        order: ORDER,
+        type: LIGHT_TICKET,
+        attributes,
+      });
+
+      setOpenFilter(false);
+      setLightTicketFilters(attributes);
+      setFilteredTicketIds(lightTickets.data.map(({ id }) => id));
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
@@ -52,14 +95,7 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
     }
   }, [selectTicketId, tickets]);
 
-  const handleTicketClick = (ticketId) => {
-    console.log("🖱 Клик по тикету в списке:", ticketId);
-
-    if (selectTicketId === ticketId) return;
-
-    setSelectTicketId(ticketId);
-  };
-
+  // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
     let filtered = [...tickets];
 
@@ -91,8 +127,14 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
       });
     }
 
+    if (filteredTicketIds === null) return filtered;
+    if (filteredTicketIds.length === 0) return [];
+    filtered = filtered.filter((ticket) =>
+      filteredTicketIds.includes(ticket.id),
+    );
+
     return filtered;
-  }, [tickets, showMyTickets, searchQuery]);
+  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
@@ -101,41 +143,70 @@ const ChatList = ({ selectTicketId, setSelectTicketId }) => {
       <ChatListItem
         chat={ticket}
         style={style}
-        onHandleTicketClick={handleTicketClick}
         selectTicketId={selectTicketId}
       />
     );
   };
 
   return (
-    <Box direction="column" w="20%" ref={chatListRef}>
-      <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
-        <Title order={3}>{getLanguageByKey("Chat")}</Title>
+    <>
+      <Box direction="column" w="20%" ref={chatListRef}>
+        <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
+          <Flex align="center" justify="space-between">
+            <Flex align="center" gap={8}>
+              <Title order={3}>{getLanguageByKey("Chat")}</Title>
 
-        <Checkbox
-          label={getLanguageByKey("Leadurile mele")}
-          onChange={(e) => setShowMyTickets(e.target.checked)}
-          checked={showMyTickets}
-        />
+              <Badge bg="#0f824c">{sortedTickets.length}</Badge>
+            </Flex>
 
-        <TextInput
-          placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
-          onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
-        />
-      </Flex>
+            <ActionIcon
+              variant="default"
+              size="24"
+              onClick={() => setOpenFilter(true)}
+            >
+              <LuFilter size={12} />
+            </ActionIcon>
+          </Flex>
 
-      <Divider />
-      <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
-        <FixedSizeList
-          height={wrapperChatHeight}
-          itemCount={sortedTickets?.length || 0}
-          itemSize={CHAT_ITEM_HEIGHT}
-          width="100%"
-        >
-          {ChatItem}
-        </FixedSizeList>
+          <Checkbox
+            label={getLanguageByKey("Leadurile mele")}
+            onChange={(e) => setShowMyTickets(e.target.checked)}
+            checked={showMyTickets}
+          />
+
+          <TextInput
+            placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+            onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
+          />
+        </Flex>
+
+        <Divider />
+        <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
+          <FixedSizeList
+            height={wrapperChatHeight}
+            itemCount={sortedTickets?.length || 0}
+            itemSize={CHAT_ITEM_HEIGHT}
+            width="100%"
+          >
+            {ChatItem}
+          </FixedSizeList>
+        </Box>
       </Box>
-    </Box>
+
+      <MantineModal
+        title={getLanguageByKey("Filtrează tichete")}
+        open={openFilter}
+        onClose={() => setOpenFilter(false)}
+      >
+        <TicketFormTabs
+          initialData={lightTicketFilters}
+          orientation="horizontal"
+          onClose={() => setOpenFilter(false)}
+          onSubmit={(filters) => filterChatList(filters)}
+          loading={isLoading}
+        />
+      </MantineModal>
+    </>
   );
 };
 

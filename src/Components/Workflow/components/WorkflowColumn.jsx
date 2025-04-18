@@ -49,10 +49,8 @@ const wrapperColumn = forwardRef(({ style, ...rest }, ref) => (
   <Box
     ref={ref}
     pos="relative"
-    mt="8px"
-    style={{
-      ...style,
-    }}
+    mt={SPACE_BETWEEN_CARDS + SPACE_BETWEEN_CARDS}
+    style={style}
     {...rest}
   />
 ));
@@ -117,7 +115,6 @@ export const WorkflowColumn = ({
       <div style={style}>
         <div ref={rowRef}>
           <TicketCard
-            key={ticket.id}
             ticket={ticket}
             onEditTicket={onEditTicket}
             technician={technician}
@@ -130,6 +127,7 @@ export const WorkflowColumn = ({
 
   return (
     <Flex
+      pos="relative"
       direction="column"
       bg={colors.gray[1]}
       style={{
@@ -142,7 +140,7 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <Flex px="8px" direction="column" h="100%" ref={columnRef}>
+      <Flex mt={30} px="8px" direction="column" h="100%" ref={columnRef}>
         <VariableSizeList
           ref={listRef}
           height={columnHeight}

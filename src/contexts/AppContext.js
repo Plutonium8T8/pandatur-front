@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useUser, useLocalStorage } from "../hooks";
+import { useUser, useLocalStorage, useMessages } from "../hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "../Components/utils";
 
@@ -20,15 +20,25 @@ const normalizeLightTickets = (tickets) => {
 };
 
 export const AppProvider = ({ children }) => {
+  const {
+    messages,
+    getUserMessages,
+    markMessageRead,
+    updateMessage,
+    markMessageSeen,
+    setMessages,
+    lastMessage,
+    loading,
+    mediaFiles,
+  } = useMessages();
   const socketRef = useRef(null);
   const [tickets, setTickets] = useState([]);
-  const [messages, setMessages] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
-  const [unreadMessages, setUnreadMessages] = useState(new Map());
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
+  const [ticketError, setTicketError] = useState("");
   const { storage, changeLocalStorage } = useLocalStorage(
     SIDEBAR_COLLAPSE,
     "false",
@@ -109,50 +119,20 @@ export const AppProvider = ({ children }) => {
     };
   }, []);
 
-  useEffect(() => {
-    const unread = messages.filter(
-      (msg) =>
-        msg.seen_by != null &&
-        msg.seen_by === "{}" &&
-        msg.sender_id !== 1 &&
-        msg.sender_id !== userId,
-    );
-    setUnreadCount(unread.length);
-  }, [messages]);
-
-  const markMessagesAsRead = (ticketId) => {
+  const markMessagesAsRead = (ticketId, count) => {
     if (!ticketId) return;
 
     const socketInstance = socketRef.current;
 
-    setMessages((prevMessages) =>
-      prevMessages.map((msg) => {
-        if (msg.ticket_id === ticketId) {
-          return {
-            ...msg,
-            seen_by: JSON.stringify({ [userId]: true }),
-            seen_at: new Date().toISOString(),
-          };
-        }
-        return msg;
-      }),
-    );
-
-    setUnreadMessages((prevUnread) => {
-      const updatedUnread = new Map(prevUnread);
-      updatedUnread.forEach((msg, msgId) => {
-        if (msg.ticket_id === ticketId) {
-          updatedUnread.delete(msgId);
-        }
-      });
-      return updatedUnread;
-    });
+    markMessageRead(ticketId);
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
         ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket,
       ),
     );
+
+    setUnreadCount((prev) => prev - count);
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
@@ -171,12 +151,20 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page) => {
     try {
+      setTicketError(false);
       const data = await api.tickets.getLightList({ page: page });
 
       if (page >= data.total_pages) {
         setSpinnerTickets(false);
         return;
       }
+
+      const totalUnread = data.tickets.reduce(
+        (sum, ticket) => sum + ticket.unseen_count,
+        0,
+      );
+
+      setUnreadCount((prev) => prev + totalUnread);
 
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => [...prev, ...processedTickets]);
@@ -185,6 +173,8 @@ export const AppProvider = ({ children }) => {
 
       getTicketsListRecursively(page + 1);
     } catch (error) {
+      setSpinnerTickets(false);
+      setTicketError(true);
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
@@ -211,6 +201,8 @@ export const AppProvider = ({ children }) => {
         }
       });
 
+      setUnreadCount((prev) => prev + ticket?.unseen_count || 0);
+
       return ticket;
     } catch (error) {
       console.error("Ticket request error:", error);
@@ -232,37 +224,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const getClientMessagesSingle = async (ticket_id) => {
-    console.log("Updating messages for ticket:", ticket_id);
-    try {
-      const data = await api.messages.messagesTicketById(ticket_id);
-
-      if (Array.isArray(data)) {
-        setMessages((prevMessages) => {
-          const otherMessages = prevMessages.filter(
-            (msg) => msg.ticket_id !== ticket_id,
-          );
-
-          return [...otherMessages, ...data];
-        });
-
-        const unseenMessages = data.filter(
-          (msg) => msg.seen_by === "{}" && msg.sender_id !== userId,
-        );
-
-        setTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket.id === ticket_id
-              ? { ...ticket, unseen_count: unseenMessages.length }
-              : ticket,
-          ),
-        );
-      }
-    } catch (error) {
-      console.error("error request messages:", error.message);
-    }
-  };
-
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case "message": {
@@ -275,7 +236,13 @@ export const AppProvider = ({ children }) => {
           sender_id,
         } = message.data;
 
-        setMessages((prevMessages) => [...prevMessages, message.data]);
+        setUnreadCount((prev) => prev + 1);
+
+        const senderId = message.data.sender_id;
+
+        if (Number(senderId) !== userId) {
+          updateMessage(message);
+        }
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -293,42 +260,12 @@ export const AppProvider = ({ children }) => {
           ),
         );
 
-        setUnreadMessages((prevUnread) => {
-          const updatedUnread = new Map(prevUnread);
-
-          if (ticket_id === selectTicketId) {
-            updatedUnread.forEach((msg, msgId) => {
-              if (msg.ticket_id === ticket_id) {
-                updatedUnread.delete(msgId);
-              }
-            });
-          } else if (sender_id !== userId) {
-            updatedUnread.set(message.data.id, message.data);
-          }
-
-          return updatedUnread;
-        });
-
         break;
       }
       case "seen": {
         const { ticket_id, seen_at } = message.data;
 
-        setMessages((prevMessages) => {
-          return prevMessages.map((msg) =>
-            msg.ticket_id === ticket_id ? { ...msg, seen_at } : msg,
-          );
-        });
-
-        setUnreadMessages((prevUnreadMessages) => {
-          const updatedUnreadMap = new Map(prevUnreadMessages);
-          updatedUnreadMap.forEach((msg, msgId) => {
-            if (msg.ticket_id === ticket_id) {
-              updatedUnreadMap.delete(msgId);
-            }
-          });
-          return updatedUnreadMap;
-        });
+        markMessageSeen(ticket_id, seen_at);
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -376,33 +313,30 @@ export const AppProvider = ({ children }) => {
     fetchTickets();
   }, []);
 
-  useEffect(() => {
-    const totalUnread = tickets.reduce(
-      (sum, ticket) => sum + ticket.unseen_count,
-      0,
-    );
-
-    setUnreadCount(totalUnread);
-  }, [tickets, unreadMessages]);
-
   return (
     <AppContext.Provider
       value={{
+        messages: {
+          list: messages,
+          lastMessage,
+          loading,
+          mediaFiles,
+          getUserMessages,
+          setMessages,
+        },
         tickets,
         setTickets,
         selectTicketId,
         setSelectTicketId,
-        messages,
-        setMessages,
         unreadCount,
         markMessagesAsRead,
         updateTicket,
         fetchTickets,
         socketRef,
-        getClientMessagesSingle,
         spinnerTickets,
         setIsCollapsed: collapsed,
         isCollapsed: storage === "true",
+        ticketError,
       }}
     >
       {children}

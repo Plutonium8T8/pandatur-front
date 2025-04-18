@@ -1,59 +1,37 @@
-import { Textarea, Flex, ActionIcon, Box, Button, Text } from "@mantine/core";
-import { useState, useRef, useEffect, useMemo } from "react";
+import {
+  Textarea,
+  Flex,
+  ActionIcon,
+  Box,
+  Button,
+  Select,
+  Loader,
+} from "@mantine/core";
+import { useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
-import { IoIosArrowDown } from "react-icons/io";
 import { RiAttachment2 } from "react-icons/ri";
-import { FaFingerprint } from "react-icons/fa6";
-import {
-  getLanguageByKey,
-  socialMediaIcons,
-  getFullName,
-} from "../../../utils";
+import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
-import { ComboSelect } from "../../../ComboSelect";
 import "./ChatInput.css";
 
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
-  loading,
   clientList,
   onChangeClient,
   currentClient,
+  loading,
 }) => {
   const [message, setMessage] = useState("");
   const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [selectedClient, setSelectedClient] = useState("");
+  const [template, setTemplate] = useState();
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0,
   });
-
-  const userList = useMemo(() => {
-    return clientList?.map(({ payload, value }) => {
-      const fullName = getFullName(payload.name, payload.surname);
-
-      return {
-        value,
-        label: (
-          <Flex align="center" gap="8">
-            <Flex align="center" gap="4">
-              {!fullName && <FaFingerprint size="12" />}
-              {fullName || payload.id}
-            </Flex>
-            {socialMediaIcons[payload?.platform]}
-          </Flex>
-        ),
-        payload: {
-          id: payload.id,
-          platform: payload.platform,
-        },
-      };
-    });
-  }, [clientList]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -68,76 +46,56 @@ export const ChatInput = ({
   };
 
   const handleFileButtonClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
+    fileInputRef.current?.click();
   };
 
   const handleFile = (e) => {
     const selectedFile = e.target.files[0];
     if (!selectedFile) return;
-
     onHandleFileSelect(selectedFile);
   };
 
   const clearState = () => {
     setMessage("");
+    setTemplate(null);
   };
 
   const sendMessage = () => {
-    if (message?.trim()) {
+    if (message.trim()) {
       onSendMessage(message);
-
       clearState();
     }
   };
 
-  useEffect(() => {
-    setSelectedClient(
-      userList.find(
-        ({ payload }) =>
-          payload.id === currentClient.payload?.id &&
-          payload.platform === currentClient.payload?.platform,
-      ),
-    );
-  }, [currentClient, userList]);
-
   return (
     <>
-      <Box p="16px">
-        <Flex gap="xs" mb="xs" align="center">
-          <ComboSelect
-            position="top"
-            renderTriggerButton={(closeDropdown) => (
-              <Text
-                className="pointer"
-                c="blue "
-                td="underline"
-                onClick={closeDropdown}
-              >
-                {selectedClient?.label ? selectedClient?.label : ""}
-              </Text>
-            )}
-            onChange={(value) => {
-              setSelectedClient(
-                userList.find((client) => client.value === value),
-              );
-              onChangeClient(value);
-            }}
-            data={userList}
-          />
+      <Box className="chat-input" p="16">
+        <Flex w="100%" gap="xs" mb="xs" align="center">
+          {socialMediaIcons[currentClient?.payload?.platform] && (
+            <Flex>{socialMediaIcons[currentClient.payload.platform]}</Flex>
+          )}
+          {loading ? (
+            <Loader size="xs" />
+          ) : (
+            <Select
+              className="w-full"
+              onChange={(value) => {
+                onChangeClient(value);
+              }}
+              placeholder={getLanguageByKey("selectUser")}
+              value={currentClient?.value}
+              data={clientList}
+            />
+          )}
 
-          <ComboSelect
-            position="top"
-            currentValue={currentClient.value}
-            renderTriggerButton={(closeDropdown) => (
-              <ActionIcon size="xs" variant="default" onClick={closeDropdown}>
-                <IoIosArrowDown />
-              </ActionIcon>
-            )}
-            onChange={(value) =>
-              setMessage(value ? templateOptions[value] : "")
-            }
+          <Select
+            onChange={(value) => {
+              setMessage(value ? templateOptions[value] : "");
+              setTemplate(value);
+            }}
+            className="w-full"
+            value={template}
+            placeholder={getLanguageByKey("select_message_template")}
             data={Object.keys(templateOptions).map((key) => ({
               value: key,
               label: key,
@@ -158,9 +116,12 @@ export const ChatInput = ({
         <Flex align="center" justify="space-between">
           <Flex gap="xs">
             <Button
-              disabled={!message}
+              disabled={
+                !message.trim() ||
+                !currentClient?.payload ||
+                currentClient.payload.platform === "sipuni"
+              }
               variant="filled"
-              loading={loading}
               onClick={sendMessage}
             >
               {getLanguageByKey("Trimite")}
@@ -179,10 +140,10 @@ export const ChatInput = ({
               style={{ display: "none" }}
             />
             <ActionIcon c="black" bg="white" onClick={handleFileButtonClick}>
-              <RiAttachment2 />
+              <RiAttachment2 size={20} />
             </ActionIcon>
             <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
-              <LuSmile />
+              <LuSmile size={20} />
             </ActionIcon>
           </Flex>
         </Flex>

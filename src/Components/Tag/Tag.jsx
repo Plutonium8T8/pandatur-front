@@ -7,9 +7,13 @@ const variants = {
   danger: "danger",
 };
 
-export const Tag = ({ children, type, ...props }) => {
+export const Tag = ({ children, type, fontSize, ...props }) => {
   return (
-    <span className={`tag tag-${variants[type] || "default"}`} {...props}>
+    <span
+      className={`tag tag-${variants[type] || "default"}`}
+      style={fontSize ? { fontSize } : undefined}
+      {...props}
+    >
       {children}
     </span>
   );

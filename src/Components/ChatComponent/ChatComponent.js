@@ -1,122 +1,57 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useUser } from "../../hooks";
+import { useSnackbar } from "notistack";
+import { useApp, useFetchTicketChat } from "../../hooks";
 import ChatExtraInfo from "./ChatExtraInfo";
 import ChatList from "./ChatList";
-import {
-  getMediaFileMessages,
-  normalizeUsersAndPlatforms,
-  getFullName,
-  parseDate,
-} from "../utils";
+import { getFullName, showServerError } from "../utils";
 import { ChatMessages } from "./components";
 import "./chat.css";
 
 const ChatComponent = () => {
-  const {
-    tickets,
-    setTickets,
-    messages,
-    markMessagesAsRead,
-    getClientMessagesSingle,
-  } = useApp();
+  const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
-  const navigate = useNavigate();
-  const { userId } = useUser();
-  const [selectTicketId, setSelectTicketId] = useState(
-    ticketId ? Number(ticketId) : null,
-  );
-  const [personalInfo, setPersonalInfo] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-  const [selectedUser, setSelectedUser] = useState({});
-  const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const getLastClientWhoSentMessage = () => {
-    if (!Array.isArray(messages) || messages.length === 0) return null;
+  const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
-    const ticketMessages = messages
-      .filter(
-        (msg) =>
-          msg.ticket_id === selectTicketId && Number(msg.sender_id) !== 1,
-      )
-      .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent));
-
-    return ticketMessages.length > 0 ? ticketMessages[0] : null;
-  };
-
-  useEffect(() => {
-    if (!selectTicketId || !messages.length) return;
-
-    const unreadMessages = messages.filter(
-      (msg) =>
-        msg.ticket_id === selectTicketId &&
-        msg.seen_by === "{}" &&
-        msg.sender_id !== userId,
-    );
-
-    if (unreadMessages.length > 0) {
-      markMessagesAsRead(selectTicketId);
-    }
-  }, [selectTicketId, messages, userId]);
+  const {
+    personalInfo,
+    messageSendersByPlatform,
+    loading,
+    selectedUser,
+    changeUser,
+    setPersonalInfo,
+    setMessageSendersByPlatform,
+    setSelectedUser,
+    getTicket,
+  } = useFetchTicketChat(ticketId);
 
   useEffect(() => {
-    const ticketById =
-      tickets.find((ticket) => ticket.id === selectTicketId) || {};
+    if (ticketId) {
+      setSelectedUser({});
+      setMessageSendersByPlatform([]);
 
-    const users = normalizeUsersAndPlatforms(ticketById.clients, messages);
-
-    setPersonalInfo(ticketById);
-    setMessageSendersByPlatform(users);
-  }, [tickets, selectTicketId]);
-
-  useEffect(() => {
-    const lastMessage = getLastClientWhoSentMessage();
-
-    if (lastMessage) {
-      const { platform, client_id } = lastMessage;
-
-      const selectedUser = messageSendersByPlatform.find(
-        ({ payload }) =>
-          payload.id === client_id && payload.platform === platform,
-      );
-      setSelectedUser(selectedUser || {});
-    } else {
-      setSelectedUser(messageSendersByPlatform?.[0] || {});
-    }
-  }, [selectTicketId, messages, messageSendersByPlatform]);
-
-  const handleSelectTicket = (ticketId) => {
-    if (selectTicketId !== ticketId) {
-      setSelectTicketId(ticketId);
-      navigate(`/chat/${ticketId}`);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectTicketId) return;
-
-    setIsLoading(true);
-
-    getClientMessagesSingle(selectTicketId).finally(() => {
-      setIsLoading(false);
-    });
-  }, [selectTicketId]);
-
-  useEffect(() => {
-    if (ticketId && Number(ticketId) !== selectTicketId) {
-      setSelectTicketId(Number(ticketId));
+      if (!messages?.list.length) {
+        messages.getUserMessages(Number(ticketId));
+      }
     }
   }, [ticketId]);
 
-  const changeUser = (userId, platform) => {
-    const user = messageSendersByPlatform.find(
-      ({ payload }) => payload.id === userId && payload.platform === platform,
-    );
-
-    setSelectedUser(user);
+  /**
+   *
+   * @param {number} mergedTicketId
+   */
+  const fetchTicketLight = async (mergedTicketId) => {
+    try {
+      await Promise.all([getTicket(), messages.getUserMessages(ticketId)]);
+      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    }
   };
 
   return (
@@ -126,15 +61,10 @@ const ChatComponent = () => {
         h="100%"
         className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
       >
-        {isChatListVisible && (
-          <ChatList
-            selectTicketId={selectTicketId}
-            setSelectTicketId={handleSelectTicket}
-          />
-        )}
+        {isChatListVisible && <ChatList selectTicketId={ticketIdToNumber} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
-          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 999 }}>
+          <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>
             <ActionIcon
               variant="default"
               onClick={() => setIsChatListVisible((prev) => !prev)}
@@ -148,21 +78,24 @@ const ChatComponent = () => {
           </Box>
 
           <ChatMessages
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             selectedClient={selectedUser}
-            isLoading={isLoading}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
+            loading={loading}
           />
         </Flex>
 
-        {selectTicketId && (
+        {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
+            fetchTicketLight={fetchTicketLight}
             ticketId={ticketId}
-            selectTicketId={selectTicketId}
+            selectTicketId={ticketIdToNumber}
             onUpdatePersonalInfo={(payload, values) => {
+              const identifier =
+                getFullName(values.name, values.surname) || `#${payload.id}`;
               const clientTicketList = personalInfo.clients.map((client) =>
                 client.id === payload.id
                   ? {
@@ -174,21 +107,21 @@ const ChatComponent = () => {
 
               setSelectedUser((prev) => ({
                 ...prev,
-                label: getFullName(values.name, values.surname),
+                label: identifier,
                 payload: { ...prev.payload, ...values },
               }));
 
               setMessageSendersByPlatform((prev) =>
-                prev.map((clientMsj) =>
-                  clientMsj.id === payload.id &&
-                  clientMsj.platform === payload.platform
+                prev.map((client) => {
+                  return client.payload.id === payload.id &&
+                    client.payload.platform === payload.platform
                     ? {
-                        ...clientMsj,
-                        label: getFullName(values.name, values.surname),
+                        ...client,
+                        label: `${identifier} - ${payload.platform}`,
                         payload: { ...payload, ...values },
                       }
-                    : clientMsj,
-                ),
+                    : client;
+                }),
               );
 
               setTickets((prev) =>
@@ -207,7 +140,7 @@ const ChatComponent = () => {
               });
             }}
             updatedTicket={personalInfo}
-            mediaFiles={getMediaFileMessages(messages, selectTicketId)}
+            mediaFiles={messages.mediaFiles}
           />
         )}
       </Flex>

@@ -1,36 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Flex } from "@mantine/core";
+import { Flex, Text } from "@mantine/core";
 import { useSnackbar } from "notistack";
+import dayjs from "dayjs";
 import { useApp, useUser, useGetTechniciansList } from "../../../../hooks";
 import { api } from "../../../../api";
-import TaskListOverlay from "../../../Task/Components/TicketTask/TaskListOverlay";
-import { translations } from "../../../utils/translations";
-import { getLanguageByKey, showServerError } from "../../../utils";
+import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "../../../Spin";
-import { ChatInput } from "..";
-import { getMediaType } from "../../utils";
+import { ChatInput } from "../ChatInput";
+import { getMediaType } from "../../renderContent";
 import { GroupedMessages } from "../GroupedMessages";
+import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
 import "./ChatMessages.css";
 
-const language = localStorage.getItem("language") || "RO";
+const getSendedMessage = (msj, currentMsj, statusMessage) => {
+  return msj.sender_id === currentMsj.sender_id &&
+    msj.message === currentMsj.message &&
+    msj.time_sent === currentMsj.time_sent
+    ? { ...msj, messageStatus: statusMessage }
+    : msj;
+};
 
 export const ChatMessages = ({
   selectTicketId,
   selectedClient,
-  isLoading,
   personalInfo,
   messageSendersByPlatform,
   onChangeSelectedUser,
+  loading,
 }) => {
   const { userId } = useUser();
-  const { messages, setMessages } = useApp();
+  const { messages } = useApp();
+
   const { enqueueSnackbar } = useSnackbar();
   const { technicians } = useGetTechniciansList();
   const technician = technicians.find(({ value }) => Number(value) === userId);
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
-  const [loadingMessage, setLoadingMessage] = useState(false);
 
   const uploadFile = async (file) => {
     const formData = new FormData();
@@ -47,22 +54,12 @@ export const ChatMessages = ({
     }
   };
 
-  const sendMessage = async (selectedFile, platform, inputValue) => {
-    setLoadingMessage(true);
+  const sendMessage = async (selectedFile, metadataMsj, platform) => {
     try {
-      const messageData = {
-        sender_id: Number(userId),
-        client_id: selectedClient.payload?.id,
-        platform: platform,
-        message: inputValue.trim(),
-        media_type: null,
-        media_url: "",
-<<<<<<< Updated upstream
-=======
-        isError: false,
-        technician,
->>>>>>> Stashed changes
-      };
+      messages.setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...metadataMsj, seenAt: false },
+      ]);
 
       if (selectedFile) {
         const uploadResponse = await uploadFile(selectedFile);
@@ -74,8 +71,8 @@ export const ChatMessages = ({
           return;
         }
 
-        messageData.media_url = uploadResponse.url;
-        messageData.media_type = getMediaType(selectedFile.type);
+        metadataMsj["media_url"] = uploadResponse.url;
+        metadataMsj["media_type"] = getMediaType(selectedFile.type);
       }
 
       let apiUrl = api.messages.send.create;
@@ -86,16 +83,19 @@ export const ChatMessages = ({
         apiUrl = api.messages.send.viber;
       }
 
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...messageData, seenAt: false },
-      ]);
+      await apiUrl(metadataMsj);
 
-      await apiUrl(messageData);
+      messages.setMessages((prev) => {
+        return prev.map((msj) =>
+          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
+        );
+      });
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    } finally {
-      setLoadingMessage(false);
+      messages.setMessages((prev) => {
+        return prev.map((msj) =>
+          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
+        );
+      });
     }
   };
 
@@ -113,7 +113,7 @@ export const ChatMessages = ({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages, selectTicketId]);
+  }, [messages.list, selectTicketId]);
 
   useEffect(() => {
     const container = messageContainerRef.current;
@@ -127,6 +127,42 @@ export const ChatMessages = ({
     };
   }, []);
 
+  const renderMessagesContent = () => {
+    if (messages.error) {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Text size="lg" c="red">
+            {getLanguageByKey("loadMessagesError")}
+          </Text>
+        </Flex>
+      );
+    }
+    if (messages.loading) {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Spin />
+        </Flex>
+      );
+    }
+
+    if (selectTicketId) {
+      return (
+        <GroupedMessages
+          personalInfo={personalInfo}
+          selectTicketId={selectTicketId}
+        />
+      );
+    }
+
+    return (
+      <Flex h="100%" align="center" justify="center">
+        <Text size="lg" c="dimmed">
+          {getLanguageByKey("Alege lead")}
+        </Text>
+      </Flex>
+    );
+  };
+
   return (
     <Flex w="100%" direction="column" className="chat-area">
       <Flex
@@ -136,48 +172,47 @@ export const ChatMessages = ({
         className="chat-messages"
         ref={messageContainerRef}
       >
-        {isLoading ? (
-          <Flex h="100%" align="center" justify="center">
-            <Spin />
-          </Flex>
-        ) : selectTicketId ? (
-          <GroupedMessages
-            personalInfo={personalInfo}
-            selectTicketId={selectTicketId}
-          />
-        ) : (
-          <div className="empty-chat">
-            <p>{translations["Alege lead"][language]}</p>
-          </div>
-        )}
+        {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !isLoading && (
-        <TaskListOverlay ticketId={selectTicketId} userId={userId} />
-      )}
-
-      {selectTicketId && !isLoading && (
-        <ChatInput
-          clientList={messageSendersByPlatform}
-          currentClient={selectedClient}
-          loading={loadingMessage}
-          onSendMessage={(value) => {
-            if (!selectedClient) {
-              return;
+      {selectTicketId && !messages.loading && (
+        <>
+          <TaskListOverlay ticketId={selectTicketId} userId={userId} />
+          <ChatInput
+            loading={loading}
+            id={selectTicketId}
+            clientList={messageSendersByPlatform}
+            currentClient={selectedClient}
+            onSendMessage={(value) => {
+              if (!selectedClient.payload) {
+                return;
+              }
+              sendMessage(
+                null,
+                {
+                  sender_id: Number(userId),
+                  client_id: selectedClient.payload?.id,
+                  platform: selectedClient.payload?.platform,
+                  message: value.trim(),
+                  ticket_id: selectTicketId,
+                  time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
+                  messageStatus: MESSAGES_STATUS.PENDING,
+                },
+                selectedClient.payload?.platform,
+              );
+            }}
+            onHandleFileSelect={(file) =>
+              sendMessage(file, selectedClient.payload?.platform)
             }
-            sendMessage(null, selectedClient.payload?.platform, value);
-          }}
-          onHandleFileSelect={(file) =>
-            sendMessage(file, selectedClient.payload?.platform)
-          }
-          onChangeClient={(value) => {
-            if (!value) return;
-            const [clientId, platform] = value.split("-");
-            const selectUserId = Number(clientId);
+            onChangeClient={(value) => {
+              if (!value) return;
+              const [clientId, platform] = value.split("-");
+              const selectUserId = Number(clientId);
 
-            onChangeSelectedUser(selectUserId, platform);
-          }}
-        />
+              onChangeSelectedUser(selectUserId, platform);
+            }}
+          />
+        </>
       )}
     </Flex>
   );

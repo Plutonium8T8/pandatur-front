@@ -5,3 +5,7 @@
   border-radius: 8px;
   transition: opacity 0.2s;
 }
+
+.chat-input {
+  border-top: 1px solid var(--mantine-color-gray-4);
+}

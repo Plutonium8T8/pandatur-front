@@ -5,24 +5,23 @@ import { Divider } from "@mantine/core";
 import { useDOMElementHeight, useApp } from "../../hooks";
 import { priorityOptions } from "../../FormOptions/PriorityOption";
 import { workflowOptions } from "../../FormOptions/WorkFlowOption";
-import { LeadsTicketTabsFilter } from "./LeadsTicketTabsFilter";
 import { LeadTable } from "./LeadTable";
 import { useDebounce, useConfirmPopup } from "../../hooks";
 import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
 import { api } from "../../api";
 import SingleChat from "../ChatComponent/SingleChat";
 import { Spin } from "../Spin";
-import { RefLeadsFilter } from "./LeadsFilter";
+import { RefLeadsHeader } from "./LeadsHeader";
 import TicketModal from "./TicketModal/TicketModalComponent";
 import "../../App.css";
 import "../SnackBarComponent/SnackBarComponent.css";
 import { SpinnerRightBottom } from "../SpinnerRightBottom";
 import { MantineModal } from "../MantineModal";
 import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
-import { VIEW_MODE, formIDsList, formIDsKanban } from "./utils";
+import { VIEW_MODE, filteredWorkflows } from "./utils";
 import { WorkflowColumns } from "../Workflow";
-import { TicketTabs } from "./LeadsTicketTabsFilter/components";
-import { filteredWorkflows } from "./LeadsTicketTabsFilter/utils";
+import { LeadsKanbanFilter } from "./LeadsKanbanFilter";
+import { LeadsTableFilter } from "./LeadsTableFilter";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -35,10 +34,10 @@ const getTicketsIds = (ticketList) => {
 };
 
 const Leads = () => {
-  const refLeadsFilter = useRef();
+  const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
-  const leadsFilterHeight = useDOMElementHeight(refLeadsFilter);
+  const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
   const { tickets, setTickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
@@ -157,7 +156,7 @@ const Leads = () => {
   ) => {
     try {
       setLoading(true);
-      const hardTicket = await api.tickets.filters({
+      const tickets = await api.tickets.filters({
         page,
         sort_by: sortBy,
         order: order,
@@ -166,7 +165,7 @@ const Leads = () => {
         group_title,
       });
 
-      cb(hardTicket);
+      cb(tickets);
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
@@ -273,9 +272,9 @@ const Leads = () => {
 
   return (
     <>
-      <RefLeadsFilter
+      <RefLeadsHeader
         onChangeViewMode={setViewMode}
-        ref={refLeadsFilter}
+        ref={refLeadsHeader}
         openCreateTicketModal={openCreateTicketModal}
         setSearchTerm={setSearchTerm}
         searchTerm={searchTerm}
@@ -338,7 +337,7 @@ const Leads = () => {
         onClose={closeChatModal}
         height="calc(100% - 60px)"
       >
-        <SingleChat ticketId={ticketId} onClose={closeChatModal} />
+        <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
       {isOpenAddLeadModal && (
@@ -367,18 +366,9 @@ const Leads = () => {
         open={isOpenKanbanFilterModal}
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
-        <LeadsTicketTabsFilter
+        <LeadsKanbanFilter
+          initialData={lightTicketFilters}
           systemWorkflow={selectedWorkflow}
-          renderTicketForms={() => (
-            <TicketTabs
-              initialData={lightTicketFilters}
-              formIds={formIDsKanban}
-              onClose={() => setIsOpenKanbanFilterModal(false)}
-              onSubmit={handleApplyFilterLightTicket}
-              loading={loading}
-            />
-          )}
-          formIds={formIDsKanban}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(workflows) => {
@@ -386,6 +376,7 @@ const Leads = () => {
             setIsOpenKanbanFilterModal(false);
             setFilteredTicketIds(filteredTicketIds ?? null);
           }}
+          onSubmitTicket={handleApplyFilterLightTicket}
         />
       </MantineModal>
 
@@ -394,19 +385,11 @@ const Leads = () => {
         open={isOpenListFilterModal}
         onClose={() => setIsOpenListFilterModal(false)}
       >
-        <LeadsTicketTabsFilter
-          formIds={formIDsList}
+        <LeadsTableFilter
+          initialData={hardTicketFilters}
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
-          renderTicketForms={() => (
-            <TicketTabs
-              initialData={hardTicketFilters}
-              formIds={formIDsKanban}
-              onClose={() => setIsOpenKanbanFilterModal(false)}
-              onSubmit={handleApplyFiltersHardTicket}
-              loading={loading}
-            />
-          )}
+          onSubmitTicket={handleApplyFiltersHardTicket}
         />
       </MantineModal>
 

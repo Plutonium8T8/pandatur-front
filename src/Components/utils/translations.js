@@ -734,9 +734,9 @@ export const translations = {
     RO: "Ultima platformă",
     RU: "Последнея платформа",
   },
-  "Creat de": {
-    RO: "Creat de utilizatorul",
-    RU: "Создан пользователем",
+  Autor: {
+    RO: "Autor",
+    RU: "Автор",
   },
   "Alege utilizator": {
     RO: "Alege utilizator",
@@ -1322,17 +1322,13 @@ export const translations = {
     RO: "Descriere task",
     RU: "Описание задачи",
   },
-  Pentru: {
-    RO: "Pentru",
-    RU: "Для",
+  Responsabil: {
+    RO: "Responsabil",
+    RU: "Ответственный",
   },
   "Selectează utilizator": {
     RO: "Selectează utilizator",
     RU: "Выберите пользователя",
-  },
-  "De la utilizatorul": {
-    RO: "De la utilizatorul",
-    RU: "От пользователя",
   },
   "Adaugă task": {
     RO: "Adaugă task",
@@ -1511,7 +1507,7 @@ export const translations = {
     RO: "Taskuri",
     RU: "Задачи",
   },
-  "Нет задач, создать?": {
+  noTasksCreate: {
     RO: "Niciun task, creați unul?",
     RU: "Нет задач, создать?",
   },
@@ -1933,19 +1929,19 @@ export const translations = {
   },
   "Team Lead": {
     RO: "Team Lead",
-    RU: "Тимлид"
+    RU: "Тимлид",
   },
   "Selectați Team Lead": {
     RO: "Selectați Team Lead",
-    RU: "Выберите тимлида"
+    RU: "Выберите тимлида",
   },
-  "Tehnicieni": {
+  Tehnicieni: {
     RO: "Tehnicieni",
-    RU: "Техники"
+    RU: "Техники",
   },
   "Alegeți tehnicienii": {
     RO: "Alegeți tehnicienii",
-    RU: "Выберите техников"
+    RU: "Выберите техников",
   },
   "Sigur doriți să ștergeți acest grup?": {
     RO: "Sigur doriți să ștergeți acest grup?",
@@ -1953,55 +1949,55 @@ export const translations = {
   },
   "Grup actualizat cu succes": {
     RO: "Grup actualizat cu succes",
-    RU: "Группа успешно обновлена"
+    RU: "Группа успешно обновлена",
   },
-  "Anuleazǎ": {
+  Anuleazǎ: {
     RO: "Anuleazǎ",
-    RU: "Отмена"
+    RU: "Отмена",
   },
   "Eroare la încărcarea grupurilor de utilizatori": {
-    "RO": "Eroare la încărcarea grupurilor de utilizatori",
-    "RU": "Ошибка при загрузке групп пользователей"
+    RO: "Eroare la încărcarea grupurilor de utilizatori",
+    RU: "Ошибка при загрузке групп пользователей",
   },
   "Eroare la încărcarea grupurilor de permisiuni": {
-    "RO": "Eroare la încărcarea grupurilor de permisiuni",
-    "RU": "Ошибка при загрузке групп разрешений"
+    RO: "Eroare la încărcarea grupurilor de permisiuni",
+    RU: "Ошибка при загрузке групп разрешений",
   },
   "Permisiunile au fost eliminate cu succes": {
-    "RO": "Permisiunile au fost eliminate cu succes",
-    "RU": "Успешно удалено"
+    RO: "Permisiunile au fost eliminate cu succes",
+    RU: "Успешно удалено",
   },
   "Eroare la eliminarea permisiunilor": {
-    "RO": "Eroare la eliminarea permisiunilor",
-    "RU": "Ошибка при удалении"
+    RO: "Eroare la eliminarea permisiunilor",
+    RU: "Ошибка при удалении",
   },
   "Schimbǎ grup de permisiuni": {
-    "RO": "Schimbǎ grup de permisiuni",
-    "RU": "Сменить группу с правами"
+    RO: "Schimbǎ grup de permisiuni",
+    RU: "Сменить группу с правами",
   },
   "Grup de permisiuni atribuit": {
-    "RO": "Grup de permisiuni atribuit",
-    "RU": "Группа разрешений успешно назначена"
+    RO: "Grup de permisiuni atribuit",
+    RU: "Группа разрешений успешно назначена",
   },
   "Eroare la atribuirea grupului": {
-    "RO": "Eroare la atribuirea grupului",
-    "RU": "Ошибка при назначении группы разрешений"
+    RO: "Eroare la atribuirea grupului",
+    RU: "Ошибка при назначении группы разрешений",
   },
   "Atribuiți grupul de permisiuni": {
-    "RO": "Atribuiți grupul de permisiuni",
-    "RU": "Назначить группу разрешений"
+    RO: "Atribuiți grupul de permisiuni",
+    RU: "Назначить группу разрешений",
   },
   "Nu există grupuri": {
-    "RO": "Nu există grupuri",
-    "RU": "Нет групп"
+    RO: "Nu există grupuri",
+    RU: "Нет групп",
   },
   "Grup adăugat cu succes": {
-    "RO": "Grup adăugat cu succes",
-    "RU": "Ошибка при добавлении"
+    RO: "Grup adăugat cu succes",
+    RU: "Ошибка при добавлении",
   },
   "Nu există grupuri de permisiuni": {
-    "RO": "Nu există grupuri de permisiuni",
-    "RU": "Нет групп с правами"
+    RO: "Nu există grupuri de permisiuni",
+    RU: "Нет групп с правами",
   },
   lead: {
     RO: "Lead",
@@ -2014,5 +2010,141 @@ export const translations = {
   no_messages: {
     RO: "Nu există mesaje",
     RU: "Нет сообщений",
+  },
+  overdueTasks: {
+    RO: "Taskuri Expirate",
+    RU: "Просроченные задачи",
+  },
+  todayTasks: {
+    RO: "Taskuri pentru azi",
+    RU: "Задачи на сегодня",
+  },
+  tomorrowTasks: {
+    RO: "Taskuri pentru mâine",
+    RU: "Задачи на завтра",
+  },
+  noTasks: {
+    RO: "Nu sunt taskuri",
+    RU: "Нет задач",
+  },
+  listView: {
+    RO: "Vizualizare listă",
+    RU: "Список",
+  },
+  columnView: {
+    RO: "Vizualizare pe coloane",
+    RU: "Колонки",
+  },
+  audio: {
+    RO: "Audio",
+    RU: "Аудио",
+  },
+  file: {
+    RO: "Fișier",
+    RU: "Файл",
+  },
+  photo: {
+    RO: "Poză",
+    RU: "Фото",
+  },
+  video: {
+    RO: "Video",
+    RU: "Видео",
+  },
+  link: {
+    RO: "Link",
+    RU: "Ссылка",
+  },
+  selectUser: {
+    RO: "Select user",
+    RU: "Выбрать пользователя",
+  },
+  today: {
+    RO: "Astăzi",
+    RU: "Сегодня",
+  },
+  tomorrow: {
+    RO: "Mâine",
+    RU: "Завтра",
+  },
+  inAWeek: {
+    RO: "Peste o săptămână",
+    RU: "Через неделю",
+  },
+  in15Min: {
+    RO: "Peste 15 minute",
+    RU: "Через 15 минут",
+  },
+  in30Min: {
+    RO: "Peste 30 minute",
+    RU: "Через 30 минут",
+  },
+  in1Hour: {
+    RO: "Peste o oră",
+    RU: "Через час",
+  },
+  thisWeek: {
+    RO: "Săptămâna aceasta",
+    RU: "На этой неделе",
+  },
+  in30Days: {
+    RO: "Peste 30 de zile",
+    RU: "Через 30 дней",
+  },
+  in1Year: {
+    RO: "Peste un an",
+    RU: "Через год",
+  },
+  Date: {
+    RO: "Data",
+    RU: "Дата",
+  },
+  Hour: {
+    RO: "Ora",
+    RU: "Часы",
+  },
+  noConversationStartedForThisLead: {
+    RO: "Nu a fost inițiată nicio conversație pentru acest lead",
+    RU: "Для этого лида не было начато ни одного разговора",
+  },
+  loadMessagesError: {
+    RO: "A apărut o eroare la încărcarea mesajelor",
+    RU: "Произошла ошибка при загрузке сообщений",
+  },
+  somethingWentWrong: {
+    RO: "Ceva nu a funcționat bine",
+    RU: "Что-то работает неправильно",
+  },
+  selectAll: {
+    RO: "Selectează toate",
+    RU: "Выбрать все",
+  },
+  call: {
+    RO: "Apel",
+    RU: "Звонок",
+  },
+  callFrom: {
+    RO: "De la",
+    RU: "От",
+  },
+  callTo: {
+    RO: "către",
+    RU: "k",
+  },
+  AddResult: {
+    RO: "Adaugă rezultat",
+    RU: "Введите результат",
+  },
+  Save: {
+    RO: "Salveazǎ",
+    RU: "Сохранить",
+  },
+  combineTickets: {
+    RO: "Combină lead",
+    RU: "СохранОбъединение тикетовить",
+  },
+  combineClient: {
+    RO: "Combină client",
+    RU: "Объединить лид",
   },
 };

@@ -1,26 +1,23 @@
-import { Flex, Badge, DEFAULT_THEME, Divider } from "@mantine/core";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useUser, useApp } from "../../../../hooks";
 import { DD_MM_YYYY } from "../../../../app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
-import { parseServerDate, getFullName, getLanguageByKey } from "../../../utils";
+import {
+  parseServerDate,
+  getFullName,
+  getLanguageByKey,
+  parseDate,
+} from "../../../utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
-
-const parseDate = (dateString) => {
-  if (!dateString) return null;
-  const [date, time] = dateString.split(" ");
-  if (!date || !time) return null;
-  const [day, month, year] = date.split("-");
-  return new Date(`${year}-${month}-${day}T${time}`);
-};
 
 export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { userId } = useUser();
   const { messages } = useApp();
 
   // TODO: Please refactor me
-  const sortedMessages = messages
+  const sortedMessages = messages.list
     .filter((msg) => msg.ticket_id === selectTicketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
 
@@ -47,8 +44,9 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
       lastClientId = currentClientId;
       groupedMessages.push({
         date: messageDate,
-        clientId: currentClientId,
+        clientId: Number(currentClientId),
         messages: [msg],
+        id: crypto.randomUUID(),
       });
     } else {
       lastGroup.messages.push(msg);
@@ -56,48 +54,56 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   });
 
   return (
-    <Flex direction="column" gap="xl">
-      {groupedMessages.map(({ date, clientId, messages }, index) => {
-        const clientInfo = personalInfo?.clients?.[0] || {};
+    <Flex direction="column" gap="xl" h="100%">
+      {groupedMessages.length ? (
+        groupedMessages.map(({ date, clientId, messages, id }) => {
+          const clientInfo =
+            personalInfo?.clients?.find(({ id }) => id === clientId) || {};
 
-        const clientName =
-          getFullName(clientInfo.name, clientInfo.surname) || `ID: ${clientId}`;
+          const clientName =
+            getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
 
-        return (
-          <Flex direction="column" gap="md" key={index}>
-            <Divider
-              label={
+          return (
+            <Flex pb="xs" direction="column" gap="md" key={id}>
+              <Divider
+                label={
+                  <Badge c="black" size="lg" bg={colors.gray[2]}>
+                    {date}
+                  </Badge>
+                }
+                labelPosition="center"
+              />
+
+              <Flex justify="center">
                 <Badge c="black" size="lg" bg={colors.gray[2]}>
-                  {date}
+                  {getLanguageByKey("Mesajele clientului")}: {clientName}
                 </Badge>
-              }
-              labelPosition="center"
-            />
-
-            <Flex justify="center">
-              <Badge c="black" size="lg" bg={colors.gray[2]}>
-                {getLanguageByKey("Mesajele clientului")} #{clientId} -{" "}
-                {clientName}
-              </Badge>
+              </Flex>
+              <Flex direction="column" gap="xs">
+                {messages.map((msg) => {
+                  const isMessageSentByMe =
+                    msg.sender_id === userId || msg.sender_id === 1;
+                  return isMessageSentByMe ? (
+                    <SendedMessage key={msg.id} msg={msg} />
+                  ) : (
+                    <ReceivedMessage
+                      key={msg.id}
+                      msg={msg}
+                      personalInfo={personalInfo}
+                    />
+                  );
+                })}
+              </Flex>
             </Flex>
-            <Flex direction="column" gap="xs">
-              {messages.map((msg) => {
-                const isMessageSentByMe =
-                  msg.sender_id === userId || msg.sender_id === 1;
-                return isMessageSentByMe ? (
-                  <SendedMessage key={msg.id} msg={msg} />
-                ) : (
-                  <ReceivedMessage
-                    key={msg.id}
-                    msg={msg}
-                    personalInfo={personalInfo}
-                  />
-                );
-              })}
-            </Flex>
-          </Flex>
-        );
-      })}
+          );
+        })
+      ) : (
+        <Flex h="100%" align="center" justify="center">
+          <Text c="dimmed">
+            {getLanguageByKey("noConversationStartedForThisLead")}
+          </Text>
+        </Flex>
+      )}
     </Flex>
   );
 };

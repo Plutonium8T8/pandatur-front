@@ -1,47 +1,76 @@
-import React from "react"
-import { Select } from "@mantine/core"
-import { translations } from "../utils/translations"
+import { ComboSelect } from "../ComboSelect";
 
 const IconSelect = ({
   options,
-  label,
-  id,
   value,
   onChange,
-  placeholder,
-  required,
-  disabled,
-  hasError
+  label = "Select",
+  placeholder = "Alege opțiune",
+  required = false,
+  disabled = false,
 }) => {
-  const language = localStorage.getItem("language") || "RO"
+  const selected = options.find((item) => item.name === value);
 
   return (
-    <div className={`input-group-icon ${hasError ? "invalid-field" : ""}`}>
-      <label htmlFor={id} style={{ fontSize: "14px", fontWeight: 500 }}>
-        {translations[label]?.[language] ?? label}
-      </label>
+    <div style={{ width: 250 }}>
+      {label && (
+        <label
+          style={{
+            display: "inline-block",
+            fontWeight: 500,
+            fontSize: "var(--input-label-size, var(--mantine-font-size-sm))",
+            marginBottom: 6,
+          }}
+        >
+          {label}
+          {required && <span style={{ color: "red", marginLeft: 4 }}>*</span>}
+        </label>
+      )}
 
-      <Select
-        id={id}
-        data={options.map((option) => ({
-          value: option.name,
-          label: translations[option.name]?.[language] ?? option.name
-        }))}
-        value={value}
-        onChange={onChange}
-        placeholder={translations[placeholder]?.[language] ?? placeholder}
-        required={required}
-        disabled={disabled}
-        searchable
-        clearable
-        error={
-          hasError
-            ? (translations["error_field"]?.[language] ?? "Ошибка")
-            : undefined
-        }
-      />
+      <div style={{ opacity: disabled ? 0.6 : 1, pointerEvents: disabled ? "none" : "auto" }}>
+        <ComboSelect
+          data={options.map((item) => ({
+            value: item.name,
+            label: (
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                {item.icon}
+                {item.name}
+              </div>
+            ),
+          }))}
+          currentValue={value}
+          onChange={onChange}
+          width={250}
+          disabled={disabled}
+          renderTriggerButton={(toggleDropdown) => (
+            <div
+              onClick={toggleDropdown}
+              style={{
+                border: "1px solid #ced4da",
+                padding: "5px 12px",
+                borderRadius: "0.25rem",
+                background: "#fff",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
+              {selected ? (
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {selected.icon}
+                  <span>{selected.name}</span>
+                </div>
+              ) : (
+                <span style={{ color: "#999" }}>{placeholder}</span>
+              )}
+              <span style={{ fontSize: 12, marginLeft: "auto" }}>▾</span>
+            </div>
+          )}
+        />
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default IconSelect
+export default IconSelect;
