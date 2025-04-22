@@ -34,7 +34,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
       setTasks(Array.isArray(data?.data) ? data.data : []);
       updateTaskCount();
     } catch (error) {
-      console.error("Ошибка загрузки задач:", error);
+      console.error("error upload task:", error);
       setTasks([]);
     }
   };
