@@ -12,6 +12,7 @@ import { MantineModal } from "../MantineModal";
 import { TypeTask } from "./OptionsTaskType";
 import { useGetTechniciansList } from "../../hooks/useGetTechniciansList";
 import { useUser } from "../../hooks";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -33,14 +34,14 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         } else {
             setLocalFilters(filters);
         }
-    }, [filters, userId]);
+    }, [userId]);
 
     const handleChange = (field, value) => {
         setLocalFilters((prev) => ({ ...prev, [field]: value }));
     };
 
     const handleClear = () => {
-        const cleared = {};
+        const cleared = { created_for: [String(userId)] };
         setLocalFilters(cleared);
         onApply(cleared);
     };
@@ -95,18 +96,18 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
 
                     <DatePickerInput
                         label="De la"
-                        value={localFilters.date_from || null}
+                        value={localFilters.date_from ? new Date(localFilters.date_from) : null}
                         onChange={(val) =>
-                            handleChange("date_from", val ? val.toISOString().split("T")[0] : null)
+                            handleChange("date_from", val ? dayjs(val).format("YYYY-MM-DD") : null)
                         }
                         clearable
                     />
 
                     <DatePickerInput
                         label="Până la"
-                        value={localFilters.date_to || null}
+                        value={localFilters.date_to ? new Date(localFilters.date_to) : null}
                         onChange={(val) =>
-                            handleChange("date_to", val ? val.toISOString().split("T")[0] : null)
+                            handleChange("date_to", val ? dayjs(val).format("YYYY-MM-DD") : null)
                         }
                         clearable
                     />
