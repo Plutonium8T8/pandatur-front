@@ -2182,5 +2182,13 @@ export const translations = {
   completeAllFields: {
     RO: "Completați toate câmpurile obligatorii",
     RU: "Заполните все обязательные поля",
-  }
+  },
+  addFileOrImage: {
+    RO: "Adaugă fișier sau poză",
+    RU: "Добавьте файл или фото",
+  },
+  imageUrlNotReturnedTryAgainLater: {
+    RO: "URL-ul imaginii nu a fost returnat. Încearcă din nou mai târziu",
+    RU: "URL изображения не был получен. Пожалуйста, попробуйте позже",
+  },
 };

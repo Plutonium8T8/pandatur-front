@@ -1,89 +1,95 @@
-import queryString from "query-string"
-import { baseAxios } from "./baseAxios"
+import queryString from "query-string";
+import { baseAxios } from "./baseAxios";
 
 export const tickets = {
   list: async () => {
-    const { data } = await baseAxios.get("/api/tickets")
+    const { data } = await baseAxios.get("/api/tickets");
 
-    return data
+    return data;
   },
 
   getById: async (id) => {
-    const { data } = await baseAxios.get(`/api/tickets/${id}`)
+    const { data } = await baseAxios.get(`/api/tickets/${id}`);
 
-    return data
+    return data;
   },
 
   updateById: async (body) => {
-    const { data } = await baseAxios.patch(`/api/tickets`, body)
+    const { data } = await baseAxios.patch(`/api/tickets`, body);
 
-    return data
+    return data;
   },
 
   createTickets: async (body) => {
-    const { data } = await baseAxios.post("/api/tickets", body)
+    const { data } = await baseAxios.post("/api/tickets", body);
 
-    return data
+    return data;
   },
 
   deleteById: async (id) => {
     await baseAxios.delete(`/api/tickets`, {
       data: {
-        id
-      }
-    })
+        id,
+      },
+    });
   },
 
   merge: async (body) => {
-    const { data } = await baseAxios.patch("/api/merge/tickets", body)
+    const { data } = await baseAxios.patch("/api/merge/tickets", body);
 
-    return data
+    return data;
   },
 
   getLightList: async (params) => {
     const url = queryString.stringifyUrl({
       url: "/api/light/tickets",
-      query: params
-    })
-    const { data } = await baseAxios.get(url)
+      query: params,
+    });
+    const { data } = await baseAxios.get(url);
 
-    return data
+    return data;
   },
 
   getHardList: async (params) => {
     const url = queryString.stringifyUrl({
       url: "/api/hard/tickets",
-      query: params
-    })
+      query: params,
+    });
 
-    const { data } = await baseAxios.get(url)
+    const { data } = await baseAxios.get(url);
 
-    return data
+    return data;
   },
 
   filters: async (body) => {
-    const { data } = await baseAxios.post("/api/tickets/filter", body)
+    const { data } = await baseAxios.post("/api/tickets/filter", body);
 
-    return data
+    return data;
   },
 
   ticket: {
     getInfo: async (id) => {
-      const { data } = await baseAxios.get(`/api/ticket-info/${id}`)
+      const { data } = await baseAxios.get(`/api/ticket-info/${id}`);
 
-      return data
+      return data;
     },
 
     create: async (id, body) => {
-      const { data } = await baseAxios.post(`/api/ticket-info/${id}`, body)
+      const { data } = await baseAxios.post(`/api/ticket-info/${id}`, body);
 
-      return data
+      return data;
     },
 
     getLightById: async (id) => {
-      const { data } = await baseAxios.get(`/api/light/ticket/${id}`)
+      const { data } = await baseAxios.get(`/api/light/ticket/${id}`);
 
-      return data
-    }
-  }
-}
+      return data;
+    },
+
+    uploadMedia: async (body) => {
+      const { data } = await baseAxios.post("/ticket-media", body);
+
+      return data;
+    },
+  },
+};

@@ -340,7 +340,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="media" h="100%">
           <Box p="md" h="100%">
-            <Media messages={mediaFiles} />
+            <Media messages={mediaFiles} id={selectTicketId} />
           </Box>
         </Tabs.Panel>
 

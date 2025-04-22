@@ -39,6 +39,7 @@ export const ChatMessages = ({
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
 
+  // TODO: Create a hook for upload files
   const uploadFile = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
