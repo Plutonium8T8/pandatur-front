@@ -6,3 +6,6 @@ export const HH_mm = "HH:mm";
 
 export const DEFAULT_PHOTO =
   "https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp";
+
+export const FALLBACK_IMAGE =
+  "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
