@@ -19,6 +19,7 @@
     "dayjs": "^1.11.13",
     "emoji-picker-react": "^4.12.0",
     "js-cookie": "^3.0.5",
+    "module-alias": "^2.2.3",
     "notistack": "^3.0.1",
     "open-graph-scraper": "^6.8.3",
     "query-string": "^9.1.1",
@@ -68,6 +69,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "_moduleAliases": {
+    "@modules": "dist/rest/modules",
+    "@services": "dist/services"
   },
   "devDependencies": {
     "gh-pages": "^6.3.0",
