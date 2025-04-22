@@ -35,7 +35,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         const cleared = {};
         setLocalFilters(cleared);
         onApply(cleared);
-        onClose();
     };
 
     const handleApply = () => {

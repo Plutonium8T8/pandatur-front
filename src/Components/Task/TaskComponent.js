@@ -6,7 +6,8 @@ import {
   Box,
   Group,
   Tooltip,
-  Flex
+  Flex,
+  ActionIcon
 } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { api } from "../../api";
@@ -73,7 +74,13 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         extraInfo={
           <Group gap="sm">
 
-            <LuFilter size={16} onClick={() => setFilterModalOpen(true)} />
+            <ActionIcon
+              variant={Object.keys(filters).length > 0 ? "filled" : "default"}
+              size="36"
+              onClick={() => setFilterModalOpen(true)}
+            >
+              <LuFilter size={16} />
+            </ActionIcon>
 
             <SegmentedControl
               value={viewMode}
@@ -110,7 +117,9 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
               }}
               w={350}
             />
-            <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
+            <Button
+              leftSection={<IoMdAdd size={16} />}
+              onClick={openNewTask}>
               {translations["New Task"][language]}
             </Button>
           </Group>
