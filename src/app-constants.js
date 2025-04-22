@@ -18,3 +18,9 @@ export const MEDIA_TYPE = {
   URL: "url",
   CALL: "call",
 };
+
+export const PLATFORMS = {
+  VIBER: "viber",
+  TELEGRAM: "telegram",
+  FACEBOOK: "facebook",
+};

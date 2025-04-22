@@ -6,15 +6,19 @@ import {
   Button,
   Select,
   Loader,
+  FileButton,
 } from "@mantine/core";
-import { useState, useRef } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import { FaPlus } from "react-icons/fa6";
+import { useState } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
-import { FaPlus } from "react-icons/fa6";
+import { useUploadMediaFile } from "../../../../hooks";
+import { getMediaType } from "../../renderContent";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -26,14 +30,17 @@ export const ChatInput = ({
   loading,
   onCreateTask,
 }) => {
+  const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
-  const fileInputRef = useRef(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [template, setTemplate] = useState();
+  const [url, setUrl] = useState({});
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({
     top: 0,
     left: 0,
   });
+
+  const { uploadFile } = useUploadMediaFile();
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -47,24 +54,30 @@ export const ChatInput = ({
     setShowEmojiPicker((prev) => !prev);
   };
 
-  const handleFileButtonClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleFile = async (file) => {
+    handlers.open();
+    const url = await uploadFile(file);
 
-  const handleFile = (e) => {
-    const selectedFile = e.target.files[0];
-    if (!selectedFile) return;
-    onHandleFileSelect(selectedFile);
+    handlers.close();
+
+    if (url) {
+      setUrl({ media_url: url, media_type: getMediaType(file.type) });
+      setMessage(url);
+    }
   };
 
   const clearState = () => {
     setMessage("");
     setTemplate(null);
+    setUrl(null);
   };
 
   const sendMessage = () => {
     if (message.trim()) {
-      onSendMessage(message);
+      onSendMessage({
+        message: message.trim(),
+        ...url,
+      });
       clearState();
     }
   };
@@ -125,6 +138,7 @@ export const ChatInput = ({
               }
               variant="filled"
               onClick={sendMessage}
+              loading={opened}
             >
               {getLanguageByKey("Trimite")}
             </Button>
@@ -134,16 +148,18 @@ export const ChatInput = ({
             </Button>
           </Flex>
           <Flex>
-            <input
-              type="file"
-              accept="image/*,audio/mp3,video/mp4,application/pdf,audio/ogg"
+            <FileButton
+              // loading={opened}
               onChange={handleFile}
-              ref={fileInputRef}
-              style={{ display: "none" }}
-            />
-            <ActionIcon c="black" bg="white" onClick={handleFileButtonClick}>
-              <RiAttachment2 size={20} />
-            </ActionIcon>
+              accept="image/*,video/*,audio/*"
+            >
+              {(props) => (
+                <ActionIcon {...props} c="black" bg="white">
+                  <RiAttachment2 size={20} />
+                </ActionIcon>
+              )}
+            </FileButton>
+
             <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
               <LuSmile size={20} />
             </ActionIcon>
