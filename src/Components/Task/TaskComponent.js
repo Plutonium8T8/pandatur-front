@@ -7,20 +7,21 @@ import {
   Group,
   Tooltip,
   Flex,
-  ActionIcon
+  ActionIcon,
 } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
+import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { FaList } from "react-icons/fa6";
+import { LuFilter } from "react-icons/lu";
 import { api } from "../../api";
 import { translations } from "../utils/translations";
 import TaskModal from "./TaskModal";
 import TaskList from "./TaskList/TaskList";
 import TaskColumnsView from "./TaskColumnsView";
-import { PageHeader } from "../PageHeader";
-import { TbLayoutKanbanFilled } from "react-icons/tb";
-import { FaList } from "react-icons/fa6";
-import { LuFilter } from "react-icons/lu";
 import TaskFilterModal from "./FilterTask";
+import { PageHeader } from "../PageHeader";
 import { Pagination } from "../Pagination";
+import { useUser } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -34,6 +35,13 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const { userId: currentUserId } = useUser();
+
+  useEffect(() => {
+    if (!filters.created_for || filters.created_for.length === 0) {
+      setFilters({ created_for: [String(currentUserId)] });
+    }
+  }, []);
 
   const fetchTasks = async () => {
     try {
@@ -66,6 +74,14 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
     setIsModalOpen(true);
   };
 
+  const hasActiveFilters =
+    Object.entries(filters).some(([key, value]) => {
+      if (key === "created_for") {
+        return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
+      }
+      return value && value.length > 0;
+    });
+
   return (
     <Box p="md">
       <PageHeader
@@ -73,10 +89,9 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         count={tasks.length}
         extraInfo={
           <Group gap="sm">
-
             <ActionIcon
-              variant={Object.keys(filters).length > 0 ? "filled" : "default"}
               size="36"
+              variant={hasActiveFilters ? "filled" : "default"}
               onClick={() => setFilterModalOpen(true)}
             >
               <LuFilter size={16} />
@@ -119,7 +134,8 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
             />
             <Button
               leftSection={<IoMdAdd size={16} />}
-              onClick={openNewTask}>
+              onClick={openNewTask}
+            >
               {translations["New Task"][language]}
             </Button>
           </Group>

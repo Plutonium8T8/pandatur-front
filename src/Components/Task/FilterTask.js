@@ -11,6 +11,7 @@ import { translations } from "../utils/translations";
 import { MantineModal } from "../MantineModal";
 import { TypeTask } from "./OptionsTaskType";
 import { useGetTechniciansList } from "../../hooks/useGetTechniciansList";
+import { useUser } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -20,12 +21,19 @@ const taskTypeOptions = TypeTask.map((task) => ({
 }));
 
 const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
-    const [localFilters, setLocalFilters] = useState(filters);
+    const [localFilters, setLocalFilters] = useState({});
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+    const { userId } = useUser();
 
     useEffect(() => {
-        setLocalFilters(filters);
-    }, [filters]);
+        if (!filters.created_for || filters.created_for.length === 0) {
+            const defaultFilters = { ...filters, created_for: [String(userId)] };
+            setLocalFilters(defaultFilters);
+            onApply(defaultFilters);
+        } else {
+            setLocalFilters(filters);
+        }
+    }, [filters, userId]);
 
     const handleChange = (field, value) => {
         setLocalFilters((prev) => ({ ...prev, [field]: value }));
