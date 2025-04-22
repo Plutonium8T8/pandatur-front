@@ -35,5 +35,11 @@ export const task = {
     const { data } = await baseAxios.get(`/api/task/ticket/${id}`)
 
     return data
+  },
+
+  filterTasks: async (filters = {}) => {
+    const { data } = await baseAxios.post("/api/filter_tasks", filters)
+
+    return data
   }
 }
