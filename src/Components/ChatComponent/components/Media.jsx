@@ -1,11 +1,12 @@
 import {
-  Box,
   Flex,
   Image,
   Badge,
   DEFAULT_THEME,
   FileButton,
   Button,
+  Divider,
+  Box,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect } from "react";
@@ -116,52 +117,52 @@ export const Media = ({ messages, id }) => {
 
   useEffect(() => {
     getMediaFiles();
-  }, []);
+  }, [id]);
 
   return (
     <>
-      {messages.length ? (
-        <Flex direction="column" align="center" gap="md">
-          {messages.map((msg, index) => {
-            return (
-              <Flex
-                direction="column"
-                align="center"
-                mt={index ? "md" : "0"}
-                key={msg.id}
-              >
-                <Box mb="5" ta="center">
-                  <Badge c="black" size="lg" bg={colors.gray[2]}>
-                    {getTimeFormat(msg.time_sent)}
-                  </Badge>
-                </Box>
+      {mediaList.map((media, index) => (
+        <Flex direction="column" align="center" key={media.id}>
+          <Divider
+            w="100%"
+            label={
+              <Badge c="black" size="lg" bg={colors.gray[2]}>
+                {getTimeFormat(media.time_sent)}
+              </Badge>
+            }
+            my="md"
+            labelPosition="center"
+          />
 
-                {renderMediaContent(msg.mtype, msg.message)}
-              </Flex>
-            );
-          })}
+          {renderMediaContent(media.mtype, media.url)}
+        </Flex>
+      ))}
 
-          {mediaList.map((media, index) => (
-            <Flex
-              direction="column"
-              align="center"
-              mt={index ? "md" : "0"}
-              key={media.id}
-            >
-              <Box mb="5" ta="center">
+      {messages.map((msg, index) => {
+        return (
+          <Flex direction="column" align="center">
+            <Divider
+              w="100%"
+              my="md"
+              label={
                 <Badge c="black" size="lg" bg={colors.gray[2]}>
-                  {getTimeFormat(media.time_sent)}
+                  {getTimeFormat(msg.time_sent)}
                 </Badge>
-              </Box>
+              }
+              labelPosition="center"
+            />
 
-              {renderMediaContent(media.mtype, media.url)}
-            </Flex>
-          ))}
+            {renderMediaContent(msg.mtype, msg.message)}
+          </Flex>
+        );
+      })}
 
+      {(!!messages.length || !!mediaList.length) && (
+        <Flex mt="md" justify="center">
           <FileButton
             loading={opened}
             onChange={sendAttachment}
-            accept="image/*,video/*,audio/*"
+            accept="image/*,video/*,audio/*,.pdf"
           >
             {(props) => (
               <Button
@@ -174,31 +175,45 @@ export const Media = ({ messages, id }) => {
             )}
           </FileButton>
         </Flex>
-      ) : (
-        <Flex
-          h="100%"
-          direction="column"
-          gap="md"
-          justify="center"
-          align="center"
-        >
-          <Empty renderEmptyContent={(content) => content} />
-          <FileButton
-            loading={opened}
-            onChange={sendAttachment}
-            accept="image/*,video/*,audio/*"
+      )}
+
+      {!messages.length && !mediaList.length && (
+        <>
+          <Flex
+            h="100%"
+            align="center"
+            direction="column"
+            justify="center"
+            gap="md"
           >
-            {(props) => (
-              <Button
-                leftSection={<IoMdAdd size={16} />}
-                variant="outline"
-                {...props}
-              >
-                {getLanguageByKey("addMedia")}
-              </Button>
-            )}
-          </FileButton>
-        </Flex>
+            <Empty
+              renderEmptyContent={(content) => (
+                <Flex
+                  direction="column"
+                  align="center"
+                  c={DEFAULT_THEME.colors.dark[2]}
+                >
+                  {content}
+                </Flex>
+              )}
+            />
+            <FileButton
+              loading={opened}
+              onChange={sendAttachment}
+              accept="image/*,video/*,audio/*,.pdf"
+            >
+              {(props) => (
+                <Button
+                  leftSection={<IoMdAdd size={16} />}
+                  variant="outline"
+                  {...props}
+                >
+                  {getLanguageByKey("addMedia")}
+                </Button>
+              )}
+            </FileButton>
+          </Flex>
+        </>
       )}
     </>
   );
