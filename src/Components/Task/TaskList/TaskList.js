@@ -10,6 +10,7 @@ import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
 import { useConfirmPopup } from "../../../hooks";
+import { Pagination } from "../../Pagination";
 import dayjs from "dayjs";
 import "./TaskList.css";
 import {
@@ -28,12 +29,17 @@ const TaskList = ({
   loading = false,
   openEditTask,
   fetchTasks,
+  currentPage,
+  totalPages,
+  onChangePagination,
+  searchQuery = "",
 }) => {
   const [order, setOrder] = useState("ASC");
   const [sortColumn, setSortColumn] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
+
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
   });
@@ -87,21 +93,23 @@ const TaskList = ({
     };
   }, [openMenuId]);
 
+  const filteredTasks = useMemo(() => {
+    return tasks.filter((task) =>
+      (task?.task_type || "").toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [tasks, searchQuery]);
+
   const sortedTasks = useMemo(() => {
-    if (!Array.isArray(tasks)) return [];
+    if (!sortColumn) return filteredTasks;
 
-    if (!sortColumn) return tasks;
-
-    return [...tasks].sort((a, b) => {
+    return [...filteredTasks].sort((a, b) => {
       let valA = a[sortColumn];
       let valB = b[sortColumn];
 
       if (sortColumn === "scheduled_time") {
         const dateA = dayjs(valA, "DD-MM-YYYY HH:mm:ss");
         const dateB = dayjs(valB, "DD-MM-YYYY HH:mm:ss");
-
         if (!dateA.isValid() || !dateB.isValid()) return 0;
-
         return order === "ASC"
           ? dateA.valueOf() - dateB.valueOf()
           : dateB.valueOf() - dateA.valueOf();
@@ -113,7 +121,7 @@ const TaskList = ({
 
       return order === "ASC" ? comparison : -comparison;
     });
-  }, [tasks, sortColumn, order]);
+  }, [filteredTasks, sortColumn, order]);
 
   const columns = useMemo(
     () => [
@@ -308,19 +316,31 @@ const TaskList = ({
   );
 
   return (
-    <div style={{ margin: "10px" }}>
-      <RcTable
-        rowKey={({ id }) => id}
-        columns={columns}
-        data={sortedTasks}
-        selectedRow={selectedRow}
-        loading={loading}
-        bordered
-        onRow={(record) => ({
-          onClick: () => openEditTask(record),
-        })}
-      />
-    </div>
+    <>
+      <div style={{ margin: "10px" }}>
+        <RcTable
+          rowKey={({ id }) => id}
+          columns={columns}
+          data={sortedTasks}
+          selectedRow={selectedRow}
+          loading={loading}
+          bordered
+          onRow={(record) => ({
+            onClick: () => openEditTask(record),
+          })}
+        />
+      </div>
+
+      {totalPages > 0 && (
+        <Flex p="20" justify="center" className="leads-table-pagination">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPaginationChange={onChangePagination}
+          />
+        </Flex>
+      )}
+    </>
   );
 };
 

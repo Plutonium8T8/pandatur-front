@@ -31,6 +31,12 @@ export const task = {
     return data
   },
 
+  getPaginatedTasks: async (page = 1) => {
+    const { data } = await baseAxios.get(`/api/list_tasks?page=${page}`);
+    
+    return data;
+  },
+
   getTaskByTicket: async (id) => {
     const { data } = await baseAxios.get(`/api/task/ticket/${id}`)
 

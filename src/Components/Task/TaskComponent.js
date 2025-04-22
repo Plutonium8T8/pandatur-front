@@ -19,8 +19,10 @@ import { FaList } from "react-icons/fa6";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) => {
+const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
   const [tasks, setTasks] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,10 +30,9 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
 
   const fetchTasks = async () => {
     try {
-      const data = selectTicketId
-        ? await api.task.getTaskByTicket(selectTicketId)
-        : await api.task.getAllTasks();
-      setTasks(Array.isArray(data?.data) ? data.data : []);
+      const res = await api.task.getPaginatedTasks(currentPage);
+      setTasks(Array.isArray(res?.data) ? res.data : []);
+      setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {
       console.error("Ошибка загрузки задач:", error);
@@ -41,7 +42,7 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
 
   useEffect(() => {
     fetchTasks();
-  }, [selectTicketId]);
+  }, [currentPage]);
 
   const openNewTask = () => {
     setSelectedTask(null);
@@ -53,19 +54,11 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
     setIsModalOpen(true);
   };
 
-  const filteredTasks = Array.isArray(tasks)
-    ? tasks.filter((task) =>
-      (task?.task_type || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    : [];
-
   return (
     <Box p="md">
       <PageHeader
         title={translations["Tasks"][language]}
-        count={filteredTasks.length}
+        count={tasks.length}
         extraInfo={
           <Group gap="sm">
             <SegmentedControl
@@ -109,15 +102,16 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
 
       {viewMode === "list" ? (
         <TaskList
-          tasks={filteredTasks}
+          tasks={tasks}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onChangePagination={setCurrentPage}
+          searchQuery={searchQuery}
           openEditTask={openEditTask}
           fetchTasks={fetchTasks}
         />
       ) : (
-        <TaskColumnsView
-          tasks={filteredTasks}
-          onEdit={openEditTask}
-        />
+        <TaskColumnsView tasks={tasks} onEdit={openEditTask} />
       )}
 
       <TaskModal
@@ -125,7 +119,6 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
         onClose={() => setIsModalOpen(false)}
         fetchTasks={fetchTasks}
         selectedTask={selectedTask}
-        defaultTicketId={selectTicketId}
         defaultCreatedBy={userId}
       />
     </Box>
