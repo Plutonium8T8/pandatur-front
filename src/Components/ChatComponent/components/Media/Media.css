@@ -1,0 +1,9 @@
+.media-wrapper-delete-btn {
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.media-wrapper:hover .media-wrapper-delete-btn {
+  opacity: 1;
+}
