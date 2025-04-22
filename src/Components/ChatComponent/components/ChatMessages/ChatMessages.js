@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
-import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import { useApp, useUser } from "../../../../hooks";
 import { api } from "../../../../api";
@@ -8,9 +7,8 @@ import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "../ChatInput";
-import { getMediaType } from "../../renderContent";
 import { GroupedMessages } from "../GroupedMessages";
-import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
+import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "../../../../app-constants";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {
@@ -33,54 +31,22 @@ export const ChatMessages = ({
   const { userId } = useUser();
   const { messages } = useApp();
 
-  const { enqueueSnackbar } = useSnackbar();
-
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
 
-  // TODO: Create a hook for upload files
-  const uploadFile = async (file) => {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const data = await api.messages.upload(formData);
-
-      return data;
-    } catch (error) {
-      enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
-        variant: "error",
-      });
-    }
-  };
-
-  const sendMessage = async (selectedFile, metadataMsj, platform) => {
+  const sendMessage = async (metadataMsj) => {
     try {
       messages.setMessages((prevMessages) => [
         ...prevMessages,
         { ...metadataMsj, seenAt: false },
       ]);
 
-      if (selectedFile) {
-        const uploadResponse = await uploadFile(selectedFile);
-
-        if (!uploadResponse || !uploadResponse.url) {
-          enqueueSnackbar(getLanguageByKey("file_upload_failed"), {
-            variant: "error",
-          });
-          return;
-        }
-
-        metadataMsj["media_url"] = uploadResponse.url;
-        metadataMsj["media_type"] = getMediaType(selectedFile.type);
-      }
-
       let apiUrl = api.messages.send.create;
 
-      if (platform === "telegram") {
+      if (metadataMsj.platform === PLATFORMS.TELEGRAM) {
         apiUrl = api.messages.send.telegram;
-      } else if (platform === "viber") {
+      } else if (metadataMsj.platform === PLATFORMS.VIBER) {
         apiUrl = api.messages.send.viber;
       }
 
@@ -195,23 +161,16 @@ export const ChatMessages = ({
               if (!selectedClient.payload) {
                 return;
               }
-              sendMessage(
-                null,
-                {
-                  sender_id: Number(userId),
-                  client_id: selectedClient.payload?.id,
-                  platform: selectedClient.payload?.platform,
-                  message: value.trim(),
-                  ticket_id: selectTicketId,
-                  time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
-                  messageStatus: MESSAGES_STATUS.PENDING,
-                },
-                selectedClient.payload?.platform,
-              );
+              sendMessage({
+                sender_id: Number(userId),
+                client_id: selectedClient.payload?.id,
+                platform: selectedClient.payload?.platform,
+                ticket_id: selectTicketId,
+                time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
+                messageStatus: MESSAGES_STATUS.PENDING,
+                ...value,
+              });
             }}
-            onHandleFileSelect={(file) =>
-              sendMessage(file, selectedClient.payload?.platform)
-            }
             onChangeClient={(value) => {
               if (!value) return;
               const [clientId, platform] = value.split("-");
