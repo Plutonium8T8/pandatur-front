@@ -35,7 +35,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
       setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {
-      console.error("Ошибка загрузки задач:", error);
+      console.error("error upload tasks:", error);
       setTasks([]);
     }
   };
