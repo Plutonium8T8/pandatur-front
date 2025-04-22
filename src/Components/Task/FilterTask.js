@@ -46,8 +46,16 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         onApply(cleared);
     };
 
+    const cleanFilters = (filters) => {
+        return Object.fromEntries(
+            Object.entries(filters).filter(
+                ([_, value]) => !(Array.isArray(value) && value.length === 0) && value !== null
+            )
+        );
+    };
+
     const handleApply = () => {
-        onApply(localFilters);
+        onApply(cleanFilters(localFilters));
         onClose();
     };
 
