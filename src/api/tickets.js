@@ -96,5 +96,11 @@ export const tickets = {
 
       return data;
     },
+
+    deleteMediaById: async (id) => {
+      const { data } = await baseAxios.delete(`/ticket-media/${id}`);
+
+      return data;
+    },
   },
 };

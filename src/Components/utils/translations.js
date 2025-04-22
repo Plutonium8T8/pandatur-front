@@ -2191,4 +2191,16 @@ export const translations = {
     RO: "Adaugă media",
     RU: "Добавьте медиа",
   },
+  messageAttachments: {
+    RO: "Fișiere atașate din mesaje",
+    RU: "Вложения из сообщений",
+  },
+  uploadedFiles: {
+    RO: "Fișiere încărcate",
+    RU: "Загруженные файлы",
+  },
+  "confirmDeleteAttachment": {
+    "RO": "Sunteți sigur că doriți să ștergeți acest atașament?",
+    "RU": "Вы уверены, что хотите удалить это вложение?"
+  }
 };

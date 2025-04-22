@@ -4,7 +4,7 @@ import { getLanguageByKey } from "../Components/utils";
 
 const { colors } = DEFAULT_THEME;
 
-export const useConfirmPopup = ({ subTitle, onConfirm, loading }) => {
+export const useConfirmPopup = ({ subTitle, loading }) => {
   return (callback) =>
     openConfirmModal({
       title: (
