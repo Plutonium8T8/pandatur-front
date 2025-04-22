@@ -106,7 +106,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         label="De la"
                         value={localFilters.date_from ? new Date(localFilters.date_from) : null}
                         onChange={(val) =>
-                            handleChange("date_from", val ? dayjs(val).format("YYYY-MM-DD") : null)
+                            handleChange("date_from", val ? dayjs(val).format("DD-MM-YYYY") : null)
                         }
                         clearable
                     />
@@ -115,7 +115,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         label="Până la"
                         value={localFilters.date_to ? new Date(localFilters.date_to) : null}
                         onChange={(val) =>
-                            handleChange("date_to", val ? dayjs(val).format("YYYY-MM-DD") : null)
+                            handleChange("date_to", val ? dayjs(val).format("DD-MM-YYYY") : null)
                         }
                         clearable
                     />

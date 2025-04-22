@@ -9,7 +9,7 @@ import {
   Flex,
   ActionIcon,
 } from "@mantine/core";
-import { IoMdAdd } from "react-icons/io";
+import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { FaList } from "react-icons/fa6";
 import { LuFilter } from "react-icons/lu";
@@ -28,6 +28,7 @@ const language = localStorage.getItem("language") || "RO";
 const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
   const [tasks, setTasks] = useState([]);
   const [filters, setFilters] = useState({});
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,6 +44,14 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
+
   const fetchTasks = async () => {
     try {
       const res = await api.task.filterTasks({
@@ -55,7 +64,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
       setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {
-      console.error("Ошибка загрузки задач:", error);
+      console.error("error upload tasks", error);
       setTasks([]);
     }
   };
@@ -74,13 +83,12 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
     setIsModalOpen(true);
   };
 
-  const hasActiveFilters =
-    Object.entries(filters).some(([key, value]) => {
-      if (key === "created_for") {
-        return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
-      }
-      return value && value.length > 0;
-    });
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === "created_for") {
+      return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
+    }
+    return value && value.length > 0;
+  });
 
   return (
     <Box p="md">
@@ -125,12 +133,18 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
             />
             <TextInput
               placeholder={translations["Cautare"][language]}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.currentTarget.value);
-                setCurrentPage(1);
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.currentTarget.value)}
               w={350}
+              rightSection={
+                searchInput ? (
+                  <IoMdClose
+                    size={16}
+                    className="pointer"
+                    onClick={() => setSearchInput("")}
+                  />
+                ) : null
+              }
             />
             <Button
               leftSection={<IoMdAdd size={16} />}
