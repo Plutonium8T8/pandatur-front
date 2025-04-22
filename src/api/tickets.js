@@ -91,5 +91,10 @@ export const tickets = {
 
       return data;
     },
+    getMediaListByTicketId: async (id) => {
+      const { data } = await baseAxios.get(`/ticket-media/${id}`);
+
+      return data;
+    },
   },
 };
