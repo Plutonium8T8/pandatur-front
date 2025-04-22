@@ -2187,8 +2187,8 @@ export const translations = {
     RO: "Adaugă fișier sau poză",
     RU: "Добавьте файл или фото",
   },
-  imageUrlNotReturnedTryAgainLater: {
-    RO: "URL-ul imaginii nu a fost returnat. Încearcă din nou mai târziu",
-    RU: "URL изображения не был получен. Пожалуйста, попробуйте позже",
+  addMedia: {
+    RO: "Adaugă media",
+    RU: "Добавьте медиа",
   },
 };
