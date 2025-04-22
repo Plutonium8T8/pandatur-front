@@ -331,8 +331,8 @@ const TaskList = ({
         />
       </div>
 
-      {totalPages > 0 && (
-        <Flex p="20" justify="center" className="leads-table-pagination">
+      {totalPages > 1 && (
+        <Flex p="20" justify="center">
           <Pagination
             totalPages={totalPages}
             currentPage={currentPage}
