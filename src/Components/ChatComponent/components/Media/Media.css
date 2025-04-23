@@ -24,3 +24,15 @@
 .file-link:hover {
   color: var(--mantine-color-blue-8);
 }
+
+.media-tabs .mantine-Tabs-panel[data-orientation="horizontal"] {
+  height: calc(100% - 36px);
+}
+
+.media-tabs .mantine-Tabs-root[data-orientation="vertical"] {
+  height: calc(100% - 36px);
+}
+
+.media-tabs .mantine-Tabs-root[data-orientation="horizontal"] {
+  height: calc(100% - 36px);
+}
