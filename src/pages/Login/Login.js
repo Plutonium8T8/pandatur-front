@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useSnackbar } from "notistack";
+import { Button, Flex, TextInput, Title, Box, Text } from "@mantine/core";
 import { api } from "../../api";
 import { showServerError } from "../../Components/utils/showServerError";
 import { LoadingOverlay } from "../../Components/LoadingOverlay";
-import { Input } from "../../Components/Input";
 import "./Login.css";
 
 const setCookieToken = (token) => {
@@ -82,64 +82,61 @@ export const Login = ({ onLoginSuccess }) => {
   return (
     <div className="body-login">
       <div className="body-login-form">
-        <div className="login-form">
-          <h2>{isLogin ? "Login" : "Register"}</h2>
-          <div className="login-wrapper">
+        <Box w="40%" className="login-form">
+          <Title mb="md" order={2}>
+            {isLogin ? "Login" : "Register"}
+          </Title>
+          <Box w="80%">
             {!isLogin && (
-              <Input
+              <TextInput
                 name="username"
                 value={form.username}
                 onChange={handleInputChange}
                 placeholder="Username"
-                className="mb-24"
+                mb="md"
                 disabled={isLoading}
               />
             )}
 
-            <Input
+            <TextInput
               type="email"
               name="email"
               value={form.email}
               onChange={handleInputChange}
               placeholder="Email"
-              className="mb-24"
+              mb="md"
               disabled={isLoading}
             />
 
-            <Input
+            <TextInput
               type="password"
               name="password"
               value={form.password}
               onChange={handleInputChange}
               placeholder="Password"
-              className="mb-24"
+              mb="md"
               disabled={isLoading}
             />
 
-            <div className="button-container">
-              <button
-                onClick={handleSubmit}
-                className="submit-button"
-                id="login-button"
-                disabled={isLoading}
-              >
+            <Flex gap="md">
+              <Button fullWidth disabled={isLoading} onClick={handleSubmit}>
                 {isLogin ? "Login" : "Register"}
-              </button>
+              </Button>
 
-              <button
-                onClick={handleSwitch}
-                className="switch-button"
-                disabled={isLoading}
-              >
+              <Button fullWidth onClick={handleSwitch} disabled={isLoading}>
                 {isLogin ? "Register" : "Login"}
-              </button>
-            </div>
+              </Button>
+            </Flex>
 
             {isLoading && <LoadingOverlay />}
 
-            {message && <p className="message">{message}</p>}
-          </div>
-        </div>
+            {message && (
+              <Text c="red" size="md" mt="md">
+                {message}
+              </Text>
+            )}
+          </Box>
+        </Box>
       </div>
     </div>
   );
