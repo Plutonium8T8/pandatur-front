@@ -10,3 +10,4 @@ export * from "./useLanguageToggle";
 export * from "./useLocalStorage";
 export * from "./useMessages";
 export * from "./useFetchTicketChat";
+export * from "./useUploadMediaFile";
