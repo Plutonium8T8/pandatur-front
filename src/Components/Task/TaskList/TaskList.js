@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { RcTable, HeaderCellRcTable } from "../../RcTable";
 import { FaFingerprint } from "react-icons/fa6";
 import { Checkbox } from "../../Checkbox";
@@ -69,23 +69,6 @@ const TaskList = ({
       );
     }
   };
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        openMenuId &&
-        !event.target.closest(".dropdown-menu") &&
-        !event.target.closest(".action-button-task")
-      ) {
-        setOpenMenuId(null);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [openMenuId]);
 
   const sortedTasks = useMemo(() => {
     if (!Array.isArray(tasks)) return [];
@@ -315,10 +298,10 @@ const TaskList = ({
         data={sortedTasks}
         selectedRow={selectedRow}
         loading={loading}
-        bordered
         onRow={(record) => ({
-          onClick: () => openEditTask(record),
+          onDoubleClick: () => openEditTask(record),
         })}
+        bordered
       />
     </div>
   );
