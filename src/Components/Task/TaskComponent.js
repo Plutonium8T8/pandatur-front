@@ -26,8 +26,9 @@ import { useUser } from "../../hooks";
 const language = localStorage.getItem("language") || "RO";
 
 const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
+  const { userId: currentUserId } = useUser();
+  const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
   const [tasks, setTasks] = useState([]);
-  const [filters, setFilters] = useState({});
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,13 +37,6 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
-  const { userId: currentUserId } = useUser();
-
-  useEffect(() => {
-    if (!filters.created_for || filters.created_for.length === 0) {
-      setFilters({ created_for: [String(currentUserId)] });
-    }
-  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -146,10 +140,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
                 ) : null
               }
             />
-            <Button
-              leftSection={<IoMdAdd size={16} />}
-              onClick={openNewTask}
-            >
+            <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}
             </Button>
           </Group>

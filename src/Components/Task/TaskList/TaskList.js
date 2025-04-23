@@ -105,21 +105,18 @@ const TaskList = ({
         key: "checkbox",
         align: "center",
         render: (row) => (
-          <div onClick={(e) => e.stopPropagation()}>
-            <Checkbox
-              checked={selectedRow.includes(row.id)}
-              onChange={(e) => {
-                e.stopPropagation();
-                setSelectedRow((prev) =>
-                  prev.includes(row.id)
-                    ? prev.filter((id) => id !== row.id)
-                    : [...prev, row.id]
-                );
-              }}
-            />
-          </div>
+          <Checkbox
+            checked={selectedRow.includes(row.id)}
+            onChange={() => {
+              setSelectedRow((prev) =>
+                prev.includes(row.id)
+                  ? prev.filter((id) => id !== row.id)
+                  : [...prev, row.id]
+              );
+            }}
+          />
         ),
-      },
+      },      
       {
         title: (
           <HeaderCellRcTable
@@ -193,7 +190,6 @@ const TaskList = ({
         render: (ticketId) => (
           <Link
             to={`/tasks/${ticketId}`}
-            onClick={(e) => e.stopPropagation()}
           >
             <Flex justify="center" gap="8" align="center">
               <FaFingerprint />
@@ -247,16 +243,13 @@ const TaskList = ({
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-              <div
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Button variant="default" className="action-button-task" size="xs" p="xs">
-                  <IoEllipsisHorizontal size={18} />
-                </Button>
-              </div>
+
+              <Button variant="default" className="action-button-task" size="xs" p="xs">
+                <IoEllipsisHorizontal size={18} />
+              </Button>
             </Menu.Target>
 
-            <Menu.Dropdown onClick={(e) => e.stopPropagation()}>
+            <Menu.Dropdown>
               <Menu.Item
                 leftSection={<IoCheckmarkCircle size={16} />}
                 onClick={() => {
