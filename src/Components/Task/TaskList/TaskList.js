@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { RcTable, HeaderCellRcTable } from "../../RcTable";
+import { RcTable } from "../../RcTable";
 import { FaFingerprint } from "react-icons/fa6";
 import { Checkbox } from "../../Checkbox";
 import { translations } from "../../utils/translations";
@@ -23,16 +23,12 @@ const language = localStorage.getItem("language") || "RO";
 
 const TaskList = ({
   tasks = [],
-  handleMarkAsSeenTask,
   userList = [],
   loading = false,
   openEditTask,
   fetchTasks,
 }) => {
-  const [order, setOrder] = useState("ASC");
-  const [sortColumn, setSortColumn] = useState(null);
   const [selectedRow, setSelectedRow] = useState([]);
-  const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const handleDeleteTaskById = useConfirmPopup({
@@ -71,34 +67,6 @@ const TaskList = ({
     }
   };
 
-  const sortedTasks = useMemo(() => {
-    if (!Array.isArray(tasks)) return [];
-
-    if (!sortColumn) return tasks;
-
-    return [...tasks].sort((a, b) => {
-      let valA = a[sortColumn];
-      let valB = b[sortColumn];
-
-      if (sortColumn === "scheduled_time") {
-        const dateA = dayjs(valA, "DD-MM-YYYY HH:mm:ss");
-        const dateB = dayjs(valB, "DD-MM-YYYY HH:mm:ss");
-
-        if (!dateA.isValid() || !dateB.isValid()) return 0;
-
-        return order === "ASC"
-          ? dateA.valueOf() - dateB.valueOf()
-          : dateB.valueOf() - dateA.valueOf();
-      }
-
-      const comparison = String(valA).localeCompare(String(valB), undefined, {
-        numeric: true,
-      });
-
-      return order === "ASC" ? comparison : -comparison;
-    });
-  }, [tasks, sortColumn, order]);
-
   const columns = useMemo(
     () => [
       {
@@ -119,22 +87,11 @@ const TaskList = ({
         ),
       },
       {
-        title: (
-          <HeaderCellRcTable
-            title={translations["Deadline"][language]}
-            order={order}
-          />
-        ),
+        title: translations["Deadline"][language],
         dataIndex: "scheduled_time",
         key: "scheduled_time",
         width: 180,
         align: "center",
-        onHeaderCell: () => ({
-          onClick: () => {
-            setSortColumn("scheduled_time");
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
-          },
-        }),
         render: (date) => {
           const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
           if (!parsed.isValid()) return "Invalid Date";
@@ -144,14 +101,13 @@ const TaskList = ({
           const isPast = parsed.isBefore(today);
 
           const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
-          const fontWeight = isPast || isToday ? 500 : 500;
 
           return (
-            <span style={{ color, fontWeight }}>
+            <span style={{ color, fontWeight: 500 }}>
               {parsed.format("DD.MM.YYYY HH:mm")}
             </span>
           );
-        }
+        },
       },
       {
         title: translations["Autor"][language],
@@ -172,26 +128,13 @@ const TaskList = ({
           row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
-        title: (
-          <HeaderCellRcTable
-            title={translations["Lead ID"][language]}
-            order={order}
-          />
-        ),
+        title: translations["Lead ID"][language],
         dataIndex: "ticket_id",
         key: "ticket_id",
         width: 120,
         align: "center",
-        onHeaderCell: () => ({
-          onClick: () => {
-            setSortColumn("ticket_id");
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
-          },
-        }),
         render: (ticketId) => (
-          <Link
-            to={`/tasks/${ticketId}`}
-          >
+          <Link to={`/tasks/${ticketId}`}>
             <Flex justify="center" gap="8" align="center">
               <FaFingerprint />
               {ticketId}
@@ -260,31 +203,25 @@ const TaskList = ({
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">
             <Menu.Target>
-
               <Button variant="default" className="action-button-task" size="xs" p="xs">
                 <IoEllipsisHorizontal size={18} />
               </Button>
             </Menu.Target>
-
             <Menu.Dropdown>
               <Menu.Item
                 leftSection={<IoCheckmarkCircle size={16} />}
-                onClick={() => {
-                  if (!row.status) handleMarkTaskAsComplete(row.id);
-                }}
+                onClick={() => !row.status && handleMarkTaskAsComplete(row.id)}
                 disabled={row.status}
                 style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
               >
                 {translations["Finalizați"][language]}
               </Menu.Item>
-
               <Menu.Item
                 leftSection={<IoPencil size={16} />}
                 onClick={() => openEditTask(row)}
               >
                 {translations["Modificați"][language]}
               </Menu.Item>
-
               <Menu.Item
                 leftSection={<IoTrash size={16} />}
                 onClick={() => handleDeleteTask(row.id)}
@@ -297,7 +234,7 @@ const TaskList = ({
         ),
       },
     ],
-    [language, userList, handleMarkAsSeenTask, order, sortColumn, selectedRow, openMenuId]
+    [language, userList, selectedRow]
   );
 
   return (
@@ -305,7 +242,7 @@ const TaskList = ({
       <RcTable
         rowKey={({ id }) => id}
         columns={columns}
-        data={sortedTasks}
+        data={tasks}
         selectedRow={selectedRow}
         loading={loading}
         onRow={(record) => ({
