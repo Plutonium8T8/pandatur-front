@@ -232,7 +232,7 @@ export const renderMedia = (media, deleteAttachment, shouldDelete) => {
             <Grid.Col span={4} key={media.id}>
               {renderMediaContent({
                 type: media.mtype,
-                message: media.url,
+                message: media.url || media.message,
                 id: media.id,
                 deleteAttachment: () => deleteAttachment(media.id),
                 shouldDelete,
