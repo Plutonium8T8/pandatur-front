@@ -20,7 +20,6 @@ import { api } from "../api";
 import SingleChat from "../Components/ChatComponent/SingleChat";
 import { Spin } from "../Components/Spin";
 import { RefLeadsHeader } from "../Components/LeadsComponent/LeadsHeader";
-import TicketModal from "../Components/LeadsComponent/TicketModal/TicketModalComponent";
 import { SpinnerRightBottom } from "../Components/SpinnerRightBottom";
 import { MantineModal } from "../Components/MantineModal";
 import { ManageLeadInfoTabs } from "../Components/LeadsComponent/ManageLeadInfoTabs";
@@ -49,7 +48,7 @@ export const Leads = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
-  const { tickets, setTickets, spinnerTickets } = useApp();
+  const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
   const [hardTickets, setHardTickets] = useState([]);
@@ -356,28 +355,9 @@ export const Leads = () => {
       <AddLeadModal
         open={isOpenAddLeadModal}
         onClose={() => setIsOpenAddLeadModal(false)}
+        selectedGroupTitle={groupTitle}
+        fetchTickets={fetchTicketList}
       />
-
-      {/* {isOpenAddLeadModal && (
-        <TicketModal
-          fetchTickets={fetchTicketList}
-          selectedGroupTitle={groupTitle}
-          ticket={currentTicket}
-          onClose={() => setIsOpenAddLeadModal(false)}
-          onSave={(updatedTicket) => {
-            setTickets((prevTickets) => {
-              const isEditing = Boolean(updatedTicket.ticket_id);
-              return isEditing
-                ? prevTickets.map((ticket) =>
-                    ticket.id === updatedTicket.ticket_id
-                      ? updatedTicket
-                      : ticket,
-                  )
-                : [...prevTickets, updatedTicket];
-            });
-          }}
-        />
-      )} */}
 
       <MantineModal
         title={getLanguageByKey("Filtrează tichete")}

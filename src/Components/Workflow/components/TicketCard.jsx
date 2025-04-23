@@ -123,18 +123,19 @@ export const TicketCard = ({
 
                 <Flex direction="column">
                   <Text size="xs">
-                    {parseServerDate(ticket.creation_date).format(DD_MM_YYYY)}:{" "}
-                    {parseServerDate(ticket.creation_date).format(HH_mm)}
+                    {parseServerDate(ticket.creation_date)?.format(DD_MM_YYYY)}:{" "}
+                    {parseServerDate(ticket.creation_date)?.format(HH_mm)}
                   </Text>
 
                   <Text size="xs">
-                    {parseServerDate(ticket.last_interaction_date).format(
+                    {parseServerDate(ticket.last_interaction_date)?.format(
                       DD_MM_YYYY,
                     )}
-                    :{" "}
-                    {parseServerDate(ticket.last_interaction_date).format(
-                      HH_mm,
-                    )}
+                    {ticket.last_interaction_date
+                      ? `: ${parseServerDate(
+                          ticket.last_interaction_date,
+                        )?.format(HH_mm)}`
+                      : null}
                   </Text>
                 </Flex>
               </Flex>
