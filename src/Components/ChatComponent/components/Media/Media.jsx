@@ -93,7 +93,7 @@ export const Media = ({ messages, id }) => {
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel h="100%" value="messages-media">
+        <Tabs.Panel h="calc(100% - 36px)" value="messages-media">
           <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
@@ -101,19 +101,19 @@ export const Media = ({ messages, id }) => {
               <Tabs.Tab value="audio">{getLanguageByKey("audio")}</Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel h="100%" value="media">
+            <Tabs.Panel className="media-tabs" h="100%" value="media">
               <Flex h="100%" direction="column" mt="md">
                 {renderMedia({ media: messages })}
               </Flex>
             </Tabs.Panel>
 
-            <Tabs.Panel h="100%" value="files">
+            <Tabs.Panel className="media-tabs" h="100%" value="files">
               <Flex h="100%" direction="column" mt="md">
                 {renderFile({ media: messages })}
               </Flex>
             </Tabs.Panel>
 
-            <Tabs.Panel h="100%" value="audio">
+            <Tabs.Panel className="media-tabs" h="100%" value="audio">
               <Flex h="100%" direction="column" mt="md">
                 {renderCall({ media: messages })}
               </Flex>
@@ -121,7 +121,7 @@ export const Media = ({ messages, id }) => {
           </Tabs>
         </Tabs.Panel>
 
-        <Tabs.Panel value="uploaded-media">
+        <Tabs.Panel h="calc(100% - 36px)" value="uploaded-media">
           <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
