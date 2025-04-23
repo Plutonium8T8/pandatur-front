@@ -337,8 +337,8 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
         </Group>
 
         <Collapse in={!listCollapsed}>
-        <Stack spacing="xs" mt="xs">
-        {tasks.map((task) => renderTaskForm(task.id))}
+          <Stack spacing="xs" mt="xs">
+            {tasks.map((task) => renderTaskForm(task.id))}
             {creatingTask && renderTaskForm("new", true)}
           </Stack>
         </Collapse>

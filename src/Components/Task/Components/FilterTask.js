@@ -13,6 +13,7 @@ import { TypeTask } from "../OptionsTaskType";
 import { useGetTechniciansList } from "../../../hooks/useGetTechniciansList";
 import { useUser } from "../../../hooks";
 import dayjs from "dayjs";
+import { api } from "../../../api";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -25,6 +26,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const [localFilters, setLocalFilters] = useState({});
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
     const { userId } = useUser();
+    const [groupOptions, setGroupOptions] = useState([]);
 
     useEffect(() => {
         if (!filters.created_for || filters.created_for.length === 0) {
@@ -35,6 +37,18 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             setLocalFilters(filters);
         }
     }, [userId]);
+
+    useEffect(() => {
+        const fetchGroups = async () => {
+            const data = await api.user.getGroupsList();
+            const options = data.map((group) => ({
+                value: group.name,
+                label: group.name,
+            }));
+            setGroupOptions(options);
+        };
+        fetchGroups();
+    }, []);
 
     const handleChange = (field, value) => {
         setLocalFilters((prev) => ({ ...prev, [field]: value }));
@@ -49,13 +63,20 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const cleanFilters = (filters) => {
         return Object.fromEntries(
             Object.entries(filters).filter(
-                ([_, value]) => !(Array.isArray(value) && value.length === 0) && value !== null
+                ([_, value]) =>
+                    !(Array.isArray(value) && value.length === 0) &&
+                    value !== null &&
+                    value !== ""
             )
         );
     };
 
     const handleApply = () => {
-        onApply(cleanFilters(localFilters));
+        const cleaned = cleanFilters(localFilters);
+        if (cleaned.user_group_names && typeof cleaned.user_group_names === "string") {
+            cleaned.user_group_names = [cleaned.user_group_names];
+        }
+        onApply(cleaned);
         onClose();
     };
 
@@ -69,7 +90,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         return undefined;
     };
 
-    const handleDateRangeChange = (range, handleChange) => {
+    const handleDateRangeChange = (range) => {
         handleChange("date_from", range?.[0] ? dayjs(range[0]).format("DD-MM-YYYY") : null);
         handleChange("date_to", range?.[1] ? dayjs(range[1]).format("DD-MM-YYYY") : null);
     };
@@ -117,21 +138,31 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         disabled={loadingTechnicians}
                     />
 
+                    <MultiSelect
+                        label={translations["Alege grupul"][language]}
+                        placeholder={translations["Alege grupul"][language]}
+                        data={groupOptions}
+                        value={localFilters.user_group_names || []}
+                        onChange={(val) => handleChange("user_group_names", val)}
+                        clearable
+                        searchable
+                        nothingFoundMessage={translations["noResult"][language]}
+                    />
+
                     <DatePickerInput
                         type="range"
                         label={translations["intervalDate"][language]}
                         value={getDateRangeValue(localFilters.date_from, localFilters.date_to)}
-                        onChange={(range) => handleDateRangeChange(range, handleChange)}
+                        onChange={handleDateRangeChange}
                         clearable
                         valueFormat="DD-MM-YYYY"
                         placeholder={translations["intervalDate"][language]}
                     />
-
                 </Flex>
 
                 <Group mt="xl" justify="flex-end">
                     <Button variant="outline" onClick={handleClear}>
-                        {translations["Reset filtru"][language] || "Curăță"}
+                        {translations["Reset filtru"][language]}
                     </Button>
                     <Button onClick={handleApply}>
                         {translations["Aplică"][language]}
