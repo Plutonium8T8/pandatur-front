@@ -1,10 +1,10 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import TaskComponent from "../TaskComponent";
-import SingleChat from "../../ChatComponent/SingleChat";
-import { MantineModal } from "../../MantineModal";
+import TaskComponent from "../Components/Task/TaskComponent";
+import SingleChat from "../Components/ChatComponent/SingleChat";
+import { MantineModal } from "../Components/MantineModal";
 
-const TaskPage = () => {
+export const TaskPage = () => {
   const { ticketId } = useParams();
   const navigate = useNavigate();
 
@@ -17,12 +17,13 @@ const TaskPage = () => {
         fullScreen
         open={!!ticketId}
         onClose={handleCloseModal}
-        height="calc(100% - 60px)"
+        title={false}
+        withCloseButton={false}
+        style={{ padding: 0 }}
+        height="100%"
       >
         <SingleChat id={ticketId} onClose={handleCloseModal} />
       </MantineModal>
     </>
   );
 };
-
-export default TaskPage;
