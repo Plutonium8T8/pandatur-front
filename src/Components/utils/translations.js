@@ -1136,7 +1136,7 @@ export const translations = {
   },
   Email: {
     RO: "Email",
-    RU: "Email",
+    RU: "Электронная почта",
   },
   Ștergere: {
     RO: "Ștergere",
@@ -2226,5 +2226,17 @@ export const translations = {
   numberMustContain8Characters: {
     RO: "Numărul trebuie să conțină 8 caractere",
     RU: "Номер должен содержать 8 символов",
+  },
+  addNewLead: {
+    RO: "Adaugă un lead nou",
+    RU: "Добавить новый лид",
+  },
+  fieldIsRequired: {
+    RO: "Acest câmp este obligatoriu",
+    RU: "Это поле обязательно для заполнения",
+  },
+  selectGroup: {
+    RO: "Selectează grupa",
+    RU: "Выберите группу",
   },
 };
