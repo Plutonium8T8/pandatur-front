@@ -15,3 +15,4 @@ export * from "./socialMediaIcons";
 export * from "./isStoreFile";
 export * from "./messageStatus";
 export * from "./extractNumbers";
+export * from "./translations";
