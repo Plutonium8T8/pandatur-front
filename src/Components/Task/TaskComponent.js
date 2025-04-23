@@ -22,6 +22,8 @@ import TaskFilterModal from "./Components/FilterTask";
 import { PageHeader } from "../PageHeader";
 import { Pagination } from "../Pagination";
 import { useUser } from "../../hooks";
+import { useSnackbar } from "notistack";
+import { showServerError } from "../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -37,6 +39,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -55,15 +58,16 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         sort_by: "scheduled_time",
         sort_dir: "ASC",
       });
-  
+
       setTasks(Array.isArray(res?.data) ? res.data : []);
       setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {
       console.error("error upload tasks", error);
       setTasks([]);
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  };  
+  };
 
   useEffect(() => {
     fetchTasks();
