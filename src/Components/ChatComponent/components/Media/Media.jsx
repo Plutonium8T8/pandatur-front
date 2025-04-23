@@ -106,7 +106,7 @@ export const Media = ({ messages, id }) => {
             </Tabs.List>
 
             <Tabs.Panel h="100%" value="media">
-              {/* <Box mt="md">{renderMedia(messages)}</Box> */}
+              <Box mt="md">{renderMedia(messages)}</Box>
             </Tabs.Panel>
 
             <Tabs.Panel h="100%" value="files">
