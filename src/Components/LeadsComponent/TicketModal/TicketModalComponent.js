@@ -194,6 +194,7 @@ const TicketModal = ({
           <div className="input-group">
             <label>{translations["surname"][language]}:</label>
             <Input
+              style={{ border: "1px solid red" }}
               name="surname"
               value={editedTicket.surname || ""}
               onChange={handleInputChange}

@@ -31,6 +31,7 @@ import {
 import { WorkflowColumns } from "../Components/Workflow";
 import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
+import { AddLeadModal } from "../Components";
 import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
@@ -352,7 +353,12 @@ export const Leads = () => {
         <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
-      {isOpenAddLeadModal && (
+      <AddLeadModal
+        open={isOpenAddLeadModal}
+        onClose={() => setIsOpenAddLeadModal(false)}
+      />
+
+      {/* {isOpenAddLeadModal && (
         <TicketModal
           fetchTickets={fetchTicketList}
           selectedGroupTitle={groupTitle}
@@ -371,7 +377,7 @@ export const Leads = () => {
             });
           }}
         />
-      )}
+      )} */}
 
       <MantineModal
         title={getLanguageByKey("Filtrează tichete")}
