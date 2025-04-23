@@ -54,12 +54,11 @@ export const renderMediaContent = ({
       >
         {shouldDelete && (
           <Box
-            onClick={() => deleteAttachment(id)}
-            pos="absolute"
             className="media-wrapper-delete-btn"
             bg="white"
             right="10px"
             top="10px"
+            pos="absolute"
           >
             <ActionIcon
               size="md"
@@ -86,7 +85,6 @@ export const renderMediaContent = ({
       <Flex className="media-wrapper" pos="relative">
         {shouldDelete && (
           <Box
-            onClick={() => deleteAttachment(id)}
             pos="absolute"
             className="media-wrapper-delete-btn"
             bg="white"
@@ -124,13 +122,15 @@ export const renderMediaContent = ({
           />
         </Flex>
 
-        <ActionIcon
-          size="md"
-          onClick={() => deleteAttachment(id)}
-          variant="danger"
-        >
-          <GoTrash size={14} />
-        </ActionIcon>
+        {shouldDelete && (
+          <ActionIcon
+            size="md"
+            onClick={() => deleteAttachment(id)}
+            variant="danger"
+          >
+            <GoTrash size={14} />
+          </ActionIcon>
+        )}
       </Flex>
     ),
     [MEDIA_TYPE.FILE]: (
@@ -156,13 +156,15 @@ export const renderMediaContent = ({
           </Link>
         </Flex>
 
-        <ActionIcon
-          size="md"
-          onClick={() => deleteAttachment(id)}
-          variant="danger"
-        >
-          <GoTrash size={14} />
-        </ActionIcon>
+        {shouldDelete && (
+          <ActionIcon
+            size="md"
+            onClick={() => deleteAttachment(id)}
+            variant="danger"
+          >
+            <GoTrash size={14} />
+          </ActionIcon>
+        )}
       </Flex>
     ),
     [MEDIA_TYPE.CALL]: (
@@ -190,24 +192,22 @@ export const renderFile = (media, deleteAttachment, shouldDelete) => {
   return (
     <>
       {filterMediaByImageAndVideo.length ? (
-        filterMediaByImageAndVideo
-          .filter((i) => [MEDIA_TYPE.FILE].includes(i.mtype))
-          .map((media, index) => (
-            <Flex direction="column" align="center" key={media.id}>
-              {index === 0 && <Divider w="100%" />}
-              {renderMediaContent({
-                type: media.mtype,
-                message: media.url || media.message,
-                id: media.id,
-                deleteAttachment: () => deleteAttachment(media.id),
-                shouldDelete,
-                msjTime: media.time_sent,
-                payload: media,
-              })}
+        filterMediaByImageAndVideo.map((media, index) => (
+          <Flex direction="column" align="center" key={media.id}>
+            {index === 0 && <Divider w="100%" />}
+            {renderMediaContent({
+              type: media.mtype,
+              message: media.url || media.message,
+              id: media.id,
+              deleteAttachment: () => deleteAttachment(media.id),
+              shouldDelete,
+              msjTime: media.time_sent,
+              payload: media,
+            })}
 
-              <Divider w="100%" />
-            </Flex>
-          ))
+            <Divider w="100%" />
+          </Flex>
+        ))
       ) : (
         <Flex h="100%" align="center" justify="center">
           <Empty />
@@ -226,21 +226,17 @@ export const renderMedia = (media, deleteAttachment, shouldDelete) => {
     <>
       {filterMediaByImageAndVideo.length ? (
         <Grid gutter="1px">
-          {filterMediaByImageAndVideo
-            .filter((i) =>
-              [MEDIA_TYPE.VIDEO, MEDIA_TYPE.IMAGE].includes(i.mtype),
-            )
-            .map((media) => (
-              <Grid.Col span={4} key={media.id}>
-                {renderMediaContent({
-                  type: media.mtype,
-                  message: media.url,
-                  id: media.id,
-                  deleteAttachment: () => deleteAttachment(media.id),
-                  shouldDelete,
-                })}
-              </Grid.Col>
-            ))}
+          {filterMediaByImageAndVideo.map((media) => (
+            <Grid.Col span={4} key={media.id}>
+              {renderMediaContent({
+                type: media.mtype,
+                message: media.url,
+                id: media.id,
+                deleteAttachment: () => deleteAttachment(media.id),
+                shouldDelete,
+              })}
+            </Grid.Col>
+          ))}
         </Grid>
       ) : (
         <Empty />
@@ -257,25 +253,23 @@ export const renderCall = (media, deleteAttachment, shouldDelete) => {
   return (
     <>
       {filterMediaByCallAndAudio.length ? (
-        filterMediaByCallAndAudio
-          .filter((i) => [MEDIA_TYPE.CALL, MEDIA_TYPE.AUDIO].includes(i.mtype))
-          .map((media, index) => (
-            <Flex w="100%" direction="column" key={media.id}>
-              {index === 0 && <Divider w="100%" />}
-              <Box py="md">
-                {renderMediaContent({
-                  type: media.mtype,
-                  message: media.url,
-                  id: media.id,
-                  deleteAttachment: () => deleteAttachment(media.id),
-                  shouldDelete,
-                  msjTime: media.time_sent,
-                })}
-              </Box>
+        filterMediaByCallAndAudio.map((media, index) => (
+          <Flex w="100%" direction="column" key={media.id}>
+            {index === 0 && <Divider w="100%" />}
+            <Box py="md">
+              {renderMediaContent({
+                type: media.mtype,
+                message: media.url,
+                id: media.id,
+                deleteAttachment: () => deleteAttachment(media.id),
+                shouldDelete,
+                msjTime: media.time_sent,
+              })}
+            </Box>
 
-              <Divider w="100%" />
-            </Flex>
-          ))
+            <Divider w="100%" />
+          </Flex>
+        ))
       ) : (
         <Empty />
       )}
