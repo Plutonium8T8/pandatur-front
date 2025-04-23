@@ -6,32 +6,51 @@ import {
   Textarea,
   TagsInput,
   Button,
+  Modal,
+  Text,
 } from "@mantine/core";
 import { useForm, hasLength, isEmail } from "@mantine/form";
-import { MantineModal } from "../Components";
-import { getLanguageByKey } from "./utils";
+import { useDisclosure } from "@mantine/hooks";
+import { useEffect } from "react";
+import { useSnackbar } from "notistack";
+import { getLanguageByKey, showServerError } from "./utils";
 import { priorityOptions, workflowOptions } from "../FormOptions";
+import { api } from "../api";
+import { useUser } from "../hooks";
 
-const checkPhoneNumber = (value) => {
-  if (value) {
-    const convertToString = value.toString();
-    if (!convertToString.startsWith("6") && !convertToString.startsWith("7")) {
-      return getLanguageByKey("numberMustStartWith6Or7");
-    }
+const verifyPhoneNumber = (value) => {
+  if (!value) return getLanguageByKey("fieldIsRequired");
 
-    if (convertToString.length !== 8) {
-      return getLanguageByKey("numberMustContain8Characters");
-    }
+  const convertToString = value.toString();
+  if (!convertToString.startsWith("6") && !convertToString.startsWith("7")) {
+    return getLanguageByKey("numberMustStartWith6Or7");
+  }
+
+  if (convertToString.length !== 8) {
+    return getLanguageByKey("numberMustContain8Characters");
   }
 };
 
-export const AddLeadModal = ({ open, onClose }) => {
+const verifyEmail = (value) => {
+  if (!value) {
+    return getLanguageByKey("fieldIsRequired");
+  }
+
+  return isEmail(getLanguageByKey("invalidEmail"))(value);
+};
+
+export const AddLeadModal = ({
+  open,
+  onClose,
+  selectedGroupTitle,
+  fetchTickets,
+}) => {
+  const { userId } = useUser();
+  const { enqueueSnackbar } = useSnackbar();
+  const [loading, handlers] = useDisclosure(false);
+
   const form = useForm({
     mode: "uncontrolled",
-    initialValues: {
-      email: "",
-      termsOfService: false,
-    },
 
     validate: {
       name: hasLength({ min: 3 }, getLanguageByKey("mustBeAtLeast3Characters")),
@@ -39,19 +58,49 @@ export const AddLeadModal = ({ open, onClose }) => {
         { min: 3 },
         getLanguageByKey("mustBeAtLeast3Characters"),
       ),
-      email: isEmail(getLanguageByKey("invalidEmail")),
-      phone: checkPhoneNumber,
+      email: verifyEmail,
+      phone: verifyPhoneNumber,
     },
   });
+
+  const createTicket = async (values) => {
+    handlers.open();
+    try {
+      await api.tickets.createTickets({ ...values, technician_id: userId });
+      form.reset();
+      await fetchTickets();
+      onClose();
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), {
+        variant: "error",
+      });
+    } finally {
+      handlers.close();
+    }
+  };
+
+  useEffect(() => {
+    if (selectedGroupTitle) {
+      form.setFieldValue("group_title", selectedGroupTitle);
+    }
+  }, [selectedGroupTitle]);
+
   return (
-    <MantineModal
-      open={open}
+    <Modal
+      centered
+      size={600}
+      opened={open}
       onClose={onClose}
-      title={getLanguageByKey("Lead nou")}
+      title={
+        <Text size="xl" fw="bold">
+          {getLanguageByKey("addNewLead")}
+        </Text>
+      }
     >
-      <form onSubmit={form.onSubmit((values) => console.log(values))}>
+      <form onSubmit={form.onSubmit(createTicket)}>
         <Flex gap="md">
           <TextInput
+            withAsterisk
             w="100%"
             label={getLanguageByKey("Nume")}
             placeholder={getLanguageByKey("Nume")}
@@ -59,6 +108,7 @@ export const AddLeadModal = ({ open, onClose }) => {
             {...form.getInputProps("name")}
           />
           <TextInput
+            withAsterisk
             w="100%"
             label={getLanguageByKey("Prenume")}
             placeholder={getLanguageByKey("Prenume")}
@@ -69,6 +119,7 @@ export const AddLeadModal = ({ open, onClose }) => {
 
         <Flex gap="md">
           <TextInput
+            withAsterisk
             type="email"
             w="100%"
             label={getLanguageByKey("Email")}
@@ -77,6 +128,7 @@ export const AddLeadModal = ({ open, onClose }) => {
             {...form.getInputProps("email")}
           />
           <NumberInput
+            withAsterisk
             hideControls
             w="100%"
             label={getLanguageByKey("Telefon")}
@@ -94,7 +146,9 @@ export const AddLeadModal = ({ open, onClose }) => {
             {...form.getInputProps("contact")}
           />
           <Select
-            placeholder={getLanguageByKey("Grup")}
+            disabled={selectedGroupTitle}
+            value={selectedGroupTitle || undefined}
+            placeholder={getLanguageByKey("selectGroup")}
             w="100%"
             label={getLanguageByKey("Grup")}
             data={[
@@ -103,6 +157,8 @@ export const AddLeadModal = ({ open, onClose }) => {
               { value: "Filiale", label: getLanguageByKey("FIL") },
               { value: "Francize", label: getLanguageByKey("FRA") },
             ]}
+            key={form.key("group_title")}
+            {...form.getInputProps("group_title")}
           />
         </Flex>
         <Flex gap="md">
@@ -110,7 +166,7 @@ export const AddLeadModal = ({ open, onClose }) => {
             data={priorityOptions}
             w="100%"
             label={getLanguageByKey("Prioritate")}
-            placeholder={getLanguageByKey("Prioritate")}
+            placeholder={getLanguageByKey("Selectează prioritate")}
             key={form.key("priority")}
             {...form.getInputProps("priority")}
           />
@@ -118,33 +174,39 @@ export const AddLeadModal = ({ open, onClose }) => {
           <Select
             w="100%"
             label={getLanguageByKey("Workflow")}
-            placeholder={getLanguageByKey(
-              "Alege workflow pentru afisare in sistem",
-            )}
+            placeholder={getLanguageByKey("Selectează flux de lucru")}
             data={workflowOptions}
+            key={form.key("workflow")}
+            {...form.getInputProps("workflow")}
           />
         </Flex>
 
         <TagsInput
           label={getLanguageByKey("tags")}
           placeholder={getLanguageByKey("tags")}
+          clearable
+          key={form.key("tags")}
+          {...form.getInputProps("tags")}
         />
 
         <Textarea
           autosize
           minRows={4}
-          clearable
           label={getLanguageByKey("Descriere")}
           placeholder={getLanguageByKey("Descriere")}
+          key={form.key("description")}
+          {...form.getInputProps("description")}
         />
 
         <Flex justify="end" mt="md" gap="md">
-          <Button type="submit" variant="outline">
+          <Button onClick={onClose} variant="outline">
             {getLanguageByKey("Anulează")}
           </Button>
-          <Button type="submit">{getLanguageByKey("Creează")}</Button>
+          <Button loading={loading} type="submit">
+            {getLanguageByKey("Creează")}
+          </Button>
         </Flex>
       </form>
-    </MantineModal>
+    </Modal>
   );
 };
