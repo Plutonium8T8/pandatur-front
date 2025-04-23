@@ -22,7 +22,7 @@ import "./SideBar.css";
 
 const LOGO = "/logo.png";
 
-export const SideBar = ({ onOpenAccount }) => {
+export const SideBar = () => {
   const location = useLocation();
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const [loading, setLoading] = useState(false);

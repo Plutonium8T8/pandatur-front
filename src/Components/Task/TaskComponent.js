@@ -6,42 +6,71 @@ import {
   Box,
   Group,
   Tooltip,
+  Flex,
+  ActionIcon,
 } from "@mantine/core";
-import { IoMdAdd } from "react-icons/io";
+import { IoMdAdd, IoMdClose } from "react-icons/io";
+import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { FaList } from "react-icons/fa6";
+import { LuFilter } from "react-icons/lu";
 import { api } from "../../api";
 import { translations } from "../utils/translations";
 import TaskModal from "./TaskModal";
 import TaskList from "./TaskList/TaskList";
-import TaskColumnsView from "./TaskColumnsView";
+import TaskColumnsView from "./Kanban/TaskColumnsView";
+import TaskFilterModal from "./Components/FilterTask";
 import { PageHeader } from "../PageHeader";
-import { TbLayoutKanbanFilled } from "react-icons/tb";
-import { FaList } from "react-icons/fa6";
+import { Pagination } from "../Pagination";
+import { useUser } from "../../hooks";
+import { useSnackbar } from "notistack";
+import { showServerError } from "../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) => {
+const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
+  const { userId: currentUserId } = useUser();
+  const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
   const [tasks, setTasks] = useState([]);
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [viewMode, setViewMode] = useState("list");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [viewMode, setViewMode] = useState("list");
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+      setCurrentPage(1);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   const fetchTasks = async () => {
     try {
-      const data = selectTicketId
-        ? await api.task.getTaskByTicket(selectTicketId)
-        : await api.task.getAllTasks();
-      setTasks(Array.isArray(data?.data) ? data.data : []);
+      const res = await api.task.filterTasks({
+        ...filters,
+        search: searchQuery,
+        page: currentPage,
+        sort_by: "scheduled_time",
+      });
+
+      setTasks(Array.isArray(res?.data) ? res.data : []);
+      setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {
-      console.error("Ошибка загрузки задач:", error);
+      console.error("error upload tasks", error);
       setTasks([]);
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
   useEffect(() => {
     fetchTasks();
-  }, [selectTicketId]);
+  }, [filters, searchQuery, currentPage]);
 
   const openNewTask = () => {
     setSelectedTask(null);
@@ -53,21 +82,28 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
     setIsModalOpen(true);
   };
 
-  const filteredTasks = Array.isArray(tasks)
-    ? tasks.filter((task) =>
-      (task?.task_type || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    )
-    : [];
+  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
+    if (key === "created_for") {
+      return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
+    }
+    return value && value.length > 0;
+  });
 
   return (
     <Box p="md">
       <PageHeader
         title={translations["Tasks"][language]}
-        count={filteredTasks.length}
+        count={tasks.length}
         extraInfo={
           <Group gap="sm">
+            <ActionIcon
+              size="36"
+              variant={hasActiveFilters ? "filled" : "default"}
+              onClick={() => setFilterModalOpen(true)}
+            >
+              <LuFilter size={16} />
+            </ActionIcon>
+
             <SegmentedControl
               value={viewMode}
               onChange={setViewMode}
@@ -96,28 +132,48 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
             />
             <TextInput
               placeholder={translations["Cautare"][language]}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.currentTarget.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.currentTarget.value)}
               w={350}
+              rightSection={
+                searchInput ? (
+                  <IoMdClose
+                    size={16}
+                    className="pointer"
+                    onClick={() => setSearchInput("")}
+                  />
+                ) : null
+              }
             />
-            <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
+            {/* <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}
-            </Button>
+            </Button> */}
           </Group>
         }
       />
 
       {viewMode === "list" ? (
         <TaskList
-          tasks={filteredTasks}
+          tasks={tasks}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onChangePagination={setCurrentPage}
+          searchQuery={searchQuery}
           openEditTask={openEditTask}
           fetchTasks={fetchTasks}
         />
       ) : (
-        <TaskColumnsView
-          tasks={filteredTasks}
-          onEdit={openEditTask}
-        />
+        <TaskColumnsView tasks={tasks} onEdit={openEditTask} />
+      )}
+
+      {totalPages > 1 && (
+        <Flex p="20" justify="center" className="leads-table-pagination">
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage}
+            onPaginationChange={setCurrentPage}
+          />
+        </Flex>
       )}
 
       <TaskModal
@@ -125,8 +181,17 @@ const TaskComponent = ({ selectTicketId, updateTaskCount = () => { }, userId }) 
         onClose={() => setIsModalOpen(false)}
         fetchTasks={fetchTasks}
         selectedTask={selectedTask}
-        defaultTicketId={selectTicketId}
         defaultCreatedBy={userId}
+      />
+
+      <TaskFilterModal
+        opened={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        filters={filters}
+        onApply={(newFilters) => {
+          setFilters(newFilters);
+          setCurrentPage(1);
+        }}
       />
     </Box>
   );

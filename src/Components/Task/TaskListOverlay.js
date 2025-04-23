@@ -25,7 +25,7 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
-import DateQuickInput from "./DateQuickPicker";
+import DateQuickInput from "./Components/DateQuickPicker";
 import { useGetTechniciansList } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";
@@ -144,6 +144,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
         ticket_id: ticketId,
         priority: "",
         status_task: "",
+        status: "false"
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
@@ -326,7 +327,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   return (
     <Box pos="relative" p="xs" w="100%">
       <Paper shadow="xs" radius="md" withBorder p="xs">
-        <Group justify="space-between" mb="sm">
+        <Group justify="space-between">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
             <Badge size="sm" color="green">{tasks.length}</Badge>
@@ -337,7 +338,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
         </Group>
 
         <Collapse in={!listCollapsed}>
-          <Stack spacing="xs">
+          <Stack spacing="xs" mt="xs">
             {tasks.map((task) => renderTaskForm(task.id))}
             {creatingTask && renderTaskForm("new", true)}
           </Stack>

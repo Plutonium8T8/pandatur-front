@@ -12,6 +12,12 @@ const spliceMessage = (message) => {
   return `${message.slice(0, 15)}...`;
 };
 
+const textMessageStyle = {
+  wordWrap: "break-word",
+  overflowWrap: "break-word",
+  wordBreak: "break-word",
+};
+
 export const getMediaType = (mimeType) => {
   if (mimeType.startsWith("image/")) return MEDIA_TYPE.IMAGE;
   if (mimeType.startsWith("video/")) return MEDIA_TYPE.VIDEO;
@@ -22,7 +28,7 @@ export const getMediaType = (mimeType) => {
 export const renderContent = (msg) => {
   if (!msg.message) {
     return (
-      <div className="text-message">{getLanguageByKey("Mesajul lipseste")}</div>
+      <div style={textMessageStyle}>{getLanguageByKey("Mesajul lipseste")}</div>
     );
   }
   switch (msg.mtype) {

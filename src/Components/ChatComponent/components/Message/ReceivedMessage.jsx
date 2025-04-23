@@ -28,7 +28,7 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
               w={36}
               h={36}
               radius="50%"
-              src={personalInfo?.photo_url}
+              // src={personalInfo?.photo_url}
               fallbackSrc={DEFAULT_PHOTO}
             />
 

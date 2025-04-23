@@ -14,8 +14,3 @@
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark-9);
 }
-
-.video-preview {
-  max-width: 100%;
-  height: auto;
-}

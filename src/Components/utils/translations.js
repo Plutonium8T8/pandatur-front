@@ -1136,7 +1136,7 @@ export const translations = {
   },
   Email: {
     RO: "Email",
-    RU: "Email",
+    RU: "Электронная почта",
   },
   Ștergere: {
     RO: "Ștergere",
@@ -1242,13 +1242,13 @@ export const translations = {
     RO: "ID-ul tichetului",
     RU: "ID заявки",
   },
-  activ: {
-    RO: "activ",
-    RU: "активный",
+  done: {
+    RO: "îndeplinit",
+    RU: "выполнен",
   },
-  inactiv: {
-    RO: "inactiv",
-    RU: "неактивный",
+toDo: {
+    RO: "neîndeplinit",
+    RU: "невыполнено",
   },
   Tasks: {
     RO: "Task-uri",
@@ -2182,5 +2182,77 @@ export const translations = {
   completeAllFields: {
     RO: "Completați toate câmpurile obligatorii",
     RU: "Заполните все обязательные поля",
-  }
+  },
+  noResult: {
+    RO: "Niciun rezultat",
+    RU: "Без результата"
+  },
+  intervalDate: {
+    RO: "Alege interval",
+    RU: "Выберите интервал"
+  },
+  groupTitle: {
+    RO: "Alegeți grupa de lead-uri",
+    RU: "Выберите группу лидов"
+  },
+  ChoiseStatus: {
+    RO: "Alege statusul",
+    RU: "Выберите статус"
+  },
+  addFileOrImage: {
+    RO: "Adaugă fișier sau poză",
+    RU: "Добавьте файл или фото",
+  },
+  addMedia: {
+    RO: "Adaugă media",
+    RU: "Добавьте медиа",
+  },
+  messageAttachments: {
+    RO: "Fișiere atașate din mesaje",
+    RU: "Вложения из сообщений",
+  },
+  uploadedFiles: {
+    RO: "Fișiere încărcate",
+    RU: "Загруженные файлы",
+  },
+  confirmDeleteAttachment: {
+    RO: "Sunteți sigur că doriți să ștergeți acest atașament?",
+    RU: "Вы уверены, что хотите удалить это вложение?",
+  },
+  files: {
+    RO: "Fișiere",
+    RU: "Файлы",
+  },
+  tags: {
+    RO: "Taguri",
+    RU: "Теги",
+  },
+  mustBeAtLeast3Characters: {
+    RO: "Trebuie să conțină cel puțin 3 caractere",
+    RU: "Должно содержать как минимум 3 символа",
+  },
+  invalidEmail: {
+    RO: "Email invalid",
+    RU: "Неверный адрес электронной почты",
+  },
+  numberMustStartWith6Or7: {
+    RO: "Numărul trebuie să înceapă cu 6 sau 7",
+    RU: "Номер должен начинаться с 6 или 7",
+  },
+  numberMustContain8Characters: {
+    RO: "Numărul trebuie să conțină 8 caractere",
+    RU: "Номер должен содержать 8 символов",
+  },
+  addNewLead: {
+    RO: "Adaugă un lead nou",
+    RU: "Добавить новый лид",
+  },
+  fieldIsRequired: {
+    RO: "Acest câmp este obligatoriu",
+    RU: "Это поле обязательно для заполнения",
+  },
+  selectGroup: {
+    RO: "Selectează grupa",
+    RU: "Выберите группу",
+  },
 };

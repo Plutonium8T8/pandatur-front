@@ -1,22 +1,19 @@
 import React, { useEffect } from "react";
-import { UserProvider, AppProvider } from "./contexts";
 import Cookies from "js-cookie";
+import { UserProvider, AppProvider } from "./contexts";
+import { useNavigate, useLocation } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
+import { ModalsProvider } from "@mantine/modals";
 import { publicRoutes } from "./routes";
 import { AppLayout } from "./layout";
-import { useNavigate, useLocation } from "react-router-dom";
 import { PrivateRoutes, PublicRoutes } from "./AppRoutes";
 import { Session } from "./Session";
-import "./App.css";
 import { MantineProvider } from "./MantineProvider";
-import { ModalsProvider } from "@mantine/modals";
-import "@mantine/core/styles.css";
-import "@mantine/dates/styles.css";
-import { isStoreFile } from "@utils";
-// FIXME: Server sends date in an unsupported format (DD-MM-YYYY HH:mm:ss)
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
-import "module-alias/register";
+import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
+import "./App.css";
 
 dayjs.extend(customParseFormat);
 
@@ -44,7 +41,6 @@ function App() {
         >
           {JWT_TOKEN ? (
             <UserProvider>
-              <h1>{isStoreFile("file")}</h1>
               <Session>
                 <AppProvider>
                   <AppLayout>

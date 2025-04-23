@@ -1,12 +1,14 @@
-import Dashboard from "./Components/DashboardComponent/Dashboard";
-import Leads from "./Components/LeadsComponent/LeadsComponent";
-import ChatComponent from "./Components/ChatComponent/ChatComponent";
-import LoginForm from "./Components/LoginComponent/LoginForm";
-import UsersComponent from "./Components/UsersComponent/UsersComponent";
-import TaskPage from "./Components/Task/Page/TaskPage";
-import Schedules from "./Components/Schedules/Schedules";
-import { Test } from "./Components/Test";
-import { Logs } from "./pages";
+import {
+  Logs,
+  Leads,
+  TaskPage,
+  Test,
+  Schedules,
+  Users,
+  Login,
+  Chat,
+  Dashboard,
+} from "./pages";
 
 export const privatePaths = [
   "dashboard",
@@ -21,7 +23,7 @@ export const privatePaths = [
 export const publicRoutes = [
   {
     path: "/auth",
-    component: LoginForm,
+    component: Login,
   },
 ];
 
@@ -36,12 +38,12 @@ export const privateRoutes = (isAllowRole) => [
   },
   {
     path: "/chat/:ticketId?",
-    component: ChatComponent,
+    component: Chat,
   },
   {
     path: "/users",
     // component: isAllowRole ? UsersComponent : NoAccess
-    component: UsersComponent,
+    component: Users,
   },
   {
     path: "/leads/:ticketId?",
