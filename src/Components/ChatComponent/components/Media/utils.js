@@ -17,7 +17,7 @@ import {
   DD_MM_YYYY,
   HH_mm,
 } from "../../../../app-constants";
-import { getLanguageByKey } from "../../../utils";
+import { getLanguageByKey, parseServerDate } from "../../../utils";
 import { Audio } from "../../../Audio";
 import { TimeClient } from "./TimeClient";
 import { Empty } from "../../../Empty";
@@ -56,8 +56,8 @@ export const renderMediaContent = ({
           <Box
             className="media-wrapper-delete-btn"
             bg="white"
-            right="10px"
-            top="10px"
+            right="4px"
+            top="4px"
             pos="absolute"
           >
             <ActionIcon
@@ -118,7 +118,7 @@ export const renderMediaContent = ({
 
           <TimeClient
             id={payload?.client_id}
-            date={dayjs(msjTime).format(`${DD_MM_YYYY} ${HH_mm}`)}
+            date={parseServerDate(msjTime)?.format(`${DD_MM_YYYY} ${HH_mm}`)}
           />
         </Flex>
 
@@ -149,7 +149,9 @@ export const renderMediaContent = ({
 
                 <TimeClient
                   id={payload?.client_id}
-                  date={dayjs(msjTime).format(`${DD_MM_YYYY} ${HH_mm}`)}
+                  date={parseServerDate(msjTime)?.format(
+                    `${DD_MM_YYYY} ${HH_mm}`,
+                  )}
                 />
               </Flex>
             </Flex>
