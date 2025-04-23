@@ -7,11 +7,11 @@ import {
     MultiSelect,
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import { translations } from "../utils/translations";
-import { MantineModal } from "../MantineModal";
-import { TypeTask } from "./OptionsTaskType";
-import { useGetTechniciansList } from "../../hooks/useGetTechniciansList";
-import { useUser } from "../../hooks";
+import { translations } from "../../utils/translations";
+import { MantineModal } from "../../MantineModal";
+import { TypeTask } from "../OptionsTaskType";
+import { useGetTechniciansList } from "../../../hooks/useGetTechniciansList";
+import { useUser } from "../../../hooks";
 import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
@@ -57,6 +57,21 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const handleApply = () => {
         onApply(cleanFilters(localFilters));
         onClose();
+    };
+
+    const getDateRangeValue = (dateFrom, dateTo) => {
+        if (dateFrom && dateTo) {
+            return [
+                dayjs(dateFrom, "DD-MM-YYYY").toDate(),
+                dayjs(dateTo, "DD-MM-YYYY").toDate(),
+            ];
+        }
+        return undefined;
+    };
+
+    const handleDateRangeChange = (range, handleChange) => {
+        handleChange("date_from", range?.[0] ? dayjs(range[0]).format("DD-MM-YYYY") : null);
+        handleChange("date_to", range?.[1] ? dayjs(range[1]).format("DD-MM-YYYY") : null);
     };
 
     return (
@@ -105,20 +120,11 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                     <DatePickerInput
                         type="range"
                         label={translations["intervalDate"][language]}
-                        value={
-                            localFilters.date_from && localFilters.date_to
-                                ? [
-                                    dayjs(localFilters.date_from, "DD-MM-YYYY").toDate(),
-                                    dayjs(localFilters.date_to, "DD-MM-YYYY").toDate(),
-                                ]
-                                : undefined
-                        }
-                        onChange={(range) => {
-                            handleChange("date_from", range?.[0] ? dayjs(range[0]).format("DD-MM-YYYY") : null);
-                            handleChange("date_to", range?.[1] ? dayjs(range[1]).format("DD-MM-YYYY") : null);
-                        }}
+                        value={getDateRangeValue(localFilters.date_from, localFilters.date_to)}
+                        onChange={(range) => handleDateRangeChange(range, handleChange)}
                         clearable
                         valueFormat="DD-MM-YYYY"
+                        placeholder={translations["intervalDate"][language]}
                     />
 
                 </Flex>

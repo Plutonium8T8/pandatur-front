@@ -2,7 +2,7 @@ import React from "react";
 import { Paper, ScrollArea, Stack, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import TaskCard from "./TaskCard";
-import { translations } from "../utils/translations";
+import { translations } from "../../utils/translations";
 
 const language = localStorage.getItem("language") || "RO";
 

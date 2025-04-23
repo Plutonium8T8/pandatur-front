@@ -1,6 +1,6 @@
 import React from "react";
 import { Paper, Text, Box, Flex } from "@mantine/core";
-import { TypeTask } from "./OptionsTaskType";
+import { TypeTask } from "../OptionsTaskType";
 import { Link } from "react-router-dom";
 import { FaFingerprint } from "react-icons/fa6";
 

@@ -25,7 +25,7 @@ import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
-import DateQuickInput from "./DateQuickPicker";
+import DateQuickInput from "./Components/DateQuickPicker";
 import { useGetTechniciansList } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useConfirmPopup } from "../../hooks/useConfirmPopup";

@@ -11,9 +11,9 @@ import {
     formatDate,
     applyOffset,
     quickOptions,
-} from "../utils/date";
+} from "../../utils/date";
 import { DatePicker, TimeInput } from "@mantine/dates";
-import { translations } from "../utils/translations";
+import { translations } from "../../utils/translations";
 import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
