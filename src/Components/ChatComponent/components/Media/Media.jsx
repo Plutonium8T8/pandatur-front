@@ -1,51 +1,16 @@
-import {
-  Flex,
-  Image,
-  Badge,
-  DEFAULT_THEME,
-  FileButton,
-  Button,
-  Divider,
-  Tabs,
-  Box,
-  ActionIcon,
-  Text,
-} from "@mantine/core";
-import { IoClose } from "react-icons/io5";
+import { Flex, FileButton, Button, Tabs, Text, Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
-import {
-  getLanguageByKey,
-  formattedDate,
-  showServerError,
-} from "../../../utils";
-import { Empty } from "../../../Empty";
-import {
-  FALLBACK_IMAGE,
-  MEDIA_TYPE,
-  DD_MM_YYYY__HH_mm_ss,
-} from "../../../../app-constants";
-import { File } from "../../../File";
-import { Audio } from "../../../Audio";
+import { getLanguageByKey, showServerError } from "../../../utils";
+import { DD_MM_YYYY__HH_mm_ss } from "../../../../app-constants";
 import { api } from "../../../../api";
 import { useUploadMediaFile, useConfirmPopup } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
+import { renderFile, renderMedia, renderCall } from "./utils";
 import "./Media.css";
-
-const { colors } = DEFAULT_THEME;
-
-/**
- *
- * @param {string} dateTime
- * @returns {string}
- */
-const getTimeFormat = (dateTime) => {
-  const { formateDate, formateTime } = formattedDate(dateTime);
-  return `${formateDate} ${formateTime}`;
-};
 
 export const Media = ({ messages, id }) => {
   const { enqueueSnackbar } = useSnackbar();
@@ -56,99 +21,7 @@ export const Media = ({ messages, id }) => {
     subTitle: getLanguageByKey("confirmDeleteAttachment"),
   });
 
-  const renderMediaContent = (type, message, id, shouldDelete) => {
-    const MEDIA_CONTENT = {
-      [MEDIA_TYPE.IMAGE]: (
-        <Box
-          className="media-wrapper"
-          style={{
-            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-          }}
-          pos="relative"
-        >
-          {id && (
-            <Box
-              onClick={() => deleteMediaFile(id)}
-              pos="absolute"
-              className="media-wrapper-delete-btn"
-              bg="white"
-              right="10px"
-              top="10px"
-            >
-              <ActionIcon variant="danger">
-                <IoClose />
-              </ActionIcon>
-            </Box>
-          )}
-          <Image
-            radius="md"
-            src={message}
-            fallbackSrc={FALLBACK_IMAGE}
-            onClick={() => {
-              window.open(message, "_blank");
-            }}
-          />
-        </Box>
-      ),
-      [MEDIA_TYPE.VIDEO]: (
-        <Box
-          className="media-wrapper"
-          style={{
-            boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
-          }}
-          pos="relative"
-        >
-          {id && (
-            <Box
-              onClick={() => deleteMediaFile(id)}
-              pos="absolute"
-              className="media-wrapper-delete-btn"
-              bg="white"
-              right="10px"
-              top="10px"
-            >
-              <ActionIcon variant="danger">
-                <IoClose />
-              </ActionIcon>
-            </Box>
-          )}
-          <video controls className="video-preview">
-            <source src={message} type="video/mp4" />
-            {getLanguageByKey("Acest browser nu suporta video")}
-          </video>
-        </Box>
-      ),
-      [MEDIA_TYPE.AUDIO]: <Audio src={message} />,
-      [MEDIA_TYPE.FILE]: (
-        <Box pos="relative" className="media-wrapper">
-          {id && (
-            <Box
-              onClick={() => deleteMediaFile(id)}
-              pos="absolute"
-              className="media-wrapper-delete-btn"
-              bg="white"
-              right="10px"
-              top="10px"
-            >
-              <ActionIcon variant="danger">
-                <IoClose />
-              </ActionIcon>
-            </Box>
-          )}
-          <File
-            bg={colors.gray[2]}
-            src={message}
-            label={`${message.slice(0, 15)}...`}
-          />
-        </Box>
-      ),
-      [MEDIA_TYPE.CALL]: <Audio src={message} />,
-    };
-
-    return MEDIA_CONTENT[type];
-  };
-
-  const deleteMediaFile = async (id) => {
+  const deleteAttachment = async (id) => {
     deleteMedia(async () => {
       try {
         await api.tickets.ticket.deleteMediaById(id);
@@ -206,9 +79,13 @@ export const Media = ({ messages, id }) => {
 
   return (
     <>
-      <Tabs defaultValue="messages-media">
+      <Tabs
+        h="100%"
+        className="leads-modal-filter-tabs"
+        defaultValue="messages-media"
+      >
         <Tabs.List>
-          <Tabs.Tab value="messages-media">
+          <Tabs.Tab h="100%" value="messages-media">
             <Text fw={700} size="sm">
               {getLanguageByKey("messageAttachments")}
             </Text>
@@ -221,67 +98,112 @@ export const Media = ({ messages, id }) => {
         </Tabs.List>
 
         <Tabs.Panel h="100%" value="messages-media">
-          <>
-            {messages.map((msg, index) => {
-              return (
-                <Flex direction="column" align="center">
-                  <Divider
-                    w="100%"
-                    my="md"
-                    label={
-                      <Badge c="black" size="lg" bg={colors.gray[2]}>
-                        {getTimeFormat(msg.time_sent)}
-                      </Badge>
-                    }
-                    labelPosition="center"
-                  />
+          <Tabs className="leads-modal-filter-tabs" defaultValue="media">
+            <Tabs.List>
+              <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+              <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
+              <Tabs.Tab value="audio">{getLanguageByKey("audio")}</Tabs.Tab>
+            </Tabs.List>
 
-                  {renderMediaContent(msg.mtype, msg.message)}
-                </Flex>
-              );
-            })}
+            <Tabs.Panel h="100%" value="media">
+              <Box mt="md">{renderMedia(messages)}</Box>
+            </Tabs.Panel>
 
-            {!messages.length && <Empty />}
-          </>
+            <Tabs.Panel h="100%" value="files">
+              <Box mt="md">{renderFile(messages)}</Box>
+            </Tabs.Panel>
+
+            <Tabs.Panel h="100%" value="audio">
+              <Flex direction="column" mt="md">
+                {renderCall(messages)}
+              </Flex>
+            </Tabs.Panel>
+          </Tabs>
         </Tabs.Panel>
 
         <Tabs.Panel value="uploaded-media">
-          {mediaList.map((media, index) => (
-            <Flex direction="column" align="center" key={media.id}>
-              <Divider
-                w="100%"
-                label={
-                  <Badge c="black" size="lg" bg={colors.gray[2]}>
-                    {getTimeFormat(media.time_sent)}
-                  </Badge>
-                }
-                my="md"
-                labelPosition="center"
-              />
+          <Tabs className="leads-modal-filter-tabs" defaultValue="media">
+            <Tabs.List>
+              <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
+              <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
+              <Tabs.Tab value="audio">{getLanguageByKey("audio")}</Tabs.Tab>
+            </Tabs.List>
 
-              {renderMediaContent(media.mtype, media.url, media.id)}
-            </Flex>
-          ))}
+            <Tabs.Panel value="media">
+              <Flex mt="md" direction="column">
+                {renderMedia(mediaList, deleteAttachment, true)}
 
-          {!mediaList.length && <Empty />}
+                <Flex justify="center" mt="md">
+                  <FileButton
+                    loading={opened}
+                    onChange={sendAttachment}
+                    accept="image/*,video/*"
+                  >
+                    {(props) => (
+                      <Button
+                        leftSection={<IoMdAdd size={16} />}
+                        variant="outline"
+                        {...props}
+                      >
+                        {getLanguageByKey("addMedia")}
+                      </Button>
+                    )}
+                  </FileButton>
+                </Flex>
+              </Flex>
+            </Tabs.Panel>
 
-          <Flex justify="center" mt="md">
-            <FileButton
-              loading={opened}
-              onChange={sendAttachment}
-              accept="image/*,video/*,audio/*,.pdf"
+            <Tabs.Panel
+              className="leads-modal-filter-tabs"
+              h="100%"
+              value="files"
             >
-              {(props) => (
-                <Button
-                  leftSection={<IoMdAdd size={16} />}
-                  variant="outline"
-                  {...props}
-                >
-                  {getLanguageByKey("addMedia")}
-                </Button>
-              )}
-            </FileButton>
-          </Flex>
+              <Flex h="100%" mt="md" direction="column">
+                {renderFile(mediaList, deleteAttachment, true)}
+
+                <Flex justify="center" mt="md">
+                  <FileButton
+                    loading={opened}
+                    onChange={sendAttachment}
+                    accept=".pdf"
+                  >
+                    {(props) => (
+                      <Button
+                        leftSection={<IoMdAdd size={16} />}
+                        variant="outline"
+                        {...props}
+                      >
+                        {getLanguageByKey("addMedia")}
+                      </Button>
+                    )}
+                  </FileButton>
+                </Flex>
+              </Flex>
+            </Tabs.Panel>
+            <Tabs.Panel h="100%" value="audio">
+              <Flex direction="column" mt="md">
+                {renderCall(mediaList, deleteAttachment, true)}
+
+                <Flex justify="center" mt="md">
+                  <FileButton
+                    loading={opened}
+                    onChange={sendAttachment}
+                    accept="audio/*"
+                  >
+                    {(props) => (
+                      <Button
+                        leftSection={<IoMdAdd size={16} />}
+                        variant="outline"
+                        {...props}
+                      >
+                        {getLanguageByKey("addMedia")}
+                      </Button>
+                    )}
+                  </FileButton>
+                </Flex>
+              </Flex>
+            </Tabs.Panel>
+          </Tabs>
         </Tabs.Panel>
       </Tabs>
     </>
