@@ -107,14 +107,18 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         label={translations["intervalDate"][language]}
                         value={
                             localFilters.date_from && localFilters.date_to
-                                ? [new Date(localFilters.date_from), new Date(localFilters.date_to)]
-                                : [null, null]
+                                ? [
+                                    dayjs(localFilters.date_from, "DD-MM-YYYY").toDate(),
+                                    dayjs(localFilters.date_to, "DD-MM-YYYY").toDate(),
+                                ]
+                                : undefined
                         }
                         onChange={(range) => {
-                            handleChange("date_from", range?.[0] ? dayjs(range[0]).format("YYYY-MM-DD") : null);
-                            handleChange("date_to", range?.[1] ? dayjs(range[1]).format("YYYY-MM-DD") : null);
+                            handleChange("date_from", range?.[0] ? dayjs(range[0]).format("DD-MM-YYYY") : null);
+                            handleChange("date_to", range?.[1] ? dayjs(range[1]).format("DD-MM-YYYY") : null);
                         }}
                         clearable
+                        valueFormat="DD-MM-YYYY"
                     />
 
                 </Flex>
