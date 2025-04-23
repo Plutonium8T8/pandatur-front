@@ -145,9 +145,9 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
                 ) : null
               }
             />
-            <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
+            {/* <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
               {translations["New Task"][language]}
-            </Button>
+            </Button> */}
           </Group>
         }
       />
