@@ -14,6 +14,8 @@ import { useGetTechniciansList } from "../../../hooks/useGetTechniciansList";
 import { useUser } from "../../../hooks";
 import dayjs from "dayjs";
 import { api } from "../../../api";
+import { useSnackbar } from "notistack";
+import { showServerError } from "../../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -27,6 +29,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
     const { userId } = useUser();
     const [groupOptions, setGroupOptions] = useState([]);
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         if (!filters.created_for || filters.created_for.length === 0) {
@@ -40,12 +43,16 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
 
     useEffect(() => {
         const fetchGroups = async () => {
-            const data = await api.user.getGroupsList();
-            const options = data.map((group) => ({
-                value: group.name,
-                label: group.name,
-            }));
-            setGroupOptions(options);
+            try {
+                const data = await api.user.getGroupsList();
+                const options = data.map((group) => ({
+                    value: group.name,
+                    label: group.name,
+                }));
+                setGroupOptions(options);
+            } catch (error) {
+                enqueueSnackbar(showServerError(error), { variant: "error" });
+            }
         };
         fetchGroups();
     }, []);
@@ -104,14 +111,15 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         >
             <Box p="sm" mt="md">
                 <Flex gap="sm" direction="column">
-                    <MultiSelect
-                        label={translations["Tipul Taskului"][language]}
-                        data={taskTypeOptions}
-                        value={localFilters.task_type || []}
-                        onChange={(val) => handleChange("task_type", val)}
-                        placeholder={translations["Tipul Taskului"][language]}
+
+                    <DatePickerInput
+                        type="range"
+                        label={translations["intervalDate"][language]}
+                        value={getDateRangeValue(localFilters.date_from, localFilters.date_to)}
+                        onChange={handleDateRangeChange}
                         clearable
-                        searchable
+                        valueFormat="DD-MM-YYYY"
+                        placeholder={translations["intervalDate"][language]}
                     />
 
                     <MultiSelect
@@ -139,6 +147,16 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                     />
 
                     <MultiSelect
+                        label={translations["Tipul Taskului"][language]}
+                        data={taskTypeOptions}
+                        value={localFilters.task_type || []}
+                        onChange={(val) => handleChange("task_type", val)}
+                        placeholder={translations["Tipul Taskului"][language]}
+                        clearable
+                        searchable
+                    />
+
+                    <MultiSelect
                         label={translations["Alege grupul"][language]}
                         placeholder={translations["Alege grupul"][language]}
                         data={groupOptions}
@@ -149,15 +167,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         nothingFoundMessage={translations["noResult"][language]}
                     />
 
-                    <DatePickerInput
-                        type="range"
-                        label={translations["intervalDate"][language]}
-                        value={getDateRangeValue(localFilters.date_from, localFilters.date_to)}
-                        onChange={handleDateRangeChange}
-                        clearable
-                        valueFormat="DD-MM-YYYY"
-                        placeholder={translations["intervalDate"][language]}
-                    />
                 </Flex>
 
                 <Group mt="xl" justify="flex-end">
