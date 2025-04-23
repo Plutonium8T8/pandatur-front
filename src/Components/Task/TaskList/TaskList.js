@@ -149,7 +149,7 @@ const TaskList = ({
         key: "workflow",
         width: 160,
         align: "center",
-        render: (value) => <WorkflowTag type={value} />, // используем WorkflowTag
+        render: (value) => <WorkflowTag type={value} />
       },
       {
         title: translations["groupTitle"][language],
