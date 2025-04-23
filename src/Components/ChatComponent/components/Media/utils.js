@@ -177,7 +177,7 @@ export const renderMediaContent = ({
         {!shouldDelete && (
           <TimeClient
             id={payload?.client_id}
-            date={dayjs(msjTime).format(`${DD_MM_YYYY} ${HH_mm}`)}
+            date={parseServerDate(msjTime)?.format(`${DD_MM_YYYY} ${HH_mm}`)}
           />
         )}
       </Flex>
