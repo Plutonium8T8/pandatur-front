@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaUser, FaTrash } from "react-icons/fa";
 import Priority from "../../PriorityComponent/PriorityComponent";
-import Workflow from "../../WorkFlowComponent/WorkflowComponent";
 import TagInput from "../../TagsComponent/TagComponent";
 import { translations } from "../../utils/translations";
 import { useApp, useUser } from "../../../hooks";
@@ -10,6 +9,7 @@ import { useSnackbar } from "notistack";
 import { Input } from "../../Input/Input";
 import { Segmented } from "../../Segmented";
 import { showServerError } from "../../utils";
+import { SelectWorkflow } from "../../SelectWorkflow";
 import "./TicketModalComponent.css";
 
 const language = localStorage.getItem("language") || "RO";
@@ -167,8 +167,7 @@ const TicketModal = ({
               onChange={handleInputChange}
               disabled={AdminRoles}
             />
-            <Workflow
-              ticket={editedTicket}
+            <SelectWorkflow
               onChange={handleInputChange}
               disabled={AdminRoles}
             />

@@ -1,5 +1,5 @@
-import { useState } from "react"
-import "./Segmented.css"
+import { useState } from "react";
+import "./Segmented.css";
 
 // NOTE: These variants are based on Mantine UI CSS variables.
 // For more details, refer to: https://mantine.dev/styles/css-variables/
@@ -8,11 +8,11 @@ const variants = {
   sm: "var(--mantine-spacing-sm)",
   md: "var(--mantine-spacing-md)",
   lg: "var(--mantine-spacing-lg)",
-  xl: "var(--mantine-spacing-xl)"
-}
+  xl: "var(--mantine-spacing-xl)",
+};
 
 export const Segmented = ({ options, onChange, defaultValue, mt }) => {
-  const [selected, setSelected] = useState(defaultValue || options[0].value)
+  const [selected, setSelected] = useState(defaultValue || options[0].value);
 
   return (
     <div className="segmented" style={{ "--mt": variants[mt] }}>
@@ -20,8 +20,8 @@ export const Segmented = ({ options, onChange, defaultValue, mt }) => {
         <div
           key={option.value}
           onClick={() => {
-            onChange?.(option.value)
-            setSelected(option.value)
+            onChange?.(option.value);
+            setSelected(option.value);
           }}
           className={`segmented-option ${option.value === selected ? "active" : ""} ${option.disabled ? "disabled" : ""}`}
         >
@@ -29,5 +29,5 @@ export const Segmented = ({ options, onChange, defaultValue, mt }) => {
         </div>
       ))}
     </div>
-  )
-}
+  );
+};

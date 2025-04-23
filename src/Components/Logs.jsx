@@ -1,9 +1,9 @@
 import { Text, Box } from "@mantine/core";
-import { cleanValue, priorityTagColors, getLanguageByKey } from "../utils";
-import { Tag } from "../Tag";
-import { WorkflowTag } from "../Workflow/components";
-import { RcTable } from "../RcTable";
-import { DateCell } from "../DateCell";
+import { cleanValue, priorityTagColors, getLanguageByKey } from "./utils";
+import { Tag } from "./Tag";
+import { WorkflowTag } from "./Workflow/components";
+import { RcTable } from "./RcTable";
+import { DateCell } from "./DateCell";
 
 export const Logs = ({ logList }) => {
   const rcColumn = [
