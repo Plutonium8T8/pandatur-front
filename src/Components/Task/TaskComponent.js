@@ -56,7 +56,6 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         search: searchQuery,
         page: currentPage,
         sort_by: "scheduled_time",
-        sort_dir: "ASC",
       });
 
       setTasks(Array.isArray(res?.data) ? res.data : []);
