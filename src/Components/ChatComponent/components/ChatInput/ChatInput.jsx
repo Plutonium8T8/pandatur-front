@@ -148,7 +148,10 @@ export const ChatInput = ({
             </Button>
           </Flex>
           <Flex>
-            <FileButton onChange={handleFile} accept="image/*,video/*,audio/*">
+            <FileButton
+              onChange={handleFile}
+              accept="image/*,video/*,audio/*, .pdf"
+            >
               {(props) => (
                 <ActionIcon {...props} c="black" bg="white">
                   <RiAttachment2 size={20} />
