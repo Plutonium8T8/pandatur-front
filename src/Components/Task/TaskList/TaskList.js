@@ -9,6 +9,7 @@ import { api } from "../../../api";
 import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
+import { WorkflowTag } from "../../Workflow/components/WorkflowTag";
 import { useConfirmPopup } from "../../../hooks";
 import dayjs from "dayjs";
 import "./TaskList.css";
@@ -148,7 +149,7 @@ const TaskList = ({
         key: "workflow",
         width: 160,
         align: "center",
-        render: (value) => <Tag type="default">{value}</Tag>,
+        render: (value) => <WorkflowTag type={value} />, // используем WorkflowTag
       },
       {
         title: translations["groupTitle"][language],
@@ -198,7 +199,7 @@ const TaskList = ({
         title: translations["Acțiune"][language],
         dataIndex: "action",
         key: "action",
-        width: 70,
+        width: 100,
         align: "center",
         render: (_, row) => (
           <Menu shadow="md" width={200} position="bottom-end">
