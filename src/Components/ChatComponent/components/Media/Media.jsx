@@ -79,11 +79,7 @@ export const Media = ({ messages, id }) => {
 
   return (
     <>
-      <Tabs
-        h="100%"
-        className="leads-modal-filter-tabs"
-        defaultValue="messages-media"
-      >
+      <Tabs h="100%" className="media-tabs" defaultValue="messages-media">
         <Tabs.List>
           <Tabs.Tab h="100%" value="messages-media">
             <Text fw={700} size="sm">
@@ -98,7 +94,7 @@ export const Media = ({ messages, id }) => {
         </Tabs.List>
 
         <Tabs.Panel h="100%" value="messages-media">
-          <Tabs className="leads-modal-filter-tabs" defaultValue="media">
+          <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
               <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
@@ -106,101 +102,116 @@ export const Media = ({ messages, id }) => {
             </Tabs.List>
 
             <Tabs.Panel h="100%" value="media">
-              <Box mt="md">{renderMedia(messages)}</Box>
+              <Flex h="100%" direction="column" mt="md">
+                {renderMedia({ media: messages })}
+              </Flex>
             </Tabs.Panel>
 
             <Tabs.Panel h="100%" value="files">
-              <Box mt="md">{renderFile(messages)}</Box>
+              <Flex h="100%" direction="column" mt="md">
+                {renderFile({ media: messages })}
+              </Flex>
             </Tabs.Panel>
 
             <Tabs.Panel h="100%" value="audio">
-              <Flex direction="column" mt="md">
-                {renderCall(messages)}
+              <Flex h="100%" direction="column" mt="md">
+                {renderCall({ media: messages })}
               </Flex>
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
 
         <Tabs.Panel value="uploaded-media">
-          <Tabs className="leads-modal-filter-tabs" defaultValue="media">
+          <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
               <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
               <Tabs.Tab value="audio">{getLanguageByKey("audio")}</Tabs.Tab>
             </Tabs.List>
 
-            <Tabs.Panel value="media">
-              <Flex mt="md" direction="column">
-                {renderMedia(mediaList, deleteAttachment, true)}
-
-                <Flex justify="center" mt="md">
-                  <FileButton
-                    loading={opened}
-                    onChange={sendAttachment}
-                    accept="image/*,video/*"
-                  >
-                    {(props) => (
-                      <Button
-                        leftSection={<IoMdAdd size={16} />}
-                        variant="outline"
-                        {...props}
-                      >
-                        {getLanguageByKey("addMedia")}
-                      </Button>
-                    )}
-                  </FileButton>
-                </Flex>
-              </Flex>
-            </Tabs.Panel>
-
-            <Tabs.Panel
-              className="leads-modal-filter-tabs"
-              h="100%"
-              value="files"
-            >
+            <Tabs.Panel className="media-tabs" h="100%" value="media">
               <Flex h="100%" mt="md" direction="column">
-                {renderFile(mediaList, deleteAttachment, true)}
-
-                <Flex justify="center" mt="md">
-                  <FileButton
-                    loading={opened}
-                    onChange={sendAttachment}
-                    accept=".pdf"
-                  >
-                    {(props) => (
-                      <Button
-                        leftSection={<IoMdAdd size={16} />}
-                        variant="outline"
-                        {...props}
+                {renderMedia({
+                  media: mediaList,
+                  deleteAttachment,
+                  shouldDelete: true,
+                  renderAddAttachments: () => {
+                    return (
+                      <FileButton
+                        loading={opened}
+                        onChange={sendAttachment}
+                        accept="image/*,video/*"
                       >
-                        {getLanguageByKey("addMedia")}
-                      </Button>
-                    )}
-                  </FileButton>
-                </Flex>
+                        {(props) => (
+                          <Button
+                            leftSection={<IoMdAdd size={16} />}
+                            variant="outline"
+                            {...props}
+                          >
+                            {getLanguageByKey("addMedia")}
+                          </Button>
+                        )}
+                      </FileButton>
+                    );
+                  },
+                })}
               </Flex>
             </Tabs.Panel>
-            <Tabs.Panel h="100%" value="audio">
-              <Flex direction="column" mt="md">
-                {renderCall(mediaList, deleteAttachment, true)}
 
-                <Flex justify="center" mt="md">
-                  <FileButton
-                    loading={opened}
-                    onChange={sendAttachment}
-                    accept="audio/*"
-                  >
-                    {(props) => (
-                      <Button
-                        leftSection={<IoMdAdd size={16} />}
-                        variant="outline"
-                        {...props}
+            <Tabs.Panel className="media-tabs" h="100%" value="files">
+              <Flex h="100%" mt="md" direction="column">
+                {renderFile({
+                  deleteAttachment,
+                  media: mediaList,
+                  shouldDelete: true,
+                  renderAddAttachments: () => {
+                    return (
+                      <FileButton
+                        loading={opened}
+                        onChange={sendAttachment}
+                        accept=".pdf"
                       >
-                        {getLanguageByKey("addMedia")}
-                      </Button>
-                    )}
-                  </FileButton>
-                </Flex>
+                        {(props) => (
+                          <Button
+                            leftSection={<IoMdAdd size={16} />}
+                            variant="outline"
+                            {...props}
+                          >
+                            {getLanguageByKey("addMedia")}
+                          </Button>
+                        )}
+                      </FileButton>
+                    );
+                  },
+                })}
+              </Flex>
+            </Tabs.Panel>
+            <Tabs.Panel className="media-tabs" h="100%" value="audio">
+              <Flex h="100%" direction="column" mt="md">
+                {renderCall({
+                  media: mediaList,
+                  deleteAttachment,
+                  shouldDelete: true,
+                  renderAddAttachments: () => {
+                    return (
+                      <FileButton
+                        loading={opened}
+                        onChange={sendAttachment}
+                        accept="audio/*"
+                      >
+                        {(props) => (
+                          <Button
+                            leftSection={<IoMdAdd size={16} />}
+                            variant="outline"
+                            {...props}
+                          >
+                            {getLanguageByKey("addMedia")}
+                          </Button>
+                        )}
+                      </FileButton>
+                    );
+                  },
+                })}
               </Flex>
             </Tabs.Panel>
           </Tabs>

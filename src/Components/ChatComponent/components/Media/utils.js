@@ -73,6 +73,7 @@ export const renderMediaContent = ({
           fit="contain"
           h="100px"
           radius="md"
+          className="pointer"
           src={message}
           fallbackSrc={FALLBACK_IMAGE}
           onClick={() => {
@@ -186,40 +187,63 @@ export const renderMediaContent = ({
   return MEDIA_CONTENT[type];
 };
 
-export const renderFile = (media, deleteAttachment, shouldDelete) => {
+export const renderFile = ({
+  media,
+  deleteAttachment,
+  shouldDelete,
+  renderAddAttachments,
+}) => {
   const filterMediaByImageAndVideo = media.filter((i) =>
     [MEDIA_TYPE.FILE].includes(i.mtype),
   );
 
   return (
     <>
-      {filterMediaByImageAndVideo.length ? (
-        filterMediaByImageAndVideo.map((media, index) => (
-          <Flex direction="column" align="center" key={media.id}>
-            {index === 0 && <Divider w="100%" />}
-            {renderMediaContent({
-              type: media.mtype,
-              message: media.url || media.message,
-              id: media.id,
-              deleteAttachment: () => deleteAttachment(media.id),
-              shouldDelete,
-              msjTime: media.time_sent,
-              payload: media,
-            })}
+      {filterMediaByImageAndVideo.length > 0 ? (
+        <div>
+          {filterMediaByImageAndVideo.map((media, index) => (
+            <Flex direction="column" align="center" key={media.id ?? index}>
+              {index === 0 && <Divider w="100%" />}
 
-            <Divider w="100%" />
+              {renderMediaContent({
+                type: media.mtype,
+                message: media.url || media.message || "",
+                id: media.id,
+                deleteAttachment: () => deleteAttachment(media.id),
+                shouldDelete,
+                msjTime: media.time_sent,
+                payload: media,
+              })}
+
+              <Divider w="100%" />
+            </Flex>
+          ))}
+          <Flex justify="center" mt="md">
+            {renderAddAttachments?.()}
           </Flex>
-        ))
+        </div>
       ) : (
-        <Flex h="100%" align="center" justify="center">
+        <Flex
+          direction="column"
+          h="100%"
+          align="center"
+          justify="center"
+          gap="md"
+        >
           <Empty />
+          {renderAddAttachments?.()}
         </Flex>
       )}
     </>
   );
 };
 
-export const renderMedia = (media, deleteAttachment, shouldDelete) => {
+export const renderMedia = ({
+  media,
+  deleteAttachment,
+  shouldDelete,
+  renderAddAttachments,
+}) => {
   const filterMediaByImageAndVideo = media.filter((i) =>
     [MEDIA_TYPE.VIDEO, MEDIA_TYPE.IMAGE].includes(i.mtype),
   );
@@ -227,27 +251,47 @@ export const renderMedia = (media, deleteAttachment, shouldDelete) => {
   return (
     <>
       {filterMediaByImageAndVideo.length ? (
-        <Grid gutter="1px">
-          {filterMediaByImageAndVideo.map((media) => (
-            <Grid.Col span={4} key={media.id}>
-              {renderMediaContent({
-                type: media.mtype,
-                message: media.url || media.message,
-                id: media.id,
-                deleteAttachment: () => deleteAttachment(media.id),
-                shouldDelete,
-              })}
-            </Grid.Col>
-          ))}
-        </Grid>
+        <div>
+          <Grid gutter="1px">
+            {filterMediaByImageAndVideo.map((media) => (
+              <Grid.Col span={4} key={media.id}>
+                {renderMediaContent({
+                  type: media.mtype,
+                  message: media.url || media.message,
+                  id: media.id,
+                  deleteAttachment: () => deleteAttachment(media.id),
+                  shouldDelete,
+                })}
+              </Grid.Col>
+            ))}
+          </Grid>
+
+          <Flex justify="center" mt="md">
+            {renderAddAttachments?.()}
+          </Flex>
+        </div>
       ) : (
-        <Empty />
+        <Flex
+          direction="column"
+          h="100%"
+          align="center"
+          justify="center"
+          gap="md"
+        >
+          <Empty />
+          {renderAddAttachments?.()}
+        </Flex>
       )}
     </>
   );
 };
 
-export const renderCall = (media, deleteAttachment, shouldDelete) => {
+export const renderCall = ({
+  media,
+  deleteAttachment,
+  shouldDelete,
+  renderAddAttachments,
+}) => {
   const filterMediaByCallAndAudio = media.filter((i) =>
     [MEDIA_TYPE.CALL, MEDIA_TYPE.AUDIO].includes(i.mtype),
   );
@@ -255,25 +299,40 @@ export const renderCall = (media, deleteAttachment, shouldDelete) => {
   return (
     <>
       {filterMediaByCallAndAudio.length ? (
-        filterMediaByCallAndAudio.map((media, index) => (
-          <Flex w="100%" direction="column" key={media.id}>
-            {index === 0 && <Divider w="100%" />}
-            <Box py="md">
-              {renderMediaContent({
-                type: media.mtype,
-                message: media.url,
-                id: media.id,
-                deleteAttachment: () => deleteAttachment(media.id),
-                shouldDelete,
-                msjTime: media.time_sent,
-              })}
-            </Box>
+        <div>
+          {filterMediaByCallAndAudio.map((media, index) => (
+            <Flex w="100%" direction="column" key={media.id}>
+              {index === 0 && <Divider w="100%" />}
+              <Box py="md">
+                {renderMediaContent({
+                  type: media.mtype,
+                  message: media.url,
+                  id: media.id,
+                  deleteAttachment: () => deleteAttachment(media.id),
+                  shouldDelete,
+                  msjTime: media.time_sent,
+                })}
+              </Box>
 
-            <Divider w="100%" />
+              <Divider w="100%" />
+            </Flex>
+          ))}
+
+          <Flex justify="center" mt="md">
+            {renderAddAttachments?.()}
           </Flex>
-        ))
+        </div>
       ) : (
-        <Empty />
+        <Flex
+          direction="column"
+          h="100%"
+          align="center"
+          justify="center"
+          gap="md"
+        >
+          <Empty />
+          {renderAddAttachments?.()}
+        </Flex>
       )}
     </>
   );
