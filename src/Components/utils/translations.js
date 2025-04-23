@@ -2199,8 +2199,12 @@ export const translations = {
     RO: "Fișiere încărcate",
     RU: "Загруженные файлы",
   },
-  "confirmDeleteAttachment": {
-    "RO": "Sunteți sigur că doriți să ștergeți acest atașament?",
-    "RU": "Вы уверены, что хотите удалить это вложение?"
-  }
+  confirmDeleteAttachment: {
+    RO: "Sunteți sigur că doriți să ștergeți acest atașament?",
+    RU: "Вы уверены, что хотите удалить это вложение?",
+  },
+  files: {
+    RO: "Fișiere",
+    RU: "Файлы",
+  },
 };
