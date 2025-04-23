@@ -10,7 +10,6 @@ import {
   Divider,
   Grid,
 } from "@mantine/core";
-import dayjs from "dayjs";
 import {
   FALLBACK_IMAGE,
   MEDIA_TYPE,
@@ -193,6 +192,7 @@ export const renderFile = ({
   shouldDelete,
   renderAddAttachments,
 }) => {
+  console.log("🚀 ~ media:", media);
   const filterMediaByImageAndVideo = media.filter((i) =>
     [MEDIA_TYPE.FILE].includes(i.mtype),
   );
