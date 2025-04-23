@@ -1136,7 +1136,7 @@ export const translations = {
   },
   Email: {
     RO: "Email",
-    RU: "Email",
+    RU: "Электронная почта",
   },
   Ștergere: {
     RO: "Ștergere",
@@ -2222,5 +2222,37 @@ toDo: {
   files: {
     RO: "Fișiere",
     RU: "Файлы",
+  },
+  tags: {
+    RO: "Taguri",
+    RU: "Теги",
+  },
+  mustBeAtLeast3Characters: {
+    RO: "Trebuie să conțină cel puțin 3 caractere",
+    RU: "Должно содержать как минимум 3 символа",
+  },
+  invalidEmail: {
+    RO: "Email invalid",
+    RU: "Неверный адрес электронной почты",
+  },
+  numberMustStartWith6Or7: {
+    RO: "Numărul trebuie să înceapă cu 6 sau 7",
+    RU: "Номер должен начинаться с 6 или 7",
+  },
+  numberMustContain8Characters: {
+    RO: "Numărul trebuie să conțină 8 caractere",
+    RU: "Номер должен содержать 8 символов",
+  },
+  addNewLead: {
+    RO: "Adaugă un lead nou",
+    RU: "Добавить новый лид",
+  },
+  fieldIsRequired: {
+    RO: "Acest câmp este obligatoriu",
+    RU: "Это поле обязательно для заполнения",
+  },
+  selectGroup: {
+    RO: "Selectează grupa",
+    RU: "Выберите группу",
   },
 };

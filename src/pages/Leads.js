@@ -2,26 +2,36 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider } from "@mantine/core";
-import { useDOMElementHeight, useApp } from "../../hooks";
-import { priorityOptions } from "../../FormOptions/PriorityOption";
-import { workflowOptions } from "../../FormOptions/WorkFlowOption";
-import { LeadTable } from "./LeadTable";
-import { useDebounce, useConfirmPopup } from "../../hooks";
-import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
-import { api } from "../../api";
-import SingleChat from "../ChatComponent/SingleChat";
-import { Spin } from "../Spin";
-import { RefLeadsHeader } from "./LeadsHeader";
-import TicketModal from "./TicketModal/TicketModalComponent";
-import "../../App.css";
-import "../SnackBarComponent/SnackBarComponent.css";
-import { SpinnerRightBottom } from "../SpinnerRightBottom";
-import { MantineModal } from "../MantineModal";
-import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
-import { VIEW_MODE, filteredWorkflows } from "./utils";
-import { WorkflowColumns } from "../Workflow";
-import { LeadsKanbanFilter } from "./LeadsKanbanFilter";
-import { LeadsTableFilter } from "./LeadsTableFilter";
+import {
+  useDOMElementHeight,
+  useApp,
+  useDebounce,
+  useConfirmPopup,
+} from "../hooks";
+import { priorityOptions } from "../FormOptions/PriorityOption";
+import { workflowOptions } from "../FormOptions/WorkFlowOption";
+import { LeadTable } from "../Components/LeadsComponent/LeadTable";
+import {
+  showServerError,
+  getTotalPages,
+  getLanguageByKey,
+} from "../Components/utils";
+import { api } from "../api";
+import SingleChat from "../Components/ChatComponent/SingleChat";
+import { Spin } from "../Components/Spin";
+import { RefLeadsHeader } from "../Components/LeadsComponent/LeadsHeader";
+import { SpinnerRightBottom } from "../Components/SpinnerRightBottom";
+import { MantineModal } from "../Components/MantineModal";
+import { ManageLeadInfoTabs } from "../Components/LeadsComponent/ManageLeadInfoTabs";
+import {
+  VIEW_MODE,
+  filteredWorkflows,
+} from "../Components/LeadsComponent/utils";
+import { WorkflowColumns } from "../Components/Workflow";
+import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
+import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
+import { AddLeadModal } from "../Components";
+import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -33,12 +43,12 @@ const getTicketsIds = (ticketList) => {
   return ticketList.map(({ id }) => id);
 };
 
-const Leads = () => {
+export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
-  const { tickets, setTickets, spinnerTickets } = useApp();
+  const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
   const [hardTickets, setHardTickets] = useState([]);
@@ -297,7 +307,7 @@ const Leads = () => {
         style={{
           "--leads-filter-height": `${leadsFilterHeight}px`,
         }}
-        className="dashboard-container"
+        className="leads-container"
       >
         <Divider mb="md" />
 
@@ -342,26 +352,12 @@ const Leads = () => {
         <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
-      {isOpenAddLeadModal && (
-        <TicketModal
-          fetchTickets={fetchTicketList}
-          selectedGroupTitle={groupTitle}
-          ticket={currentTicket}
-          onClose={() => setIsOpenAddLeadModal(false)}
-          onSave={(updatedTicket) => {
-            setTickets((prevTickets) => {
-              const isEditing = Boolean(updatedTicket.ticket_id);
-              return isEditing
-                ? prevTickets.map((ticket) =>
-                    ticket.id === updatedTicket.ticket_id
-                      ? updatedTicket
-                      : ticket,
-                  )
-                : [...prevTickets, updatedTicket];
-            });
-          }}
-        />
-      )}
+      <AddLeadModal
+        open={isOpenAddLeadModal}
+        onClose={() => setIsOpenAddLeadModal(false)}
+        selectedGroupTitle={groupTitle}
+        fetchTickets={fetchTicketList}
+      />
 
       <MantineModal
         title={getLanguageByKey("Filtrează tichete")}
@@ -414,5 +410,3 @@ const Leads = () => {
     </>
   );
 };
-
-export default Leads;
