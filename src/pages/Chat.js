@@ -3,14 +3,13 @@ import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useSnackbar } from "notistack";
-import { useApp, useFetchTicketChat, useGetTechniciansList } from "../../hooks";
-import ChatExtraInfo from "./ChatExtraInfo";
-import ChatList from "./ChatList";
-import { getFullName, showServerError } from "../utils";
-import { ChatMessages } from "./components";
-import "./chat.css";
+import { useApp, useFetchTicketChat, useGetTechniciansList } from "../hooks";
+import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
+import ChatList from "../Components/ChatComponent/ChatList";
+import { getFullName, showServerError } from "../Components/utils";
+import { ChatMessages } from "../Components/ChatComponent/components";
 
-const ChatComponent = () => {
+export const Chat = () => {
   const { enqueueSnackbar } = useSnackbar();
   const { setTickets, messages } = useApp();
   const { ticketId } = useParams();
@@ -58,11 +57,7 @@ const ChatComponent = () => {
 
   return (
     <Flex h="100%" className="chat-wrapper">
-      <Flex
-        w="100%"
-        h="100%"
-        className={`chat-container ${isChatListVisible ? "" : "chat-hidden"}`}
-      >
+      <Flex w="100%" h="100%" className="chat-container">
         {isChatListVisible && <ChatList selectTicketId={ticketIdToNumber} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
@@ -150,5 +145,3 @@ const ChatComponent = () => {
     </Flex>
   );
 };
-
-export default ChatComponent;

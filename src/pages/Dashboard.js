@@ -20,9 +20,9 @@ import {
   RadialLinearScale,
 } from "chart.js";
 import { Flex } from "@mantine/core";
-import { useUser } from "../../hooks";
-import { api } from "../../api";
-import { Filter } from "./Filter";
+import { useUser } from "../hooks";
+import { api } from "../api";
+import { Filter } from "../Components/DashboardComponent/Filter";
 import {
   chartsMetadata,
   metricsDashboardCharts,
@@ -30,12 +30,11 @@ import {
   renderChart,
   chartComponents,
   getLastItemId,
-} from "./utils";
-import { showServerError, getLanguageByKey } from "../utils";
-import "./Dashboard.css";
-import { ISO_DATE } from "../../app-constants";
-import { Spin } from "../Spin";
-import { PageHeader } from "../PageHeader";
+} from "../Components/DashboardComponent/utils";
+import { showServerError, getLanguageByKey } from "../Components/utils";
+import { ISO_DATE } from "../app-constants";
+import { Spin } from "../Components/Spin";
+import { PageHeader } from "../Components/PageHeader";
 
 ChartJS.register(
   CategoryScale,
@@ -52,7 +51,7 @@ ChartJS.register(
 
 const THRESHOLD = 47;
 
-const Dashboard = () => {
+export const Dashboard = () => {
   const [statistics, setStatistics] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
@@ -195,4 +194,3 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;

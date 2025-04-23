@@ -5,7 +5,6 @@ import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useApp, useFetchTicketChat } from "../../hooks";
 import { getFullName } from "../utils";
-import "./chat.css";
 
 const SingleChat = ({ id, onClose }) => {
   const { setTickets, messages } = useApp();

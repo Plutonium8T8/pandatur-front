@@ -2,18 +2,18 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import { TextInput, Button, Menu, ActionIcon, Container } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { BsThreeDots } from "react-icons/bs";
-import { api } from "../../api";
-import UserModal from "./UserModal";
-import UserList from "./UserList";
-import { translations } from "../utils/translations";
+import { api } from "../api";
+import UserModal from "../Components/UsersComponent/UserModal";
+import UserList from "../Components/UsersComponent/UserList";
+import { translations } from "../Components/utils/translations";
 import { useSnackbar } from "notistack";
-import EditGroupsListModal from "./GroupsUsers/EditGroupsListModal";
-import CreatePermissionGroupModal from "./Roles/CreatePermissionGroupModal";
-import { PageHeader } from "../PageHeader";
+import EditGroupsListModal from "../Components/UsersComponent/GroupsUsers/EditGroupsListModal";
+import CreatePermissionGroupModal from "../Components/UsersComponent/Roles/CreatePermissionGroupModal";
+import { PageHeader } from "../Components/PageHeader";
 
 const language = localStorage.getItem("language") || "RO";
 
-const UsersComponent = () => {
+export const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
@@ -145,5 +145,3 @@ const UsersComponent = () => {
     </Container>
   );
 };
-
-export default UsersComponent;

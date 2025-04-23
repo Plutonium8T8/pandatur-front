@@ -2,11 +2,65 @@ a {
   text-decoration: none;
 }
 
+/* Leads Page */
+
 .leads-container {
   margin-top: var(--leads-filter-height);
   height: calc(100% - var(--leads-filter-height));
   padding: 10px 20px 20px 20px;
 }
+
+/* Chat Page */
+
+.chat-wrapper {
+  flex: 1;
+}
+
+.chat-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  /* TODO: Use `overflow: hidden` as a temporary
+      workaround, further investigation is needed
+      to identify the root cause.
+  */
+  overflow: hidden;
+}
+
+.chat-extra-info-scroll-area > div > div {
+  height: calc(100% - 50px);
+}
+
+/* Dashboard Page */
+
+.dashboard-container-wrapper {
+  width: 100%;
+  height: 100%;
+  padding: 20px;
+}
+
+.dashboard-layout > div {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  text-align: center;
+  background-color: white;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.react-grid-layout {
+  width: 100%;
+  height: auto;
+  position: relative;
+}
+
+.dashboard-loading {
+  height: calc(100% - (42px + 66px + 20px));
+}
+
+/* Utility class names */
 
 .text-center {
   text-align: center;

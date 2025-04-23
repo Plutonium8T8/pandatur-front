@@ -1,11 +1,11 @@
-import { useState } from "react"
-import { RcTable, HeaderCellRcTable } from "../RcTable"
-import { Checkbox } from "../Checkbox"
+import { useState } from "react";
+import { RcTable, HeaderCellRcTable } from "../Components/RcTable";
+import { Checkbox } from "../Components/Checkbox";
 
 export const Test = () => {
-  const [order, setOrder] = useState("ASC")
-  const [selectedRow, setSelectedRow] = useState([])
-  const [, setColumn] = useState("")
+  const [order, setOrder] = useState("ASC");
+  const [selectedRow, setSelectedRow] = useState([]);
+  const [, setColumn] = useState("");
 
   const columns = [
     {
@@ -20,12 +20,12 @@ export const Test = () => {
               setSelectedRow((prev) =>
                 prev.includes(row.id)
                   ? prev.filter((id) => id !== row.id)
-                  : [...prev, row.id]
-              )
+                  : [...prev, row.id],
+              );
             }}
           />
-        )
-      }
+        );
+      },
     },
     {
       title: <HeaderCellRcTable title="Title" order={order} />,
@@ -36,18 +36,18 @@ export const Test = () => {
       onHeaderCell: () => {
         return {
           onClick: () => {
-            setColumn("name")
-            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"))
-          }
-        }
-      }
+            setColumn("name");
+            setOrder((prev) => (prev === "ASC" ? "DESC" : "ASC"));
+          },
+        };
+      },
     },
     {
       title: "Age",
       dataIndex: "age",
       key: "age",
       width: 100,
-      align: "center"
+      align: "center",
     },
 
     {
@@ -55,35 +55,35 @@ export const Test = () => {
       dataIndex: "address",
       key: "address",
       width: 200,
-      align: "center"
+      align: "center",
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: 250,
-      align: "center"
+      align: "center",
     },
     {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
       width: 180,
-      align: "center"
+      align: "center",
     },
     {
       title: "Job",
       dataIndex: "job",
       key: "job",
       width: 200,
-      align: "center"
+      align: "center",
     },
     {
       title: "Company",
       dataIndex: "company",
       key: "company",
       width: 200,
-      align: "center"
+      align: "center",
     },
     {
       title: "Hobbies",
@@ -91,14 +91,14 @@ export const Test = () => {
       key: "hobbies",
       width: 650,
       align: "center",
-      render: (hobbies) => hobbies.join(", ") // Afișează ca listă separată prin virgulă
+      render: (hobbies) => hobbies.join(", "), // Afișează ca listă separată prin virgulă
     },
     {
       title: "Status",
       dataIndex: "status",
       key: "status",
       width: 350,
-      align: "center"
+      align: "center",
     },
     {
       title: "Registered At",
@@ -106,9 +106,9 @@ export const Test = () => {
       key: "registeredAt",
       width: 500,
       align: "center",
-      render: (date) => new Date(date).toLocaleDateString() // Formatare frumoasă a datei
-    }
-  ]
+      render: (date) => new Date(date).toLocaleDateString(), // Formatare frumoasă a datei
+    },
+  ];
 
   const data = [
     {
@@ -122,7 +122,7 @@ export const Test = () => {
       company: "TechCorp",
       hobbies: ["Reading", "Gaming", "Hiking"],
       status: "Active",
-      registeredAt: "2022-05-10T12:34:56Z"
+      registeredAt: "2022-05-10T12:34:56Z",
     },
     {
       id: "2",
@@ -135,7 +135,7 @@ export const Test = () => {
       company: "Innovate Ltd",
       hobbies: ["Cooking", "Traveling", "Photography"],
       status: "Active",
-      registeredAt: "2021-09-15T10:20:30Z"
+      registeredAt: "2021-09-15T10:20:30Z",
     },
     {
       id: "3",
@@ -148,7 +148,7 @@ export const Test = () => {
       company: "DesignHub",
       hobbies: ["Drawing", "Biking", "Chess"],
       status: "Inactive",
-      registeredAt: "2020-07-22T08:45:12Z"
+      registeredAt: "2020-07-22T08:45:12Z",
     },
     {
       id: "4",
@@ -161,7 +161,7 @@ export const Test = () => {
       company: "AI Solutions",
       hobbies: ["AI Research", "Piano", "Running"],
       status: "Active",
-      registeredAt: "2019-11-03T14:10:05Z"
+      registeredAt: "2019-11-03T14:10:05Z",
     },
     {
       id: "565",
@@ -174,9 +174,9 @@ export const Test = () => {
       company: "FutureTech",
       hobbies: ["Investing", "Reading", "Golf"],
       status: "Active",
-      registeredAt: "2018-06-29T16:30:50Z"
-    }
-  ]
+      registeredAt: "2018-06-29T16:30:50Z",
+    },
+  ];
 
   return (
     <div style={{ margin: "10px" }}>
@@ -190,5 +190,5 @@ export const Test = () => {
         bordered
       />
     </div>
-  )
-}
+  );
+};

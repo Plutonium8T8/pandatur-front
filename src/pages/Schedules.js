@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 import { Button } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import SchedulesList from "./SchedulesGroupList";
-import { translations } from "../utils/translations";
-import ModalGroup from "./ModalGroup";
-import { PageHeader } from "../PageHeader";
+import SchedulesList from "../Components/Schedules/SchedulesGroupList";
+import { translations } from "../Components/utils/translations";
+import ModalGroup from "../Components/Schedules/ModalGroup";
+import { PageHeader } from "../Components/PageHeader";
 
 const language = localStorage.getItem("language") || "RO";
 
-const Schedules = () => {
+export const Schedules = () => {
   const [opened, setOpened] = useState(false);
   const [reload, setReload] = useState(false);
   const [inGroupView, setInGroupView] = useState(false);
@@ -43,5 +43,3 @@ const Schedules = () => {
     </div>
   );
 };
-
-export default Schedules;
