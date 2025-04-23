@@ -144,6 +144,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
         ticket_id: ticketId,
         priority: "",
         status_task: "",
+        status: "false"
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);

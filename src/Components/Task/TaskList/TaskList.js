@@ -34,6 +34,7 @@ const TaskList = ({
   const [selectedRow, setSelectedRow] = useState([]);
   const [openMenuId, setOpenMenuId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
+
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
   });
@@ -116,7 +117,7 @@ const TaskList = ({
             }}
           />
         ),
-      },      
+      },
       {
         title: (
           <HeaderCellRcTable
@@ -199,6 +200,22 @@ const TaskList = ({
         ),
       },
       {
+        title: translations["Workflow"][language],
+        dataIndex: "workflow",
+        key: "workflow",
+        width: 160,
+        align: "center",
+        render: (value) => <Tag type="default">{value}</Tag>,
+      },
+      {
+        title: translations["groupTitle"][language],
+        dataIndex: "group_title",
+        key: "group_title",
+        width: 120,
+        align: "center",
+        render: (value) => <Tag type="default">{value}</Tag>,
+      },
+      {
         title: translations["Tipul Taskului"][language],
         dataIndex: "task_type",
         key: "task_type",
@@ -227,10 +244,10 @@ const TaskList = ({
         width: 120,
         align: "center",
         render: (status) => (
-          <Tag type={status ? "danger" : "success"}>
+          <Tag type={status ? "success" : "danger"}>
             {status
-              ? translations["inactiv"][language]
-              : translations["activ"][language]}
+              ? translations["done"][language]
+              : translations["toDo"][language]}
           </Tag>
         ),
       },

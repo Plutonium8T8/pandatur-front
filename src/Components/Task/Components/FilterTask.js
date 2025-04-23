@@ -5,6 +5,7 @@ import {
     Box,
     Flex,
     MultiSelect,
+    Select
 } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations } from "../../utils/translations";
@@ -16,6 +17,8 @@ import dayjs from "dayjs";
 import { api } from "../../../api";
 import { useSnackbar } from "notistack";
 import { showServerError } from "../../utils";
+import { SelectWorkflow } from "../../SelectWorkflow";
+import { groupTitleOptions } from "../../../FormOptions";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -64,7 +67,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const handleClear = () => {
         const cleared = { created_for: [String(userId)] };
         setLocalFilters(cleared);
-        onApply(cleared);
     };
 
     const cleanFilters = (filters) => {
@@ -80,9 +82,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
 
     const handleApply = () => {
         const cleaned = cleanFilters(localFilters);
-        if (cleaned.user_group_names && typeof cleaned.user_group_names === "string") {
-            cleaned.user_group_names = [cleaned.user_group_names];
-        }
         onApply(cleaned);
         onClose();
     };
@@ -109,7 +108,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             title={translations["Filtru"][language]}
             height="auto"
         >
-            <Box p="sm" mt="md">
+            <Box p="sm">
                 <Flex gap="sm" direction="column">
 
                     <DatePickerInput
@@ -165,6 +164,37 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         clearable
                         searchable
                         nothingFoundMessage={translations["noResult"][language]}
+                    />
+
+                    <MultiSelect
+                        label={translations["groupTitle"][language]}
+                        placeholder={translations["groupTitle"][language]}
+                        data={groupTitleOptions.map((val) => ({ value: val, label: val }))}
+                        value={localFilters.group_title || []}
+                        onChange={(val) => handleChange("group_title", val)}
+                        clearable
+                        searchable
+                    />
+
+                    <SelectWorkflow
+                        selectedValues={localFilters.workflow || []}
+                        onChange={(val) => handleChange("workflow", val)}
+                    />
+
+                    <Select
+                        label={translations["Status"][language]}
+                        placeholder={translations["ChoiseStatus"][language]}
+                        data={[
+                            { value: "true", label: translations["done"][language] },
+                            { value: "false", label: translations["toDo"][language] },
+                        ]}
+                        value={
+                            typeof localFilters.status === "boolean"
+                                ? String(localFilters.status)
+                                : localFilters.status || null
+                        }
+                        onChange={(val) => handleChange("status", val ?? null)}
+                        clearable
                     />
 
                 </Flex>

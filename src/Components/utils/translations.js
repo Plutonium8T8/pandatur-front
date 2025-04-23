@@ -1242,13 +1242,13 @@ export const translations = {
     RO: "ID-ul tichetului",
     RU: "ID заявки",
   },
-  activ: {
-    RO: "activ",
-    RU: "активный",
+  done: {
+    RO: "îndeplinit",
+    RU: "выполнен",
   },
-  inactiv: {
-    RO: "inactiv",
-    RU: "неактивный",
+toDo: {
+    RO: "neîndeplinit",
+    RU: "невыполнено",
   },
   Tasks: {
     RO: "Task-uri",
@@ -2190,5 +2190,13 @@ export const translations = {
   intervalDate: {
     RO: "Alege interval",
     RU: "Выберите интервал"
+  },
+  groupTitle: {
+    RO: "Alegeți grupa de lead-uri",
+    RU: "Выберите группу лидов"
+  },
+  ChoiseStatus: {
+    RO: "Alege statusul",
+    RU: "Выберите статус"
   }
 };
