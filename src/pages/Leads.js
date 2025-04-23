@@ -2,26 +2,32 @@ import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider } from "@mantine/core";
-import { useDOMElementHeight, useApp } from "../../hooks";
-import { priorityOptions } from "../../FormOptions/PriorityOption";
-import { workflowOptions } from "../../FormOptions/WorkFlowOption";
-import { LeadTable } from "./LeadTable";
-import { useDebounce, useConfirmPopup } from "../../hooks";
-import { showServerError, getTotalPages, getLanguageByKey } from "../utils";
-import { api } from "../../api";
-import SingleChat from "../ChatComponent/SingleChat";
-import { Spin } from "../Spin";
-import { RefLeadsHeader } from "./LeadsHeader";
-import TicketModal from "./TicketModal/TicketModalComponent";
-import "../../App.css";
-import "../SnackBarComponent/SnackBarComponent.css";
-import { SpinnerRightBottom } from "../SpinnerRightBottom";
-import { MantineModal } from "../MantineModal";
-import { ManageLeadInfoTabs } from "./ManageLeadInfoTabs";
-import { VIEW_MODE, filteredWorkflows } from "./utils";
-import { WorkflowColumns } from "../Workflow";
-import { LeadsKanbanFilter } from "./LeadsKanbanFilter";
-import { LeadsTableFilter } from "./LeadsTableFilter";
+import { useDOMElementHeight, useApp } from "../hooks";
+import { priorityOptions } from "../FormOptions/PriorityOption";
+import { workflowOptions } from "../FormOptions/WorkFlowOption";
+import { LeadTable } from "../Components/LeadsComponent/LeadTable";
+import { useDebounce, useConfirmPopup } from "../hooks";
+import {
+  showServerError,
+  getTotalPages,
+  getLanguageByKey,
+} from "../Components/utils";
+import { api } from "../api";
+import SingleChat from "../Components/ChatComponent/SingleChat";
+import { Spin } from "../Components/Spin";
+import { RefLeadsHeader } from "../Components/LeadsComponent/LeadsHeader";
+import TicketModal from "../Components/LeadsComponent/TicketModal/TicketModalComponent";
+import { SpinnerRightBottom } from "../Components/SpinnerRightBottom";
+import { MantineModal } from "../Components/MantineModal";
+import { ManageLeadInfoTabs } from "../Components/LeadsComponent/ManageLeadInfoTabs";
+import {
+  VIEW_MODE,
+  filteredWorkflows,
+} from "../Components/LeadsComponent/utils";
+import { WorkflowColumns } from "../Components/Workflow";
+import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
+import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
+import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -33,7 +39,7 @@ const getTicketsIds = (ticketList) => {
   return ticketList.map(({ id }) => id);
 };
 
-const Leads = () => {
+export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -297,7 +303,7 @@ const Leads = () => {
         style={{
           "--leads-filter-height": `${leadsFilterHeight}px`,
         }}
-        className="dashboard-container"
+        className="leads-container"
       >
         <Divider mb="md" />
 
@@ -414,5 +420,3 @@ const Leads = () => {
     </>
   );
 };
-
-export default Leads;

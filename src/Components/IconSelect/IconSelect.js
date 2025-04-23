@@ -27,7 +27,12 @@ const IconSelect = ({
         </label>
       )}
 
-      <div style={{ opacity: disabled ? 0.6 : 1, pointerEvents: disabled ? "none" : "auto" }}>
+      <div
+        style={{
+          opacity: disabled ? 0.6 : 1,
+          pointerEvents: disabled ? "none" : "auto",
+        }}
+      >
         <ComboSelect
           data={options.map((item) => ({
             value: item.name,
