@@ -110,7 +110,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         >
             <Box p="sm">
                 <Flex gap="sm" direction="column">
-
                     <DatePickerInput
                         type="range"
                         label={translations["intervalDate"][language]}
@@ -198,7 +197,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         }
                         clearable
                     />
-
                 </Flex>
 
                 <Group mt="xl" justify="flex-end">
