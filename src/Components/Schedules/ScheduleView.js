@@ -3,7 +3,6 @@ import { startOfWeek, addDays, format } from "date-fns";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
-import { showServerError } from "../utils/showServerError";
 import ModalIntervals from "./ModalIntervals";
 import ModalGroup from "./ModalGroup";
 import { Button, Checkbox } from "@mantine/core";
@@ -46,12 +45,12 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
       const combined = groupUsers.map((user) => {
         const userId = user.id;
         const userSchedule = scheduleData.find(
-          (s) => s.technician_id === userId
+          (s) => s.technician_id === userId,
         );
         const weeklySchedule = userSchedule?.weekly_schedule || {};
 
         const shifts = dayKeys.map((day) =>
-          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
+          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : [],
         );
 
         return { id: userId, name: user.username, shifts };
@@ -61,7 +60,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     } catch (e) {
       enqueueSnackbar(
         translations["Eroare la încărcarea programului"][language],
-        { variant: "error" }
+        { variant: "error" },
       );
     } finally {
       setIsLoading(false);
@@ -203,10 +202,10 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   >
                     {shift.length > 0
                       ? shift.map((i, idx) => (
-                        <div className="container-interval" key={idx}>
-                          {i.start} - {i.end}
-                        </div>
-                      ))
+                          <div className="container-interval" key={idx}>
+                            {i.start} - {i.end}
+                          </div>
+                        ))
                       : "-"}
                   </td>
                 ))}
