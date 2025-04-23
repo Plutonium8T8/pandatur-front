@@ -193,7 +193,9 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                                 ? String(localFilters.status)
                                 : localFilters.status || null
                         }
-                        onChange={(val) => handleChange("status", val ?? null)}
+                        onChange={(val) =>
+                            handleChange("status", val === "true" ? true : val === "false" ? false : null)
+                        }
                         clearable
                     />
 
