@@ -3,6 +3,7 @@ import Select from "react-select";
 import { workflowOptions as rawWorkflowOptions } from "../../FormOptions/WorkFlowOption";
 import { translations } from "../utils/translations";
 import { getColorByWorkflowType } from "../Workflow/components";
+import "./WorkflowComponent.css";
 
 const workflowOptions = rawWorkflowOptions.map((workflow) => ({
   value: workflow,

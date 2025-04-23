@@ -1,12 +1,11 @@
 import Dashboard from "./Components/DashboardComponent/Dashboard";
-import Leads from "./Components/LeadsComponent/LeadsComponent";
 import ChatComponent from "./Components/ChatComponent/ChatComponent";
 import LoginForm from "./Components/LoginComponent/LoginForm";
 import UsersComponent from "./Components/UsersComponent/UsersComponent";
 import TaskPage from "./Components/Task/Page/TaskPage";
 import Schedules from "./Components/Schedules/Schedules";
 import { Test } from "./Components/Test";
-import { Logs } from "./pages";
+import { Logs, Leads } from "./pages";
 
 export const privatePaths = [
   "dashboard",
