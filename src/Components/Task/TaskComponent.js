@@ -52,8 +52,10 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         ...filters,
         search: searchQuery,
         page: currentPage,
+        sort_by: "scheduled_time",
+        sort_dir: "ASC",
       });
-
+  
       setTasks(Array.isArray(res?.data) ? res.data : []);
       setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
@@ -61,7 +63,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
       console.error("error upload tasks", error);
       setTasks([]);
     }
-  };
+  };  
 
   useEffect(() => {
     fetchTasks();
