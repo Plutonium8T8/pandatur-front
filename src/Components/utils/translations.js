@@ -2182,5 +2182,13 @@ export const translations = {
   completeAllFields: {
     RO: "Completați toate câmpurile obligatorii",
     RU: "Заполните все обязательные поля",
+  },
+  noResult: {
+    RO: "Niciun rezultat",
+    RU: "Без результата"
+  },
+  intervalDate: {
+    RO: "Alege interval",
+    RU: "Выберите интервал"
   }
 };

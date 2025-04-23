@@ -83,10 +83,10 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         data={technicians}
                         value={localFilters.created_by || []}
                         onChange={(val) => handleChange("created_by", val)}
-                        placeholder="Alege autorii"
+                        placeholder={translations["Autor"][language]}
                         clearable
                         searchable
-                        nothingFoundMessage="Niciun rezultat"
+                        nothingFoundMessage={translations["noResult"][language]}
                         disabled={loadingTechnicians}
                     />
 
@@ -95,30 +95,28 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
                         data={technicians}
                         value={localFilters.created_for || []}
                         onChange={(val) => handleChange("created_for", val)}
-                        placeholder="Alege responsabili"
+                        placeholder={translations["Responsabil"][language]}
                         clearable
                         searchable
-                        nothingFoundMessage="Niciun rezultat"
+                        nothingFoundMessage={translations["noResult"][language]}
                         disabled={loadingTechnicians}
                     />
 
                     <DatePickerInput
-                        label="De la"
-                        value={localFilters.date_from ? new Date(localFilters.date_from) : null}
-                        onChange={(val) =>
-                            handleChange("date_from", val ? dayjs(val).format("DD-MM-YYYY") : null)
+                        type="range"
+                        label={translations["intervalDate"][language]}
+                        value={
+                            localFilters.date_from && localFilters.date_to
+                                ? [new Date(localFilters.date_from), new Date(localFilters.date_to)]
+                                : [null, null]
                         }
+                        onChange={(range) => {
+                            handleChange("date_from", range?.[0] ? dayjs(range[0]).format("YYYY-MM-DD") : null);
+                            handleChange("date_to", range?.[1] ? dayjs(range[1]).format("YYYY-MM-DD") : null);
+                        }}
                         clearable
                     />
 
-                    <DatePickerInput
-                        label="Până la"
-                        value={localFilters.date_to ? new Date(localFilters.date_to) : null}
-                        onChange={(val) =>
-                            handleChange("date_to", val ? dayjs(val).format("DD-MM-YYYY") : null)
-                        }
-                        clearable
-                    />
                 </Flex>
 
                 <Group mt="xl" justify="flex-end">
