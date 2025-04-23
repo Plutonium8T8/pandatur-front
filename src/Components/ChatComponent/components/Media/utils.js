@@ -192,7 +192,6 @@ export const renderFile = ({
   shouldDelete,
   renderAddAttachments,
 }) => {
-  console.log("🚀 ~ media:", media);
   const filterMediaByImageAndVideo = media.filter((i) =>
     [MEDIA_TYPE.FILE].includes(i.mtype),
   );

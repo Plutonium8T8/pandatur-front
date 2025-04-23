@@ -1,4 +1,4 @@
-import { Flex, FileButton, Button, Tabs, Text, Box } from "@mantine/core";
+import { Flex, FileButton, Button, Tabs, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect } from "react";
 import { IoMdAdd } from "react-icons/io";
