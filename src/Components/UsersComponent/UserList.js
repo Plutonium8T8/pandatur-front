@@ -202,6 +202,7 @@ const UserList = ({
       dataIndex: "email",
       key: "email",
       width: 250,
+      render: (email) => <div className="break-word">{email}</div>,
     },
     {
       align: "center",

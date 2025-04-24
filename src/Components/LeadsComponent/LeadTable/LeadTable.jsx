@@ -120,7 +120,8 @@ export const LeadTable = ({
       dataIndex: "email",
       align: "center",
       width: 200,
-      render: (email) => (email ? email : cleanValue()),
+      render: (email) =>
+        email ? <div className="break-word">{email}</div> : cleanValue(),
     },
     {
       title: getLanguageByKey("Telefon"),
