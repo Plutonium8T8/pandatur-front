@@ -1,10 +1,9 @@
-import { Text, Box, Image, DEFAULT_THEME } from "@mantine/core";
+import { Text, Box, DEFAULT_THEME } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
 import { File } from "../File";
 import { MEDIA_TYPE } from "../../app-constants";
-
-const BROKEN_PHOTO = "/broken.png";
+import { Image } from "@components";
 
 const { colors } = DEFAULT_THEME;
 
@@ -33,18 +32,7 @@ export const renderContent = (msg) => {
   }
   switch (msg.mtype) {
     case MEDIA_TYPE.IMAGE:
-      return (
-        <Image
-          fallbackSrc={BROKEN_PHOTO}
-          my="5"
-          radius="md"
-          src={msg.message}
-          className="pointer"
-          onClick={() => {
-            window.open(msg.message, "_blank");
-          }}
-        />
-      );
+      return <Image src={msg.message} />;
     case MEDIA_TYPE.VIDEO:
       return (
         <video controls className="video-preview">

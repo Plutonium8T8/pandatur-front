@@ -2263,4 +2263,8 @@ export const translations = {
     RO: "Nu există date",
     RU: "Нет данных",
   },
+  failToLoadImage: {
+    RO: "Eroare la încărcarea imaginii",
+    RU: "Ошибка загрузки изображения",
+  },
 };
