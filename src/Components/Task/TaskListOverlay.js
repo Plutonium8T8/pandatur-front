@@ -73,6 +73,20 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }
     }
   }, [creatingTask, userId]);
 
+  useEffect(() => {
+    const initialEdits = {};
+    ticketTasks.forEach((t) => {
+      initialEdits[t.id] = {
+        task_type: t.task_type,
+        scheduled_time: parseDate(t.scheduled_time),
+        created_for: String(t.created_for),
+        created_by: String(t.created_by),
+        description: t.description || "",
+      };
+    });
+    setTaskEdits(initialEdits);
+  }, [ticketTasks]);
+
   if (!creatingTask && ticketTasks.length === 0) return null;
 
   const updateTaskField = (id, field, value) => {
