@@ -11,3 +11,4 @@ export * from "./SpinnerRightBottom";
 export * from "./Workflow";
 export * from "./Checkbox";
 export * from "./RcTable";
+export * from "./Empty";

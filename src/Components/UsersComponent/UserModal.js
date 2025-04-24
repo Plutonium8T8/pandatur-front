@@ -30,6 +30,7 @@ const initialFormState = {
   groups: "",
   permissionGroupId: null,
   selectedRoles: [],
+  sipuni_id: "",
 };
 
 const safeParseJson = (str) => {
@@ -56,7 +57,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   useEffect(() => {
     if (initialUser) {
-      const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
+      const permissionGroupId =
+        initialUser.permissions?.[0]?.id?.toString() || null;
 
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
       const userRoles = safeParseJson(rawRoles)
@@ -83,6 +85,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         username: initialUser.username || "",
         email: initialUser.email || "",
         job_title: initialUser.job_title || initialUser.jobTitle || "",
+        sipuni_id: initialUser.sipuni_id || "",
         status: Boolean(initialUser.status),
         groups:
           typeof initialUser.groups?.[0] === "string"
@@ -108,8 +111,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           setGroupsList(userGroups);
         } catch (e) {
           enqueueSnackbar(
-            translations["Eroare la încărcarea grupurilor de utilizatori"][language],
-            { variant: "error" }
+            translations["Eroare la încărcarea grupurilor de utilizatori"][
+              language
+            ],
+            { variant: "error" },
           );
         }
 
@@ -118,8 +123,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           setPermissionGroups(permissionGroups);
         } catch (e) {
           enqueueSnackbar(
-            translations["Eroare la încărcarea grupurilor de permisiuni"][language],
-            { variant: "error" }
+            translations["Eroare la încărcarea grupurilor de permisiuni"][
+              language
+            ],
+            { variant: "error" },
           );
         }
       } finally {
@@ -132,7 +139,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
     const selectedGroup = permissionGroups.find(
-      (g) => g.permission_id.toString() === permissionGroupId
+      (g) => g.permission_id.toString() === permissionGroupId,
     );
 
     const groupRoles = formatRoles(selectedGroup?.roles)
@@ -164,9 +171,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   const toggleRole = (role) => {
     setCustomRoles((prev) =>
-      prev.includes(role)
-        ? prev.filter((r) => r !== role)
-        : [...prev, role]
+      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
     );
 
     setForm((prev) => {
@@ -193,13 +198,26 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       groups,
       permissionGroupId,
       selectedRoles,
+      sipuni_id,
     } = form;
 
     if (!initialUser) {
-      if (!name || !surname || !username || !email || !password || !job_title || !groups) {
-        enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
-          variant: "warning",
-        });
+      if (
+        !name ||
+        !surname ||
+        !username ||
+        !email ||
+        !password ||
+        !job_title ||
+        !groups ||
+        !sipuni_id
+      ) {
+        enqueueSnackbar(
+          translations["Completați toate câmpurile obligatorii"][language],
+          {
+            variant: "warning",
+          },
+        );
         return;
       }
     }
@@ -213,6 +231,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           api.users.updateTechnician(technicianId, {
             status: status.toString(),
             job_title,
+            sipuni_id,
           }),
           api.users.updateExtended(technicianId, {
             name,
@@ -239,12 +258,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         if (!permissionGroupId && hadPermissionBefore) {
           await api.permissions.removePermissionFromTechnician(userId);
         } else if (permissionGroupId) {
-          await api.permissions.assignPermissionToUser(permissionGroupId, userId);
+          await api.permissions.assignPermissionToUser(
+            permissionGroupId,
+            userId,
+          );
         }
 
-        enqueueSnackbar(translations["Utilizator actualizat cu succes"][language], {
-          variant: "success",
-        });
+        enqueueSnackbar(
+          translations["Utilizator actualizat cu succes"][language],
+          {
+            variant: "success",
+          },
+        );
       } else {
         const payload = {
           user: {
@@ -258,18 +283,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             surname,
           },
           technician: {
+            sipuni_id,
             status: status.toString(),
             job_title,
           },
           groups: [groups],
         };
 
-        const { id: createdUser } = await api.users.createTechnicianUser(payload);
+        const { id: createdUser } =
+          await api.users.createTechnicianUser(payload);
 
         if (permissionGroupId) {
           await api.permissions.assignPermissionToUser(
             permissionGroupId,
-            createdUser?.user?.id
+            createdUser?.user?.id,
           );
         }
 
@@ -379,7 +406,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                     <Select
                       clearable
                       label={translations["Grup permisiuni"][language]}
-                      placeholder={translations["Alege grupul de permisiuni"][language]}
+                      placeholder={
+                        translations["Alege grupul de permisiuni"][language]
+                      }
                       data={permissionGroups.map((g) => ({
                         value: g.permission_id.toString(),
                         label: g.permission_name,
@@ -400,8 +429,17 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
           <TextInput
             label={translations["Funcție"][language]}
+            placeholder={translations["Funcție"][language]}
             value={form.job_title}
             onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+            required
+          />
+
+          <TextInput
+            label="Sipuni ID"
+            placeholder="Sipuni ID"
+            value={form.sipuni_id}
+            onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
             required
           />
 

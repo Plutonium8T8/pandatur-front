@@ -1,5 +1,5 @@
 import { RcTable } from "../RcTable";
-import { Button, Menu, Checkbox } from "@mantine/core";
+import { Button, Menu, Checkbox, Flex } from "@mantine/core";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -21,8 +21,8 @@ const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
 const UserList = ({
   users,
   loading,
-  fetchUsers = () => { },
-  openEditUser = () => { },
+  fetchUsers = () => {},
+  openEditUser = () => {},
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
@@ -92,8 +92,8 @@ const UserList = ({
     subTitle:
       selectedIds.length > 1
         ? translations["Sigur doriți să ștergeți utilizatorii selectați?"][
-        language
-        ]
+            language
+          ]
         : translations["Sigur doriți să ștergeți utilizatorul?"][language],
     loading: false,
   });
@@ -136,7 +136,10 @@ const UserList = ({
 
   const handleAssignPermissionGroup = async (permissionGroupId) => {
     try {
-      await api.permissions.batchAssignPermissionGroup(permissionGroupId, selectedIds);
+      await api.permissions.batchAssignPermissionGroup(
+        permissionGroupId,
+        selectedIds,
+      );
       enqueueSnackbar(translations["Grup de permisiuni atribuit"][language], {
         variant: "success",
       });
@@ -172,6 +175,7 @@ const UserList = ({
       },
     },
     {
+      align: "center",
       title: translations["ID"][language],
       dataIndex: "id",
       key: "id",
@@ -179,24 +183,29 @@ const UserList = ({
       render: (id) => id,
     },
     {
+      align: "center",
       title: translations["Nume"][language],
       dataIndex: "name",
       key: "name",
       width: 150,
     },
     {
+      align: "center",
       title: translations["Prenume"][language],
       dataIndex: "surname",
       key: "surname",
       width: 150,
     },
     {
+      align: "center",
       title: translations["Email"][language],
       dataIndex: "email",
       key: "email",
       width: 250,
+      render: (email) => <div className="break-word">{email}</div>,
     },
     {
+      align: "center",
       title: translations["Grup"][language],
       dataIndex: "groups",
       key: "groups",
@@ -207,6 +216,7 @@ const UserList = ({
           : "—",
     },
     {
+      align: "center",
       title: translations["Grup permisiuni"][language],
       dataIndex: "permissions",
       key: "permissions",
@@ -217,6 +227,7 @@ const UserList = ({
           : "—",
     },
     {
+      align: "center",
       title: translations["Funcție"][language],
       dataIndex: "job_title",
       key: "job_title",
@@ -224,6 +235,7 @@ const UserList = ({
       render: (_, row) => row.jobTitle || "—",
     },
     {
+      align: "center",
       title: translations["Status"][language],
       dataIndex: "status",
       key: "status",
@@ -232,6 +244,14 @@ const UserList = ({
         status
           ? translations["Activ"][language]
           : translations["Inactiv"][language],
+    },
+    {
+      align: "center",
+      title: "Sipuni ID",
+      dataIndex: "sipuni_id",
+      key: "sipuni_id",
+      width: 150,
+      render: (sipuni_id) => <Flex justify="center">{sipuni_id || "—"}</Flex>,
     },
     {
       title: translations["Acțiune"][language],
@@ -291,7 +311,11 @@ const UserList = ({
           <Button variant="light" onClick={() => setGroupModalOpen(true)}>
             {translations["Schimbă grupul"][language]}
           </Button>
-          <Button variant="light" color="grape" onClick={() => setPermissionModalOpen(true)}>
+          <Button
+            variant="light"
+            color="grape"
+            onClick={() => setPermissionModalOpen(true)}
+          >
             {translations["Schimbǎ grup de permisiuni"][language]}
           </Button>
           <Button

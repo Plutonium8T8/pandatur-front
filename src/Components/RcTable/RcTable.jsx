@@ -1,7 +1,7 @@
 import Table from "rc-table";
-import { Empty } from "../Empty";
+import { getLanguageByKey } from "@utils";
+import { Empty, Spin } from "@components";
 import "./RcTable.css";
-import { Spin } from "../Spin";
 
 const renderSpinOrEmptyBox = (isLoading) => {
   if (isLoading) {
@@ -12,7 +12,7 @@ const renderSpinOrEmptyBox = (isLoading) => {
     );
   }
 
-  return <Empty />;
+  return <Empty title={getLanguageByKey("noDate")} />;
 };
 
 export const RcTable = ({

@@ -1246,7 +1246,7 @@ export const translations = {
     RO: "îndeplinit",
     RU: "выполнен",
   },
-toDo: {
+  toDo: {
     RO: "neîndeplinit",
     RU: "невыполнено",
   },
@@ -2185,19 +2185,19 @@ toDo: {
   },
   noResult: {
     RO: "Niciun rezultat",
-    RU: "Без результата"
+    RU: "Без результата",
   },
   intervalDate: {
     RO: "Alege interval",
-    RU: "Выберите интервал"
+    RU: "Выберите интервал",
   },
   groupTitle: {
     RO: "Alegeți grupa de lead-uri",
-    RU: "Выберите группу лидов"
+    RU: "Выберите группу лидов",
   },
   ChoiseStatus: {
     RO: "Alege statusul",
-    RU: "Выберите статус"
+    RU: "Выберите статус",
   },
   addFileOrImage: {
     RO: "Adaugă fișier sau poză",
@@ -2254,5 +2254,13 @@ toDo: {
   selectGroup: {
     RO: "Selectează grupa",
     RU: "Выберите группу",
+  },
+  marketing: {
+    RO: "Marketing",
+    RU: "Маркетинг",
+  },
+  noDate: {
+    RO: "Nu există date",
+    RU: "Нет данных",
   },
 };

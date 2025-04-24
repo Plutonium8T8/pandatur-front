@@ -102,6 +102,10 @@ export const RefLeadsHeader = forwardRef(
                   { value: "MD", label: "MD" },
                   { value: "Filiale", label: getLanguageByKey("FIL") },
                   { value: "Francize", label: getLanguageByKey("FRA") },
+                  {
+                    value: "Marketing",
+                    label: getLanguageByKey("marketing"),
+                  },
                 ]}
                 onChange={(group) => setGroupTitle(group)}
               />

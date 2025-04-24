@@ -1,18 +1,17 @@
 import { GoArchive } from "react-icons/go";
 import { Flex, Text, DEFAULT_THEME } from "@mantine/core";
-import { getLanguageByKey } from "./utils";
 
-const renderContentEmpty = (
+const renderContentEmpty = (title) => (
   <>
     <div className="mb-16">
       <GoArchive size={64} />
     </div>
 
-    <Text>{getLanguageByKey("Fără date media")}</Text>
+    <Text>{title}</Text>
   </>
 );
 
-export const Empty = ({ renderEmptyContent }) => {
+export const Empty = ({ renderEmptyContent, title }) => {
   return (
     <>
       {renderEmptyContent ? (
@@ -24,7 +23,7 @@ export const Empty = ({ renderEmptyContent }) => {
           direction="column"
           c={DEFAULT_THEME.colors.dark[2]}
         >
-          {renderContentEmpty}
+          {renderContentEmpty(title)}
         </Flex>
       )}
     </>
