@@ -42,6 +42,7 @@ export const Users = () => {
           status: item.status,
           permissions: item.permissions || [],
           rawRoles: user.roles || "[]",
+          sipuni_id: item.sipuni_id,
         };
       });
 
