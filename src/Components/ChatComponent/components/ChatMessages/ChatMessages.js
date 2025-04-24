@@ -151,6 +151,7 @@ export const ChatMessages = ({
             tasks={tasks}
             creatingTask={creatingTask}
             setCreatingTask={setCreatingTask}
+            fetchTasks={window.fetchTasksGlobal}
           />
           <ChatInput
             loading={loading}

@@ -27,7 +27,7 @@ import { showServerError } from "../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ updateTaskCount = () => {}, userId, tasks = [], setTasks }) => {
+const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTasks, setFetchTasksRef }) => {
   const { userId: currentUserId } = useUser();
   const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
   const [searchInput, setSearchInput] = useState("");
@@ -66,6 +66,10 @@ const TaskComponent = ({ updateTaskCount = () => {}, userId, tasks = [], setTask
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
+
+  useEffect(() => {
+    if (setFetchTasksRef) setFetchTasksRef(fetchTasks);
+  }, [setFetchTasksRef, fetchTasks]);
 
   useEffect(() => {
     fetchTasks();

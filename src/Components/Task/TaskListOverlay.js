@@ -35,7 +35,13 @@ import { useSnackbar } from "notistack";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }) => {
+const TaskListOverlay = ({
+  ticketId,
+  creatingTask,
+  setCreatingTask,
+  tasks = [],
+  fetchTasks,
+}) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
@@ -112,6 +118,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }
       enqueueSnackbar(translations["taskUpdated"][language],
         { variant: "success" });
       setEditMode((prev) => ({ ...prev, [taskId]: false }));
+      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
     }
@@ -136,6 +143,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
+      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
     }
@@ -146,6 +154,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }
       api.task.delete({ id })
         .then(() => {
           enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
+          fetchTasks();
         })
         .catch(() => {
           enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
