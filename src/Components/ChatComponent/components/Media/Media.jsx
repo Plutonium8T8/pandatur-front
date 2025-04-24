@@ -74,7 +74,9 @@ export const Media = ({ messages, id }) => {
   };
 
   useEffect(() => {
-    getMediaFiles();
+    if (id) {
+      getMediaFiles();
+    }
   }, [id]);
 
   return (
