@@ -49,6 +49,7 @@ const TaskListOverlay = ({
   const { technicians: users } = useGetTechniciansList();
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
+  const [originalTaskValues, setOriginalTaskValues] = useState({});
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
@@ -177,6 +178,16 @@ const TaskListOverlay = ({
     return match?.icon || null;
   };
 
+  const handleCancelEdit = (id) => {
+    if (originalTaskValues[id]) {
+      setTaskEdits((prev) => ({
+        ...prev,
+        [id]: { ...originalTaskValues[id] },
+      }));
+    }
+    setEditMode((prev) => ({ ...prev, [id]: false }));
+  };
+
   const renderTaskForm = (id, isNew = false) => {
     const isEditing = isNew || editMode[id];
 
@@ -278,7 +289,7 @@ const TaskListOverlay = ({
                 <Button
                   size="xs"
                   variant="subtle"
-                  onClick={() => setEditMode((prev) => ({ ...prev, [id]: false }))}
+                  onClick={() => handleCancelEdit(id)}
                 >
                   {translations["Anulare"][language]}
                 </Button>
@@ -297,7 +308,22 @@ const TaskListOverlay = ({
                 <Button
                   size="xs"
                   variant="light"
-                  onClick={() => setEditMode((prev) => ({ ...prev, [id]: true }))}
+                  onClick={() => {
+                    const original = ticketTasks.find((t) => t.id === id);
+                    if (original) {
+                      setOriginalTaskValues((prev) => ({
+                        ...prev,
+                        [id]: {
+                          task_type: original.task_type,
+                          scheduled_time: parseDate(original.scheduled_time),
+                          created_for: String(original.created_for),
+                          created_by: String(original.created_by),
+                          description: original.description || "",
+                        },
+                      }));
+                    }
+                    setEditMode((prev) => ({ ...prev, [id]: true }));
+                  }}
                   leftSection={<FaPencil />}
                 >
                   {translations["Editare Task"][language]}
