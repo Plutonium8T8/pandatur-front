@@ -2255,4 +2255,8 @@ export const translations = {
     RO: "Selectează grupa",
     RU: "Выберите группу",
   },
+  marketing: {
+    RO: "Marketing",
+    RU: "Маркетинг",
+  },
 };
