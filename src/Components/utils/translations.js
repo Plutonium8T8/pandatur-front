@@ -2263,4 +2263,8 @@ export const translations = {
     RO: "Nu există date",
     RU: "Нет данных",
   },
+  fileIsMandatory: {
+    RO: "Acest fișier este obligatoriu",
+    RU: "Этот файл обязательный",
+  },
 };
