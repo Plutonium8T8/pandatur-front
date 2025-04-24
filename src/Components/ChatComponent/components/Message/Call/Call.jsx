@@ -1,7 +1,7 @@
 import { Box, Flex, Text, DEFAULT_THEME, Divider } from "@mantine/core";
 import { MdCall } from "react-icons/md";
-import { HH_mm } from "../../../../../app-constants";
-import { parseServerDate, getLanguageByKey } from "../../../../utils";
+import { HH_mm } from "@app-constants";
+import { parseServerDate, getLanguageByKey } from "@utils";
 import { Audio } from "../../../../Audio";
 import "./Call.css";
 

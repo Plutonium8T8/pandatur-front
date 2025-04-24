@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { GoTrash } from "react-icons/go";
 import { FaRegFileLines } from "react-icons/fa6";
+import { MdCall } from "react-icons/md";
 import {
   Flex,
   Image,
@@ -10,13 +11,8 @@ import {
   Divider,
   Grid,
 } from "@mantine/core";
-import {
-  FALLBACK_IMAGE,
-  MEDIA_TYPE,
-  DD_MM_YYYY,
-  HH_mm,
-} from "../../../../app-constants";
-import { getLanguageByKey, parseServerDate } from "../../../utils";
+import { FALLBACK_IMAGE, MEDIA_TYPE, DD_MM_YYYY, HH_mm } from "@app-constants";
+import { getLanguageByKey, parseServerDate } from "@utils";
 import { Audio } from "../../../Audio";
 import { TimeClient } from "./TimeClient";
 import { Empty } from "../../../Empty";
@@ -171,7 +167,14 @@ export const renderMediaContent = ({
     ),
     [MEDIA_TYPE.CALL]: (
       <Flex gap="4" direction="column">
-        <Audio src={message} />
+        <Flex align="center">
+          <MdCall />
+
+          <Box>
+            <Divider orientation="vertical" mx="8" h="30px" />
+          </Box>
+          <Audio src={message} />
+        </Flex>
 
         {!shouldDelete && (
           <TimeClient
@@ -305,11 +308,12 @@ export const renderCall = ({
               <Box py="md">
                 {renderMediaContent({
                   type: media.mtype,
-                  message: media.url,
+                  message: media.url || media.message,
                   id: media.id,
                   deleteAttachment: () => deleteAttachment(media.id),
                   shouldDelete,
                   msjTime: media.time_sent,
+                  payload: media,
                 })}
               </Box>
 
