@@ -107,6 +107,7 @@ export const GeneralForm = ({
         />
 
         <Select
+          searchable
           mt="md"
           label={getLanguageByKey("Tehnician")}
           placeholder={getLanguageByKey("Selectează tehnician")}
