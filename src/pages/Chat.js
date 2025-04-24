@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useSnackbar } from "notistack";
-import { useApp, useFetchTicketChat, useGetTechniciansList } from "../hooks";
-import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
-import ChatList from "../Components/ChatComponent/ChatList";
-import { getFullName, showServerError } from "../Components/utils";
-import { ChatMessages } from "../Components/ChatComponent/components";
+import { useApp, useFetchTicketChat, useGetTechniciansList } from "@hooks";
+import ChatExtraInfo from "@components/ChatComponent/ChatExtraInfo";
+import ChatList from "@components/ChatComponent/ChatList";
+import { getFullName, showServerError } from "@utils";
+import { ChatMessages } from "@components/ChatComponent/components";
 
 export const Chat = () => {
   const { enqueueSnackbar } = useSnackbar();

@@ -7,30 +7,24 @@ import {
   useApp,
   useDebounce,
   useConfirmPopup,
-} from "../hooks";
-import { priorityOptions } from "../FormOptions/PriorityOption";
-import { workflowOptions } from "../FormOptions/WorkFlowOption";
-import { LeadTable } from "../Components/LeadsComponent/LeadTable";
+} from "@hooks";
+import { priorityOptions, workflowOptions } from "../FormOptions";
+import { LeadTable } from "@components/LeadsComponent/LeadTable";
+import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
+import { api } from "@api";
+import SingleChat from "@components/ChatComponent/SingleChat";
+import { Spin } from "@components";
+import { RefLeadsHeader } from "@components/LeadsComponent/LeadsHeader";
 import {
-  showServerError,
-  getTotalPages,
-  getLanguageByKey,
-} from "../Components/utils";
-import { api } from "../api";
-import SingleChat from "../Components/ChatComponent/SingleChat";
-import { Spin } from "../Components/Spin";
-import { RefLeadsHeader } from "../Components/LeadsComponent/LeadsHeader";
-import { SpinnerRightBottom } from "../Components/SpinnerRightBottom";
-import { MantineModal } from "../Components/MantineModal";
-import { ManageLeadInfoTabs } from "../Components/LeadsComponent/ManageLeadInfoTabs";
-import {
-  VIEW_MODE,
-  filteredWorkflows,
-} from "../Components/LeadsComponent/utils";
-import { WorkflowColumns } from "../Components/Workflow";
-import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
-import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
-import { AddLeadModal } from "../Components";
+  SpinnerRightBottom,
+  MantineModal,
+  WorkflowColumns,
+  AddLeadModal,
+} from "@components";
+import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
+import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
+import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
+import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
 import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";

@@ -1,9 +1,9 @@
 import { Box, Flex, Pagination } from "@mantine/core";
 import { enqueueSnackbar } from "notistack";
 import { useState, useEffect } from "react";
-import { Logs as LogsComponent, PageHeader, Spin } from "../Components";
-import { getLanguageByKey, showServerError } from "../Components/utils";
-import { api } from "../api";
+import { Logs as LogsComponent, PageHeader, Spin } from "@components";
+import { getLanguageByKey, showServerError } from "@utils";
+import { api } from "@api";
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);

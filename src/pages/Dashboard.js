@@ -20,9 +20,9 @@ import {
   RadialLinearScale,
 } from "chart.js";
 import { Flex } from "@mantine/core";
-import { useUser } from "../hooks";
-import { api } from "../api";
-import { Filter } from "../Components/DashboardComponent/Filter";
+import { useUser } from "@hooks";
+import { api } from "@api";
+import { Filter } from "@components/DashboardComponent/Filter";
 import {
   chartsMetadata,
   metricsDashboardCharts,
@@ -30,11 +30,10 @@ import {
   renderChart,
   chartComponents,
   getLastItemId,
-} from "../Components/DashboardComponent/utils";
-import { showServerError, getLanguageByKey } from "../Components/utils";
-import { ISO_DATE } from "../app-constants";
-import { Spin } from "../Components/Spin";
-import { PageHeader } from "../Components/PageHeader";
+} from "@components/DashboardComponent/utils";
+import { showServerError, getLanguageByKey } from "@utils";
+import { ISO_DATE } from "@app-constants";
+import { Spin, PageHeader } from "@components";
 
 ChartJS.register(
   CategoryScale,
@@ -193,4 +192,3 @@ export const Dashboard = () => {
     </div>
   );
 };
-

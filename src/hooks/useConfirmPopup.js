@@ -1,6 +1,6 @@
 import { openConfirmModal } from "@mantine/modals";
 import { Text, DEFAULT_THEME } from "@mantine/core";
-import { getLanguageByKey } from "../Components/utils";
+import { getLanguageByKey } from "@utils";
 
 const { colors } = DEFAULT_THEME;
 

@@ -1,6 +1,6 @@
 import { useSnackbar } from "notistack";
-import { api } from "../api";
-import { getLanguageByKey } from "../Components/utils";
+import { api } from "@api";
+import { getLanguageByKey } from "@utils";
 
 export const useUploadMediaFile = () => {
   const { enqueueSnackbar } = useSnackbar();

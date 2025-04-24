@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import Cookies from "js-cookie";
-import { useUser } from "./hooks";
-import { api } from "./api";
 import { useNavigate, useLocation } from "react-router-dom";
-import { privatePaths } from "./routes";
 import { enqueueSnackbar } from "notistack";
-import { showServerError } from "./Components/utils";
-import { LoadingOverlay } from "./Components/LoadingOverlay";
+import Cookies from "js-cookie";
+import { useUser } from "@hooks";
+import { api } from "@api";
+import { showServerError } from "@utils";
+import { LoadingOverlay } from "@components";
+import { privatePaths } from "./routes";
 
 export const Session = ({ children }) => {
   const navigate = useNavigate();

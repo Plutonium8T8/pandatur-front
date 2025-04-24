@@ -1,10 +1,10 @@
-import { useContext } from "react"
-import { AppContext } from "../contexts"
+import { useContext } from "react";
+import { AppContext } from "@contexts";
 
 export const useApp = () => {
-  const context = useContext(AppContext)
+  const context = useContext(AppContext);
   if (!context) {
-    throw new Error("useApp must be used within a AppProvider")
+    throw new Error("useApp must be used within a AppProvider");
   }
-  return context
-}
+  return context;
+};

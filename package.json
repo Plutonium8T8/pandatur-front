@@ -43,10 +43,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "craco eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
     "prettier": "npx prettier . --write",
@@ -75,6 +75,7 @@
     "@services": "dist/services"
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "gh-pages": "^6.3.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
