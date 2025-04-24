@@ -1,12 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import { api } from "../api";
-import {
-  extractNumbers,
-  showServerError,
-  getFullName,
-} from "../Components/utils";
-import { useApp } from "../hooks";
+import { api } from "@api";
+import { extractNumbers, showServerError, getFullName } from "@utils";
+import { useApp } from "@hooks";
 
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {

@@ -1,5 +1,5 @@
-import { SideBar } from "../../Components";
-import { useApp } from "../../hooks";
+import { SideBar } from "@components";
+import { useApp } from "@hooks";
 import "./AppLayout.css";
 
 export const AppLayout = ({ children }) => {

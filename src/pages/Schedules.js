@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import SchedulesList from "../Components/Schedules/SchedulesGroupList";
-import { translations } from "../Components/utils/translations";
-import ModalGroup from "../Components/Schedules/ModalGroup";
-import { PageHeader } from "../Components/PageHeader";
+import SchedulesList from "@components/Schedules/SchedulesGroupList";
+import { translations } from "@utils";
+import ModalGroup from "@components/Schedules/ModalGroup";
+import { PageHeader } from "@components";
 
 const language = localStorage.getItem("language") || "RO";
 

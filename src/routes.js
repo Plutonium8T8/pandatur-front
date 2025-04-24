@@ -8,7 +8,7 @@ import {
   Login,
   Chat,
   Dashboard,
-} from "./pages";
+} from "@pages";
 
 export const privatePaths = [
   "dashboard",

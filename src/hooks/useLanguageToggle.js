@@ -1,4 +1,4 @@
-import { useLocalStorage } from "../hooks";
+import { useLocalStorage } from "@hooks";
 
 const LANGUAGE_LOCAL_STORAGE_KEY = "language";
 

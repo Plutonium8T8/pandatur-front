@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useForm } from "@mantine/form";
-import { formatDate } from "../Components/utils";
-import { getLanguageByKey } from "../Components/utils";
+import { formatDate, getLanguageByKey } from "@utils";
 
 export const useFormTicket = () => {
   const [hasErrorsTicketInfoForm, setHasErrorsTicketInfoForm] = useState();

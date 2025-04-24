@@ -1,8 +1,8 @@
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import TaskComponent from "../Components/Task/TaskComponent";
-import SingleChat from "../Components/ChatComponent/SingleChat";
-import { MantineModal } from "../Components/MantineModal";
+import TaskComponent from "@components/Task/TaskComponent";
+import SingleChat from "@components/ChatComponent/SingleChat";
+import { MantineModal } from "@components";
 
 export const TaskPage = () => {
   const { ticketId } = useParams();

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { RcTable, HeaderCellRcTable } from "../Components/RcTable";
-import { Checkbox } from "../Components/Checkbox";
+import { RcTable, HeaderCellRcTable, Checkbox } from "@components";
 
 export const Test = () => {
   const [order, setOrder] = useState("ASC");

@@ -1,15 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { TextInput, Button, Menu, ActionIcon, Container } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import { BsThreeDots } from "react-icons/bs";
-import { api } from "../api";
-import UserModal from "../Components/UsersComponent/UserModal";
-import UserList from "../Components/UsersComponent/UserList";
-import { translations } from "../Components/utils/translations";
 import { useSnackbar } from "notistack";
-import EditGroupsListModal from "../Components/UsersComponent/GroupsUsers/EditGroupsListModal";
-import CreatePermissionGroupModal from "../Components/UsersComponent/Roles/CreatePermissionGroupModal";
-import { PageHeader } from "../Components/PageHeader";
+import { BsThreeDots } from "react-icons/bs";
+import { api } from "@api";
+import { translations } from "@utils";
+import { PageHeader } from "@components";
+import UserModal from "@components/UsersComponent/UserModal";
+import UserList from "@components/UsersComponent/UserList";
+import EditGroupsListModal from "@components/UsersComponent/GroupsUsers/EditGroupsListModal";
+import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
 
 const language = localStorage.getItem("language") || "RO";
 
