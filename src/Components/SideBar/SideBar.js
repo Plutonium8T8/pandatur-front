@@ -11,13 +11,13 @@ import {
   FaHistory,
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
-import { Badge, Flex } from "@mantine/core";
+import { Badge, Flex, Divider } from "@mantine/core";
 import { Link } from "react-router-dom";
-import { clearCookies } from "../../Components/utils/clearCookies";
-import { api } from "../../api";
-import { LoadingOverlay } from "../LoadingOverlay";
-import { useApp, useLanguageToggle, LANGUAGES } from "../../hooks";
-import { getLanguageByKey } from "../utils";
+import { clearCookies } from "@utils";
+import { api } from "@api";
+import { LoadingOverlay } from "@components";
+import { useApp, useLanguageToggle, LANGUAGES, useUser } from "@hooks";
+import { getLanguageByKey } from "@utils";
 import "./SideBar.css";
 
 const LOGO = "/logo.png";
@@ -25,6 +25,7 @@ const LOGO = "/logo.png";
 export const SideBar = () => {
   const location = useLocation();
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
+  const { surname, name, userId } = useUser();
   const [loading, setLoading] = useState(false);
   const { toggleLanguage, selectedLanguage } = useLanguageToggle();
 
@@ -125,6 +126,12 @@ export const SideBar = () => {
         </Menu>
 
         <Menu>
+          {!isCollapsed && (
+            <MenuItem>
+              {surname} {name} ({userId})
+            </MenuItem>
+          )}
+          <Divider />
           <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
             {getLanguageByKey("Log Out")}
           </MenuItem>

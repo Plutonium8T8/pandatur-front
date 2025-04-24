@@ -2267,4 +2267,8 @@ export const translations = {
     RO: "Eroare la încărcarea imaginii",
     RU: "Ошибка загрузки изображения",
   },
+  fileIsMandatory: {
+    RO: "Acest fișier este obligatoriu",
+    RU: "Этот файл обязательный",
+  },
 };

@@ -9,35 +9,14 @@ import {
   Modal,
   Text,
 } from "@mantine/core";
-import { useForm, hasLength, isEmail } from "@mantine/form";
+import { useForm, hasLength } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect } from "react";
 import { useSnackbar } from "notistack";
-import { getLanguageByKey, showServerError } from "./utils";
+import { getLanguageByKey, showServerError } from "@utils";
 import { priorityOptions, workflowOptions } from "../FormOptions";
-import { api } from "../api";
-import { useUser } from "../hooks";
-
-const verifyPhoneNumber = (value) => {
-  if (!value) return getLanguageByKey("fieldIsRequired");
-
-  const convertToString = value.toString();
-  if (!convertToString.startsWith("6") && !convertToString.startsWith("7")) {
-    return getLanguageByKey("numberMustStartWith6Or7");
-  }
-
-  if (convertToString.length !== 8) {
-    return getLanguageByKey("numberMustContain8Characters");
-  }
-};
-
-const verifyEmail = (value) => {
-  if (!value) {
-    return getLanguageByKey("fieldIsRequired");
-  }
-
-  return isEmail(getLanguageByKey("invalidEmail"))(value);
-};
+import { api } from "@api";
+import { useUser } from "@hooks";
 
 export const AddLeadModal = ({
   open,
@@ -58,8 +37,10 @@ export const AddLeadModal = ({
         { min: 3 },
         getLanguageByKey("mustBeAtLeast3Characters"),
       ),
-      email: verifyEmail,
-      phone: verifyPhoneNumber,
+      phone: (value) =>
+        value?.toString().trim() === "" || value === undefined
+          ? getLanguageByKey("fileIsMandatory")
+          : null,
     },
   });
 
@@ -119,7 +100,6 @@ export const AddLeadModal = ({
 
         <Flex gap="md">
           <TextInput
-            withAsterisk
             type="email"
             w="100%"
             label={getLanguageByKey("Email")}
