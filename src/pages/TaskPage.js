@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import TaskComponent from "@components/Task/TaskComponent";
 import SingleChat from "@components/ChatComponent/SingleChat";
@@ -7,12 +7,13 @@ import { MantineModal } from "@components";
 export const TaskPage = () => {
   const { ticketId } = useParams();
   const navigate = useNavigate();
+  const [tasks, setTasks] = useState([]);
 
   const handleCloseModal = () => navigate("/tasks");
 
   return (
     <>
-      <TaskComponent />
+      <TaskComponent tasks={tasks} setTasks={setTasks} />
       <MantineModal
         fullScreen
         open={!!ticketId}
@@ -22,7 +23,7 @@ export const TaskPage = () => {
         style={{ padding: 0 }}
         height="100%"
       >
-        <SingleChat id={ticketId} onClose={handleCloseModal} />
+        <SingleChat id={ticketId} onClose={handleCloseModal} tasks={tasks} />
       </MantineModal>
     </>
   );

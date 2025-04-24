@@ -27,10 +27,9 @@ import { showServerError } from "../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
+const TaskComponent = ({ updateTaskCount = () => {}, userId, tasks = [], setTasks }) => {
   const { userId: currentUserId } = useUser();
   const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
-  const [tasks, setTasks] = useState([]);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -58,7 +57,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId }) => {
         sort_by: "scheduled_time",
       });
 
-      setTasks(Array.isArray(res?.data) ? res.data : []);
+      setTasks?.(Array.isArray(res?.data) ? res.data : []);
       setTotalPages(res?.pagination?.total_pages || 1);
       updateTaskCount();
     } catch (error) {

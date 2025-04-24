@@ -35,7 +35,7 @@ const TaskColumnsView = ({ tasks = [], onEdit }) => {
     return (
         <Box mt="md" display="flex" gap="md" h="85vh">
             {TASK_GROUPS.map((key) => (
-                <Box key={key} flex={1} display="flex" flexDirection="column">
+                <Box key={key} flex={1} display="flex">
                     <TaskColumn
                         titleKey={`${key}Tasks`}
                         tasksList={grouped[key]}

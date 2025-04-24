@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   Paper,
   Text,
@@ -35,8 +35,7 @@ import { useSnackbar } from "notistack";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
-  const [tasks, setTasks] = useState([]);
+const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask, tasks = [] }) => {
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
@@ -49,38 +48,14 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     subTitle: translations["Confirmare ștergere"][language],
   });
 
-  const fetchTasks = async () => {
-    if (!ticketId) return setTasks([]);
-    try {
-      const res = await api.task.getTaskByTicket(ticketId);
-      const taskArray = (Array.isArray(res?.data) ? res.data : res)
-        .filter(t => t.ticket_id === ticketId && !t.status)
-        .sort((a, b) =>
-          dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
-          dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
-        );
-      setTasks(taskArray);
-
-      const edits = {};
-      taskArray.forEach((t) => {
-        edits[t.id] = {
-          task_type: t.task_type,
-          description: t.description || "",
-          scheduled_time: parseDate(t.scheduled_time),
-          created_for: t.created_for?.toString(),
-          created_by: t.created_by?.toString() || "",
-        };
-      });
-      setTaskEdits(edits);
-    } catch (error) {
-      console.error("Error loading tasks", error);
-      setTasks([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchTasks();
-  }, [ticketId]);
+  const ticketTasks = useMemo(() => {
+    return tasks
+      .filter((t) => t.ticket_id === ticketId)
+      .sort((a, b) =>
+        dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
+        dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
+      );
+  }, [tasks, ticketId]);
 
   useEffect(() => {
     if (creatingTask) {
@@ -98,7 +73,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     }
   }, [creatingTask, userId]);
 
-  if (!creatingTask && tasks.length === 0) return null;
+  if (!creatingTask && ticketTasks.length === 0) return null;
 
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({
@@ -123,7 +98,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       enqueueSnackbar(translations["taskUpdated"][language],
         { variant: "success" });
       setEditMode((prev) => ({ ...prev, [taskId]: false }));
-      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
     }
@@ -148,7 +122,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
-      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
     }
@@ -159,7 +132,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       api.task.delete({ id })
         .then(() => {
           enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
-          fetchTasks();
         })
         .catch(() => {
           enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
@@ -171,7 +143,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     try {
       await api.task.update({ id, status: true });
       enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
-      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
     }
@@ -205,7 +176,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                   }}
                 >
                   {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
-                  {tasks.find((t) => t.id === id)?.created_for_full_name}
+                  {ticketTasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
                 {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
               </Group>
@@ -330,7 +301,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
         <Group justify="space-between">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color="green">{tasks.length}</Badge>
+            <Badge size="sm" color="green">{ticketTasks.length}</Badge>
           </Group>
           <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
             {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
@@ -339,7 +310,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
 
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs" mt="xs">
-            {tasks.map((task) => renderTaskForm(task.id))}
+            {ticketTasks.map((task) => renderTaskForm(task.id))}
             {creatingTask && renderTaskForm("new", true)}
           </Stack>
         </Collapse>
