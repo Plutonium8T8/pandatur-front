@@ -6,7 +6,7 @@ import { ChatMessages } from "./components";
 import { useApp, useFetchTicketChat } from "../../hooks";
 import { getFullName } from "../utils";
 
-const SingleChat = ({ id, onClose }) => {
+const SingleChat = ({ id, onClose, tasks = [] }) => {
   const { setTickets, messages } = useApp();
 
   const {
@@ -42,6 +42,7 @@ const SingleChat = ({ id, onClose }) => {
           messageSendersByPlatform={messageSendersByPlatform || []}
           onChangeSelectedUser={changeUser}
           loading={loading}
+          tasks={tasks}
         />
       </Flex>
 
@@ -56,9 +57,9 @@ const SingleChat = ({ id, onClose }) => {
           const clientTicketList = personalInfo.clients.map((client) =>
             client.id === payload.id
               ? {
-                  ...client,
-                  ...values,
-                }
+                ...client,
+                ...values,
+              }
               : client,
           );
 
@@ -73,10 +74,10 @@ const SingleChat = ({ id, onClose }) => {
               return client.payload.id === payload.id &&
                 client.payload.platform === payload.platform
                 ? {
-                    ...client,
-                    label: `${identifier} - ${payload.platform}`,
-                    payload: { ...payload, ...values },
-                  }
+                  ...client,
+                  label: `${identifier} - ${payload.platform}`,
+                  payload: { ...payload, ...values },
+                }
                 : client;
             }),
           );

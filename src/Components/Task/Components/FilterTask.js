@@ -26,13 +26,13 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    if (!filters.created_for || filters.created_for.length === 0) {
-      const defaultFilters = { ...filters, created_for: [String(userId)] };
-      setLocalFilters(defaultFilters);
-      onApply(defaultFilters);
-    } else {
-      setLocalFilters(filters);
-    }
+    const defaultFilters = {
+      ...filters,
+      created_for: filters.created_for?.length ? filters.created_for : [String(userId)],
+      status: filters.status === undefined ? false : filters.status,
+    };
+    setLocalFilters(defaultFilters);
+    onApply(defaultFilters);
   }, [userId]);
 
   useEffect(() => {
@@ -56,8 +56,12 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   };
 
   const handleClear = () => {
-    const cleared = { created_for: [String(userId)] };
-    setLocalFilters(cleared);
+    const defaultFilters = {
+      created_for: [String(userId)],
+      status: false,
+    };
+    setLocalFilters(defaultFilters);
+    onApply(defaultFilters);
   };
 
   const cleanFilters = (filters) => {
