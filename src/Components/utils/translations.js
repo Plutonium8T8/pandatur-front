@@ -1561,7 +1561,7 @@ export const translations = {
   },
   Users: {
     RO: "Users",
-    RU: "Юзеры",
+    RU: "Пользователи",
   },
   "Căutare utilizator": {
     RO: "Căutare utilizator",
