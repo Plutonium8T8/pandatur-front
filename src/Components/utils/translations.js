@@ -1560,7 +1560,7 @@ export const translations = {
     RU: "Пользователь активирован",
   },
   Users: {
-    RO: "Users",
+    RO: "Utilizatori",
     RU: "Пользователи",
   },
   "Căutare utilizator": {
