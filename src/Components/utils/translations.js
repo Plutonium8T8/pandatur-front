@@ -2259,4 +2259,8 @@ export const translations = {
     RO: "Marketing",
     RU: "Маркетинг",
   },
+  noDate: {
+    RO: "Nu există date",
+    RU: "Нет данных",
+  },
 };

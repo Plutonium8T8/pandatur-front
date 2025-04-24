@@ -229,7 +229,7 @@ export const renderFile = ({
           justify="center"
           gap="md"
         >
-          <Empty />
+          <Empty title={getLanguageByKey("Fără date media")} />
           {renderAddAttachments?.()}
         </Flex>
       )}
@@ -277,7 +277,7 @@ export const renderMedia = ({
           justify="center"
           gap="md"
         >
-          <Empty />
+          <Empty title={getLanguageByKey("Fără date media")} />
           {renderAddAttachments?.()}
         </Flex>
       )}
@@ -329,7 +329,7 @@ export const renderCall = ({
           justify="center"
           gap="md"
         >
-          <Empty />
+          <Empty title={getLanguageByKey("Fără date media")} />
           {renderAddAttachments?.()}
         </Flex>
       )}
