@@ -166,6 +166,7 @@ const TaskListOverlay = ({
     try {
       await api.task.update({ id, status: true });
       enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
+      fetchTasks();
     } catch (err) {
       enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
     }
