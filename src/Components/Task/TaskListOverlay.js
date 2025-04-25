@@ -253,6 +253,8 @@ const TaskListOverlay = ({
               placeholder={translations["Autor"][language]}
               disabled={!isEditing}
               required
+              searchable
+              clearable
             />
             <Select
               data={users}
@@ -263,6 +265,8 @@ const TaskListOverlay = ({
               disabled={!isEditing}
               placeholder={translations["Responsabil"][language]}
               required
+              searchable
+              clearable
             />
           </Group>
 
