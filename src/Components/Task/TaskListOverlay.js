@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   Paper,
   Text,
@@ -38,10 +38,9 @@ const language = localStorage.getItem("language") || "RO";
 const TaskListOverlay = ({
   ticketId,
   creatingTask,
-  setCreatingTask,
-  tasks = [],
-  fetchTasks,
+  setCreatingTask
 }) => {
+  const [tasks, setTasks] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
   const [taskEdits, setTaskEdits] = useState({});
@@ -55,14 +54,38 @@ const TaskListOverlay = ({
     subTitle: translations["Confirmare ștergere"][language],
   });
 
-  const ticketTasks = useMemo(() => {
-    return tasks
-      .filter((t) => t.ticket_id === ticketId)
-      .sort((a, b) =>
-        dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
-        dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
-      );
-  }, [tasks, ticketId]);
+  const fetchTasks = async () => {
+    if (!ticketId) return setTasks([]);
+    try {
+      const res = await api.task.getTaskByTicket(ticketId);
+      const taskArray = (Array.isArray(res?.data) ? res.data : res)
+        .filter(t => t.ticket_id === ticketId && !t.status)
+        .sort((a, b) =>
+          dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
+          dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
+        );
+      setTasks(taskArray);
+
+      const edits = {};
+      taskArray.forEach((t) => {
+        edits[t.id] = {
+          task_type: t.task_type,
+          description: t.description || "",
+          scheduled_time: parseDate(t.scheduled_time),
+          created_for: t.created_for?.toString(),
+          created_by: t.created_by?.toString() || "",
+        };
+      });
+      setTaskEdits((prev) => ({ ...edits, ...(prev.new ? { new: prev.new } : {}) }));
+    } catch (error) {
+      console.error("Error loading tasks", error);
+      setTasks([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [ticketId]);
 
   useEffect(() => {
     if (creatingTask) {
@@ -71,8 +94,8 @@ const TaskListOverlay = ({
         ...prev,
         new: {
           task_type: "",
-          scheduled_time: null,
-          created_for: "",
+          scheduled_time: dayjs().add(1, "day").toDate(),
+          created_for: userId?.toString() || "",
           created_by: userId?.toString() || "",
           description: "",
         },
@@ -85,7 +108,7 @@ const TaskListOverlay = ({
       const preservedNew = prev.new;
 
       const updated = {};
-      ticketTasks.forEach((t) => {
+      tasks.forEach((t) => {
         updated[t.id] = {
           task_type: t.task_type,
           scheduled_time: parseDate(t.scheduled_time),
@@ -100,9 +123,9 @@ const TaskListOverlay = ({
         ...(preservedNew ? { new: preservedNew } : {}),
       };
     });
-  }, [ticketTasks]);
+  }, [tasks]);
 
-  if (!creatingTask && ticketTasks.length === 0) return null;
+  if (!creatingTask && tasks.length === 0) return null;
 
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({
@@ -219,7 +242,7 @@ const TaskListOverlay = ({
                   }}
                 >
                   {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
-                  {ticketTasks.find((t) => t.id === id)?.created_for_full_name}
+                  {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
                 {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
               </Group>
@@ -321,7 +344,7 @@ const TaskListOverlay = ({
                   size="xs"
                   variant="light"
                   onClick={() => {
-                    const original = ticketTasks.find((t) => t.id === id);
+                    const original = tasks.find((t) => t.id === id);
                     if (original) {
                       setOriginalTaskValues((prev) => ({
                         ...prev,
@@ -363,7 +386,7 @@ const TaskListOverlay = ({
         <Group justify="space-between">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color="green">{ticketTasks.length}</Badge>
+            <Badge size="sm" color="green">{tasks.length}</Badge>
           </Group>
           <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
             {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
@@ -372,7 +395,7 @@ const TaskListOverlay = ({
 
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs" mt="xs">
-            {ticketTasks.map((task) => renderTaskForm(task.id))}
+            {tasks.map((task) => renderTaskForm(task.id))}
             {creatingTask && renderTaskForm("new", true)}
           </Stack>
         </Collapse>

@@ -13,7 +13,7 @@ export const TaskPage = () => {
 
   return (
     <>
-      <TaskComponent tasks={tasks} setTasks={setTasks} setFetchTasksRef={(fn) => (window.fetchTasksGlobal = fn)} />
+      <TaskComponent tasks={tasks} setTasks={setTasks} />
       <MantineModal
         fullScreen
         open={!!ticketId}
@@ -23,7 +23,7 @@ export const TaskPage = () => {
         style={{ padding: 0 }}
         height="100%"
       >
-        <SingleChat id={ticketId} onClose={handleCloseModal} tasks={tasks} fetchTasks={window.fetchTasksGlobal} />
+        <SingleChat id={ticketId} onClose={handleCloseModal} tasks={tasks} />
       </MantineModal>
     </>
   );

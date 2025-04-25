@@ -42,7 +42,6 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
           messageSendersByPlatform={messageSendersByPlatform || []}
           onChangeSelectedUser={changeUser}
           loading={loading}
-          tasks={tasks}
         />
       </Flex>
 
