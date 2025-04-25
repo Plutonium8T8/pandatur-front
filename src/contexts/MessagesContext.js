@@ -1,5 +1,6 @@
 import React, { createContext, useEffect } from "react";
 import { useMessages, useSocket, useUser } from "@hooks";
+import { TYPE_SOCKET_EVENTS } from "@app-constants";
 
 export const MessagesContext = createContext();
 
@@ -10,7 +11,7 @@ export const MessagesProvider = ({ children }) => {
 
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
-      case "message": {
+      case TYPE_SOCKET_EVENTS.MESSAGE: {
         console.log("New message from WebSocket:", message.data);
 
         const senderId = message.data.sender_id;

@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { api } from "@api";
+import { TYPE_SOCKET_EVENTS } from "@app-constants";
 
 export const SocketContext = createContext();
 
@@ -42,7 +43,7 @@ export const SocketProvider = ({ children }) => {
         });
 
         const socketMessage = JSON.stringify({
-          type: "connect",
+          type: TYPE_SOCKET_EVENTS.CONNECT,
           data: { ticket_id: ids.data.map(({ id }) => id) },
         });
 
@@ -61,10 +62,10 @@ export const SocketProvider = ({ children }) => {
     const socketInstance = socketRef.current;
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
-        type: "seen",
+        type: TYPE_SOCKET_EVENTS.SEEN,
         data: {
           ticket_id: ticketId,
-          sender_id: Number(userId),
+          sender_id: userId,
         },
       };
       socketInstance.send(JSON.stringify(readMessageData));

@@ -24,3 +24,10 @@ export const PLATFORMS = {
   TELEGRAM: "telegram",
   FACEBOOK: "facebook",
 };
+
+export const TYPE_SOCKET_EVENTS = {
+  SEEN: "seen",
+  MESSAGE: "message",
+  TICKET: "ticket",
+  CONNECT: "connect",
+};
