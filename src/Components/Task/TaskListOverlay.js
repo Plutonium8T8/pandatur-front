@@ -239,6 +239,16 @@ const TaskListOverlay = ({
     return "gray";
   };
 
+  const getDeadlineColor = (date) => {
+    const parsedDate = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (parsedDate < today) return "red";
+    if (parsedDate.toDateString() === today.toDateString()) return "green";
+    return "black";
+  };
+
   const renderTaskForm = (id, isNew = false) => {
     const isEditing = isNew || editMode[id];
 
@@ -258,7 +268,7 @@ const TaskListOverlay = ({
                 <Text
                   size="sm"
                   style={{
-                    color: new Date(taskEdits[id]?.scheduled_time) < new Date() ? "red" : undefined,
+                    color: getDeadlineColor(taskEdits[id]?.scheduled_time),
                   }}
                 >
                   {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
