@@ -222,6 +222,24 @@ const TaskListOverlay = ({
     setEditMode((prev) => ({ ...prev, [id]: false }));
   };
 
+  const getBadgeColor = () => {
+    const today = dayjs().startOf("day");
+
+    const hasOverdue = tasks.some((task) =>
+      dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").isBefore(today)
+    );
+
+    if (hasOverdue) return "red";
+
+    const hasToday = tasks.some((task) =>
+      dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").isSame(today, "day")
+    );
+
+    if (hasToday) return "green";
+
+    return "gray";
+  };
+
   const renderTaskForm = (id, isNew = false) => {
     const isEditing = isNew || editMode[id];
 
@@ -387,7 +405,9 @@ const TaskListOverlay = ({
         <Group justify="space-between">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color="green">{tasks.length}</Badge>
+            <Badge size="sm" color={getBadgeColor()}>
+              {tasks.length}
+            </Badge>
           </Group>
           <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
             {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
