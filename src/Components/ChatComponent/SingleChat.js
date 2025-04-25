@@ -1,13 +1,15 @@
 import { FaArrowLeft } from "react-icons/fa";
 import React, { useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useFetchTicketChat } from "@hooks";
+import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
 import { getFullName } from "@utils";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 
 const SingleChat = ({ id, onClose, tasks = [] }) => {
-  const { setTickets, messages } = useApp();
+  const { setTickets } = useApp();
+
+  const { getUserMessages } = useMessagesContext();
 
   const {
     personalInfo,
@@ -69,7 +71,7 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
 
   useEffect(() => {
     if (id) {
-      messages.getUserMessages(Number(id));
+      getUserMessages(Number(id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -95,9 +97,8 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
       </Flex>
 
       <ChatExtraInfo
+        id={id}
         selectedUser={selectedUser}
-        ticketId={id}
-        selectTicketId={id}
         updatedTicket={personalInfo}
         onUpdatePersonalInfo={(payload, values) =>
           updatePersonInfo(payload, values)

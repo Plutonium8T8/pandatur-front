@@ -19,10 +19,9 @@ import {
 import { PersonalData4ClientForm, Merge, Media } from "./components";
 
 const ChatExtraInfo = ({
-  selectTicketId,
+  id,
   onUpdatePersonalInfo,
   updatedTicket,
-  ticketId,
   selectedUser,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
@@ -34,7 +33,7 @@ const ChatExtraInfo = ({
 
   const { setTickets } = useApp();
   const { getUserMessages, mediaFiles } = useMessagesContext();
-  const { getTicket } = useFetchTicketChat(ticketId);
+  const { getTicket } = useFetchTicketChat(id);
 
   const {
     form,
@@ -44,10 +43,10 @@ const ChatExtraInfo = ({
   } = useFormTicket();
 
   useEffect(() => {
-    if (selectTicketId) {
-      fetchTicketExtraInfo(selectTicketId);
+    if (id) {
+      fetchTicketExtraInfo(id);
     }
-  }, [selectTicketId]);
+  }, [id]);
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
@@ -63,7 +62,7 @@ const ChatExtraInfo = ({
     setIsLoadingGeneral(true);
     try {
       await api.tickets.updateById({
-        id: [selectTicketId],
+        id: [id],
         ...values,
       });
       enqueueSnackbar(
@@ -117,7 +116,7 @@ const ChatExtraInfo = ({
    */
   const fetchTicketLight = async (mergedTicketId) => {
     try {
-      await Promise.all([getTicket(), getUserMessages(ticketId)]);
+      await Promise.all([getTicket(), getUserMessages(id)]);
       setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -126,20 +125,18 @@ const ChatExtraInfo = ({
 
   /**
    *
-   * @param {number} id
+   * @param {number} clientId
    * @param {() => void} resetField
    */
-  const mergeClientsData = async (id, resetField) => {
-    const ticketOld = selectTicketId;
-
+  const mergeClientsData = async (clientId, resetField) => {
     setIsLoadingCombineLead(true);
     try {
       await api.tickets.merge({
-        ticket_old: ticketOld,
-        ticket_new: id,
+        ticket_old: Number(id),
+        ticket_new: Number(clientId),
       });
 
-      await fetchTicketLight(id);
+      await fetchTicketLight(clientId);
 
       resetField();
 
@@ -184,7 +181,7 @@ const ChatExtraInfo = ({
   const saveTicketExtraDate = async (values) => {
     setIsLoadingInfoTicket(true);
     try {
-      await api.tickets.ticket.create(selectTicketId, values);
+      await api.tickets.ticket.create(id, values);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
@@ -283,7 +280,7 @@ const ChatExtraInfo = ({
             <Merge
               buttonText={getLanguageByKey("combineTickets")}
               loading={isLoadingCombineLead}
-              value={ticketId || ""}
+              value={id || ""}
               onSubmit={(values, resetField) =>
                 mergeClientsData(values, resetField)
               }
@@ -360,7 +357,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="media" h="100%">
           <Box pb="md" pr="md" pl="md" h="100%">
-            <Media attachments={mediaFiles} id={selectTicketId} />
+            <Media attachments={mediaFiles} id={id} />
           </Box>
         </Tabs.Panel>
 

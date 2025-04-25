@@ -114,8 +114,7 @@ export const Chat = () => {
         {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
-            ticketId={ticketId}
-            selectTicketId={ticketIdToNumber}
+            id={ticketId}
             onUpdatePersonalInfo={(payload, values) =>
               updatePersonInfo(payload, values)
             }
