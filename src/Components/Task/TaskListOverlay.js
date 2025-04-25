@@ -83,9 +83,6 @@ const TaskListOverlay = ({
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [ticketId]);
 
   useEffect(() => {
     if (creatingTask) {
@@ -102,6 +99,12 @@ const TaskListOverlay = ({
       }));
     }
   }, [creatingTask, userId]);
+
+  useEffect(() => {
+    setCreatingTask(false);
+    setListCollapsed(true);
+    fetchTasks();
+  }, [ticketId]);
 
   useEffect(() => {
     setTaskEdits((prev) => {
@@ -291,18 +294,16 @@ const TaskListOverlay = ({
               searchable
               clearable
             />
+            <TextInput
+              label={translations["AddResult"][language]}
+              placeholder={translations["AddResult"][language]}
+              value={taskEdits[id]?.description || ""}
+              onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
+              w="100%"
+            />
           </Group>
 
-          <TextInput
-            label={translations["AddResult"][language]}
-            placeholder={translations["AddResult"][language]}
-            value={taskEdits[id]?.description || ""}
-            onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
-            mb="xs"
-            mt="xs"
-          />
-
-          <Group gap="xs" mt="xs">
+          <Group gap="xs" mt="md">
             {isNew ? (
               <>
                 <Button size="xs" onClick={handleCreateTask}>
