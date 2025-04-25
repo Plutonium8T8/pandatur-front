@@ -239,7 +239,7 @@ const UserList = ({
       title: translations["Status"][language],
       dataIndex: "status",
       key: "status",
-      width: 150,
+      width: 110,
       render: (status) =>
         status
           ? translations["Activ"][language]
@@ -250,14 +250,14 @@ const UserList = ({
       title: "Sipuni ID",
       dataIndex: "sipuni_id",
       key: "sipuni_id",
-      width: 150,
+      width: 120,
       render: (sipuni_id) => <Flex justify="center">{sipuni_id || "—"}</Flex>,
     },
     {
       title: translations["Acțiune"][language],
       dataIndex: "action",
       key: "action",
-      width: 150,
+      width: 100,
       align: "center",
       render: (_, row) => (
         <Menu shadow="md" width={200} position="bottom-end">
