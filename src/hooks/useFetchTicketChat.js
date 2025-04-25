@@ -35,7 +35,7 @@ export const useFetchTicketChat = (id) => {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
-  const {} = useMessagesContext();
+  const { messages } = useMessagesContext();
 
   const changeUser = (userId, platform) => {
     const user = messageSendersByPlatform?.find(
@@ -46,8 +46,7 @@ export const useFetchTicketChat = (id) => {
   };
 
   const getLightTicketInfo = async () => {
-    // const { lastMessage } = messages;
-    const { lastMessage } = {};
+    const { lastMessage } = messages;
 
     setLoading(true);
     try {

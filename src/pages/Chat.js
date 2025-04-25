@@ -12,7 +12,7 @@ import { LoadingOverlay } from "@components";
 export const Chat = () => {
   const { ticketId } = useParams();
 
-  const { spinnerTickets } = useApp();
+  const { spinnerTickets, setTickets } = useApp();
   const { technicians } = useGetTechniciansList();
 
   const [isChatListVisible, setIsChatListVisible] = useState(true);
@@ -29,6 +29,53 @@ export const Chat = () => {
     setMessageSendersByPlatform,
     setSelectedUser,
   } = useFetchTicketChat(ticketId);
+
+  const updatePersonInfo = (payload, values) => {
+    const identifier =
+      getFullName(values.name, values.surname) || `#${payload.id}`;
+    const clientTicketList = personalInfo.clients.map((client) =>
+      client.id === payload.id
+        ? {
+            ...client,
+            ...values,
+          }
+        : client,
+    );
+
+    setSelectedUser((prev) => ({
+      ...prev,
+      label: identifier,
+      payload: { ...prev.payload, ...values },
+    }));
+
+    setMessageSendersByPlatform((prev) =>
+      prev.map((client) => {
+        return client.payload.id === payload.id &&
+          client.payload.platform === payload.platform
+          ? {
+              ...client,
+              label: `${identifier} - ${payload.platform}`,
+              payload: { ...payload, ...values },
+            }
+          : client;
+      }),
+    );
+
+    setTickets((prev) =>
+      prev.map((ticket) =>
+        ticket.id === personalInfo.id
+          ? { ...ticket, ...personalInfo, clients: clientTicketList }
+          : ticket,
+      ),
+    );
+
+    setPersonalInfo((prev) => {
+      return {
+        ...prev,
+        clients: clientTicketList,
+      };
+    });
+  };
 
   if (spinnerTickets) {
     return <LoadingOverlay />;
@@ -69,55 +116,10 @@ export const Chat = () => {
             selectedUser={selectedUser}
             ticketId={ticketId}
             selectTicketId={ticketIdToNumber}
-            onUpdatePersonalInfo={(payload, values) => {
-              const identifier =
-                getFullName(values.name, values.surname) || `#${payload.id}`;
-              const clientTicketList = personalInfo.clients.map((client) =>
-                client.id === payload.id
-                  ? {
-                      ...client,
-                      ...values,
-                    }
-                  : client,
-              );
-
-              setSelectedUser((prev) => ({
-                ...prev,
-                label: identifier,
-                payload: { ...prev.payload, ...values },
-              }));
-
-              setMessageSendersByPlatform((prev) =>
-                prev.map((client) => {
-                  return client.payload.id === payload.id &&
-                    client.payload.platform === payload.platform
-                    ? {
-                        ...client,
-                        label: `${identifier} - ${payload.platform}`,
-                        payload: { ...payload, ...values },
-                      }
-                    : client;
-                }),
-              );
-
-              // setTickets((prev) =>
-              //   prev.map((ticket) =>
-              //     ticket.id === personalInfo.id
-              //       ? { ...ticket, ...personalInfo, clients: clientTicketList }
-              //       : ticket,
-              //   ),
-              // );
-
-              setPersonalInfo((prev) => {
-                return {
-                  ...prev,
-                  clients: clientTicketList,
-                };
-              });
-            }}
+            onUpdatePersonalInfo={(payload, values) =>
+              updatePersonInfo(payload, values)
+            }
             updatedTicket={personalInfo}
-            // mediaFiles={messages?.mediaFiles}
-            mediaFiles={[]}
           />
         )}
       </Flex>

@@ -23,9 +23,7 @@ const ChatExtraInfo = ({
   onUpdatePersonalInfo,
   updatedTicket,
   ticketId,
-  mediaFiles,
   selectedUser,
-  // fetchTicketLight,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -35,7 +33,7 @@ const ChatExtraInfo = ({
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
 
   const { setTickets } = useApp();
-  const { getUserMessages } = useMessagesContext();
+  const { getUserMessages, mediaFiles } = useMessagesContext();
   const { getTicket } = useFetchTicketChat(ticketId);
 
   const {

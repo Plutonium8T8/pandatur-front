@@ -1,20 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
-import {
-  useApp,
-  useUser,
-  useFetchTicketChat,
-  useMessages,
-  useMessagesContext,
-} from "@hooks";
+import { useUser, useFetchTicketChat, useMessagesContext } from "@hooks";
 import { api } from "@api";
+import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
 import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "../ChatInput";
 import { GroupedMessages } from "../GroupedMessages";
-import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {
@@ -27,7 +21,6 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
 
 export const ChatMessages = ({
   id,
-  // selectTicketId,
   selectedClient,
   personalInfo,
   messageSendersByPlatform,
@@ -40,12 +33,11 @@ export const ChatMessages = ({
 
   const {
     setMessages,
-    messages,
+
     getUserMessages,
     error,
     loading: messagesLoading,
   } = useMessagesContext();
-  // const { messages } = useApp();
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
@@ -208,7 +200,6 @@ export const ChatMessages = ({
             loading={loading}
             id={id}
             clientList={messageSendersByPlatform}
-            // currentClient={selectedUser}
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {
