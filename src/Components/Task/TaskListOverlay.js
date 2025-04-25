@@ -83,7 +83,6 @@ const TaskListOverlay = ({
     }
   };
 
-
   useEffect(() => {
     if (creatingTask) {
       setListCollapsed(false);
