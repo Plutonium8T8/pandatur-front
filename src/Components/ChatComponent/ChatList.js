@@ -12,12 +12,12 @@ import {
   Badge,
 } from "@mantine/core";
 import { useSnackbar } from "notistack";
-import { getLanguageByKey, showServerError } from "../utils";
-import { useUser, useApp, useDOMElementHeight } from "../../hooks";
+import { getLanguageByKey, showServerError } from "@utils";
+import { useUser, useApp, useDOMElementHeight } from "@hooks";
+import { api } from "@api";
 import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { api } from "../../api";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -93,7 +93,7 @@ const ChatList = ({ id }) => {
         });
       }
     }
-  }, [id, tickets]);
+  }, [id]);
 
   // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
@@ -139,7 +139,7 @@ const ChatList = ({ id }) => {
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
 
-    return <ChatListItem chat={ticket} style={style} id={Number(id)} />;
+    return <ChatListItem chat={ticket} style={style} id={id} />;
   };
 
   return (

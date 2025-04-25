@@ -126,6 +126,7 @@ export const ChatMessages = ({
   // }, [messages, selectTicketId]);
 
   // useEffect(() => {
+  //   console.log("re-render ");
   //   const container = messageContainerRef.current;
   //   if (container) {
   //     container.addEventListener("scroll", handleScroll);
@@ -135,7 +136,7 @@ export const ChatMessages = ({
   //       container.removeEventListener("scroll", handleScroll);
   //     }
   //   };
-  // }, []);
+  // }, [id]);
 
   const renderMessagesContent = () => {
     if (error) {

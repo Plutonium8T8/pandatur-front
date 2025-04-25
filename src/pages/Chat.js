@@ -84,7 +84,7 @@ export const Chat = () => {
   return (
     <Flex h="100%" className="chat-wrapper">
       <Flex w="100%" h="100%" className="chat-container">
-        {isChatListVisible && <ChatList selectTicketId={ticketIdToNumber} />}
+        {isChatListVisible && <ChatList id={ticketIdToNumber} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>

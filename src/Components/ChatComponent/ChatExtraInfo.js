@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
 import { getLanguageByKey, showServerError } from "@utils";
-import { PersonalData4ClientForm, Merge, Media } from "./components";
 import { api } from "@api";
 import {
   useFormTicket,
@@ -17,6 +16,7 @@ import {
   GeneralForm,
   TicketInfoForm,
 } from "../TicketForms";
+import { PersonalData4ClientForm, Merge, Media } from "./components";
 
 const ChatExtraInfo = ({
   selectTicketId,
