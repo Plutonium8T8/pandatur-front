@@ -57,9 +57,24 @@ export const SocketProvider = ({ children }) => {
     }
   }, []);
 
+  const seenMessages = (ticketId, userId) => {
+    const socketInstance = socketRef.current;
+    if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
+      const readMessageData = {
+        type: "seen",
+        data: {
+          ticket_id: ticketId,
+          sender_id: Number(userId),
+        },
+      };
+      socketInstance.send(JSON.stringify(readMessageData));
+    }
+  };
+
   const value = {
     socketRef,
     sendedValue: val,
+    seenMessages,
   };
 
   return (

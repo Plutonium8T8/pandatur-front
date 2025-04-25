@@ -99,23 +99,8 @@ export const ChatMessages = ({
       setMessageSendersByPlatform([]);
 
       getUserMessages(Number(id));
-
-      // if (!messages?.length) {
-      //   getUserMessages(Number(id));
-      // }
     }
   }, [id]);
-
-  // useEffect(() => {
-  //   if (selectTicketId) {
-  //     setSelectedUser({});
-  //     setMessageSendersByPlatform([]);
-
-  //     if (messages && !messages.list?.length) {
-  //       messages.getUserMessages(Number(selectTicketId));
-  //     }
-  //   }
-  // }, [selectTicketId]);
 
   // useEffect(() => {
   //   if (isUserAtBottom && messageContainerRef.current) {
@@ -160,7 +145,7 @@ export const ChatMessages = ({
       return (
         <GroupedMessages
           personalInfo={personalInfo}
-          selectTicketId={Number(id)}
+          id={Number(id)}
           technicians={technicians}
         />
       );

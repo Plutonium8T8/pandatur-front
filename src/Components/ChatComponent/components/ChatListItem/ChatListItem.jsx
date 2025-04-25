@@ -71,7 +71,7 @@ const MESSAGE_INDICATOR = {
 export const ChatListItem = ({ chat, style, id }) => {
   const navigate = useNavigate();
   const { markMessagesAsRead } = useApp();
-  const { socketRef } = useSocket();
+  const { seenMessages } = useSocket();
   const { userId } = useUser();
   const { getUserMessages } = useMessagesContext();
 
@@ -82,18 +82,8 @@ export const ChatListItem = ({ chat, style, id }) => {
   };
 
   const readChat = (ticketId, count) => {
-    const socketInstance = socketRef.current;
-    if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
-      const readMessageData = {
-        type: "seen",
-        data: {
-          ticket_id: ticketId,
-          sender_id: Number(userId),
-        },
-      };
-      socketInstance.send(JSON.stringify(readMessageData));
-      markMessagesAsRead(ticketId, count);
-    }
+    seenMessages(ticketId, userId);
+    markMessagesAsRead(ticketId, count);
   };
 
   return (
