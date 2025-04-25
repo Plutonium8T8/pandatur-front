@@ -2192,8 +2192,8 @@ export const translations = {
     RU: "Выберите интервал",
   },
   groupTitle: {
-    RO: "Alegeți grupa de lead-uri",
-    RU: "Выберите группу лидов",
+    RO: "Grupa de lead-uri",
+    RU: "Группа лидов",
   },
   ChoiseStatus: {
     RO: "Alege statusul",
