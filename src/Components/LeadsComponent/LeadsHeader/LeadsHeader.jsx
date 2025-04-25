@@ -96,6 +96,7 @@ export const RefLeadsHeader = forwardRef(
 
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
+                defaultValue=""
                 data={[
                   { value: "", label: getLanguageByKey("Toate") },
                   { value: "RO", label: "RO" },

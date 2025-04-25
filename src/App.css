@@ -6,8 +6,8 @@ a {
 
 .leads-container {
   margin-top: var(--leads-filter-height);
-  height: calc(100% - var(--leads-filter-height));
-  padding: 10px 20px 20px 20px;
+  height: calc(100% - calc(var(--leads-filter-height) + 10px));
+  padding-top: 10px;
 }
 
 /* Chat Page */

@@ -60,8 +60,14 @@ export const ChatInput = ({
 
     handlers.close();
 
+    const mediaType = getMediaType(file.type);
+
     if (url) {
-      setUrl({ media_url: url, media_type: getMediaType(file.type) });
+      setUrl({
+        media_url: url,
+        media_type: mediaType,
+        last_message_type: mediaType,
+      });
       setMessage(url);
     }
   };

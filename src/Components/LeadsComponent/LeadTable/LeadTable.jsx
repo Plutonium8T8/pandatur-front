@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Flex, Paper, ActionIcon, Text, Checkbox } from "@mantine/core";
+import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -358,23 +358,25 @@ export const LeadTable = ({
 
   return (
     <>
-      <RcTable
-        rowKey="id"
-        columns={rcColumn}
-        data={filteredLeads}
-        selectedRow={selectTicket}
-        bordered
-      />
+      <Box px="20px">
+        <RcTable
+          rowKey="id"
+          columns={rcColumn}
+          data={filteredLeads}
+          selectedRow={selectTicket}
+          bordered
+        />
 
-      {!!totalLeadsPages && (
-        <Flex p="20" justify="center" className="leads-table-pagination">
-          <Pagination
-            totalPages={totalLeadsPages}
-            currentPage={currentPage}
-            onPaginationChange={onChangePagination}
-          />
-        </Flex>
-      )}
+        {!!totalLeadsPages && (
+          <Flex p="20" justify="center" className="leads-table-pagination">
+            <Pagination
+              totalPages={totalLeadsPages}
+              currentPage={currentPage}
+              onPaginationChange={onChangePagination}
+            />
+          </Flex>
+        )}
+      </Box>
 
       <MantineModal
         centered

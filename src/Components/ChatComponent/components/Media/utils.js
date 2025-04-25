@@ -2,21 +2,16 @@ import { Link } from "react-router-dom";
 import { GoTrash } from "react-icons/go";
 import { FaRegFileLines } from "react-icons/fa6";
 import { MdCall } from "react-icons/md";
-import {
-  Flex,
-  Image,
-  Box,
-  ActionIcon,
-  Text,
-  Divider,
-  Grid,
-} from "@mantine/core";
+import { PiImageBrokenThin } from "react-icons/pi";
+import { Flex, Box, ActionIcon, Text, Divider, Grid } from "@mantine/core";
 import { FALLBACK_IMAGE, MEDIA_TYPE, DD_MM_YYYY, HH_mm } from "@app-constants";
 import { getLanguageByKey, parseServerDate } from "@utils";
 import { Audio } from "../../../Audio";
 import { TimeClient } from "./TimeClient";
 import { Empty } from "../../../Empty";
+import { Image } from "@components";
 import "./Media.css";
+
 /**
  * @typedef {Object} Params
  * @property {string} type
@@ -41,41 +36,58 @@ export const renderMediaContent = ({
 }) => {
   const MEDIA_CONTENT = {
     [MEDIA_TYPE.IMAGE]: (
-      <Box
-        w="100%"
-        h="100%"
-        className="media-wrapper media-files"
-        pos="relative"
-      >
-        {shouldDelete && (
+      <Image
+        url={message}
+        renderFallbackImage={() => (
           <Box
-            className="media-wrapper-delete-btn"
-            bg="white"
-            right="4px"
-            top="4px"
-            pos="absolute"
+            w="100%"
+            h="100%"
+            style={{ border: "1px solid var(--mantine-color-red-3)" }}
+            pos="relative"
           >
-            <ActionIcon
-              size="md"
-              onClick={() => deleteAttachment(id)}
-              variant="danger"
-            >
-              <GoTrash size={14} />
-            </ActionIcon>
+            <Flex c="red" align="center" justify="center" h="100px">
+              <PiImageBrokenThin size={32} />
+            </Flex>
           </Box>
         )}
-        <Image
-          fit="contain"
-          h="100px"
-          radius="md"
-          className="pointer"
-          src={message}
-          fallbackSrc={FALLBACK_IMAGE}
-          onClick={() => {
-            window.open(message, "_blank");
-          }}
-        />
-      </Box>
+        renderImage={() => (
+          <Box
+            w="100%"
+            h="100%"
+            className="media-wrapper media-files"
+            pos="relative"
+          >
+            {shouldDelete && (
+              <Box
+                className="media-wrapper-delete-btn"
+                bg="white"
+                right="4px"
+                top="4px"
+                pos="absolute"
+              >
+                <ActionIcon
+                  size="md"
+                  onClick={() => deleteAttachment(id)}
+                  variant="danger"
+                >
+                  <GoTrash size={14} />
+                </ActionIcon>
+              </Box>
+            )}
+            <Image
+              fit="contain"
+              h="100px"
+              radius="md"
+              className="pointer"
+              src={message}
+              fallbackSrc={FALLBACK_IMAGE}
+              onClick={() => {
+                window.open(message, "_blank");
+              }}
+            />
+          </Box>
+        )}
+      />
     ),
     [MEDIA_TYPE.VIDEO]: (
       <Flex className="media-wrapper" pos="relative">

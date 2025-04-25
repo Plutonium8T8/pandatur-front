@@ -249,6 +249,7 @@ export const AppProvider = ({ children }) => {
             ticket.id === ticket_id
               ? {
                   ...ticket,
+                  last_message_type: message.data.mtype,
                   last_message: msgText,
                   time_sent: time_sent,
                   unseen_count:
@@ -256,7 +257,10 @@ export const AppProvider = ({ children }) => {
                       ? 0
                       : ticket.unseen_count + (sender_id !== userId ? 1 : 0),
                 }
-              : ticket,
+              : {
+                  ...ticket,
+                  last_message_type: message.data.mtype,
+                },
           ),
         );
 

@@ -11,7 +11,7 @@ export const Call = ({ time, from, to, name, src }) => {
   const isFromTo = from && to;
 
   return (
-    <Box p="xs" mx="auto" className="call-message">
+    <Box maw="700px" p="xs" mx="auto" className="call-message">
       <Flex w="100%" gap="8" justify="space-between">
         <Flex gap="12" align="center">
           <MdCall size="36" />
@@ -20,8 +20,12 @@ export const Call = ({ time, from, to, name, src }) => {
 
           {isFromTo && (
             <Box>
-              <Flex gap="4">
-                <Text size="sm" c={colors.gray[7]}>
+              <Flex wrap="wrap" gap="4">
+                <Text
+                  style={{ whiteSpace: "nowrap" }}
+                  size="sm"
+                  c={colors.gray[7]}
+                >
                   {getLanguageByKey("callFrom")}:
                 </Text>
                 <Text size="sm" c="black">

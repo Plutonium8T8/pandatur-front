@@ -13,7 +13,7 @@ export const WorkflowColumns = ({
   const { technicians } = useGetTechniciansList();
 
   return (
-    <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll">
+    <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll" px="20px">
       {workflowOptions
         .filter((workflow) => selectedWorkflow.includes(workflow))
         .map((workflow) => (
