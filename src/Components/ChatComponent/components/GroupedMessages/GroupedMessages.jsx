@@ -1,14 +1,14 @@
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useCallback } from "react";
-import { useUser, useApp } from "../../../../hooks";
-import { DD_MM_YYYY } from "../../../../app-constants";
+import { useUser, useMessagesContext } from "@hooks";
+import { DD_MM_YYYY } from "@app-constants";
 import { SendedMessage, ReceivedMessage } from "../Message";
 import {
   parseServerDate,
   getFullName,
   getLanguageByKey,
   parseDate,
-} from "../../../utils";
+} from "@utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
@@ -19,7 +19,7 @@ export const GroupedMessages = ({
   technicians,
 }) => {
   const { userId } = useUser();
-  const { messages } = useApp();
+  const { messages } = useMessagesContext();
 
   const getTechnician = useCallback(
     (id) => {
@@ -30,8 +30,7 @@ export const GroupedMessages = ({
     [technicians],
   );
 
-  // TODO: Please refactor me
-  const sortedMessages = messages.list
+  const sortedMessages = messages
     .filter((msg) => msg.ticket_id === selectTicketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
 

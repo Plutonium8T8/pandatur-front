@@ -37,7 +37,8 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
       <Flex w="70%">
         <ChatMessages
           selectedClient={selectedUser}
-          selectTicketId={id ? Number(id) : undefined}
+          // selectTicketId={id ? Number(id) : undefined}
+          id={id}
           personalInfo={personalInfo}
           messageSendersByPlatform={messageSendersByPlatform || []}
           onChangeSelectedUser={changeUser}
@@ -57,9 +58,9 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
           const clientTicketList = personalInfo.clients.map((client) =>
             client.id === payload.id
               ? {
-                ...client,
-                ...values,
-              }
+                  ...client,
+                  ...values,
+                }
               : client,
           );
 
@@ -74,10 +75,10 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
               return client.payload.id === payload.id &&
                 client.payload.platform === payload.platform
                 ? {
-                  ...client,
-                  label: `${identifier} - ${payload.platform}`,
-                  payload: { ...payload, ...values },
-                }
+                    ...client,
+                    label: `${identifier} - ${payload.platform}`,
+                    payload: { ...payload, ...values },
+                  }
                 : client;
             }),
           );

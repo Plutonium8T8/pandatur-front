@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
-import { getLanguageByKey, showServerError } from "../utils";
+import { getLanguageByKey, showServerError } from "@utils";
 import { PersonalData4ClientForm, Merge, Media } from "./components";
-import { api } from "../../api";
+import { api } from "@api";
+import {
+  useFormTicket,
+  useApp,
+  useFetchTicketChat,
+  useMessagesContext,
+} from "@hooks";
 import {
   ContractForm,
   QualityControlForm,
@@ -11,7 +17,6 @@ import {
   GeneralForm,
   TicketInfoForm,
 } from "../TicketForms";
-import { useFormTicket } from "../../hooks";
 
 const ChatExtraInfo = ({
   selectTicketId,
@@ -20,7 +25,7 @@ const ChatExtraInfo = ({
   ticketId,
   mediaFiles,
   selectedUser,
-  fetchTicketLight,
+  // fetchTicketLight,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -28,6 +33,10 @@ const ChatExtraInfo = ({
   const [isLoadingCombineLead, setIsLoadingCombineLead] = useState(false);
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
+
+  const { setTickets } = useApp();
+  const { getUserMessages } = useMessagesContext();
+  const { getTicket } = useFetchTicketChat(ticketId);
 
   const {
     form,
@@ -101,6 +110,19 @@ const ChatExtraInfo = ({
       });
     } finally {
       setIsLoadingPersonalDate(false);
+    }
+  };
+
+  /**
+   *
+   * @param {number} mergedTicketId
+   */
+  const fetchTicketLight = async (mergedTicketId) => {
+    try {
+      await Promise.all([getTicket(), getUserMessages(ticketId)]);
+      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
@@ -340,7 +362,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="media" h="100%">
           <Box pb="md" pr="md" pl="md" h="100%">
-            <Media messages={mediaFiles} id={selectTicketId} />
+            <Media attachments={mediaFiles} id={selectTicketId} />
           </Box>
         </Tabs.Panel>
 

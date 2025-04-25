@@ -1,14 +1,20 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
-import { useApp, useUser } from "../../../../hooks";
-import { api } from "../../../../api";
-import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
+import {
+  useApp,
+  useUser,
+  useFetchTicketChat,
+  useMessages,
+  useMessagesContext,
+} from "@hooks";
+import { api } from "@api";
+import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "../../../Spin";
 import { ChatInput } from "../ChatInput";
 import { GroupedMessages } from "../GroupedMessages";
-import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "../../../../app-constants";
+import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {
@@ -20,7 +26,8 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
 };
 
 export const ChatMessages = ({
-  selectTicketId,
+  id,
+  // selectTicketId,
   selectedClient,
   personalInfo,
   messageSendersByPlatform,
@@ -30,15 +37,34 @@ export const ChatMessages = ({
   tasks = [],
 }) => {
   const { userId } = useUser();
-  const { messages } = useApp();
+
+  const {
+    setMessages,
+    messages,
+    getUserMessages,
+    error,
+    loading: messagesLoading,
+  } = useMessagesContext();
+  // const { messages } = useApp();
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
+  const {
+    // personalInfo,
+    // messageSendersByPlatform,
+    // loading,
+    // selectedUser,
+    // changeUser,
+    // setPersonalInfo,
+    setMessageSendersByPlatform,
+    setSelectedUser,
+    // getTicket,
+  } = useFetchTicketChat(id);
 
   const sendMessage = async (metadataMsj) => {
     try {
-      messages.setMessages((prevMessages) => [
+      setMessages((prevMessages) => [
         ...prevMessages,
         { ...metadataMsj, seenAt: false },
       ]);
@@ -53,13 +79,13 @@ export const ChatMessages = ({
 
       await apiUrl(metadataMsj);
 
-      messages.setMessages((prev) => {
+      setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
         );
       });
     } catch (error) {
-      messages.setMessages((prev) => {
+      setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
         );
@@ -76,27 +102,51 @@ export const ChatMessages = ({
   };
 
   useEffect(() => {
-    if (isUserAtBottom && messageContainerRef.current) {
-      messageContainerRef.current.scrollTo({
-        top: messageContainerRef.current.scrollHeight,
-      });
-    }
-  }, [messages.list, selectTicketId]);
+    if (id) {
+      setSelectedUser({});
+      setMessageSendersByPlatform([]);
 
-  useEffect(() => {
-    const container = messageContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
+      getUserMessages(Number(id));
+
+      // if (!messages?.length) {
+      //   getUserMessages(Number(id));
+      // }
     }
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, []);
+  }, [id]);
+
+  // useEffect(() => {
+  //   if (selectTicketId) {
+  //     setSelectedUser({});
+  //     setMessageSendersByPlatform([]);
+
+  //     if (messages && !messages.list?.length) {
+  //       messages.getUserMessages(Number(selectTicketId));
+  //     }
+  //   }
+  // }, [selectTicketId]);
+
+  // useEffect(() => {
+  //   if (isUserAtBottom && messageContainerRef.current) {
+  //     messageContainerRef.current.scrollTo({
+  //       top: messageContainerRef.current.scrollHeight,
+  //     });
+  //   }
+  // }, [messages, selectTicketId]);
+
+  // useEffect(() => {
+  //   const container = messageContainerRef.current;
+  //   if (container) {
+  //     container.addEventListener("scroll", handleScroll);
+  //   }
+  //   return () => {
+  //     if (container) {
+  //       container.removeEventListener("scroll", handleScroll);
+  //     }
+  //   };
+  // }, []);
 
   const renderMessagesContent = () => {
-    if (messages.error) {
+    if (error) {
       return (
         <Flex h="100%" align="center" justify="center">
           <Text size="lg" c="red">
@@ -105,7 +155,7 @@ export const ChatMessages = ({
         </Flex>
       );
     }
-    if (messages.loading) {
+    if (messagesLoading) {
       return (
         <Flex h="100%" align="center" justify="center">
           <Spin />
@@ -113,11 +163,11 @@ export const ChatMessages = ({
       );
     }
 
-    if (selectTicketId) {
+    if (id) {
       return (
         <GroupedMessages
           personalInfo={personalInfo}
-          selectTicketId={selectTicketId}
+          selectTicketId={Number(id)}
           technicians={technicians}
         />
       );
@@ -144,19 +194,21 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !messages.loading && (
+      {id && !messagesLoading && (
         <>
           <TaskListOverlay
-            ticketId={selectTicketId}
+            ticketId={Number(id)}
             tasks={tasks}
             creatingTask={creatingTask}
             setCreatingTask={setCreatingTask}
             fetchTasks={window.fetchTasksGlobal}
           />
+
           <ChatInput
             loading={loading}
-            id={selectTicketId}
+            id={id}
             clientList={messageSendersByPlatform}
+            // currentClient={selectedUser}
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {
@@ -167,7 +219,7 @@ export const ChatMessages = ({
                 sender_id: Number(userId),
                 client_id: selectedClient.payload?.id,
                 platform: selectedClient.payload?.platform,
-                ticket_id: selectTicketId,
+                ticket_id: Number(id),
                 time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
                 messageStatus: MESSAGES_STATUS.PENDING,
                 ...value,

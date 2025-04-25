@@ -12,7 +12,7 @@ import { getMediaType } from "../../renderContent";
 import { renderFile, renderMedia, renderCall } from "./utils";
 import "./Media.css";
 
-export const Media = ({ messages, id }) => {
+export const Media = ({ attachments, id }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { uploadFile } = useUploadMediaFile();
   const [opened, handlers] = useDisclosure(false);
@@ -105,19 +105,19 @@ export const Media = ({ messages, id }) => {
 
             <Tabs.Panel className="media-tabs" h="100%" value="media">
               <Flex h="100%" direction="column" mt="md">
-                {renderMedia({ media: messages })}
+                {renderMedia({ attachments })}
               </Flex>
             </Tabs.Panel>
 
             <Tabs.Panel className="media-tabs" h="100%" value="files">
               <Flex h="100%" direction="column" mt="md">
-                {renderFile({ media: messages })}
+                {renderFile({ media: attachments })}
               </Flex>
             </Tabs.Panel>
 
             <Tabs.Panel className="media-tabs" h="100%" value="audio">
               <Flex h="100%" direction="column" mt="md">
-                {renderCall({ media: messages })}
+                {renderCall({ media: attachments })}
               </Flex>
             </Tabs.Panel>
           </Tabs>
@@ -134,7 +134,7 @@ export const Media = ({ messages, id }) => {
             <Tabs.Panel className="media-tabs" h="100%" value="media">
               <Flex h="100%" mt="md" direction="column">
                 {renderMedia({
-                  media: mediaList,
+                  attachments: mediaList,
                   deleteAttachment,
                   shouldDelete: true,
                   renderAddAttachments: () => {

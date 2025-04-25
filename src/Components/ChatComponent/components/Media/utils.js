@@ -202,18 +202,18 @@ export const renderMediaContent = ({
 };
 
 export const renderFile = ({
-  media,
+  attachments,
   deleteAttachment,
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByImageAndVideo = media.filter((i) =>
+  const filterMediaByImageAndVideo = attachments?.filter((i) =>
     [MEDIA_TYPE.FILE].includes(i.mtype),
   );
 
   return (
     <>
-      {filterMediaByImageAndVideo.length > 0 ? (
+      {filterMediaByImageAndVideo?.length > 0 ? (
         <div>
           {filterMediaByImageAndVideo.map((media, index) => (
             <Flex direction="column" align="center" key={media.id ?? index}>
@@ -253,18 +253,18 @@ export const renderFile = ({
 };
 
 export const renderMedia = ({
-  media,
+  attachments,
   deleteAttachment,
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByImageAndVideo = media.filter((i) =>
+  const filterMediaByImageAndVideo = attachments?.filter((i) =>
     [MEDIA_TYPE.VIDEO, MEDIA_TYPE.IMAGE].includes(i.mtype),
   );
 
   return (
     <>
-      {filterMediaByImageAndVideo.length ? (
+      {filterMediaByImageAndVideo?.length ? (
         <div>
           <Grid gutter="1px">
             {filterMediaByImageAndVideo.map((media) => (
@@ -301,18 +301,18 @@ export const renderMedia = ({
 };
 
 export const renderCall = ({
-  media,
+  attachments,
   deleteAttachment,
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByCallAndAudio = media.filter((i) =>
+  const filterMediaByCallAndAudio = attachments?.filter((i) =>
     [MEDIA_TYPE.CALL, MEDIA_TYPE.AUDIO].includes(i.mtype),
   );
 
   return (
     <>
-      {filterMediaByCallAndAudio.length ? (
+      {filterMediaByCallAndAudio?.length ? (
         <div>
           {filterMediaByCallAndAudio.map((media, index) => (
             <Flex w="100%" direction="column" key={media.id}>

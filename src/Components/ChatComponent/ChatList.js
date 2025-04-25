@@ -39,7 +39,7 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ selectTicketId }) => {
+const ChatList = ({ id }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(true);
@@ -76,10 +76,10 @@ const ChatList = ({ selectTicketId }) => {
 
   // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
-    if (chatListRef.current && selectTicketId) {
+    if (chatListRef.current && id) {
       const container = chatListRef.current;
       const selectedElement = container.querySelector(
-        `[data-ticket-id="${selectTicketId}"]`,
+        `[data-ticket-id="${id}"]`,
       );
 
       if (selectedElement) {
@@ -93,7 +93,7 @@ const ChatList = ({ selectTicketId }) => {
         });
       }
     }
-  }, [selectTicketId, tickets]);
+  }, [id, tickets]);
 
   // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
@@ -139,13 +139,7 @@ const ChatList = ({ selectTicketId }) => {
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
 
-    return (
-      <ChatListItem
-        chat={ticket}
-        style={style}
-        selectTicketId={selectTicketId}
-      />
-    );
+    return <ChatListItem chat={ticket} style={style} id={Number(id)} />;
   };
 
   return (

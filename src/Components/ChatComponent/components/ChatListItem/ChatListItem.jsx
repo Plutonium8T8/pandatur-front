@@ -8,14 +8,10 @@ import { IoCall } from "react-icons/io5";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
-import { useApp } from "../../../../hooks";
-import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "../../../../app-constants";
+import { useApp, useSocket, useUser, useMessagesContext } from "@hooks";
+import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "@app-constants";
+import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
 import { Tag } from "../../../Tag";
-import {
-  priorityTagColors,
-  parseServerDate,
-  getLanguageByKey,
-} from "../../../utils";
 import "./ChatListItem.css";
 
 const MESSAGE_INDICATOR = {
@@ -72,14 +68,32 @@ const MESSAGE_INDICATOR = {
   ),
 };
 
-export const ChatListItem = ({ chat, style, selectTicketId }) => {
+export const ChatListItem = ({ chat, style, id }) => {
   const navigate = useNavigate();
-  const { markMessagesAsRead, messages } = useApp();
-  const formatDate = parseServerDate(chat.time_sent);
+  const { markMessagesAsRead } = useApp();
+  const { socketRef } = useSocket();
+  const { userId } = useUser();
+  const { getUserMessages } = useMessagesContext();
 
+  const formatDate = parseServerDate(chat.time_sent);
   const choseChat = async (id) => {
-    await messages.getUserMessages(id);
+    await getUserMessages(id);
     navigate(`/chat/${id}`);
+  };
+
+  const readChat = (ticketId, count) => {
+    const socketInstance = socketRef.current;
+    if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
+      const readMessageData = {
+        type: "seen",
+        data: {
+          ticket_id: ticketId,
+          sender_id: Number(userId),
+        },
+      };
+      socketInstance.send(JSON.stringify(readMessageData));
+      markMessagesAsRead(ticketId, count);
+    }
   };
 
   return (
@@ -89,7 +103,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         pr="16px"
         pl="24px"
         key={chat.id}
-        className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
+        className={`chat-item ${chat.id === id ? "active" : ""} pointer`}
         onClick={() => choseChat(chat.id)}
         data-ticket-id={chat.id}
         pos="relative"
@@ -107,7 +121,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
                 top="50%"
                 left="50%"
                 className="mark-seen-message-button | pointer"
-                onClick={() => markMessagesAsRead(chat.id, chat.unseen_count)}
+                onClick={() => readChat(chat.id, chat.unseen_count)}
               >
                 <IoMdEye className="pointer" />
               </Flex>
