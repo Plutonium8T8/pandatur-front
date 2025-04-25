@@ -336,11 +336,11 @@ export const translations = {
   },
   Nume: {
     RO: "Nume",
-    RU: "Имя",
+    RU: "Фамилия",
   },
   Prenume: {
     RO: "Prenume",
-    RU: "Фамилия",
+    RU: "Имя",
   },
   Tag: {
     RO: "Tag",
