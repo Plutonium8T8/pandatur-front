@@ -12,12 +12,10 @@ import { LoadingOverlay } from "@components";
 export const Chat = () => {
   const { ticketId } = useParams();
 
-  const { spinnerTickets, setTickets } = useApp();
+  // const { spinnerTickets, setTickets } = useApp();
   const { technicians } = useGetTechniciansList();
 
   const [isChatListVisible, setIsChatListVisible] = useState(true);
-
-  const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
 
   const {
     personalInfo,
@@ -61,13 +59,13 @@ export const Chat = () => {
       }),
     );
 
-    setTickets((prev) =>
-      prev.map((ticket) =>
-        ticket.id === personalInfo.id
-          ? { ...ticket, ...personalInfo, clients: clientTicketList }
-          : ticket,
-      ),
-    );
+    // setTickets((prev) =>
+    //   prev.map((ticket) =>
+    //     ticket.id === personalInfo.id
+    //       ? { ...ticket, ...personalInfo, clients: clientTicketList }
+    //       : ticket,
+    //   ),
+    // );
 
     setPersonalInfo((prev) => {
       return {
@@ -77,14 +75,14 @@ export const Chat = () => {
     });
   };
 
-  if (spinnerTickets) {
-    return <LoadingOverlay />;
-  }
+  // if (spinnerTickets) {
+  //   return <LoadingOverlay />;
+  // }
 
   return (
     <Flex h="100%" className="chat-wrapper">
       <Flex w="100%" h="100%" className="chat-container">
-        {isChatListVisible && <ChatList id={ticketIdToNumber} />}
+        {isChatListVisible && <ChatList id={ticketId} />}
 
         <Flex pos="relative" style={{ flex: "1 1 0" }}>
           <Box pos="absolute" left="10px" top="16px" style={{ zIndex: 1 }}>

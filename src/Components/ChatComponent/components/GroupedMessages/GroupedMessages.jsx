@@ -1,5 +1,5 @@
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useUser, useMessagesContext } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
 import {
@@ -16,6 +16,7 @@ const { colors } = DEFAULT_THEME;
 export const GroupedMessages = ({ personalInfo, id, technicians }) => {
   const { userId } = useUser();
   const { messages } = useMessagesContext();
+  const refChatArea = useRef(null);
 
   const getTechnician = useCallback(
     (id) => {

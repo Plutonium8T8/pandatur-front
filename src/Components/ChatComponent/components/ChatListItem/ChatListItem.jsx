@@ -93,7 +93,7 @@ export const ChatListItem = ({ chat, style, id }) => {
         pr="16px"
         pl="24px"
         key={chat.id}
-        className={`chat-item ${chat.id === id ? "active" : ""} pointer`}
+        className={`chat-item ${chat.id === Number(id) ? "active" : ""} pointer`}
         onClick={() => choseChat(chat.id)}
         data-ticket-id={chat.id}
         pos="relative"

@@ -33,14 +33,14 @@ export const ChatMessages = ({
 
   const {
     setMessages,
-
     getUserMessages,
     error,
     loading: messagesLoading,
+    messages,
   } = useMessagesContext();
 
+  const refChatArea = useRef(null);
   const messageContainerRef = useRef(null);
-  const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
   const {
     // personalInfo,
@@ -60,6 +60,8 @@ export const ChatMessages = ({
         ...prevMessages,
         { ...metadataMsj, seenAt: false },
       ]);
+
+      refChatArea.current.scrollIntoView({ behavior: "smooth" });
 
       let apiUrl = api.messages.send.create;
 
@@ -85,14 +87,6 @@ export const ChatMessages = ({
     }
   };
 
-  const handleScroll = () => {
-    if (messageContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        messageContainerRef.current;
-      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
-    }
-  };
-
   useEffect(() => {
     if (id) {
       setSelectedUser({});
@@ -102,26 +96,17 @@ export const ChatMessages = ({
     }
   }, [id]);
 
-  // useEffect(() => {
-  //   if (isUserAtBottom && messageContainerRef.current) {
-  //     messageContainerRef.current.scrollTo({
-  //       top: messageContainerRef.current.scrollHeight,
-  //     });
-  //   }
-  // }, [messages, selectTicketId]);
+  useEffect(() => {
+    if (refChatArea.current) {
+      refChatArea.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [id]);
 
-  // useEffect(() => {
-  //   console.log("re-render ");
-  //   const container = messageContainerRef.current;
-  //   if (container) {
-  //     container.addEventListener("scroll", handleScroll);
-  //   }
-  //   return () => {
-  //     if (container) {
-  //       container.removeEventListener("scroll", handleScroll);
-  //     }
-  //   };
-  // }, [id]);
+  useEffect(() => {
+    if (refChatArea.current) {
+      refChatArea.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const renderMessagesContent = () => {
     if (error) {
@@ -170,6 +155,9 @@ export const ChatMessages = ({
         ref={messageContainerRef}
       >
         {renderMessagesContent()}
+
+        {/* Please don't remove me */}
+        <div ref={refChatArea} />
       </Flex>
 
       {id && !messagesLoading && (
