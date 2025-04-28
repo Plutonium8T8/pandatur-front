@@ -4,11 +4,11 @@ import dayjs from "dayjs";
 import { useUser, useMessagesContext, useFetchTicketChat } from "@hooks";
 import { api } from "@api";
 import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
-import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { Spin } from "@components";
-import { ChatInput } from "../ChatInput";
-import { GroupedMessages } from "../GroupedMessages";
 import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
+import { ChatInput } from "../ChatInput";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
+import { GroupedMessages } from "../GroupedMessages";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {

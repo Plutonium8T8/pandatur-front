@@ -1,10 +1,14 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
+import { useSnackbar } from "notistack";
 import { api } from "@api";
-import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { TYPE_SOCKET_EVENTS, TYPE_TICKET } from "@app-constants";
+import { showServerError } from "@utils";
 
 export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const socketRef = useRef(null);
   const [val, setVal] = useState(null);
 
@@ -39,7 +43,7 @@ export const SocketProvider = ({ children }) => {
     const getTicketFightIds = async () => {
       try {
         const ids = await api.tickets.filters({
-          type: "light",
+          type: TYPE_TICKET.LIGHT,
         });
 
         const socketMessage = JSON.stringify({
@@ -48,7 +52,11 @@ export const SocketProvider = ({ children }) => {
         });
 
         socketRef.current.send(socketMessage);
-      } catch (e) {}
+      } catch (e) {
+        enqueueSnackbar(showServerError(e), {
+          variant: "error",
+        });
+      }
     };
 
     const socketInstance = socketRef.current;

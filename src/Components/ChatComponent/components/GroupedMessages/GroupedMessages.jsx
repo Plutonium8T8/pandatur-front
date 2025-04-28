@@ -2,13 +2,13 @@ import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useCallback } from "react";
 import { useUser, useMessagesContext } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
-import { SendedMessage, ReceivedMessage } from "../Message";
 import {
   parseServerDate,
   getFullName,
   getLanguageByKey,
   parseDate,
 } from "@utils";
+import { SendedMessage, ReceivedMessage } from "../Message";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
