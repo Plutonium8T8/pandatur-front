@@ -81,7 +81,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const socketMessage = JSON.stringify({
-      type: "connect",
+      type: TYPE_SOCKET_EVENTS.CONNECT,
       data: { ticket_id: ticketIds },
     });
 
@@ -136,7 +136,7 @@ export const AppProvider = ({ children }) => {
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
-        type: "seen",
+        type: TYPE_SOCKET_EVENTS.SEEN,
         data: {
           ticket_id: ticketId,
           sender_id: Number(userId),
