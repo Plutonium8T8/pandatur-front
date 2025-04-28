@@ -31,3 +31,8 @@ export const TYPE_SOCKET_EVENTS = {
   TICKET: "ticket",
   CONNECT: "connect",
 };
+
+export const TYPE_TICKET = {
+  HARD: "hard",
+  LIGHT: "light",
+};
