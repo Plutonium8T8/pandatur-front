@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { useUser } from "@hooks";
@@ -64,7 +64,7 @@ export const useMessages = () => {
   };
 
   const updateMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message.data]);
+    setMessages((prevMessages) => [...prevMessages, message]);
   };
 
   const markMessageSeen = (id, seenAt) => {
@@ -75,15 +75,18 @@ export const useMessages = () => {
     });
   };
 
-  return {
-    messages,
-    lastMessage,
-    loading,
-    mediaFiles,
-    getUserMessages,
-    markMessageRead,
-    updateMessage,
-    markMessageSeen,
-    setMessages,
-  };
+  return useMemo(
+    () => ({
+      messages,
+      lastMessage,
+      loading,
+      mediaFiles,
+      getUserMessages,
+      markMessageRead,
+      updateMessage,
+      markMessageSeen,
+      setMessages,
+    }),
+    [messages, lastMessage, mediaFiles, loading],
+  );
 };
