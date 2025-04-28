@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
-import { useApp } from "@hooks";
+import { useMessagesContext } from "@hooks";
 
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
@@ -29,12 +29,13 @@ const normalizeClients = (clientList) => {
 };
 export const useFetchTicketChat = (id) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { messages } = useApp();
 
   const [personalInfo, setPersonalInfo] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
+
+  const { messages } = useMessagesContext();
 
   const changeUser = (userId, platform) => {
     const user = messageSendersByPlatform?.find(
@@ -46,6 +47,7 @@ export const useFetchTicketChat = (id) => {
 
   const getLightTicketInfo = async () => {
     const { lastMessage } = messages;
+
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
@@ -81,11 +83,17 @@ export const useFetchTicketChat = (id) => {
     }
   };
 
+  // useEffect(() => {
+  //   if (id) {
+  //     getLightTicketInfo();
+  //   }
+  // }, [id, messages.lastMessage]);
+
   useEffect(() => {
     if (id) {
       getLightTicketInfo();
     }
-  }, [id, messages.lastMessage]);
+  }, [id]);
 
   return {
     personalInfo,

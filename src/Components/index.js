@@ -13,3 +13,4 @@ export * from "./Checkbox";
 export * from "./RcTable";
 export * from "./Empty";
 export * from "./Image";
+export * from "./Tag";

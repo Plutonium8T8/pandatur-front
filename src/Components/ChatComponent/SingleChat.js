@@ -3,11 +3,12 @@ import React, { useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
-import { useApp, useFetchTicketChat } from "../../hooks";
-import { getFullName } from "../utils";
+import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
+import { getFullName } from "@utils";
 
 const SingleChat = ({ id, onClose, tasks = [] }) => {
-  const { setTickets, messages } = useApp();
+  const { setTickets } = useApp();
+  const { getUserMessages } = useMessagesContext();
 
   const {
     personalInfo,
@@ -22,7 +23,7 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
 
   useEffect(() => {
     if (id) {
-      messages.getUserMessages(Number(id));
+      getUserMessages(Number(id));
     }
   }, [id]);
 
@@ -57,9 +58,9 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
           const clientTicketList = personalInfo.clients.map((client) =>
             client.id === payload.id
               ? {
-                ...client,
-                ...values,
-              }
+                  ...client,
+                  ...values,
+                }
               : client,
           );
 
@@ -74,10 +75,10 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
               return client.payload.id === payload.id &&
                 client.payload.platform === payload.platform
                 ? {
-                  ...client,
-                  label: `${identifier} - ${payload.platform}`,
-                  payload: { ...payload, ...values },
-                }
+                    ...client,
+                    label: `${identifier} - ${payload.platform}`,
+                    payload: { ...payload, ...values },
+                  }
                 : client;
             }),
           );
@@ -97,7 +98,6 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
             };
           });
         }}
-        mediaFiles={messages.mediaFiles}
       />
     </div>
   );
