@@ -31,13 +31,11 @@ import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
 import { formatDate, parseDate } from "../utils/date";
 import DateQuickInput from "./Components/DateQuickPicker";
-import { useGetTechniciansList } from "../../hooks";
+import { useGetTechniciansList, useUser, useConfirmPopup } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
-import { useConfirmPopup } from "../../hooks/useConfirmPopup";
-import dayjs from "dayjs";
-import { useUser } from "../../hooks";
 import { useSnackbar } from "notistack";
 import { PageHeader } from "../PageHeader";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -238,7 +236,7 @@ const TaskListOverlay = ({
                     color: getDeadlineColor(taskEdits[id]?.scheduled_time),
                   }}
                 >
-                  {formatDate(taskEdits[id]?.scheduled_time, "DD.MM.YYYY")}{" "}
+                  {formatDate(taskEdits[id]?.scheduled_time)}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
                 {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
@@ -248,7 +246,7 @@ const TaskListOverlay = ({
         )}
 
         <Collapse in={isNew ? creatingTask : expandedCard === id}>
-          <Divider my="sm" />
+          {!isNew && <Divider my="sm" />}
 
           <Group gap="xs" align="end">
             <IconSelect
