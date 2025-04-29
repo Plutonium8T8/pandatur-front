@@ -2275,4 +2275,8 @@ export const translations = {
     RO: "A fost detectată o eroare neașteptată de la socket",
     RU: "Обнаружена непредвиденная ошибка сокета",
   },
+  errorConnectingToChatRoomWebSocket: {
+    RO: "Eroare la conectarea la camera de chat. Conexiunea WebSocket nu este disponibilă",
+    RU: "Ошибка подключения к чату. Соединение WebSocket недоступно",
+  },
 };
