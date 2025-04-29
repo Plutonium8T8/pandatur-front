@@ -2271,4 +2271,8 @@ export const translations = {
     RO: "Acest fișier este obligatoriu",
     RU: "Этот файл обязательный",
   },
+  unexpectedSocketErrorDetected: {
+    RO: "A fost detectată o eroare neașteptată de la socket",
+    RU: "Обнаружена непредвиденная ошибка сокета",
+  },
 };

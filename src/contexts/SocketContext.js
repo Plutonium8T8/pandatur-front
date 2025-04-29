@@ -2,7 +2,7 @@ import React, { createContext, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { TYPE_SOCKET_EVENTS, TYPE_TICKET } from "@app-constants";
-import { showServerError } from "@utils";
+import { showServerError, getLanguageByKey } from "@utils";
 
 export const SocketContext = createContext();
 
@@ -26,6 +26,9 @@ export const SocketProvider = ({ children }) => {
     };
 
     socketRef.current.onerror = (error) => {
+      enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), {
+        variant: "error",
+      });
       console.error("WebSocket error:", error);
     };
 
