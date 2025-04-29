@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { useUser } from "@hooks";
-import { parseDate, showServerError } from "@utils";
+import { showServerError } from "@utils";
 import { MEDIA_TYPE } from "@app-constants";
 
 const FORMAT_MEDIA = [
@@ -33,13 +33,12 @@ export const useMessages = () => {
 
       setMessages(data);
 
-      const lastMessage =
-        data
-          .filter(({ sender_id }) => sender_id !== 1 && sender_id !== userId)
-          .sort((a, b) => parseDate(b.time_sent) - parseDate(a.time_sent)) ||
-        [];
+      const sortedMessages =
+        data?.filter(
+          ({ sender_id }) => sender_id !== 1 && sender_id !== userId,
+        ) || [];
 
-      setLastMessage(lastMessage[0]);
+      setLastMessage(sortedMessages[sortedMessages.length - 1]);
       setMediaFiles(getMediaFileMessages(data));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -87,6 +86,7 @@ export const useMessages = () => {
       markMessageSeen,
       setMessages,
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [messages, lastMessage, mediaFiles, loading],
   );
 };

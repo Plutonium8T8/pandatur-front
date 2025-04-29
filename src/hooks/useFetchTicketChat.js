@@ -35,7 +35,7 @@ export const useFetchTicketChat = (id) => {
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
 
-  const { messages } = useMessagesContext();
+  const { lastMessage } = useMessagesContext();
 
   const changeUser = (userId, platform) => {
     const user = messageSendersByPlatform?.find(
@@ -46,8 +46,6 @@ export const useFetchTicketChat = (id) => {
   };
 
   const getLightTicketInfo = async () => {
-    const { lastMessage } = messages;
-
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
@@ -83,17 +81,11 @@ export const useFetchTicketChat = (id) => {
     }
   };
 
-  // useEffect(() => {
-  //   if (id) {
-  //     getLightTicketInfo();
-  //   }
-  // }, [id, messages.lastMessage]);
-
   useEffect(() => {
     if (id) {
       getLightTicketInfo();
     }
-  }, [id]);
+  }, [id, lastMessage]);
 
   return {
     personalInfo,
