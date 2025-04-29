@@ -21,8 +21,8 @@ const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
 const UserList = ({
   users,
   loading,
-  fetchUsers = () => {},
-  openEditUser = () => {},
+  fetchUsers = () => { },
+  openEditUser = () => { },
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [selectedIds, setSelectedIds] = useState([]);
@@ -92,8 +92,8 @@ const UserList = ({
     subTitle:
       selectedIds.length > 1
         ? translations["Sigur doriți să ștergeți utilizatorii selectați?"][
-            language
-          ]
+        language
+        ]
         : translations["Sigur doriți să ștergeți utilizatorul?"][language],
     loading: false,
   });
@@ -262,7 +262,7 @@ const UserList = ({
       render: (_, row) => (
         <Menu shadow="md" width={200} position="bottom-end">
           <Menu.Target>
-            <Button variant="default" className="action-button-task">
+            <Button variant="default" className="action-button-task" size="xs" p="xs">
               <IoEllipsisHorizontal size={18} />
             </Button>
           </Menu.Target>
@@ -292,7 +292,7 @@ const UserList = ({
               {translations["Ștergeți"][language]}
             </Menu.Item>
           </Menu.Dropdown>
-        </Menu>
+        </Menu >
       ),
     },
   ];
