@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import {
   Paper,
   Text,
-  Badge,
   Box,
   Group,
   Stack,
@@ -21,6 +20,12 @@ import {
   FaCheck,
   FaPencil,
 } from "react-icons/fa6";
+import {
+  getDeadlineColor,
+  getBadgeColor,
+  formatTasksToEdits,
+  sortTasksByDate
+} from "../utils/taskUtils";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
@@ -32,12 +37,7 @@ import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
 import { useUser } from "../../hooks";
 import { useSnackbar } from "notistack";
-import {
-  getDeadlineColor,
-  getBadgeColor,
-  formatTasksToEdits,
-  sortTasksByDate
-} from "../utils/taskUtils";
+import { PageHeader } from "../PageHeader";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -378,17 +378,17 @@ const TaskListOverlay = ({
   return (
     <Box pos="relative" p="xs" w="100%">
       <Paper shadow="xs" radius="md" withBorder p="xs">
-        <Group justify="space-between">
-          <Group gap="xs">
-            <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color={getBadgeColor(tasks)}>
-              {tasks.length}
-            </Badge>
-          </Group>
-          <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
-            {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-          </ActionIcon>
-        </Group>
+        <PageHeader
+          title={translations["Tasks"][language]}
+          count={tasks.length}
+          badgeColor={getBadgeColor(tasks)}
+          withDivider={false}
+          extraInfo={
+            <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
+              {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
+            </ActionIcon>
+          }
+        />
 
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs" mt="xs">

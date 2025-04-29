@@ -1,6 +1,6 @@
 import { Flex, Text, Badge, Divider } from "@mantine/core";
 
-export const PageHeader = ({ title, count, extraInfo, ...props }) => {
+export const PageHeader = ({ title, count, extraInfo, withDivider = true, badgeColor = "#0f824c", ...props }) => {
   return (
     <>
       <Flex align="center" justify="space-between" w="100%" {...props}>
@@ -10,7 +10,7 @@ export const PageHeader = ({ title, count, extraInfo, ...props }) => {
           </Text>
 
           {!!count && (
-            <Badge size="lg" bg="#0f824c">
+            <Badge size="lg" bg={badgeColor}>
               {count}
             </Badge>
           )}
@@ -23,7 +23,7 @@ export const PageHeader = ({ title, count, extraInfo, ...props }) => {
         )}
       </Flex>
 
-      <Divider my="md" />
+      {withDivider && <Divider my="md" />}
     </>
   );
 };
