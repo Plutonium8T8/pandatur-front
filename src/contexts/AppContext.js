@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect, useRef } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
-import { useUser, useLocalStorage, useMessages } from "@hooks";
+import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "@api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
@@ -21,24 +21,13 @@ const normalizeLightTickets = (tickets) => {
 };
 
 export const AppProvider = ({ children }) => {
-  const {
-    messages,
-    getUserMessages,
-    markMessageRead,
-    updateMessage,
-    setMessages,
-    lastMessage,
-    loading,
-    mediaFiles,
-  } = useMessages();
-  const socketRef = useRef(null);
+  const { sendedValue, socketRef } = useSocket();
   const [tickets, setTickets] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
   const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
-  const [ticketError, setTicketError] = useState("");
   const { storage, changeLocalStorage } = useLocalStorage(
     SIDEBAR_COLLAPSE,
     "false",
@@ -48,83 +37,8 @@ export const AppProvider = ({ children }) => {
     changeLocalStorage(storage === "true" ? "false" : "true");
   };
 
-  useEffect(() => {
-    let pingInterval;
-
-    if (socketRef.current) {
-      pingInterval = setInterval(() => {
-        if (socketRef.current.readyState === WebSocket.OPEN) {
-          const pingMessage = JSON.stringify({ type: "ping" });
-          socketRef.current.send(pingMessage);
-        }
-      }, 5000);
-
-      return () => {
-        clearInterval(pingInterval);
-        if (socketRef.current) {
-          socketRef.current.onmessage = null;
-        }
-      };
-    }
-  }, []);
-
-  const connectToChatRooms = (ticketIds) => {
-    const socketInstance = socketRef.current;
-    if (!socketInstance || socketInstance.readyState !== WebSocket.OPEN) {
-      console.warn("WebSocket is not connected or currently unavailable.");
-      return;
-    }
-
-    if (!ticketIds || ticketIds.length === 0) {
-      console.warn("Missing ID for connecting to rooms.");
-      return;
-    }
-
-    const socketMessage = JSON.stringify({
-      type: TYPE_SOCKET_EVENTS.CONNECT,
-      data: { ticket_id: ticketIds },
-    });
-
-    socketInstance.send(socketMessage);
-  };
-
-  useEffect(() => {
-    if (!socketRef.current) {
-      const socketInstance = new WebSocket(process.env.REACT_APP_WS_URL);
-      socketRef.current = socketInstance;
-
-      socketInstance.onopen = async () => {
-        console.log("Connected to WebSocket");
-      };
-
-      socketInstance.onmessage = (event) => {
-        const message = JSON.parse(event.data);
-        handleWebSocketMessage(message);
-      };
-
-      socketInstance.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-
-      socketInstance.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-    }
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.close();
-        socketRef.current = null;
-      }
-    };
-  }, []);
-
   const markMessagesAsRead = (ticketId, count) => {
     if (!ticketId) return;
-
-    const socketInstance = socketRef.current;
-
-    markMessageRead(ticketId);
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
@@ -133,25 +47,10 @@ export const AppProvider = ({ children }) => {
     );
 
     setUnreadCount((prev) => prev - count);
-
-    if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
-      const readMessageData = {
-        type: TYPE_SOCKET_EVENTS.SEEN,
-        data: {
-          ticket_id: ticketId,
-          sender_id: Number(userId),
-        },
-      };
-      socketInstance.send(JSON.stringify(readMessageData));
-      console.log(`✅ Seen sent for ticket_id=${ticketId}`);
-    } else {
-      console.warn("WebSocket is not connected, failed to send seen.");
-    }
   };
 
   const getTicketsListRecursively = async (page) => {
     try {
-      setTicketError(false);
       const data = await api.tickets.getLightList({ page: page });
 
       if (page >= data.total_pages) {
@@ -169,12 +68,8 @@ export const AppProvider = ({ children }) => {
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => [...prev, ...processedTickets]);
 
-      connectToChatRooms(processedTickets.map((ticket) => ticket.id));
-
       getTicketsListRecursively(page + 1);
     } catch (error) {
-      setSpinnerTickets(false);
-      setTicketError(true);
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
@@ -202,25 +97,8 @@ export const AppProvider = ({ children }) => {
       });
 
       setUnreadCount((prev) => prev + ticket?.unseen_count || 0);
-
-      return ticket;
     } catch (error) {
-      console.error("Ticket request error:", error);
-      return null;
-    }
-  };
-
-  const updateTicket = async (updateData) => {
-    try {
-      const updatedTicket = await api.tickets.updateById({
-        id: [updateData.id],
-        ...updateData,
-      });
-
-      return updatedTicket;
-    } catch (error) {
-      console.error("Error updating the ticket:", error.message || error);
-      throw error;
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
@@ -237,12 +115,6 @@ export const AppProvider = ({ children }) => {
         } = message.data;
 
         setUnreadCount((prev) => prev + 1);
-
-        const senderId = message.data.sender_id;
-
-        if (Number(senderId) !== userId) {
-          updateMessage(message);
-        }
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -279,27 +151,25 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.TICKET: {
-        console.log("A new ticket has arrived:", message.data);
-
         const ticketId = message.data.ticket_id;
 
-        if (!ticketId) {
-          console.warn("Cannot extract ticket id from 'ticket'.");
+        if (ticketId) {
+          fetchSingleTicket(ticketId);
 
-          break;
-        }
-
-        fetchSingleTicket(ticketId);
-
-        const socketInstance = socketRef.current;
-        if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
-          const socketMessage = JSON.stringify({
-            type: TYPE_SOCKET_EVENTS.CONNECT,
-            data: { ticket_id: [ticketId] },
-          });
-          socketInstance.send(socketMessage);
-        } else {
-          console.warn("Error connecting to chat-room, WebSocket is off.");
+          const socketInstance = socketRef.current;
+          if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
+            const socketMessage = JSON.stringify({
+              type: TYPE_SOCKET_EVENTS.CONNECT,
+              data: { ticket_id: [ticketId] },
+            });
+            socketInstance.send(socketMessage);
+          } else {
+            enqueueSnackbar(
+              getLanguageByKey("errorConnectingToChatRoomWebSocket"),
+              { variant: "error" },
+            );
+            console.warn("Error connecting to chat-room, WebSocket is off.");
+          }
         }
         break;
       }
@@ -313,30 +183,27 @@ export const AppProvider = ({ children }) => {
     fetchTickets();
   }, []);
 
+  useEffect(() => {
+    if (sendedValue) {
+      handleWebSocketMessage(sendedValue);
+    }
+  }, [sendedValue]);
+
   return (
     <AppContext.Provider
       value={{
-        messages: {
-          list: messages,
-          lastMessage,
-          loading,
-          mediaFiles,
-          getUserMessages,
-          setMessages,
-        },
         tickets,
         setTickets,
         selectTicketId,
         setSelectTicketId,
         unreadCount,
         markMessagesAsRead,
-        updateTicket,
-        fetchTickets,
-        socketRef,
+
         spinnerTickets,
         setIsCollapsed: collapsed,
         isCollapsed: storage === "true",
-        ticketError,
+
+        setUnreadCount,
       }}
     >
       {children}

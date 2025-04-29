@@ -3,7 +3,12 @@ import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import { ModalsProvider } from "@mantine/modals";
-import { UserProvider, AppProvider } from "@contexts";
+import {
+  UserProvider,
+  AppProvider,
+  SocketProvider,
+  MessagesProvider,
+} from "@contexts";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import { AppLayout } from "@layout";
@@ -42,11 +47,15 @@ function App() {
           {JWT_TOKEN ? (
             <UserProvider>
               <Session>
-                <AppProvider>
-                  <AppLayout>
-                    <PrivateRoutes />
-                  </AppLayout>
-                </AppProvider>
+                <SocketProvider>
+                  <AppProvider>
+                    <MessagesProvider>
+                      <AppLayout>
+                        <PrivateRoutes />
+                      </AppLayout>
+                    </MessagesProvider>
+                  </AppProvider>
+                </SocketProvider>
               </Session>
             </UserProvider>
           ) : (

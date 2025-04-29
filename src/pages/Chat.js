@@ -1,17 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useSnackbar } from "notistack";
 import { useApp, useFetchTicketChat, useGetTechniciansList } from "@hooks";
 import ChatExtraInfo from "@components/ChatComponent/ChatExtraInfo";
 import ChatList from "@components/ChatComponent/ChatList";
-import { getFullName, showServerError } from "@utils";
+import { getFullName } from "@utils";
 import { ChatMessages } from "@components/ChatComponent/components";
 
 export const Chat = () => {
-  const { enqueueSnackbar } = useSnackbar();
-  const { setTickets, messages } = useApp();
+  const { setTickets } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
 
@@ -28,32 +26,7 @@ export const Chat = () => {
     setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
-    getTicket,
   } = useFetchTicketChat(ticketId);
-
-  useEffect(() => {
-    if (ticketId) {
-      setSelectedUser({});
-      setMessageSendersByPlatform([]);
-
-      if (!messages?.list.length) {
-        messages.getUserMessages(Number(ticketId));
-      }
-    }
-  }, [ticketId]);
-
-  /**
-   *
-   * @param {number} mergedTicketId
-   */
-  const fetchTicketLight = async (mergedTicketId) => {
-    try {
-      await Promise.all([getTicket(), messages.getUserMessages(ticketId)]);
-      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    }
-  };
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -88,7 +61,6 @@ export const Chat = () => {
         {ticketId && (
           <ChatExtraInfo
             selectedUser={selectedUser}
-            fetchTicketLight={fetchTicketLight}
             ticketId={ticketId}
             selectTicketId={ticketIdToNumber}
             onUpdatePersonalInfo={(payload, values) => {
@@ -138,7 +110,6 @@ export const Chat = () => {
               });
             }}
             updatedTicket={personalInfo}
-            mediaFiles={messages.mediaFiles}
           />
         )}
       </Flex>

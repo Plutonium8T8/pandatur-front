@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
-import { getLanguageByKey, showServerError } from "../utils";
+import { getLanguageByKey, showServerError } from "@utils";
+import { api } from "@api";
+import {
+  useFormTicket,
+  useApp,
+  useFetchTicketChat,
+  useMessagesContext,
+} from "@hooks";
 import { PersonalData4ClientForm, Merge, Media } from "./components";
-import { api } from "../../api";
 import {
   ContractForm,
   QualityControlForm,
@@ -11,16 +17,13 @@ import {
   GeneralForm,
   TicketInfoForm,
 } from "../TicketForms";
-import { useFormTicket } from "../../hooks";
 
 const ChatExtraInfo = ({
   selectTicketId,
   onUpdatePersonalInfo,
   updatedTicket,
   ticketId,
-  mediaFiles,
   selectedUser,
-  fetchTicketLight,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
@@ -29,6 +32,10 @@ const ChatExtraInfo = ({
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
 
+  const { setTickets } = useApp();
+  const { getUserMessages, mediaFiles } = useMessagesContext();
+  const { getTicket } = useFetchTicketChat(selectTicketId);
+
   const {
     form,
     hasErrorsTicketInfoForm,
@@ -36,11 +43,18 @@ const ChatExtraInfo = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
-  useEffect(() => {
-    if (selectTicketId) {
-      fetchTicketExtraInfo(selectTicketId);
+  /**
+   *
+   * @param {number} mergedTicketId
+   */
+  const fetchTicketLight = async (mergedTicketId) => {
+    try {
+      await Promise.all([getTicket(), getUserMessages(selectTicketId)]);
+      setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }, [selectTicketId]);
+  };
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
@@ -178,6 +192,12 @@ const ChatExtraInfo = ({
       setIsLoadingInfoTicket(false);
     }
   };
+
+  useEffect(() => {
+    if (selectTicketId) {
+      fetchTicketExtraInfo(selectTicketId);
+    }
+  }, [selectTicketId]);
 
   return (
     <ScrollArea

@@ -207,7 +207,7 @@ export const renderFile = ({
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByImageAndVideo = media.filter((i) =>
+  const filterMediaByImageAndVideo = media?.filter((i) =>
     [MEDIA_TYPE.FILE].includes(i.mtype),
   );
 
@@ -258,7 +258,7 @@ export const renderMedia = ({
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByImageAndVideo = media.filter((i) =>
+  const filterMediaByImageAndVideo = media?.filter((i) =>
     [MEDIA_TYPE.VIDEO, MEDIA_TYPE.IMAGE].includes(i.mtype),
   );
 
@@ -267,7 +267,7 @@ export const renderMedia = ({
       {filterMediaByImageAndVideo.length ? (
         <div>
           <Grid gutter="1px">
-            {filterMediaByImageAndVideo.map((media) => (
+            {filterMediaByImageAndVideo?.map((media) => (
               <Grid.Col span={4} key={media.id}>
                 {renderMediaContent({
                   type: media.mtype,
@@ -306,7 +306,7 @@ export const renderCall = ({
   shouldDelete,
   renderAddAttachments,
 }) => {
-  const filterMediaByCallAndAudio = media.filter((i) =>
+  const filterMediaByCallAndAudio = media?.filter((i) =>
     [MEDIA_TYPE.CALL, MEDIA_TYPE.AUDIO].includes(i.mtype),
   );
 

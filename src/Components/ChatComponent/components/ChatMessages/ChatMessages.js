@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
-import { useApp, useUser } from "../../../../hooks";
-import { api } from "../../../../api";
-import { getLanguageByKey, MESSAGES_STATUS } from "../../../utils";
-import TaskListOverlay from "../../../Task/TaskListOverlay";
-import { Spin } from "../../../Spin";
+import { useUser, useMessagesContext, useFetchTicketChat } from "@hooks";
+import { api } from "@api";
+import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
+import { Spin } from "@components";
+import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
 import { ChatInput } from "../ChatInput";
+import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
-import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "../../../../app-constants";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {
@@ -29,7 +29,16 @@ export const ChatMessages = ({
   technicians,
 }) => {
   const { userId } = useUser();
-  const { messages } = useApp();
+
+  const { setMessageSendersByPlatform, setSelectedUser } =
+    useFetchTicketChat(selectTicketId);
+
+  const {
+    setMessages,
+    getUserMessages,
+    loading: messagesLoading,
+    messages,
+  } = useMessagesContext();
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
@@ -37,7 +46,7 @@ export const ChatMessages = ({
 
   const sendMessage = async (metadataMsj) => {
     try {
-      messages.setMessages((prevMessages) => [
+      setMessages((prevMessages) => [
         ...prevMessages,
         { ...metadataMsj, seenAt: false },
       ]);
@@ -52,13 +61,13 @@ export const ChatMessages = ({
 
       await apiUrl(metadataMsj);
 
-      messages.setMessages((prev) => {
+      setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
         );
       });
     } catch (error) {
-      messages.setMessages((prev) => {
+      setMessages((prev) => {
         return prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
         );
@@ -80,7 +89,7 @@ export const ChatMessages = ({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages.list, selectTicketId]);
+  }, [messages, selectTicketId]);
 
   useEffect(() => {
     const container = messageContainerRef.current;
@@ -94,6 +103,15 @@ export const ChatMessages = ({
     };
   }, []);
 
+  useEffect(() => {
+    if (selectTicketId) {
+      setSelectedUser({});
+      setMessageSendersByPlatform([]);
+
+      getUserMessages(Number(selectTicketId));
+    }
+  }, [selectTicketId]);
+
   const renderMessagesContent = () => {
     if (messages.error) {
       return (
@@ -104,7 +122,7 @@ export const ChatMessages = ({
         </Flex>
       );
     }
-    if (messages.loading) {
+    if (messagesLoading) {
       return (
         <Flex h="100%" align="center" justify="center">
           <Spin />
@@ -143,7 +161,7 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !messages.loading && (
+      {selectTicketId && !messagesLoading && (
         <>
           <TaskListOverlay
             ticketId={selectTicketId}
