@@ -336,11 +336,11 @@ export const translations = {
   },
   Nume: {
     RO: "Nume",
-    RU: "Имя",
+    RU: "Фамилия",
   },
   Prenume: {
     RO: "Prenume",
-    RU: "Фамилия",
+    RU: "Имя",
   },
   Tag: {
     RO: "Tag",
@@ -1560,8 +1560,8 @@ export const translations = {
     RU: "Пользователь активирован",
   },
   Users: {
-    RO: "Users",
-    RU: "Юзеры",
+    RO: "Utilizatori",
+    RU: "Пользователи",
   },
   "Căutare utilizator": {
     RO: "Căutare utilizator",
@@ -2192,8 +2192,8 @@ export const translations = {
     RU: "Выберите интервал",
   },
   groupTitle: {
-    RO: "Alegeți grupa de lead-uri",
-    RU: "Выберите группу лидов",
+    RO: "Grupa de lead-uri",
+    RU: "Группа лидов",
   },
   ChoiseStatus: {
     RO: "Alege statusul",

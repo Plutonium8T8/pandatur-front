@@ -7,6 +7,7 @@ import {
     Stack,
     Divider,
     Group,
+    ScrollArea
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
@@ -141,75 +142,85 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             }
             size="lg"
         >
-            <Stack>
-                <TextInput
-                    label={translations["Nume grup"][language]}
-                    placeholder={translations["Nume grup"][language]}
-                    value={groupName}
-                    onChange={(e) => setGroupName(e.target.value)}
-                    required
-                />
+            <ScrollArea h="800">
+                <Stack>
+                    <Box
+                        style={{
+                            position: "sticky",
+                            top: 0,
+                            zIndex: 10,
+                            backgroundColor: "white",
+                        }}
+                    >
+                        <TextInput
+                            label={translations["Nume grup"][language]}
+                            placeholder={translations["Nume grup"][language]}
+                            value={groupName}
+                            onChange={(e) => setGroupName(e.target.value)}
+                            required
+                        />
 
-                <Box>
-                    <Text fw={600} mb={4}>
-                        {translations["Selectați permisiunile"][language]}
-                    </Text>
-                    <RoleMatrix selectedRoles={selectedRoles} onToggle={toggleRole} />
-                </Box>
+                        <Text fw={600} mb={4}>
+                            {translations["Selectați permisiunile"][language]}
+                        </Text>
 
-                <Group>
-                    <Button onClick={handleSubmit}>
-                        {editingGroupId
-                            ? translations["Salvează modificările"][language]
-                            : translations["Creează"][language]}
-                    </Button>
+                        <RoleMatrix selectedRoles={selectedRoles} onToggle={toggleRole} />
 
-                    {editingGroupId && (
+                        <Group mt="sm">
+                            <Button onClick={handleSubmit}>
+                                {editingGroupId
+                                    ? translations["Salvează modificările"][language]
+                                    : translations["Creează"][language]}
+                            </Button>
+
+                            {editingGroupId && (
+                                <>
+                                    <Button color="red" onClick={handleDelete}>
+                                        {translations["Șterge grupul"][language]}
+                                    </Button>
+                                    <Button variant="default" onClick={resetForm}>
+                                        {translations["Anuleazǎ"][language]}
+                                    </Button>
+                                </>
+                            )}
+                        </Group>
+                    </Box>
+
+                    {existingGroups.length > 0 && (
                         <>
-                            <Button color="red" onClick={handleDelete}>
-                                {translations["Șterge grupul"][language]}
-                            </Button>
-                            <Button variant="default" onClick={resetForm}>
-                                {translations["Anuleazǎ"][language]}
-                            </Button>
+                            <Divider my="sm" />
+                            <Text fw={600}>
+                                {translations["Grupuri existente"][language]}
+                            </Text>
+                            <Stack spacing={4}>
+                                {existingGroups.map((g) => (
+                                    <Box
+                                        key={g.permission_id}
+                                        onClick={() => handleGroupClick(g)}
+                                        style={{
+                                            cursor: "pointer",
+                                            padding: 8,
+                                            borderRadius: 4,
+                                            background: "#f8f9fa",
+                                            border: "1px solid #dee2e6",
+                                            transition: "background 0.2s",
+                                        }}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.background = "#f1f3f5")
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.background = "#f8f9fa")
+                                        }
+                                    >
+                                        <Text fw={500}>{g.permission_name}</Text>
+                                    </Box>
+                                ))}
+                            </Stack>
                         </>
                     )}
-                </Group>
-
-                {existingGroups.length > 0 && (
-                    <>
-                        <Divider my="sm" />
-                        <Text fw={600}>
-                            {translations["Grupuri existente"][language]}
-                        </Text>
-                        <Stack spacing={4}>
-                            {existingGroups.map((g) => (
-                                <Box
-                                    key={g.permission_id}
-                                    onClick={() => handleGroupClick(g)}
-                                    style={{
-                                        cursor: "pointer",
-                                        padding: 8,
-                                        borderRadius: 4,
-                                        background: "#f8f9fa",
-                                        border: "1px solid #dee2e6",
-                                        transition: "background 0.2s",
-                                    }}
-                                    onMouseEnter={(e) =>
-                                        (e.currentTarget.style.background = "#f1f3f5")
-                                    }
-                                    onMouseLeave={(e) =>
-                                        (e.currentTarget.style.background = "#f8f9fa")
-                                    }
-                                >
-                                    <Text fw={500}>{g.permission_name}</Text>
-                                </Box>
-                            ))}
-                        </Stack>
-                    </>
-                )}
-            </Stack>
-        </Modal>
+                </Stack>
+            </ScrollArea>
+        </Modal >
     );
 };
 
