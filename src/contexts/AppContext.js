@@ -1,8 +1,9 @@
 import React, { createContext, useState, useEffect, useRef } from "react";
 import { useSnackbar } from "notistack";
-import { useUser, useLocalStorage, useMessages } from "../hooks";
-import { api } from "../api";
-import { showServerError, getLanguageByKey } from "../Components/utils";
+import { useUser, useLocalStorage, useMessages } from "@hooks";
+import { api } from "@api";
+import { showServerError, getLanguageByKey } from "@utils";
+import { TYPE_SOCKET_EVENTS } from "@app-constants";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
@@ -25,7 +26,6 @@ export const AppProvider = ({ children }) => {
     getUserMessages,
     markMessageRead,
     updateMessage,
-    markMessageSeen,
     setMessages,
     lastMessage,
     loading,
@@ -81,7 +81,7 @@ export const AppProvider = ({ children }) => {
     }
 
     const socketMessage = JSON.stringify({
-      type: "connect",
+      type: TYPE_SOCKET_EVENTS.CONNECT,
       data: { ticket_id: ticketIds },
     });
 
@@ -136,7 +136,7 @@ export const AppProvider = ({ children }) => {
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
-        type: "seen",
+        type: TYPE_SOCKET_EVENTS.SEEN,
         data: {
           ticket_id: ticketId,
           sender_id: Number(userId),
@@ -226,7 +226,7 @@ export const AppProvider = ({ children }) => {
 
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
-      case "message": {
+      case TYPE_SOCKET_EVENTS.MESSAGE: {
         console.log("New message from WebSocket:", message.data);
 
         const {
@@ -266,10 +266,8 @@ export const AppProvider = ({ children }) => {
 
         break;
       }
-      case "seen": {
-        const { ticket_id, seen_at } = message.data;
-
-        markMessageSeen(ticket_id, seen_at);
+      case TYPE_SOCKET_EVENTS.SEEN: {
+        const { ticket_id } = message.data;
 
         setTickets((prevTickets) =>
           prevTickets.map((ticket) =>
@@ -279,7 +277,8 @@ export const AppProvider = ({ children }) => {
 
         break;
       }
-      case "ticket": {
+
+      case TYPE_SOCKET_EVENTS.TICKET: {
         console.log("A new ticket has arrived:", message.data);
 
         const ticketId = message.data.ticket_id;
@@ -295,7 +294,7 @@ export const AppProvider = ({ children }) => {
         const socketInstance = socketRef.current;
         if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
           const socketMessage = JSON.stringify({
-            type: "connect",
+            type: TYPE_SOCKET_EVENTS.CONNECT,
             data: { ticket_id: [ticketId] },
           });
           socketInstance.send(socketMessage);
@@ -305,9 +304,6 @@ export const AppProvider = ({ children }) => {
         break;
       }
 
-      case "pong":
-        console.log("Pong received");
-        break;
       default:
         console.warn("Invalid message_type from socket:", message.type);
     }
