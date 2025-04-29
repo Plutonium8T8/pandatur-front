@@ -26,7 +26,6 @@ export const AppProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
-  const [selectTicketId, setSelectTicketId] = useState(null);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
   const { storage, changeLocalStorage } = useLocalStorage(
     SIDEBAR_COLLAPSE,
@@ -111,30 +110,26 @@ export const AppProvider = ({ children }) => {
           ticket_id,
           message: msgText,
           time_sent,
+          mtype,
           sender_id,
         } = message.data;
 
         setUnreadCount((prev) => prev + 1);
 
-        setTickets((prevTickets) =>
-          prevTickets.map((ticket) =>
-            ticket.id === ticket_id
+        setTickets((prev) => {
+          return prev.map((ticket) => {
+            return ticket.id === ticket_id
               ? {
                   ...ticket,
-                  last_message_type: message.data.mtype,
+                  unseen_count:
+                    ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                  last_message_type: mtype,
                   last_message: msgText,
                   time_sent: time_sent,
-                  unseen_count:
-                    ticket_id === selectTicketId
-                      ? 0
-                      : ticket.unseen_count + (sender_id !== userId ? 1 : 0),
                 }
-              : {
-                  ...ticket,
-                  last_message_type: message.data.mtype,
-                },
-          ),
-        );
+              : ticket;
+          });
+        });
 
         break;
       }
@@ -194,8 +189,6 @@ export const AppProvider = ({ children }) => {
       value={{
         tickets,
         setTickets,
-        selectTicketId,
-        setSelectTicketId,
         unreadCount,
         markMessagesAsRead,
 
