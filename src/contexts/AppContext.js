@@ -97,11 +97,8 @@ export const AppProvider = ({ children }) => {
       });
 
       setUnreadCount((prev) => prev + ticket?.unseen_count || 0);
-
-      return ticket;
     } catch (error) {
-      console.error("Ticket request error:", error);
-      return null;
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
@@ -154,27 +151,25 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.TICKET: {
-        console.log("A new ticket has arrived:", message.data);
-
         const ticketId = message.data.ticket_id;
 
-        if (!ticketId) {
-          console.warn("Cannot extract ticket id from 'ticket'.");
+        if (ticketId) {
+          fetchSingleTicket(ticketId);
 
-          break;
-        }
-
-        fetchSingleTicket(ticketId);
-
-        const socketInstance = socketRef.current;
-        if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
-          const socketMessage = JSON.stringify({
-            type: TYPE_SOCKET_EVENTS.CONNECT,
-            data: { ticket_id: [ticketId] },
-          });
-          socketInstance.send(socketMessage);
-        } else {
-          console.warn("Error connecting to chat-room, WebSocket is off.");
+          const socketInstance = socketRef.current;
+          if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
+            const socketMessage = JSON.stringify({
+              type: TYPE_SOCKET_EVENTS.CONNECT,
+              data: { ticket_id: [ticketId] },
+            });
+            socketInstance.send(socketMessage);
+          } else {
+            enqueueSnackbar(
+              getLanguageByKey("errorConnectingToChatRoomWebSocket"),
+              { variant: "error" },
+            );
+            console.warn("Error connecting to chat-room, WebSocket is off.");
+          }
         }
         break;
       }
