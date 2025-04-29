@@ -57,7 +57,7 @@ export const GroupedMessages = ({
         date: messageDate,
         clientId: Number(currentClientId),
         messages: [msg],
-        id: `${messageDate}-${Number(currentClientId)}`,
+        id: `${messageDate}-${Number(currentClientId)}-${msg.id}`,
       });
     } else {
       lastGroup.messages.push(msg);
