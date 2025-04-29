@@ -27,7 +27,6 @@ export const ChatMessages = ({
   onChangeSelectedUser,
   loading,
   technicians,
-  tasks = [],
 }) => {
   const { userId } = useUser();
 
@@ -166,10 +165,8 @@ export const ChatMessages = ({
         <>
           <TaskListOverlay
             ticketId={selectTicketId}
-            tasks={tasks}
             creatingTask={creatingTask}
             setCreatingTask={setCreatingTask}
-            fetchTasks={window.fetchTasksGlobal}
           />
           <ChatInput
             loading={loading}

@@ -68,7 +68,7 @@
 
 /* TODO  fix height component */
 .rc-table-scroll-container {
-  max-height: calc(100vh - 170px);
+  max-height: calc(100vh - 140px);
   overflow-y: auto;
   position: relative;
 }

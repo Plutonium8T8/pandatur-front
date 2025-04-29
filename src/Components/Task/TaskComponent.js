@@ -75,6 +75,8 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
     fetchTasks();
   }, [filters, searchQuery, currentPage]);
 
+
+  // *** TO DO *** need to refactor window create task
   const openNewTask = () => {
     setSelectedTask(null);
     setIsModalOpen(true);
