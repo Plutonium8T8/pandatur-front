@@ -16,8 +16,8 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
       {msg.mtype === MEDIA_TYPE.CALL ? (
         <Call
           time={msg.time_sent}
-          from={msg.call_metadata.dst_num}
-          to={msg.call_metadata.src_num}
+          from={msg.call_metadata?.dst_num}
+          to={msg.call_metadata?.src_num}
           name={msg.treename}
           src={msg.message}
         />
