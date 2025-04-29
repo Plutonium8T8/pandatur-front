@@ -1,0 +1,115 @@
+import { TextInput, MultiSelect, Select, Flex } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import { useGetTechniciansList } from "../../../hooks";
+import { getLanguageByKey } from "../../utils";
+
+export const MessageFilterForm = ({
+    onSubmit,
+    renderFooterButtons,
+    data,
+    formId,
+}) => {
+    const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+
+    const form = useForm({
+        initialValues: {
+            message: data?.message || "",
+            time_sent: data?.time_sent || [null, null],
+            sender_id: data?.sender_id || [],
+            mtype: data?.mtype || "",
+        },
+    });
+
+    const handleResetForm = () => {
+        form.setValues({
+            message: "",
+            time_sent: [null, null],
+            sender_id: [],
+            mtype: "",
+        });
+    };
+
+    return (
+        <form
+            id={formId}
+            onSubmit={form.onSubmit((values) => {
+                const attributes = { ...values };
+
+                if (Array.isArray(attributes.sender_id)) {
+                    attributes.sender_id = attributes.sender_id.map((id) => Number(id));
+                }
+
+                if (
+                    Array.isArray(attributes.time_sent) &&
+                    (attributes.time_sent[0] || attributes.time_sent[1])
+                ) {
+                    attributes.time_sent = {
+                        ...(attributes.time_sent[0] && {
+                            from: attributes.time_sent[0]?.toLocaleDateString("en-GB"),
+                        }),
+                        ...(attributes.time_sent[1] && {
+                            to: attributes.time_sent[1]?.toLocaleDateString("en-GB"),
+                        }),
+                    };
+                } else {
+                    delete attributes.time_sent;
+                }
+
+                onSubmit(attributes);
+            })}
+        >
+            <Flex direction="column" gap="md">
+                <TextInput
+                    label={getLanguageByKey("searchByMessages")}
+                    placeholder={getLanguageByKey("searchByMessages")}
+                    key={form.key("message")}
+                    {...form.getInputProps("message")}
+                />
+
+                <DatePickerInput
+                    type="range"
+                    label={getLanguageByKey("searchByInterval")}
+                    placeholder={getLanguageByKey("searchByInterval")}
+                    valueFormat="DD-MM-YYYY"
+                    clearable
+                    key={form.key("time_sent")}
+                    {...form.getInputProps("time_sent")}
+                />
+
+                <MultiSelect
+                    searchable
+                    clearable
+                    label={getLanguageByKey("Selectează operator")}
+                    placeholder={getLanguageByKey("Selectează operator")}
+                    data={technicians}
+                    disabled={loadingTechnicians}
+                    key={form.key("sender_id")}
+                    {...form.getInputProps("sender_id")}
+                />
+
+                <Select
+                    searchable
+                    clearable
+                    label={getLanguageByKey("typeMessages")}
+                    placeholder={getLanguageByKey("typeMessages")}
+                    data={[
+                        { value: "text", label: "Text" },
+                        { value: "image", label: "Image" },
+                        { value: "audio", label: "Audio" },
+                        { value: "file", label: "File" },
+                        { value: "url", label: "URL" },
+                        { value: "call", label: "Call" },
+                        { value: "video", label: "Video" },
+                    ]}
+                    key={form.key("mtype")}
+                    {...form.getInputProps("mtype")}
+                />
+
+                <Flex justify="end" gap="md" mt="md">
+                    {renderFooterButtons?.({ onResetForm: handleResetForm, formId })}
+                </Flex>
+            </Flex>
+        </form>
+    );
+};

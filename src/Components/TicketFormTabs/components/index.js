@@ -4,3 +4,4 @@ export * from "./BasicGeneralForm";
 export * from "./ContractForm";
 export * from "./InvoiceForm";
 export * from "./QualityControlForm";
+export * from "./MessageFilterForm";

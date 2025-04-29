@@ -6,22 +6,22 @@ import {
   InvoiceForm,
   QualityControlForm,
   BasicGeneralForm,
+  MessageFilterForm,
 } from "./components";
 import "./TicketFormTabs.css";
 
-const renderResetButton = (resetForm) => {
-  return (
-    <Button variant="outline" onClick={resetForm}>
-      {getLanguageByKey("Reset filter")}
-    </Button>
-  );
-};
+const renderResetButton = (resetForm) => (
+  <Button variant="outline" onClick={resetForm}>
+    {getLanguageByKey("Reset filter")}
+  </Button>
+);
 
 const formIds = {
   general: "generalForm",
   ticketInfo: "ticketInfoForm",
   contract: "contractForm",
   invoice: "invoiceForm",
+  messageFilter: "messageFilterForm",
 };
 
 export const TicketFormTabs = ({
@@ -54,13 +54,12 @@ export const TicketFormTabs = ({
         <Tabs.Tab value="filter_quality_control">
           {getLanguageByKey("Control calitate")}
         </Tabs.Tab>
+        <Tabs.Tab value="filter_message">
+          {getLanguageByKey("Filtru dupǎ mesaje")}
+        </Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel
-        className="general-information-filter"
-        pl="lg"
-        value="filter_general_info"
-      >
+      <Tabs.Panel className="general-information-filter" pl="lg" value="filter_general_info">
         <Flex direction="column" justify="space-between" h="100%">
           <BasicGeneralForm
             data={initialData}
@@ -123,7 +122,6 @@ export const TicketFormTabs = ({
             renderFooterButtons={({ onResetForm, formId }) => (
               <>
                 {renderResetButton(onResetForm)}
-
                 <Button variant="default" onClick={onClose}>
                   {getLanguageByKey("Închide")}
                 </Button>
@@ -153,6 +151,26 @@ export const TicketFormTabs = ({
                 </Button>
               </>
             )}
+          />
+        </Flex>
+      </Tabs.Panel>
+      <Tabs.Panel pl="lg" value="filter_message">
+        <Flex direction="column" justify="space-between" h="100%">
+          <MessageFilterForm
+            data={initialData}
+            onSubmit={onSubmit}
+            renderFooterButtons={({ onResetForm, formId }) => (
+              <>
+                {renderResetButton(onResetForm)}
+                <Button variant="default" onClick={onClose}>
+                  {getLanguageByKey("Închide")}
+                </Button>
+                <Button loading={loading} type="submit" form={formId}>
+                  {getLanguageByKey("Aplică")}
+                </Button>
+              </>
+            )}
+            formId={formIds.messageFilter}
           />
         </Flex>
       </Tabs.Panel>

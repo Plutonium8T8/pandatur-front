@@ -1082,9 +1082,9 @@ export const translations = {
     RO: "Platforma mesaj",
     RU: "Платформа сообщений",
   },
-  "Filtru pentru mesaje (coming soon)": {
-    RO: "Filtru pentru mesaje (coming soon)",
-    RU: "Фильтр для сообщений (скоро)",
+  "Filtru dupǎ mesaje": {
+    RO: "Filtru dupǎ mesaje",
+    RU: "Фильтр для сообщений",
   },
   Workflow: {
     RO: "Flux de lucru",
@@ -2278,5 +2278,17 @@ export const translations = {
   errorConnectingToChatRoomWebSocket: {
     RO: "Eroare la conectarea la camera de chat. Conexiunea WebSocket nu este disponibilă",
     RU: "Ошибка подключения к чату. Соединение WebSocket недоступно",
+  },
+  searchByMessages: {
+    RO: "Introduceți mesaj pentru cǎutare",
+    RU: "Введите сообшение для поиска",
+  },
+  searchByInterval: {
+    RO: "Cautǎ dupǎ datǎ",
+    RU: "Выберете интервал",
+  },
+  typeMessages: {
+    RO: "Tipul mesajului",
+    RU: "Тип сообщения"
   },
 };
