@@ -32,6 +32,12 @@ import { useConfirmPopup } from "../../hooks/useConfirmPopup";
 import dayjs from "dayjs";
 import { useUser } from "../../hooks";
 import { useSnackbar } from "notistack";
+import {
+  getDeadlineColor,
+  getBadgeColor,
+  formatTasksToEdits,
+  sortTasksByDate
+} from "../utils/taskUtils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -58,24 +64,13 @@ const TaskListOverlay = ({
     if (!ticketId) return setTasks([]);
     try {
       const res = await api.task.getTaskByTicket(ticketId);
-      const taskArray = (Array.isArray(res?.data) ? res.data : res)
-        .filter(t => t.ticket_id === ticketId && !t.status)
-        .sort((a, b) =>
-          dayjs(a.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf() -
-          dayjs(b.scheduled_time, "DD-MM-YYYY HH:mm:ss").valueOf()
-        );
+      const taskArray = sortTasksByDate(
+        (Array.isArray(res?.data) ? res.data : res)
+          .filter(t => t.ticket_id === ticketId && !t.status)
+      );
       setTasks(taskArray);
 
-      const edits = {};
-      taskArray.forEach((t) => {
-        edits[t.id] = {
-          task_type: t.task_type,
-          description: t.description || "",
-          scheduled_time: parseDate(t.scheduled_time),
-          created_for: t.created_for?.toString(),
-          created_by: t.created_by?.toString() || "",
-        };
-      });
+      const edits = formatTasksToEdits(taskArray);
       setTaskEdits((prev) => ({ ...edits, ...(prev.new ? { new: prev.new } : {}) }));
     } catch (error) {
       console.error("Error loading tasks", error);
@@ -219,34 +214,6 @@ const TaskListOverlay = ({
       }));
     }
     setEditMode((prev) => ({ ...prev, [id]: false }));
-  };
-
-  const getBadgeColor = () => {
-    const today = dayjs().startOf("day");
-
-    const hasOverdue = tasks.some((task) =>
-      dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").isBefore(today)
-    );
-
-    if (hasOverdue) return "red";
-
-    const hasToday = tasks.some((task) =>
-      dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss").isSame(today, "day")
-    );
-
-    if (hasToday) return "green";
-
-    return "gray";
-  };
-
-  const getDeadlineColor = (date) => {
-    const parsedDate = new Date(date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    if (parsedDate < today) return "red";
-    if (parsedDate.toDateString() === today.toDateString()) return "green";
-    return "black";
   };
 
   const renderTaskForm = (id, isNew = false) => {
@@ -414,7 +381,7 @@ const TaskListOverlay = ({
         <Group justify="space-between">
           <Group gap="xs">
             <Text fw={600}>{translations["Tasks"][language]}</Text>
-            <Badge size="sm" color={getBadgeColor()}>
+            <Badge size="sm" color={getBadgeColor(tasks)}>
               {tasks.length}
             </Badge>
           </Group>
