@@ -69,13 +69,6 @@ export const Leads = () => {
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
 
-  const [messageFilters, setMessageFilters] = useState({
-    message: "",
-    time_sent: null,
-    sender_id: [],
-    mtype: "",
-  });
-
   const filteredTickets = useMemo(() => {
     let result = tickets;
     if (filteredTicketIds === null) return result;
@@ -376,8 +369,6 @@ export const Leads = () => {
             setFilteredTicketIds(filteredTicketIds ?? null);
           }}
           onSubmitTicket={handleApplyFilterLightTicket}
-          messageFilters={messageFilters}
-          setMessageFilters={setMessageFilters}
         />
       </MantineModal>
 
@@ -391,8 +382,6 @@ export const Leads = () => {
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
           onSubmitTicket={handleApplyFiltersHardTicket}
-          messageFilters={messageFilters}
-          setMessageFilters={setMessageFilters}
         />
       </MantineModal>
 
