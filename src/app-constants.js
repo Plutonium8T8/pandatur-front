@@ -1,6 +1,7 @@
 export const MAX_PAGE_SIZE = 100;
 export const ISO_DATE = "yyyy-MM-dd";
 export const DD_MM_YYYY = "DD.MM.YYYY";
+export const DD_MM_YYYY_DASH = "DD-MM-YYYY";
 export const DD_MM_YYYY__HH_mm_ss = "DD-MM-YYYY HH:mm:ss";
 export const HH_mm = "HH:mm";
 
