@@ -2279,4 +2279,110 @@ export const translations = {
     RO: "Eroare la conectarea la camera de chat. Conexiunea WebSocket nu este disponibilă",
     RU: "Ошибка подключения к чату. Соединение WebSocket недоступно",
   },
+  termsAndConditionsOfUsePandaTurSRL: {
+    RO: "Termeni și Condiții de utilizare Panda Tur SRL",
+    RU: "Условия использования Panda Tur SRL",
+  },
+  lastUpdate: {
+    RO: "Ultima actualizare: 30 aprilie 2025",
+    RU: "Последнее обновление: 30 апреля 2025",
+  },
+  acceptanceOfTerms: {
+    RO: "Acceptarea Termenilor",
+    RU: "Принятие условий",
+  },
+  termsAndConditionsOfUsePandaTurSRLAcceptanceOfTerms: {
+    RO: 'Utilizarea [pandatur.md](https://pandatur.md/ro) este reglementată prin Termeni și Condiții de Utilizare prezentate în continuare.\n\nÎnainte de a utiliza [pandatur.md](https://pandatur.md/ro), vă recomandăm să citiți cu atenție condițiile de utilizare. Folosind serviciile paginii web [pandatur.md](https://pandatur.md/ro), Dvs. sunteți de acord cu Condițiile de utilizare.\n\nPrezentul Acord de utilizare (în continuare "Acord") stabilește condițiile legale obligatorii de utilizare a serviciilor [pandatur.md](https://pandatur.md/ro). Prin utilizarea serviciilor [pandatur.md](https://pandatur.md/ro), dvs. acceptați condițiile prezentului acord, indiferent dacă sunteți "Vizitator" sau "Utilizator înregistrat/membru".\n\nDvs. puteți utiliza serviciile [pandatur.md](https://pandatur.md/ro) doar dacă sunteți de acord să respectați prevederile Acordului și toate legile de referință în vigoare. Dacă doriți să deveniți utilizator înregistrat, să comunicați cu alți utilizatori și să utilizați serviciile [pandatur.md](https://pandatur.md/ro), trebuie să acceptați expres prezentul acord în timpul înregistrării.\n\nConținutul site-ului web și al aplicațiilor mobile, informațiile oferite (inclusiv prețul și disponibilitatea serviciilor turistice), precum și datele software și infrastructura utilizate pentru transmiterea informațiilor sunt proprietatea Panda Tur SRL sau a afiliaților săi.\n\nCompania Panda Tur poate modifica periodic prezentul acord, care intră în vigoare la data publicării pe site-ul web [pandatur.md](https://pandatur.md/ro). Utilizând serviciile după publicare, acceptați respectarea tuturor modificărilor. Se recomandă consultarea periodică a Termenilor.',
+    RU: 'Использование [pandatur.md](https://pandatur.md/ro) регулируется настоящими Условиями использования, изложенными ниже.\n\nПеред использованием [pandatur.md](https://pandatur.md/ro), мы рекомендуем вам внимательно прочитать условия использования. Используя услуги веб-страницы [pandatur.md](https://pandatur.md/ro), вы соглашаетесь с Условиями использования.\n\nНастоящее Соглашение о пользовании (далее "Соглашение") устанавливает обязательные условия использования услуг [pandatur.md](https://pandatur.md/ro). Используя услуги [pandatur.md](https://pandatur.md/ro), вы соглашаетесь с условиями настоящего соглашения, независимо от того, являетесь ли вы "Посетителем" или "Зарегистрированным пользователем/членом".\n\nВы можете использовать услуги [pandatur.md](https://pandatur.md/ro) только в том случае, если согласны соблюдать положения Соглашения и все соответствующие законы, действующие на данный момент. Если вы хотите стать зарегистрированным пользователем, общаться с другими пользователями и использовать услуги [pandatur.md](https://pandatur.md/ro), вы должны явно согласиться с настоящим соглашением в процессе регистрации.\n\nСодержимое веб-сайта и мобильных приложений, предоставляемая информация (включая цены и доступность туристических услуг), а также программное обеспечение и инфраструктура, используемые для передачи информации, являются собственностью Panda Tur SRL или ее аффилированных лиц.\n\nКомпания Panda Tur может периодически изменять настоящее соглашение, которое вступает в силу с момента его публикации на веб-сайте [pandatur.md](https://pandatur.md/ro). Используя услуги после публикации, вы соглашаетесь с соблюдением всех изменений. Рекомендуется периодически проверять Условия.',
+  },
+  privacyPolicy: {
+    RO: "Politica de Confidențialitate",
+    RU: "Политика конфиденциальности",
+  },
+  privacyPolicyText: {
+    RO: "Utilizarea site-ului web și a aplicațiilor companiei Panda Tur este reglementată de Politica de Confidențialitate disponibilă pe pagina web [pandatur.md](https://pandatur.md/ro).\n\nDatele colectate prin intermediul site-ului sunt procesate conform legii Republicii Moldova și Regulamentului (UE) 2016/679 (GDPR).",
+    RU: "Использование веб-сайта и приложений компании Panda Tur регулируется Политикой конфиденциальности, доступной на веб-странице [pandatur.md](https://pandatur.md/ro).\n\nДанные, собранные через сайт, обрабатываются в соответствии с законодательством Республики Молдова и Регламентом (ЕС) 2016/679 (GDPR).",
+  },
+  serviceDescription: {
+    RO: "Descrierea serviciului",
+    RU: "Описание услуги",
+  },
+  serviceDescriptionText: {
+    RO: 'Panda Tur oferă utilizatorilor instrumente și mijloace de căutare pentru planificarea și utilizarea serviciilor turistice, inclusiv rezervări online.\n\nDupă finalizarea căutării biletului de avion, utilizatorul completează:\n- Nume / Prenume\n- Data nașterii\n- Numărul și data de expirare a documentului de identitate\n- Adresa e-mail și telefon\n\nPrin selectarea metodei de plată cu "card bancar", sunteți redirecționat către procesatorul de plăți. Dacă plata este realizată cu succes, biletul de avion este expediat prin e-mail.\n\nPrin metoda "Achită în oficiu", rezervarea este validată prin achitarea directă la biroul nostru.\n\nServiciu gratuit & uz personal: Panda Tur oferă motorul de căutare gratuit pentru uz personal. Procesele automatizate (scraping, bots) sunt interzise.',
+    RU: 'Panda Tur предоставляет пользователям инструменты и средства для поиска и использования туристических услуг, включая онлайн-бронирование.\n\nПосле завершения поиска билета на самолет, пользователь заполняет:\n- Имя / Фамилия\n- Дата рождения\n- Номер и дата истечения срока действия документа, удостоверяющего личность\n- Адрес электронной почты и телефон\n\nПри выборе метода оплаты с "банковской картой", вы будете перенаправлены к процессору платежей. Если оплата прошла успешно, билет на самолет будет отправлен на ваш электронный адрес.\n\nПри методе "Оплата в офисе", бронирование подтверждается при оплате непосредственно в нашем офисе.\n\nБесплатная услуга и личное использование: Panda Tur предоставляет бесплатный поисковик для личного использования. Автоматизированные процессы (scraping, боты) запрещены.',
+  },
+
+  metaApiIntegration: {
+    RO: "Integrare API Meta",
+    RU: "Интеграция API Meta",
+  },
+  metaApiIntegrationDescription: {
+    RO: "- Platforma pandatur.md utilizează WhatsApp Cloud API, Instagram Graph API și Facebook Messenger API pentru procesarea și centralizarea mesajelor clienților.\n- Utilizarea acestor servicii este guvernată de Politicile Platformei Meta: [Platform Policies Meta](https://developers.facebook.com/policy/).\n- Comunicările inițiate prin aceste platforme pot fi procesate de Meta Platforms Ireland Ltd., inclusiv stocate în afara UE, conform propriilor politici.\n- Clienții au dreptul să solicite ștergerea datelor de comunicație printr-un e-mail la privacy@pandatur.md; solicitările vor fi procesate în max. 30 zile.\n- Panda Tur acționează independent; Meta Platforms Ireland Ltd. nu este responsabilă pentru conținutul mesajelor sau serviciile oferite de Panda Tur.",
+    RU: "- Платформа pandatur.md использует WhatsApp Cloud API, Instagram Graph API и Facebook Messenger API для обработки и централизованного управления сообщениями клиентов.\n- Использование этих сервисов регулируется Политиками платформы Meta: [Platform Policies Meta](https://developers.facebook.com/policy/).\n- Сообщения, инициированные через эти платформы, могут обрабатываться Meta Platforms Ireland Ltd., в том числе храниться за пределами ЕС, в соответствии с их политиками.\n- Клиенты имеют право запросить удаление данных о коммуникации, отправив электронное письмо на адрес privacy@pandatur.md; запросы будут обработаны в течение 30 дней.\n- Panda Tur действует независимо; Meta Platforms Ireland Ltd. не несет ответственности за содержание сообщений или услуги, предоставляемые Panda Tur.",
+  },
+  generalTermsOfUse: {
+    RO: "Condiții generale de utilizare",
+    RU: "Общие условия использования",
+  },
+  pandaTurUsageRules: {
+    RO: "Panda Tur își rezervă dreptul de a stabili reguli privind:\n- Numărul maxim de itinerarii salvate.\n- Numărul maxim de utilizatori per itinerar.\n- Spațiul de stocare pe server.\n\nEste interzisă orice acțiune care ar putea duce la supraîncărcarea infrastructurii Panda Tur.",
+    RU: "Panda Tur оставляет за собой право устанавливать правила в отношении:\n- Максимального количества сохранённых маршрутов.\n- Максимального количества пользователей на один маршрут.\n- Объема хранилища на сервере.\n\nЗапрещены любые действия, которые могут привести к перегрузке инфраструктуры Panda Tur.",
+  },
+  accountsPasswordsAndSecurity: {
+    RO: "Conturi, parole și securitate",
+    RU: "Учетные записи, пароли и безопасность",
+  },
+  userAccountSecurity: {
+    RO: "Conturile utilizatorilor sunt protejate prin parolă.\n\nUtilizatorii sunt responsabili pentru păstrarea confidențialității. [Platform Terms - Meta for Developers](https://developers.facebook.com/terms/)\n\nÎn caz de acces neautorizat, vă rugăm să contactați imediat security@pandatur.md.",
+    RU: "Учетные записи пользователей защищены паролем.\n\nПользователи несут ответственность за сохранение конфиденциальности.\n\n[Условия платформы — Meta for Developers](https://developers.facebook.com/terms/)\n\nВ случае несанкционированного доступа свяжитесь с нами по адресу security@pandatur.md.",
+  },
+  limitationOfLiability: {
+    RO: "Limitarea răspunderii",
+    RU: "Ограничение ответственности",
+  },
+  pandaTurLiabilityLimitation: {
+    RO: "Panda Tur nu este responsabilă pentru:\n- Informații incorecte furnizate de terți (ex.: companii aeriene, hoteluri).\n- Indisponibilitatea temporară a serviciului.\n- Pierderi indirecte rezultate din utilizarea serviciului.\n\nRăspunderea Panda Tur este limitată la valoarea cumulată a serviciilor achitate de utilizator în ultimele 12 luni.",
+    RU: "Panda Tur не несет ответственности за:\n- Некорректную информацию, предоставленную третьими сторонами (например, авиакомпании, отели).\n- Временную недоступность сервиса.\n- Косвенные убытки, возникающие в результате использования сервиса.\n\nОтветственность Panda Tur ограничена суммой, уплаченной пользователем за услуги за последние 12 месяцев.",
+  },
+  advertisingAndThirdPartyLinks: {
+    RO: "Publicitatea și link-urile către terți",
+    RU: "Реклама и ссылки на сторонние ресурсы",
+  },
+  externalLinksAndAdvertising: {
+    RO: "Site-ul poate conține link-uri către site-uri externe. Panda Tur nu are control asupra acestor site-uri și nu garantează conținutul lor.",
+    RU: "Сайт может содержать ссылки на внешние ресурсы. Panda Tur не контролирует эти сайты и не гарантирует их содержание.",
+  },
+  intellectualProperty: {
+    RO: "Proprietatea intelectuală",
+    RU: "Интеллектуальная собственность",
+  },
+  copyrightAndIntellectualProperty: {
+    RO: "Toate materialele de pe site sunt protejate de drepturile de autor.\nReproducerea, distribuirea sau utilizarea materialelor fără acordul scris al Panda Tur este interzisă.",
+    RU: "Все материалы на сайте защищены авторскими правами.\nЗапрещено воспроизведение, распространение или использование материалов без письменного согласия Panda Tur.",
+  },
+  disputeResolution: {
+    RO: "Soluționarea disputelor",
+    RU: "Разрешение споров",
+  },
+
+  disputeResolutionDetails: {
+    RO: "Orice dispută va fi soluționată pe cale amiabilă, iar în caz contrar de instanțele competente din Chișinău.\n\nConsumatorii din UE pot utiliza platforma ODR: [https://ec.europa.eu/consumers/odr/](https://ec.europa.eu/consumers/odr/)",
+    RU: "Любой спор будет решаться мирным путем, а в случае невозможности — в компетентных судах города Кишинев.\n\nПотребители из ЕС могут использовать платформу ODR: [https://ec.europa.eu/consumers/odr/](https://ec.europa.eu/consumers/odr/)",
+  },
+  modificationOfTerms: {
+    RO: "Modificarea Termenilor",
+    RU: "Изменение условий",
+  },
+  modificationOfTermsDetails: {
+    RO: "Panda Tur își rezervă dreptul de a modifica periodic prezentul document. Modificările devin efective la publicare pe site.",
+    RU: "Panda Tur оставляет за собой право периодически изменять настоящий документ. Изменения вступают в силу с момента их публикации на сайте.",
+  },
+  contact: {
+    RO: "Contact",
+    RU: "Контакт",
+  },
+  contactDetails: {
+    RO: "Pentru întrebări sau reclamații:\n- E-mail: contact@pandatur.md\n- Suport clienți: +373 22 78-19-19\n- Protecția datelor: privacy@pandatur.md",
+    RU: "Для вопросов или жалоб:\n- Электронная почта: contact@pandatur.md\n- Служба поддержки клиентов: +373 22 78-19-19\n- Защита данных: privacy@pandatur.md",
+  },
 };
