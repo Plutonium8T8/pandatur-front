@@ -341,11 +341,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="documents">
           <Box p="md">
-            <InvoiceTab
-              extraInfo={extraInfo}
-              onSaveTicketExtraDate={saveTicketExtraDate}
-              loading={isLoadingInfoTicket}
-            />
+            <InvoiceTab extraInfo={extraInfo} />
           </Box>
         </Tabs.Panel>
 

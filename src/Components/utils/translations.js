@@ -2409,4 +2409,8 @@ export const translations = {
     RO: "Documente",
     RU: "Документы",
   },
+  documentGeneratedSuccessfully: {
+    RO: "Documentul a fost generat cu succes",
+    RU: "Документ был успешно сгенерирован",
+  },
 };
