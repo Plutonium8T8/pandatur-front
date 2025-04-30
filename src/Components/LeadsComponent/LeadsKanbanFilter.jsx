@@ -1,13 +1,9 @@
-import { Tabs, Flex, Button, MultiSelect, TextInput, Select } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Tabs, Flex, Button } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { SelectWorkflow } from "../SelectWorkflow";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { filteredWorkflows } from "./utils";
-import { useGetTechniciansList } from "../../hooks";
-import { MESSAGES_TYPE_OPTIONS } from "../../app-constants";
-import { useDebounce } from "../../hooks";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -16,18 +12,8 @@ export const LeadsKanbanFilter = ({
   systemWorkflow: baseSystemWorkflow,
   initialData,
   onSubmitTicket,
-  messageFilters,
-  setMessageFilters,
-  handleApplyFiltersMessageTicket,
 }) => {
   const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows);
-  const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
-  const [messageInput, setMessageInput] = useState(messageFilters.message || "");
-  const debouncedMessage = useDebounce(messageInput, 300);
-
-  useEffect(() => {
-    setMessageFilters((prev) => ({ ...prev, message: debouncedMessage }));
-  }, [debouncedMessage]);
 
   useEffect(() => {
     setSystemWorkflow(baseSystemWorkflow);
@@ -47,9 +33,6 @@ export const LeadsKanbanFilter = ({
         )}
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
-        </Tabs.Tab>
-        <Tabs.Tab value="filter_message">
-          {getLanguageByKey("Filtru dupǎ mesaje")}
         </Tabs.Tab>
       </Tabs.List>
 
@@ -90,82 +73,6 @@ export const LeadsKanbanFilter = ({
           onSubmit={onSubmitTicket}
           loading={loading}
         />
-      </Tabs.Panel>
-
-      <Tabs.Panel value="filter_message" pt="xs">
-        <Flex direction="column" gap={20} h="100%">
-          <TextInput
-            label={getLanguageByKey("searchByMessages")}
-            placeholder={getLanguageByKey("searchByMessages")}
-            value={messageInput}
-            onChange={(e) => setMessageInput(e.target.value)}
-          />
-
-          <DatePickerInput
-            type="range"
-            label={getLanguageByKey("searchByInterval")}
-            value={messageFilters.time_sent ?? [null, null]}
-            onChange={(value) =>
-              setMessageFilters((prev) => ({ ...prev, time_sent: value }))
-            }
-            clearable
-            valueFormat="DD-MM-YYYY"
-            placeholder={getLanguageByKey("searchByInterval")}
-          />
-
-          <MultiSelect
-            searchable
-            clearable
-            label={getLanguageByKey("Selectează operator")}
-            placeholder={getLanguageByKey("Selectează operator")}
-            data={technicians}
-            value={messageFilters.sender_id}
-            onChange={(value) =>
-              setMessageFilters((prev) => ({ ...prev, sender_id: value }))
-            }
-            disabled={loadingTechnicians}
-          />
-
-          <Select
-            searchable
-            clearable
-            label={getLanguageByKey("typeMessages")}
-            placeholder={getLanguageByKey("typeMessages")}
-            data={MESSAGES_TYPE_OPTIONS}
-            value={messageFilters.mtype ?? null}
-            onChange={(value) =>
-              setMessageFilters((prev) => ({ ...prev, mtype: value }))
-            }
-          />
-
-          <Flex justify="end" gap="md" mt="md">
-            <Button
-              variant="outline"
-              onClick={() =>
-                setMessageFilters({
-                  message: "",
-                  time_sent: [null, null],
-                  sender_id: [],
-                  mtype: null,
-                })
-              }
-            >
-              {getLanguageByKey("Reset filter")}
-            </Button>
-
-            <Button variant="default" onClick={onClose}>
-              {getLanguageByKey("Închide")}
-            </Button>
-
-            <Button
-              variant="filled"
-              loading={loading}
-              onClick={() => handleApplyFiltersMessageTicket(messageFilters)}
-            >
-              {getLanguageByKey("Aplică")}
-            </Button>
-          </Flex>
-        </Flex>
       </Tabs.Panel>
     </Tabs >
   );

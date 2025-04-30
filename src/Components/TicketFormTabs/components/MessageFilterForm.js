@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { TextInput, MultiSelect, Select, Flex } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -7,12 +7,7 @@ import { getLanguageByKey } from "../../utils";
 import { MESSAGES_TYPE_OPTIONS } from "../../../app-constants";
 import { useDebounce } from "../../../hooks";
 
-export const MessageFilterForm = ({
-    onSubmit,
-    renderFooterButtons,
-    data,
-    formId,
-}) => {
+export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId }) => {
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
 
     const form = useForm({
@@ -20,26 +15,19 @@ export const MessageFilterForm = ({
             message: data?.message || "",
             time_sent: data?.time_sent || [null, null],
             sender_id: data?.sender_id || [],
-            mtype: data?.mtype || "",
+            mtype: data?.mtype || null,
         },
     });
 
-    const [messageInput, setMessageInput] = useState(data?.message || "");
-    const debouncedMessage = useDebounce(messageInput, 300);
+    const debouncedMessage = useDebounce(form.values.message, 300);
+
+    const handleResetForm = () => {
+        form.reset();
+    };
 
     useEffect(() => {
         form.setFieldValue("message", debouncedMessage);
     }, [debouncedMessage]);
-
-    const handleResetForm = () => {
-        form.setValues({
-            message: "",
-            time_sent: [null, null],
-            sender_id: [],
-            mtype: null,
-        });
-        setMessageInput("");
-    };
 
     return (
         <form
@@ -74,8 +62,7 @@ export const MessageFilterForm = ({
                 <TextInput
                     label={getLanguageByKey("searchByMessages")}
                     placeholder={getLanguageByKey("searchByMessages")}
-                    value={messageInput}
-                    onChange={(e) => setMessageInput(e.target.value)}
+                    {...form.getInputProps("message")}
                 />
 
                 <DatePickerInput
@@ -84,7 +71,6 @@ export const MessageFilterForm = ({
                     placeholder={getLanguageByKey("searchByInterval")}
                     valueFormat="DD-MM-YYYY"
                     clearable
-                    key={form.key("time_sent")}
                     {...form.getInputProps("time_sent")}
                 />
 
@@ -95,7 +81,6 @@ export const MessageFilterForm = ({
                     placeholder={getLanguageByKey("Selectează operator")}
                     data={technicians}
                     disabled={loadingTechnicians}
-                    key={form.key("sender_id")}
                     {...form.getInputProps("sender_id")}
                 />
 
