@@ -9,17 +9,30 @@ import {
 import { getLanguageByKey } from "@utils";
 
 const convertMarkdownToHTML = (text) => {
-  return text.replace(
-    /\[([^\]]+)\]\((http[^\)]+)\)/g,
-    '<a target="_blank" href="$2">$1</a>',
-  );
+  let replacedText = text;
+  const tests = [
+    {
+      test: /\[([^\]]+)\]\((http[^\)]+)\)/g,
+      text: '<a target="_blank" href="$2">$1</a>',
+    },
+    {
+      test: /\{\{(.*?)\}\}/g,
+      text: "<b>$1</b>",
+    },
+  ];
+
+  tests.forEach(({ test, text }) => {
+    replacedText = replacedText.replace(test, text);
+  });
+
+  return replacedText;
 };
 
 const gray = DEFAULT_THEME.colors.gray[7];
 
 export const TermsAndConditions = () => {
   return (
-    <Box>
+    <Box h="100vh" style={{ overflowY: "scroll" }}>
       <Container py="20">
         <Box>
           <Title ta="center" order={2}>
