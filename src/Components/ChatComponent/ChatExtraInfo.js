@@ -175,15 +175,14 @@ const ChatExtraInfo = ({
     }
   };
 
-  const saveTicketExtraDate = async (values) => {
-    console.log("🚀 ~ saveTicketExtraDate ~ values:", values);
+  const saveTicketExtraDate = async (type, values) => {
     setIsLoadingInfoTicket(true);
     try {
-      // await api.tickets.ticket.create(selectTicketId, values);
-      // enqueueSnackbar(
-      //   getLanguageByKey("Datele despre ticket au fost create cu succes"),
-      //   { variant: "success" },
-      // );
+      await api.documents.create(type, values);
+      enqueueSnackbar(
+        getLanguageByKey("Datele despre ticket au fost create cu succes"),
+        { variant: "success" },
+      );
     } catch (error) {
       enqueueSnackbar(showServerError(error), {
         variant: "error",
@@ -232,9 +231,9 @@ const ChatExtraInfo = ({
               {getLanguageByKey("Contract")}
             </Text>
           </Tabs.Tab>
-          <Tabs.Tab value="invoice">
+          <Tabs.Tab value="documents">
             <Text fw={700} size="sm">
-              {getLanguageByKey("Invoice")}
+              {getLanguageByKey("documents")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab h="100%" value="media">
@@ -340,7 +339,7 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
 
-        <Tabs.Panel value="invoice">
+        <Tabs.Panel value="documents">
           <Box p="md">
             <InvoiceTab
               extraInfo={extraInfo}

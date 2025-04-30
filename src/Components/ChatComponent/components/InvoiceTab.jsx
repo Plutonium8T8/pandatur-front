@@ -13,7 +13,7 @@ export const InvoiceTab = ({ extraInfo, onSaveTicketExtraDate, loading }) => {
         onChange={setSelectedValue}
         data={[
           {
-            value: "cont-spre-plată",
+            value: "cont-spre-plata",
             label: getLanguageByKey("accountForPayment"),
           },
           {
@@ -25,13 +25,13 @@ export const InvoiceTab = ({ extraInfo, onSaveTicketExtraDate, loading }) => {
             label: getLanguageByKey("joinUpGuaranteeLetter"),
           },
         ]}
-        placeholder={getLanguageByKey("selectInvoiceType")}
+        placeholder={getLanguageByKey("selectDocumentsType")}
       />
 
-      {selectedValue === "cont-spre-plată" ? (
+      {selectedValue === "cont-spre-plata" ? (
         <InvoiceForm
           data={extraInfo}
-          onSubmit={onSaveTicketExtraDate}
+          onSubmit={(values) => onSaveTicketExtraDate(selectedValue, values)}
           renderFooterButtons={({ formId }) => (
             <Button loading={loading} type="submit" form={formId}>
               {getLanguageByKey("generate")}
