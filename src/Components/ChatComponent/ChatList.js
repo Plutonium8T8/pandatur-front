@@ -114,9 +114,9 @@ const ChatList = ({ selectTicketId }) => {
           : "";
         const tags = ticket.tags
           ? ticket.tags
-              .replace(/[{}]/g, "")
-              .split(",")
-              .map((tag) => tag.trim().toLowerCase())
+            .replace(/[{}]/g, "")
+            .split(",")
+            .map((tag) => tag.trim().toLowerCase())
           : [];
 
         return (
@@ -197,6 +197,7 @@ const ChatList = ({ selectTicketId }) => {
         title={getLanguageByKey("Filtrează tichete")}
         open={openFilter}
         onClose={() => setOpenFilter(false)}
+        size="xxl"
       >
         <TicketFormTabs
           initialData={lightTicketFilters}
