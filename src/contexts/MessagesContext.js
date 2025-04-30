@@ -9,29 +9,19 @@ export const MessagesProvider = ({ children }) => {
   const { sendedValue } = useSocket();
   const { userId } = useUser();
 
-  const handleWebSocketMessage = (message) => {
-    switch (message.type) {
-      case TYPE_SOCKET_EVENTS.MESSAGE: {
-        console.log("New message from WebSocket:", message.data);
+  const updateMessageContext = (message) => {
+    const senderId = message.data.sender_id;
 
-        const senderId = message.data.sender_id;
-
-        if (Number(senderId) !== userId) {
-          messages.updateMessage(message.data);
-        }
-
-        break;
-      }
-
-      default:
-        console.warn("Invalid message_type from socket:", message.type);
+    if (Number(senderId) !== userId) {
+      messages.updateMessage(message.data);
     }
   };
 
   useEffect(() => {
-    if (sendedValue) {
-      handleWebSocketMessage(sendedValue);
+    if (sendedValue?.type === TYPE_SOCKET_EVENTS.MESSAGE) {
+      updateMessageContext(sendedValue);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendedValue]);
 
   return (

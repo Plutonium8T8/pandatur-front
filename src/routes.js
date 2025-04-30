@@ -8,6 +8,7 @@ import {
   Login,
   Chat,
   Dashboard,
+  TermsAndConditions,
 } from "@pages";
 
 export const privatePaths = [
@@ -18,12 +19,17 @@ export const privatePaths = [
   "tasks",
   "schedules",
   "logs",
+  "terms-and-conditions",
 ];
 
 export const publicRoutes = [
   {
     path: "/auth",
     component: Login,
+  },
+  {
+    path: "/terms-and-conditions",
+    component: TermsAndConditions,
   },
 ];
 
@@ -64,5 +70,9 @@ export const privateRoutes = (isAllowRole) => [
   {
     path: "/test",
     component: Test,
+  },
+  {
+    path: "/terms-and-conditions",
+    component: TermsAndConditions,
   },
 ];
