@@ -40,10 +40,6 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                 onSubmit={form.onSubmit((values) => {
                     const attributes = { ...values };
 
-                    if (Array.isArray(attributes.sender_id)) {
-                        attributes.sender_id = attributes.sender_id.map((id) => parseInt(id, 10));
-                    }
-
                     if (
                         Array.isArray(attributes.time_sent) &&
                         (attributes.time_sent[0] || attributes.time_sent[1])
