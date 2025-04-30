@@ -10,14 +10,7 @@ export const InvoiceTab = ({ extraInfo, onSaveTicketExtraDate, loading }) => {
     <div>
       <Select
         mb="md"
-        onChange={(value) => {
-          setSelectedValue(value);
-          // if (value === "cont_spre_plată") {
-          //   setSelectedValue(value);
-          // } else {
-          //   setSelectedValue(undefined);
-          // }
-        }}
+        onChange={setSelectedValue}
         data={[
           {
             value: "cont-spre-plată",
