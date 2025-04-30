@@ -10,11 +10,13 @@ import {
 } from "./components";
 import "./TicketFormTabs.css";
 
-const renderResetButton = (resetForm) => (
-  <Button variant="outline" onClick={resetForm}>
-    {getLanguageByKey("Reset filter")}
-  </Button>
-);
+const renderResetButton = (resetForm) => {
+  return (
+    <Button variant="outline" onClick={resetForm}>
+      {getLanguageByKey("Reset filter")}
+    </Button>
+  );
+};
 
 const formIds = {
   general: "generalForm",
@@ -59,7 +61,11 @@ export const TicketFormTabs = ({
         </Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel className="general-information-filter" pl="lg" value="filter_general_info">
+      <Tabs.Panel
+        className="general-information-filter"
+        pl="lg"
+        value="filter_general_info"
+      >
         <Flex direction="column" justify="space-between" h="100%">
           <BasicGeneralForm
             data={initialData}
