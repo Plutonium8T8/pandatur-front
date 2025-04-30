@@ -32,11 +32,10 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
     const handleResetForm = () => {
         form.setValues({
             message: "",
-            time_sent: [,],
+            time_sent: [undefined, undefined],
             sender_id: [],
             mtype: null,
         });
-        form.resetDirty();
     };
 
     return (
@@ -61,6 +60,20 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                     } else {
                         delete attributes.time_sent;
                     }
+
+                    Object.entries(attributes).forEach(([key, value]) => {
+                        const isEmpty =
+                            value === null ||
+                            value === "" ||
+                            (Array.isArray(value) && value.length === 0) ||
+                            (typeof value === "object" &&
+                                !Array.isArray(value) &&
+                                Object.keys(value).length === 0);
+
+                        if (isEmpty) {
+                            delete attributes[key];
+                        }
+                    });
 
                     onSubmit(attributes);
                 })}
