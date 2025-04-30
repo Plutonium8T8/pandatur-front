@@ -1,5 +1,5 @@
 import { Select, TextInput, NumberInput, Flex } from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { useForm, isNotEmpty } from "@mantine/form";
 import { useEffect } from "react";
 import { getLanguageByKey } from "../utils";
 import { valutaOptions, ibanOptions } from "../../FormOptions";
@@ -11,11 +11,22 @@ export const InvoiceForm = ({
   data,
   renderFooterButtons,
   formId,
+  okProps,
 }) => {
   const idForm = formId || INVOICE_FORM_FILTER_ID;
 
   const form = useForm({
     mode: "uncontrolled",
+
+    validate: {
+      f_serviciu: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      f_nr_factura: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      f_numarul: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      f_pret: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      f_suma: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      f_valuta_contului: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+      iban: isNotEmpty(getLanguageByKey("fieldIsRequired")),
+    },
   });
 
   useEffect(() => {
