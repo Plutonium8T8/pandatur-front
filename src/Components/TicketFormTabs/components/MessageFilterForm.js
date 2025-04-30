@@ -3,6 +3,7 @@ import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useGetTechniciansList } from "../../../hooks";
 import { getLanguageByKey } from "../../utils";
+import { MESSAGES_TYPE_OPTIONS } from "../../../app-constants";
 
 export const MessageFilterForm = ({
     onSubmit,
@@ -93,15 +94,7 @@ export const MessageFilterForm = ({
                     clearable
                     label={getLanguageByKey("typeMessages")}
                     placeholder={getLanguageByKey("typeMessages")}
-                    data={[
-                        { value: "text", label: "Text" },
-                        { value: "image", label: "Image" },
-                        { value: "audio", label: "Audio" },
-                        { value: "file", label: "File" },
-                        { value: "url", label: "URL" },
-                        { value: "call", label: "Call" },
-                        { value: "video", label: "Video" },
-                    ]}
+                    data={MESSAGES_TYPE_OPTIONS}
                     key={form.key("mtype")}
                     {...form.getInputProps("mtype")}
                 />

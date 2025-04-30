@@ -6,7 +6,8 @@ import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { filteredWorkflows } from "./utils";
 import { useGetTechniciansList } from "../../hooks";
-import { MEDIA_TYPE_OPTIONS } from "../../app-constants";
+import { MESSAGES_TYPE_OPTIONS } from "../../app-constants";
+import { useDebounce } from "../../hooks";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -21,6 +22,12 @@ export const LeadsKanbanFilter = ({
 }) => {
   const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows);
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+  const [messageInput, setMessageInput] = useState(messageFilters.message || "");
+  const debouncedMessage = useDebounce(messageInput, 300);
+
+  useEffect(() => {
+    setMessageFilters((prev) => ({ ...prev, message: debouncedMessage }));
+  }, [debouncedMessage]);
 
   useEffect(() => {
     setSystemWorkflow(baseSystemWorkflow);
@@ -90,10 +97,8 @@ export const LeadsKanbanFilter = ({
           <TextInput
             label={getLanguageByKey("searchByMessages")}
             placeholder={getLanguageByKey("searchByMessages")}
-            value={messageFilters.message}
-            onChange={(e) =>
-              setMessageFilters((prev) => ({ ...prev, message: e.target.value }))
-            }
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
           />
 
           <DatePickerInput
@@ -126,7 +131,7 @@ export const LeadsKanbanFilter = ({
             clearable
             label={getLanguageByKey("typeMessages")}
             placeholder={getLanguageByKey("typeMessages")}
-            data={MEDIA_TYPE_OPTIONS}
+            data={MESSAGES_TYPE_OPTIONS}
             value={messageFilters.mtype}
             onChange={(value) =>
               setMessageFilters((prev) => ({ ...prev, mtype: value }))

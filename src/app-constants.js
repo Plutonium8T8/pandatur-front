@@ -20,7 +20,7 @@ export const MEDIA_TYPE = {
   CALL: "call",
 };
 
-export const MEDIA_TYPE_OPTIONS = [
+export const MESSAGES_TYPE_OPTIONS = [
   { value: "text", label: "Text" },
   { value: "image", label: "Image" },
   { value: "audio", label: "Audio" },

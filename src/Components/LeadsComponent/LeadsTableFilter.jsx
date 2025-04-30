@@ -3,6 +3,7 @@ import { DatePickerInput } from "@mantine/dates";
 import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
+import { MESSAGES_TYPE_OPTIONS } from "../../app-constants";
 
 export const LeadsTableFilter = ({
   onClose,
@@ -80,15 +81,7 @@ export const LeadsTableFilter = ({
             clearable
             label={getLanguageByKey("typeMessages")}
             placeholder={getLanguageByKey("typeMessages")}
-            data={[
-              { value: "text", label: "Text" },
-              { value: "image", label: "Image" },
-              { value: "audio", label: "Audio" },
-              { value: "file", label: "File" },
-              { value: "url", label: "URL" },
-              { value: "call", label: "Call" },
-              { value: "video", label: "Video" },
-            ]}
+            data={MESSAGES_TYPE_OPTIONS}
             value={messageFilters.mtype}
             onChange={(value) =>
               setMessageFilters((prev) => ({ ...prev, mtype: value }))
