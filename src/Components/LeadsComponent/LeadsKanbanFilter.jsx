@@ -132,7 +132,7 @@ export const LeadsKanbanFilter = ({
             label={getLanguageByKey("typeMessages")}
             placeholder={getLanguageByKey("typeMessages")}
             data={MESSAGES_TYPE_OPTIONS}
-            value={messageFilters.mtype}
+            value={messageFilters.mtype ?? null}
             onChange={(value) =>
               setMessageFilters((prev) => ({ ...prev, mtype: value }))
             }
@@ -146,7 +146,7 @@ export const LeadsKanbanFilter = ({
                   message: "",
                   time_sent: [null, null],
                   sender_id: [],
-                  mtype: "",
+                  mtype: null,
                 })
               }
             >

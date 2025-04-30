@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { Tabs, Flex, Button, MultiSelect, TextInput, Select } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MESSAGES_TYPE_OPTIONS } from "../../app-constants";
+import { useDebounce } from "../../hooks";
 
 export const LeadsTableFilter = ({
   onClose,
@@ -15,13 +17,15 @@ export const LeadsTableFilter = ({
   handleApplyFiltersMessageTicket,
 }) => {
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+  const [messageInput, setMessageInput] = useState(messageFilters.message || "");
+  const debouncedMessage = useDebounce(messageInput, 300);
+
+  useEffect(() => {
+    setMessageFilters((prev) => ({ ...prev, message: debouncedMessage }));
+  }, [debouncedMessage]);
 
   return (
-    <Tabs
-      h="100%"
-      className="leads-modal-filter-tabs"
-      defaultValue="filter_ticket"
-    >
+    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_ticket">
       <Tabs.List>
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
@@ -45,10 +49,8 @@ export const LeadsTableFilter = ({
           <TextInput
             label={getLanguageByKey("searchByMessages")}
             placeholder={getLanguageByKey("searchByMessages")}
-            value={messageFilters.message}
-            onChange={(e) =>
-              setMessageFilters((prev) => ({ ...prev, message: e.target.value }))
-            }
+            value={messageInput}
+            onChange={(e) => setMessageInput(e.target.value)}
           />
 
           <DatePickerInput
@@ -82,7 +84,7 @@ export const LeadsTableFilter = ({
             label={getLanguageByKey("typeMessages")}
             placeholder={getLanguageByKey("typeMessages")}
             data={MESSAGES_TYPE_OPTIONS}
-            value={messageFilters.mtype}
+            value={messageFilters.mtype ?? null}
             onChange={(value) =>
               setMessageFilters((prev) => ({ ...prev, mtype: value }))
             }
@@ -91,14 +93,15 @@ export const LeadsTableFilter = ({
           <Flex justify="end" gap="md" mt="md">
             <Button
               variant="outline"
-              onClick={() =>
+              onClick={() => {
+                setMessageInput("");
                 setMessageFilters({
                   message: "",
                   time_sent: [null, null],
                   sender_id: [],
-                  mtype: "",
-                })
-              }
+                  mtype: null,
+                });
+              }}
             >
               {getLanguageByKey("Reset filter")}
             </Button>

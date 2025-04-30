@@ -1,9 +1,11 @@
+import { useState, useEffect } from "react";
 import { TextInput, MultiSelect, Select, Flex } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { useGetTechniciansList } from "../../../hooks";
 import { getLanguageByKey } from "../../utils";
 import { MESSAGES_TYPE_OPTIONS } from "../../../app-constants";
+import { useDebounce } from "../../../hooks";
 
 export const MessageFilterForm = ({
     onSubmit,
@@ -22,13 +24,21 @@ export const MessageFilterForm = ({
         },
     });
 
+    const [messageInput, setMessageInput] = useState(data?.message || "");
+    const debouncedMessage = useDebounce(messageInput, 300);
+
+    useEffect(() => {
+        form.setFieldValue("message", debouncedMessage);
+    }, [debouncedMessage]);
+
     const handleResetForm = () => {
         form.setValues({
             message: "",
             time_sent: [null, null],
             sender_id: [],
-            mtype: "",
+            mtype: null,
         });
+        setMessageInput("");
     };
 
     return (
@@ -64,8 +74,8 @@ export const MessageFilterForm = ({
                 <TextInput
                     label={getLanguageByKey("searchByMessages")}
                     placeholder={getLanguageByKey("searchByMessages")}
-                    key={form.key("message")}
-                    {...form.getInputProps("message")}
+                    value={messageInput}
+                    onChange={(e) => setMessageInput(e.target.value)}
                 />
 
                 <DatePickerInput
@@ -95,8 +105,8 @@ export const MessageFilterForm = ({
                     label={getLanguageByKey("typeMessages")}
                     placeholder={getLanguageByKey("typeMessages")}
                     data={MESSAGES_TYPE_OPTIONS}
-                    key={form.key("mtype")}
-                    {...form.getInputProps("mtype")}
+                    value={form.values.mtype ?? null}
+                    onChange={(value) => form.setFieldValue("mtype", value)}
                 />
 
                 <Flex justify="end" gap="md" mt="md">
