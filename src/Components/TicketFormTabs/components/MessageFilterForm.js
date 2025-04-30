@@ -30,7 +30,13 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
     });
 
     const handleResetForm = () => {
-        form.reset();
+        form.setValues({
+            message: "",
+            time_sent: [,],
+            sender_id: [],
+            mtype: null,
+        });
+        form.resetDirty();
     };
 
     return (
