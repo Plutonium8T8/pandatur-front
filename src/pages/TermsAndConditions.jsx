@@ -5,8 +5,12 @@ import {
   Box,
   Divider,
   DEFAULT_THEME,
+  Flex,
+  Image,
 } from "@mantine/core";
 import { getLanguageByKey } from "@utils";
+
+const LOGO = "/logo.png";
 
 const convertMarkdownToHTML = (text) => {
   let replacedText = text;
@@ -33,6 +37,14 @@ const gray = DEFAULT_THEME.colors.gray[7];
 export const TermsAndConditions = () => {
   return (
     <Box h="100vh" style={{ overflowY: "scroll" }}>
+      <Flex align="center" justify="center" h="75" bg="#1f2937">
+        <Image
+          className="pointer"
+          height="40px"
+          src={LOGO}
+          alt="PANDATUR CRM"
+        />
+      </Flex>
       <Container py="20">
         <Box>
           <Title ta="center" order={2}>
