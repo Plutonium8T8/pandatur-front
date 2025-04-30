@@ -2385,4 +2385,24 @@ export const translations = {
     RO: "Pentru întrebări sau reclamații:\n- E-mail: {{contact@pandatur.md}}\n- Suport clienți: {{+373 22 78-19-19}}\n- Protecția datelor: {{privacy@pandatur.md}}",
     RU: "Для вопросов или жалоб:\n- Электронная почта: {{contact@pandatur.md}}\n- Служба поддержки клиентов: {{+373 22 78-19-19}}\n- Защита данных: {{privacy@pandatur.md}}",
   },
+  generate: {
+    RO: "Generează",
+    RU: "Генерировать",
+  },
+  accountForPayment: {
+    RO: "Cont spre plată",
+    RU: "Счет для оплаты",
+  },
+  returnRequest: {
+    RO: "Cerere de return",
+    RU: "Запрос на возврат",
+  },
+  joinUpGuaranteeLetter: {
+    RO: "JoinUp Guarantee Letter",
+    RU: "JoinUp Guarantee Letter",
+  },
+  selectInvoiceType: {
+    RO: "Selectează tipul de invoice",
+    RU: "Выберите тип счета",
+  },
 };

@@ -7,3 +7,4 @@ export * from "./GroupedMessages";
 export * from "./EmojiMessage";
 export * from "./ChatMessages";
 export * from "./Message";
+export * from "./InvoiceTab";
