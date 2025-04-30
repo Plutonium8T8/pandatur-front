@@ -240,48 +240,6 @@ export const Leads = () => {
     );
   };
 
-  const handleApplyFiltersMessageTicket = (filters) => {
-    const isViewModeList = viewMode === VIEW_MODE.LIST;
-    const attributes = { ...filters };
-    if (Array.isArray(attributes.sender_id)) {
-      attributes.sender_id = attributes.sender_id.map((id) => Number(id));
-    }
-    if (
-      Array.isArray(attributes.time_sent) &&
-      (attributes.time_sent[0] || attributes.time_sent[1])
-    ) {
-      attributes.time_sent = {
-        ...(attributes.time_sent[0] && {
-          from: attributes.time_sent[0]?.toLocaleDateString("en-GB"),
-        }),
-        ...(attributes.time_sent[1] && {
-          to: attributes.time_sent[1]?.toLocaleDateString("en-GB"),
-        }),
-      };
-    } else {
-      delete attributes.time_sent;
-    }
-    fetchTickets(
-      {
-        page: NUMBER_PAGE,
-        type: isViewModeList ? HARD_TICKET : LIGHT_TICKET,
-        attributes,
-      },
-      ({ data, pagination }) => {
-        if (isViewModeList) {
-          setHardTickets(data);
-        } else {
-          setFilteredTicketIds(getTicketsIds(data) ?? null);
-        }
-        setTotalLeads(pagination?.total || 0);
-        setCurrentPage(1);
-        setIsOpenListFilterModal(false);
-        setIsOpenKanbanFilterModal(false);
-      },
-      true,
-    );
-  };
-
   const handlePaginationWorkflow = (page) => {
     fetchTickets(
       { page, type: HARD_TICKET, attributes: hardTicketFilters },
@@ -420,7 +378,6 @@ export const Leads = () => {
           onSubmitTicket={handleApplyFilterLightTicket}
           messageFilters={messageFilters}
           setMessageFilters={setMessageFilters}
-          handleApplyFiltersMessageTicket={handleApplyFiltersMessageTicket}
         />
       </MantineModal>
 
@@ -436,7 +393,6 @@ export const Leads = () => {
           onSubmitTicket={handleApplyFiltersHardTicket}
           messageFilters={messageFilters}
           setMessageFilters={setMessageFilters}
-          handleApplyFiltersMessageTicket={handleApplyFiltersMessageTicket}
         />
       </MantineModal>
 
