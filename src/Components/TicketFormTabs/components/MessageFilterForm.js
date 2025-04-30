@@ -20,21 +20,17 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                         data.time_sent?.to ? dayjs(data.time_sent.to, DD_MM_YYYY_DASH).toDate() : null,
                     ]
                     : [null, null],
-            sender_id: typeof data?.sender_id === "string"
-                ? data.sender_id.split(",")
-                : data?.sender_id || [],
+            sender_id: Array.isArray(data?.sender_id)
+                ? data.sender_id.map(String)
+                : typeof data?.sender_id === "string"
+                    ? data.sender_id.split(",")
+                    : [],
             mtype: data?.mtype || null,
         },
     });
 
     const handleResetForm = () => {
         form.reset();
-        onSubmit({
-            message: "",
-            time_sent: null,
-            sender_id: "",
-            mtype: null,
-        });
     };
 
     return (
@@ -44,12 +40,10 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                 onSubmit={form.onSubmit((values) => {
                     const attributes = { ...values };
 
-                    // sender_id -> строка
                     if (Array.isArray(attributes.sender_id)) {
-                        attributes.sender_id = attributes.sender_id.join(",");
+                        attributes.sender_id = attributes.sender_id.map((id) => parseInt(id, 10));
                     }
 
-                    // форматируем дату
                     if (
                         Array.isArray(attributes.time_sent) &&
                         (attributes.time_sent[0] || attributes.time_sent[1])
