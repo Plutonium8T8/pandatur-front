@@ -12,8 +12,6 @@ export const MessagesProvider = ({ children }) => {
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
-        console.log("New message from WebSocket:", message.data);
-
         const senderId = message.data.sender_id;
 
         if (Number(senderId) !== userId) {
