@@ -6,6 +6,7 @@ import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { filteredWorkflows } from "./utils";
 import { useGetTechniciansList } from "../../hooks";
+import { MEDIA_TYPE_OPTIONS } from "../../app-constants";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -125,15 +126,7 @@ export const LeadsKanbanFilter = ({
             clearable
             label={getLanguageByKey("typeMessages")}
             placeholder={getLanguageByKey("typeMessages")}
-            data={[
-              { value: "text", label: "Text" },
-              { value: "image", label: "image" },
-              { value: "audio", label: "audio" },
-              { value: "file", label: "file" },
-              { value: "url", label: "url" },
-              { value: "call", label: "call" },
-              { value: "video", label: "video" },
-            ]}
+            data={MEDIA_TYPE_OPTIONS}
             value={messageFilters.mtype}
             onChange={(value) =>
               setMessageFilters((prev) => ({ ...prev, mtype: value }))

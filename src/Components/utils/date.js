@@ -37,7 +37,10 @@ export const quickOptions = [
   { label: translations["in30Min"][language], offset: { minutes: 30 } },
   { label: translations["in1Hour"][language], offset: { hours: 1 } },
   { label: translations["today"][language], custom: () => dayjs() },
-  { label: translations["tomorrow"][language], custom: () => dayjs().add(1, "day"), },
+  {
+    label: translations["tomorrow"][language],
+    custom: () => dayjs().add(1, "day"),
+  },
   {
     label: translations["thisWeek"][language],
     custom: () => dayjs().endOf("week"),

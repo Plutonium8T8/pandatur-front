@@ -11,6 +11,7 @@ export const FALLBACK_IMAGE =
   "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
 
 export const MEDIA_TYPE = {
+  TEXT: "text",
   IMAGE: "image",
   VIDEO: "video",
   AUDIO: "audio",
@@ -18,6 +19,16 @@ export const MEDIA_TYPE = {
   URL: "url",
   CALL: "call",
 };
+
+export const MEDIA_TYPE_OPTIONS = [
+  { value: "text", label: "Text" },
+  { value: "image", label: "Image" },
+  { value: "audio", label: "Audio" },
+  { value: "file", label: "File" },
+  { value: "url", label: "URL" },
+  { value: "call", label: "Call" },
+  { value: "video", label: "Video" },
+];
 
 export const PLATFORMS = {
   VIBER: "viber",
