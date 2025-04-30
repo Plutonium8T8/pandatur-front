@@ -2401,8 +2401,12 @@ export const translations = {
     RO: "JoinUp Guarantee Letter",
     RU: "JoinUp Guarantee Letter",
   },
-  selectInvoiceType: {
-    RO: "Selectează tipul de invoice",
-    RU: "Выберите тип счета",
+  selectDocumentsType: {
+    RO: "Selectează tipul de document",
+    RU: "Выберите тип документа",
+  },
+  documents: {
+    RO: "Documente",
+    RU: "Документы",
   },
 };

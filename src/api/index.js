@@ -12,6 +12,7 @@ import { standalone } from "./standalone";
 import { activity } from "./activity";
 import { groupSchedules } from "./groupSchedules";
 import { permissions } from "./permissions";
+import { documents } from "./documents";
 export * from "./baseAxios";
 
 export const api = {
@@ -29,4 +30,5 @@ export const api = {
   activity,
   groupSchedules,
   permissions,
+  documents,
 };
