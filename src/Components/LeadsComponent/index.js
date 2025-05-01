@@ -4,3 +4,4 @@ export * from "./TicketModal";
 export * from "./LeadsKanbanFilter";
 export * from "./LeadsTableFilter";
 export * from "./ManageLeadInfoTabs";
+export * from "./MessageFilterForm";
