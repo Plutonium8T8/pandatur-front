@@ -29,8 +29,8 @@ export const LeadsTableFilter = ({
             onSubmit={(filters) => onSubmitTicket(filters, "ticket")}
             loading={loading}
           />
-
-          <Flex justify="end" gap="md" mt="md">
+          {/*TODO NEED FOR REFACTOR */}
+          {/* <Flex justify="end" gap="md" mt="md">
             <Button
               variant="outline"
               onClick={() => {
@@ -49,7 +49,7 @@ export const LeadsTableFilter = ({
             >
               {getLanguageByKey("Aplică")}
             </Button>
-          </Flex>
+          </Flex> */}
         </Flex>
       </Tabs.Panel>
 

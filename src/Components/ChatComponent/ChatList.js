@@ -10,6 +10,7 @@ import {
   Divider,
   ActionIcon,
   Badge,
+  Tabs
 } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "../utils";
@@ -18,6 +19,7 @@ import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { api } from "../../api";
+import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -199,14 +201,37 @@ const ChatList = ({ selectTicketId }) => {
         onClose={() => setOpenFilter(false)}
         size="xl"
       >
-        <TicketFormTabs
-          initialData={lightTicketFilters}
-          orientation="horizontal"
-          onClose={() => setOpenFilter(false)}
-          onSubmit={(filters) => filterChatList(filters)}
-          loading={isLoading}
-        />
+        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs">
+          <Tabs.List>
+            <Tabs.Tab value="filter_ticket">
+              {getLanguageByKey("Filtru pentru Lead")}
+            </Tabs.Tab>
+            <Tabs.Tab value="filter_message">
+              {getLanguageByKey("Filtru dupǎ mesaje")}
+            </Tabs.Tab>
+          </Tabs.List>
+
+          <Tabs.Panel value="filter_ticket" pt="xs">
+            <TicketFormTabs
+              initialData={lightTicketFilters}
+              orientation="horizontal"
+              onClose={() => setOpenFilter(false)}
+              onSubmit={(filters) => filterChatList(filters)}
+              loading={isLoading}
+            />
+          </Tabs.Panel>
+
+          <Tabs.Panel value="filter_message" pt="xs">
+            <MessageFilterForm
+              initialData={lightTicketFilters}
+              loading={isLoading}
+              onClose={() => setOpenFilter(false)}
+              onSubmit={(filters) => filterChatList(filters)}
+            />
+          </Tabs.Panel>
+        </Tabs>
       </MantineModal>
+
     </>
   );
 };
