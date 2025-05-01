@@ -6,7 +6,6 @@ import {
   InvoiceForm,
   QualityControlForm,
   BasicGeneralForm,
-  MessageFilterForm,
 } from "./components";
 import "./TicketFormTabs.css";
 
@@ -23,7 +22,6 @@ const formIds = {
   ticketInfo: "ticketInfoForm",
   contract: "contractForm",
   invoice: "invoiceForm",
-  messageFilter: "messageFilterForm",
 };
 
 export const TicketFormTabs = ({
@@ -157,26 +155,6 @@ export const TicketFormTabs = ({
                 </Button>
               </>
             )}
-          />
-        </Flex>
-      </Tabs.Panel>
-      <Tabs.Panel pl="lg" value="filter_message">
-        <Flex direction="column" justify="space-between" h="100%">
-          <MessageFilterForm
-            data={initialData}
-            onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
-            formId={formIds.messageFilter}
           />
         </Flex>
       </Tabs.Panel>
