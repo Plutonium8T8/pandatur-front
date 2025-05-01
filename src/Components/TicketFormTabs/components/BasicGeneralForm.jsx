@@ -35,7 +35,7 @@ export const BasicGeneralForm = ({
   });
 
   form.watch("workflow", ({ value }) => {
-    if (value.includes(getLanguageByKey("selectAll"))) {
+    if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
       form.setFieldValue("workflow", workflowOptions);
     } else {
       form.setFieldValue("workflow", value);
