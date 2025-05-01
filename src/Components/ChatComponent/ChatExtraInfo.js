@@ -13,10 +13,10 @@ import { PersonalData4ClientForm, Merge, Media } from "./components";
 import {
   ContractForm,
   QualityControlForm,
-  InvoiceForm,
   GeneralForm,
   TicketInfoForm,
 } from "../TicketForms";
+import { InvoiceTab } from "./components";
 
 const ChatExtraInfo = ({
   selectTicketId,
@@ -175,11 +175,10 @@ const ChatExtraInfo = ({
     }
   };
 
-  const saveTicketExtraDate = async (values) => {
+  const saveTicketExtraDate = async (type, values) => {
     setIsLoadingInfoTicket(true);
     try {
-      await api.tickets.ticket.create(selectTicketId, values);
-
+      await api.documents.create(type, values);
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" },
@@ -232,9 +231,9 @@ const ChatExtraInfo = ({
               {getLanguageByKey("Contract")}
             </Text>
           </Tabs.Tab>
-          <Tabs.Tab value="invoice">
+          <Tabs.Tab value="documents">
             <Text fw={700} size="sm">
-              {getLanguageByKey("Invoice")}
+              {getLanguageByKey("documents")}
             </Text>
           </Tabs.Tab>
           <Tabs.Tab h="100%" value="media">
@@ -340,21 +339,9 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
 
-        <Tabs.Panel value="invoice">
+        <Tabs.Panel value="documents">
           <Box p="md">
-            <InvoiceForm
-              data={extraInfo}
-              onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
-            />
+            <InvoiceTab extraInfo={extraInfo} />
           </Box>
         </Tabs.Panel>
 
