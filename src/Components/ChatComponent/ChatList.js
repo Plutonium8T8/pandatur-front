@@ -200,7 +200,7 @@ const ChatList = ({ selectTicketId }) => {
         open={openFilter}
         onClose={() => setOpenFilter(false)}
       >
-        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs">
+        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%">
           <Tabs.List>
             <Tabs.Tab value="filter_ticket">
               {getLanguageByKey("Filtru pentru Lead")}
