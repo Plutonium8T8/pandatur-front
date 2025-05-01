@@ -54,9 +54,6 @@ export const TicketFormTabs = ({
         <Tabs.Tab value="filter_quality_control">
           {getLanguageByKey("Control calitate")}
         </Tabs.Tab>
-        <Tabs.Tab value="filter_message">
-          {getLanguageByKey("Filtru dupǎ mesaje")}
-        </Tabs.Tab>
       </Tabs.List>
 
       <Tabs.Panel

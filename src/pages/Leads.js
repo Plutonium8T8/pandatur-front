@@ -187,10 +187,14 @@ export const Leads = () => {
   };
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
-    const mergedHardTicketFilters = {
-      ...hardTicketFilters,
-      ...selectedFilters,
-    };
+    const isReset = Object.keys(selectedFilters).length === 0;
+
+    const mergedHardTicketFilters = isReset
+      ? {}
+      : {
+        ...hardTicketFilters,
+        ...selectedFilters,
+      };
 
     fetchTickets(
       {
@@ -205,7 +209,7 @@ export const Leads = () => {
         setCurrentPage(1);
         setIsOpenListFilterModal(false);
       },
-      true,
+      true
     );
   };
 
@@ -401,6 +405,10 @@ export const Leads = () => {
           loading={loading}
           onClose={() => setIsOpenListFilterModal(false)}
           onSubmitTicket={handleApplyFiltersHardTicket}
+          onResetFilters={() => {
+            setHardTicketFilters({});
+            handleApplyFiltersHardTicket({});
+          }}
         />
       </MantineModal>
 
