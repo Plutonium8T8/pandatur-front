@@ -209,7 +209,26 @@ export const Leads = () => {
     );
   };
 
-  const handleApplyFilterLightTicket = (selectedFilters) => {
+  const handleApplyFilterLightTicket = (selectedFilters, source = "ticket") => {
+    if (source === "message") {
+      setLightTicketFilters(selectedFilters);
+
+      fetchTickets(
+        {
+          page: NUMBER_PAGE,
+          type: LIGHT_TICKET,
+          attributes: selectedFilters,
+        },
+        ({ data, pagination }) => {
+          setTotalLeads(pagination?.total || 0);
+          setFilteredTicketIds(getTicketsIds(data) ?? null);
+          setIsOpenKanbanFilterModal(false);
+        }
+      );
+
+      return;
+    }
+
     const mergedLightTicketFilters = {
       ...lightTicketFilters,
       ...selectedFilters,
@@ -224,12 +243,12 @@ export const Leads = () => {
       ({ data, pagination }) => {
         setLightTicketFilters(mergedLightTicketFilters);
         setTotalLeads(pagination?.total || 0);
-        setIsOpenKanbanFilterModal(false);
         setFilteredTicketIds(getTicketsIds(data) ?? null);
         setSelectedWorkflow(
-          mergedLightTicketFilters.workflow || filteredWorkflows,
+          mergedLightTicketFilters.workflow || filteredWorkflows
         );
-      },
+        setIsOpenKanbanFilterModal(false);
+      }
     );
   };
 
@@ -365,8 +384,8 @@ export const Leads = () => {
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(workflows) => {
             setSelectedWorkflow(workflows);
-            setIsOpenKanbanFilterModal(false);
             setFilteredTicketIds(filteredTicketIds ?? null);
+            setIsOpenKanbanFilterModal(false);
           }}
           onSubmitTicket={handleApplyFilterLightTicket}
         />
