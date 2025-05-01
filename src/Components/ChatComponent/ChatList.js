@@ -197,7 +197,7 @@ const ChatList = ({ selectTicketId }) => {
         title={getLanguageByKey("Filtrează tichete")}
         open={openFilter}
         onClose={() => setOpenFilter(false)}
-        size="xxl"
+        size="xl"
       >
         <TicketFormTabs
           initialData={lightTicketFilters}

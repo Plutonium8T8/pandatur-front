@@ -7,7 +7,10 @@ import { getLanguageByKey } from "../../utils";
 import { MESSAGES_TYPE_OPTIONS, DD_MM_YYYY_DASH } from "../../../app-constants";
 import dayjs from "dayjs";
 
+const MESSAGE_FILTER_FORM_ID = "MESSAGE_FILTER_FORM_ID";
+
 export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId }) => {
+    const idForm = formId || MESSAGE_FILTER_FORM_ID;
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
 
     const form = useForm({
@@ -20,20 +23,20 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
         },
 
         transformValues: ({ message, time_sent, sender_id, mtype }) => {
-            const values = {};
+            const result = {};
 
-            if (message) values.message = message;
-            if (sender_id?.length) values.sender_id = sender_id.map((id) => parseInt(id, 10));
-            if (mtype) values.mtype = mtype;
+            if (message) result.message = message;
+            if (Array.isArray(sender_id) && sender_id.length)
+                result.sender_id = sender_id.map((id) => parseInt(id, 10));
+            if (mtype) result.mtype = mtype;
 
             if (time_sent?.[0] || time_sent?.[1]) {
-                values.time_sent = {
+                result.time_sent = {
                     ...(time_sent[0] && { from: dayjs(time_sent[0]).format(DD_MM_YYYY_DASH) }),
                     ...(time_sent[1] && { to: dayjs(time_sent[1]).format(DD_MM_YYYY_DASH) }),
                 };
             }
-
-            return values;
+            return result;
         },
     });
 
@@ -62,7 +65,7 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
     return (
         <>
             <form
-                id={formId}
+                id={idForm}
                 onSubmit={form.onSubmit((values) => onSubmit(values, form.reset))}
             >
                 <Flex direction="column" gap="md">
@@ -107,7 +110,7 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
             </form>
 
             <Flex justify="end" gap="md" mt="md">
-                {renderFooterButtons?.({ onResetForm: form.reset, formId })}
+                {renderFooterButtons?.({ onResetForm: form.reset, formId: idForm })}
             </Flex>
         </>
     );

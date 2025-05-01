@@ -1,9 +1,9 @@
-import { Tabs, Flex, Button, MultiSelect } from "@mantine/core";
+import { Tabs, Flex, Button } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { SelectWorkflow } from "../SelectWorkflow";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { platformOptions, filteredWorkflows } from "./utils";
+import { filteredWorkflows } from "./utils";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -33,9 +33,6 @@ export const LeadsKanbanFilter = ({
         )}
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
-        </Tabs.Tab>
-        <Tabs.Tab value="filter_message">
-          {getLanguageByKey("Filtru pentru mesaje (coming soon)")}
         </Tabs.Tab>
       </Tabs.List>
 
@@ -76,27 +73,6 @@ export const LeadsKanbanFilter = ({
           onSubmit={onSubmitTicket}
           loading={loading}
         />
-      </Tabs.Panel>
-
-      <Tabs.Panel value="filter_message" pt="xs">
-        <Flex direction="column" justify="space-between" h="100%">
-          <MultiSelect
-            searchable
-            clearable
-            label={getLanguageByKey("Platforma mesaj")}
-            placeholder={getLanguageByKey("Platforma mesaj")}
-            data={platformOptions}
-          />
-
-          <Flex justify="end" gap="md" mt="md">
-            <Button variant="default" onClick={onClose}>
-              {getLanguageByKey("Închide")}
-            </Button>
-            <Button disabled variant="filled">
-              {getLanguageByKey("Aplică")}
-            </Button>
-          </Flex>
-        </Flex>
       </Tabs.Panel>
     </Tabs>
   );

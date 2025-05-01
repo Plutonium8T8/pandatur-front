@@ -50,9 +50,9 @@ export const TicketFormTabs = ({
         <Tabs.Tab value="filter_contract">
           {getLanguageByKey("Contract")}
         </Tabs.Tab>
-        <Tabs.Tab value="filter_invoice">
+        {/* <Tabs.Tab value="filter_invoice">
           {getLanguageByKey("Invoice")}
-        </Tabs.Tab>
+        </Tabs.Tab> */}
         <Tabs.Tab value="filter_quality_control">
           {getLanguageByKey("Control calitate")}
         </Tabs.Tab>
