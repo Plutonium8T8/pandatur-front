@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { TextInput, MultiSelect, Select, Flex } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -10,82 +11,70 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
 
     const form = useForm({
+        mode: "uncontrolled",
         initialValues: {
-            message: data?.message || "",
-            time_sent: Array.isArray(data?.time_sent)
-                ? data.time_sent
-                : data?.time_sent?.from || data?.time_sent?.to
-                    ? [
-                        data.time_sent?.from ? dayjs(data.time_sent.from, DD_MM_YYYY_DASH).toDate() : null,
-                        data.time_sent?.to ? dayjs(data.time_sent.to, DD_MM_YYYY_DASH).toDate() : null,
-                    ]
-                    : [null, null],
-            sender_id: Array.isArray(data?.sender_id)
-                ? data.sender_id.map(String)
-                : typeof data?.sender_id === "string"
-                    ? data.sender_id.split(",")
-                    : [],
-            mtype: data?.mtype || null,
+            message: "",
+            time_sent: [null, null],
+            sender_id: [],
+            mtype: null,
+        },
+
+        transformValues: ({ message, time_sent, sender_id, mtype }) => {
+            const values = {};
+
+            if (message) values.message = message;
+            if (sender_id?.length) values.sender_id = sender_id.map((id) => parseInt(id, 10));
+            if (mtype) values.mtype = mtype;
+
+            if (time_sent?.[0] || time_sent?.[1]) {
+                values.time_sent = {
+                    ...(time_sent[0] && { from: dayjs(time_sent[0]).format(DD_MM_YYYY_DASH) }),
+                    ...(time_sent[1] && { to: dayjs(time_sent[1]).format(DD_MM_YYYY_DASH) }),
+                };
+            }
+
+            return values;
         },
     });
 
-    const handleResetForm = () => {
-        form.setValues({
-            message: "",
-            time_sent: [undefined, undefined],
-            sender_id: [],
-            mtype: null,
-        });
-    };
+    useEffect(() => {
+        if (data) {
+            form.setValues({
+                message: data.message || "",
+                time_sent: Array.isArray(data.time_sent)
+                    ? data.time_sent
+                    : data?.time_sent?.from || data?.time_sent?.to
+                        ? [
+                            data.time_sent?.from ? dayjs(data.time_sent.from, DD_MM_YYYY_DASH).toDate() : null,
+                            data.time_sent?.to ? dayjs(data.time_sent.to, DD_MM_YYYY_DASH).toDate() : null,
+                        ]
+                        : [null, null],
+                sender_id: Array.isArray(data.sender_id)
+                    ? data.sender_id.map(String)
+                    : typeof data.sender_id === "string"
+                        ? data.sender_id.split(",")
+                        : [],
+                mtype: data.mtype || null,
+            });
+        }
+    }, [data]);
 
     return (
         <>
             <form
                 id={formId}
-                onSubmit={form.onSubmit((values) => {
-                    const attributes = { ...values };
-
-                    if (
-                        Array.isArray(attributes.time_sent) &&
-                        (attributes.time_sent[0] || attributes.time_sent[1])
-                    ) {
-                        attributes.time_sent = {
-                            ...(attributes.time_sent[0] && {
-                                from: dayjs(attributes.time_sent[0]).format(DD_MM_YYYY_DASH),
-                            }),
-                            ...(attributes.time_sent[1] && {
-                                to: dayjs(attributes.time_sent[1]).format(DD_MM_YYYY_DASH),
-                            }),
-                        };
-                    } else {
-                        delete attributes.time_sent;
-                    }
-
-                    Object.entries(attributes).forEach(([key, value]) => {
-                        const isEmpty =
-                            value === null ||
-                            value === "" ||
-                            (Array.isArray(value) && value.length === 0) ||
-                            (typeof value === "object" &&
-                                !Array.isArray(value) &&
-                                Object.keys(value).length === 0);
-
-                        if (isEmpty) {
-                            delete attributes[key];
-                        }
-                    });
-
-                    onSubmit(attributes);
-                })}
+                onSubmit={form.onSubmit((values) => onSubmit(values, form.reset))}
             >
                 <Flex direction="column" gap="md">
                     <TextInput
+                        key={form.key("message")}
                         label={getLanguageByKey("searchByMessages")}
                         placeholder={getLanguageByKey("searchByMessages")}
                         {...form.getInputProps("message")}
                     />
 
                     <DatePickerInput
+                        key={form.key("time_sent")}
                         type="range"
                         label={getLanguageByKey("searchByInterval")}
                         placeholder={getLanguageByKey("searchByInterval")}
@@ -95,6 +84,7 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                     />
 
                     <MultiSelect
+                        key={form.key("sender_id")}
                         searchable
                         clearable
                         label={getLanguageByKey("Selectează operator")}
@@ -105,19 +95,19 @@ export const MessageFilterForm = ({ onSubmit, renderFooterButtons, data, formId 
                     />
 
                     <Select
+                        key={form.key("mtype")}
                         searchable
                         clearable
                         label={getLanguageByKey("typeMessages")}
                         placeholder={getLanguageByKey("typeMessages")}
                         data={MESSAGES_TYPE_OPTIONS}
-                        value={form.values.mtype ?? null}
-                        onChange={(value) => form.setFieldValue("mtype", value)}
+                        {...form.getInputProps("mtype")}
                     />
                 </Flex>
             </form>
 
             <Flex justify="end" gap="md" mt="md">
-                {renderFooterButtons?.({ onResetForm: handleResetForm, formId })}
+                {renderFooterButtons?.({ onResetForm: form.reset, formId })}
             </Flex>
         </>
     );
