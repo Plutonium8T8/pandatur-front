@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Flex, Button, TextInput, Select, MultiSelect } from "@mantine/core";
+import { Flex, Button, TextInput, Select, MultiSelect, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
@@ -59,54 +59,58 @@ export const MessageFilterForm = ({ initialData, loading, onClose, onSubmit }) =
     };
 
     return (
-        <Flex direction="column" gap="md">
-            <TextInput
-                label={getLanguageByKey("searchByMessages")}
-                placeholder={getLanguageByKey("searchByMessages")}
-                value={message}
-                onChange={(e) => setMessage(e.currentTarget.value)}
-            />
+        <Flex direction="column" justify="space-between" h="100%">
+            <Flex direction="column" gap="md">
+                <TextInput
+                    label={getLanguageByKey("searchByMessages")}
+                    placeholder={getLanguageByKey("searchByMessages")}
+                    value={message}
+                    onChange={(e) => setMessage(e.currentTarget.value)}
+                />
 
-            <Select
-                label={getLanguageByKey("typeMessages")}
-                placeholder={getLanguageByKey("typeMessages")}
-                data={MESSAGES_TYPE_OPTIONS}
-                value={mtype}
-                onChange={setMtype}
-                clearable
-            />
+                <Select
+                    label={getLanguageByKey("typeMessages")}
+                    placeholder={getLanguageByKey("typeMessages")}
+                    data={MESSAGES_TYPE_OPTIONS}
+                    value={mtype}
+                    onChange={setMtype}
+                    clearable
+                />
 
-            <DatePickerInput
-                type="range"
-                label={getLanguageByKey("searchByInterval")}
-                placeholder={getLanguageByKey("searchByInterval")}
-                value={timeSent}
-                onChange={setTimeSent}
-                valueFormat="DD-MM-YYYY"
-                clearable
-            />
+                <DatePickerInput
+                    type="range"
+                    label={getLanguageByKey("searchByInterval")}
+                    placeholder={getLanguageByKey("searchByInterval")}
+                    value={timeSent}
+                    onChange={setTimeSent}
+                    valueFormat="DD-MM-YYYY"
+                    clearable
+                />
 
-            <MultiSelect
-                label={getLanguageByKey("Selectează operator")}
-                placeholder={getLanguageByKey("Selectează operator")}
-                data={technicians}
-                value={senderIds}
-                onChange={setSenderIds}
-                searchable
-                clearable
-            />
-
-            <Flex justify="end" gap="md" mt="md">
-                <Button variant="outline" onClick={handleReset}>
-                    {getLanguageByKey("Reset filter")}
-                </Button>
-                <Button variant="default" onClick={onClose}>
-                    {getLanguageByKey("Închide")}
-                </Button>
-                <Button variant="filled" loading={loading} onClick={handleApply}>
-                    {getLanguageByKey("Aplică")}
-                </Button>
+                <MultiSelect
+                    label={getLanguageByKey("Selectează operator")}
+                    placeholder={getLanguageByKey("Selectează operator")}
+                    data={technicians}
+                    value={senderIds}
+                    onChange={setSenderIds}
+                    searchable
+                    clearable
+                />
             </Flex>
+
+            <Box mt="md">
+                <Flex justify="end" gap="md">
+                    <Button variant="outline" onClick={handleReset}>
+                        {getLanguageByKey("Reset filter")}
+                    </Button>
+                    <Button variant="default" onClick={onClose}>
+                        {getLanguageByKey("Închide")}
+                    </Button>
+                    <Button variant="filled" loading={loading} onClick={handleApply}>
+                        {getLanguageByKey("Aplică")}
+                    </Button>
+                </Flex>
+            </Box>
         </Flex>
     );
 };
