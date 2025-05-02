@@ -109,33 +109,29 @@ const ChatList = ({ selectTicketId }) => {
 
     if (searchQuery) {
       const lowerSearchQuery = searchQuery.toLowerCase();
+
       filtered = filtered.filter((ticket) => {
         const ticketId = ticket.id.toString().toLowerCase();
-        const ticketContact = ticket.contact
-          ? ticket.contact.toLowerCase()
-          : "";
+        const contact = ticket.contact?.toLowerCase() || "";
         const tags = ticket.tags
-          ? ticket.tags
-            .replace(/[{}]/g, "")
-            .split(",")
-            .map((tag) => tag.trim().toLowerCase())
+          ? ticket.tags.replace(/[{}]/g, "").split(",").map((tag) => tag.trim().toLowerCase())
           : [];
+
+        const phones = ticket.clients?.map((c) => c.phone?.toLowerCase() || "") || [];
 
         return (
           ticketId.includes(lowerSearchQuery) ||
-          ticketContact.includes(lowerSearchQuery) ||
-          tags.some((tag) => tag.includes(lowerSearchQuery))
+          contact.includes(lowerSearchQuery) ||
+          tags.some((tag) => tag.includes(lowerSearchQuery)) ||
+          phones.some((phone) => phone.includes(lowerSearchQuery))
         );
       });
     }
 
+    // Применение серверного фильтра (если был)
     if (filteredTicketIds === null) return filtered;
     if (filteredTicketIds.length === 0) return [];
-    filtered = filtered.filter((ticket) =>
-      filteredTicketIds.includes(ticket.id),
-    );
-
-    return filtered;
+    return filtered.filter((ticket) => filteredTicketIds.includes(ticket.id));
   }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
 
   const ChatItem = ({ index, style }) => {
@@ -236,3 +232,43 @@ const ChatList = ({ selectTicketId }) => {
 };
 
 export default ChatList;
+
+
+
+
+
+
+
+// {
+//   "tickets": [
+//       {
+//           "id": 12901,
+//           "client_id": "{16110}",
+//           "tags": "{}",
+//           "workflow": "Interesat",
+//           "priority": "joasă",
+//           "contact": "facebook: 16110",
+//           "technician_id": 126,
+//           "last_interaction_date": "14-04-2025 17:06:03",
+//           "photo_url": null,
+//           "creation_date": "20-03-2025 10:36:14",
+//           "group_title": "MD",
+//           "unseen_count": 1,
+//           "last_message": "Доброе утро, есть ли у вас ещё вопросы по поводу экскурсии в Стамбул? Хотите сделать бронь?",
+//           "time_sent": "20-03-2025 10:36:14",
+//           "clients": [
+//               {
+//                   "id": 16110,
+//                   "phone": null,
+//                   "photo": null,
+//                   "name": null,
+//                   "surname": null,
+//                   "email": null
+//               }
+//           ],
+//           "latestMessageId": 66847,
+//           "last_message_type": "text"
+//       },
+//   ],
+//   "total_pages": 13
+// }
