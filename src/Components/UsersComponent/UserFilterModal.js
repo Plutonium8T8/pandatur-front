@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Button, Group, Select, Flex } from "@mantine/core";
+import { Box, Button, Group, MultiSelect, Select, Flex } from "@mantine/core";
 import { MantineModal } from "../MantineModal";
 import { translations } from "../utils";
 import { api } from "../../api";
@@ -8,7 +8,12 @@ import { useSnackbar } from "notistack";
 const language = localStorage.getItem("language") || "RO";
 
 const UserFilterModal = ({ opened, onClose, onApply, users }) => {
-    const [filters, setFilters] = useState({});
+    const [filters, setFilters] = useState({
+        group: [],
+        role: [],
+        status: null,
+        functie: null,
+    });
     const [groupOptions, setGroupOptions] = useState([]);
     const [permissionOptions, setPermissionOptions] = useState([]);
     const { enqueueSnackbar } = useSnackbar();
@@ -59,7 +64,12 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
     };
 
     const resetFilters = () => {
-        setFilters({});
+        setFilters({
+            group: [],
+            role: [],
+            status: null,
+            functie: null,
+        });
     };
 
     const applyFilters = () => {
@@ -68,29 +78,25 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
     };
 
     return (
-        <MantineModal
-            open={opened}
-            onClose={onClose}
-            title={translations["FilterForUser"][language]}
-        >
+        <MantineModal open={opened} onClose={onClose} title={translations["FilterForUser"][language]}>
             <Flex direction="column" h="100%" justify="space-between">
                 <Box p="sm">
                     <Flex direction="column" gap="sm">
-                        <Select
+                        <MultiSelect
                             label={translations["Grup utilizator"][language]}
                             placeholder={translations["Alege grupul"][language]}
                             data={groupOptions}
-                            value={filters.group || null}
+                            value={Array.isArray(filters.group) ? filters.group : []}
                             onChange={(val) => updateFilter("group", val)}
                             clearable
                             searchable
                         />
 
-                        <Select
+                        <MultiSelect
                             label={translations["Grup permisiuni"][language]}
                             placeholder={translations["Alege grupul de permisiuni"][language]}
                             data={permissionOptions}
-                            value={filters.role || null}
+                            value={Array.isArray(filters.role) ? filters.role : []}
                             onChange={(val) => updateFilter("role", val)}
                             clearable
                             searchable
