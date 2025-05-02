@@ -100,41 +100,41 @@ const ChatList = ({ selectTicketId }) => {
   // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
     if (!tickets || tickets.length === 0) return [];
-  
+
     let result = [...tickets];
-  
+
     result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-  
+
     if (showMyTickets) {
       result = result.filter(ticket => ticket.technician_id === userId);
     }
-  
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-  
+
       result = result.filter(ticket => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        
+
         const tags = ticket.tags
           ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase())
           : [];
         const tagMatch = tags.some(tag => tag.includes(query));
-  
+
         const phones = ticket.clients?.map(c => c.phone?.toLowerCase() || "") || [];
         const phoneMatch = phones.some(phone => phone.includes(query));
-  
+
         return idMatch || contactMatch || tagMatch || phoneMatch;
       });
     }
-  
+
     if (filteredTicketIds !== null) {
       if (filteredTicketIds.length === 0) return [];
       result = result.filter(ticket => filteredTicketIds.includes(ticket.id));
     }
-  
+
     return result;
-  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);  
+  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
