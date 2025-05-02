@@ -349,6 +349,9 @@ const UserList = ({
         selectedRow={[]}
         pagination={false}
         scroll={{ y: "calc(100vh - 200px)" }}
+        onRow={(row) => ({
+          onDoubleClick: () => openEditUser(row),
+        })}
       />
     </>
   );
