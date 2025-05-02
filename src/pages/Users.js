@@ -94,9 +94,8 @@ export const Users = () => {
     return users.filter((user) => {
       const matchesSearch =
         user.name.toLowerCase().includes(term) ||
-        user.surname.toLowerCase().includes(term) ||
-        user.email.toLowerCase().includes(term);
-
+        user.surname.toLowerCase().includes(term)
+        
       const matchesGroup =
         filtersSafe.group.length === 0 ||
         user.groups.some((g) => filtersSafe.group.includes(g.name));
