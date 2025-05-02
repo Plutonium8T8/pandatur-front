@@ -112,7 +112,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         } catch (e) {
           enqueueSnackbar(
             translations["Eroare la încărcarea grupurilor de utilizatori"][
-              language
+            language
             ],
             { variant: "error" },
           );
@@ -124,7 +124,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         } catch (e) {
           enqueueSnackbar(
             translations["Eroare la încărcarea grupurilor de permisiuni"][
-              language
+            language
             ],
             { variant: "error" },
           );
@@ -420,6 +420,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
                   <RoleMatrix
                     selectedRoles={form.selectedRoles}
+                    disabledRoles={permissionGroupRoles}
                     onToggle={toggleRole}
                   />
                 </>
