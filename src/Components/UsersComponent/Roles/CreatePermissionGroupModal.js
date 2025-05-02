@@ -158,6 +158,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             required
+                            mb="md"
                         />
 
                         <Text fw={600} mb={4}>
@@ -184,11 +185,12 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                 </>
                             )}
                         </Group>
+                        <Divider my="sm" />
+
                     </Box>
 
                     {existingGroups.length > 0 && (
                         <>
-                            <Divider my="sm" />
                             <Text fw={600}>
                                 {translations["Grupuri existente"][language]}
                             </Text>
