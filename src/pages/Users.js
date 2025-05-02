@@ -1,8 +1,15 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { TextInput, Button, Menu, ActionIcon, Container } from "@mantine/core";
+import {
+  Container,
+  TextInput,
+  Button,
+  Menu,
+  ActionIcon,
+} from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import { useSnackbar } from "notistack";
+import { LuFilter } from "react-icons/lu";
 import { BsThreeDots } from "react-icons/bs";
+import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { translations } from "@utils";
 import { PageHeader } from "@components";
@@ -10,27 +17,36 @@ import UserModal from "@components/UsersComponent/UserModal";
 import UserList from "@components/UsersComponent/UserList";
 import EditGroupsListModal from "@components/UsersComponent/GroupsUsers/EditGroupsListModal";
 import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
+import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
 
 const language = localStorage.getItem("language") || "RO";
 
 export const Users = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [opened, setOpened] = useState(false);
-  const [editUser, setEditUser] = useState(null);
-  const [editGroupsOpen, setEditGroupsOpen] = useState(false);
-  const [createPermissionModalOpen, setCreatePermissionModalOpen] =
-    useState(false);
-  const { enqueueSnackbar } = useSnackbar();
+  const [loading, setLoading] = useState(true);
 
-  const fetchUsers = useCallback(async () => {
+  const [editUser, setEditUser] = useState(null);
+  const [modals, setModals] = useState({
+    user: false,
+    groups: false,
+    permissions: false,
+    filter: false,
+  });
+
+  const [filters, setFilters] = useState({});
+  const { enqueueSnackbar } = useSnackbar();
+  const hasActiveFilters = Object.keys(filters).length > 0;
+
+  const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await api.users.getTechnicianList();
-      const normalized = data.map((item) => {
+      const response = await api.users.getTechnicianList();
+
+      const normalized = response.map((item) => {
         const personal = item.id || {};
         const user = personal.user || {};
+
         return {
           id: personal.id,
           name: personal.name || "-",
@@ -50,7 +66,7 @@ export const Users = () => {
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la încărcarea utilizatorilor"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     } finally {
       setLoading(false);
@@ -58,23 +74,47 @@ export const Users = () => {
   }, [enqueueSnackbar]);
 
   useEffect(() => {
-    fetchUsers();
-  }, [fetchUsers]);
+    loadUsers();
+  }, [loadUsers]);
 
   const filtered = useMemo(() => {
-    if (!search) return users;
-    const s = search.toLowerCase();
-    return users.filter(
-      (user) =>
-        user.name?.toLowerCase().includes(s) ||
-        user.surname?.toLowerCase().includes(s) ||
-        user.email?.toLowerCase().includes(s),
-    );
-  }, [users, search]);
+    const term = search.toLowerCase();
+
+    return users.filter((user) => {
+      const matchesSearch =
+        user.name.toLowerCase().includes(term) ||
+        user.surname.toLowerCase().includes(term) ||
+        user.email.toLowerCase().includes(term);
+
+      const matchesGroup =
+        !filters.group || user.groups.some((g) => g.name === filters.group);
+
+      const matchesRole =
+        !filters.role || user.permissions.some((p) => p.name === filters.role);
+
+      const matchesStatus =
+        !filters.status ||
+        (filters.status === "active" && user.status) ||
+        (filters.status === "inactive" && !user.status);
+
+      const matchesJob =
+        !filters.functie || user.jobTitle === filters.functie;
+
+      return (
+        matchesSearch &&
+        matchesGroup &&
+        matchesRole &&
+        matchesStatus &&
+        matchesJob
+      );
+    });
+  }, [users, search, filters]);
 
   return (
-    <Container p="20" size="xxl" style={{ height: "100%" }}>
+    <Container p={20} size="xxl" style={{ height: "100%" }}>
       <PageHeader
+        title={translations["Utilizatori"][language]}
+        count={filtered.length}
         extraInfo={
           <>
             <Menu shadow="md" width={200}>
@@ -84,64 +124,80 @@ export const Users = () => {
                 </ActionIcon>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Item onClick={() => setEditGroupsOpen(true)}>
+                <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
                   {translations["Editează grupurile"][language]}
                 </Menu.Item>
-                <Menu.Item onClick={() => setCreatePermissionModalOpen(true)}>
+                <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
                   {translations["Editează rolurile"][language]}
                 </Menu.Item>
               </Menu.Dropdown>
             </Menu>
+
+            <ActionIcon
+              onClick={() => setModals((m) => ({ ...m, filter: true }))}
+              variant={hasActiveFilters ? "filled" : "default"}
+              color={hasActiveFilters ? "custom" : "gray"}
+              size="36"
+            >
+              <LuFilter size={16} />
+            </ActionIcon>
+
             <TextInput
-              className="min-w-300"
               placeholder={translations["Căutare utilizator"][language]}
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              className="min-w-300"
               autoComplete="off"
             />
+
             <Button
               leftSection={<IoMdAdd size={16} />}
               onClick={() => {
                 setEditUser(null);
-                setOpened(true);
+                setModals((m) => ({ ...m, user: true }));
               }}
             >
               {translations["Adaugă utilizator"][language]}
             </Button>
           </>
         }
-        title={translations["Utilizatori"][language]}
-        count={filtered.length}
       />
 
       <UserList
         users={filtered}
         loading={loading}
-        fetchUsers={fetchUsers}
+        fetchUsers={loadUsers}
         openEditUser={(user) => {
           setEditUser(user);
-          setOpened(true);
+          setModals((m) => ({ ...m, user: true }));
         }}
       />
 
       <UserModal
-        opened={opened}
+        opened={modals.user}
         onClose={() => {
-          setOpened(false);
+          setModals((m) => ({ ...m, user: false }));
           setEditUser(null);
         }}
-        onUserCreated={fetchUsers}
         initialUser={editUser}
+        onUserCreated={loadUsers}
       />
 
       <EditGroupsListModal
-        opened={editGroupsOpen}
-        onClose={() => setEditGroupsOpen(false)}
+        opened={modals.groups}
+        onClose={() => setModals((m) => ({ ...m, groups: false }))}
       />
 
       <CreatePermissionGroupModal
-        opened={createPermissionModalOpen}
-        onClose={() => setCreatePermissionModalOpen(false)}
+        opened={modals.permissions}
+        onClose={() => setModals((m) => ({ ...m, permissions: false }))}
+      />
+
+      <UserFilterModal
+        opened={modals.filter}
+        onClose={() => setModals((m) => ({ ...m, filter: false }))}
+        users={users}
+        onApply={setFilters}
       />
     </Container>
   );
