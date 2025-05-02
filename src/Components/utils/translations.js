@@ -2425,4 +2425,8 @@ export const translations = {
     RO: "Documentul a fost generat cu succes",
     RU: "Документ был успешно сгенерирован",
   },
+  FilterForUser: {
+    RO: "Filtru pentru utilizatori",
+    RU: "Фильтр для пользователей"
+  }
 };
