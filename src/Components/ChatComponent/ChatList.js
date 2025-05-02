@@ -99,39 +99,42 @@ const ChatList = ({ selectTicketId }) => {
 
   // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
-    let filtered = [...tickets];
-
-    filtered.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-
+    if (!tickets || tickets.length === 0) return [];
+  
+    let result = [...tickets];
+  
+    result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
+  
     if (showMyTickets) {
-      filtered = filtered.filter((ticket) => ticket.technician_id === userId);
+      result = result.filter(ticket => ticket.technician_id === userId);
     }
-
+  
     if (searchQuery) {
-      const lowerSearchQuery = searchQuery.toLowerCase();
-
-      filtered = filtered.filter((ticket) => {
-        const ticketId = ticket.id.toString().toLowerCase();
-        const contact = ticket.contact?.toLowerCase() || "";
+      const query = searchQuery.toLowerCase();
+  
+      result = result.filter(ticket => {
+        const idMatch = ticket.id.toString().includes(query);
+        const contactMatch = ticket.contact?.toLowerCase().includes(query);
+        
         const tags = ticket.tags
-          ? ticket.tags.replace(/[{}]/g, "").split(",").map((tag) => tag.trim().toLowerCase())
+          ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase())
           : [];
-
-        const phones = ticket.clients?.map((c) => c.phone?.toLowerCase() || "") || [];
-
-        return (
-          ticketId.includes(lowerSearchQuery) ||
-          contact.includes(lowerSearchQuery) ||
-          tags.some((tag) => tag.includes(lowerSearchQuery)) ||
-          phones.some((phone) => phone.includes(lowerSearchQuery))
-        );
+        const tagMatch = tags.some(tag => tag.includes(query));
+  
+        const phones = ticket.clients?.map(c => c.phone?.toLowerCase() || "") || [];
+        const phoneMatch = phones.some(phone => phone.includes(query));
+  
+        return idMatch || contactMatch || tagMatch || phoneMatch;
       });
     }
-
-    if (filteredTicketIds === null) return filtered;
-    if (filteredTicketIds.length === 0) return [];
-    return filtered.filter((ticket) => filteredTicketIds.includes(ticket.id));
-  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
+  
+    if (filteredTicketIds !== null) {
+      if (filteredTicketIds.length === 0) return [];
+      result = result.filter(ticket => filteredTicketIds.includes(ticket.id));
+    }
+  
+    return result;
+  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);  
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
