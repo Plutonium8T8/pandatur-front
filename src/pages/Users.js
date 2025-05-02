@@ -36,7 +36,12 @@ export const Users = () => {
 
   const [filters, setFilters] = useState({});
   const { enqueueSnackbar } = useSnackbar();
-  const hasActiveFilters = Object.keys(filters).length > 0;
+
+  const hasActiveFilters =
+    (filters.group?.length || 0) > 0 ||
+    (filters.role?.length || 0) > 0 ||
+    !!filters.status ||
+    !!filters.functie;
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -79,6 +84,12 @@ export const Users = () => {
 
   const filtered = useMemo(() => {
     const term = search.toLowerCase();
+    const filtersSafe = {
+      group: filters.group || [],
+      role: filters.role || [],
+      status: filters.status || null,
+      functie: filters.functie || null,
+    };
 
     return users.filter((user) => {
       const matchesSearch =
@@ -87,18 +98,31 @@ export const Users = () => {
         user.email.toLowerCase().includes(term);
 
       const matchesGroup =
-        !filters.group || user.groups.some((g) => g.name === filters.group);
+        filtersSafe.group.length === 0 ||
+        user.groups.some((g) => filtersSafe.group.includes(g.name));
 
       const matchesRole =
-        !filters.role || user.permissions.some((p) => p.name === filters.role);
+        filtersSafe.role.length === 0 ||
+        user.permissions.some((p) => {
+          try {
+            const roles = JSON.parse(p.roles);
+            return (
+              Array.isArray(roles) &&
+              roles.length === filtersSafe.role.length &&
+              filtersSafe.role.every((r) => roles.includes(r))
+            );
+          } catch {
+            return false;
+          }
+        });
 
       const matchesStatus =
-        !filters.status ||
-        (filters.status === "active" && user.status) ||
-        (filters.status === "inactive" && !user.status);
+        !filtersSafe.status ||
+        (filtersSafe.status === "active" && user.status) ||
+        (filtersSafe.status === "inactive" && !user.status);
 
       const matchesJob =
-        !filters.functie || user.jobTitle === filters.functie;
+        !filtersSafe.functie || user.jobTitle === filtersSafe.functie;
 
       return (
         matchesSearch &&
@@ -145,7 +169,7 @@ export const Users = () => {
             <TextInput
               placeholder={translations["Căutare utilizator"][language]}
               value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
+              onChange={(e) => setSearch(e.target.value)}
               className="min-w-300"
               autoComplete="off"
             />
