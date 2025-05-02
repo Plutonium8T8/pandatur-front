@@ -328,11 +328,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           : translations["Adaugă utilizator"][language]
       }
       padding="md"
-      size="lg"
+      size="md"
     >
       <Group align="flex-start" spacing="xl">
-        <Avatar src={DEFAULT_PHOTO} size={120} />
-
         <Stack style={{ flex: 1 }}>
           <Switch
             label={translations["Activ"][language]}
