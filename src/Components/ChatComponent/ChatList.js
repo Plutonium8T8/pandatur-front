@@ -128,7 +128,6 @@ const ChatList = ({ selectTicketId }) => {
       });
     }
 
-    // Применение серверного фильтра (если был)
     if (filteredTicketIds === null) return filtered;
     if (filteredTicketIds.length === 0) return [];
     return filtered.filter((ticket) => filteredTicketIds.includes(ticket.id));
