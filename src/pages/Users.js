@@ -103,18 +103,7 @@ export const Users = () => {
 
       const matchesRole =
         filtersSafe.role.length === 0 ||
-        user.permissions.some((p) => {
-          try {
-            const roles = JSON.parse(p.roles);
-            return (
-              Array.isArray(roles) &&
-              roles.length === filtersSafe.role.length &&
-              filtersSafe.role.every((r) => roles.includes(r))
-            );
-          } catch {
-            return false;
-          }
-        });
+        user.permissions.some((p) => filtersSafe.role.includes(p.name));
 
       const matchesStatus =
         !filtersSafe.status ||
