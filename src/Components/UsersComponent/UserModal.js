@@ -70,24 +70,31 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
 
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
-      const userRoles = safeParseJson(rawRoles)
-        .map((r) => r.replace(/^ROLE_/, ""))
-        .filter(Boolean);
+      const userRoles = safeParseJson(rawRoles).map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
 
       const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
-      const permissionRoles = safeParseJson(rawPermissionRoles)
-        .map((r) => r.replace(/^ROLE_/, ""))
-        .filter(Boolean);
+      const permissionRoles = safeParseJson(rawPermissionRoles).map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
 
-      const rawMatrix = initialUser?.id?.user?.role_matrix
-        ? JSON.parse(initialUser.id.user.role_matrix)
-        : {};
+      const matrix = {};
+      permissionRoles.forEach((roleStr) => {
+        const parts = roleStr.split("_");
+        const level = parts.pop();
+        const key = parts.join("_");
+
+        const readable = Object.keys(LEVEL_VALUES).find(
+          (k) => LEVEL_VALUES[k] === level.toUpperCase()
+        );
+
+        if (readable) {
+          matrix[key] = readable;
+        }
+      });
 
       const fullMatrix = {};
       categories.forEach((category) => {
         actions.forEach((action) => {
           const key = `${category}_${action}`;
-          fullMatrix[key] = rawMatrix[key] || "Denied";
+          fullMatrix[key] = matrix[key] || "Denied";
         });
       });
 
