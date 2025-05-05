@@ -21,9 +21,6 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
                         <Text fw={500} ta="center">{action}</Text>
                     </Grid.Col>
                 ))}
-                <Grid.Col span={1}>
-                    <Text fw={500}>Legend</Text>
-                </Grid.Col>
             </Grid>
 
             {categories.map((category, index) => (
