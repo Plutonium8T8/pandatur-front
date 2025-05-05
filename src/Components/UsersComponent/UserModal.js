@@ -15,8 +15,7 @@ import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
-import { formatRoles } from "../utils/formatRoles";
-import { categories, actions } from "../utils/permissionConstants";
+import { categories, actions, LEVEL_VALUES } from "../utils/permissionConstants";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -161,25 +160,32 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
     const selectedGroup = permissionGroups.find(
-      (g) => g.permission_id.toString() === permissionGroupId,
+      (g) => g.permission_id.toString() === permissionGroupId
     );
 
-    const groupRoles = formatRoles(selectedGroup?.roles)
-      .map((r) => r.replace(/^ROLE_/, ""))
-      .filter(Boolean);
+    if (!selectedGroup) return;
+
+    const rawRoles = typeof selectedGroup.roles === "string"
+      ? safeParseJson(selectedGroup.roles)
+      : selectedGroup.roles || [];
 
     const groupMatrix = {};
-    categories.forEach((category) => {
-      actions.forEach((action) => {
-        const key = `${category}_${action}`;
-        const match = groupRoles.find((r) => r.startsWith(key));
-        const level = match?.split(":")?.[1] || "Denied";
-        groupMatrix[key] = level;
-      });
+
+    rawRoles.forEach((roleStr) => {
+      const withoutPrefix = roleStr.replace(/^ROLE_/, "");
+      const parts = withoutPrefix.split("_");
+      const levelRaw = parts.pop();
+      const key = parts.join("_");
+
+      const readableLevel = Object.keys(LEVEL_VALUES).find(
+        (k) => LEVEL_VALUES[k].toUpperCase() === levelRaw.toUpperCase()
+      ) || "Denied";
+
+      groupMatrix[key] = readableLevel;
     });
 
-    permissionGroupInitialRolesRef.current = groupRoles;
-    setPermissionGroupRoles(groupRoles);
+    permissionGroupInitialRolesRef.current = rawRoles;
+    setPermissionGroupRoles(rawRoles);
 
     setForm((prev) => ({
       ...prev,
@@ -428,29 +434,28 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
-              {initialUser && (
-                <>
-                  {permissionGroups.length > 0 && (
-                    <Select
-                      clearable
-                      label={translations["Grup permisiuni"][language]}
-                      placeholder={
-                        translations["Alege grupul de permisiuni"][language]
-                      }
-                      data={permissionGroups.map((g) => ({
-                        value: g.permission_id.toString(),
-                        label: g.permission_name,
-                      }))}
-                      value={form.permissionGroupId}
-                      onChange={handlePermissionGroupChange}
-                    />
-                  )}
+              {permissionGroups.length > 0 && (
+                <Select
+                  clearable
+                  label={translations["Grup permisiuni"][language]}
+                  placeholder={
+                    translations["Alege grupul de permisiuni"][language]
+                  }
+                  data={permissionGroups.map((g) => ({
+                    value: g.permission_id.toString(),
+                    label: g.permission_name,
+                  }))}
+                  value={form.permissionGroupId}
+                  onChange={handlePermissionGroupChange}
+                />
+              )}
 
-                  <RoleMatrix
-                    permissions={form.roleMatrix}
-                    onChange={updateRoleMatrix}
-                  />
-                </>
+              {form.permissionGroupId && (
+                <RoleMatrix
+                  key={form.permissionGroupId}
+                  permissions={form.roleMatrix}
+                  onChange={updateRoleMatrix}
+                />
               )}
             </>
           )}
