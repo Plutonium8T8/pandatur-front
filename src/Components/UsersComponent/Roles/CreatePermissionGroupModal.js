@@ -7,21 +7,20 @@ import {
     Stack,
     Divider,
     Group,
-    ScrollArea
+    ScrollArea,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
-import { formatRoles } from "../../utils/formatRoles";
 import { useConfirmPopup } from "../../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
 const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const [groupName, setGroupName] = useState("");
-    const [selectedRoles, setSelectedRoles] = useState([]);
+    const [roleMatrix, setRoleMatrix] = useState({});
     const [existingGroups, setExistingGroups] = useState([]);
     const [editingGroupId, setEditingGroupId] = useState(null);
     const { enqueueSnackbar } = useSnackbar();
@@ -40,7 +39,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const resetForm = () => {
         setGroupName("");
-        setSelectedRoles([]);
+        setRoleMatrix({});
         setEditingGroupId(null);
     };
 
@@ -56,16 +55,15 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }
     };
 
-    const toggleRole = (role) => {
-        setSelectedRoles((prev) =>
-            prev.includes(role)
-                ? prev.filter((r) => r !== role)
-                : [...prev, role]
-        );
+    const handleChangeMatrix = (key, value) => {
+        setRoleMatrix((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
     };
 
     const handleSubmit = async () => {
-        if (!groupName || selectedRoles.length === 0) {
+        if (!groupName || Object.keys(roleMatrix).length === 0) {
             enqueueSnackbar(
                 translations["Completați toate câmpurile obligatorii"][language],
                 { variant: "warning" }
@@ -73,12 +71,12 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             return;
         }
 
-        try {
-            const payload = {
-                name: groupName,
-                roles: selectedRoles.map((r) => "ROLE_" + r),
-            };
+        const payload = {
+            name: groupName,
+            role_matrix: JSON.stringify(roleMatrix),
+        };
 
+        try {
             if (editingGroupId) {
                 await api.permissions.updatePermissionGroup(editingGroupId, payload);
                 enqueueSnackbar(
@@ -115,18 +113,17 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 fetchExistingGroups();
                 resetForm();
             } catch (err) {
-                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
-                    variant: "error",
-                });
+                enqueueSnackbar(
+                    translations["Eroare la ștergerea grupului"][language],
+                    { variant: "error" }
+                );
             }
         });
     };
 
     const handleGroupClick = (group) => {
-        const rolesArray = formatRoles(group.roles)
-            .map((r) => r.replace(/^ROLE_/, ""))
-            .filter(Boolean);
-        setSelectedRoles(rolesArray);
+        const parsedMatrix = group.role_matrix ? JSON.parse(group.role_matrix) : {};
+        setRoleMatrix(parsedMatrix);
         setGroupName(group.permission_name);
         setEditingGroupId(group.permission_id);
     };
@@ -142,16 +139,9 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             }
             size="lg"
         >
-            <ScrollArea h="800">
+            <ScrollArea h={800}>
                 <Stack>
-                    <Box
-                        style={{
-                            position: "sticky",
-                            top: 0,
-                            zIndex: 10,
-                            backgroundColor: "white",
-                        }}
-                    >
+                    <Box>
                         <TextInput
                             label={translations["Nume grup"][language]}
                             placeholder={translations["Nume grup"][language]}
@@ -165,7 +155,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                             {translations["Selectați permisiunile"][language]}
                         </Text>
 
-                        <RoleMatrix selectedRoles={selectedRoles} onToggle={toggleRole} />
+                        <RoleMatrix permissions={roleMatrix} onChange={handleChangeMatrix} />
 
                         <Group mt="sm">
                             <Button onClick={handleSubmit}>
@@ -186,7 +176,6 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                             )}
                         </Group>
                         <Divider my="sm" />
-
                     </Box>
 
                     {existingGroups.length > 0 && (
@@ -222,7 +211,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     )}
                 </Stack>
             </ScrollArea>
-        </Modal >
+        </Modal>
     );
 };
 
