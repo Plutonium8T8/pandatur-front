@@ -5,7 +5,7 @@ export const categories = [
     "DASHBOARD",
     "NOTIFI",
     "TASK",
-    "CALENDAR",
+    "SCHEDULES",
 ];
 
 export const actions = ["CREATE", "VIEW", "EDIT", "DELETE"];

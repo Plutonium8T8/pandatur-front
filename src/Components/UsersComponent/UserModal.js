@@ -254,7 +254,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           api.users.updateUser(userId, {
             email,
             ...(password ? { password } : {}),
-            role_matrix: JSON.stringify(form.roleMatrix),
+            roles: JSON.stringify(form.roleMatrix),
           }),
         ]);
 
@@ -412,6 +412,22 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
+              <TextInput
+                label={translations["Funcție"][language]}
+                placeholder={translations["Funcție"][language]}
+                value={form.job_title}
+                onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+                required
+              />
+
+              <TextInput
+                label="Sipuni ID"
+                placeholder="Sipuni ID"
+                value={form.sipuni_id}
+                onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
+                required
+              />
+
               {initialUser && (
                 <>
                   {permissionGroups.length > 0 && (
@@ -438,22 +454,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
               )}
             </>
           )}
-
-          <TextInput
-            label={translations["Funcție"][language]}
-            placeholder={translations["Funcție"][language]}
-            value={form.job_title}
-            onChange={(e) => setForm({ ...form, job_title: e.target.value })}
-            required
-          />
-
-          <TextInput
-            label="Sipuni ID"
-            placeholder="Sipuni ID"
-            value={form.sipuni_id}
-            onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
-            required
-          />
 
           <Button fullWidth mt="sm" onClick={handleCreate}>
             {initialUser
