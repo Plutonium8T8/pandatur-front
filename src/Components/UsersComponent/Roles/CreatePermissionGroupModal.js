@@ -15,6 +15,7 @@ import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
 import { useConfirmPopup } from "../../../hooks";
+import { categories, actions, LEVEL_VALUES } from "../../utils"; // убедись, что импортируются эти значения
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -62,6 +63,21 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }));
     };
 
+    const generateRoleArray = (matrix) => {
+        const allRoles = [];
+
+        categories.forEach((category) => {
+            actions.forEach((action) => {
+                const key = `${category}_${action}`;
+                const level = matrix[key] || "Denied";
+                const levelValue = LEVEL_VALUES[level] || "DENIED";
+                allRoles.push(`ROLE_${key}_${levelValue}`);
+            });
+        });
+
+        return allRoles;
+    };
+
     const handleSubmit = async () => {
         if (!groupName || Object.keys(roleMatrix).length === 0) {
             enqueueSnackbar(
@@ -71,9 +87,11 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             return;
         }
 
+        const roles = generateRoleArray(roleMatrix);
+
         const payload = {
             name: groupName,
-            role_matrix: JSON.stringify(roleMatrix),
+            roles,
         };
 
         try {
@@ -122,8 +140,26 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     };
 
     const handleGroupClick = (group) => {
-        const parsedMatrix = group.role_matrix ? JSON.parse(group.role_matrix) : {};
-        setRoleMatrix(parsedMatrix);
+        const matrix = {};
+
+        if (group.roles?.length) {
+            group.roles.forEach((roleStr) => {
+                const withoutPrefix = roleStr.replace(/^ROLE_/, "");
+                const parts = withoutPrefix.split("_");
+                const level = parts.pop();
+                const key = parts.join("_");
+
+                const readableLevel = Object.keys(LEVEL_VALUES).find(
+                    (k) => LEVEL_VALUES[k] === level.toUpperCase()
+                );
+
+                if (readableLevel) {
+                    matrix[key] = readableLevel;
+                }
+            });
+        }
+
+        setRoleMatrix(matrix);
         setGroupName(group.permission_name);
         setEditingGroupId(group.permission_id);
     };
@@ -137,7 +173,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     ? translations["Editează grup de permisiuni"][language]
                     : translations["Creează grup de permisiuni"][language]
             }
-            size="lg"
+            size="xl"
         >
             <ScrollArea h={800}>
                 <Stack>

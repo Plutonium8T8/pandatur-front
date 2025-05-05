@@ -1772,8 +1772,8 @@ export const translations = {
     RU: "Выберите шаблон сообщения",
   },
   schedules: {
-    RO: "Calendar",
-    RU: "Календарь",
+    RO: "Grafic de lucru",
+    RU: "График работы",
   },
   "Eroare la salvarea grupului": {
     RO: "Eroare la salvarea grupului",

@@ -16,6 +16,7 @@ import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
 import { formatRoles } from "../utils/formatRoles";
+import { categories, actions } from "../utils/permissionConstants";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -67,8 +68,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   useEffect(() => {
     if (initialUser) {
-      const permissionGroupId =
-        initialUser.permissions?.[0]?.id?.toString() || null;
+      const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
 
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
       const userRoles = safeParseJson(rawRoles)
@@ -80,9 +80,17 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         .map((r) => r.replace(/^ROLE_/, ""))
         .filter(Boolean);
 
-      const parsedRoleMatrix = initialUser?.id?.user?.role_matrix
+      const rawMatrix = initialUser?.id?.user?.role_matrix
         ? JSON.parse(initialUser.id.user.role_matrix)
         : {};
+
+      const fullMatrix = {};
+      categories.forEach((category) => {
+        actions.forEach((action) => {
+          const key = `${category}_${action}`;
+          fullMatrix[key] = rawMatrix[key] || "Denied";
+        });
+      });
 
       setPermissionGroupRoles(permissionRoles);
       permissionGroupInitialRolesRef.current = permissionRoles;
@@ -93,7 +101,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId,
-        roleMatrix: parsedRoleMatrix,
+        roleMatrix: fullMatrix,
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
@@ -160,13 +168,23 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       .map((r) => r.replace(/^ROLE_/, ""))
       .filter(Boolean);
 
+    const groupMatrix = {};
+    categories.forEach((category) => {
+      actions.forEach((action) => {
+        const key = `${category}_${action}`;
+        const match = groupRoles.find((r) => r.startsWith(key));
+        const level = match?.split(":")?.[1] || "Denied";
+        groupMatrix[key] = level;
+      });
+    });
+
     permissionGroupInitialRolesRef.current = groupRoles;
     setPermissionGroupRoles(groupRoles);
 
     setForm((prev) => ({
       ...prev,
       permissionGroupId,
-      selectedRoles: Array.from(new Set([...customRoles, ...groupRoles])),
+      roleMatrix: groupMatrix,
     }));
   };
 
@@ -183,23 +201,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     }
   };
 
-  const toggleRole = (role) => {
-    setCustomRoles((prev) =>
-      prev.includes(role) ? prev.filter((r) => r !== role) : [...prev, role],
-    );
-
-    setForm((prev) => {
-      const nextRoles = prev.selectedRoles.includes(role)
-        ? prev.selectedRoles.filter((r) => r !== role)
-        : [...prev.selectedRoles, role];
-
-      return {
-        ...prev,
-        selectedRoles: nextRoles,
-      };
-    });
-  };
-
   const handleCreate = async () => {
     const {
       name,
@@ -211,7 +212,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       status,
       groups,
       permissionGroupId,
-      selectedRoles,
       sipuni_id,
     } = form;
 
