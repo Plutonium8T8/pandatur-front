@@ -1,14 +1,14 @@
 import { Grid, Text, Paper, Stack, Box, Divider } from "@mantine/core";
 import { categories, actions, levels } from "../../utils/permissionConstants";
 
-const circleStyle = (active, color) => ({
+const getCircleStyle = (isActive, color) => ({
     width: 17,
     height: 17,
     borderRadius: "50%",
     border: `1px solid ${color}`,
-    backgroundColor: active ? color : "transparent",
+    backgroundColor: isActive ? color : "transparent",
     cursor: "pointer",
-    transition: "background 0.2s",
+    transition: "background-color 0.2s ease",
 });
 
 const RoleMatrix = ({ permissions = {}, onChange }) => {
@@ -27,22 +27,23 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
                 <Box key={category}>
                     {index > 0 && <Divider my="sm" />}
                     <Grid columns={actions.length + 2} gutter="xs" align="center">
+                        {/* Название категории */}
                         <Grid.Col span={1}>
                             <Text fw={500}>{category}</Text>
                         </Grid.Col>
 
                         {actions.map((action) => {
-                            const roleKey = `${category}_${action}`;
-                            const value = permissions[roleKey] || "Denied";
+                            const key = `${category}_${action}`;
+                            const currentLevel = permissions[key] || "Denied";
 
                             return (
-                                <Grid.Col span={1} key={roleKey}>
+                                <Grid.Col span={1} key={key}>
                                     <Stack align="center" gap={6}>
-                                        {levels.map((lvl) => (
+                                        {levels.map(({ value, color }) => (
                                             <Box
-                                                key={lvl.value}
-                                                onClick={() => onChange(roleKey, lvl.value)}
-                                                style={circleStyle(value === lvl.value, lvl.color)}
+                                                key={value}
+                                                onClick={() => onChange(key, value)}
+                                                style={getCircleStyle(currentLevel === value, color)}
                                             />
                                         ))}
                                     </Stack>
@@ -52,9 +53,9 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
 
                         <Grid.Col span={1}>
                             <Stack gap={4}>
-                                {levels.map((lvl) => (
-                                    <Text key={lvl.value} size="xs" c={lvl.color}>
-                                        {lvl.label}
+                                {levels.map(({ value, label, color }) => (
+                                    <Text key={value} size="xs" c={color}>
+                                        {label}
                                     </Text>
                                 ))}
                             </Stack>
