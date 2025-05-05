@@ -27,7 +27,6 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
                 <Box key={category}>
                     {index > 0 && <Divider my="sm" />}
                     <Grid columns={actions.length + 2} gutter="xs" align="center">
-                        {/* Название категории */}
                         <Grid.Col span={1}>
                             <Text fw={500}>{category}</Text>
                         </Grid.Col>
