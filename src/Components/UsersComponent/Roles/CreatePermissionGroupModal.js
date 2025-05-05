@@ -11,11 +11,11 @@ import {
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
-import { translations } from "../../utils/translations";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
 import { useConfirmPopup } from "../../../hooks";
-import { categories, actions, LEVEL_VALUES } from "../../utils"; // убедись, что импортируются эти значения
+import { translations } from "../../utils/translations";
+import { categories, actions, LEVEL_VALUES } from "../../utils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -32,7 +32,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     useEffect(() => {
         if (opened) {
-            fetchExistingGroups();
+            loadPermissionGroups();
         } else {
             resetForm();
         }
@@ -44,11 +44,11 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         setEditingGroupId(null);
     };
 
-    const fetchExistingGroups = async () => {
+    const loadPermissionGroups = async () => {
         try {
-            const data = await api.permissions.getAllPermissionGroups();
-            setExistingGroups(data);
-        } catch (error) {
+            const groups = await api.permissions.getAllPermissionGroups();
+            setExistingGroups(groups);
+        } catch {
             enqueueSnackbar(
                 translations["Eroare la încărcarea grupurilor existente"][language],
                 { variant: "error" }
@@ -56,29 +56,22 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         }
     };
 
-    const handleChangeMatrix = (key, value) => {
-        setRoleMatrix((prev) => ({
-            ...prev,
-            [key]: value,
-        }));
+    const handleMatrixChange = (key, value) => {
+        setRoleMatrix((prev) => ({ ...prev, [key]: value }));
     };
 
-    const generateRoleArray = (matrix) => {
-        const allRoles = [];
-
-        categories.forEach((category) => {
-            actions.forEach((action) => {
+    const convertMatrixToRoles = (matrix) => {
+        return categories.flatMap((category) =>
+            actions.map((action) => {
                 const key = `${category}_${action}`;
                 const level = matrix[key] || "Denied";
                 const levelValue = LEVEL_VALUES[level] || "DENIED";
-                allRoles.push(`ROLE_${key}_${levelValue}`);
-            });
-        });
-
-        return allRoles;
+                return `ROLE_${key}_${levelValue}`;
+            })
+        );
     };
 
-    const handleSubmit = async () => {
+    const handleSave = async () => {
         if (!groupName || Object.keys(roleMatrix).length === 0) {
             enqueueSnackbar(
                 translations["Completați toate câmpurile obligatorii"][language],
@@ -87,11 +80,9 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             return;
         }
 
-        const roles = generateRoleArray(roleMatrix);
-
         const payload = {
             name: groupName,
-            roles,
+            roles: convertMatrixToRoles(roleMatrix),
         };
 
         try {
@@ -109,9 +100,9 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 );
             }
 
-            fetchExistingGroups();
+            await loadPermissionGroups();
             resetForm();
-        } catch (err) {
+        } catch {
             enqueueSnackbar(
                 translations["Eroare la salvarea grupului de permisiuni"][language],
                 { variant: "error" }
@@ -125,12 +116,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         confirmDelete(async () => {
             try {
                 await api.permissions.deletePermissionGroup(editingGroupId);
-                enqueueSnackbar(translations["Grup șters cu succes"][language], {
-                    variant: "success",
-                });
-                fetchExistingGroups();
+                enqueueSnackbar(
+                    translations["Grup șters cu succes"][language],
+                    { variant: "success" }
+                );
+                await loadPermissionGroups();
                 resetForm();
-            } catch (err) {
+            } catch {
                 enqueueSnackbar(
                     translations["Eroare la ștergerea grupului"][language],
                     { variant: "error" }
@@ -139,29 +131,37 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         });
     };
 
-    const handleGroupClick = (group) => {
+    const handleSelectGroup = (group) => {
         const matrix = {};
+        const roles = Array.isArray(group.roles) ? group.roles : safeParseJson(group.roles);
 
-        if (group.roles?.length) {
-            group.roles.forEach((roleStr) => {
-                const withoutPrefix = roleStr.replace(/^ROLE_/, "");
-                const parts = withoutPrefix.split("_");
-                const level = parts.pop();
-                const key = parts.join("_");
+        roles.forEach((roleStr) => {
+            const trimmed = roleStr.replace(/^ROLE_/, "");
+            const parts = trimmed.split("_");
+            const level = parts.pop();
+            const key = parts.join("_");
 
-                const readableLevel = Object.keys(LEVEL_VALUES).find(
-                    (k) => LEVEL_VALUES[k] === level.toUpperCase()
-                );
+            const readable = Object.keys(LEVEL_VALUES).find(
+                (k) => LEVEL_VALUES[k] === level.toUpperCase()
+            );
 
-                if (readableLevel) {
-                    matrix[key] = readableLevel;
-                }
-            });
-        }
+            if (readable) {
+                matrix[key] = readable;
+            }
+        });
 
-        setRoleMatrix(matrix);
         setGroupName(group.permission_name);
         setEditingGroupId(group.permission_id);
+        setRoleMatrix(matrix);
+    };
+
+    const safeParseJson = (str) => {
+        try {
+            const parsed = JSON.parse(str);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch {
+            return [];
+        }
     };
 
     return (
@@ -191,10 +191,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                             {translations["Selectați permisiunile"][language]}
                         </Text>
 
-                        <RoleMatrix permissions={roleMatrix} onChange={handleChangeMatrix} />
+                        <RoleMatrix permissions={roleMatrix} onChange={handleMatrixChange} />
 
                         <Group mt="sm">
-                            <Button onClick={handleSubmit}>
+                            <Button onClick={handleSave}>
                                 {editingGroupId
                                     ? translations["Salvează modificările"][language]
                                     : translations["Creează"][language]}
@@ -211,19 +211,18 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                 </>
                             )}
                         </Group>
+
                         <Divider my="sm" />
                     </Box>
 
                     {existingGroups.length > 0 && (
                         <>
-                            <Text fw={600}>
-                                {translations["Grupuri existente"][language]}
-                            </Text>
+                            <Text fw={600}>{translations["Grupuri existente"][language]}</Text>
                             <Stack spacing={4}>
-                                {existingGroups.map((g) => (
+                                {existingGroups.map((group) => (
                                     <Box
-                                        key={g.permission_id}
-                                        onClick={() => handleGroupClick(g)}
+                                        key={group.permission_id}
+                                        onClick={() => handleSelectGroup(group)}
                                         style={{
                                             cursor: "pointer",
                                             padding: 8,
@@ -232,14 +231,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                             border: "1px solid #dee2e6",
                                             transition: "background 0.2s",
                                         }}
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.background = "#f1f3f5")
-                                        }
-                                        onMouseLeave={(e) =>
-                                            (e.currentTarget.style.background = "#f8f9fa")
-                                        }
+                                        onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f3f5")}
+                                        onMouseLeave={(e) => (e.currentTarget.style.background = "#f8f9fa")}
                                     >
-                                        <Text fw={500}>{g.permission_name}</Text>
+                                        <Text fw={500}>{group.permission_name}</Text>
                                     </Box>
                                 ))}
                             </Stack>
