@@ -175,7 +175,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             }
             size="xl"
         >
-            <ScrollArea h={800}>
+            <ScrollArea h={900}>
                 <Stack>
                     <Box>
                         <TextInput
