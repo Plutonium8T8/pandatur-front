@@ -35,10 +35,8 @@ export const ChatInput = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [template, setTemplate] = useState();
   const [url, setUrl] = useState({});
-  const [emojiPickerPosition, setEmojiPickerPosition] = useState({
-    top: 0,
-    left: 0,
-  });
+  const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
 
@@ -57,7 +55,6 @@ export const ChatInput = ({
   const handleFile = async (file) => {
     handlers.open();
     const url = await uploadFile(file);
-
     handlers.close();
 
     const mediaType = getMediaType(file.type);
@@ -86,6 +83,13 @@ export const ChatInput = ({
       });
       clearState();
     }
+  };
+
+  const handleDrop = async (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) await handleFile(file);
   };
 
   return (
@@ -132,6 +136,22 @@ export const ChatInput = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder={getLanguageByKey("Introduceți mesaj")}
+          onDragEnter={(e) => {
+            e.preventDefault();
+            setIsDragOver(true);
+          }}
+          onDragLeave={(e) => {
+            e.preventDefault();
+            setIsDragOver(false);
+          }}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={handleDrop}
+          styles={{
+            input: {
+              border: isDragOver ? "2px dashed #69db7c" : undefined,
+              backgroundColor: isDragOver ? "#ebfbee" : undefined
+            },
+          }}
         />
 
         <Flex align="center" justify="space-between">
