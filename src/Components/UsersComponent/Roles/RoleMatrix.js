@@ -1,12 +1,5 @@
-import { Grid, Text, Paper, Stack, Box } from "@mantine/core";
-import { categories, actions } from "../../utils/permissionConstants";
-
-const levels = [
-    { label: "Denied", value: "Denied", color: "#fa5252" },
-    { label: "If responsible", value: "IfResponsible", color: "#fab005" },
-    { label: "Team-wide access", value: "Team", color: "#228be6" },
-    { label: "Allowed", value: "Allowed", color: "#40c057" },
-];
+import { Grid, Text, Paper, Stack, Box, Divider } from "@mantine/core";
+import { categories, actions, levels } from "../../utils/permissionConstants";
 
 const circleStyle = (active, color) => ({
     width: 17,
@@ -33,41 +26,44 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
                 </Grid.Col>
             </Grid>
 
-            {categories.map((category) => (
-                <Grid columns={actions.length + 2} gutter="xs" key={category} align="center">
-                    <Grid.Col span={1}>
-                        <Text fw={500}>{category}</Text>
-                    </Grid.Col>
+            {categories.map((category, index) => (
+                <Box key={category}>
+                    {index > 0 && <Divider my="sm" />}
+                    <Grid columns={actions.length + 2} gutter="xs" align="center">
+                        <Grid.Col span={1}>
+                            <Text fw={500}>{category}</Text>
+                        </Grid.Col>
 
-                    {actions.map((action) => {
-                        const roleKey = `${category}_${action}`;
-                        const value = permissions[roleKey] || "Denied";
+                        {actions.map((action) => {
+                            const roleKey = `${category}_${action}`;
+                            const value = permissions[roleKey] || "Denied";
 
-                        return (
-                            <Grid.Col span={1} key={roleKey}>
-                                <Stack align="center" gap={6}>
-                                    {levels.map((lvl) => (
-                                        <Box
-                                            key={lvl.value}
-                                            onClick={() => onChange(roleKey, lvl.value)}
-                                            style={circleStyle(value === lvl.value, lvl.color)}
-                                        />
-                                    ))}
-                                </Stack>
-                            </Grid.Col>
-                        );
-                    })}
+                            return (
+                                <Grid.Col span={1} key={roleKey}>
+                                    <Stack align="center" gap={6}>
+                                        {levels.map((lvl) => (
+                                            <Box
+                                                key={lvl.value}
+                                                onClick={() => onChange(roleKey, lvl.value)}
+                                                style={circleStyle(value === lvl.value, lvl.color)}
+                                            />
+                                        ))}
+                                    </Stack>
+                                </Grid.Col>
+                            );
+                        })}
 
-                    <Grid.Col span={1}>
-                        <Stack gap={4}>
-                            {levels.map((lvl) => (
-                                <Text key={lvl.value} size="xs" c={lvl.color}>
-                                    {lvl.label}
-                                </Text>
-                            ))}
-                        </Stack>
-                    </Grid.Col>
-                </Grid>
+                        <Grid.Col span={1}>
+                            <Stack gap={4}>
+                                {levels.map((lvl) => (
+                                    <Text key={lvl.value} size="xs" c={lvl.color}>
+                                        {lvl.label}
+                                    </Text>
+                                ))}
+                            </Stack>
+                        </Grid.Col>
+                    </Grid>
+                </Box>
             ))}
         </Paper>
     );
