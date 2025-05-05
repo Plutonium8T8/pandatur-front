@@ -29,7 +29,7 @@ const initialFormState = {
   status: false,
   groups: "",
   permissionGroupId: null,
-  selectedRoles: [],
+  roleMatrix: {},
   sipuni_id: "",
 };
 
@@ -55,6 +55,16 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const permissionGroupInitialRolesRef = useRef([]);
   const [customRoles, setCustomRoles] = useState([]);
 
+  const updateRoleMatrix = (roleKey, level) => {
+    setForm((prev) => ({
+      ...prev,
+      roleMatrix: {
+        ...prev.roleMatrix,
+        [roleKey]: level,
+      },
+    }));
+  };
+
   useEffect(() => {
     if (initialUser) {
       const permissionGroupId =
@@ -70,6 +80,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         .map((r) => r.replace(/^ROLE_/, ""))
         .filter(Boolean);
 
+      const parsedRoleMatrix = initialUser?.id?.user?.role_matrix
+        ? JSON.parse(initialUser.id.user.role_matrix)
+        : {};
+
       setPermissionGroupRoles(permissionRoles);
       permissionGroupInitialRolesRef.current = permissionRoles;
 
@@ -79,7 +93,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId,
-        selectedRoles: Array.from(new Set([...onlyCustom, ...permissionRoles])),
+        roleMatrix: parsedRoleMatrix,
         name: initialUser.name || "",
         surname: initialUser.surname || "",
         username: initialUser.username || "",
@@ -240,9 +254,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           api.users.updateUser(userId, {
             email,
             ...(password ? { password } : {}),
-            roles: selectedRoles
-              .filter((r) => !permissionGroupRoles.includes(r))
-              .map((r) => `ROLE_${r}`),
+            role_matrix: JSON.stringify(form.roleMatrix),
           }),
         ]);
 
@@ -328,7 +340,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           : translations["Adaugă utilizator"][language]
       }
       padding="md"
-      size="lg"
+      size="xl"
     >
       <Group align="flex-start" spacing="xl">
         <Avatar src={DEFAULT_PHOTO} size={120} />
@@ -419,9 +431,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                   )}
 
                   <RoleMatrix
-                    selectedRoles={form.selectedRoles}
-                    disabledRoles={permissionGroupRoles}
-                    onToggle={toggleRole}
+                    permissions={form.roleMatrix}
+                    onChange={updateRoleMatrix}
                   />
                 </>
               )}
