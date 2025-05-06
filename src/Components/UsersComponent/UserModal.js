@@ -58,13 +58,34 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateRoleMatrix = (roleKey, level) => {
-    setForm((prev) => ({
-      ...prev,
-      roleMatrix: {
-        ...prev.roleMatrix,
-        [roleKey]: level,
-      },
-    }));
+    const newMatrix = {
+      ...form.roleMatrix,
+      [roleKey]: level,
+    };
+
+    const newRolesList = convertMatrixToRoles(newMatrix);
+    const originalRolesList = permissionGroupInitialRolesRef.current;
+
+    const isChanged = newRolesList.some(
+      (role) => !originalRolesList.includes(role)
+    ) || originalRolesList.some(
+      (role) => !newRolesList.includes(role)
+    );
+
+    if (form.permissionGroupId && isChanged) {
+      setForm((prev) => ({
+        ...prev,
+        permissionGroupId: null,
+        roleMatrix: newMatrix,
+      }));
+      setPermissionGroupRoles([]);
+      setCustomRoles(Object.keys(newMatrix));
+    } else {
+      setForm((prev) => ({
+        ...prev,
+        roleMatrix: newMatrix,
+      }));
+    }
   };
 
   useEffect(() => {
@@ -279,6 +300,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       if (initialUser) {
         const technicianId = initialUser.id?.id || initialUser.id;
         const userId = initialUser.id?.user?.id || initialUser.id;
+        const hadPermissionBefore = initialUser?.permissions?.length > 0;
+        const isExitingGroup = !permissionGroupId && hadPermissionBefore;
 
         await Promise.all([
           api.users.updateTechnician(technicianId, {
@@ -290,11 +313,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name,
             surname,
           }),
-          api.users.updateUser(userId, {
-            email,
-            ...(password ? { password } : {}),
-            roles: JSON.stringify(convertMatrixToRoles(form.roleMatrix)),
-          }),
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
@@ -304,11 +322,17 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           });
         }
 
-        const hadPermissionBefore = initialUser?.permissions?.length > 0;
-
-        if (!permissionGroupId && hadPermissionBefore) {
+        if (isExitingGroup) {
           await api.permissions.removePermissionFromTechnician(userId);
-        } else if (permissionGroupId) {
+        }
+
+        await api.users.updateUser(userId, {
+          email,
+          ...(password ? { password } : {}),
+          roles: JSON.stringify(convertMatrixToRoles(form.roleMatrix)),
+        });
+
+        if (permissionGroupId) {
           await api.permissions.assignPermissionToUser(permissionGroupId, userId);
         }
 
