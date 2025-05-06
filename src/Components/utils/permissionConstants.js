@@ -8,7 +8,7 @@ export const categories = [
     "SCHEDULES",
 ];
 
-export const actions = ["CREATE", "VIEW", "EDIT", "DELETE"];
+export const actions = ["VIEW", "CREATE", "EDIT", "DELETE"];
 
 export const levels = [
     { label: "Denied", value: "Denied", color: "#fa5252" },
