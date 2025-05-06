@@ -13,7 +13,12 @@ const getCircleStyle = (isActive, color) => ({
 
 const RoleMatrix = ({ permissions = {}, onChange }) => {
     return (
-        <Paper withBorder p="sm" radius="md">
+        <Paper
+            withBorder
+            p="sm"
+            radius="md"
+            style={{ backgroundColor: "#f9f9f9" }}
+        >
             <Grid columns={actions.length + 2} gutter="xs" mb="xs" align="center">
                 <Grid.Col span={1}></Grid.Col>
                 {actions.map((action) => (
@@ -33,7 +38,7 @@ const RoleMatrix = ({ permissions = {}, onChange }) => {
 
                         {actions.map((action) => {
                             const key = `${category}_${action}`;
-                            const currentLevel = permissions[key] || "Denied";
+                            const currentLevel = permissions[key];
 
                             return (
                                 <Grid.Col span={1} key={key}>
