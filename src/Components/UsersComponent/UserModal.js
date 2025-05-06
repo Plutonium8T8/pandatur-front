@@ -15,7 +15,7 @@ import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
-import { categories, actions, LEVEL_VALUES } from "../utils/permissionConstants";
+import { LEVEL_VALUES } from "../utils/permissionConstants";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -70,7 +70,27 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
 
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
-      const userRoles = safeParseJson(rawRoles).map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
+      let userRolesMap = {};
+      const parsedRoles = safeParseJson(rawRoles);
+
+      if (Array.isArray(parsedRoles)) {
+        parsedRoles.forEach((roleStr) => {
+          const withoutPrefix = roleStr.replace(/^ROLE_/, "");
+          const parts = withoutPrefix.split("_");
+          const level = parts.pop();
+          const key = parts.join("_");
+
+          const readable = Object.keys(LEVEL_VALUES).find(
+            (k) => LEVEL_VALUES[k] === level.toUpperCase()
+          );
+
+          if (readable) {
+            userRolesMap[key] = readable;
+          }
+        });
+      } else if (parsedRoles && typeof parsedRoles === "object") {
+        userRolesMap = parsedRoles;
+      }
 
       const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
       const permissionRoles = safeParseJson(rawPermissionRoles).map((r) => r.replace(/^ROLE_/, "")).filter(Boolean);
@@ -91,18 +111,15 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       });
 
       const fullMatrix = {};
-      categories.forEach((category) => {
-        actions.forEach((action) => {
-          const key = `${category}_${action}`;
-          fullMatrix[key] = matrix[key] || "Denied";
-        });
+      Object.keys(userRolesMap).forEach((key) => {
+        fullMatrix[key] = userRolesMap[key];
       });
+
 
       setPermissionGroupRoles(permissionRoles);
       permissionGroupInitialRolesRef.current = permissionRoles;
 
-      const onlyCustom = userRoles.filter((r) => !permissionRoles.includes(r));
-      setCustomRoles(onlyCustom);
+      setCustomRoles(Object.keys(userRolesMap));
 
       setForm((prev) => ({
         ...prev,
@@ -206,12 +223,19 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        selectedRoles: customRoles,
+        roleMatrix: {},
       }));
       setPermissionGroupRoles([]);
     } else {
       handleSelectPermissionGroup(value);
     }
+  };
+
+  const convertMatrixToRoles = (matrix) => {
+    return Object.entries(matrix).map(([key, level]) => {
+      const levelValue = LEVEL_VALUES[level] || "DENIED";
+      return `ROLE_${key.toUpperCase()}_${levelValue}`;
+    });
   };
 
   const handleCreate = async () => {
@@ -267,7 +291,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           api.users.updateUser(userId, {
             email,
             ...(password ? { password } : {}),
-            roles: JSON.stringify(form.roleMatrix),
+            roles: JSON.stringify(convertMatrixToRoles(form.roleMatrix)),
           }),
         ]);
 
@@ -441,13 +465,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 required
               />
 
-              {permissionGroups.length > 0 && (
+              {!initialUser && null}
+
+              {initialUser && permissionGroups.length > 0 && (
                 <Select
                   clearable
                   label={translations["Grup permisiuni"][language]}
-                  placeholder={
-                    translations["Alege grupul de permisiuni"][language]
-                  }
+                  placeholder={translations["Alege grupul de permisiuni"][language]}
                   data={permissionGroups.map((g) => ({
                     value: g.permission_id.toString(),
                     label: g.permission_name,
@@ -457,7 +481,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 />
               )}
 
-              {form.permissionGroupId && (
+              {initialUser && (
                 <RoleMatrix
                   key={form.permissionGroupId}
                   permissions={form.roleMatrix}
