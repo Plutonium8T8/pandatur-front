@@ -7,7 +7,8 @@ import {
     Stack,
     Divider,
     Group,
-    ScrollArea,
+    Loader,
+    Center,
 } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { api } from "../../../api";
@@ -24,6 +25,10 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     const [roleMatrix, setRoleMatrix] = useState({});
     const [existingGroups, setExistingGroups] = useState([]);
     const [editingGroupId, setEditingGroupId] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+
     const { enqueueSnackbar } = useSnackbar();
 
     const confirmDelete = useConfirmPopup({
@@ -45,6 +50,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
     };
 
     const loadPermissionGroups = async () => {
+        setLoading(true);
         try {
             const groups = await api.permissions.getAllPermissionGroups();
             setExistingGroups(groups);
@@ -53,6 +59,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 translations["Eroare la încărcarea grupurilor existente"][language],
                 { variant: "error" }
             );
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -79,6 +87,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             );
             return;
         }
+
+        setSaving(true);
 
         const payload = {
             name: groupName,
@@ -107,6 +117,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                 translations["Eroare la salvarea grupului de permisiuni"][language],
                 { variant: "error" }
             );
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -114,26 +126,29 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         if (!editingGroupId) return;
 
         confirmDelete(async () => {
+            setDeleting(true);
             try {
                 await api.permissions.deletePermissionGroup(editingGroupId);
-                enqueueSnackbar(
-                    translations["Grup șters cu succes"][language],
-                    { variant: "success" }
-                );
+                enqueueSnackbar(translations["Grup șters cu succes"][language], {
+                    variant: "success",
+                });
                 await loadPermissionGroups();
                 resetForm();
             } catch {
-                enqueueSnackbar(
-                    translations["Eroare la ștergerea grupului"][language],
-                    { variant: "error" }
-                );
+                enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
+                    variant: "error",
+                });
+            } finally {
+                setDeleting(false);
             }
         });
     };
 
     const handleSelectGroup = (group) => {
         const matrix = {};
-        const roles = Array.isArray(group.roles) ? group.roles : safeParseJson(group.roles);
+        const roles = Array.isArray(group.roles)
+            ? group.roles
+            : safeParseJson(group.roles);
 
         roles.forEach((roleStr) => {
             const trimmed = roleStr.replace(/^ROLE_/, "");
@@ -157,8 +172,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
     const safeParseJson = (str) => {
         try {
-            const parsed = JSON.parse(str);
-            return Array.isArray(parsed) ? parsed : [];
+            return typeof str === "string" ? JSON.parse(str) : [];
         } catch {
             return [];
         }
@@ -175,7 +189,6 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
             }
             size="lg"
         >
-            {/* <ScrollArea h={900}> */}
             <Stack>
                 <Box>
                     <TextInput
@@ -194,7 +207,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     <RoleMatrix permissions={roleMatrix} onChange={handleMatrixChange} />
 
                     <Group mt="sm">
-                        <Button onClick={handleSave}>
+                        <Button onClick={handleSave} loading={saving}>
                             {editingGroupId
                                 ? translations["Salvează modificările"][language]
                                 : translations["Creează"][language]}
@@ -202,7 +215,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
 
                         {editingGroupId && (
                             <>
-                                <Button color="red" onClick={handleDelete}>
+                                <Button color="red" onClick={handleDelete} loading={deleting}>
                                     {translations["Șterge grupul"][language]}
                                 </Button>
                                 <Button variant="default" onClick={resetForm}>
@@ -215,33 +228,42 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     <Divider my="sm" />
                 </Box>
 
-                {existingGroups.length > 0 && (
-                    <>
-                        <Text fw={600}>{translations["Grupuri existente"][language]}</Text>
-                        <Stack spacing={4}>
-                            {existingGroups.map((group) => (
-                                <Box
-                                    key={group.permission_id}
-                                    onClick={() => handleSelectGroup(group)}
-                                    style={{
-                                        cursor: "pointer",
-                                        padding: 8,
-                                        borderRadius: 4,
-                                        background: "#f8f9fa",
-                                        border: "1px solid #dee2e6",
-                                        transition: "background 0.2s",
-                                    }}
-                                    onMouseEnter={(e) => (e.currentTarget.style.background = "#f1f3f5")}
-                                    onMouseLeave={(e) => (e.currentTarget.style.background = "#f8f9fa")}
-                                >
-                                    <Text fw={500}>{group.permission_name}</Text>
-                                </Box>
-                            ))}
-                        </Stack>
-                    </>
+                {loading ? (
+                    <Center my="sm">
+                        <Loader />
+                    </Center>
+                ) : (
+                    existingGroups.length > 0 && (
+                        <>
+                            <Text fw={600}>{translations["Grupuri existente"][language]}</Text>
+                            <Stack spacing={4}>
+                                {existingGroups.map((group) => (
+                                    <Box
+                                        key={group.permission_id}
+                                        onClick={() => handleSelectGroup(group)}
+                                        style={{
+                                            cursor: "pointer",
+                                            padding: 8,
+                                            borderRadius: 4,
+                                            background: "#f8f9fa",
+                                            border: "1px solid #dee2e6",
+                                            transition: "background 0.2s",
+                                        }}
+                                        onMouseEnter={(e) =>
+                                            (e.currentTarget.style.background = "#f1f3f5")
+                                        }
+                                        onMouseLeave={(e) =>
+                                            (e.currentTarget.style.background = "#f8f9fa")
+                                        }
+                                    >
+                                        <Text fw={500}>{group.permission_name}</Text>
+                                    </Box>
+                                ))}
+                            </Stack>
+                        </>
+                    )
                 )}
             </Stack>
-            {/* </ScrollArea> */}
         </Modal>
     );
 };
