@@ -9,6 +9,7 @@ import {
   Group,
   Select,
   PasswordInput,
+  Loader
 } from "@mantine/core";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
@@ -54,6 +55,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [permissionGroupRoles, setPermissionGroupRoles] = useState([]);
   const permissionGroupInitialRolesRef = useRef([]);
   const [customRoles, setCustomRoles] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateRoleMatrix = (roleKey, level) => {
     setForm((prev) => ({
@@ -74,7 +76,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
       let parsedRoles = safeParseJson(rawRoles);
       if (typeof parsedRoles === "string") {
-        parsedRoles = safeParseJson(parsedRoles); // двойной JSON
+        parsedRoles = safeParseJson(parsedRoles);
       }
 
       if (Array.isArray(parsedRoles)) {
@@ -265,13 +267,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       ) {
         enqueueSnackbar(
           translations["Completați toate câmpurile obligatorii"][language],
-          {
-            variant: "warning",
-          },
+          { variant: "warning" }
         );
         return;
       }
     }
+
+    setIsSubmitting(true);
 
     try {
       if (initialUser) {
@@ -307,17 +309,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         if (!permissionGroupId && hadPermissionBefore) {
           await api.permissions.removePermissionFromTechnician(userId);
         } else if (permissionGroupId) {
-          await api.permissions.assignPermissionToUser(
-            permissionGroupId,
-            userId,
-          );
+          await api.permissions.assignPermissionToUser(permissionGroupId, userId);
         }
 
         enqueueSnackbar(
           translations["Utilizator actualizat cu succes"][language],
-          {
-            variant: "success",
-          },
+          { variant: "success" }
         );
       } else {
         const payload = {
@@ -339,19 +336,19 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           groups: [groups],
         };
 
-        const { id: createdUser } =
-          await api.users.createTechnicianUser(payload);
+        const { id: createdUser } = await api.users.createTechnicianUser(payload);
 
         if (permissionGroupId) {
           await api.permissions.assignPermissionToUser(
             permissionGroupId,
-            createdUser?.user?.id,
+            createdUser?.user?.id
           );
         }
 
-        enqueueSnackbar(translations["Utilizator creat cu succes"][language], {
-          variant: "success",
-        });
+        enqueueSnackbar(
+          translations["Utilizator creat cu succes"][language],
+          { variant: "success" }
+        );
       }
 
       setForm(initialFormState);
@@ -363,6 +360,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const fallbackMessage =
         translations["Eroare la salvarea utilizatorului"][language];
       enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -447,6 +446,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                 value={form.groups}
                 onChange={(value) => setForm({ ...form, groups: value || "" })}
                 required
+                rightSection={groupsLoading ? <Loader size="xs" /> : null}
               />
 
               <TextInput
@@ -478,6 +478,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
                   }))}
                   value={form.permissionGroupId}
                   onChange={handlePermissionGroupChange}
+                  rightSection={groupsLoading ? <Loader size="xs" /> : null}
                 />
               )}
 
@@ -491,7 +492,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             </>
           )}
 
-          <Button fullWidth mt="sm" onClick={handleCreate}>
+          <Button fullWidth mt="sm" onClick={handleCreate} loading={isSubmitting}>
             {initialUser
               ? translations["Salvează"][language]
               : translations["Creează"][language]}
