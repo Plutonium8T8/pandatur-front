@@ -1,9 +1,8 @@
-export const hasPermission = (roleList, module, action) => {
+export const hasStrictPermission = (roleList, module, action) => {
     if (!Array.isArray(roleList)) return false;
-
-    const levels = ["ALLOWED", "TEAM", "IFRESPONSIBLE"];
-    return levels.some((level) => roleList.includes(`ROLE_${module}_${action}_${level}`));
+    return roleList.includes(`ROLE_${module}_${action}_ALLOWED`);
 };
+
 
 export const parseRolesString = (rolesArray) => {
     const roleMap = {};

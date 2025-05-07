@@ -17,7 +17,7 @@ import { api } from "@api";
 import { LoadingOverlay } from "@components";
 import { useApp, useLanguageToggle, LANGUAGES, useUser } from "@hooks";
 import { getLanguageByKey } from "@utils";
-import { hasPermission } from "../utils/permissions";
+import { hasStrictPermission } from "../utils/permissions";
 import "./SideBar.css";
 
 const LOGO = "/logo.png";
@@ -63,7 +63,7 @@ export const SideBar = () => {
             )}
           </MenuItem>
 
-          {hasPermission(userRoles, "USERS", "VIEW") && (
+          {hasStrictPermission(userRoles, "USERS", "VIEW") && (
             <MenuItem
               active={isActive("users")}
               icon={<FaUsers />}
@@ -73,7 +73,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "DASHBOARD", "VIEW") && (
+          {hasStrictPermission(userRoles, "DASHBOARD", "VIEW") && (
             <MenuItem
               active={isActive("dashboard")}
               icon={<FaChartBar />}
@@ -83,7 +83,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "LEADS", "VIEW") && (
+          {hasStrictPermission(userRoles, "LEADS", "VIEW") && (
             <MenuItem
               active={isActive("leads")}
               icon={<FaClipboardList />}
@@ -93,7 +93,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "CHAT", "VIEW") && (
+          {hasStrictPermission(userRoles, "CHAT", "VIEW") && (
             <MenuItem
               suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
               active={isActive("chat")}
@@ -104,7 +104,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "TASK", "VIEW") && (
+          {hasStrictPermission(userRoles, "TASK", "VIEW") && (
             <MenuItem
               active={isActive("tasks")}
               icon={<FaTasks />}
@@ -114,7 +114,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "SCHEDULES", "VIEW") && (
+          {hasStrictPermission(userRoles, "SCHEDULES", "VIEW") && (
             <MenuItem
               active={isActive("schedules")}
               icon={<FaCalendar />}
@@ -124,7 +124,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasPermission(userRoles, "LOGS", "VIEW") && (
+          {hasStrictPermission(userRoles, "LOGS", "VIEW") && (
             <MenuItem
               active={isActive("logs")}
               icon={<FaHistory />}
