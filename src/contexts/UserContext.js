@@ -1,87 +1,81 @@
-import React, { createContext, useState, useEffect } from "react"
-import Cookies from "js-cookie"
-import { api } from "../api"
+import React, { createContext, useState, useEffect } from "react";
+import Cookies from "js-cookie";
+import { api } from "../api";
 
-export const UserContext = createContext()
+export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const [userId, setUserId] = useState(() => {
-    const savedUserId = localStorage.getItem("user_id")
-    return savedUserId ? Number(savedUserId) : null
-  })
+    const savedUserId = localStorage.getItem("user_id");
+    return savedUserId ? Number(savedUserId) : null;
+  });
 
-  const [name, setName] = useState(
-    () => localStorage.getItem("user_name") || null
-  )
-  const [surname, setSurname] = useState(
-    () => localStorage.getItem("user_surname") || null
-  )
+  const [name, setName] = useState(() => localStorage.getItem("user_name") || null);
+  const [surname, setSurname] = useState(() => localStorage.getItem("user_surname") || null);
+
   const [userRoles, setUserRoles] = useState(() => {
-    const savedRoles = localStorage.getItem("user_roles")
-    return savedRoles ? JSON.parse(savedRoles) : []
-  })
+    const saved = localStorage.getItem("user_roles");
+    return saved ? JSON.parse(saved) : [];
+  });
 
-  const [isLoadingRoles, setIsLoadingRoles] = useState(true)
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
   useEffect(() => {
     if (userId) {
-      localStorage.setItem("user_id", userId)
-      fetchRoles()
+      localStorage.setItem("user_id", userId);
+      fetchRoles();
     } else {
-      localStorage.removeItem("user_id")
-      setUserRoles([])
-      setIsLoadingRoles(false)
+      localStorage.removeItem("user_id");
+      setUserRoles([]);
+      setIsLoadingRoles(false);
     }
-  }, [userId])
+  }, [userId]);
 
   useEffect(() => {
     if (name) {
-      localStorage.setItem("user_name", name)
+      localStorage.setItem("user_name", name);
     } else {
-      localStorage.removeItem("user_name")
+      localStorage.removeItem("user_name");
     }
-  }, [name])
+  }, [name]);
 
   useEffect(() => {
     if (surname) {
-      localStorage.setItem("user_surname", surname)
+      localStorage.setItem("user_surname", surname);
     } else {
-      localStorage.removeItem("user_surname")
+      localStorage.removeItem("user_surname");
     }
-  }, [surname])
+  }, [surname]);
 
   useEffect(() => {
     if (userRoles.length > 0) {
-      localStorage.setItem("user_roles", JSON.stringify(userRoles))
+      localStorage.setItem("user_roles", JSON.stringify(userRoles));
     } else {
-      localStorage.removeItem("user_roles")
+      localStorage.removeItem("user_roles");
     }
-  }, [userRoles])
+  }, [userRoles]);
 
   const fetchRoles = async () => {
-    setIsLoadingRoles(true)
+    setIsLoadingRoles(true);
     try {
-      const token = Cookies.get("jwt")
+      const token = Cookies.get("jwt");
       if (!token || !userId) {
-        setUserRoles([])
-        setIsLoadingRoles(false)
-        return
+        setUserRoles([]);
+        setIsLoadingRoles(false);
+        return;
       }
 
-      const data = await api.users.getById(userId)
-
-      const parsedRoles = JSON.parse(data.roles)
-      setUserRoles(data.roles)
-      localStorage.setItem("user_roles", JSON.stringify(parsedRoles))
+      const data = await api.users.getById(userId);
+      const rawArray = JSON.parse(data.roles); // строка с массивом
+      setUserRoles(rawArray);
+      localStorage.setItem("user_roles", JSON.stringify(rawArray));
     } catch (error) {
-      console.error("❌ Ошибка при загрузке ролей:", error.message)
-      setUserRoles([])
+      console.error("❌ Ошибка при загрузке ролей:", error.message);
+      setUserRoles([]);
     } finally {
-      setIsLoadingRoles(false)
+      setIsLoadingRoles(false);
     }
-  }
-
-  const hasRole = (role) => userRoles.includes(role)
+  };
 
   return (
     <UserContext.Provider
@@ -94,11 +88,10 @@ export const UserProvider = ({ children }) => {
         setSurname,
         userRoles,
         setUserRoles,
-        hasRole,
-        isLoadingRoles
+        isLoadingRoles,
       }}
     >
       {children}
     </UserContext.Provider>
-  )
-}
+  );
+};

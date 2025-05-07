@@ -15,15 +15,15 @@ export const PublicRoutes = () => {
 };
 
 export const PrivateRoutes = () => {
-  const { hasRole } = useUser();
+  const { userRoles } = useUser();
+
+  const isAdmin = userRoles.includes(ADMIN_ROLE);
 
   return (
     <Routes>
-      {privateRoutes(hasRole(ADMIN_ROLE)).map(
-        ({ path, component: Component }) => (
-          <Route key={path} path={path} element={<Component />} />
-        ),
-      )}
+      {privateRoutes(isAdmin).map(({ path, component: Component }) => (
+        <Route key={path} path={path} element={<Component />} />
+      ))}
     </Routes>
   );
 };
