@@ -50,19 +50,20 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateRoleMatrix = (roleKey, level) => {
-    const newMatrix = {
-      ...form.roleMatrix,
-      [roleKey]: level,
-    };
+    const newMatrix = { ...form.roleMatrix };
+
+    if (level === undefined) {
+      delete newMatrix[roleKey];
+    } else {
+      newMatrix[roleKey] = level;
+    }
 
     const newRolesList = convertMatrixToRoles(newMatrix);
     const originalRolesList = permissionGroupInitialRolesRef.current;
 
-    const isChanged = newRolesList.some(
-      (role) => !originalRolesList.includes(role)
-    ) || originalRolesList.some(
-      (role) => !newRolesList.includes(role)
-    );
+    const isChanged =
+      newRolesList.some((role) => !originalRolesList.includes(role)) ||
+      originalRolesList.some((role) => !newRolesList.includes(role));
 
     if (form.permissionGroupId && isChanged) {
       setForm((prev) => ({
