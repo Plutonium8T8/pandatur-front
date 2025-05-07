@@ -262,13 +262,27 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           await api.permissions.removePermissionFromTechnician(userId);
         }
 
-        await api.users.updateUser(userId, {
-          email,
-          ...(password ? { password } : {}),
-          roles: convertMatrixToRoles(form.roleMatrix),
-        });
+        const userUpdate = { email };
+        if (password) userUpdate.password = password;
+
+        const newRoles = convertMatrixToRoles(form.roleMatrix);
+        const currentRolesRaw = initialUser?.id?.user?.roles || "[]";
+        const currentRoles = Array.isArray(currentRolesRaw)
+          ? currentRolesRaw
+          : safeParseJson(currentRolesRaw);
+
+        const rolesChanged =
+          JSON.stringify(currentRoles.sort()) !== JSON.stringify(newRoles.sort());
+
+        if (rolesChanged && !permissionGroupId) {
+          userUpdate.roles = newRoles;
+        }
+
+        await api.users.updateUser(userId, userUpdate);
 
         if (permissionGroupId) {
+          await api.users.updateUser(userId, { roles: [] });
+
           await api.permissions.assignPermissionToUser(permissionGroupId, userId);
         }
 
@@ -282,7 +296,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             username,
             email,
             password,
-            roles: convertMatrixToRoles(form.roleMatrix),
+            ...(permissionGroupId ? {} : { roles: convertMatrixToRoles(form.roleMatrix) }),
           },
           extended: {
             name,
