@@ -461,59 +461,55 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             name="new-password-field"
           />
 
-          {groupsList.length > 0 && (
-            <>
-              <Select
-                label={translations["Grup utilizator"][language]}
-                placeholder={translations["Alege grupul"][language]}
-                data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
-                value={form.groups}
-                onChange={(value) => setForm({ ...form, groups: value || "" })}
-                required
-                rightSection={groupsLoading ? <Loader size="xs" /> : null}
-              />
+          <Select
+            label={translations["Grup utilizator"][language]}
+            placeholder={translations["Alege grupul"][language]}
+            data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
+            value={form.groups}
+            onChange={(value) => setForm({ ...form, groups: value || "" })}
+            required
+            rightSection={groupsLoading ? <Loader size="xs" /> : null}
+          />
 
-              <TextInput
-                label={translations["Funcție"][language]}
-                placeholder={translations["Funcție"][language]}
-                value={form.job_title}
-                onChange={(e) => setForm({ ...form, job_title: e.target.value })}
-                required
-              />
+          <TextInput
+            label={translations["Funcție"][language]}
+            placeholder={translations["Funcție"][language]}
+            value={form.job_title}
+            onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+            required
+          />
 
-              <TextInput
-                label="Sipuni ID"
-                placeholder="Sipuni ID"
-                value={form.sipuni_id}
-                onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
-                required
-              />
+          <TextInput
+            label="Sipuni ID"
+            placeholder="Sipuni ID"
+            value={form.sipuni_id}
+            onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
+            required
+          />
 
-              {!initialUser && null}
+          {!initialUser && null}
 
-              {initialUser && permissionGroups.length > 0 && (
-                <Select
-                  clearable
-                  label={translations["Grup permisiuni"][language]}
-                  placeholder={translations["Alege grupul de permisiuni"][language]}
-                  data={permissionGroups.map((g) => ({
-                    value: g.permission_id.toString(),
-                    label: g.permission_name,
-                  }))}
-                  value={form.permissionGroupId}
-                  onChange={handlePermissionGroupChange}
-                  rightSection={groupsLoading ? <Loader size="xs" /> : null}
-                />
-              )}
+          {initialUser && permissionGroups.length > 0 && (
+            <Select
+              clearable
+              label={translations["Grup permisiuni"][language]}
+              placeholder={translations["Alege grupul de permisiuni"][language]}
+              data={permissionGroups.map((g) => ({
+                value: g.permission_id.toString(),
+                label: g.permission_name,
+              }))}
+              value={form.permissionGroupId}
+              onChange={handlePermissionGroupChange}
+              rightSection={groupsLoading ? <Loader size="xs" /> : null}
+            />
+          )}
 
-              {initialUser && (
-                <RoleMatrix
-                  key={form.permissionGroupId}
-                  permissions={form.roleMatrix}
-                  onChange={updateRoleMatrix}
-                />
-              )}
-            </>
+          {initialUser && (
+            <RoleMatrix
+              key={form.permissionGroupId}
+              permissions={form.roleMatrix}
+              onChange={updateRoleMatrix}
+            />
           )}
 
           <Button fullWidth mt="sm" onClick={handleCreate} loading={isSubmitting}>
