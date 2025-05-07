@@ -1,7 +1,7 @@
 export const categories = [
     "USERS",
     "DASHBOARD",
-    "LEAD",
+    "LEADS",
     "CHAT",
     "TASK",
     "SCHEDULES",
