@@ -11,12 +11,16 @@ import {
   PasswordInput,
   Loader
 } from "@mantine/core";
+import {
+  safeParseJson,
+  convertMatrixToRoles,
+  convertRolesToMatrix,
+} from "./rolesUtils";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
-import { LEVEL_VALUES } from "../utils/permissionConstants";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -32,18 +36,6 @@ const initialFormState = {
   permissionGroupId: null,
   roleMatrix: {},
   sipuni_id: "",
-};
-
-const safeParseJson = (str) => {
-  if (typeof str !== "string") return [];
-  try {
-    return JSON.parse(str);
-  } catch (err) {
-    if (process.env.NODE_ENV === "development") {
-      console.warn("error JSON.parse:", err, str);
-    }
-    return [];
-  }
 };
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
@@ -93,55 +85,19 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
 
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
-      let userRolesMap = {};
-
-      let parsedRoles = safeParseJson(rawRoles);
-      if (typeof parsedRoles === "string") {
-        parsedRoles = safeParseJson(parsedRoles);
-      }
-
-      if (Array.isArray(parsedRoles)) {
-        parsedRoles.forEach((roleStr) => {
-          const withoutPrefix = roleStr.replace(/^ROLE_/, "");
-          const parts = withoutPrefix.split("_");
-          const level = parts.pop();
-          const key = parts.join("_");
-
-          const readable = Object.keys(LEVEL_VALUES).find(
-            (k) => LEVEL_VALUES[k] === level.toUpperCase()
-          );
-
-          if (readable) {
-            userRolesMap[key] = readable;
-          }
-        });
-      }
+      const parsedUserRoles = Array.isArray(rawRoles) ? rawRoles : safeParseJson(rawRoles);
+      const userRolesMap = convertRolesToMatrix(parsedUserRoles || []);
 
       const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
-      const permissionRoles = safeParseJson(rawPermissionRoles);
-      const matrix = {};
+      const parsedPermissionRoles = Array.isArray(rawPermissionRoles)
+        ? rawPermissionRoles
+        : safeParseJson(rawPermissionRoles);
+      const groupRolesMap = convertRolesToMatrix(parsedPermissionRoles || []);
 
-      if (Array.isArray(permissionRoles)) {
-        permissionRoles.forEach((roleStr) => {
-          const withoutPrefix = roleStr.replace(/^ROLE_/, "");
-          const parts = withoutPrefix.split("_");
-          const level = parts.pop();
-          const key = parts.join("_");
+      const fullMatrix = { ...groupRolesMap, ...userRolesMap };
 
-          const readable = Object.keys(LEVEL_VALUES).find(
-            (k) => LEVEL_VALUES[k] === level.toUpperCase()
-          );
-
-          if (readable) {
-            matrix[key] = readable;
-          }
-        });
-      }
-
-      const fullMatrix = { ...matrix, ...userRolesMap };
-
-      setPermissionGroupRoles(permissionRoles || []);
-      permissionGroupInitialRolesRef.current = permissionRoles || [];
+      setPermissionGroupRoles(parsedPermissionRoles || []);
+      permissionGroupInitialRolesRef.current = parsedPermissionRoles || [];
       setCustomRoles(Object.keys(userRolesMap));
 
       setForm((prev) => ({
@@ -216,20 +172,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       ? safeParseJson(selectedGroup.roles)
       : selectedGroup.roles || [];
 
-    const groupMatrix = {};
-
-    rawRoles.forEach((roleStr) => {
-      const withoutPrefix = roleStr.replace(/^ROLE_/, "");
-      const parts = withoutPrefix.split("_");
-      const levelRaw = parts.pop();
-      const key = parts.join("_");
-
-      const readableLevel = Object.keys(LEVEL_VALUES).find(
-        (k) => LEVEL_VALUES[k].toUpperCase() === levelRaw.toUpperCase()
-      ) || "Denied";
-
-      groupMatrix[key] = readableLevel;
-    });
+    const groupMatrix = convertRolesToMatrix(rawRoles);
 
     permissionGroupInitialRolesRef.current = rawRoles;
     setPermissionGroupRoles(rawRoles);
@@ -252,13 +195,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     } else {
       handleSelectPermissionGroup(value);
     }
-  };
-
-  const convertMatrixToRoles = (matrix) => {
-    return Object.entries(matrix).map(([key, level]) => {
-      const levelValue = LEVEL_VALUES[level] || "DENIED";
-      return `ROLE_${key.toUpperCase()}_${levelValue}`;
-    });
   };
 
   const handleCreate = async () => {
