@@ -30,9 +30,7 @@ export const SideBar = () => {
   const { toggleLanguage, selectedLanguage } = useLanguageToggle();
 
   const isActive = (page) => {
-    if (page === "chat") {
-      return location.pathname.startsWith("/chat");
-    }
+    if (page === "chat") return location.pathname.startsWith("/chat");
     return location.pathname === `/${page}`;
   };
 
@@ -65,68 +63,76 @@ export const SideBar = () => {
             )}
           </MenuItem>
 
-          {/* {hasPermission(userRoles, "USERS", "VIEW") && ( */}
-          <MenuItem
-            active={isActive("users")}
-            icon={<FaUsers />}
-            component={<Link to="/users" />}
-          >
-            {getLanguageByKey("Users")}
-          </MenuItem>
-          {/* )} */}
+          {hasPermission(userRoles, "USERS", "VIEW") && (
+            <MenuItem
+              active={isActive("users")}
+              icon={<FaUsers />}
+              component={<Link to="/users" />}
+            >
+              {getLanguageByKey("Users")}
+            </MenuItem>
+          )}
 
-          <MenuItem
-            active={isActive("dashboard")}
-            icon={<FaChartBar />}
-            component={<Link to="/dashboard" />}
-          >
-            {getLanguageByKey("Dashboard")}
-          </MenuItem>
+          {hasPermission(userRoles, "DASHBOARD", "VIEW") && (
+            <MenuItem
+              active={isActive("dashboard")}
+              icon={<FaChartBar />}
+              component={<Link to="/dashboard" />}
+            >
+              {getLanguageByKey("Dashboard")}
+            </MenuItem>
+          )}
 
-          <MenuItem
-            active={isActive("leads")}
-            icon={<FaClipboardList />}
-            component={<Link to="/leads" />}
-          >
-            {getLanguageByKey("Leads")}
-          </MenuItem>
+          {hasPermission(userRoles, "LEADS", "VIEW") && (
+            <MenuItem
+              active={isActive("leads")}
+              icon={<FaClipboardList />}
+              component={<Link to="/leads" />}
+            >
+              {getLanguageByKey("Leads")}
+            </MenuItem>
+          )}
 
-          <MenuItem
-            suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
-            active={isActive("chat")}
-            icon={<FaComments />}
-            component={<Link to="/chat" />}
-          >
-            {getLanguageByKey("Chat")}
-          </MenuItem>
+          {hasPermission(userRoles, "CHAT", "VIEW") && (
+            <MenuItem
+              suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
+              active={isActive("chat")}
+              icon={<FaComments />}
+              component={<Link to="/chat" />}
+            >
+              {getLanguageByKey("Chat")}
+            </MenuItem>
+          )}
 
-          <MenuItem
-            active={isActive("tasks")}
-            icon={<FaTasks />}
-            component={<Link to="/tasks" />}
-          >
-            {getLanguageByKey("Taskuri")}
-          </MenuItem>
+          {hasPermission(userRoles, "TASK", "VIEW") && (
+            <MenuItem
+              active={isActive("tasks")}
+              icon={<FaTasks />}
+              component={<Link to="/tasks" />}
+            >
+              {getLanguageByKey("Taskuri")}
+            </MenuItem>
+          )}
 
-          {/* {hasPermission(userRoles, "SCHEDULES", "VIEW") && ( */}
-          <MenuItem
-            active={isActive("schedules")}
-            icon={<FaCalendar />}
-            component={<Link to="/schedules" />}
-          >
-            {getLanguageByKey("schedules")}
-          </MenuItem>
-          {/* )} */}
+          {hasPermission(userRoles, "SCHEDULES", "VIEW") && (
+            <MenuItem
+              active={isActive("schedules")}
+              icon={<FaCalendar />}
+              component={<Link to="/schedules" />}
+            >
+              {getLanguageByKey("schedules")}
+            </MenuItem>
+          )}
 
-          {/* {hasPermission(userRoles, "LOGS", "VIEW") && ( */}
-          <MenuItem
-            active={isActive("logs")}
-            icon={<FaHistory />}
-            component={<Link to="/logs" />}
-          >
-            {getLanguageByKey("logs")}
-          </MenuItem>
-          {/* )} */}
+          {hasPermission(userRoles, "LOGS", "VIEW") && (
+            <MenuItem
+              active={isActive("logs")}
+              icon={<FaHistory />}
+              component={<Link to="/logs" />}
+            >
+              {getLanguageByKey("logs")}
+            </MenuItem>
+          )}
 
           <MenuItem
             onClick={toggleLanguage}

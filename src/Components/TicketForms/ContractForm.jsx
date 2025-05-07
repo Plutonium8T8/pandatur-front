@@ -6,14 +6,11 @@ import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
 import { paymentStatusOptions } from "../../FormOptions";
 import { DD_MM_YYYY } from "../../app-constants";
-import { useUser } from "../../hooks";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
 const calculateCompanyCommission = (budget, netPrice) => {
-  const isSetBudgetAndNetPrice = budget && netPrice;
-
-  return isSetBudgetAndNetPrice ? budget - netPrice : undefined;
+  return budget && netPrice ? budget - netPrice : undefined;
 };
 
 export const ContractForm = ({
@@ -26,8 +23,6 @@ export const ContractForm = ({
   formInstance,
 }) => {
   const idForm = formId || CONTRACT_FORM_FILTER_ID;
-  const { hasRole } = useUser();
-  const isAdmin = hasRole("ROLE_ADMIN");
 
   useEffect(() => {
     if (data) {
@@ -243,14 +238,12 @@ export const ContractForm = ({
           />
         )}
 
-        {isAdmin && (
           <LabelSwitch
             mt="md"
             label={getLanguageByKey("Control Admin")}
             key={formInstance.key("control")}
             {...formInstance.getInputProps("control", { type: "checkbox" })}
           />
-        )}
       </form>
 
       <Flex justify="end" gap="md" mt="md">
