@@ -10,7 +10,7 @@ import {
   Dashboard,
   TermsAndConditions,
 } from "@pages";
-import { hasPermission } from "./Components/utils/permissions";
+import { hasStrictPermission } from "./Components/utils/permissions";
 
 export const privatePaths = [
   "dashboard",
@@ -37,31 +37,31 @@ export const publicRoutes = [
 export const privateRoutes = (userRoles) => {
   const routes = [];
 
-  if (hasPermission(userRoles, "DASHBOARD", "VIEW")) {
+  if (hasStrictPermission(userRoles, "DASHBOARD", "VIEW")) {
     routes.push({ path: "/dashboard", component: Dashboard });
   }
 
-  if (hasPermission(userRoles, "LEADS", "VIEW")) {
+  if (hasStrictPermission(userRoles, "LEADS", "VIEW")) {
     routes.push({ path: "/leads/:ticketId?", component: Leads });
   }
 
-  if (hasPermission(userRoles, "CHAT", "VIEW")) {
+  if (hasStrictPermission(userRoles, "CHAT", "VIEW")) {
     routes.push({ path: "/chat/:ticketId?", component: Chat });
   }
 
-  if (hasPermission(userRoles, "USERS", "VIEW")) {
+  if (hasStrictPermission(userRoles, "USERS", "VIEW")) {
     routes.push({ path: "/users", component: Users });
   }
 
-  if (hasPermission(userRoles, "TASK", "VIEW")) {
+  if (hasStrictPermission(userRoles, "TASK", "VIEW")) {
     routes.push({ path: "/tasks/:ticketId?", component: TaskPage });
   }
 
-  if (hasPermission(userRoles, "SCHEDULES", "VIEW")) {
+  if (hasStrictPermission(userRoles, "SCHEDULES", "VIEW")) {
     routes.push({ path: "/schedules", component: Schedules });
   }
 
-  if (hasPermission(userRoles, "LOGS", "VIEW")) {
+  if (hasStrictPermission(userRoles, "LOGS", "VIEW")) {
     routes.push({ path: "/logs", component: Logs });
   }
 
