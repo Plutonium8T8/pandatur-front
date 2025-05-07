@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { Sidebar as BaseSideBar, Menu, MenuItem } from "react-pro-sidebar";
 import {
   FaChartBar,
@@ -12,12 +12,12 @@ import {
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
 import { Badge, Flex, Divider } from "@mantine/core";
-import { Link } from "react-router-dom";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
 import { useApp, useLanguageToggle, LANGUAGES, useUser } from "@hooks";
 import { getLanguageByKey } from "@utils";
+import { hasPermission } from "../utils/permissions";
 import "./SideBar.css";
 
 const LOGO = "/logo.png";
@@ -25,7 +25,7 @@ const LOGO = "/logo.png";
 export const SideBar = () => {
   const location = useLocation();
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
-  const { surname, name, userId } = useUser();
+  const { surname, name, userId, userRoles } = useUser();
   const [loading, setLoading] = useState(false);
   const { toggleLanguage, selectedLanguage } = useLanguageToggle();
 
@@ -65,6 +65,7 @@ export const SideBar = () => {
             )}
           </MenuItem>
 
+          {/* {hasPermission(userRoles, "USERS", "VIEW") && ( */}
           <MenuItem
             active={isActive("users")}
             icon={<FaUsers />}
@@ -72,6 +73,8 @@ export const SideBar = () => {
           >
             {getLanguageByKey("Users")}
           </MenuItem>
+          {/* )} */}
+
           <MenuItem
             active={isActive("dashboard")}
             icon={<FaChartBar />}
@@ -79,6 +82,7 @@ export const SideBar = () => {
           >
             {getLanguageByKey("Dashboard")}
           </MenuItem>
+
           <MenuItem
             active={isActive("leads")}
             icon={<FaClipboardList />}
@@ -86,6 +90,7 @@ export const SideBar = () => {
           >
             {getLanguageByKey("Leads")}
           </MenuItem>
+
           <MenuItem
             suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
             active={isActive("chat")}
@@ -102,6 +107,8 @@ export const SideBar = () => {
           >
             {getLanguageByKey("Taskuri")}
           </MenuItem>
+
+          {/* {hasPermission(userRoles, "SCHEDULES", "VIEW") && ( */}
           <MenuItem
             active={isActive("schedules")}
             icon={<FaCalendar />}
@@ -109,6 +116,9 @@ export const SideBar = () => {
           >
             {getLanguageByKey("schedules")}
           </MenuItem>
+          {/* )} */}
+
+          {/* {hasPermission(userRoles, "LOGS", "VIEW") && ( */}
           <MenuItem
             active={isActive("logs")}
             icon={<FaHistory />}
@@ -116,6 +126,7 @@ export const SideBar = () => {
           >
             {getLanguageByKey("logs")}
           </MenuItem>
+          {/* )} */}
 
           <MenuItem
             onClick={toggleLanguage}

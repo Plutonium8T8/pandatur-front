@@ -265,7 +265,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         await api.users.updateUser(userId, {
           email,
           ...(password ? { password } : {}),
-          roles: JSON.stringify(convertMatrixToRoles(form.roleMatrix)),
+          roles: convertMatrixToRoles(form.roleMatrix),
         });
 
         if (permissionGroupId) {
@@ -282,7 +282,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             username,
             email,
             password,
-            roles: [],
+            roles: convertMatrixToRoles(form.roleMatrix),
           },
           extended: {
             name,
@@ -423,9 +423,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             required
           />
 
-          {!initialUser && null}
-
-          {initialUser && permissionGroups.length > 0 && (
+          {initialUser && (
             <Select
               clearable
               label={translations["Grup permisiuni"][language]}
