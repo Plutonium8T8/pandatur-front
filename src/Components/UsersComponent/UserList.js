@@ -13,6 +13,8 @@ import { useState } from "react";
 import GroupChangeModal from "./GroupsUsers/GroupChangeModal";
 import { useConfirmPopup } from "../../hooks";
 import PermissionGroupAssignModal from "./Roles/PermissionGroupAssignModal";
+import { useUser } from "../../hooks";
+import { hasStrictPermission } from "../utils/permissions";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -28,6 +30,9 @@ const UserList = ({
   const [selectedIds, setSelectedIds] = useState([]);
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
+  const { userRoles } = useUser();
+  const canDelete = hasStrictPermission(userRoles, "USERS", "DELETE", "ALLOWED");
+  const canEdit = hasStrictPermission(userRoles, "USERS", "EDIT", "ALLOWED");
 
   const allIds = users.map(extractId).filter(Boolean);
   const allSelected =
@@ -259,72 +264,92 @@ const UserList = ({
       key: "action",
       width: 100,
       align: "center",
-      render: (_, row) => (
-        <Menu shadow="md" width={200} position="bottom-end">
-          <Menu.Target>
-            <Button variant="default" className="action-button-task" size="xs" p="xs">
-              <IoEllipsisHorizontal size={18} />
-            </Button>
-          </Menu.Target>
+      render: (_, row) => {
+        return (
+          <Menu shadow="md" width={200} position="bottom-end">
+            {(canEdit || canDelete) && (
+              <Menu.Target>
+                <Button variant="default" className="action-button-task" size="xs" p="xs">
+                  <IoEllipsisHorizontal size={18} />
+                </Button>
+              </Menu.Target>
+            )}
 
-          <Menu.Dropdown>
-            <Menu.Item
-              leftSection={<IoCheckmarkCircle size={16} />}
-              onClick={() => toggleUserStatus(row.id, row.status)}
-            >
-              {row.status
-                ? translations["Dezactivați"][language]
-                : translations["Activați"][language]}
-            </Menu.Item>
-
-            <Menu.Item
-              leftSection={<IoPencil size={16} />}
-              onClick={() => openEditUser(row)}
-            >
-              {translations["Modificați"][language]}
-            </Menu.Item>
-
-            <Menu.Item
-              leftSection={<IoTrash size={16} />}
-              onClick={() => handleDeleteUsersWithConfirm([row.id])}
-              color="red"
-            >
-              {translations["Ștergeți"][language]}
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu >
-      ),
-    },
+            <Menu.Dropdown>
+              {canEdit && (
+                <Menu.Item
+                  leftSection={<IoCheckmarkCircle size={16} />}
+                  onClick={() => toggleUserStatus(row.id, row.status)}
+                >
+                  {row.status
+                    ? translations["Dezactivați"][language]
+                    : translations["Activați"][language]}
+                </Menu.Item>
+              )}
+              {canEdit && (
+                <Menu.Item
+                  leftSection={<IoPencil size={16} />}
+                  onClick={() => openEditUser(row)}
+                >
+                  {translations["Modificați"][language]}
+                </Menu.Item>
+              )}
+              {canDelete && (
+                <Menu.Item
+                  leftSection={<IoTrash size={16} />}
+                  onClick={() => handleDeleteUsersWithConfirm([row.id])}
+                  color="red"
+                >
+                  {translations["Ștergeți"][language]}
+                </Menu.Item>
+              )}
+            </Menu.Dropdown>
+          </Menu>
+        );
+      },
+    }
   ];
 
   return (
     <>
       {selectedIds.length > 0 && (
         <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
-          <Button
-            variant="light"
-            color="blue"
-            onClick={handleToggleStatusSelected}
-          >
-            {translations["Schimbǎ status"][language]}
-          </Button>
-          <Button variant="light" onClick={() => setGroupModalOpen(true)}>
-            {translations["Schimbă grupul"][language]}
-          </Button>
-          <Button
-            variant="light"
-            color="grape"
-            onClick={() => setPermissionModalOpen(true)}
-          >
-            {translations["Schimbǎ grup de permisiuni"][language]}
-          </Button>
-          <Button
-            variant="light"
-            color="red"
-            onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
-          >
-            {translations["Șterge"][language]}
-          </Button>
+
+          {canEdit && (
+            <Button
+              variant="light"
+              color="blue"
+              onClick={handleToggleStatusSelected}
+            >
+              {translations["Schimbǎ status"][language]}
+            </Button>
+          )}
+
+          {canEdit && (
+            <Button variant="light" onClick={() => setGroupModalOpen(true)}>
+              {translations["Schimbă grupul"][language]}
+            </Button>
+          )}
+
+          {canEdit && (
+            <Button
+              variant="light"
+              color="grape"
+              onClick={() => setPermissionModalOpen(true)}
+            >
+              {translations["Schimbǎ grup de permisiuni"][language]}
+            </Button>
+          )}
+
+          {canDelete && (
+            <Button
+              variant="light"
+              color="red"
+              onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
+            >
+              {translations["Șterge"][language]}
+            </Button>
+          )}
         </div>
       )}
 
@@ -350,7 +375,9 @@ const UserList = ({
         pagination={false}
         scroll={{ y: "calc(100vh - 200px)" }}
         onRow={(row) => ({
-          onDoubleClick: () => openEditUser(row),
+          onDoubleClick: () => {
+            if (canEdit) openEditUser(row);
+          },
         })}
       />
     </>
