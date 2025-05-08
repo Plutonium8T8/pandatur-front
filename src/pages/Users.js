@@ -18,6 +18,8 @@ import UserList from "@components/UsersComponent/UserList";
 import EditGroupsListModal from "@components/UsersComponent/GroupsUsers/EditGroupsListModal";
 import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
 import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
+import { useUser } from "@hooks";
+import { hasStrictPermission } from "../Components/utils/permissions";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -25,6 +27,9 @@ export const Users = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const { userRoles } = useUser();
+  const canCreateUser = hasStrictPermission(userRoles, "USERS", "CREATE", "ALLOWED");
+  const canEdit = hasStrictPermission(userRoles, "USERS", "EDIT", "ALLOWED");
 
   const [editUser, setEditUser] = useState(null);
   const [modals, setModals] = useState({
@@ -95,7 +100,7 @@ export const Users = () => {
       const matchesSearch =
         user.name.toLowerCase().includes(term) ||
         user.surname.toLowerCase().includes(term)
-        
+
       const matchesGroup =
         filtersSafe.group.length === 0 ||
         user.groups.some((g) => filtersSafe.group.includes(g.name));
@@ -129,22 +134,23 @@ export const Users = () => {
         count={filtered.length}
         extraInfo={
           <>
-            <Menu shadow="md" width={200}>
-              <Menu.Target>
-                <ActionIcon size="lg" variant="default">
-                  <BsThreeDots />
-                </ActionIcon>
-              </Menu.Target>
-              <Menu.Dropdown>
-                <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
-                  {translations["Editează grupurile"][language]}
-                </Menu.Item>
-                <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
-                  {translations["Editează rolurile"][language]}
-                </Menu.Item>
-              </Menu.Dropdown>
-            </Menu>
-
+            {canEdit && (
+              <Menu shadow="md" width={200}>
+                <Menu.Target>
+                  <ActionIcon size="lg" variant="default">
+                    <BsThreeDots />
+                  </ActionIcon>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
+                    {translations["Editează grupurile"][language]}
+                  </Menu.Item>
+                  <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
+                    {translations["Editează rolurile"][language]}
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
+            )}
             <ActionIcon
               onClick={() => setModals((m) => ({ ...m, filter: true }))}
               variant={hasActiveFilters ? "filled" : "default"}
@@ -162,15 +168,17 @@ export const Users = () => {
               autoComplete="off"
             />
 
-            <Button
-              leftSection={<IoMdAdd size={16} />}
-              onClick={() => {
-                setEditUser(null);
-                setModals((m) => ({ ...m, user: true }));
-              }}
-            >
-              {translations["Adaugă utilizator"][language]}
-            </Button>
+            {canCreateUser && (
+              <Button
+                leftSection={<IoMdAdd size={16} />}
+                onClick={() => {
+                  setEditUser(null);
+                  setModals((m) => ({ ...m, user: true }));
+                }}
+              >
+                {translations["Adaugă utilizator"][language]}
+              </Button>
+            )}
           </>
         }
       />
