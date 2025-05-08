@@ -12,21 +12,21 @@ export const UserProvider = ({ children }) => {
 
   const [name, setName] = useState(() => localStorage.getItem("user_name") || null);
   const [surname, setSurname] = useState(() => localStorage.getItem("user_surname") || null);
-
   const [userRoles, setUserRoles] = useState(() => {
     const saved = localStorage.getItem("user_roles");
     return saved ? JSON.parse(saved) : [];
   });
-
+  const [userGroups, setUserGroups] = useState([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
   useEffect(() => {
     if (userId) {
       localStorage.setItem("user_id", userId);
-      fetchRoles();
+      fetchRolesAndGroups();
     } else {
       localStorage.removeItem("user_id");
       setUserRoles([]);
+      setUserGroups([]);
       setIsLoadingRoles(false);
     }
   }, [userId]);
@@ -49,23 +49,28 @@ export const UserProvider = ({ children }) => {
       : localStorage.removeItem("user_roles");
   }, [userRoles]);
 
-  const fetchRoles = async () => {
+  const fetchRolesAndGroups = async () => {
     setIsLoadingRoles(true);
     try {
       const token = Cookies.get("jwt");
       if (!token || !userId) {
         setUserRoles([]);
+        setUserGroups([]);
         setIsLoadingRoles(false);
         return;
       }
 
       const data = await api.users.getById(userId);
-      const rawArray = JSON.parse(data.roles);
-      setUserRoles(rawArray);
-      localStorage.setItem("user_roles", JSON.stringify(rawArray));
+      const rawRoles = JSON.parse(data.roles);
+      const groups = await api.user.getGroupsList();
+
+      setUserRoles(rawRoles);
+      localStorage.setItem("user_roles", JSON.stringify(rawRoles));
+      setUserGroups(groups);
     } catch (error) {
-      console.error("❌ Ошибка при загрузке ролей:", error.message);
+      console.error("❌ Ошибка при загрузке данных пользователя:", error.message);
       setUserRoles([]);
+      setUserGroups([]);
     } finally {
       setIsLoadingRoles(false);
     }
@@ -76,6 +81,7 @@ export const UserProvider = ({ children }) => {
     name,
     surname,
     roles: userRoles,
+    groups: userGroups,
   };
 
   return (
@@ -89,6 +95,7 @@ export const UserProvider = ({ children }) => {
         setSurname,
         userRoles,
         setUserRoles,
+        userGroups,
         isLoadingRoles,
         user,
       }}
