@@ -56,7 +56,6 @@ export const convertRolesToMatrix = (roles) => {
         const readable = REVERSE_LEVEL_VALUES[levelRaw?.toUpperCase()] || "Denied";
         matrix[key] = readable;
     });
-    console.log("🔧 Parsed matrix from roles:", matrix);
 
     return matrix;
 };
