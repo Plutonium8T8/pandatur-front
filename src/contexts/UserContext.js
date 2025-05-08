@@ -32,27 +32,21 @@ export const UserProvider = ({ children }) => {
   }, [userId]);
 
   useEffect(() => {
-    if (name) {
-      localStorage.setItem("user_name", name);
-    } else {
-      localStorage.removeItem("user_name");
-    }
+    name
+      ? localStorage.setItem("user_name", name)
+      : localStorage.removeItem("user_name");
   }, [name]);
 
   useEffect(() => {
-    if (surname) {
-      localStorage.setItem("user_surname", surname);
-    } else {
-      localStorage.removeItem("user_surname");
-    }
+    surname
+      ? localStorage.setItem("user_surname", surname)
+      : localStorage.removeItem("user_surname");
   }, [surname]);
 
   useEffect(() => {
-    if (userRoles.length > 0) {
-      localStorage.setItem("user_roles", JSON.stringify(userRoles));
-    } else {
-      localStorage.removeItem("user_roles");
-    }
+    userRoles.length > 0
+      ? localStorage.setItem("user_roles", JSON.stringify(userRoles))
+      : localStorage.removeItem("user_roles");
   }, [userRoles]);
 
   const fetchRoles = async () => {
@@ -66,7 +60,7 @@ export const UserProvider = ({ children }) => {
       }
 
       const data = await api.users.getById(userId);
-      const rawArray = JSON.parse(data.roles); // строка с массивом
+      const rawArray = JSON.parse(data.roles);
       setUserRoles(rawArray);
       localStorage.setItem("user_roles", JSON.stringify(rawArray));
     } catch (error) {
@@ -75,6 +69,13 @@ export const UserProvider = ({ children }) => {
     } finally {
       setIsLoadingRoles(false);
     }
+  };
+
+  const user = {
+    id: userId,
+    name,
+    surname,
+    roles: userRoles,
   };
 
   return (
@@ -89,6 +90,7 @@ export const UserProvider = ({ children }) => {
         userRoles,
         setUserRoles,
         isLoadingRoles,
+        user,
       }}
     >
       {children}

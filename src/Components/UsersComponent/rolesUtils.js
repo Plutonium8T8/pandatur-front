@@ -35,14 +35,28 @@ export const convertMatrixToRoles = (matrix) => {
     });
 };
 
+const REVERSE_LEVEL_VALUES = {
+    ALLOWED: "Allowed",
+    DENIED: "Denied",
+    IFRESPONSIBLE: "IfResponsible",
+    TEAM: "Team",
+};
+
 export const convertRolesToMatrix = (roles) => {
     const matrix = {};
     if (!Array.isArray(roles)) return matrix;
 
     roles.forEach((roleStr) => {
-        const { key, level } = parseRoleString(roleStr);
-        matrix[key] = level;
+        if (!roleStr.startsWith("ROLE_")) return;
+
+        const parts = roleStr.replace("ROLE_", "").split("_");
+        const levelRaw = parts.pop();
+        const key = parts.join("_");
+
+        const readable = REVERSE_LEVEL_VALUES[levelRaw?.toUpperCase()] || "Denied";
+        matrix[key] = readable;
     });
+    console.log("🔧 Parsed matrix from roles:", matrix);
 
     return matrix;
 };

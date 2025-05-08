@@ -10,7 +10,7 @@ import { Menu, Button, Flex } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components/WorkflowTag";
-import { useConfirmPopup } from "../../../hooks";
+import { useConfirmPopup, useUser } from "../../../hooks";
 import dayjs from "dayjs";
 import "./TaskList.css";
 import {
@@ -19,6 +19,7 @@ import {
   IoTrash,
   IoPencil,
 } from "react-icons/io5";
+import Can from "../../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -31,6 +32,8 @@ const TaskList = ({
 }) => {
   const [selectedRow, setSelectedRow] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useUser();
+  const currentUserId = user?.id?.toString();
 
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
@@ -149,7 +152,7 @@ const TaskList = ({
         key: "workflow",
         width: 160,
         align: "center",
-        render: (value) => <WorkflowTag type={value} />
+        render: (value) => <WorkflowTag type={value} />,
       },
       {
         title: translations["groupTitle"][language],
@@ -217,25 +220,43 @@ const TaskList = ({
               >
                 {translations["Finalizați"][language]}
               </Menu.Item>
-              <Menu.Item
-                leftSection={<IoPencil size={16} />}
-                onClick={() => openEditTask(row)}
+
+              <Can
+                permission={{ module: "TASK", action: "EDIT" }}
+                context={{
+                  responsibleId: String(row.created_for),
+                  currentUserId,
+                }}
               >
-                {translations["Modificați"][language]}
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<IoTrash size={16} />}
-                onClick={() => handleDeleteTask(row.id)}
-                color="red"
+                <Menu.Item
+                  leftSection={<IoPencil size={16} />}
+                  onClick={() => openEditTask(row)}
+                >
+                  {translations["Modificați"][language]}
+                </Menu.Item>
+              </Can>
+
+              <Can
+                permission={{ module: "TASK", action: "DELETE" }}
+                context={{
+                  responsibleId: String(row.created_for),
+                  currentUserId,
+                }}
               >
-                {translations["Ștergeți"][language]}
-              </Menu.Item>
+                <Menu.Item
+                  leftSection={<IoTrash size={16} />}
+                  onClick={() => handleDeleteTask(row.id)}
+                  color="red"
+                >
+                  {translations["Ștergeți"][language]}
+                </Menu.Item>
+              </Can>
             </Menu.Dropdown>
           </Menu>
         ),
       },
     ],
-    [language, userList, selectedRow]
+    [language, selectedRow, currentUserId]
   );
 
   return (

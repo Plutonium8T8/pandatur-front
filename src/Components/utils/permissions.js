@@ -1,8 +1,24 @@
+export const hasPermission = (matrix, { module, action }, context = {}) => {
+    if (!matrix || typeof matrix !== "object") return false;
+
+    const key = `${module.toUpperCase()}_${action.toUpperCase()}`;
+    const level = matrix[key];
+
+    const responsibleId = String(context?.responsibleId || "");
+    const currentUserId = String(context?.currentUserId || "");
+
+    if (!level || level === "Denied") return false;
+    if (level === "Allowed") return true;
+    if (level === "IfResponsible") return responsibleId === currentUserId;
+    if (level === "Team") return true;
+
+    return false;
+};
+
 export const hasStrictPermission = (roleList, module, action) => {
     if (!Array.isArray(roleList)) return false;
     return roleList.includes(`ROLE_${module}_${action}_ALLOWED`);
 };
-
 
 export const parseRolesString = (rolesArray) => {
     const roleMap = {};
