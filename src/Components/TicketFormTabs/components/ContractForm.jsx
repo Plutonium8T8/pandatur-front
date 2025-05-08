@@ -7,7 +7,6 @@ import { getLanguageByKey } from "../../utils";
 import { LabelSwitch } from "../../LabelSwitch";
 import { paymentStatusOptions } from "../../../FormOptions";
 import { DD_MM_YYYY } from "../../../app-constants";
-import { useUser } from "../../../hooks";
 import {
   formatDateOrUndefined,
   formatNumericValue,
@@ -32,8 +31,6 @@ export const ContractForm = ({
   formId,
 }) => {
   const idForm = formId || CONTRACT_FORM_FILTER_ID;
-  const { hasRole } = useUser();
-  const isAdmin = hasRole("ROLE_ADMIN");
 
   const form = useForm({
     mode: "uncontrolled",
@@ -79,9 +76,7 @@ export const ContractForm = ({
       form.setValues({
         data_contractului: convertDateToArray(data.data_contractului),
         data_avansului: convertDateToArray(data.data_avansului),
-        data_de_plata_integrala: convertDateToArray(
-          data.data_de_plata_integrala,
-        ),
+        data_de_plata_integrala: convertDateToArray(data.data_de_plata_integrala),
         numar_de_contract: data.numar_de_contract,
         contract_trimis: data.contract_trimis,
         contract_semnat: data.contract_semnat,
@@ -275,14 +270,12 @@ export const ContractForm = ({
           />
         )}
 
-        {isAdmin && (
-          <LabelSwitch
-            mt="md"
-            label={getLanguageByKey("Control Admin")}
-            key={form.key("control")}
-            {...form.getInputProps("control", { type: "checkbox" })}
-          />
-        )}
+        <LabelSwitch
+          mt="md"
+          label={getLanguageByKey("Control Admin")}
+          key={form.key("control")}
+          {...form.getInputProps("control", { type: "checkbox" })}
+        />
       </form>
 
       <Flex justify="end" gap="md" mt="md">
