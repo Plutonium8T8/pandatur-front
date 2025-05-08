@@ -158,27 +158,31 @@ const UserList = ({
   };
 
   const columns = [
-    {
-      title: (
-        <Checkbox
-          checked={allSelected}
-          indeterminate={selectedIds.length > 0 && !allSelected}
-          onChange={toggleSelectAll}
-        />
-      ),
-      dataIndex: "select",
-      key: "select",
-      width: 50,
-      render: (_, row) => {
-        const rowId = extractId(row);
-        return (
-          <Checkbox
-            checked={selectedIds.includes(rowId)}
-            onChange={() => toggleSelect(rowId)}
-          />
-        );
-      },
-    },
+    ...(canEdit || canDelete
+      ? [
+        {
+          title: (
+            <Checkbox
+              checked={allSelected}
+              indeterminate={selectedIds.length > 0 && !allSelected}
+              onChange={toggleSelectAll}
+            />
+          ),
+          dataIndex: "select",
+          key: "select",
+          width: 50,
+          render: (_, row) => {
+            const rowId = extractId(row);
+            return (
+              <Checkbox
+                checked={selectedIds.includes(rowId)}
+                onChange={() => toggleSelect(rowId)}
+              />
+            );
+          },
+        },
+      ]
+      : []),
     {
       align: "center",
       title: translations["ID"][language],
@@ -258,56 +262,61 @@ const UserList = ({
       width: 120,
       render: (sipuni_id) => <Flex justify="center">{sipuni_id || "—"}</Flex>,
     },
-    {
-      title: translations["Acțiune"][language],
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      align: "center",
-      render: (_, row) => {
-        return (
-          <Menu shadow="md" width={200} position="bottom-end">
-            {(canEdit || canDelete) && (
+    ...(canEdit || canDelete
+      ? [
+        {
+          title: translations["Acțiune"][language],
+          dataIndex: "action",
+          key: "action",
+          width: 100,
+          align: "center",
+          render: (_, row) => (
+            <Menu shadow="md" width={200} position="bottom-end">
               <Menu.Target>
-                <Button variant="default" className="action-button-task" size="xs" p="xs">
+                <Button
+                  variant="default"
+                  className="action-button-task"
+                  size="xs"
+                  p="xs"
+                >
                   <IoEllipsisHorizontal size={18} />
                 </Button>
               </Menu.Target>
-            )}
 
-            <Menu.Dropdown>
-              {canEdit && (
-                <Menu.Item
-                  leftSection={<IoCheckmarkCircle size={16} />}
-                  onClick={() => toggleUserStatus(row.id, row.status)}
-                >
-                  {row.status
-                    ? translations["Dezactivați"][language]
-                    : translations["Activați"][language]}
-                </Menu.Item>
-              )}
-              {canEdit && (
-                <Menu.Item
-                  leftSection={<IoPencil size={16} />}
-                  onClick={() => openEditUser(row)}
-                >
-                  {translations["Modificați"][language]}
-                </Menu.Item>
-              )}
-              {canDelete && (
-                <Menu.Item
-                  leftSection={<IoTrash size={16} />}
-                  onClick={() => handleDeleteUsersWithConfirm([row.id])}
-                  color="red"
-                >
-                  {translations["Ștergeți"][language]}
-                </Menu.Item>
-              )}
-            </Menu.Dropdown>
-          </Menu>
-        );
-      },
-    }
+              <Menu.Dropdown>
+                {canEdit && (
+                  <Menu.Item
+                    leftSection={<IoCheckmarkCircle size={16} />}
+                    onClick={() => toggleUserStatus(row.id, row.status)}
+                  >
+                    {row.status
+                      ? translations["Dezactivați"][language]
+                      : translations["Activați"][language]}
+                  </Menu.Item>
+                )}
+                {canEdit && (
+                  <Menu.Item
+                    leftSection={<IoPencil size={16} />}
+                    onClick={() => openEditUser(row)}
+                  >
+                    {translations["Modificați"][language]}
+                  </Menu.Item>
+                )}
+                {canDelete && (
+                  <Menu.Item
+                    leftSection={<IoTrash size={16} />}
+                    onClick={() => handleDeleteUsersWithConfirm([row.id])}
+                    color="red"
+                  >
+                    {translations["Ștergeți"][language]}
+                  </Menu.Item>
+                )}
+              </Menu.Dropdown>
+            </Menu>
+          ),
+        },
+      ]
+      : []),
   ];
 
   return (
