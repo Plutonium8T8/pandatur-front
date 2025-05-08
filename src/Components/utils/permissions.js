@@ -1,4 +1,8 @@
-export const hasPermission = (matrix, { module, action }, context = {}) => {
+export const hasPermission = (
+    matrix,
+    { module, action },
+    context = {}
+) => {
     if (!matrix || typeof matrix !== "object") return false;
 
     const key = `${module.toUpperCase()}_${action.toUpperCase()}`;
@@ -6,11 +10,12 @@ export const hasPermission = (matrix, { module, action }, context = {}) => {
 
     const responsibleId = String(context?.responsibleId || "");
     const currentUserId = String(context?.currentUserId || "");
+    const isInSameTeam = context?.isInSameTeam || false;
 
     if (!level || level === "Denied") return false;
     if (level === "Allowed") return true;
     if (level === "IfResponsible") return responsibleId === currentUserId;
-    if (level === "Team") return true;
+    if (level === "Team") return isInSameTeam;
 
     return false;
 };
