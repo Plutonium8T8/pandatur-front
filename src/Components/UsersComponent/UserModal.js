@@ -48,6 +48,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const permissionGroupInitialRolesRef = useRef([]);
   const [customRoles, setCustomRoles] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const customRolesMatrixRef = useRef({});
 
   const updateRoleMatrix = (roleKey, level) => {
     const newMatrix = { ...form.roleMatrix };
@@ -88,6 +89,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
       const parsedUserRoles = Array.isArray(rawRoles) ? rawRoles : safeParseJson(rawRoles);
       const userRolesMap = convertRolesToMatrix(parsedUserRoles || []);
+      customRolesMatrixRef.current = userRolesMap;
 
       const rawPermissionRoles = initialUser?.permissions?.[0]?.roles;
       const parsedPermissionRoles = Array.isArray(rawPermissionRoles)
@@ -190,12 +192,13 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        roleMatrix: {},
+        roleMatrix: customRolesMatrixRef.current || {},
       }));
       setPermissionGroupRoles([]);
-    } else {
-      handleSelectPermissionGroup(value);
+      return;
     }
+
+    handleSelectPermissionGroup(value);
   };
 
   const handleCreate = async () => {
