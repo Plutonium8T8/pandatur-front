@@ -67,6 +67,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       originalRolesList.some((role) => !newRolesList.includes(role));
 
     if (form.permissionGroupId && isChanged) {
+      if (Object.keys(customRolesMatrixRef.current).length === 0) {
+        customRolesMatrixRef.current = { ...newMatrix };
+      }
+
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
@@ -189,11 +193,14 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
   const handlePermissionGroupChange = (value) => {
     if (!value) {
+      const hasCustomChanges = Object.keys(customRolesMatrixRef.current || {}).length > 0;
+
       setForm((prev) => ({
         ...prev,
         permissionGroupId: null,
-        roleMatrix: customRolesMatrixRef.current || {},
+        roleMatrix: hasCustomChanges ? customRolesMatrixRef.current : {},
       }));
+
       setPermissionGroupRoles([]);
       return;
     }
