@@ -11,19 +11,20 @@ const Can = ({ permission, context = {}, children }) => {
     const currentUserId = String(user?.id || "");
     const responsibleId = String(context?.responsibleId || "");
 
-    const isInSameTeam = useSameTeamChecker(responsibleId);
+    const isSameTeam = useSameTeamChecker(responsibleId);
 
     const isAllowed = hasPermission(matrix, permission, {
         ...context,
         currentUserId,
-        isInSameTeam,
+        responsibleId,
+        isSameTeam,
     });
 
     console.log("🔐 CAN CHECK:");
-    console.log("Permission:", permission);
-    console.log("Context:", { ...context, currentUserId, isInSameTeam });
-    console.log("Matrix:", matrix);
-    console.log("Result:", isAllowed);
+    console.log("→ Permission:", permission);
+    console.log("→ Context:", { ...context, currentUserId, responsibleId, isSameTeam });
+    console.log("→ Matrix:", matrix);
+    console.log("→ Result:", isAllowed);
 
     if (!isAllowed) return null;
 

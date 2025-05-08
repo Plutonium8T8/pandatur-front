@@ -19,6 +19,7 @@ import {
   IoTrash,
   IoPencil,
 } from "react-icons/io5";
+import { useSameTeamChecker } from "../../utils/useSameTeamChecker";
 import Can from "../../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
@@ -69,6 +70,63 @@ const TaskList = ({
         { variant: "error" }
       );
     }
+  };
+  
+  const ActionMenu = ({ row }) => {
+    const isSameTeam = useSameTeamChecker(String(row.created_for));
+
+    return (
+      <Menu shadow="md" width={200} position="bottom-end">
+        <Menu.Target>
+          <Button variant="default" className="action-button-task" size="xs" p="xs">
+            <IoEllipsisHorizontal size={18} />
+          </Button>
+        </Menu.Target>
+        <Menu.Dropdown>
+          <Menu.Item
+            leftSection={<IoCheckmarkCircle size={16} />}
+            onClick={() => !row.status && handleMarkTaskAsComplete(row.id)}
+            disabled={row.status}
+            style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+          >
+            {translations["Finalizați"][language]}
+          </Menu.Item>
+
+          <Can
+            permission={{ module: "TASK", action: "EDIT" }}
+            context={{
+              responsibleId: String(row.created_for),
+              currentUserId,
+              isSameTeam,
+            }}
+          >
+            <Menu.Item
+              leftSection={<IoPencil size={16} />}
+              onClick={() => openEditTask(row)}
+            >
+              {translations["Modificați"][language]}
+            </Menu.Item>
+          </Can>
+
+          <Can
+            permission={{ module: "TASK", action: "DELETE" }}
+            context={{
+              responsibleId: String(row.created_for),
+              currentUserId,
+              isSameTeam,
+            }}
+          >
+            <Menu.Item
+              leftSection={<IoTrash size={16} />}
+              onClick={() => handleDeleteTask(row.id)}
+              color="red"
+            >
+              {translations["Ștergeți"][language]}
+            </Menu.Item>
+          </Can>
+        </Menu.Dropdown>
+      </Menu>
+    );
   };
 
   const columns = useMemo(
@@ -204,57 +262,8 @@ const TaskList = ({
         key: "action",
         width: 100,
         align: "center",
-        render: (_, row) => (
-          <Menu shadow="md" width={200} position="bottom-end">
-            <Menu.Target>
-              <Button variant="default" className="action-button-task" size="xs" p="xs">
-                <IoEllipsisHorizontal size={18} />
-              </Button>
-            </Menu.Target>
-            <Menu.Dropdown>
-              <Menu.Item
-                leftSection={<IoCheckmarkCircle size={16} />}
-                onClick={() => !row.status && handleMarkTaskAsComplete(row.id)}
-                disabled={row.status}
-                style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-              >
-                {translations["Finalizați"][language]}
-              </Menu.Item>
-
-              <Can
-                permission={{ module: "TASK", action: "EDIT" }}
-                context={{
-                  responsibleId: String(row.created_for),
-                  currentUserId,
-                }}
-              >
-                <Menu.Item
-                  leftSection={<IoPencil size={16} />}
-                  onClick={() => openEditTask(row)}
-                >
-                  {translations["Modificați"][language]}
-                </Menu.Item>
-              </Can>
-
-              <Can
-                permission={{ module: "TASK", action: "DELETE" }}
-                context={{
-                  responsibleId: String(row.created_for),
-                  currentUserId,
-                }}
-              >
-                <Menu.Item
-                  leftSection={<IoTrash size={16} />}
-                  onClick={() => handleDeleteTask(row.id)}
-                  color="red"
-                >
-                  {translations["Ștergeți"][language]}
-                </Menu.Item>
-              </Can>
-            </Menu.Dropdown>
-          </Menu>
-        ),
-      },
+        render: (_, row) => <ActionMenu row={row} />,
+      }
     ],
     [language, selectedRow, currentUserId]
   );
