@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Image as MantineImage, Flex, Text } from "@mantine/core";
 import { IoWarningOutline } from "react-icons/io5";
 import { getLanguageByKey } from "@utils";
-import { baseAxios } from "@api";
 
 const BROKEN_PHOTO = "/broken.png";
 
@@ -35,9 +34,7 @@ const content = (renderImage, url) => {
       radius="md"
       src={url}
       className="pointer"
-      onClick={() => {
-        window.open(url, "_blank");
-      }}
+      onClick={() => window.open(url, "_blank")}
     />
   );
 };
@@ -46,24 +43,14 @@ export const Image = ({ url, renderImage, renderFallbackImage }) => {
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {
-    const getImageUrl = async (url) => {
-      try {
-        const response = await baseAxios.get(url);
+    if (!url) return;
 
-        if (response.ok) {
-          setImageUrl(url);
-        } else {
-          setImageUrl(null);
-        }
-      } catch (error) {
-        setImageUrl(null);
-      }
-    };
+    const img = new window.Image();
+    img.src = url;
 
-    if (url) {
-      getImageUrl(url);
-    }
-  }, []);
+    img.onload = () => setImageUrl(url);
+    img.onerror = () => setImageUrl(null);
+  }, [url]);
 
   return (
     <>

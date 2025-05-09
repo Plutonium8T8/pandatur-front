@@ -1,10 +1,24 @@
+
 import { Link } from "react-router-dom";
 import { GoTrash } from "react-icons/go";
 import { FaRegFileLines } from "react-icons/fa6";
 import { MdCall } from "react-icons/md";
 import { PiImageBrokenThin } from "react-icons/pi";
-import { Flex, Box, ActionIcon, Text, Divider, Grid } from "@mantine/core";
-import { FALLBACK_IMAGE, MEDIA_TYPE, DD_MM_YYYY, HH_mm } from "@app-constants";
+import {
+  Flex,
+  Box,
+  ActionIcon,
+  Text,
+  Divider,
+  Grid,
+  Image as MantineImage,
+} from "@mantine/core";
+import {
+  FALLBACK_IMAGE,
+  MEDIA_TYPE,
+  DD_MM_YYYY,
+  HH_mm,
+} from "@app-constants";
 import { getLanguageByKey, parseServerDate } from "@utils";
 import { Audio } from "../../../Audio";
 import { TimeClient } from "./TimeClient";
@@ -74,16 +88,15 @@ export const renderMediaContent = ({
                 </ActionIcon>
               </Box>
             )}
-            <Image
-              fit="contain"
-              h="100px"
+
+            <MantineImage
+              fit="cover"
               radius="md"
               className="pointer"
               src={message}
               fallbackSrc={FALLBACK_IMAGE}
-              onClick={() => {
-                window.open(message, "_blank");
-              }}
+              onClick={() => window.open(message, "_blank")}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
           </Box>
         )}
@@ -123,7 +136,6 @@ export const renderMediaContent = ({
       >
         <Flex direction="column" gap="4">
           <Audio src={message} />
-
           <TimeClient
             id={payload?.client_id}
             date={parseServerDate(msjTime)?.format(`${DD_MM_YYYY} ${HH_mm}`)}
@@ -154,7 +166,6 @@ export const renderMediaContent = ({
               <FaRegFileLines size={32} />
               <Flex direction="column" gap="4">
                 <Text>{`${message?.slice(0, 45)}...`}</Text>
-
                 <TimeClient
                   id={payload?.client_id}
                   date={parseServerDate(msjTime)?.format(
@@ -181,7 +192,6 @@ export const renderMediaContent = ({
       <Flex gap="4" direction="column">
         <Flex align="center">
           <MdCall />
-
           <Box>
             <Divider orientation="vertical" mx="8" h="30px" />
           </Box>
