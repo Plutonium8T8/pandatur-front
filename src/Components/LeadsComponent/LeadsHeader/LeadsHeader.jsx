@@ -50,13 +50,15 @@ export const RefLeadsHeader = forwardRef(
           extraInfo={
             <>
               {selectedTickets.length > 0 && (
-                <Button
-                  variant="danger"
-                  leftSection={<FaTrash size={16} />}
-                  onClick={deleteTicket}
-                >
-                  {getLanguageByKey("Ștergere")} ({selectedTickets.length})
-                </Button>
+                <Can permission={{ module: "leads", action: "delete" }}>
+                  <Button
+                    variant="danger"
+                    leftSection={<FaTrash size={16} />}
+                    onClick={deleteTicket}
+                  >
+                    {getLanguageByKey("Ștergere")} ({selectedTickets.length})
+                  </Button>
+                </Can>
               )}
 
               {selectedTickets.length > 0 && (
