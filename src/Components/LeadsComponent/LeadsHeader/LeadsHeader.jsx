@@ -33,10 +33,16 @@ export const RefLeadsHeader = forwardRef(
       setGroupTitle,
       totalTicketsFiltered,
       hasOpenFiltersModal,
+      tickets,
     },
     ref,
   ) => {
     const { isCollapsed } = useApp();
+
+    const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);
+    const responsibleId = selectedTicket?.technician_id
+      ? String(selectedTicket.technician_id)
+      : undefined;
 
     return (
       <Flex
@@ -62,13 +68,18 @@ export const RefLeadsHeader = forwardRef(
               )}
 
               {selectedTickets.length > 0 && (
-                <Button
-                  variant="warning"
-                  leftSection={<FaEdit size={16} />}
-                  onClick={onOpenModal}
+                <Can
+                  permission={{ module: "leads", action: "edit" }}
+                  context={{ responsibleId }}
                 >
-                  {getLanguageByKey("Editare")} ({selectedTickets.length})
-                </Button>
+                  <Button
+                    variant="warning"
+                    leftSection={<FaEdit size={16} />}
+                    onClick={onOpenModal}
+                  >
+                    {getLanguageByKey("Editare")} ({selectedTickets.length})
+                  </Button>
+                </Can>
               )}
 
               <ActionIcon

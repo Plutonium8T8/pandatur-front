@@ -318,6 +318,7 @@ export const Leads = () => {
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
+        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : filteredTickets}
       />
 
       <div
