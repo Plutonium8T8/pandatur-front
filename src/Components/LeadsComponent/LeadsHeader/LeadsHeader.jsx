@@ -56,7 +56,10 @@ export const RefLeadsHeader = forwardRef(
           extraInfo={
             <>
               {selectedTickets.length > 0 && (
-                <Can permission={{ module: "leads", action: "delete" }}>
+                <Can
+                  permission={{ module: "leads", action: "delete" }}
+                  context={{ responsibleId }}
+                >
                   <Button
                     variant="danger"
                     leftSection={<FaTrash size={16} />}
