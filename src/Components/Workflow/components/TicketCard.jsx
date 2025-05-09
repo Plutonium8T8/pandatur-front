@@ -22,6 +22,7 @@ import { parseTags } from "../../../stringUtils";
 import { parseServerDate, getLanguageByKey } from "../../utils";
 import { Tag } from "../../Tag";
 import { DEFAULT_PHOTO, DD_MM_YYYY, HH_mm } from "../../../app-constants";
+import Can from "../../CanComponent/Can";
 
 const { colors } = DEFAULT_THEME;
 
@@ -40,8 +41,8 @@ export const TicketCard = ({
   technician,
 }) => {
   const tags = parseTags(ticket.tags);
-
   const firstClient = ticket.clients?.[0];
+  const responsibleId = String(ticket.technician_id || "");
 
   return (
     <Link to={`/leads/${ticket.id}`}>
@@ -62,41 +63,58 @@ export const TicketCard = ({
           bg={priorityTagColors[ticket.priority] || "gray"}
         />
 
-        <Box
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-          }}
-          pos="absolute"
-          right="16px"
-          top="16px"
-        >
-          <Menu shadow="md">
-            <Menu.Target>
-              <ActionIcon variant="default">
-                <BsThreeDots />
-              </ActionIcon>
-            </Menu.Target>
+        <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
+          {(canEdit) => (
+            <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
+              {(canDelete) => {
+                if (!canEdit && !canDelete) return null;
 
-            <Menu.Dropdown>
-              <Menu.Item
-                onClick={() => onEditTicket(ticket)}
-                leftSection={<MdModeEdit />}
-              >
-                {getLanguageByKey("edit")}
-              </Menu.Item>
+                return (
+                  <Box
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
+                    pos="absolute"
+                    right="16px"
+                    top="16px"
+                  >
+                    <Menu shadow="md">
+                      <Menu.Target>
+                        <ActionIcon variant="default">
+                          <BsThreeDots />
+                        </ActionIcon>
+                      </Menu.Target>
 
-              <Divider />
-              <Menu.Item
-                onClick={() => onDeleteTicket(ticket.id)}
-                color="red"
-                leftSection={<MdDelete />}
-              >
-                {getLanguageByKey("delete")}
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Box>
+                      <Menu.Dropdown>
+                        {canEdit && (
+                          <Menu.Item
+                            onClick={() => onEditTicket(ticket)}
+                            leftSection={<MdModeEdit />}
+                          >
+                            {getLanguageByKey("edit")}
+                          </Menu.Item>
+                        )}
+
+                        {canEdit && canDelete && <Divider />}
+
+                        {canDelete && (
+                          <Menu.Item
+                            onClick={() => onDeleteTicket(ticket.id)}
+                            color="red"
+                            leftSection={<MdDelete />}
+                          >
+                            {getLanguageByKey("delete")}
+                          </Menu.Item>
+                        )}
+                      </Menu.Dropdown>
+                    </Menu>
+                  </Box>
+                );
+              }}
+            </Can>
+          )}
+        </Can>
 
         <Box p="8">
           <Flex align="center" gap="xs">
@@ -120,21 +138,15 @@ export const TicketCard = ({
 
               <Flex c={colors.dark[3]} align="center" gap="4">
                 <MdAccessTime />
-
                 <Flex direction="column">
                   <Text size="xs">
                     {parseServerDate(ticket.creation_date)?.format(DD_MM_YYYY)}:{" "}
                     {parseServerDate(ticket.creation_date)?.format(HH_mm)}
                   </Text>
-
                   <Text size="xs">
-                    {parseServerDate(ticket.last_interaction_date)?.format(
-                      DD_MM_YYYY,
-                    )}
+                    {parseServerDate(ticket.last_interaction_date)?.format(DD_MM_YYYY)}
                     {ticket.last_interaction_date
-                      ? `: ${parseServerDate(
-                          ticket.last_interaction_date,
-                        )?.format(HH_mm)}`
+                      ? `: ${parseServerDate(ticket.last_interaction_date)?.format(HH_mm)}`
                       : null}
                   </Text>
                 </Flex>
@@ -168,7 +180,6 @@ export const TicketCard = ({
                   <Tag key={tag}>{tag}</Tag>
                 ))}
               </Flex>
-
               <Box
                 pos="absolute"
                 right="0px"
@@ -187,7 +198,6 @@ export const TicketCard = ({
           {technician?.value && (
             <Flex align="center" gap="8">
               <FaHeadphones />
-
               <Text>
                 {technician.label} #{technician.value}
               </Text>

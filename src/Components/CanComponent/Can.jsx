@@ -26,6 +26,10 @@ const Can = ({ permission, context = {}, children }) => {
     console.log("→ Matrix:", matrix);
     console.log("→ Result:", isAllowed);
 
+    if (typeof children === "function") {
+        return children(isAllowed);
+    }
+
     if (!isAllowed) return null;
 
     return <>{children}</>;
