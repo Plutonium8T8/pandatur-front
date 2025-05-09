@@ -36,6 +36,7 @@ import IconSelect from "../IconSelect/IconSelect";
 import { useSnackbar } from "notistack";
 import { PageHeader } from "../PageHeader";
 import dayjs from "dayjs";
+import Can from "../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -53,6 +54,9 @@ const TaskListOverlay = ({
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [originalTaskValues, setOriginalTaskValues] = useState({});
+  const { user } = useUser();
+  const currentUserId = String(user?.id);
+  const userGroups = user?.groups || [];
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
@@ -214,8 +218,13 @@ const TaskListOverlay = ({
     setEditMode((prev) => ({ ...prev, [id]: false }));
   };
 
-  const renderTaskForm = (id, isNew = false) => {
+  const renderTaskForm = (id, isNew = false, currentUserId, userGroups) => {
     const isEditing = isNew || editMode[id];
+    const responsibleId = String(taskEdits[id]?.created_for);
+
+    const isSameTeam = Array.isArray(userGroups) && userGroups.some(group =>
+      Array.isArray(group.users) && group.users.map(String).includes(responsibleId)
+    );
 
     return (
       <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
@@ -232,9 +241,7 @@ const TaskListOverlay = ({
               <Group gap="xs">
                 <Text
                   size="sm"
-                  style={{
-                    color: getDeadlineColor(taskEdits[id]?.scheduled_time),
-                  }}
+                  style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}
                 >
                   {formatDate(taskEdits[id]?.scheduled_time)}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
@@ -287,8 +294,8 @@ const TaskListOverlay = ({
               clearable
             />
             <TextInput
-              label={translations["AddResult"][language]}
-              placeholder={translations["AddResult"][language]}
+              label={translations["Comentariu"][language]}
+              placeholder={translations["Comentariu"][language]}
               value={taskEdits[id]?.description || ""}
               onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
               w="100%"
@@ -301,11 +308,7 @@ const TaskListOverlay = ({
                 <Button size="xs" onClick={handleCreateTask}>
                   {translations["Adaugă task"][language]}
                 </Button>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  onClick={() => setCreatingTask(false)}
-                >
+                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)}>
                   {translations["Anulare"][language]}
                 </Button>
               </>
@@ -314,57 +317,66 @@ const TaskListOverlay = ({
                 <Button size="xs" onClick={() => handleUpdateTask(id)} variant="filled">
                   {translations["Save"][language]}
                 </Button>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  onClick={() => handleCancelEdit(id)}
-                >
+                <Button size="xs" variant="subtle" onClick={() => handleCancelEdit(id)}>
                   {translations["Anulare"][language]}
                 </Button>
               </>
             ) : (
               <>
-                <Button
-                  size="xs"
-                  variant="filled"
-                  onClick={() => handleMarkDone(id)}
-                  leftSection={<FaCheck />}
-                  disabled={!taskEdits[id]?.description?.trim()}
+                <Can
+                  permission={{ module: "TASK", action: "EDIT" }}
+                  context={{ responsibleId, currentUserId, isSameTeam }}
                 >
-                  {translations["Done"][language]}
-                </Button>
-                <Button
-                  size="xs"
-                  variant="light"
-                  onClick={() => {
-                    const original = tasks.find((t) => t.id === id);
-                    if (original) {
-                      setOriginalTaskValues((prev) => ({
-                        ...prev,
-                        [id]: {
-                          task_type: original.task_type,
-                          scheduled_time: parseDate(original.scheduled_time),
-                          created_for: String(original.created_for),
-                          created_by: String(original.created_by),
-                          description: original.description || "",
-                        },
-                      }));
-                    }
-                    setEditMode((prev) => ({ ...prev, [id]: true }));
-                  }}
-                  leftSection={<FaPencil />}
+                  <Button
+                    size="xs"
+                    variant="filled"
+                    onClick={() => handleMarkDone(id)}
+                    leftSection={<FaCheck />}
+                    disabled={!taskEdits[id]?.description?.trim()}
+                  >
+                    {translations["Done"][language]}
+                  </Button>
+
+
+                  <Button
+                    size="xs"
+                    variant="light"
+                    onClick={() => {
+                      const original = tasks.find((t) => t.id === id);
+                      if (original) {
+                        setOriginalTaskValues((prev) => ({
+                          ...prev,
+                          [id]: {
+                            task_type: original.task_type,
+                            scheduled_time: parseDate(original.scheduled_time),
+                            created_for: String(original.created_for),
+                            created_by: String(original.created_by),
+                            description: original.description || "",
+                          },
+                        }));
+                      }
+                      setEditMode((prev) => ({ ...prev, [id]: true }));
+                    }}
+                    leftSection={<FaPencil />}
+                  >
+                    {translations["Editare Task"][language]}
+                  </Button>
+                </Can>
+
+                <Can
+                  permission={{ module: "TASK", action: "DELETE" }}
+                  context={{ responsibleId, currentUserId, isSameTeam }}
                 >
-                  {translations["Editare Task"][language]}
-                </Button>
-                <Button
-                  size="xs"
-                  variant="subtle"
-                  color="red"
-                  onClick={() => handleDeleteTask(id)}
-                  leftSection={<FaTrash />}
-                >
-                  {translations["Șterge"][language]}
-                </Button>
+                  <Button
+                    size="xs"
+                    variant="subtle"
+                    color="red"
+                    onClick={() => handleDeleteTask(id)}
+                    leftSection={<FaTrash />}
+                  >
+                    {translations["Șterge"][language]}
+                  </Button>
+                </Can>
               </>
             )}
           </Group>

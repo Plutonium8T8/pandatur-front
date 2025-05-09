@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { api } from "../api";
 
@@ -18,6 +18,19 @@ export const UserProvider = ({ children }) => {
   });
   const [userGroups, setUserGroups] = useState([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
+
+  const teamUserIds = useMemo(() => {
+    const groups = userGroups || [];
+    const all = groups
+      .filter((group) => group.users?.includes(userId))
+      .flatMap((group) => group.users || []);
+    return new Set(all.map(String));
+  }, [userGroups, userId]);
+
+  const isSameTeam = (responsibleId) => {
+    if (!responsibleId) return false;
+    return teamUserIds.has(String(responsibleId));
+  };
 
   useEffect(() => {
     if (userId) {
@@ -68,7 +81,7 @@ export const UserProvider = ({ children }) => {
       localStorage.setItem("user_roles", JSON.stringify(rawRoles));
       setUserGroups(groups);
     } catch (error) {
-      console.error("❌ Ошибка при загрузке данных пользователя:", error.message);
+      console.error("error get data users", error.message);
       setUserRoles([]);
       setUserGroups([]);
     } finally {
@@ -96,6 +109,8 @@ export const UserProvider = ({ children }) => {
         userRoles,
         setUserRoles,
         userGroups,
+        teamUserIds,
+        isSameTeam,
         isLoadingRoles,
         user,
       }}

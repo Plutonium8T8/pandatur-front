@@ -2131,9 +2131,9 @@ export const translations = {
     RO: "către",
     RU: "k",
   },
-  AddResult: {
-    RO: "Adaugă rezultat",
-    RU: "Введите результат",
+  Comentariu: {
+    RO: "Comentariu",
+    RU: "Комментарии",
   },
   Save: {
     RO: "Salveazǎ",
