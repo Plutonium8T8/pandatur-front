@@ -9,7 +9,7 @@ import {
   FileButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FaPlus } from "react-icons/fa6";
+import { FaTasks } from "react-icons/fa";
 import { useState } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
@@ -198,7 +198,7 @@ export const ChatInput = ({
                 bg="white"
                 title={getLanguageByKey("New Task")}
               >
-                <FaPlus size={20} />
+                <FaTasks size={20} />
               </ActionIcon>
             </Can>
 
