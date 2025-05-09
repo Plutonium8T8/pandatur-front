@@ -3,7 +3,6 @@ import { FixedSizeList } from "react-window";
 import { LuFilter } from "react-icons/lu";
 import {
   TextInput,
-  Checkbox,
   Title,
   Flex,
   Box,
@@ -21,7 +20,7 @@ import { TicketFormTabs } from "../TicketFormTabs";
 import { api } from "../../api";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 import { convertRolesToMatrix, safeParseJson } from "../UsersComponent/rolesUtils";
-import { hasPermission } from "../utils/permissions";
+import { useSameTeamChecker } from "../utils/useSameTeamChecker";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -31,7 +30,6 @@ const CHAT_ITEM_HEIGHT = 94;
 const parseCustomDate = (dateStr) => {
   if (!dateStr) return 0;
   const [datePart, timePart] = dateStr.split(" ");
-  if (!datePart || !timePart) return 0;
   const [day, month, year] = datePart.split("-").map(Number);
   const [hours, minutes, seconds] = timePart.split(":").map(Number);
   return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
@@ -41,23 +39,23 @@ const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
 const ChatList = ({ selectTicketId }) => {
   const { tickets } = useApp();
-  const { user } = useUser();
-  const [showMyTickets, setShowMyTickets] = useState(true);
+  const { userId, user } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [filteredTicketIds, setFilteredTicketIds] = useState(null);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
+  const { enqueueSnackbar } = useSnackbar();
 
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
 
-  const rawRoles = safeParseJson(user?.roles || []);
-  const matrix = convertRolesToMatrix(rawRoles);
-  const currentUserId = String(user?.id || "");
-  const userGroupIds = new Set(user?.groups?.flatMap((g) => g.users).map(String) || []);
+  const matrix = useMemo(() => convertRolesToMatrix(safeParseJson(user?.roles || [])), [user]);
+  const currentUserId = String(userId);
+  const isSameTeam = useSameTeamChecker();
+
+  const level = matrix?.["CHAT_VIEW"];
 
   const filterChatList = async (attributes) => {
     setIsLoading(true);
@@ -68,7 +66,6 @@ const ChatList = ({ selectTicketId }) => {
         type: LIGHT_TICKET,
         attributes,
       });
-
       setOpenFilter(false);
       setLightTicketFilters(attributes);
       setFilteredTicketIds(lightTickets.data.map(({ id }) => id));
@@ -79,42 +76,31 @@ const ChatList = ({ selectTicketId }) => {
     }
   };
 
-  // FIXME: Need to center `active` chat on the Y axis
   useEffect(() => {
     if (chatListRef.current && selectTicketId) {
       const container = chatListRef.current;
-      const selectedElement = container.querySelector(
-        `[data-ticket-id="${selectTicketId}"]`,
-      );
+      const selectedElement = container.querySelector(`[data-ticket-id="${selectTicketId}"]`);
       if (selectedElement) {
-        const containerHeight = container.clientHeight;
-        const itemTop = selectedElement.offsetTop;
-        const itemHeight = selectedElement.clientHeight;
-        const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2;
+        const scrollTop =
+          selectedElement.offsetTop - container.clientHeight / 2 + selectedElement.clientHeight / 2;
         container.scrollTo({ top: scrollTop });
       }
     }
   }, [selectTicketId, tickets]);
 
-  // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
-    if (!tickets || tickets.length === 0) return [];
+    if (!tickets?.length) return [];
 
     let result = [...tickets];
-    result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
 
-    result = result.filter((ticket) => {
-      const responsibleId = String(ticket.technician_id || "");
-      const isSameTeam = userGroupIds.has(responsibleId);
-      return hasPermission(matrix, { module: "chat", action: "view" }, {
-        currentUserId,
-        responsibleId,
-        isSameTeam,
+    if (level === "Denied") return [];
+    if (level === "IfResponsible") {
+      result = result.filter(ticket => String(ticket.technician_id) === currentUserId);
+    } else if (level === "Team") {
+      result = result.filter(ticket => {
+        const techId = String(ticket.technician_id);
+        return techId === currentUserId || isSameTeam(techId);
       });
-    });
-
-    if (showMyTickets) {
-      result = result.filter(ticket => ticket.technician_id === user.id);
     }
 
     if (searchQuery) {
@@ -137,18 +123,12 @@ const ChatList = ({ selectTicketId }) => {
       result = result.filter(ticket => filteredTicketIds.includes(ticket.id));
     }
 
-    return result;
-  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
+    return result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
+  }, [tickets, searchQuery, filteredTicketIds, level, currentUserId, isSameTeam]);
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
-    return (
-      <ChatListItem
-        chat={ticket}
-        style={style}
-        selectTicketId={selectTicketId}
-      />
-    );
+    return <ChatListItem chat={ticket} style={style} selectTicketId={selectTicketId} />;
   };
 
   return (
@@ -160,20 +140,10 @@ const ChatList = ({ selectTicketId }) => {
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
               <Badge bg="#0f824c">{sortedTickets.length}</Badge>
             </Flex>
-            <ActionIcon
-              variant="default"
-              size="24"
-              onClick={() => setOpenFilter(true)}
-            >
+            <ActionIcon variant="default" size="24" onClick={() => setOpenFilter(true)}>
               <LuFilter size={12} />
             </ActionIcon>
           </Flex>
-
-          <Checkbox
-            label={getLanguageByKey("Leadurile mele")}
-            onChange={(e) => setShowMyTickets(e.target.checked)}
-            checked={showMyTickets}
-          />
 
           <TextInput
             placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
@@ -185,7 +155,7 @@ const ChatList = ({ selectTicketId }) => {
         <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
           <FixedSizeList
             height={wrapperChatHeight}
-            itemCount={sortedTickets?.length || 0}
+            itemCount={sortedTickets.length}
             itemSize={CHAT_ITEM_HEIGHT}
             width="100%"
           >
@@ -201,12 +171,8 @@ const ChatList = ({ selectTicketId }) => {
       >
         <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%">
           <Tabs.List>
-            <Tabs.Tab value="filter_ticket">
-              {getLanguageByKey("Filtru pentru Lead")}
-            </Tabs.Tab>
-            <Tabs.Tab value="filter_message">
-              {getLanguageByKey("Filtru dupǎ mesaje")}
-            </Tabs.Tab>
+            <Tabs.Tab value="filter_ticket">{getLanguageByKey("Filtru pentru Lead")}</Tabs.Tab>
+            <Tabs.Tab value="filter_message">{getLanguageByKey("Filtru dupǎ mesaje")}</Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="filter_ticket" pt="xs">
