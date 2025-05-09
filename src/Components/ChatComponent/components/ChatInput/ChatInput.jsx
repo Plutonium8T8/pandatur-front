@@ -19,6 +19,8 @@ import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
+import Can from "../../../CanComponent/Can";
+
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -188,14 +190,18 @@ export const ChatInput = ({
             <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
               <LuSmile size={20} />
             </ActionIcon>
-            <ActionIcon
-              onClick={onCreateTask}
-              c="black"
-              bg="white"
-              title={getLanguageByKey("New Task")}
-            >
-              <FaPlus size={20} />
-            </ActionIcon>
+
+            <Can permission={{ module: "TASK", action: "CREATE" }}>
+              <ActionIcon
+                onClick={onCreateTask}
+                c="black"
+                bg="white"
+                title={getLanguageByKey("New Task")}
+              >
+                <FaPlus size={20} />
+              </ActionIcon>
+            </Can>
+
           </Flex>
         </Flex>
       </Box>
