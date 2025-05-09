@@ -77,18 +77,22 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     return h + m / 60;
   };
 
-  const calculateWorkedHours = (shifts) =>
-    shifts
-      .reduce(
-        (total, shift) =>
-          total +
-          shift.reduce(
-            (sum, i) => sum + parseTime(i.end) - parseTime(i.start),
-            0,
-          ),
-        0,
-      )
-      .toFixed(2);
+  const calculateWorkedHours = (shifts) => {
+    const totalHours = shifts.reduce(
+      (total, shift) =>
+        total +
+        shift.reduce(
+          (sum, i) => sum + parseTime(i.end) - parseTime(i.start),
+          0
+        ),
+      0
+    );
+
+    const hours = Math.floor(totalHours);
+    const minutes = Math.round((totalHours - hours) * 60);
+
+    return `${hours}h ${minutes}m`;
+  };
 
   const openDrawer = (employeeIndex, dayIndex) => {
     setSelected({ employeeIndex, dayIndex });
@@ -202,10 +206,10 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   >
                     {shift.length > 0
                       ? shift.map((i, idx) => (
-                          <div className="container-interval" key={idx}>
-                            {i.start} - {i.end}
-                          </div>
-                        ))
+                        <div className="container-interval" key={idx}>
+                          {i.start} - {i.end}
+                        </div>
+                      ))
                       : "-"}
                   </td>
                 ))}
