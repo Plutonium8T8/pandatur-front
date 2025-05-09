@@ -3,7 +3,7 @@ import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
 import { File } from "../File";
 import { MEDIA_TYPE } from "../../app-constants";
-import { Image } from "@components";
+import { Image as CheckedImage } from "../Image";
 
 const { colors } = DEFAULT_THEME;
 
@@ -25,14 +25,27 @@ export const getMediaType = (mimeType) => {
 };
 
 export const renderContent = (msg) => {
-  if (!msg.message) {
+  if (!msg.message?.trim()) {
     return (
-      <div style={textMessageStyle}>{getLanguageByKey("Mesajul lipseste")}</div>
+      <div style={textMessageStyle}>
+        {getLanguageByKey("Mesajul lipseste")}
+      </div>
     );
   }
+
   switch (msg.mtype) {
     case MEDIA_TYPE.IMAGE:
-      return <Image src={msg.message} />;
+      return (
+        <CheckedImage
+          url={msg.message}
+          renderFallbackImage={() => (
+            <Text c="red" size="xs">
+              {getLanguageByKey("failToLoadImage")}
+            </Text>
+          )}
+        />
+      );
+
     case MEDIA_TYPE.VIDEO:
       return (
         <video controls className="video-preview">
@@ -40,8 +53,10 @@ export const renderContent = (msg) => {
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
       );
+
     case MEDIA_TYPE.AUDIO:
       return <Audio src={msg.message} />;
+
     case MEDIA_TYPE.FILE:
       return (
         <File
