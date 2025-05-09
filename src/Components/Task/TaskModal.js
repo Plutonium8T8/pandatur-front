@@ -169,11 +169,11 @@ const TaskModal = ({
           <DateQuickInput value={scheduledTime} onChange={setScheduledTime} />
 
           <Textarea
-            label={translations["Descriere task"][language]}
+            label={translations["Comentariu"][language]}
             name="description"
             value={task.description}
             onChange={(e) => setTask((prev) => ({ ...prev, description: e.target.value }))}
-            placeholder={translations["Descriere task"][language]}
+            placeholder={translations["Comentariu"][language]}
             autosize
             minRows={3}
             maxRows={6}

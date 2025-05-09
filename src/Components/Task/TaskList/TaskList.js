@@ -71,7 +71,7 @@ const TaskList = ({
       );
     }
   };
-  
+
   const ActionMenu = ({ row }) => {
     const isSameTeam = useSameTeamChecker(String(row.created_for));
 
@@ -83,15 +83,6 @@ const TaskList = ({
           </Button>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item
-            leftSection={<IoCheckmarkCircle size={16} />}
-            onClick={() => !row.status && handleMarkTaskAsComplete(row.id)}
-            disabled={row.status}
-            style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
-          >
-            {translations["Finalizați"][language]}
-          </Menu.Item>
-
           <Can
             permission={{ module: "TASK", action: "EDIT" }}
             context={{
@@ -100,6 +91,15 @@ const TaskList = ({
               isSameTeam,
             }}
           >
+            <Menu.Item
+              leftSection={<IoCheckmarkCircle size={16} />}
+              onClick={() => !row.status && handleMarkTaskAsComplete(row.id)}
+              disabled={row.status}
+              style={row.status ? { opacity: 0.5, cursor: "not-allowed" } : {}}
+            >
+              {translations["Finalizați"][language]}
+            </Menu.Item>
+
             <Menu.Item
               leftSection={<IoPencil size={16} />}
               onClick={() => openEditTask(row)}
