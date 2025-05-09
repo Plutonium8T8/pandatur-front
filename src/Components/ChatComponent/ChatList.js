@@ -9,7 +9,8 @@ import {
   Divider,
   ActionIcon,
   Badge,
-  Tabs
+  Tabs,
+  Checkbox,
 } from "@mantine/core";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "../utils";
@@ -45,6 +46,7 @@ const ChatList = ({ selectTicketId }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [filteredTicketIds, setFilteredTicketIds] = useState(null);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
+  const [showOnlyMine, setShowOnlyMine] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
   const chatListRef = useRef(null);
@@ -103,6 +105,10 @@ const ChatList = ({ selectTicketId }) => {
       });
     }
 
+    if (showOnlyMine) {
+      result = result.filter(ticket => String(ticket.technician_id) === currentUserId);
+    }
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter(ticket => {
@@ -124,7 +130,7 @@ const ChatList = ({ selectTicketId }) => {
     }
 
     return result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-  }, [tickets, searchQuery, filteredTicketIds, level, currentUserId, isSameTeam]);
+  }, [tickets, searchQuery, filteredTicketIds, level, currentUserId, isSameTeam, showOnlyMine]);
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
@@ -145,6 +151,13 @@ const ChatList = ({ selectTicketId }) => {
             </ActionIcon>
           </Flex>
 
+          <Checkbox
+            label={getLanguageByKey("Leadurile mele")}
+            checked={showOnlyMine}
+            onChange={(e) => setShowOnlyMine(e.currentTarget.checked)}
+            mt="xs"
+          />
+
           <TextInput
             placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
             onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
@@ -152,7 +165,7 @@ const ChatList = ({ selectTicketId }) => {
         </Flex>
 
         <Divider />
-        <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
+        <Box style={{ height: "calc(100% - 147px)" }} ref={wrapperChatItemRef}>
           <FixedSizeList
             height={wrapperChatHeight}
             itemCount={sortedTickets.length}
