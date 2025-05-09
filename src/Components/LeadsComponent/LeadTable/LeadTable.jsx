@@ -22,6 +22,7 @@ import { DateCell } from "../../DateCell";
 import { MantineModal } from "../../MantineModal";
 import "./LeadTable.css";
 import { parseTags } from "../../../stringUtils";
+import Can from "../../CanComponent/Can";
 
 const MAX_COUNT_SLICE = 2;
 
@@ -340,20 +341,33 @@ export const LeadTable = ({
       title: getLanguageByKey("Acțiune"),
       fixed: "right",
       width: 85,
-      dataIndex: "id",
-      render: (id) => (
-        <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
-          <Flex align="center" justify="center" gap="8" h="100%" p="xs">
-            <ActionIcon variant="danger" onClick={() => handleDeleteLead(id)}>
-              <MdDelete />
-            </ActionIcon>
-            <ActionIcon variant="outline" onClick={() => setId(id)}>
-              <MdEdit />
-            </ActionIcon>
-          </Flex>
-        </Paper>
-      ),
-    },
+      render: (_, ticket) => {
+        const responsibleId = ticket.technician_id
+          ? String(ticket.technician_id)
+          : undefined;
+
+        return (
+          <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
+            <Flex align="center" justify="center" gap="8" h="100%" p="xs">
+              <Can permission={{ module: "leads", action: "delete" }}>
+                <ActionIcon variant="danger" onClick={() => handleDeleteLead(ticket.id)}>
+                  <MdDelete />
+                </ActionIcon>
+              </Can>
+
+              <Can
+                permission={{ module: "leads", action: "edit" }}
+                context={{ responsibleId }}
+              >
+                <ActionIcon variant="outline" onClick={() => setId(ticket.id)}>
+                  <MdEdit />
+                </ActionIcon>
+              </Can>
+            </Flex>
+          </Paper>
+        );
+      },
+    }
   ];
 
   return (
