@@ -276,9 +276,6 @@ const TaskList = ({
         data={tasks}
         selectedRow={selectedRow}
         loading={loading}
-        onRow={(record) => ({
-          onDoubleClick: () => openEditTask(record),
-        })}
         bordered
       />
     </div>
