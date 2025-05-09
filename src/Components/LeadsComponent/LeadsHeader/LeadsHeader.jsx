@@ -16,6 +16,7 @@ import { useApp } from "../../../hooks";
 import { VIEW_MODE } from "../utils";
 import { getLanguageByKey } from "../../utils";
 import { PageHeader } from "../../PageHeader";
+import Can from "../../CanComponent/Can";
 import "./LeadsFilter.css";
 
 export const RefLeadsHeader = forwardRef(
@@ -119,12 +120,14 @@ export const RefLeadsHeader = forwardRef(
                 ]}
               />
 
-              <Button
-                onClick={openCreateTicketModal}
-                leftSection={<IoMdAdd size={16} />}
-              >
-                {getLanguageByKey("Adaugă lead")}
-              </Button>
+              <Can permission={{ module: "leads", action: "create" }}>
+                <Button
+                  onClick={openCreateTicketModal}
+                  leftSection={<IoMdAdd size={16} />}
+                >
+                  {getLanguageByKey("Adaugă lead")}
+                </Button>
+              </Can>
             </>
           }
           title={getLanguageByKey("Leads")}
