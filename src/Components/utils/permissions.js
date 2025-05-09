@@ -1,4 +1,9 @@
-export const hasPermission = (matrix, { module, action }, context = {}) => {
+export const hasPermission = (
+    matrix,
+    { module, action },
+    context = {},
+    options = {}
+) => {
     if (!matrix || typeof matrix !== "object") return false;
 
     const key = `${module.toUpperCase()}_${action.toUpperCase()}`;
@@ -8,8 +13,12 @@ export const hasPermission = (matrix, { module, action }, context = {}) => {
     const currentUserId = String(context?.currentUserId || "");
     const isSameTeam = context?.isSameTeam || false;
 
+    const { skipContextCheck = false } = options;
+
     if (!level || level === "Denied") return false;
     if (level === "Allowed") return true;
+    if (skipContextCheck) return true;
+
     if (level === "IfResponsible") return responsibleId === currentUserId;
     if (level === "Team") return isSameTeam;
 
@@ -29,7 +38,8 @@ export const parseRolesString = (rolesArray) => {
 
         const parts = str.replace("ROLE_", "").split("_");
         const [module, action, levelRaw] = parts;
-        const key = `${capitalize(module.toLowerCase())}_${capitalize(action.toLowerCase())}`;
+
+        const key = `${module.toUpperCase()}_${action.toUpperCase()}`;
         const level = formatLevel(levelRaw);
 
         roleMap[key] = level;
@@ -41,11 +51,18 @@ export const parseRolesString = (rolesArray) => {
 const formatLevel = (level) => {
     const map = {
         denied: "Denied",
-        ifresponsible: "If responsible",
-        team: "Team-wide access",
+        ifresponsible: "IfResponsible",
+        team: "Team",
         allowed: "Allowed",
     };
     return map[level.toLowerCase()] || "Denied";
 };
 
-const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+export const hasRouteAccess = (matrix, module, action) => {
+    if (!matrix || typeof matrix !== "object") return false;
+
+    const key = `${module.toUpperCase()}_${action.toUpperCase()}`;
+    const level = matrix[key];
+
+    return !!level && level !== "Denied";
+};

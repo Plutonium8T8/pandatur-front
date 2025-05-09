@@ -20,22 +20,20 @@ import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { api } from "../../api";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
+import { convertRolesToMatrix, safeParseJson } from "../UsersComponent/rolesUtils";
+import { hasPermission } from "../utils/permissions";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
 const LIGHT_TICKET = "light";
-
 const CHAT_ITEM_HEIGHT = 94;
 
 const parseCustomDate = (dateStr) => {
   if (!dateStr) return 0;
-
   const [datePart, timePart] = dateStr.split(" ");
   if (!datePart || !timePart) return 0;
-
   const [day, month, year] = datePart.split("-").map(Number);
   const [hours, minutes, seconds] = timePart.split(":").map(Number);
-
   return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
 };
 
@@ -43,7 +41,7 @@ const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
 const ChatList = ({ selectTicketId }) => {
   const { tickets } = useApp();
-  const { userId } = useUser();
+  const { user } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
@@ -55,6 +53,11 @@ const ChatList = ({ selectTicketId }) => {
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
+
+  const rawRoles = safeParseJson(user?.roles || []);
+  const matrix = convertRolesToMatrix(rawRoles);
+  const currentUserId = String(user?.id || "");
+  const userGroupIds = new Set(user?.groups?.flatMap((g) => g.users).map(String) || []);
 
   const filterChatList = async (attributes) => {
     setIsLoading(true);
@@ -83,16 +86,12 @@ const ChatList = ({ selectTicketId }) => {
       const selectedElement = container.querySelector(
         `[data-ticket-id="${selectTicketId}"]`,
       );
-
       if (selectedElement) {
         const containerHeight = container.clientHeight;
         const itemTop = selectedElement.offsetTop;
         const itemHeight = selectedElement.clientHeight;
         const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2;
-
-        container.scrollTo({
-          top: scrollTop,
-        });
+        container.scrollTo({ top: scrollTop });
       }
     }
   }, [selectTicketId, tickets]);
@@ -102,28 +101,33 @@ const ChatList = ({ selectTicketId }) => {
     if (!tickets || tickets.length === 0) return [];
 
     let result = [...tickets];
-
     result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
 
+    result = result.filter((ticket) => {
+      const responsibleId = String(ticket.technician_id || "");
+      const isSameTeam = userGroupIds.has(responsibleId);
+      return hasPermission(matrix, { module: "chat", action: "view" }, {
+        currentUserId,
+        responsibleId,
+        isSameTeam,
+      });
+    });
+
     if (showMyTickets) {
-      result = result.filter(ticket => ticket.technician_id === userId);
+      result = result.filter(ticket => ticket.technician_id === user.id);
     }
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-
       result = result.filter(ticket => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-
         const tags = ticket.tags
           ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase())
           : [];
         const tagMatch = tags.some(tag => tag.includes(query));
-
         const phones = ticket.clients?.map(c => c.phone?.toLowerCase() || "") || [];
         const phoneMatch = phones.some(phone => phone.includes(query));
-
         return idMatch || contactMatch || tagMatch || phoneMatch;
       });
     }
@@ -138,7 +142,6 @@ const ChatList = ({ selectTicketId }) => {
 
   const ChatItem = ({ index, style }) => {
     const ticket = sortedTickets[index];
-
     return (
       <ChatListItem
         chat={ticket}
@@ -155,10 +158,8 @@ const ChatList = ({ selectTicketId }) => {
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
-
               <Badge bg="#0f824c">{sortedTickets.length}</Badge>
             </Flex>
-
             <ActionIcon
               variant="default"
               size="24"
@@ -228,49 +229,8 @@ const ChatList = ({ selectTicketId }) => {
           </Tabs.Panel>
         </Tabs>
       </MantineModal>
-
     </>
   );
 };
 
 export default ChatList;
-
-
-
-
-
-
-
-// {
-//   "tickets": [
-//       {
-//           "id": 12901,
-//           "client_id": "{16110}",
-//           "tags": "{}",
-//           "workflow": "Interesat",
-//           "priority": "joasă",
-//           "contact": "facebook: 16110",
-//           "technician_id": 126,
-//           "last_interaction_date": "14-04-2025 17:06:03",
-//           "photo_url": null,
-//           "creation_date": "20-03-2025 10:36:14",
-//           "group_title": "MD",
-//           "unseen_count": 1,
-//           "last_message": "Доброе утро, есть ли у вас ещё вопросы по поводу экскурсии в Стамбул? Хотите сделать бронь?",
-//           "time_sent": "20-03-2025 10:36:14",
-//           "clients": [
-//               {
-//                   "id": 16110,
-//                   "phone": null,
-//                   "photo": null,
-//                   "name": null,
-//                   "surname": null,
-//                   "email": null
-//               }
-//           ],
-//           "latestMessageId": 66847,
-//           "last_message_type": "text"
-//       },
-//   ],
-//   "total_pages": 13
-// }
