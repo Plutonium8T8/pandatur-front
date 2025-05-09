@@ -12,7 +12,6 @@ export const Chat = () => {
   const { setTickets } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
-
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
@@ -68,10 +67,7 @@ export const Chat = () => {
                 getFullName(values.name, values.surname) || `#${payload.id}`;
               const clientTicketList = personalInfo.clients.map((client) =>
                 client.id === payload.id
-                  ? {
-                      ...client,
-                      ...values,
-                    }
+                  ? { ...client, ...values }
                   : client,
               );
 
@@ -82,16 +78,16 @@ export const Chat = () => {
               }));
 
               setMessageSendersByPlatform((prev) =>
-                prev.map((client) => {
-                  return client.payload.id === payload.id &&
+                prev.map((client) =>
+                  client.payload.id === payload.id &&
                     client.payload.platform === payload.platform
                     ? {
-                        ...client,
-                        label: `${identifier} - ${payload.platform}`,
-                        payload: { ...payload, ...values },
-                      }
-                    : client;
-                }),
+                      ...client,
+                      label: `${identifier} - ${payload.platform}`,
+                      payload: { ...payload, ...values },
+                    }
+                    : client,
+                ),
               );
 
               setTickets((prev) =>
@@ -102,12 +98,10 @@ export const Chat = () => {
                 ),
               );
 
-              setPersonalInfo((prev) => {
-                return {
-                  ...prev,
-                  clients: clientTicketList,
-                };
-              });
+              setPersonalInfo((prev) => ({
+                ...prev,
+                clients: clientTicketList,
+              }));
             }}
             updatedTicket={personalInfo}
           />
