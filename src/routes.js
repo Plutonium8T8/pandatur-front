@@ -10,7 +10,8 @@ import {
   Dashboard,
   TermsAndConditions,
 } from "@pages";
-import { hasStrictPermission } from "./Components/utils/permissions";
+import { hasStrictPermission, hasRouteAccess } from "./Components/utils/permissions";
+import { convertRolesToMatrix, safeParseJson } from "./Components/UsersComponent/rolesUtils";
 
 export const privatePaths = [
   "dashboard",
@@ -37,6 +38,8 @@ export const publicRoutes = [
 export const privateRoutes = (userRoles) => {
   const routes = [];
 
+  const matrix = convertRolesToMatrix(safeParseJson(userRoles || []));
+
   if (hasStrictPermission(userRoles, "DASHBOARD", "VIEW")) {
     routes.push({ path: "/dashboard", component: Dashboard });
   }
@@ -45,7 +48,7 @@ export const privateRoutes = (userRoles) => {
     routes.push({ path: "/leads/:ticketId?", component: Leads });
   }
 
-  if (hasStrictPermission(userRoles, "CHAT", "VIEW")) {
+  if (hasRouteAccess(matrix, "chat", "view")) {
     routes.push({ path: "/chat/:ticketId?", component: Chat });
   }
 

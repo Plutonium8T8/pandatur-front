@@ -15,9 +15,15 @@ import { Badge, Flex, Divider } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
-import { useApp, useLanguageToggle, LANGUAGES, useUser } from "@hooks";
+import {
+  useApp,
+  useLanguageToggle,
+  LANGUAGES,
+  useUser,
+} from "@hooks";
 import { getLanguageByKey } from "@utils";
 import { hasStrictPermission } from "../utils/permissions";
+import Can from "../CanComponent/Can";
 import "./SideBar.css";
 
 const LOGO = "/logo.png";
@@ -93,7 +99,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasStrictPermission(userRoles, "CHAT", "VIEW") && (
+          <Can permission={{ module: "chat", action: "view" }} skipContextCheck>
             <MenuItem
               suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
               active={isActive("chat")}
@@ -102,7 +108,7 @@ export const SideBar = () => {
             >
               {getLanguageByKey("Chat")}
             </MenuItem>
-          )}
+          </Can>
 
           {hasStrictPermission(userRoles, "TASK", "VIEW") && (
             <MenuItem
