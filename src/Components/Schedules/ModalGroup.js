@@ -6,6 +6,7 @@ import {
   Button,
   Group,
   Loader,
+  Select,
 } from "@mantine/core";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
@@ -23,39 +24,38 @@ const ModalGroup = ({
 }) => {
   const [groupName, setGroupName] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectedSupervisor, setSelectedSupervisor] = useState(null);
   const { technicians, loading } = useGetTechniciansList();
   const { enqueueSnackbar } = useSnackbar();
 
   const handleSubmit = async () => {
-    if (!groupName.trim() || selectedUserIds.length === 0) {
+    if (!groupName.trim() || selectedUserIds.length === 0 || !selectedSupervisor) {
       enqueueSnackbar(
         translations["Completați toate câmpurile obligatorii"][language],
-        { variant: "warning" },
+        { variant: "warning" }
       );
       return;
     }
 
     try {
+      const payload = {
+        name: groupName,
+        user_ids: selectedUserIds.map((id) => parseInt(id)),
+        supervisor_id: parseInt(selectedSupervisor),
+      };
+
       if (isEditMode && initialData?.id) {
         const groupId = initialData.id;
-
-        await api.groupSchedules.updateGroup(groupId, { name: groupName });
+        await api.groupSchedules.updateGroup(groupId, payload);
 
         const currentUserIds = initialData.user_ids || [];
-        const newUserIds = selectedUserIds.map((id) => parseInt(id));
+        const newUserIds = payload.user_ids;
 
-        const usersToAdd = newUserIds.filter(
-          (id) => !currentUserIds.includes(id),
-        );
-        const usersToRemove = currentUserIds.filter(
-          (id) => !newUserIds.includes(id),
-        );
+        const usersToAdd = newUserIds.filter((id) => !currentUserIds.includes(id));
+        const usersToRemove = currentUserIds.filter((id) => !newUserIds.includes(id));
 
         if (usersToAdd.length > 0) {
-          await api.groupSchedules.assignMultipleTechnicians(
-            groupId,
-            usersToAdd,
-          );
+          await api.groupSchedules.assignMultipleTechnicians(groupId, usersToAdd);
         }
 
         for (const userId of usersToRemove) {
@@ -65,16 +65,14 @@ const ModalGroup = ({
         const updatedGroup = await api.groupSchedules.getGroupById(groupId);
         onGroupCreated(updatedGroup);
       } else {
-        await api.groupSchedules.createGroup({
-          name: groupName,
-          user_ids: selectedUserIds.map((id) => parseInt(id)),
-        });
+        await api.groupSchedules.createGroup(payload);
         onGroupCreated();
       }
 
       onClose();
       setGroupName("");
       setSelectedUserIds([]);
+      setSelectedSupervisor(null);
     } catch (err) {
       enqueueSnackbar(translations["Eroare la salvarea grupului"][language], {
         variant: "error",
@@ -86,12 +84,12 @@ const ModalGroup = ({
     if (opened) {
       if (isEditMode && initialData) {
         setGroupName(initialData.name || "");
-        setSelectedUserIds(
-          initialData.user_ids?.map((id) => id.toString()) || [],
-        );
+        setSelectedUserIds(initialData.user_ids?.map((id) => id.toString()) || []);
+        setSelectedSupervisor(initialData.supervisor_id?.toString() || null);
       } else {
         setGroupName("");
         setSelectedUserIds([]);
+        setSelectedSupervisor(null);
       }
     }
   }, [opened, initialData, isEditMode]);
@@ -114,6 +112,17 @@ const ModalGroup = ({
         placeholder={translations["Nume grup"][language]}
         value={groupName}
         onChange={(e) => setGroupName(e.target.value)}
+        mb="md"
+      />
+      <Select
+        label={translations["Team Lead"][language]}
+        placeholder={translations["Team Lead"][language]}
+        data={technicians}
+        value={selectedSupervisor}
+        onChange={setSelectedSupervisor}
+        searchable
+        clearable
+        rightSection={loading && <Loader size="xs" />}
         mb="md"
       />
       <MultiSelect

@@ -91,10 +91,16 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
     }
   };
 
-  const handleEdit = (group) => {
-    setEditingGroup(group);
+  const handleEdit = async (group) => {
+    const usersInGroup = await groupSchedules.getTechniciansInGroup(group.id);
+  
+    setEditingGroup({
+      ...group,
+      user_ids: usersInGroup.map((u) => u.id),
+      supervisor_id: usersInGroup.find((u) => u.is_supervisor)?.id || null,
+    });
     setEditOpened(true);
-  };
+  };  
 
   const handleGroupUpdate = async (updatedGroup) => {
     try {
