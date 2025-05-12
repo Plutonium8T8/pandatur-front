@@ -10,6 +10,7 @@ import { api } from "../../../api";
 import { useSnackbar } from "notistack";
 import { SelectWorkflow } from "../../SelectWorkflow";
 import { groupTitleOptions } from "../../../FormOptions";
+import { convertRolesToMatrix, safeParseJson } from "../../UsersComponent/rolesUtils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -24,6 +25,15 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   const { userId } = useUser();
   const [groupOptions, setGroupOptions] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
+  const { user, teamUserIds } = useUser();
+  const rolesMatrix = convertRolesToMatrix(safeParseJson(user?.roles || "[]"));
+  const taskViewLevel = rolesMatrix["TASK_VIEW"];
+  const isIfResponsible = taskViewLevel === "IfResponsible";
+  const isTeam = taskViewLevel === "Team";
+  const isAllowed = taskViewLevel === "Allowed";
+  const teamTechnicians = technicians.filter((tech) =>
+    teamUserIds.has(String(tech.value)) || tech.value === String(userId)
+  );
 
   useEffect(() => {
     const defaultFilters = {
@@ -102,6 +112,21 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     );
   };
 
+  useEffect(() => {
+    if (isTeam) {
+      const validIds = new Set(teamTechnicians.map(t => t.value));
+      const selected = localFilters.created_for || [];
+  
+      const filtered = selected.filter((id) => validIds.has(id));
+  
+      if (filtered.length === 0) {
+        handleChange("created_for", [String(userId)]);
+      } else if (filtered.length !== selected.length) {
+        handleChange("created_for", filtered);
+      }
+    }
+  }, [isTeam, localFilters.created_for, teamTechnicians, userId]);
+  
   return (
     <MantineModal
       open={opened}
@@ -138,14 +163,24 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
 
           <MultiSelect
             label={translations["Responsabil"][language]}
-            data={technicians}
-            value={localFilters.created_for || []}
+            data={
+              isTeam
+                ? teamTechnicians
+                : isIfResponsible
+                  ? technicians.filter((tech) => tech.value === String(userId))
+                  : technicians
+            }
+            value={
+              isIfResponsible
+                ? [String(userId)]
+                : localFilters.created_for || []
+            }
             onChange={(val) => handleChange("created_for", val)}
             placeholder={translations["Responsabil"][language]}
-            clearable
+            clearable={!isIfResponsible}
             searchable
             nothingFoundMessage={translations["noResult"][language]}
-            disabled={loadingTechnicians}
+            disabled={loadingTechnicians || isIfResponsible}
           />
 
           <MultiSelect

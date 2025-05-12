@@ -22,9 +22,12 @@ import {
   useUser,
 } from "@hooks";
 import { getLanguageByKey } from "@utils";
-import { hasStrictPermission } from "../utils/permissions";
 import Can from "../CanComponent/Can";
 import "./SideBar.css";
+import { safeParseJson } from "../UsersComponent/rolesUtils";
+import { convertRolesToMatrix } from "../UsersComponent/rolesUtils";
+import { hasRouteAccess } from "../utils/permissions";
+import { hasStrictPermission } from "../utils/permissions";
 
 const LOGO = "/logo.png";
 
@@ -110,7 +113,7 @@ export const SideBar = () => {
             </MenuItem>
           </Can>
 
-          {hasStrictPermission(userRoles, "TASK", "VIEW") && (
+          {hasRouteAccess(convertRolesToMatrix(safeParseJson(userRoles)), "TASK", "VIEW") && (
             <MenuItem
               active={isActive("tasks")}
               icon={<FaTasks />}
