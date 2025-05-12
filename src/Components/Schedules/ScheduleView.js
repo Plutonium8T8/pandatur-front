@@ -32,6 +32,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [groupModalOpened, setGroupModalOpened] = useState(false);
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
+  const [supervisorId, setSupervisorId] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
 
   const getWeekDays = () =>
@@ -108,6 +109,17 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     );
   };
 
+  const openGroupModal = async () => {
+    try {
+      const techs = await api.groupSchedules.getTechniciansInGroup(groupId);
+      const supervisor = techs.find((u) => u.is_supervisor);
+      setSupervisorId(supervisor?.id?.toString() || null);
+      setGroupModalOpened(true);
+    } catch (err) {
+      enqueueSnackbar("Eroare la încărcarea supervizorului", { variant: "error" });
+    }
+  };
+
   return (
     <div className="schedule-container">
       <div className="header-component">
@@ -150,7 +162,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         variant="outline"
         color="blue"
         style={{ marginTop: 20 }}
-        onClick={() => setGroupModalOpened(true)}
+        onClick={openGroupModal}
       >
         {translations["Modifică grupul"][language]}
       </Button>
@@ -234,6 +246,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
           id: groupId,
           name: groupName,
           user_ids: groupUsers.map((u) => u.id),
+          supervisor_id: supervisorId,
         }}
         isEditMode={true}
       />
