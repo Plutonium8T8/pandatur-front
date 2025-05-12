@@ -5,5 +5,5 @@
 
 .chat-messages {
   overflow-y: auto;
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth; */
 }
