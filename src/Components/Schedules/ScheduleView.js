@@ -131,10 +131,10 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         enqueueSnackbar("Eroare la încărcarea supervizorului", { variant: "error" });
       }
     };
-  
+
     fetchSupervisor();
   }, [groupId]);
-  
+
   return (
     <div className="schedule-container">
       <div className="header-component">
