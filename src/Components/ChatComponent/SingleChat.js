@@ -5,6 +5,7 @@ import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
 import { getFullName } from "@utils";
+import Can from "@components/CanComponent/Can";
 
 const SingleChat = ({ id, onClose, tasks = [] }) => {
   const { setTickets } = useApp();
@@ -21,6 +22,8 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
     setSelectedUser,
   } = useFetchTicketChat(id);
 
+  const responsibleId = personalInfo?.technician_id?.toString() ?? null;
+
   useEffect(() => {
     if (id) {
       getUserMessages(Number(id));
@@ -34,70 +37,74 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
           <FaArrowLeft size="12" />
         </ActionIcon>
       </Box>
+      <Can
+        permission={{ module: "chat", action: "edit" }}
+        context={{ responsibleId }}
+      >
+        <Flex w="70%">
+          <ChatMessages
+            selectedClient={selectedUser}
+            selectTicketId={id ? Number(id) : undefined}
+            personalInfo={personalInfo}
+            messageSendersByPlatform={messageSendersByPlatform || []}
+            onChangeSelectedUser={changeUser}
+            loading={loading}
+          />
+        </Flex>
+      </Can>
 
-      <Flex w="70%">
-        <ChatMessages
-          selectedClient={selectedUser}
-          selectTicketId={id ? Number(id) : undefined}
-          personalInfo={personalInfo}
-          messageSendersByPlatform={messageSendersByPlatform || []}
-          onChangeSelectedUser={changeUser}
-          loading={loading}
-        />
-      </Flex>
+      <Can
+        permission={{ module: "chat", action: "edit" }}
+        context={{ responsibleId }}
+      >
+        <ChatExtraInfo
+          selectedUser={selectedUser}
+          ticketId={id}
+          selectTicketId={id}
+          updatedTicket={personalInfo}
+          onUpdatePersonalInfo={(payload, values) => {
+            const identifier =
+              getFullName(values.name, values.surname) || `#${payload.id}`;
+            const clientTicketList = personalInfo.clients.map((client) =>
+              client.id === payload.id
+                ? { ...client, ...values }
+                : client,
+            );
 
-      <ChatExtraInfo
-        selectedUser={selectedUser}
-        ticketId={id}
-        selectTicketId={id}
-        updatedTicket={personalInfo}
-        onUpdatePersonalInfo={(payload, values) => {
-          const identifier =
-            getFullName(values.name, values.surname) || `#${payload.id}`;
-          const clientTicketList = personalInfo.clients.map((client) =>
-            client.id === payload.id
-              ? {
-                  ...client,
-                  ...values,
-                }
-              : client,
-          );
+            setSelectedUser((prev) => ({
+              ...prev,
+              label: identifier,
+              payload: { ...prev.payload, ...values },
+            }));
 
-          setSelectedUser((prev) => ({
-            ...prev,
-            label: identifier,
-            payload: { ...prev.payload, ...values },
-          }));
-
-          setMessageSendersByPlatform((prev) =>
-            prev.map((client) => {
-              return client.payload.id === payload.id &&
-                client.payload.platform === payload.platform
-                ? {
+            setMessageSendersByPlatform((prev) =>
+              prev.map((client) =>
+                client.payload.id === payload.id &&
+                  client.payload.platform === payload.platform
+                  ? {
                     ...client,
                     label: `${identifier} - ${payload.platform}`,
                     payload: { ...payload, ...values },
                   }
-                : client;
-            }),
-          );
+                  : client,
+              ),
+            );
 
-          setTickets((prev) =>
-            prev.map((ticket) =>
-              ticket.id === personalInfo.id
-                ? { ...ticket, ...personalInfo, clients: clientTicketList }
-                : ticket,
-            ),
-          );
+            setTickets((prev) =>
+              prev.map((ticket) =>
+                ticket.id === personalInfo.id
+                  ? { ...ticket, ...personalInfo, clients: clientTicketList }
+                  : ticket,
+              ),
+            );
 
-          setPersonalInfo((prev) => {
-            return {
+            setPersonalInfo((prev) => ({
               ...prev,
               clients: clientTicketList,
-            };
-          });
-        }}
-      />
+            }));
+          }}
+        />
+      </Can>
     </div>
   );
 };
