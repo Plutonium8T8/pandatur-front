@@ -92,7 +92,7 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          {hasStrictPermission(userRoles, "LEADS", "VIEW") && (
+          <Can permission={{ module: "chat", action: "view" }} skipContextCheck>
             <MenuItem
               active={isActive("leads")}
               icon={<FaClipboardList />}
@@ -100,7 +100,7 @@ export const SideBar = () => {
             >
               {getLanguageByKey("Leads")}
             </MenuItem>
-          )}
+          </Can>
 
           <Can permission={{ module: "chat", action: "view" }} skipContextCheck>
             <MenuItem
