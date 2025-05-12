@@ -22,11 +22,11 @@ const Can = ({ permission, context = {}, children, skipContextCheck = false }) =
 
     const isAllowed = hasPermission(matrix, permission, extendedContext, { skipContextCheck });
 
-    // console.log("🔐 CAN CHECK:");
-    // console.log("→ Permission:", permission);
-    // console.log("→ Context:", extendedContext);
-    // console.log("→ Matrix:", matrix);
-    // console.log("→ Result:", isAllowed);
+    console.log("🔐 CAN CHECK:");
+    console.log("→ Permission:", permission);
+    console.log("→ Context:", extendedContext);
+    console.log("→ Matrix:", matrix);
+    console.log("→ Result:", isAllowed);
 
     if (typeof children === "function") {
         return children(isAllowed);
