@@ -44,7 +44,7 @@ export const privateRoutes = (userRoles) => {
     routes.push({ path: "/dashboard", component: Dashboard });
   }
 
-  if (hasStrictPermission(userRoles, "LEADS", "VIEW")) {
+  if (hasRouteAccess(matrix, "LEADS", "VIEW")) {
     routes.push({ path: "/leads/:ticketId?", component: Leads });
   }
 
