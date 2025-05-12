@@ -1,23 +1,22 @@
 import { hasPermission } from "../utils/permissions";
 import { useUser } from "../../hooks";
 import { convertRolesToMatrix, safeParseJson } from "../UsersComponent/rolesUtils";
-import { useSameTeamChecker } from "../utils/useSameTeamChecker";
 
 const Can = ({ permission, context = {}, children, skipContextCheck = false }) => {
-    const { user } = useUser();
+    const { user, isSameTeam: checkTeam } = useUser();
 
     const rawRoles = safeParseJson(user?.roles || "[]");
     const matrix = convertRolesToMatrix(rawRoles);
+
     const currentUserId = String(user?.id || "");
     const responsibleId = context?.responsibleId ? String(context.responsibleId) : null;
-
-    const isSameTeam = useSameTeamChecker(responsibleId);
+    const isSameTeam = responsibleId ? checkTeam(responsibleId) : false;
 
     const extendedContext = {
-        ...(context || {}),
-        ...(currentUserId && { currentUserId }),
-        ...(responsibleId && { responsibleId }),
-        ...(responsibleId && { isSameTeam }),
+        ...context,
+        currentUserId,
+        responsibleId,
+        isSameTeam,
     };
 
     const isAllowed = hasPermission(matrix, permission, extendedContext, { skipContextCheck });
