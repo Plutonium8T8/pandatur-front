@@ -5,6 +5,7 @@ import SchedulesList from "@components/Schedules/SchedulesGroupList";
 import { translations } from "@utils";
 import ModalGroup from "@components/Schedules/ModalGroup";
 import { PageHeader } from "@components";
+import Can from "../Components/CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -19,13 +20,15 @@ export const Schedules = () => {
         <PageHeader
           title={translations["Orar"][language]}
           extraInfo={
-            <Button
-              leftSection={<IoMdAdd size={16} />}
-              ml="auto"
-              onClick={() => setOpened(true)}
-            >
-              {translations["Adaugă grup"][language]}
-            </Button>
+            <Can permission={{ module: "schedules", action: "create" }} skipContextCheck>
+              <Button
+                leftSection={<IoMdAdd size={16} />}
+                ml="auto"
+                onClick={() => setOpened(true)}
+              >
+                {translations["Adaugă grup"][language]}
+              </Button>
+            </Can>
           }
         />
       )}
