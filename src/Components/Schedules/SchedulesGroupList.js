@@ -19,6 +19,7 @@ import { FaTrash, FaEdit } from "react-icons/fa";
 import { translations } from "../utils/translations";
 import ModalGroup from "./ModalGroup";
 import { useConfirmPopup } from "../../hooks";
+import Can from "../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -49,6 +50,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         id: group.id,
         name: group.name,
         user_ids: group.user_ids,
+        supervisor_id: group.supervisor_id,
       }));
       setGroups(formattedGroups);
     } catch (err) {
@@ -62,9 +64,22 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
     fetchData();
   }, [reload]);
 
-  const handleGroupClick = (group) => {
-    setSelectedGroup(group);
-    setInGroupView?.(true);
+  const handleGroupClick = async (group) => {
+    try {
+      const usersInGroup = await groupSchedules.getTechniciansInGroup(group.id);
+
+      const fullGroup = {
+        ...group,
+        user_ids: usersInGroup.map((u) => u.id),
+        supervisor_id: usersInGroup.find((u) => u.is_supervisor)?.id || null,
+        users: usersInGroup,
+      };
+
+      setSelectedGroup(fullGroup);
+      setInGroupView?.(true);
+    } catch (err) {
+      enqueueSnackbar("Eroare la încărcare utilizatori grup", { variant: "error" });
+    }
   };
 
   const handleBack = () => {
@@ -93,14 +108,14 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
 
   const handleEdit = async (group) => {
     const usersInGroup = await groupSchedules.getTechniciansInGroup(group.id);
-  
+
     setEditingGroup({
       ...group,
       user_ids: usersInGroup.map((u) => u.id),
       supervisor_id: usersInGroup.find((u) => u.is_supervisor)?.id || null,
     });
     setEditOpened(true);
-  };  
+  };
 
   const handleGroupUpdate = async (updatedGroup) => {
     try {
@@ -210,20 +225,31 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
                   </div>
 
                   <Group>
-                    <ActionIcon
-                      color="blue"
-                      variant="light"
-                      onClick={() => handleEdit(group)}
+                    <Can
+                      permission={{ module: "schedules", action: "edit" }}
+                      context={{ responsibleId: group.supervisor_id }}
                     >
-                      <FaEdit />
-                    </ActionIcon>
-                    <ActionIcon
-                      color="red"
-                      variant="light"
-                      onClick={() => handleClickDelete(group)}
+                      <ActionIcon
+                        color="blue"
+                        variant="light"
+                        onClick={() => handleEdit(group)}
+                      >
+                        <FaEdit />
+                      </ActionIcon>
+                    </Can>
+                    
+                    <Can
+                      permission={{ module: "schedules", action: "delete" }}
+                      context={{ responsibleId: group.supervisor_id }}
                     >
-                      <FaTrash />
-                    </ActionIcon>
+                      <ActionIcon
+                        color="red"
+                        variant="light"
+                        onClick={() => handleClickDelete(group)}
+                      >
+                        <FaTrash />
+                      </ActionIcon>
+                    </Can>
                   </Group>
                 </Group>
               </Card>
