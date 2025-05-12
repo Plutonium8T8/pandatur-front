@@ -107,6 +107,7 @@ export const BasicGeneralForm = ({
           data={technicians}
           key={form.key("technician_id")}
           {...form.getInputProps("technician_id")}
+          searchable
         />
       </form>
       <Flex justify="end" gap="md" mt="md">
