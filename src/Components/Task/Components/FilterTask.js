@@ -36,14 +36,16 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   );
 
   useEffect(() => {
-    const defaultFilters = {
-      ...filters,
-      created_for: filters.created_for?.length ? filters.created_for : [String(userId)],
-      status: filters.status === undefined ? false : filters.status,
-    };
-    setLocalFilters(defaultFilters);
-    onApply(defaultFilters);
-  }, [userId]);
+    if (opened) {
+      const defaultFilters = {
+        ...filters,
+        created_for: filters.created_for?.length ? filters.created_for : [String(userId)],
+        status: filters.status === undefined ? false : filters.status,
+      };
+      setLocalFilters(defaultFilters);
+      onApply(defaultFilters);
+    }
+  }, [opened]);  
 
   useEffect(() => {
     const fetchGroups = async () => {
