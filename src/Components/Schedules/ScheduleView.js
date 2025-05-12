@@ -6,6 +6,7 @@ import { useSnackbar } from "notistack";
 import ModalIntervals from "./ModalIntervals";
 import ModalGroup from "./ModalGroup";
 import { Button, Checkbox } from "@mantine/core";
+import Can from "../CanComponent/Can";
 import "./Schedule.css";
 
 const language = localStorage.getItem("language") || "RO";
@@ -120,6 +121,20 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
     }
   };
 
+  useEffect(() => {
+    const fetchSupervisor = async () => {
+      try {
+        const techs = await api.groupSchedules.getTechniciansInGroup(groupId);
+        const supervisor = techs.find((u) => u.is_supervisor);
+        setSupervisorId(supervisor?.id?.toString() || null);
+      } catch (err) {
+        enqueueSnackbar("Eroare la încărcarea supervizorului", { variant: "error" });
+      }
+    };
+  
+    fetchSupervisor();
+  }, [groupId]);
+  
   return (
     <div className="schedule-container">
       <div className="header-component">
@@ -157,15 +172,20 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
         </button>
       </div>
 
-      <Button
-        fullWidth
-        variant="outline"
-        color="blue"
-        style={{ marginTop: 20 }}
-        onClick={openGroupModal}
+      <Can
+        permission={{ module: "schedules", action: "edit" }}
+        context={{ responsibleId: supervisorId }}
       >
-        {translations["Modifică grupul"][language]}
-      </Button>
+        <Button
+          fullWidth
+          variant="outline"
+          color="blue"
+          style={{ marginTop: 20 }}
+          onClick={openGroupModal}
+        >
+          {translations["Modifică grupul"][language]}
+        </Button>
+      </Can>
 
       <div className="schedule-table-container">
         <table className="schedule-table">
