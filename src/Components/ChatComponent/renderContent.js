@@ -40,6 +40,7 @@ export const renderContent = (msg) => {
       return (
         <CheckedImage
           url={msg.message}
+          style={{ maxWidth: 500, maxHeight: 500 }}
           renderFallbackImage={() => (
             <Text c="red" size="xs">
               {getLanguageByKey("failToLoadImage")}
@@ -50,7 +51,10 @@ export const renderContent = (msg) => {
 
     case MEDIA_TYPE.VIDEO:
       return (
-        <video controls className="video-preview">
+        <video
+          controls
+          style={{ borderRadius: 8, maxWidth: 500, maxHeight: 500 }}
+        >
           <source src={msg.message} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
@@ -67,6 +71,35 @@ export const renderContent = (msg) => {
           src={msg.message}
         />
       );
+
+    case MEDIA_TYPE.IG_REEL:
+      return (
+        <video
+          controls
+          style={{ borderRadius: "8", maxWidth: 500, maxHeight: 500 }}
+        >
+          <source src={msg.message} type="video/mp4" />
+          {getLanguageByKey("Acest browser nu suporta video")}
+        </video>
+      );
+
+    case MEDIA_TYPE.SHARE: {
+      const isImage = msg.message.match(/\.(jpeg|jpg|png|webp|gif)$/i);
+
+      return isImage ? (
+        <CheckedImage
+          url={msg.message}
+          style={{ maxWidth: 500, maxHeight: 500 }}
+          renderFallbackImage={() => (
+            <Text c="red" size="xs">
+              {getLanguageByKey("failToLoadImage")}
+            </Text>
+          )}
+        />
+      ) : (
+        <Text>{msg.message}</Text>
+      );
+    }
 
     default:
       const { message } = msg;

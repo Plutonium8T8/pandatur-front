@@ -19,6 +19,8 @@ export const MEDIA_TYPE = {
   FILE: "file",
   URL: "url",
   CALL: "call",
+  IG_REEL: "ig_reel",
+  SHARE: "share",     
 };
 
 export const MESSAGES_TYPE_OPTIONS = [
@@ -29,6 +31,8 @@ export const MESSAGES_TYPE_OPTIONS = [
   { value: "url", label: "URL" },
   { value: "call", label: "Call" },
   { value: "video", label: "Video" },
+  { value: "ig_reel", label: "Instagram Reel ID" },
+  { value: "share", label: "Shared Content" },
 ];
 
 export const PLATFORMS = {

@@ -39,7 +39,7 @@ const content = (renderImage, url) => {
   );
 };
 
-export const Image = ({ url, renderImage, renderFallbackImage }) => {
+export const Image = ({ url, renderImage, renderFallbackImage, style }) => {
   const [imageUrl, setImageUrl] = useState();
 
   useEffect(() => {
@@ -52,10 +52,18 @@ export const Image = ({ url, renderImage, renderFallbackImage }) => {
     img.onerror = () => setImageUrl(null);
   }, [url]);
 
-  return (
-    <>
-      {!imageUrl && fallbackImage(renderFallbackImage)}
-      {imageUrl && content(renderImage, imageUrl)}
-    </>
+  const fallback = fallbackImage(renderFallbackImage);
+  const rendered = renderImage ? renderImage() : (
+    <MantineImage
+      fallbackSrc={BROKEN_PHOTO}
+      my="5"
+      radius="md"
+      src={imageUrl}
+      style={style}
+      className="pointer"
+      onClick={() => window.open(imageUrl, "_blank")}
+    />
   );
+
+  return <>{imageUrl ? rendered : fallback}</>;
 };
