@@ -64,6 +64,8 @@ export const GroupedMessages = ({
     }
   });
 
+  const clientIds = (personalInfo?.clients || []).map((c) => c.id);
+
   return (
     <Flex direction="column" gap="xl" h="100%">
       {groupedMessages.length ? (
@@ -97,20 +99,19 @@ export const GroupedMessages = ({
 
                 <Flex direction="column" gap="xs">
                   {messages.map((msg) => {
-                    const isMessageSentByMe =
-                      msg.sender_id === userId || msg.sender_id === 1;
+                    const isClientMessage = clientIds.includes(msg.sender_id);
 
-                    return isMessageSentByMe ? (
-                      <SendedMessage
-                        key={`${msg.id ?? ""}-${msg.time_sent}`}
-                        msg={msg}
-                        technician={getTechnician(msg.sender_id)}
-                      />
-                    ) : (
+                    return isClientMessage ? (
                       <ReceivedMessage
                         key={`${msg.id ?? ""}-${msg.time_sent}`}
                         msg={msg}
                         personalInfo={personalInfo}
+                      />
+                    ) : (
+                      <SendedMessage
+                        key={`${msg.id ?? ""}-${msg.time_sent}`}
+                        msg={msg}
+                        technician={getTechnician(msg.sender_id)}
                       />
                     );
                   })}
