@@ -7,9 +7,12 @@ import { Call } from "./Call";
 const { colors } = DEFAULT_THEME;
 
 export const ReceivedMessage = ({ personalInfo, msg }) => {
-  const receivedMsj = personalInfo?.clients?.find(
-    ({ id }) => msg.client_id === id,
+  const sender = personalInfo?.clients?.find(
+    ({ id }) => id === msg.sender_id,
   );
+
+  const senderName =
+    getFullName(sender?.name, sender?.surname) || `#${msg.sender_id}`;
 
   return (
     <Flex w="100%">
@@ -28,15 +31,13 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
               w={36}
               h={36}
               radius="50%"
-              // src={personalInfo?.photo_url}
               fallbackSrc={DEFAULT_PHOTO}
             />
 
             <Flex miw="250px" direction="column" p="8" className="text">
               <Flex c={colors.gray[7]} align="center" gap="4">
                 <Text size="sm" fw="bold">
-                  {getFullName(receivedMsj?.name, receivedMsj?.surname) ||
-                    `#${msg.client_id}`}
+                  {senderName}
                 </Text>
 
                 {socialMediaIcons[msg.platform] || null}
