@@ -64,9 +64,10 @@ export const useFetchTicketChat = (id) => {
           clientsPlatform.find(
             ({ payload }) =>
               payload.id === client_id && payload.platform === platform,
-          ) || {};
+          ) || clientsPlatform[0] || {};
 
-        setSelectedUser(currentClient || {});
+        setSelectedUser(currentClient);
+
       } else {
         setSelectedUser(clientsPlatform[0] || {});
       }
