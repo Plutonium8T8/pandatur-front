@@ -33,7 +33,9 @@ export const renderContent = (msg) => {
     );
   }
 
-  switch (msg.mtype) {
+  const type = msg.mtype || msg.media_type;
+
+  switch (type) {
     case MEDIA_TYPE.IMAGE:
       return (
         <CheckedImage
