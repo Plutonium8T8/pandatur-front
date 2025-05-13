@@ -1,7 +1,8 @@
 import Cookies from "js-cookie"
 import { clearCookies } from "../Components/utils/clearCookies"
 
-const STATUS_CODE = [401, 403]
+// const STATUS_CODE = [401, 403]
+const STATUS_CODE = [401]
 
 export const authInterceptor = (config) => {
   if (!config.headers) config.headers = {}
@@ -16,7 +17,7 @@ export const responseInterceptor = [
   (res) => res,
   async (err) => {
     if (STATUS_CODE.includes(err?.response?.status)) {
-      // clearCookies()
+      clearCookies()
     }
 
     return Promise.reject(err)
