@@ -12,16 +12,18 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
   );
 
   const senderName =
-    getFullName(sender?.name, sender?.surname) || `#${msg.sender_id}`;
+    getFullName(sender?.name, sender?.surname) ||
+    sender?.phone || `#${msg.sender_id}`;
+
 
   return (
     <Flex w="100%">
       {msg.mtype === MEDIA_TYPE.CALL ? (
         <Call
           time={msg.time_sent}
-          from={msg.call_metadata?.src_num} // ← номер клиента (например, 061240480)
-          to={msg.treename || msg.treenumber || msg.call_metadata?.dst_num} // куда звонит
-          name={senderName} // имя клиента (если есть)
+          from={msg.call_metadata?.src_num}
+          to={msg.treename || msg.treenumber || msg.call_metadata?.dst_num}
+          name={senderName}
           src={msg.message}
           status={msg.call_metadata?.status}
         />
