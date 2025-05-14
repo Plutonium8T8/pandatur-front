@@ -22,7 +22,7 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
         <Call
           time={msg.time_sent}
           from={msg.call_metadata?.src_num}
-          to={msg.treename || msg.treenumber || msg.call_metadata?.dst_num}
+          to={msg.call_metadata?.dst_num}
           name={senderName}
           src={msg.message}
           status={msg.call_metadata?.status}
