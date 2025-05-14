@@ -19,10 +19,11 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
       {msg.mtype === MEDIA_TYPE.CALL ? (
         <Call
           time={msg.time_sent}
-          from={msg.call_metadata?.dst_num}
-          to={msg.call_metadata?.src_num}
-          name={msg.treename}
+          from={msg.call_metadata?.src_num} // ← номер клиента (например, 061240480)
+          to={msg.treename || msg.treenumber || msg.call_metadata?.dst_num} // куда звонит
+          name={senderName} // имя клиента (если есть)
           src={msg.message}
+          status={msg.call_metadata?.status}
         />
       ) : (
         <Flex w="90%" direction="column" className="chat-message received">
