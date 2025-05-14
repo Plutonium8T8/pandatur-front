@@ -45,9 +45,8 @@ export const Call = ({ time, from, to, name, src, status }) => {
               {to && (
                 <>
                   <Text size="sm" c={colors.gray[7]}>
-                    {getLanguageByKey("callTo")}:
+                    {getLanguageByKey("callTo")}: {to}
                   </Text>
-                  <Text size="sm">{to}</Text>
                 </>
               )}
             </Flex>
