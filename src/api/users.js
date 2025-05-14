@@ -42,10 +42,13 @@ export const users = {
   },
 
   updateUsersGroup: async (body) => {
-    const { data } = await baseAxios.patch("/api/user-groups/update", body);
-
+    const { data } = await baseAxios.post("/api/user-groups/batch-assign", {
+      group_id: body.group_id,
+      user_ids: body.user_ids,
+    });
+  
     return data;
-  },
+  },  
 
   deleteMultipleUsers: async (body) => {
     const { data } = await baseAxios.delete("/admin/users", { data: body });
