@@ -1,5 +1,6 @@
 import { Box, Flex, Text, DEFAULT_THEME, Divider } from "@mantine/core";
 import { MdCall } from "react-icons/md";
+import { HiPhoneMissedCall } from "react-icons/hi";
 import { HH_mm } from "@app-constants";
 import { parseServerDate, getLanguageByKey } from "@utils";
 import { Audio } from "../../../../Audio";
@@ -7,44 +8,60 @@ import "./Call.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const Call = ({ time, from, to, name, src }) => {
-  const isFromTo = from && to;
+export const Call = ({ time, from, to, name, src, status }) => {
+  const isMissed = status === "NOANSWER";
+
+  const showFrom = name || from;
 
   return (
     <Box maw="700px" p="xs" mx="auto" className="call-message">
       <Flex w="100%" gap="8" justify="space-between">
         <Flex gap="12" align="center">
-          <MdCall size="36" />
+          {isMissed ? (
+            <HiPhoneMissedCall size={28} color="#c92a2a" />
+          ) : (
+            <MdCall size={36} />
+          )}
 
           <Divider orientation="vertical" />
 
-          {isFromTo && (
-            <Box>
-              <Flex wrap="wrap" gap="4">
-                <Text
-                  style={{ whiteSpace: "nowrap" }}
-                  size="sm"
-                  c={colors.gray[7]}
-                >
-                  {getLanguageByKey("callFrom")}:
-                </Text>
-                <Text size="sm" c="black">
-                  {from}
-                </Text>
-                <Text size="sm" c={colors.gray[7]}>
-                  {getLanguageByKey("callTo")}:
-                </Text>
+          <Box>
+            <Flex wrap="wrap" gap={4}>
+              {showFrom && (
+                <>
+                  <Text
+                    style={{ whiteSpace: "nowrap" }}
+                    size="sm"
+                    c={colors.gray[7]}
+                  >
+                    {getLanguageByKey("callFrom")}:
+                  </Text>
+                  <Text size="sm" c="black">
+                    {name || from}
+                  </Text>
+                </>
+              )}
 
-                <Text size="sm">{to}</Text>
-              </Flex>
+              {to && (
+                <>
+                  <Text size="sm" c={colors.gray[7]}>
+                    {getLanguageByKey("callTo")}:
+                  </Text>
+                  <Text size="sm">{to}</Text>
+                </>
+              )}
+            </Flex>
+          </Box>
 
-              <Text size="sm">{name}</Text>
-            </Box>
+          <Divider orientation="vertical" />
+
+          {isMissed ? (
+            <Text size="sm" c="red">
+              {getLanguageByKey("noAnswer")}
+            </Text>
+          ) : (
+            <Audio src={src} />
           )}
-
-          {isFromTo && <Divider orientation="vertical" />}
-
-          <Audio src={src} />
         </Flex>
 
         <Flex align="end">
