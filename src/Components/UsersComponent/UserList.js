@@ -120,21 +120,26 @@ const UserList = ({
     });
   };
 
-  const handleChangeGroup = async (group) => {
+  const handleChangeGroup = async (groupName) => {
     try {
+      const allGroups = await api.user.getGroupsList();
+      const selectedGroup = allGroups.find((g) => g.name === groupName);
+
       await api.users.updateUsersGroup({
+        group_id: selectedGroup.id,
         user_ids: selectedIds,
-        group_name: group,
       });
+
       enqueueSnackbar(translations["Grup actualizat"][language], {
         variant: "success",
       });
+
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
       enqueueSnackbar(
         translations["Eroare la actualizarea grupului"][language],
-        { variant: "error" },
+        { variant: "error" }
       );
     }
   };
