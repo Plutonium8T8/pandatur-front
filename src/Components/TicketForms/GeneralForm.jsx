@@ -68,6 +68,7 @@ export const GeneralForm = ({
         />
 
         <Select
+          disabled
           mt="md"
           label={getLanguageByKey("Prioritate")}
           placeholder={getLanguageByKey("Selectează prioritate")}
