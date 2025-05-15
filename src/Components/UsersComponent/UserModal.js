@@ -263,9 +263,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
+          const selectedGroup = groupsList.find((g) => g.name === groups);
+          const group_id = selectedGroup?.id;
+
           await api.users.updateUsersGroup({
             user_ids: [technicianId],
-            group_name: groups,
+            group_id,
           });
         }
 
