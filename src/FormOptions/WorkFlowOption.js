@@ -11,3 +11,14 @@ export const workflowOptions = [
   "Realizat cu succes",
   "Închis și nerealizat"
 ]
+
+export const workflowOptionsLimited = [
+  "Apel de intrare",
+  "De prelucrat",
+  "Luat în lucru",
+  "Ofertă trimisă",
+  "Aprobat cu client",
+  "Contract semnat",
+  "Plată primită",
+  "Contract încheiat",
+]

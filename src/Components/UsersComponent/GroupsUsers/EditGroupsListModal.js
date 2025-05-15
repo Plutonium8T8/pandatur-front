@@ -97,19 +97,24 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
     const handleSave = async (groupId, groupName) => {
         const current = groupState[groupId];
-        if (!groupName || !current.supervisor_id || !current.user_ids.length) {
+        if (!groupName || !current.user_ids.length) {
             enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
                 variant: "warning",
             });
             return;
         }
 
+        const payload = {
+            group_name: groupName,
+            user_ids: current.user_ids.map(Number),
+        };
+
+        if (current.supervisor_id) {
+            payload.supervisor_id = Number(current.supervisor_id);
+        }
+
         try {
-            await api.user.updateGroupByName({
-                group_name: groupName,
-                supervisor_id: Number(current.supervisor_id),
-                user_ids: current.user_ids.map(Number),
-            });
+            await api.user.updateGroupByName(payload);
 
             enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
                 variant: "success",
