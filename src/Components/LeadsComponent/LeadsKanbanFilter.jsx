@@ -65,7 +65,7 @@ export const LeadsKanbanFilter = ({
               <Button
                 variant="filled"
                 loading={loading}
-                onClick={() => onSubmitTicket({}, "message")}
+                onClick={() => onApplyWorkflowFilters(systemWorkflow)}
               >
                 {getLanguageByKey("Aplică")}
               </Button>
