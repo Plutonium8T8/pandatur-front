@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useMemo, useEffect, useRef, useContext } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider } from "@mantine/core";
@@ -25,6 +25,9 @@ import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTab
 import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
+import { UserContext } from "../contexts/UserContext";
+import { workflowOptionsLimited } from "../FormOptions";
+
 import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
@@ -56,18 +59,34 @@ export const Leads = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(!!ticketId);
   const [groupTitle, setGroupTitle] = useState("");
-  const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
+  // const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
+  const [selectedWorkflow, setSelectedWorkflow] = useState([]);
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false);
   const [hardTicketFilters, setHardTicketFilters] = useState({});
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
+  const { userGroups, userId } = useContext(UserContext);
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
+
+  const isAdmin = useMemo(() => {
+    const adminGroup = userGroups?.find((g) => g.name === "Admin");
+    return adminGroup?.users?.includes(userId);
+  }, [userGroups, userId]);
+  
+  useEffect(() => {
+    if (userGroups && userId) {
+      const adminGroup = userGroups.find((g) => g.name === "Admin");
+      const isAdminUser = adminGroup?.users?.includes(userId);
+
+      setSelectedWorkflow(isAdminUser ? workflowOptions : workflowOptionsLimited);
+    }
+  }, [userGroups, userId]);
 
   const filteredTickets = useMemo(() => {
     let result = tickets;
@@ -384,7 +403,7 @@ export const Leads = () => {
       >
         <LeadsKanbanFilter
           initialData={lightTicketFilters}
-          systemWorkflow={selectedWorkflow}
+          systemWorkflow={isAdmin ? workflowOptions : workflowOptionsLimited}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(workflows) => {

@@ -1,10 +1,10 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
-import { workflowOptions, priorityOptions } from "../../../FormOptions";
+import { useEffect, useMemo, useContext } from "react";
+import { workflowOptions, workflowOptionsLimited, priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
-import { filteredWorkflows } from "../../LeadsComponent/utils";
+import { UserContext } from "../../../contexts/UserContext";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
@@ -17,15 +17,21 @@ export const BasicGeneralForm = ({
   formId,
 }) => {
   const idForm = formId || GENERAL_FORM_FILTER_ID;
-
   const { technicians } = useGetTechniciansList();
+  const { userGroups, userId } = useContext(UserContext);
+
+  const isAdmin = useMemo(() => {
+    const adminGroup = userGroups?.find((g) => g.name === "Admin");
+    return adminGroup?.users?.includes(userId);
+  }, [userGroups, userId]);
+
+  const availableWorkflowOptions = isAdmin ? workflowOptions : workflowOptionsLimited;
 
   const form = useForm({
     mode: "uncontrolled",
-
     transformValues: ({ workflow, priority, contact, tags, technician_id }) => {
       return {
-        workflow: workflow ?? filteredWorkflows,
+        workflow: workflow ?? availableWorkflowOptions,
         priority: priority ?? undefined,
         contact: contact ?? undefined,
         tags: tags ?? undefined,
@@ -36,7 +42,7 @@ export const BasicGeneralForm = ({
 
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
-      form.setFieldValue("workflow", workflowOptions);
+      form.setFieldValue("workflow", availableWorkflowOptions);
     } else {
       form.setFieldValue("workflow", value);
     }
@@ -59,13 +65,13 @@ export const BasicGeneralForm = ({
       <form
         id={idForm}
         onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset()),
+          onSubmit(values, () => form.reset())
         )}
       >
         <MultiSelect
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={[getLanguageByKey("selectAll"), ...workflowOptions]}
+          data={[getLanguageByKey("selectAll"), ...availableWorkflowOptions]}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
@@ -92,9 +98,7 @@ export const BasicGeneralForm = ({
         <TagsInput
           mt="md"
           label={getLanguageByKey("Tag-uri")}
-          placeholder={getLanguageByKey(
-            "Introdu tag-uri separate prin virgule",
-          )}
+          placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
           key={form.key("tags")}
           {...form.getInputProps("tags")}
         />
@@ -110,6 +114,7 @@ export const BasicGeneralForm = ({
           searchable
         />
       </form>
+
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.(form.reset)}
         <Button variant="default" onClick={onClose}>

@@ -1,10 +1,11 @@
 import { Tabs, Flex, Button } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext, useMemo } from "react";
 import { SelectWorkflow } from "../SelectWorkflow";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { filteredWorkflows } from "./utils";
+import { workflowOptions, workflowOptionsLimited } from "../../FormOptions";
 import { MessageFilterForm } from "./MessageFilterForm";
+import { UserContext } from "../../contexts/UserContext";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -14,16 +15,30 @@ export const LeadsKanbanFilter = ({
   initialData,
   onSubmitTicket,
 }) => {
-  const [systemWorkflow, setSystemWorkflow] = useState(filteredWorkflows);
+  const { userGroups, userId } = useContext(UserContext);
+
+  const isAdmin = useMemo(() => {
+    const adminGroup = userGroups?.find((g) => g.name === "Admin");
+    return adminGroup?.users?.includes(userId);
+  }, [userGroups, userId]);
+
+  const availableWorkflowOptions = isAdmin ? workflowOptions : workflowOptionsLimited;
+
+  const [systemWorkflow, setSystemWorkflow] = useState(() =>
+    (baseSystemWorkflow || []).filter((w) => availableWorkflowOptions.includes(w)),
+  );
 
   useEffect(() => {
-    setSystemWorkflow(baseSystemWorkflow);
-  }, [baseSystemWorkflow]);
+    const valid = (baseSystemWorkflow || []).filter((w) =>
+      availableWorkflowOptions.includes(w),
+    );
+    setSystemWorkflow(valid);
+  }, [baseSystemWorkflow, availableWorkflowOptions]);
 
   return (
-    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_workflow">
+    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue={isAdmin ? "filter_workflow" : "filter_ticket"}>
       <Tabs.List>
-        {onApplyWorkflowFilters && (
+        {isAdmin && onApplyWorkflowFilters && (
           <Tabs.Tab value="filter_workflow">
             {getLanguageByKey("Filtru de sistem")}
           </Tabs.Tab>
@@ -36,7 +51,7 @@ export const LeadsKanbanFilter = ({
         </Tabs.Tab>
       </Tabs.List>
 
-      {onApplyWorkflowFilters && (
+      {isAdmin && onApplyWorkflowFilters && (
         <Tabs.Panel value="filter_workflow" pt="xs">
           <Flex direction="column" justify="space-between" h="100%">
             <SelectWorkflow selectedValues={systemWorkflow} onChange={setSystemWorkflow} />
@@ -47,7 +62,11 @@ export const LeadsKanbanFilter = ({
               <Button variant="default" onClick={onClose}>
                 {getLanguageByKey("Închide")}
               </Button>
-              <Button variant="filled" loading={loading} onClick={() => onSubmitTicket({}, "message")}>
+              <Button
+                variant="filled"
+                loading={loading}
+                onClick={() => onApplyWorkflowFilters(systemWorkflow)}
+              >
                 {getLanguageByKey("Aplică")}
               </Button>
             </Flex>
