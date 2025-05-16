@@ -6,6 +6,8 @@ import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
 import { paymentStatusOptions } from "../../FormOptions";
 import { DD_MM_YYYY } from "../../app-constants";
+import { useContext, useMemo } from "react";
+import { UserContext } from "../../contexts/UserContext";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
@@ -23,6 +25,12 @@ export const ContractForm = ({
   formInstance,
 }) => {
   const idForm = formId || CONTRACT_FORM_FILTER_ID;
+  const { userGroups, userId } = useContext(UserContext);
+
+  const isAdmin = useMemo(() => {
+    const adminGroup = userGroups?.find((g) => g.name === "Admin");
+    return adminGroup?.users?.includes(userId);
+  }, [userGroups, userId]);
 
   useEffect(() => {
     if (data) {
@@ -238,12 +246,14 @@ export const ContractForm = ({
           />
         )}
 
+        {isAdmin && (
           <LabelSwitch
             mt="md"
             label={getLanguageByKey("Control Admin")}
             key={formInstance.key("control")}
             {...formInstance.getInputProps("control", { type: "checkbox" })}
           />
+        )}
       </form>
 
       <Flex justify="end" gap="md" mt="md">

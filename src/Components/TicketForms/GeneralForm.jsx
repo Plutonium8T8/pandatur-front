@@ -7,15 +7,17 @@ import {
   Flex,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
+import { useEffect, useContext, useMemo } from "react";
 import {
   workflowOptions,
+  workflowOptionsLimited,
   priorityOptions,
   groupTitleOptions,
 } from "../../FormOptions";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
+import { UserContext } from "../../contexts/UserContext";
 
 const GENERAL_FORM_ID = "GENERAL_FORM_ID";
 
@@ -27,6 +29,14 @@ export const GeneralForm = ({
   formInstance,
 }) => {
   const { technicians } = useGetTechniciansList();
+  const { userGroups, userId } = useContext(UserContext);
+
+  const isAdmin = useMemo(() => {
+    const adminGroup = userGroups?.find((g) => g.name === "Admin");
+    return adminGroup?.users?.includes(userId);
+  }, [userGroups, userId]);
+
+  const availableWorkflows = isAdmin ? workflowOptions : workflowOptionsLimited;
 
   const form = useForm({
     mode: "uncontrolled",
@@ -61,7 +71,7 @@ export const GeneralForm = ({
         <Select
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={workflowOptions}
+          data={availableWorkflows}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
