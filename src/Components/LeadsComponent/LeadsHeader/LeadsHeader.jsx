@@ -17,6 +17,7 @@ import { VIEW_MODE } from "../utils";
 import { getLanguageByKey } from "../../utils";
 import { PageHeader } from "../../PageHeader";
 import Can from "../../CanComponent/Can";
+import { groupTitleOptions } from "../../../FormOptions";
 import "./LeadsFilter.css";
 
 export const RefLeadsHeader = forwardRef(
@@ -114,17 +115,7 @@ export const RefLeadsHeader = forwardRef(
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
                 defaultValue=""
-                data={[
-                  { value: "", label: getLanguageByKey("Toate") },
-                  { value: "RO", label: "RO" },
-                  { value: "MD", label: "MD" },
-                  { value: "Filiale", label: getLanguageByKey("FIL") },
-                  { value: "Francize", label: getLanguageByKey("FRA") },
-                  {
-                    value: "Marketing",
-                    label: getLanguageByKey("marketing"),
-                  },
-                ]}
+                data={groupTitleOptions}
                 onChange={(group) => setGroupTitle(group)}
               />
 

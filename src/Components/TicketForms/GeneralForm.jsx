@@ -109,10 +109,7 @@ export const GeneralForm = ({
 
         <SegmentedControl
           fullWidth
-          data={groupTitleOptions.map((item) => ({
-            value: item,
-            label: item,
-          }))}
+          data={groupTitleOptions}
           mt="md"
           key={form.key("group_title")}
           {...form.getInputProps("group_title")}

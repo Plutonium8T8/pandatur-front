@@ -45,7 +45,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       setLocalFilters(defaultFilters);
       onApply(defaultFilters);
     }
-  }, [opened]);  
+  }, [opened]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -118,9 +118,9 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     if (isTeam) {
       const validIds = new Set(teamTechnicians.map(t => t.value));
       const selected = localFilters.created_for || [];
-  
+
       const filtered = selected.filter((id) => validIds.has(id));
-  
+
       if (filtered.length === 0) {
         handleChange("created_for", [String(userId)]);
       } else if (filtered.length !== selected.length) {
@@ -128,7 +128,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       }
     }
   }, [isTeam, localFilters.created_for, teamTechnicians, userId]);
-  
+
   return (
     <MantineModal
       open={opened}
@@ -209,7 +209,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           <MultiSelect
             label={translations["groupTitle"][language]}
             placeholder={translations["groupTitle"][language]}
-            data={groupTitleOptions.map((val) => ({ value: val, label: val }))}
+            data={groupTitleOptions}
             value={localFilters.group_title || []}
             onChange={(val) => handleChange("group_title", val)}
             clearable
