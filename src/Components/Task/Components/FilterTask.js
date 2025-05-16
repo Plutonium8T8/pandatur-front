@@ -34,15 +34,20 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   const teamTechnicians = technicians.filter((tech) =>
     teamUserIds.has(String(tech.value)) || tech.value === String(userId)
   );
+  const [manuallyChangedCreatedFor, setManuallyChangedCreatedFor] = useState(false);
 
   useEffect(() => {
     if (opened) {
       const defaultFilters = {
         ...filters,
-        created_for: filters.created_for?.length ? filters.created_for : [String(userId)],
+        created_for:
+          isAllowed || filters.created_for?.length
+            ? filters.created_for
+            : [String(userId)],
         status: filters.status === undefined ? false : filters.status,
       };
       setLocalFilters(defaultFilters);
+      setManuallyChangedCreatedFor(false);
       onApply(defaultFilters);
     }
   }, [opened]);
@@ -210,8 +215,8 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             label={translations["groupTitle"][language]}
             placeholder={translations["groupTitle"][language]}
             data={groupTitleOptions}
-            value={localFilters.group_title || []}
-            onChange={(val) => handleChange("group_title", val)}
+            value={localFilters.group_titles || []}
+            onChange={(val) => handleChange("group_titles", val)}
             clearable
             searchable
           />
