@@ -1,5 +1,5 @@
 import { Flex } from "@mantine/core";
-import { workflowOptionsSalesMD } from "../../FormOptions";
+import { workflowOptionsSalesMD } from "../utils/workflowUtils";
 import { WorkflowColumn } from "./components";
 import { useGetTechniciansList } from "../../hooks";
 

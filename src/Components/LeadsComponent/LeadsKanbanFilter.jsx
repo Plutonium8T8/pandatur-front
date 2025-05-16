@@ -3,7 +3,7 @@ import { useEffect, useState, useContext, useMemo } from "react";
 import { SelectWorkflow } from "../SelectWorkflow";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD } from "../../FormOptions";
+import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD } from "../utils/workflowUtils";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { UserContext } from "../../contexts/UserContext";
 

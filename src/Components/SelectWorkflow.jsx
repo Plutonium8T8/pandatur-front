@@ -1,5 +1,5 @@
 import { MultiSelect } from "@mantine/core";
-import { workflowOptionsSalesMD } from "../FormOptions";
+import { workflowOptionsSalesMD } from "./utils/workflowUtils";
 import { getLanguageByKey } from "./utils";
 
 export const SelectWorkflow = ({ onChange, selectedValues, ...props }) => {

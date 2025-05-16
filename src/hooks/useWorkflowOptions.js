@@ -1,9 +1,9 @@
 import { useMemo } from "react";
 import {
-    workflowOptionsByGroupTitle,
-    workflowOptionsLimitedByGroupTitle,
     userGroupsToGroupTitle,
-} from "../FormOptions";
+    workflowOptionsLimitedByGroupTitle,
+    workflowOptionsByGroupTitle
+} from "../Components/utils/workflowUtils";
 
 export const useWorkflowOptions = ({ groupTitle, userGroups, userId }) => {
     const isAdmin = useMemo(() => {

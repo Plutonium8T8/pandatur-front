@@ -14,9 +14,10 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "@utils";
-import { priorityOptions, workflowOptionsSalesMD } from "../FormOptions";
+import { priorityOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
+import { workflowOptionsSalesMD } from "./utils/workflowUtils";
 
 export const AddLeadModal = ({
   open,

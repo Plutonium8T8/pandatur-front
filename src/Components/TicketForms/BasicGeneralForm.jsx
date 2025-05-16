@@ -1,10 +1,10 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
-import { workflowOptionsSalesMD, priorityOptions } from "../../FormOptions";
+import { priorityOptions } from "../../FormOptions";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
-
+import { workflowOptionsSalesMD } from "../utils/workflowUtils";
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
 export const BasicGeneralForm = ({

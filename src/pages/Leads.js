@@ -8,7 +8,7 @@ import {
   useDebounce,
   useConfirmPopup,
 } from "@hooks";
-import { priorityOptions, workflowOptionsSalesMD } from "../FormOptions";
+import { priorityOptions } from "../FormOptions";
 import { LeadTable } from "@components/LeadsComponent/LeadTable";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
 import { api } from "@api";
@@ -26,8 +26,7 @@ import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
 import { UserContext } from "../contexts/UserContext";
-import { workflowOptionsLimitedSalesMD } from "../FormOptions";
-
+import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD } from "../Components/utils/workflowUtils";
 import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
@@ -78,7 +77,7 @@ export const Leads = () => {
     const adminGroup = userGroups?.find((g) => g.name === "Admin");
     return adminGroup?.users?.includes(userId);
   }, [userGroups, userId]);
-  
+
   useEffect(() => {
     if (userGroups && userId) {
       const adminGroup = userGroups.find((g) => g.name === "Admin");

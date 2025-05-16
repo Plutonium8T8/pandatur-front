@@ -9,8 +9,6 @@ import {
 import { useForm } from "@mantine/form";
 import { useEffect, useContext, useMemo } from "react";
 import {
-  workflowOptionsSalesMD,
-  workflowOptionsLimitedSalesMD,
   priorityOptions,
   groupTitleOptions,
 } from "../../FormOptions";
@@ -18,7 +16,7 @@ import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
 import { UserContext } from "../../contexts/UserContext";
-
+import { workflowOptionsSalesMD,workflowOptionsLimitedSalesMD } from "../utils/workflowUtils";
 const GENERAL_FORM_ID = "GENERAL_FORM_ID";
 
 export const GeneralForm = ({
