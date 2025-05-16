@@ -51,15 +51,15 @@ export const workflowOptionsLimitedSalesRO = [
 
 // Мапа: groupTitle → workflow (для админа)
 export const workflowOptionsByGroupTitle = {
-    RO: workflowOptionsSalesRO,
     MD: workflowOptionsSalesMD,
+    RO: workflowOptionsSalesRO,
     Default: workflowOptionsSalesRO,
 };
 
 // Мапа: groupTitle → урезанный workflow
 export const workflowOptionsLimitedByGroupTitle = {
-    RO: workflowOptionsLimitedSalesRO,
     MD: workflowOptionsLimitedSalesMD,
+    RO: workflowOptionsLimitedSalesRO,
     Default: workflowOptionsLimitedSalesRO,
 };
 

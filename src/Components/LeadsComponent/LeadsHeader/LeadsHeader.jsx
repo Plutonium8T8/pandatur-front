@@ -35,6 +35,7 @@ export const RefLeadsHeader = forwardRef(
       totalTicketsFiltered,
       hasOpenFiltersModal,
       tickets,
+      groupTitle,
     },
     ref,
   ) => {
@@ -114,7 +115,7 @@ export const RefLeadsHeader = forwardRef(
 
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
-                defaultValue=""
+                value={groupTitle} // <-- вот тут показываем выбранную воронку
                 data={groupTitleOptions}
                 onChange={(group) => setGroupTitle(group)}
               />

@@ -22,12 +22,13 @@ import {
   AddLeadModal,
 } from "@components";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
-import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
+import { VIEW_MODE } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
 import { UserContext } from "../contexts/UserContext";
 import "../css/SnackBarComponent.css";
 import { useWorkflowOptions } from "../hooks/useWorkflowOptions";
+import { userGroupsToGroupTitle } from "../Components/utils/workflowUtils";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -36,6 +37,15 @@ const LIGHT_TICKET = "light";
 const NUMBER_PAGE = 1;
 
 const getTicketsIds = (ticketList) => ticketList.map(({ id }) => id);
+
+const getDefaultGroupTitle = (userGroups) => {
+  for (let group of userGroups || []) {
+    if (userGroupsToGroupTitle[group.name]) {
+      return userGroupsToGroupTitle[group.name];
+    }
+  }
+  return "";
+};
 
 export const Leads = () => {
   const refLeadsHeader = useRef();
@@ -63,6 +73,18 @@ export const Leads = () => {
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const { userGroups, userId } = useContext(UserContext);
+
+  // --- Установка groupTitle по дефолту ---
+  useEffect(() => {
+    if (!groupTitle && userGroups && userGroups.length > 0) {
+      const defaultGroupTitle = getDefaultGroupTitle(userGroups);
+      if (defaultGroupTitle) {
+        setGroupTitle(defaultGroupTitle);
+      }
+    }
+    // eslint-disable-next-line
+  }, [userGroups]);
+
   const { workflowOptions } = useWorkflowOptions({ groupTitle, userGroups, userId });
 
   const debouncedSearch = useDebounce(searchTerm);
@@ -70,7 +92,6 @@ export const Leads = () => {
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
 
-  // Больше не нужен selectedWorkflow, только workflowOptions из useWorkflowOptions
   const filteredTickets = useMemo(() => {
     let result = tickets;
     if (filteredTicketIds === null) return result;
@@ -190,9 +211,9 @@ export const Leads = () => {
     const mergedHardTicketFilters = isReset
       ? {}
       : {
-          ...hardTicketFilters,
-          ...selectedFilters,
-        };
+        ...hardTicketFilters,
+        ...selectedFilters,
+      };
 
     fetchTickets(
       {
@@ -246,9 +267,6 @@ export const Leads = () => {
         setLightTicketFilters(mergedLightTicketFilters);
         setTotalLeads(pagination?.total || 0);
         setFilteredTicketIds(getTicketsIds(data) ?? null);
-        // setSelectedWorkflow(
-        //   mergedLightTicketFilters.workflow || filteredWorkflows
-        // );
         setIsOpenKanbanFilterModal(false);
       }
     );
@@ -313,6 +331,7 @@ export const Leads = () => {
           setIsOpenListFilterModal(true);
         }}
         deleteTicket={deleteTicket}
+        groupTitle={groupTitle}
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
@@ -385,7 +404,7 @@ export const Leads = () => {
           systemWorkflow={workflowOptions}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
-          onApplyWorkflowFilters={() => {}} // можно доработать если надо
+          onApplyWorkflowFilters={() => { }}
           onSubmitTicket={handleApplyFilterLightTicket}
         />
       </MantineModal>
