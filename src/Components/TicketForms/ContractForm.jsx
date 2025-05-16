@@ -1,13 +1,13 @@
 import { TextInput, Select, NumberInput, Flex } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
 import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
 import { paymentStatusOptions } from "../../FormOptions";
 import { DD_MM_YYYY } from "../../app-constants";
-import { useContext, useMemo } from "react";
 import { UserContext } from "../../contexts/UserContext";
+import { useWorkflowOptions } from "../../hooks/useWorkflowOptions";
 
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
@@ -27,10 +27,11 @@ export const ContractForm = ({
   const idForm = formId || CONTRACT_FORM_FILTER_ID;
   const { userGroups, userId } = useContext(UserContext);
 
-  const isAdmin = useMemo(() => {
-    const adminGroup = userGroups?.find((g) => g.name === "Admin");
-    return adminGroup?.users?.includes(userId);
-  }, [userGroups, userId]);
+  const { isAdmin } = useWorkflowOptions({
+    userGroups,
+    userId,
+    groupTitle: data?.group_title || "RO",
+  });
 
   useEffect(() => {
     if (data) {

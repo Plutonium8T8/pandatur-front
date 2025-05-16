@@ -1,5 +1,4 @@
 import { Flex } from "@mantine/core";
-import { workflowOptionsSalesMD } from "../utils/workflowUtils";
 import { WorkflowColumn } from "./components";
 import { useGetTechniciansList } from "../../hooks";
 
@@ -14,19 +13,17 @@ export const WorkflowColumns = ({
 
   return (
     <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll" px="20px">
-      {workflowOptionsSalesMD
-        .filter((workflow) => selectedWorkflow.includes(workflow))
-        .map((workflow) => (
-          <WorkflowColumn
-            key={workflow}
-            workflow={workflow}
-            tickets={tickets}
-            searchTerm={searchTerm}
-            onEditTicket={onEditTicket}
-            technicianList={technicians}
-            fetchTickets={fetchTickets}
-          />
-        ))}
+      {selectedWorkflow?.map((workflow) => (
+        <WorkflowColumn
+          key={workflow}
+          workflow={workflow}
+          tickets={tickets}
+          searchTerm={searchTerm}
+          onEditTicket={onEditTicket}
+          technicianList={technicians}
+          fetchTickets={fetchTickets}
+        />
+      ))}
     </Flex>
   );
 };

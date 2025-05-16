@@ -1,11 +1,12 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect, useMemo, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
 import { UserContext } from "../../../contexts/UserContext";
-import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD } from "../../utils/workflowUtils";
+import { useWorkflowOptions } from "../../../hooks/useWorkflowOptions";
+
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
 export const BasicGeneralForm = ({
@@ -20,24 +21,22 @@ export const BasicGeneralForm = ({
   const { technicians } = useGetTechniciansList();
   const { userGroups, userId } = useContext(UserContext);
 
-  const isAdmin = useMemo(() => {
-    const adminGroup = userGroups?.find((g) => g.name === "Admin");
-    return adminGroup?.users?.includes(userId);
-  }, [userGroups, userId]);
-
-  const availableWorkflowOptions = isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD;
+  const groupTitle = data?.group_title || "MD";
+  const { workflowOptions: availableWorkflowOptions } = useWorkflowOptions({
+    groupTitle,
+    userGroups,
+    userId,
+  });
 
   const form = useForm({
     mode: "uncontrolled",
-    transformValues: ({ workflow, priority, contact, tags, technician_id }) => {
-      return {
-        workflow: workflow ?? availableWorkflowOptions,
-        priority: priority ?? undefined,
-        contact: contact ?? undefined,
-        tags: tags ?? undefined,
-        technician_id: technician_id ?? undefined,
-      };
-    },
+    transformValues: ({ workflow, priority, contact, tags, technician_id }) => ({
+      workflow: workflow ?? availableWorkflowOptions,
+      priority: priority ?? undefined,
+      contact: contact ?? undefined,
+      tags: tags ?? undefined,
+      technician_id: technician_id ?? undefined,
+    }),
   });
 
   form.watch("workflow", ({ value }) => {

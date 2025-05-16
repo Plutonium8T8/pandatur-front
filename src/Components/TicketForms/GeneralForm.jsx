@@ -7,7 +7,7 @@ import {
   Flex,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect, useContext, useMemo } from "react";
+import { useEffect, useContext } from "react";
 import {
   priorityOptions,
   groupTitleOptions,
@@ -16,7 +16,8 @@ import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
 import { UserContext } from "../../contexts/UserContext";
-import { workflowOptionsSalesMD,workflowOptionsLimitedSalesMD } from "../utils/workflowUtils";
+import { useWorkflowOptions } from "../../hooks/useWorkflowOptions";
+
 const GENERAL_FORM_ID = "GENERAL_FORM_ID";
 
 export const GeneralForm = ({
@@ -29,12 +30,13 @@ export const GeneralForm = ({
   const { technicians } = useGetTechniciansList();
   const { userGroups, userId } = useContext(UserContext);
 
-  const isAdmin = useMemo(() => {
-    const adminGroup = userGroups?.find((g) => g.name === "Admin");
-    return adminGroup?.users?.includes(userId);
-  }, [userGroups, userId]);
+  const groupTitle = data?.group_title || "RO";
 
-  const availableWorkflows = isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD;
+  const { workflowOptions: availableWorkflows } = useWorkflowOptions({
+    groupTitle,
+    userGroups,
+    userId,
+  });
 
   const form = useForm({
     mode: "uncontrolled",

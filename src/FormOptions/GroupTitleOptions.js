@@ -1,6 +1,6 @@
 export const groupTitleOptions = [
-    { value: "RO", label: "RO-Sales" },
     { value: "MD", label: "MD-Sales" },
+    { value: "RO", label: "RO-Sales" },
     { value: "Filiale", label: "Filiale" },
     { value: "Francize", label: "Francize" },
     { value: "Marketing", label: "Marketing" },

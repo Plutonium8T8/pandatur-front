@@ -73,16 +73,14 @@ export const LeadTable = ({
       key: "checkbox",
       dataIndex: "id",
       align: "center",
-      render: (id) => {
-        return (
-          <Flex justify="center">
-            <Checkbox
-              checked={selectTicket.includes(id)}
-              onChange={() => onSelectRow(id)}
-            />
-          </Flex>
-        );
-      },
+      render: (id) => (
+        <Flex justify="center">
+          <Checkbox
+            checked={selectTicket.includes(id)}
+            onChange={() => onSelectRow(id)}
+          />
+        </Flex>
+      ),
     },
     {
       title: "ID",
@@ -349,8 +347,8 @@ export const LeadTable = ({
         return (
           <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
             <Flex align="center" justify="center" gap="8" h="100%" p="xs">
-            <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
-            <ActionIcon variant="danger" onClick={() => handleDeleteLead(ticket.id)}>
+              <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
+                <ActionIcon variant="danger" onClick={() => handleDeleteLead(ticket.id)}>
                   <MdDelete />
                 </ActionIcon>
               </Can>
