@@ -55,6 +55,9 @@ export const Leads = () => {
   const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
+  // Получаем userId из контекста (userGroups больше не нужны!)
+  const { userId } = useContext(UserContext);
+
   const [hardTickets, setHardTickets] = useState([]);
   const [filteredTicketIds, setFilteredTicketIds] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -72,20 +75,23 @@ export const Leads = () => {
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
-  const { userGroups, userId } = useContext(UserContext);
 
-  // --- Установка groupTitle по дефолту ---
+  // Получаем группы пользователя и опции ворнки из хука
+  const { workflowOptions, userGroups: myGroups } = useWorkflowOptions({
+    groupTitle,
+    userId,
+  });
+
+  // Установка groupTitle по дефолту (только после загрузки myGroups)
   useEffect(() => {
-    if (!groupTitle && userGroups && userGroups.length > 0) {
-      const defaultGroupTitle = getDefaultGroupTitle(userGroups);
+    if (!groupTitle && myGroups && myGroups.length > 0) {
+      const defaultGroupTitle = getDefaultGroupTitle(myGroups);
       if (defaultGroupTitle) {
         setGroupTitle(defaultGroupTitle);
       }
     }
     // eslint-disable-next-line
-  }, [userGroups]);
-
-  const { workflowOptions } = useWorkflowOptions({ groupTitle, userGroups, userId });
+  }, [myGroups]);
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({

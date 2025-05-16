@@ -67,8 +67,8 @@ export const userGroupsToGroupTitle = {
     "Bucharest RO": "RO",
     "Brasov RO": "RO",
     "Iasi RO": "RO",
-    "Back MD": "RO",
-    "Back Flagman": "RO",
-    "Back Headline": "RO",
+    "Back MD": "MD",
+    "Back Flagman": "MD",
+    "Back Headline": "MD",
     // Добавь другие по необходимости
 };

@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useEffect } from "react";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
@@ -39,6 +39,17 @@ export const RefLeadsHeader = forwardRef(
     },
     ref,
   ) => {
+    // Логи для проверки пропсов
+    console.log("[RefLeadsHeader] groupTitle:", groupTitle);
+    console.log("[RefLeadsHeader] setGroupTitle:", setGroupTitle);
+    console.log("[RefLeadsHeader] groupTitleOptions:", groupTitleOptions);
+    console.log("[RefLeadsHeader] tickets:", tickets?.length);
+    console.log("[RefLeadsHeader] selectedTickets:", selectedTickets);
+
+    useEffect(() => {
+      console.log("[RefLeadsHeader] groupTitle изменился:", groupTitle);
+    }, [groupTitle]);
+
     const { isCollapsed } = useApp();
 
     const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);
@@ -115,7 +126,7 @@ export const RefLeadsHeader = forwardRef(
 
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
-                value={groupTitle} // <-- вот тут показываем выбранную воронку
+                value={groupTitle}
                 data={groupTitleOptions}
                 onChange={(group) => setGroupTitle(group)}
               />
