@@ -38,15 +38,12 @@ export const workflowOptionsLimitedSalesMD = [
 ];
 
 export const workflowOptionsLimitedSalesRO = [
-    "Interesat",
     "De prelucrat",
     "Luat în lucru",
     "Ofertă trimisă",
     "Aprobat cu client",
     "Factura trimisă",
     "Contract încheiat",
-    "Realizat cu succes",
-    "Închis și nerealizat"
 ];
 
 // Мапа: groupTitle → workflow (для админа)

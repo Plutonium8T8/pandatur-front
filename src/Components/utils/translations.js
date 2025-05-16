@@ -39,6 +39,10 @@ export const translations = {
     RO: "Închis și nerealizat",
     RU: "Закрыто и не реализовано",
   },
+  "Factura trimisă": {
+    RO: "Factura trimisǎ",
+    RU: "Отправляения фактура"
+  },
   "Contract încheiat": {
     RO: "Contract încheiat",
     RU: "Договор завершён",
