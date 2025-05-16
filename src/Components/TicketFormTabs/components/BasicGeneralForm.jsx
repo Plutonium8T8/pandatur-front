@@ -1,7 +1,7 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useMemo, useContext } from "react";
-import { workflowOptions, workflowOptionsLimited, priorityOptions } from "../../../FormOptions";
+import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD, priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
 import { UserContext } from "../../../contexts/UserContext";
@@ -25,7 +25,7 @@ export const BasicGeneralForm = ({
     return adminGroup?.users?.includes(userId);
   }, [userGroups, userId]);
 
-  const availableWorkflowOptions = isAdmin ? workflowOptions : workflowOptionsLimited;
+  const availableWorkflowOptions = isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD;
 
   const form = useForm({
     mode: "uncontrolled",

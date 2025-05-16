@@ -9,8 +9,8 @@ import {
 import { useForm } from "@mantine/form";
 import { useEffect, useContext, useMemo } from "react";
 import {
-  workflowOptions,
-  workflowOptionsLimited,
+  workflowOptionsSalesMD,
+  workflowOptionsLimitedSalesMD,
   priorityOptions,
   groupTitleOptions,
 } from "../../FormOptions";
@@ -36,7 +36,7 @@ export const GeneralForm = ({
     return adminGroup?.users?.includes(userId);
   }, [userGroups, userId]);
 
-  const availableWorkflows = isAdmin ? workflowOptions : workflowOptionsLimited;
+  const availableWorkflows = isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD;
 
   const form = useForm({
     mode: "uncontrolled",

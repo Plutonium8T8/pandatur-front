@@ -1,5 +1,5 @@
 import { Flex } from "@mantine/core";
-import { workflowOptions } from "../../FormOptions";
+import { workflowOptionsSalesMD } from "../../FormOptions";
 import { WorkflowColumn } from "./components";
 import { useGetTechniciansList } from "../../hooks";
 
@@ -14,7 +14,7 @@ export const WorkflowColumns = ({
 
   return (
     <Flex gap="xs" w="100%" h="100%" className="overflow-x-scroll" px="20px">
-      {workflowOptions
+      {workflowOptionsSalesMD
         .filter((workflow) => selectedWorkflow.includes(workflow))
         .map((workflow) => (
           <WorkflowColumn

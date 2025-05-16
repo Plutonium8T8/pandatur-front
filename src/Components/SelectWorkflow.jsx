@@ -1,5 +1,5 @@
 import { MultiSelect } from "@mantine/core";
-import { workflowOptions } from "../FormOptions";
+import { workflowOptionsSalesMD } from "../FormOptions";
 import { getLanguageByKey } from "./utils";
 
 export const SelectWorkflow = ({ onChange, selectedValues, ...props }) => {
@@ -8,10 +8,10 @@ export const SelectWorkflow = ({ onChange, selectedValues, ...props }) => {
       searchable
       label={getLanguageByKey("Workflow")}
       placeholder={getLanguageByKey("Alege workflow pentru afisare in sistem")}
-      data={[getLanguageByKey("selectAll"), ...workflowOptions]}
+      data={[getLanguageByKey("selectAll"), ...workflowOptionsSalesMD]}
       onChange={(values) => {
         if (values.includes(getLanguageByKey("selectAll"))) {
-          onChange(workflowOptions);
+          onChange(workflowOptionsSalesMD);
         } else {
           onChange(values);
         }

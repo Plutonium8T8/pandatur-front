@@ -8,7 +8,7 @@ import {
   useDebounce,
   useConfirmPopup,
 } from "@hooks";
-import { priorityOptions, workflowOptions } from "../FormOptions";
+import { priorityOptions, workflowOptionsSalesMD } from "../FormOptions";
 import { LeadTable } from "@components/LeadsComponent/LeadTable";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
 import { api } from "@api";
@@ -26,7 +26,7 @@ import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
 import { UserContext } from "../contexts/UserContext";
-import { workflowOptionsLimited } from "../FormOptions";
+import { workflowOptionsLimitedSalesMD } from "../FormOptions";
 
 import "../css/SnackBarComponent.css";
 
@@ -84,7 +84,7 @@ export const Leads = () => {
       const adminGroup = userGroups.find((g) => g.name === "Admin");
       const isAdminUser = adminGroup?.users?.includes(userId);
 
-      setSelectedWorkflow(isAdminUser ? workflowOptions : workflowOptionsLimited);
+      setSelectedWorkflow(isAdminUser ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD);
     }
   }, [userGroups, userId]);
 
@@ -158,7 +158,7 @@ export const Leads = () => {
       transport: "",
       country: "",
       priority: priorityOptions[0],
-      workflow: workflowOptions[0],
+      workflow: workflowOptionsSalesMD[0],
       service_reference: "",
       technician_id: 0,
     });
@@ -403,7 +403,7 @@ export const Leads = () => {
       >
         <LeadsKanbanFilter
           initialData={lightTicketFilters}
-          systemWorkflow={isAdmin ? workflowOptions : workflowOptionsLimited}
+          systemWorkflow={isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={(workflows) => {

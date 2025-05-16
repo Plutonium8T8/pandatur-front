@@ -1,4 +1,4 @@
-import { workflowOptions } from "../../FormOptions";
+import { workflowOptionsSalesMD } from "../../FormOptions";
 import dayjs from "dayjs";
 import { DD_MM_YYYY__HH_mm_ss } from "../../app-constants";
 
@@ -16,7 +16,7 @@ export const platformOptions = [
   "sipuni",
 ];
 
-export const filteredWorkflows = workflowOptions.filter(
+export const filteredWorkflows = workflowOptionsSalesMD.filter(
   (wf) => wf !== "Realizat cu succes" && wf !== "Închis și nerealizat",
 );
 

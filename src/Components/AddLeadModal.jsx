@@ -14,7 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "@utils";
-import { priorityOptions, workflowOptions } from "../FormOptions";
+import { priorityOptions, workflowOptionsSalesMD } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
 
@@ -155,7 +155,7 @@ export const AddLeadModal = ({
             w="100%"
             label={getLanguageByKey("Workflow")}
             placeholder={getLanguageByKey("Selectează flux de lucru")}
-            data={workflowOptions}
+            data={workflowOptionsSalesMD}
             key={form.key("workflow")}
             {...form.getInputProps("workflow")}
           />

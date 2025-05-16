@@ -1,7 +1,7 @@
 import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect } from "react";
-import { workflowOptions, priorityOptions } from "../../FormOptions";
+import { workflowOptionsSalesMD, priorityOptions } from "../../FormOptions";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
 
@@ -46,7 +46,7 @@ export const BasicGeneralForm = ({
         <MultiSelect
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={workflowOptions}
+          data={workflowOptionsSalesMD}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}

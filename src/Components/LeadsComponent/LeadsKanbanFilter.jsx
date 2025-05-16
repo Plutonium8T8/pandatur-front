@@ -3,7 +3,7 @@ import { useEffect, useState, useContext, useMemo } from "react";
 import { SelectWorkflow } from "../SelectWorkflow";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { workflowOptions, workflowOptionsLimited } from "../../FormOptions";
+import { workflowOptionsSalesMD, workflowOptionsLimitedSalesMD } from "../../FormOptions";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { UserContext } from "../../contexts/UserContext";
 
@@ -22,7 +22,7 @@ export const LeadsKanbanFilter = ({
     return adminGroup?.users?.includes(userId);
   }, [userGroups, userId]);
 
-  const availableWorkflowOptions = isAdmin ? workflowOptions : workflowOptionsLimited;
+  const availableWorkflowOptions = isAdmin ? workflowOptionsSalesMD : workflowOptionsLimitedSalesMD;
 
   const [systemWorkflow, setSystemWorkflow] = useState(() =>
     (baseSystemWorkflow || []).filter((w) => availableWorkflowOptions.includes(w)),
