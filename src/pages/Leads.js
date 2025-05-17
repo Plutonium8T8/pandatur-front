@@ -56,6 +56,7 @@ export const Leads = () => {
   const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
+  // Получаем userId из контекста (userGroups больше не нужны!)
   const { userId } = useContext(UserContext);
 
   const [hardTickets, setHardTickets] = useState([]);
