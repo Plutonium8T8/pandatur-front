@@ -4,7 +4,7 @@ import {
     workflowOptionsLimitedByGroupTitle,
     workflowOptionsByGroupTitle
 } from "../Components/utils/workflowUtils";
-import { api } from "../api"; // поправь путь, если надо
+import { api } from "../api";
 
 export const useWorkflowOptions = ({ groupTitle, userId }) => {
     const [userGroups, setUserGroups] = useState([]);
@@ -13,9 +13,8 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         const fetchTechnicians = async () => {
             try {
                 const technicians = await api.users.getTechnicianList();
-                // ищем пользователя по userId внутри id.user.id
                 const me = technicians.find(
-                    t => t.id && t.id.user && String(t.id.user.id) === String(userId)
+                    (t) => t.id && t.id.user && String(t.id.user.id) === String(userId)
                 );
                 setUserGroups(me?.groups || []);
             } catch (err) {
@@ -26,13 +25,19 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         if (userId) fetchTechnicians();
     }, [userId]);
 
-    // Проверка на админа — теперь только по названию группы
     const isAdmin = useMemo(() => {
         return userGroups.some((g) => g.name === "Admin");
     }, [userGroups]);
 
     const hasAccessToGroupTitle = useMemo(() => {
-        return userGroups.some((group) => userGroupsToGroupTitle[group.name] === groupTitle);
+        return userGroups.some((group) => {
+            const mapped = userGroupsToGroupTitle[group.name];
+            if (!mapped) return false;
+            if (Array.isArray(mapped)) {
+                return mapped.includes(groupTitle);
+            }
+            return mapped === groupTitle;
+        });
     }, [userGroups, groupTitle]);
 
     const workflowOptions = useMemo(() => {
@@ -45,10 +50,26 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         return [];
     }, [groupTitle, isAdmin, hasAccessToGroupTitle]);
 
+    const groupTitleForApi = useMemo(() => {
+        const found = userGroups.find((group) => {
+            const mapped = userGroupsToGroupTitle[group.name];
+            return mapped && (Array.isArray(mapped) ? mapped.length > 0 : true);
+        });
+
+        const mapped = found ? userGroupsToGroupTitle[found.name] : null;
+
+        if (Array.isArray(mapped)) {
+            return mapped[0];
+        }
+
+        return mapped;
+    }, [userGroups]);
+
     return {
         workflowOptions,
         isAdmin,
         hasAccessToGroupTitle,
-        userGroups, // возвращаем для дебага/отображения
+        userGroups,
+        groupTitleForApi
     };
 };

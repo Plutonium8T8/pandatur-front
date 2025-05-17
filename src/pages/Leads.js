@@ -40,8 +40,12 @@ const getTicketsIds = (ticketList) => ticketList.map(({ id }) => id);
 
 const getDefaultGroupTitle = (userGroups) => {
   for (let group of userGroups || []) {
-    if (userGroupsToGroupTitle[group.name]) {
-      return userGroupsToGroupTitle[group.name];
+    const titles = userGroupsToGroupTitle[group.name];
+    if (Array.isArray(titles)) {
+      return titles[0]; // ✅ берем только первую строку
+    }
+    if (typeof titles === "string") {
+      return titles;
     }
   }
   return "";
