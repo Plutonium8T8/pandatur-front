@@ -39,12 +39,6 @@ export const RefLeadsHeader = forwardRef(
     },
     ref,
   ) => {
-    // Логи для проверки пропсов
-    console.log("[RefLeadsHeader] groupTitle:", groupTitle);
-    console.log("[RefLeadsHeader] setGroupTitle:", setGroupTitle);
-    console.log("[RefLeadsHeader] groupTitleOptions:", groupTitleOptions);
-    console.log("[RefLeadsHeader] tickets:", tickets?.length);
-    console.log("[RefLeadsHeader] selectedTickets:", selectedTickets);
 
     useEffect(() => {
       console.log("[RefLeadsHeader] groupTitle изменился:", groupTitle);
