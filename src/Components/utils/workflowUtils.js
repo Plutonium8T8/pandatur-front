@@ -173,7 +173,7 @@ export const workflowOptionsByGroupTitle = {
     BusinessGroups: workflowOptionsBusinessGroups,
     FranchiseOrhei: workflowOptionsFranchiseOrhei,
     FranchiseCantemir: workflowOptionsFranchiseCantemir,
-    Default: workflowOptionsSalesRO,
+    Default: workflowOptionsSalesMD,
 };
 
 // Мапа: groupTitle → урезанный workflow
@@ -187,7 +187,7 @@ export const workflowOptionsLimitedByGroupTitle = {
     BusinessGroups: workflowOptionsLimitedBusinessGroups,
     FranchiseOrhei: workflowOptionsLimitedFranchiseOrhei,
     FranchiseCantemir: workflowOptionsLimitedFranchiseCantemir,
-    Default: workflowOptionsLimitedSalesRO,
+    Default: workflowOptionsLimitedSalesMD,
 };
 
 // Мапа: название группы пользователя → groupTitle
