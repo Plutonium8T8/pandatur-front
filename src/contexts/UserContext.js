@@ -17,6 +17,7 @@ export const UserProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
   const [userGroups, setUserGroups] = useState([]);
+  const [technician, setTechnician] = useState(null);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
   const teamUserIds = useMemo(() => {
@@ -40,6 +41,7 @@ export const UserProvider = ({ children }) => {
       localStorage.removeItem("user_id");
       setUserRoles([]);
       setUserGroups([]);
+      setTechnician(null);
       setIsLoadingRoles(false);
     }
   }, [userId]);
@@ -69,6 +71,7 @@ export const UserProvider = ({ children }) => {
       if (!token || !userId) {
         setUserRoles([]);
         setUserGroups([]);
+        setTechnician(null);
         setIsLoadingRoles(false);
         return;
       }
@@ -76,14 +79,18 @@ export const UserProvider = ({ children }) => {
       const data = await api.users.getById(userId);
       const rawRoles = JSON.parse(data.roles);
       const groups = await api.user.getGroupsList();
+      const technicians = await api.users.getTechnicianList();
+      const me = technicians.find((t) => t.id?.user?.id === userId);
 
       setUserRoles(rawRoles);
-      localStorage.setItem("user_roles", JSON.stringify(rawRoles));
       setUserGroups(groups);
+      setTechnician(me || null);
+      localStorage.setItem("user_roles", JSON.stringify(rawRoles));
     } catch (error) {
       console.error("error get data users", error.message);
       setUserRoles([]);
       setUserGroups([]);
+      setTechnician(null);
     } finally {
       setIsLoadingRoles(false);
     }
@@ -95,6 +102,7 @@ export const UserProvider = ({ children }) => {
     surname,
     roles: userRoles,
     groups: userGroups,
+    technician,
   };
 
   return (

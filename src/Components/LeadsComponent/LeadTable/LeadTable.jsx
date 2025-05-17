@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useMemo } from "react";
 import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -45,19 +45,35 @@ export const LeadTable = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
-
   const { user } = useUser();
+  console.log("[LeadTable] user:", user);
+  console.log("[LeadTable] user.technician:", user?.technician);
+  console.log("[LeadTable] user.technician.groups:", user?.technician?.groups);
+  
+  const allowedGroupTitles = useMemo(() => {
+    if (!user?.technician?.groups) return [];
+  
+    const groupNames = user.technician.groups.map((g) => g.name);
+  
+    const titles = groupNames
+      .map((name) => userGroupsToGroupTitle[name]) // преобразуем "Back MD" → ["MD", "RO", "GreenCard"]
+      .flat()
+      .filter(Boolean);
+  
+    const uniqueTitles = [...new Set(titles)];
+  
+    console.log("[LeadTable] группы пользователя:", groupNames);
+    console.log("[LeadTable] разрешённые groupTitle:", uniqueTitles);
+  
+    return uniqueTitles;
+  }, [user]);
+  
 
-  // Получаем список разрешённых groupTitle
-  const allowedGroupTitles = (user?.groups || [])
-    .map((g) => userGroupsToGroupTitle[g.name])
-    .flat()
-    .filter(Boolean);
-
-  // Фильтрация тикетов по group_title
-  const visibleLeads = filteredLeads.filter((ticket) =>
-    allowedGroupTitles.includes(ticket.group_title)
-  );
+  const visibleLeads = useMemo(() => {
+    return filteredLeads.filter((ticket) =>
+      allowedGroupTitles.includes(ticket.group_title)
+    );
+  }, [filteredLeads, allowedGroupTitles]);
 
   const deleteLead = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead"),
@@ -346,7 +362,6 @@ export const LeadTable = ({
       width: 85,
       render: (_, ticket) => {
         const responsibleId = ticket.technician_id?.toString();
-
         return (
           <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
             <Flex align="center" justify="center" gap="8" h="100%" p="xs">
@@ -377,7 +392,6 @@ export const LeadTable = ({
           selectedRow={selectTicket}
           bordered
         />
-
         {!!totalLeadsPages && (
           <Flex p="20" justify="center" className="leads-table-pagination">
             <Pagination
@@ -388,7 +402,6 @@ export const LeadTable = ({
           </Flex>
         )}
       </Box>
-
       <MantineModal
         centered
         opened={!!id}
