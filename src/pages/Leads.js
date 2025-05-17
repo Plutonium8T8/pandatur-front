@@ -40,8 +40,9 @@ const getTicketsIds = (ticketList) => ticketList.map(({ id }) => id);
 
 const getDefaultGroupTitle = (userGroups) => {
   for (let group of userGroups || []) {
-    if (userGroupsToGroupTitle[group.name]) {
-      return userGroupsToGroupTitle[group.name];
+    const mapped = userGroupsToGroupTitle[group.name];
+    if (mapped) {
+      return Array.isArray(mapped) ? mapped[0] : mapped;
     }
   }
   return "";
@@ -77,7 +78,7 @@ export const Leads = () => {
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
 
   // Получаем группы пользователя и опции ворнки из хука
-  const { workflowOptions, userGroups: myGroups } = useWorkflowOptions({
+  const { workflowOptions, userGroups: myGroups, groupTitleForApi } = useWorkflowOptions({
     groupTitle,
     userId,
   });
@@ -300,7 +301,7 @@ export const Leads = () => {
           ...(debouncedSearch && { search: debouncedSearch }),
           ...(isViewModeList ? hardTicketFilters : lightTicketFilters),
         },
-        ...(groupTitle && { group_title: groupTitle }),
+        ...(groupTitleForApi && { group_title: groupTitleForApi }), // 👈 это изменение
       },
       ({ data, pagination }) => {
         setTotalLeads(pagination?.total || 0);

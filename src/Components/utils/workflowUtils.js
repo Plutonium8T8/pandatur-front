@@ -192,18 +192,24 @@ export const workflowOptionsLimitedByGroupTitle = {
 
 // Мапа: название группы пользователя → groupTitle
 export const userGroupsToGroupTitle = {
-    "Admin": "RO",
-    "Call Centre RO": "RO",
-    "Bucharest RO": "RO",
-    "Brasov RO": "RO",
-    "Iasi RO": "RO",
-    "Back MD": "MD",
-    "Back Flagman": "MD",
-    "Back Headline": "MD",
-    "Company branches": "Filiale",
-    "Franchise Cantemir": "Francize",
-    "Franchise Orhei": "Francize",
-    "Corporate sales": "Business groups",
-    "Corporate sales": "Individuals group"
-    // Добавь другие по необходимости
+    "Admin": ["MD"],
+    "Front Office": ["MD"],
+    "Back MD": ["MD", "RO", "GreenCard"],
+    "Back Flagman": ["MD", "RO", "GreenCard"],
+    "Back Headline": ["MD", "RO", "GreenCard"],
+
+    // RO
+    "Call Centre RO": ["RO"],
+    "Bucharest RO": ["RO"],
+    "Brasov RO": ["RO"],
+    "Iasi RO": ["RO"],
+
+    // другие
+    "Company branches": ["Filiale"],
+    "Franchise Cantemir": ["FranchiseCantemir"],
+    "Franchise Orhei": ["FranchiseOrhei"],
+    "Corporate sales": ["BusinessGroups", "IndividualGroups"],
+    "Private sales": ["IndividualGroups"],
+    "Green Card": ["GreenCard"],
+    "Agency": ["Agency"],
 };
