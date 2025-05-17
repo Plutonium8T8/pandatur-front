@@ -56,7 +56,7 @@ export const LeadTable = ({
     const groupNames = user.technician.groups.map((g) => g.name);
   
     const titles = groupNames
-      .map((name) => userGroupsToGroupTitle[name]) // преобразуем "Back MD" → ["MD", "RO", "GreenCard"]
+      .map((name) => userGroupsToGroupTitle[name])
       .flat()
       .filter(Boolean);
   

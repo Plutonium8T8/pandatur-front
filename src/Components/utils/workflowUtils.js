@@ -192,7 +192,7 @@ export const workflowOptionsLimitedByGroupTitle = {
 
 // Мапа: название группы пользователя → groupTitle
 export const userGroupsToGroupTitle = {
-    "Admin": ["MD"],
+    "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
     "Front Office": ["MD"],
     "Back MD": ["MD", "RO", "GreenCard"],
     "Back Flagman": ["MD", "RO", "GreenCard"],

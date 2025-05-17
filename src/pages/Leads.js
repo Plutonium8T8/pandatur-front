@@ -281,14 +281,19 @@ export const Leads = () => {
 
   const handlePaginationWorkflow = (page) => {
     fetchTickets(
-      { page, type: HARD_TICKET, attributes: hardTicketFilters },
+      {
+        page,
+        type: HARD_TICKET,
+        attributes: hardTicketFilters,
+        group_title: groupTitle, // 🔥 добавляем сюда
+      },
       ({ data, pagination }) => {
         setHardTickets(data);
         setTotalLeads(pagination?.total || 0);
         setCurrentPage(page);
       },
     );
-  };
+  };  
 
   const fetchTicketList = () => {
     const isViewModeList = viewMode === VIEW_MODE.LIST;
