@@ -2,7 +2,6 @@ import {
   Select,
   TextInput,
   Textarea,
-  SegmentedControl,
   TagsInput,
   Flex,
 } from "@mantine/core";
@@ -100,17 +99,18 @@ export const GeneralForm = ({
         <TagsInput
           mt="md"
           label={getLanguageByKey("Tag-uri")}
-          placeholder={getLanguageByKey(
-            "Introdu tag-uri separate prin virgule",
-          )}
+          placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
           key={form.key("tags")}
           {...form.getInputProps("tags")}
         />
 
-        <SegmentedControl
-          fullWidth
-          data={groupTitleOptions}
+        <Select
           mt="md"
+          label={getLanguageByKey("Grup")}
+          placeholder={getLanguageByKey("Selectează grupul")}
+          data={groupTitleOptions}
+          searchable
+          clearable
           key={form.key("group_title")}
           {...form.getInputProps("group_title")}
         />
@@ -136,6 +136,7 @@ export const GeneralForm = ({
           {...form.getInputProps("description")}
         />
       </form>
+
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.({
           onResetForm: form.reset,

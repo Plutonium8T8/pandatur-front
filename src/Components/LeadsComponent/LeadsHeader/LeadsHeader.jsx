@@ -40,10 +40,6 @@ export const RefLeadsHeader = forwardRef(
     ref,
   ) => {
 
-    useEffect(() => {
-      console.log("[RefLeadsHeader] groupTitle изменился:", groupTitle);
-    }, [groupTitle]);
-
     const { isCollapsed } = useApp();
 
     const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);

@@ -18,6 +18,7 @@ import { priorityOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
 import { workflowOptionsSalesMD } from "./utils/workflowUtils";
+import { groupTitleOptions } from "../FormOptions";
 
 export const AddLeadModal = ({
   open,
@@ -126,21 +127,18 @@ export const AddLeadModal = ({
             key={form.key("contact")}
             {...form.getInputProps("contact")}
           />
+          
           <Select
-            disabled={selectedGroupTitle}
-            value={selectedGroupTitle || undefined}
+            disabled={!!selectedGroupTitle}
+            value={form.values.group_title || selectedGroupTitle || undefined}
             placeholder={getLanguageByKey("selectGroup")}
             w="100%"
             label={getLanguageByKey("Grup")}
-            data={[
-              { value: "RO", label: "RO" },
-              { value: "MD", label: "MD" },
-              { value: "Filiale", label: getLanguageByKey("FIL") },
-              { value: "Francize", label: getLanguageByKey("FRA") },
-            ]}
+            data={groupTitleOptions}
             key={form.key("group_title")}
-            {...form.getInputProps("group_title")}
+            onChange={(value) => form.setFieldValue("group_title", value)}
           />
+
         </Flex>
         <Flex gap="md">
           <Select
