@@ -301,8 +301,7 @@ export const Leads = () => {
           ...(debouncedSearch && { search: debouncedSearch }),
           ...(isViewModeList ? hardTicketFilters : lightTicketFilters),
         },
-        ...(groupTitleForApi && { group_title: groupTitleForApi }), // 👈 это изменение
-      },
+        group_title: groupTitle,      },
       ({ data, pagination }) => {
         setTotalLeads(pagination?.total || 0);
 

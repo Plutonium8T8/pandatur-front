@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -16,22 +16,21 @@ import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components";
 import { RcTable } from "../../RcTable";
 import { api } from "../../../api";
-import { useConfirmPopup } from "../../../hooks";
+import { useConfirmPopup, useUser } from "../../../hooks";
 import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
 import { DateCell } from "../../DateCell";
 import { MantineModal } from "../../MantineModal";
 import "./LeadTable.css";
 import { parseTags } from "../../../stringUtils";
 import Can from "../../CanComponent/Can";
+import { userGroupsToGroupTitle } from "../../../Components/utils/workflowUtils";
 
 const MAX_COUNT_SLICE = 2;
 
 const renderTags = (tags) => {
   const tagList = parseTags(tags).slice(0, MAX_COUNT_SLICE);
   const isTags = tagList.some(Boolean);
-  return isTags
-    ? tagList.map((tag, index) => <Tag key={index}>{tag}</Tag>)
-    : "—";
+  return isTags ? tagList.map((tag, index) => <Tag key={index}>{tag}</Tag>) : "—";
 };
 
 export const LeadTable = ({
@@ -46,6 +45,19 @@ export const LeadTable = ({
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
+
+  const { user } = useUser();
+
+  // Получаем список разрешённых groupTitle
+  const allowedGroupTitles = (user?.groups || [])
+    .map((g) => userGroupsToGroupTitle[g.name])
+    .flat()
+    .filter(Boolean);
+
+  // Фильтрация тикетов по group_title
+  const visibleLeads = filteredLeads.filter((ticket) =>
+    allowedGroupTitles.includes(ticket.group_title)
+  );
 
   const deleteLead = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead"),
@@ -179,14 +191,7 @@ export const LeadTable = ({
       dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (creation_date) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={creation_date}
-        />
-      ),
+      render: (date) => <DateCell gap={4} direction="row" justify="center" date={date} />,
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
@@ -340,9 +345,7 @@ export const LeadTable = ({
       fixed: "right",
       width: 85,
       render: (_, ticket) => {
-        const responsibleId = ticket.technician_id
-          ? String(ticket.technician_id)
-          : undefined;
+        const responsibleId = ticket.technician_id?.toString();
 
         return (
           <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
@@ -352,11 +355,7 @@ export const LeadTable = ({
                   <MdDelete />
                 </ActionIcon>
               </Can>
-
-              <Can
-                permission={{ module: "leads", action: "edit" }}
-                context={{ responsibleId }}
-              >
+              <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
                 <ActionIcon variant="outline" onClick={() => setId(ticket.id)}>
                   <MdEdit />
                 </ActionIcon>
@@ -365,7 +364,7 @@ export const LeadTable = ({
           </Paper>
         );
       },
-    }
+    },
   ];
 
   return (
@@ -374,7 +373,7 @@ export const LeadTable = ({
         <RcTable
           rowKey="id"
           columns={rcColumn}
-          data={filteredLeads}
+          data={visibleLeads}
           selectedRow={selectTicket}
           bordered
         />
@@ -395,17 +394,9 @@ export const LeadTable = ({
         opened={!!id}
         onClose={() => setId()}
         size="lg"
-        title={
-          <Text size="xl" fw="bold">
-            {getLanguageByKey("Editează ticketul")}
-          </Text>
-        }
+        title={<Text size="xl" fw="bold">{getLanguageByKey("Editează ticketul")}</Text>}
       >
-        <ManageLeadInfoTabs
-          onClose={() => setId()}
-          fetchLeads={fetchTickets}
-          id={id}
-        />
+        <ManageLeadInfoTabs onClose={() => setId()} fetchLeads={fetchTickets} id={id} />
       </MantineModal>
     </>
   );
