@@ -46,17 +46,25 @@ export const ChatMessages = ({
 
   const sendMessage = async (metadataMsj) => {
     try {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { ...metadataMsj, seenAt: false },
-      ]);
+      const normalizedMessage = {
+        ...metadataMsj,
+        message: metadataMsj.message || metadataMsj.message_text,
+        seenAt: false,
+      };
+
+      setMessages((prevMessages) => [...prevMessages, normalizedMessage]);
+
 
       let apiUrl = api.messages.send.create;
 
-      if (metadataMsj.platform === PLATFORMS.TELEGRAM) {
+      const normalizedPlatform = metadataMsj.platform?.toUpperCase?.();
+
+      if (normalizedPlatform === "TELEGRAM") {
         apiUrl = api.messages.send.telegram;
-      } else if (metadataMsj.platform === PLATFORMS.VIBER) {
+      } else if (normalizedPlatform === "VIBER") {
         apiUrl = api.messages.send.viber;
+      } else if (normalizedPlatform === "WHATSAPP") {
+        apiUrl = api.messages.send.whatsapp;
       }
 
       await apiUrl(metadataMsj);
@@ -73,6 +81,8 @@ export const ChatMessages = ({
         );
       });
     }
+    console.log("📨 sending via:", metadataMsj.platform);
+
   };
 
   const handleScroll = () => {

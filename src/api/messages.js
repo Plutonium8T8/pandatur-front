@@ -40,6 +40,12 @@ export const messages = {
       const { data } = await baseAxios.post("/messages/send/viber", body)
 
       return data
+    },
+
+    whatsapp: async (body) => {
+      const { data } = await baseAxios.post("/messages/whatsapp/send", body)
+
+      return data
     }
   }
 }
