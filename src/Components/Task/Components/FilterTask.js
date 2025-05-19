@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Group, Button, Box, Flex, MultiSelect, Select } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations, showServerError } from "../../utils";
@@ -11,6 +11,7 @@ import { useSnackbar } from "notistack";
 import { SelectWorkflow } from "../../SelectWorkflow";
 import { groupTitleOptions } from "../../../FormOptions";
 import { convertRolesToMatrix, safeParseJson } from "../../UsersComponent/rolesUtils";
+import { AppContext } from "../../../contexts/AppContext";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -22,10 +23,9 @@ const taskTypeOptions = TypeTask.map((task) => ({
 const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   const [localFilters, setLocalFilters] = useState({});
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
-  const { userId } = useUser();
+  const { userId, user, teamUserIds } = useUser();
   const [groupOptions, setGroupOptions] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
-  const { user, teamUserIds } = useUser();
   const rolesMatrix = convertRolesToMatrix(safeParseJson(user?.roles || "[]"));
   const taskViewLevel = rolesMatrix["TASK_VIEW"];
   const isIfResponsible = taskViewLevel === "IfResponsible";
@@ -36,6 +36,12 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   );
   const [manuallyChangedCreatedFor, setManuallyChangedCreatedFor] = useState(false);
 
+  const { workflowOptions, groupTitleForApi } = useContext(AppContext);
+
+  const allowedGroupTitleOptions = groupTitleOptions.filter((g) =>
+    groupTitleForApi ? [groupTitleForApi].includes(g.value) : true
+  );
+
   useEffect(() => {
     if (opened) {
       const defaultFilters = {
@@ -45,12 +51,13 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             ? filters.created_for
             : [String(userId)],
         status: filters.status === undefined ? false : filters.status,
+        group_titles: groupTitleForApi ? [groupTitleForApi] : [],
       };
       setLocalFilters(defaultFilters);
       setManuallyChangedCreatedFor(false);
       onApply(defaultFilters);
     }
-  }, [opened]);
+  }, [opened, groupTitleForApi]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -76,6 +83,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const defaultFilters = {
       created_for: [String(userId)],
       status: false,
+      group_titles: groupTitleForApi ? [groupTitleForApi] : [],
     };
     setLocalFilters(defaultFilters);
     onApply(defaultFilters);
@@ -214,16 +222,17 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           <MultiSelect
             label={translations["groupTitle"][language]}
             placeholder={translations["groupTitle"][language]}
-            data={groupTitleOptions}
+            data={allowedGroupTitleOptions}
             value={localFilters.group_titles || []}
             onChange={(val) => handleChange("group_titles", val)}
-            clearable
+            clearable={false}
             searchable
           />
 
           <SelectWorkflow
             selectedValues={localFilters.workflows || []}
             onChange={(val) => handleChange("workflows", val)}
+            options={workflowOptions}
           />
 
           <Select

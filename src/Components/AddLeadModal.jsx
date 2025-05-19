@@ -11,14 +11,14 @@ import {
 } from "@mantine/core";
 import { useForm, hasLength } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "@utils";
 import { priorityOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
-import { workflowOptionsSalesMD } from "./utils/workflowUtils";
 import { groupTitleOptions } from "../FormOptions";
+import { AppContext } from "../contexts/AppContext";
 
 export const AddLeadModal = ({
   open,
@@ -29,16 +29,13 @@ export const AddLeadModal = ({
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, handlers] = useDisclosure(false);
+  const { workflowOptions } = useContext(AppContext);
 
   const form = useForm({
     mode: "uncontrolled",
-
     validate: {
       name: hasLength({ min: 3 }, getLanguageByKey("mustBeAtLeast3Characters")),
-      surname: hasLength(
-        { min: 3 },
-        getLanguageByKey("mustBeAtLeast3Characters"),
-      ),
+      surname: hasLength({ min: 3 }, getLanguageByKey("mustBeAtLeast3Characters")),
       phone: (value) =>
         value?.toString().trim() === "" || value === undefined
           ? getLanguageByKey("fileIsMandatory")
@@ -54,9 +51,7 @@ export const AddLeadModal = ({
       await fetchTickets();
       onClose();
     } catch (e) {
-      enqueueSnackbar(showServerError(e), {
-        variant: "error",
-      });
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {
       handlers.close();
     }
@@ -119,6 +114,7 @@ export const AddLeadModal = ({
             {...form.getInputProps("phone")}
           />
         </Flex>
+
         <Flex gap="md">
           <TextInput
             w="100%"
@@ -127,7 +123,7 @@ export const AddLeadModal = ({
             key={form.key("contact")}
             {...form.getInputProps("contact")}
           />
-          
+
           <Select
             disabled={!!selectedGroupTitle}
             value={form.values.group_title || selectedGroupTitle || undefined}
@@ -138,8 +134,8 @@ export const AddLeadModal = ({
             key={form.key("group_title")}
             onChange={(value) => form.setFieldValue("group_title", value)}
           />
-
         </Flex>
+
         <Flex gap="md">
           <Select
             data={priorityOptions}
@@ -154,7 +150,7 @@ export const AddLeadModal = ({
             w="100%"
             label={getLanguageByKey("Workflow")}
             placeholder={getLanguageByKey("Selectează flux de lucru")}
-            data={workflowOptionsSalesMD}
+            data={workflowOptions}
             key={form.key("workflow")}
             {...form.getInputProps("workflow")}
           />

@@ -1,22 +1,27 @@
 import { MultiSelect } from "@mantine/core";
-import { workflowOptionsSalesMD } from "./utils/workflowUtils";
+import { useContext } from "react";
+import { AppContext } from "../contexts/AppContext";
 import { getLanguageByKey } from "./utils";
 
 export const SelectWorkflow = ({ onChange, selectedValues, ...props }) => {
+  const { workflowOptions } = useContext(AppContext);
+
+  const selectAllLabel = getLanguageByKey("selectAll");
+  const options = workflowOptions || [];
+
   return (
     <MultiSelect
       searchable
       label={getLanguageByKey("Workflow")}
       placeholder={getLanguageByKey("Alege workflow pentru afisare in sistem")}
-      data={[getLanguageByKey("selectAll"), ...workflowOptionsSalesMD]}
+      data={[selectAllLabel, ...options]}
       onChange={(values) => {
-        if (values.includes(getLanguageByKey("selectAll"))) {
-          onChange(workflowOptionsSalesMD);
+        if (values.includes(selectAllLabel)) {
+          onChange(options);
         } else {
           onChange(values);
         }
       }}
-      defaultValue={selectedValues}
       value={selectedValues}
       clearable
       {...props}

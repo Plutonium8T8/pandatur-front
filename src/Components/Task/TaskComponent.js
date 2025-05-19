@@ -30,6 +30,7 @@ const language = localStorage.getItem("language") || "RO";
 const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTasks, setFetchTasksRef }) => {
   const { userId: currentUserId } = useUser();
   const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
+  const [filtersReady, setFiltersReady] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -72,11 +73,11 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
   }, [setFetchTasksRef, fetchTasks]);
 
   useEffect(() => {
-    fetchTasks();
-  }, [filters, searchQuery, currentPage]);
+    if (filtersReady) {
+      fetchTasks();
+    }
+  }, [filters, searchQuery, currentPage, filtersReady]);
 
-
-  // *** TO DO *** need to refactor window create task
   const openNewTask = () => {
     setSelectedTask(null);
     setIsModalOpen(true);
@@ -117,9 +118,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
                   value: "list",
                   label: (
                     <Tooltip label={translations["listView"][language]}>
-                      <span>
-                        <FaList size={16} />
-                      </span>
+                      <span><FaList size={16} /></span>
                     </Tooltip>
                   ),
                 },
@@ -127,9 +126,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
                   value: "columns",
                   label: (
                     <Tooltip label={translations["columnView"][language]}>
-                      <span>
-                        <TbLayoutKanbanFilled size={16} />
-                      </span>
+                      <span><TbLayoutKanbanFilled size={16} /></span>
                     </Tooltip>
                   ),
                 },
@@ -196,6 +193,7 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
         onApply={(newFilters) => {
           setFilters(newFilters);
           setCurrentPage(1);
+          setFiltersReady(true);
         }}
       />
     </Box>

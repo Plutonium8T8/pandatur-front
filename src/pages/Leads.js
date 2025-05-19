@@ -56,7 +56,6 @@ export const Leads = () => {
   const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
 
-  // Получаем userId из контекста (userGroups больше не нужны!)
   const { userId } = useContext(UserContext);
 
   const [hardTickets, setHardTickets] = useState([]);
@@ -77,13 +76,11 @@ export const Leads = () => {
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
 
-  // Получаем группы пользователя и опции ворнки из хука
   const { workflowOptions, userGroups: myGroups, groupTitleForApi } = useWorkflowOptions({
     groupTitle,
     userId,
   });
 
-  // Установка groupTitle по дефолту (только после загрузки myGroups)
   useEffect(() => {
     if (!groupTitle && myGroups && myGroups.length > 0) {
       const defaultGroupTitle = getDefaultGroupTitle(myGroups);

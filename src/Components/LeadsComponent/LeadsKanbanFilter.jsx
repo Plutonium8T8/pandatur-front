@@ -1,9 +1,7 @@
-import { Tabs, Flex } from "@mantine/core";
-import { useContext } from "react";
+import { Tabs } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
-import { UserContext } from "../../contexts/UserContext";
 
 export const LeadsKanbanFilter = ({
   onClose,

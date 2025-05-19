@@ -65,6 +65,16 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         return mapped;
     }, [userGroups]);
 
+    // useEffect(() => {
+    //     console.log("[useWorkflowOptions] userGroups:", userGroups);
+    //     console.log("[useWorkflowOptions] userId:", userId);
+    //     console.log("[useWorkflowOptions] groupTitle (вход):", groupTitle);
+    //     console.log("[useWorkflowOptions] groupTitleForApi:", groupTitleForApi);
+    //     console.log("[useWorkflowOptions] isAdmin:", isAdmin);
+    //     console.log("[useWorkflowOptions] hasAccessToGroupTitle:", hasAccessToGroupTitle);
+    //     console.log("[useWorkflowOptions] workflowOptions:", workflowOptions);
+    // }, [userGroups, groupTitle, isAdmin, hasAccessToGroupTitle, workflowOptions, groupTitleForApi]);
+
     return {
         workflowOptions,
         isAdmin,
