@@ -222,8 +222,8 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           />
 
           <SelectWorkflow
-            selectedValues={localFilters.workflow || []}
-            onChange={(val) => handleChange("workflow", val)}
+            selectedValues={localFilters.workflows || []}
+            onChange={(val) => handleChange("workflows", val)}
           />
 
           <Select
