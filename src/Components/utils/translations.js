@@ -2432,5 +2432,9 @@ export const translations = {
   FilterForUser: {
     RO: "Filtru pentru utilizatori",
     RU: "Фильтр для пользователей"
+  },
+  select_sender_number: {
+    RO:"Alege nr whatsup",
+    RU:"Выбери номер whatsup"
   }
 };

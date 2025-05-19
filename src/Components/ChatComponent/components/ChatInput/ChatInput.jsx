@@ -23,6 +23,13 @@ import Can from "../../../CanComponent/Can";
 
 import "./ChatInput.css";
 
+const pandaNumbers = [
+  { value: "37360991919", label: "37360991919 - MD / PT_MD" },
+  { value: "40720949119", label: "40720949119 - RO / PT_IASI" },
+  { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
+  { value: "40721205105", label: "40721205105 - RO / PT_BR" },
+];
+
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
@@ -37,10 +44,12 @@ export const ChatInput = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [template, setTemplate] = useState();
   const [url, setUrl] = useState({});
+  const [pandaNumber, setPandaNumber] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
+  const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -75,13 +84,18 @@ export const ChatInput = ({
     setMessage("");
     setTemplate(null);
     setUrl(null);
+    setPandaNumber(null);
   };
 
   const sendMessage = () => {
     if (message.trim()) {
       onSendMessage({
-        message: message.trim(),
+        ...(isWhatsApp
+          ? { message_text: message.trim() }
+          : { message: message.trim() }),
         ...url,
+        panda_number: isWhatsApp ? pandaNumber : undefined,
+        client_phone: isWhatsApp ? currentClient?.payload?.phone : undefined,
       });
       clearState();
     }
@@ -106,12 +120,20 @@ export const ChatInput = ({
           ) : (
             <Select
               className="w-full"
-              onChange={(value) => {
-                onChangeClient(value);
-              }}
+              onChange={onChangeClient}
               placeholder={getLanguageByKey("selectUser")}
               value={currentClient?.value}
               data={clientList}
+            />
+          )}
+
+          {isWhatsApp && (
+            <Select
+              className="w-full"
+              placeholder={getLanguageByKey("select_sender_number")}
+              value={pandaNumber}
+              onChange={setPandaNumber}
+              data={pandaNumbers}
             />
           )}
 
@@ -129,6 +151,7 @@ export const ChatInput = ({
             }))}
           />
         </Flex>
+
         <Textarea
           autosize
           minRows={6}
@@ -151,7 +174,7 @@ export const ChatInput = ({
           styles={{
             input: {
               border: isDragOver ? "2px dashed #69db7c" : undefined,
-              backgroundColor: isDragOver ? "#ebfbee" : undefined
+              backgroundColor: isDragOver ? "#ebfbee" : undefined,
             },
           }}
         />
@@ -162,7 +185,8 @@ export const ChatInput = ({
               disabled={
                 !message.trim() ||
                 !currentClient?.payload ||
-                currentClient.payload.platform === "sipuni"
+                currentClient.payload.platform === "sipuni" ||
+                (isWhatsApp && !pandaNumber)
               }
               variant="filled"
               onClick={sendMessage}
@@ -201,7 +225,6 @@ export const ChatInput = ({
                 <FaTasks size={20} />
               </ActionIcon>
             </Can>
-
           </Flex>
         </Flex>
       </Box>
@@ -223,7 +246,7 @@ export const ChatInput = ({
               onEmojiClick={(emoji) => setMessage((prev) => prev + emoji.emoji)}
             />
           </div>,
-          document.body,
+          document.body
         )}
     </>
   );

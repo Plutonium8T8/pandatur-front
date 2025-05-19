@@ -121,7 +121,7 @@ const ChatList = ({ selectTicketId }) => {
           : [];
         const tagMatch = tags.some(tag => tag.includes(query));
 
-        const phones = ticket.clients?.map(c => c.phone?.toLowerCase() || "") || [];
+        const phones = ticket.clients?.map(c => (String(c.phone || "").toLowerCase())) || [];
         const phoneMatch = phones.some(phone => phone.includes(query));
 
         return idMatch || contactMatch || tagMatch || phoneMatch;
