@@ -177,7 +177,7 @@ export const Leads = () => {
       sortBy = SORT_BY,
       order = ORDER,
       attributes = {},
-      group_title,
+      group_title = groupTitle,
     },
     cb,
     showModalLoading,
@@ -189,7 +189,10 @@ export const Leads = () => {
         sort_by: sortBy,
         order: order,
         type,
-        attributes,
+        attributes: {
+          ...attributes,
+          workflow: workflowOptions.length > 0 ? workflowOptions : undefined,
+        },
         group_title,
       });
       cb(tickets);
@@ -236,22 +239,38 @@ export const Leads = () => {
     );
   };
 
+  const fetchValidTicketsPage = async (filters, page = 1) => {
+    const res = await api.tickets.filters({
+      page,
+      type: LIGHT_TICKET,
+      attributes: filters,
+      group_title: groupTitle,
+    });
+
+    const valid = res.data?.filter((ticket) =>
+      workflowOptions.includes(ticket.workflow)
+    );
+
+    if (valid.length > 0 || page >= res.pagination?.total_pages) {
+      return {
+        data: valid,
+        pagination: res.pagination,
+      };
+    }
+
+    return fetchValidTicketsPage(filters, page + 1);
+  };
+
   const handleApplyFilterLightTicket = (selectedFilters, source = "ticket") => {
     if (source === "message") {
       setLightTicketFilters(selectedFilters);
 
-      fetchTickets(
-        {
-          page: NUMBER_PAGE,
-          type: LIGHT_TICKET,
-          attributes: selectedFilters,
-        },
-        ({ data, pagination }) => {
-          setTotalLeads(pagination?.total || 0);
-          setFilteredTicketIds(getTicketsIds(data) ?? null);
-          setIsOpenKanbanFilterModal(false);
-        }
-      );
+      fetchValidTicketsPage(mergedLightTicketFilters).then(({ data, pagination }) => {
+        setLightTicketFilters(mergedLightTicketFilters);
+        setTotalLeads(pagination?.total || 0);
+        setFilteredTicketIds(getTicketsIds(data) ?? null);
+        setIsOpenKanbanFilterModal(false);
+      });
 
       return;
     }
