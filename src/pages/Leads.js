@@ -285,7 +285,7 @@ export const Leads = () => {
         page,
         type: HARD_TICKET,
         attributes: hardTicketFilters,
-        group_title: groupTitle, // 🔥 добавляем сюда
+        group_title: groupTitle,
       },
       ({ data, pagination }) => {
         setHardTickets(data);
@@ -293,7 +293,7 @@ export const Leads = () => {
         setCurrentPage(page);
       },
     );
-  };  
+  };
 
   const fetchTicketList = () => {
     const isViewModeList = viewMode === VIEW_MODE.LIST;
@@ -306,7 +306,8 @@ export const Leads = () => {
           ...(debouncedSearch && { search: debouncedSearch }),
           ...(isViewModeList ? hardTicketFilters : lightTicketFilters),
         },
-        group_title: groupTitle,      },
+        group_title: groupTitle,
+      },
       ({ data, pagination }) => {
         setTotalLeads(pagination?.total || 0);
 
@@ -370,6 +371,7 @@ export const Leads = () => {
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
             fetchTickets={fetchTicketList}
+            workflowOptions={workflowOptions}
           />
         ) : (
           <WorkflowColumns

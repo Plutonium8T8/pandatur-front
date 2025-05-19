@@ -42,6 +42,7 @@ export const LeadTable = ({
   currentPage,
   selectTicket,
   fetchTickets,
+  workflowOptions,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
@@ -49,31 +50,31 @@ export const LeadTable = ({
   console.log("[LeadTable] user:", user);
   console.log("[LeadTable] user.technician:", user?.technician);
   console.log("[LeadTable] user.technician.groups:", user?.technician?.groups);
-  
+
   const allowedGroupTitles = useMemo(() => {
     if (!user?.technician?.groups) return [];
-  
+
     const groupNames = user.technician.groups.map((g) => g.name);
-  
+
     const titles = groupNames
       .map((name) => userGroupsToGroupTitle[name])
       .flat()
       .filter(Boolean);
-  
+
     const uniqueTitles = [...new Set(titles)];
-  
+
     console.log("[LeadTable] группы пользователя:", groupNames);
     console.log("[LeadTable] разрешённые groupTitle:", uniqueTitles);
-  
+
     return uniqueTitles;
   }, [user]);
-  
+
 
   const visibleLeads = useMemo(() => {
-    return filteredLeads.filter((ticket) =>
-      allowedGroupTitles.includes(ticket.group_title)
-    );
-  }, [filteredLeads, allowedGroupTitles]);
+    return filteredLeads
+      .filter((ticket) => allowedGroupTitles.includes(ticket.group_title))
+      .filter((ticket) => workflowOptions.includes(ticket.workflow));
+  }, [filteredLeads, allowedGroupTitles, workflowOptions]);
 
   const deleteLead = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead"),
