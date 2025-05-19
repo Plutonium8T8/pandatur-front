@@ -47,9 +47,6 @@ export const LeadTable = ({
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
   const { user } = useUser();
-  console.log("[LeadTable] user:", user);
-  console.log("[LeadTable] user.technician:", user?.technician);
-  console.log("[LeadTable] user.technician.groups:", user?.technician?.groups);
 
   const allowedGroupTitles = useMemo(() => {
     if (!user?.technician?.groups) return [];
@@ -62,9 +59,6 @@ export const LeadTable = ({
       .filter(Boolean);
 
     const uniqueTitles = [...new Set(titles)];
-
-    console.log("[LeadTable] группы пользователя:", groupNames);
-    console.log("[LeadTable] разрешённые groupTitle:", uniqueTitles);
 
     return uniqueTitles;
   }, [user]);
