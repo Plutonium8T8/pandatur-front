@@ -103,7 +103,7 @@ export const InvoiceTab = ({ clientInfo }) => {
           <Divider my="md" />
           <File
             src={generatedDocument}
-            label={<Text size="sm">{generatedDocument}</Text>}
+            label={generatedDocument}
           />
         </>
       )}
