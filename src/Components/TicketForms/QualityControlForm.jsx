@@ -81,13 +81,6 @@ export const QualityControlForm = ({
           {...formInstance.getInputProps("vacanta")}
         />
       </form>
-
-      <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.({
-          onResetForm: formInstance.reset,
-          formId: QUALITY_FORM_FILTER_ID,
-        })}
-      </Flex>
     </>
   );
 };

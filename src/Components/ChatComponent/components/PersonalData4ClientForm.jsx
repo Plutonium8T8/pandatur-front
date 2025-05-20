@@ -1,23 +1,11 @@
-import {
-  TextInput,
-  Title,
-  Box,
-  NumberInput,
-  Button,
-  Flex,
-} from "@mantine/core";
-import { useForm } from "@mantine/form";
+import { TextInput, Title, Box, NumberInput } from "@mantine/core";
 import { useEffect } from "react";
 import { getLanguageByKey } from "../../utils";
 
-export const PersonalData4ClientForm = ({ loading, onSubmit, data }) => {
-  const form = useForm({
-    mode: "uncontrolled",
-  });
-
+export const PersonalData4ClientForm = ({ formInstance, data }) => {
   useEffect(() => {
     if (data) {
-      form.setValues({
+      formInstance.setValues({
         name: data.name,
         surname: data.surname,
         phone: data.phone,
@@ -28,42 +16,31 @@ export const PersonalData4ClientForm = ({ loading, onSubmit, data }) => {
   return (
     <Box>
       <Title order={3}>{getLanguageByKey("Date personale")}</Title>
-      <form
-        onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset()),
-        )}
-      >
-        <TextInput
-          mt="md"
-          label={getLanguageByKey("Nume")}
-          placeholder={getLanguageByKey("Nume")}
-          key={form.key("name")}
-          {...form.getInputProps("name")}
-        />
 
-        <TextInput
-          mt="md"
-          label={getLanguageByKey("Prenume")}
-          placeholder={getLanguageByKey("Prenume")}
-          key={form.key("surname")}
-          {...form.getInputProps("surname")}
-        />
+      <TextInput
+        mt="md"
+        label={getLanguageByKey("Nume")}
+        placeholder={getLanguageByKey("Nume")}
+        key={formInstance.key("name")}
+        {...formInstance.getInputProps("name")}
+      />
 
-        <NumberInput
-          hideControls
-          mt="md"
-          label={getLanguageByKey("Telefon")}
-          placeholder={getLanguageByKey("Telefon")}
-          key={form.key("phone")}
-          {...form.getInputProps("phone")}
-        />
+      <TextInput
+        mt="md"
+        label={getLanguageByKey("Prenume")}
+        placeholder={getLanguageByKey("Prenume")}
+        key={formInstance.key("surname")}
+        {...formInstance.getInputProps("surname")}
+      />
 
-        <Flex justify="end">
-          <Button type="submit" mt="md" loading={loading}>
-            {getLanguageByKey("Salvați datele personale")}
-          </Button>
-        </Flex>
-      </form>
+      <NumberInput
+        hideControls
+        mt="md"
+        label={getLanguageByKey("Telefon")}
+        placeholder={getLanguageByKey("Telefon")}
+        key={formInstance.key("phone")}
+        {...formInstance.getInputProps("phone")}
+      />
     </Box>
   );
 };

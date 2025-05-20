@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
 import { getLanguageByKey, showServerError } from "@utils";
-import { api } from "@api";
+import { api } from "../../api";
 import {
   useFormTicket,
   useApp,
@@ -178,7 +178,7 @@ const ChatExtraInfo = ({
   const saveTicketExtraDate = async (type, values) => {
     setIsLoadingInfoTicket(true);
     try {
-      await api.documents.create(type, values);
+      await api.tickets.tickets.create(type, values);
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" },
@@ -197,6 +197,68 @@ const ChatExtraInfo = ({
       fetchTicketExtraInfo(selectTicketId);
     }
   }, [selectTicketId]);
+
+  const handleSubmitAllForms = async () => {
+    const values = form.getValues();
+
+    if (form.validate().hasErrors) {
+      enqueueSnackbar(
+        getLanguageByKey("please_complete_required_fields_for_workflow_change"),
+        { variant: "error" }
+      );
+      return;
+    }
+
+    const generalFields = {
+      technician_id: values.technician_id,
+      workflow: values.workflow,
+      priority: values.priority,
+      contact: values.contact,
+      tags: values.tags,
+      group_title: values.group_title,
+      description: values.description,
+    };
+
+    const {
+      technician_id,
+      workflow,
+      priority,
+      contact,
+      tags,
+      group_title,
+      description,
+      name,
+      surname,
+      phone,
+      ...extraFields
+    } = values;
+
+    try {
+      setIsLoadingGeneral(true);
+
+      await api.tickets.updateById({
+        id: [selectTicketId],
+        ...generalFields,
+      });
+
+      await api.users.updateExtended(selectedUser.payload?.id, {
+        name,
+        surname,
+        phone,
+      });
+
+      await api.tickets.ticket.create(selectTicketId, extraFields);
+
+      enqueueSnackbar(
+        getLanguageByKey("Datele despre ticket au fost create cu succes"),
+        { variant: "success" }
+      );
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    } finally {
+      setIsLoadingGeneral(false);
+    }
+  };
 
   return (
     <ScrollArea
@@ -251,6 +313,16 @@ const ChatExtraInfo = ({
               {getLanguageByKey("quality")}
             </Text>
           </Tabs.Tab>
+          <Button
+            fullWidth
+            mt="md"
+            mb="xs"
+            mx="xs"
+            loading={isLoadingGeneral || isLoadingInfoTicket}
+            onClick={handleSubmitAllForms}
+          >
+            {getLanguageByKey("Actualizare")}
+          </Button>
         </Tabs.List>
 
         <Tabs.Panel value="general">
@@ -259,22 +331,13 @@ const ChatExtraInfo = ({
               data={updatedTicket}
               formInstance={form}
               onSubmit={updateTicketDate}
-              renderFooterButtons={({ formId }) => (
-                <Button loading={isLoadingGeneral} type="submit" form={formId}>
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
 
             <Divider my="md" />
 
             <PersonalData4ClientForm
-              loading={isLoadingPersonalDate}
+              formInstance={form}
               data={selectedUser.payload}
-              onSubmit={(values) => {
-                submitPersonalData(values);
-                onUpdatePersonalInfo(selectedUser.payload, values);
-              }}
             />
 
             <Divider my="md" />
@@ -307,15 +370,6 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>
@@ -326,22 +380,13 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>
 
         <Tabs.Panel value="documents">
           <Box p="md">
-            <InvoiceTab extraInfo={extraInfo} />
+            <InvoiceTab extraInfo={extraInfo} clientInfo={selectedUser.payload} />
           </Box>
         </Tabs.Panel>
 
@@ -357,15 +402,6 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>

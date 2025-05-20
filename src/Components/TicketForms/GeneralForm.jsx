@@ -3,7 +3,6 @@ import {
   TextInput,
   Textarea,
   TagsInput,
-  Flex,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useContext } from "react";
@@ -23,8 +22,7 @@ export const GeneralForm = ({
   onSubmit,
   data,
   onClose,
-  renderFooterButtons,
-  formInstance,
+  formInstance, // <- используем это как основную форму
 }) => {
   const { technicians } = useGetTechniciansList();
   const { userGroups, userId } = useContext(UserContext);
@@ -43,7 +41,7 @@ export const GeneralForm = ({
 
   useEffect(() => {
     if (data) {
-      form.setValues({
+      formInstance.setValues({
         technician_id: data.technician_id ? `${data.technician_id}` : undefined,
         tags: parseTags(data.tags),
         workflow: data.workflow,
@@ -55,54 +53,53 @@ export const GeneralForm = ({
     }
   }, [data]);
 
-  form.watch("workflow", ({ value }) => {
+  formInstance.watch("workflow", ({ value }) => {
     formInstance.setFieldValue("workflow", value);
   });
 
   return (
-    <>
-      <form
-        id={GENERAL_FORM_ID}
-        onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset()),
-        )}
-      >
-        <Select
-          label={getLanguageByKey("Workflow")}
-          placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={availableWorkflows}
-          clearable
-          key={form.key("workflow")}
-          {...form.getInputProps("workflow")}
-        />
+    <form
+      id={GENERAL_FORM_ID}
+      onSubmit={formInstance.onSubmit((values) =>
+        onSubmit(values, () => formInstance.reset()),
+      )}
+    >
+      <Select
+        label={getLanguageByKey("Workflow")}
+        placeholder={getLanguageByKey("Selectează flux de lucru")}
+        data={availableWorkflows}
+        clearable
+        key={formInstance.key("workflow")}
+        {...formInstance.getInputProps("workflow")}
+      />
 
-        <Select
-          disabled
-          mt="md"
-          label={getLanguageByKey("Prioritate")}
-          placeholder={getLanguageByKey("Selectează prioritate")}
-          data={priorityOptions}
-          clearable
-          key={form.key("priority")}
-          {...form.getInputProps("priority")}
-        />
+      <Select
+        disabled
+        mt="md"
+        label={getLanguageByKey("Prioritate")}
+        placeholder={getLanguageByKey("Selectează prioritate")}
+        data={priorityOptions}
+        clearable
+        key={formInstance.key("priority")}
+        {...formInstance.getInputProps("priority")}
+      />
 
-        <TextInput
-          disabled
-          mt="md"
-          label={getLanguageByKey("Contact")}
-          placeholder={getLanguageByKey("Selectează contact")}
-          key={form.key("contact")}
-          {...form.getInputProps("contact")}
-        />
+      <TextInput
+        disabled
+        mt="md"
+        label={getLanguageByKey("Contact")}
+        placeholder={getLanguageByKey("Selectează contact")}
+        key={formInstance.key("contact")}
+        {...formInstance.getInputProps("contact")}
+      />
 
-        <TagsInput
-          mt="md"
-          label={getLanguageByKey("Tag-uri")}
-          placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
-          key={form.key("tags")}
-          {...form.getInputProps("tags")}
-        />
+      <TagsInput
+        mt="md"
+        label={getLanguageByKey("Tag-uri")}
+        placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
+        key={formInstance.key("tags")}
+        {...formInstance.getInputProps("tags")}
+      />
 
         <Select
           mt="md"
@@ -115,34 +112,26 @@ export const GeneralForm = ({
           {...form.getInputProps("group_title")}
         />
 
-        <Select
-          searchable
-          mt="md"
-          label={getLanguageByKey("Tehnician")}
-          placeholder={getLanguageByKey("Selectează tehnician")}
-          clearable
-          data={technicians}
-          key={form.key("technician_id")}
-          {...form.getInputProps("technician_id")}
-        />
+      <Select
+        searchable
+        mt="md"
+        label={getLanguageByKey("Tehnician")}
+        placeholder={getLanguageByKey("Selectează tehnician")}
+        clearable
+        data={technicians}
+        key={formInstance.key("technician_id")}
+        {...formInstance.getInputProps("technician_id")}
+      />
 
-        <Textarea
-          mt="md"
-          label={getLanguageByKey("Descriere")}
-          placeholder={getLanguageByKey("Descriere")}
-          minRows={4}
-          autosize
-          key={form.key("description")}
-          {...form.getInputProps("description")}
-        />
-      </form>
-
-      <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.({
-          onResetForm: form.reset,
-          formId: GENERAL_FORM_ID,
-        })}
-      </Flex>
-    </>
+      <Textarea
+        mt="md"
+        label={getLanguageByKey("Descriere")}
+        placeholder={getLanguageByKey("Descriere")}
+        minRows={4}
+        autosize
+        key={formInstance.key("description")}
+        {...formInstance.getInputProps("description")}
+      />
+    </form>
   );
 };

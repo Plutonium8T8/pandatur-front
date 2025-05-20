@@ -2434,7 +2434,20 @@ export const translations = {
     RU: "Фильтр для пользователей"
   },
   select_sender_number: {
-    RO:"Alege nr whatsup",
-    RU:"Выбери номер whatsup"
+    RO: "Alege nr whatsup",
+    RU: "Выбери номер whatsup"
+  },
+  Plătitor: {
+    RO: "Plătitor",
+    RU: "Плательщик"
+  },
+  "Nr. Plătitor": {
+    RO: "Nr. Plătitor",
+    RU: "Номер плательщика"
+  },
+  Cantitate: {
+    RO: "Cantitate",
+    RU: "Количество"
   }
+
 };
