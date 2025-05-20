@@ -307,6 +307,7 @@ const ChatExtraInfo = ({
           <Button
             fullWidth
             mt="md"
+            mb="xs"
             mx="xs"
             loading={isLoadingGeneral || isLoadingInfoTicket}
             onClick={handleSubmitAllForms}
