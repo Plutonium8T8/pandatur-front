@@ -255,13 +255,6 @@ export const ContractForm = ({
           />
         )}
       </form>
-
-      <Flex justify="end" gap="md" mt="md">
-        {renderFooterButtons?.({
-          onResetForm: formInstance.reset,
-          formId: idForm,
-        })}
-      </Flex>
     </>
   );
 };

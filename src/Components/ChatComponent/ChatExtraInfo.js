@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
 import { getLanguageByKey, showServerError } from "@utils";
-import { api } from "@api";
+import { api } from "../../api";
 import {
   useFormTicket,
   useApp,
@@ -178,7 +178,7 @@ const ChatExtraInfo = ({
   const saveTicketExtraDate = async (type, values) => {
     setIsLoadingInfoTicket(true);
     try {
-      await api.documents.create(type, values);
+      await api.tickets.tickets.create(type, values);
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" },
@@ -197,6 +197,48 @@ const ChatExtraInfo = ({
       fetchTicketExtraInfo(selectTicketId);
     }
   }, [selectTicketId]);
+
+  const handleSubmitAllForms = async () => {
+    const values = form.getValues();
+
+    if (form.validate().hasErrors) {
+      enqueueSnackbar(
+        getLanguageByKey("please_complete_required_fields_for_workflow_change"),
+        { variant: "error" }
+      );
+      return;
+    }
+
+    try {
+      setIsLoadingGeneral(true);
+
+      // GeneralForm
+      await api.tickets.updateById({
+        id: [selectTicketId],
+        ...values,
+      });
+
+      // Extra Forms
+      await api.tickets.ticket.create(selectTicketId, {
+        ...values,
+      });
+      await api.tickets.ticket.create(selectTicketId, {
+        ...values,
+      });
+      await api.tickets.ticket.create(selectTicketId, {
+        ...values,
+      });
+
+      enqueueSnackbar(
+        getLanguageByKey("Datele despre ticket au fost create cu succes"),
+        { variant: "success" }
+      );
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    } finally {
+      setIsLoadingGeneral(false);
+    }
+  };
 
   return (
     <ScrollArea
@@ -251,6 +293,14 @@ const ChatExtraInfo = ({
               {getLanguageByKey("quality")}
             </Text>
           </Tabs.Tab>
+          <Button
+            fullWidth
+            mt="md"
+            loading={isLoadingGeneral || isLoadingInfoTicket}
+            onClick={handleSubmitAllForms}
+          >
+            {getLanguageByKey("Actualizare")}
+          </Button>
         </Tabs.List>
 
         <Tabs.Panel value="general">
@@ -259,11 +309,6 @@ const ChatExtraInfo = ({
               data={updatedTicket}
               formInstance={form}
               onSubmit={updateTicketDate}
-              renderFooterButtons={({ formId }) => (
-                <Button loading={isLoadingGeneral} type="submit" form={formId}>
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
 
             <Divider my="md" />
@@ -307,14 +352,6 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ onSubmit }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  onClick={onSubmit}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>
@@ -325,15 +362,6 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>
@@ -356,15 +384,6 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
-                <Button
-                  loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
-                >
-                  {getLanguageByKey("Actualizare")}
-                </Button>
-              )}
             />
           </Box>
         </Tabs.Panel>
