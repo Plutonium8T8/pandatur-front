@@ -227,6 +227,9 @@ const ChatExtraInfo = ({
       tags,
       group_title,
       description,
+      name,
+      surname,
+      phone,
       ...extraFields
     } = values;
 
@@ -236,6 +239,12 @@ const ChatExtraInfo = ({
       await api.tickets.updateById({
         id: [selectTicketId],
         ...generalFields,
+      });
+
+      await api.users.updateExtended(selectedUser.payload?.id, {
+        name,
+        surname,
+        phone,
       });
 
       await api.tickets.ticket.create(selectTicketId, extraFields);
@@ -327,12 +336,8 @@ const ChatExtraInfo = ({
             <Divider my="md" />
 
             <PersonalData4ClientForm
-              loading={isLoadingPersonalDate}
+              formInstance={form}
               data={selectedUser.payload}
-              onSubmit={(values) => {
-                submitPersonalData(values);
-                onUpdatePersonalInfo(selectedUser.payload, values);
-              }}
             />
 
             <Divider my="md" />
