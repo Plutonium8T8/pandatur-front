@@ -341,7 +341,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="documents">
           <Box p="md">
-            <InvoiceTab extraInfo={extraInfo} />
+            <InvoiceTab extraInfo={extraInfo} clientInfo={selectedUser.payload} />
           </Box>
         </Tabs.Panel>
 
