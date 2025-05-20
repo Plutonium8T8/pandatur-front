@@ -13,7 +13,7 @@ const DOCUMENTS_TYPE = {
   JOIN_UP_GUARANTEE_LETTER: "join-up-guarantee-letter",
 };
 
-export const InvoiceTab = ({ extraInfo }) => {
+export const InvoiceTab = ({ extraInfo, clientInfo }) => {
   const [selectedValue, setSelectedValue] = useState();
   const [loading, handlers] = useDisclosure(false);
   const [generatedDocument, setGeneratedDocument] = useState("");
@@ -42,6 +42,11 @@ export const InvoiceTab = ({ extraInfo }) => {
     }
   };
 
+  const initialClientData = {
+    platitor: `${clientInfo?.name || ""} ${clientInfo?.surname || ""}`.trim(),
+    nr_platitor: clientInfo?.phone || "",
+  };
+
   return (
     <div>
       <Select
@@ -67,6 +72,7 @@ export const InvoiceTab = ({ extraInfo }) => {
       {selectedValue === DOCUMENTS_TYPE.ACCOUNT_DUE ? (
         <InvoiceForm
           data={extraInfo}
+          initialClientData={initialClientData}
           onSubmit={(values) => generateDocument(selectedValue, values)}
           renderFooterButtons={({ formId }) => (
             <Button
@@ -98,7 +104,6 @@ export const InvoiceTab = ({ extraInfo }) => {
       {generatedDocument && (
         <>
           <Divider my="md" />
-
           <File
             src={generatedDocument}
             label={<Text size="sm">{generatedDocument}</Text>}
