@@ -13,12 +13,12 @@ const DOCUMENTS_TYPE = {
   JOIN_UP_GUARANTEE_LETTER: "join-up-guarantee-letter",
 };
 
-export const InvoiceTab = ({ extraInfo, clientInfo }) => {
+export const InvoiceTab = ({ clientInfo }) => {
   const [selectedValue, setSelectedValue] = useState();
   const [loading, handlers] = useDisclosure(false);
   const [generatedDocument, setGeneratedDocument] = useState("");
 
-  const generateDocument = async (type, values) => {
+  const generateDocument = async (type, values = {}) => {
     handlers.open();
     try {
       const data = await api.documents.create(type, values);
@@ -40,11 +40,6 @@ export const InvoiceTab = ({ extraInfo, clientInfo }) => {
     } finally {
       handlers.close();
     }
-  };
-
-  const initialClientData = {
-    platitor: `${clientInfo?.name || ""} ${clientInfo?.surname || ""}`.trim(),
-    nr_platitor: clientInfo?.phone || "",
   };
 
   return (
@@ -71,17 +66,19 @@ export const InvoiceTab = ({ extraInfo, clientInfo }) => {
 
       {selectedValue === DOCUMENTS_TYPE.ACCOUNT_DUE ? (
         <InvoiceForm
-          data={extraInfo}
-          initialClientData={initialClientData}
+          data={{}}
+          initialClientData={{
+            platitor: `${clientInfo?.name || ""} ${clientInfo?.surname || ""}`.trim(),
+            nr_platitor: clientInfo?.phone || "",
+          }}
           onSubmit={(values) => generateDocument(selectedValue, values)}
-          renderFooterButtons={({ formId }) => (
+          renderFooterButtons={({ onSubmit }) => (
             <Button
               disabled={
                 !selectedValue || generatedDocument.includes(selectedValue)
               }
               loading={loading}
-              type="submit"
-              form={formId}
+              onClick={onSubmit}
             >
               {getLanguageByKey("generate")}
             </Button>
