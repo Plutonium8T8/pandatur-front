@@ -209,25 +209,36 @@ const ChatExtraInfo = ({
       return;
     }
 
+    const generalFields = {
+      technician_id: values.technician_id,
+      workflow: values.workflow,
+      priority: values.priority,
+      contact: values.contact,
+      tags: values.tags,
+      group_title: values.group_title,
+      description: values.description,
+    };
+
+    const {
+      technician_id,
+      workflow,
+      priority,
+      contact,
+      tags,
+      group_title,
+      description,
+      ...extraFields
+    } = values;
+
     try {
       setIsLoadingGeneral(true);
 
-      // GeneralForm
       await api.tickets.updateById({
         id: [selectTicketId],
-        ...values,
+        ...generalFields,
       });
 
-      // Extra Forms
-      await api.tickets.ticket.create(selectTicketId, {
-        ...values,
-      });
-      await api.tickets.ticket.create(selectTicketId, {
-        ...values,
-      });
-      await api.tickets.ticket.create(selectTicketId, {
-        ...values,
-      });
+      await api.tickets.ticket.create(selectTicketId, extraFields);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
@@ -296,6 +307,7 @@ const ChatExtraInfo = ({
           <Button
             fullWidth
             mt="md"
+            mx="xs"
             loading={isLoadingGeneral || isLoadingInfoTicket}
             onClick={handleSubmitAllForms}
           >
