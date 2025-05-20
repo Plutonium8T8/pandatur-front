@@ -3,8 +3,8 @@ import {
   TextInput,
   Textarea,
   TagsInput,
-  Flex,
 } from "@mantine/core";
+import { useForm } from "@mantine/form";
 import { useEffect, useContext } from "react";
 import {
   priorityOptions,
@@ -16,8 +16,12 @@ import { parseTags } from "../../stringUtils";
 import { UserContext } from "../../contexts/UserContext";
 import { useWorkflowOptions } from "../../hooks/useWorkflowOptions";
 
+const GENERAL_FORM_ID = "GENERAL_FORM_ID";
+
 export const GeneralForm = ({
+  onSubmit,
   data,
+  onClose,
   formInstance,
 }) => {
   const { technicians } = useGetTechniciansList();
@@ -29,6 +33,10 @@ export const GeneralForm = ({
     groupTitle,
     userGroups,
     userId,
+  });
+
+  const form = useForm({
+    mode: "uncontrolled",
   });
 
   useEffect(() => {
@@ -50,7 +58,12 @@ export const GeneralForm = ({
   });
 
   return (
-    <Flex>
+    <form
+      id={GENERAL_FORM_ID}
+      onSubmit={formInstance.onSubmit((values) =>
+        onSubmit(values, () => formInstance.reset()),
+      )}
+    >
       <Select
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
@@ -88,16 +101,16 @@ export const GeneralForm = ({
         {...formInstance.getInputProps("tags")}
       />
 
-        <Select
-          mt="md"
-          label={getLanguageByKey("Grup")}
-          placeholder={getLanguageByKey("Selectează grupul")}
-          data={groupTitleOptions}
-          searchable
-          clearable
-          key={formInstance.key("group_title")}
-          {...formInstance.getInputProps("group_title")}
-        />
+      <Select
+        mt="md"
+        label={getLanguageByKey("Grup")}
+        placeholder={getLanguageByKey("Selectează grupul")}
+        data={groupTitleOptions}
+        searchable
+        clearable
+        key={form.key("group_title")}
+        {...form.getInputProps("group_title")}
+      />
 
       <Select
         searchable
@@ -119,6 +132,6 @@ export const GeneralForm = ({
         key={formInstance.key("description")}
         {...formInstance.getInputProps("description")}
       />
-      </Flex >
+    </form>
   );
 };
