@@ -24,7 +24,7 @@ export const GeneralForm = ({
   onSubmit,
   data,
   onClose,
-  formInstance,
+  formInstance, // <- используем это как основную форму
 }) => {
   const { technicians } = useGetTechniciansList();
   const { userGroups, userId } = useContext(UserContext);
@@ -36,13 +36,9 @@ export const GeneralForm = ({
 
   const availableWorkflows = isAdmin ? workflowOptions : workflowOptionsLimited;
 
-  const form = useForm({
-    mode: "uncontrolled",
-  });
-
   useEffect(() => {
     if (data) {
-      form.setValues({
+      formInstance.setValues({
         technician_id: data.technician_id ? `${data.technician_id}` : undefined,
         tags: parseTags(data.tags),
         workflow: data.workflow,
@@ -54,15 +50,15 @@ export const GeneralForm = ({
     }
   }, [data]);
 
-  form.watch("workflow", ({ value }) => {
+  formInstance.watch("workflow", ({ value }) => {
     formInstance.setFieldValue("workflow", value);
   });
 
   return (
     <form
       id={GENERAL_FORM_ID}
-      onSubmit={form.onSubmit((values) =>
-        onSubmit(values, () => form.reset()),
+      onSubmit={formInstance.onSubmit((values) =>
+        onSubmit(values, () => formInstance.reset()),
       )}
     >
       <Select
@@ -70,8 +66,8 @@ export const GeneralForm = ({
         placeholder={getLanguageByKey("Selectează flux de lucru")}
         data={availableWorkflows}
         clearable
-        key={form.key("workflow")}
-        {...form.getInputProps("workflow")}
+        key={formInstance.key("workflow")}
+        {...formInstance.getInputProps("workflow")}
       />
 
       <Select
@@ -81,8 +77,8 @@ export const GeneralForm = ({
         placeholder={getLanguageByKey("Selectează prioritate")}
         data={priorityOptions}
         clearable
-        key={form.key("priority")}
-        {...form.getInputProps("priority")}
+        key={formInstance.key("priority")}
+        {...formInstance.getInputProps("priority")}
       />
 
       <TextInput
@@ -90,16 +86,16 @@ export const GeneralForm = ({
         mt="md"
         label={getLanguageByKey("Contact")}
         placeholder={getLanguageByKey("Selectează contact")}
-        key={form.key("contact")}
-        {...form.getInputProps("contact")}
+        key={formInstance.key("contact")}
+        {...formInstance.getInputProps("contact")}
       />
 
       <TagsInput
         mt="md"
         label={getLanguageByKey("Tag-uri")}
         placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
-        key={form.key("tags")}
-        {...form.getInputProps("tags")}
+        key={formInstance.key("tags")}
+        {...formInstance.getInputProps("tags")}
       />
 
       <SegmentedControl
@@ -109,8 +105,8 @@ export const GeneralForm = ({
           label: item,
         }))}
         mt="md"
-        key={form.key("group_title")}
-        {...form.getInputProps("group_title")}
+        key={formInstance.key("group_title")}
+        {...formInstance.getInputProps("group_title")}
       />
 
       <Select
@@ -120,8 +116,8 @@ export const GeneralForm = ({
         placeholder={getLanguageByKey("Selectează tehnician")}
         clearable
         data={technicians}
-        key={form.key("technician_id")}
-        {...form.getInputProps("technician_id")}
+        key={formInstance.key("technician_id")}
+        {...formInstance.getInputProps("technician_id")}
       />
 
       <Textarea
@@ -130,8 +126,8 @@ export const GeneralForm = ({
         placeholder={getLanguageByKey("Descriere")}
         minRows={4}
         autosize
-        key={form.key("description")}
-        {...form.getInputProps("description")}
+        key={formInstance.key("description")}
+        {...formInstance.getInputProps("description")}
       />
     </form>
   );
