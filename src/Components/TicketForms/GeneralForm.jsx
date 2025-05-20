@@ -3,8 +3,8 @@ import {
   TextInput,
   Textarea,
   TagsInput,
+  Flex,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import { useEffect, useContext } from "react";
 import {
   priorityOptions,
@@ -16,13 +16,9 @@ import { parseTags } from "../../stringUtils";
 import { UserContext } from "../../contexts/UserContext";
 import { useWorkflowOptions } from "../../hooks/useWorkflowOptions";
 
-const GENERAL_FORM_ID = "GENERAL_FORM_ID";
-
 export const GeneralForm = ({
-  onSubmit,
   data,
-  onClose,
-  formInstance, // <- используем это как основную форму
+  formInstance,
 }) => {
   const { technicians } = useGetTechniciansList();
   const { userGroups, userId } = useContext(UserContext);
@@ -33,10 +29,6 @@ export const GeneralForm = ({
     groupTitle,
     userGroups,
     userId,
-  });
-
-  const form = useForm({
-    mode: "uncontrolled",
   });
 
   useEffect(() => {
@@ -58,12 +50,7 @@ export const GeneralForm = ({
   });
 
   return (
-    <form
-      id={GENERAL_FORM_ID}
-      onSubmit={formInstance.onSubmit((values) =>
-        onSubmit(values, () => formInstance.reset()),
-      )}
-    >
+    <Flex>
       <Select
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
@@ -108,8 +95,8 @@ export const GeneralForm = ({
           data={groupTitleOptions}
           searchable
           clearable
-          key={form.key("group_title")}
-          {...form.getInputProps("group_title")}
+          key={formInstance.key("group_title")}
+          {...formInstance.getInputProps("group_title")}
         />
 
       <Select
@@ -132,6 +119,6 @@ export const GeneralForm = ({
         key={formInstance.key("description")}
         {...formInstance.getInputProps("description")}
       />
-    </form>
+      </Flex >
   );
 };
