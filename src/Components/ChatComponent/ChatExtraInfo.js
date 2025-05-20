@@ -307,11 +307,10 @@ const ChatExtraInfo = ({
               formInstance={form}
               data={extraInfo}
               onSubmit={(values) => saveTicketExtraDate(values)}
-              renderFooterButtons={({ formId }) => (
+              renderFooterButtons={({ onSubmit }) => (
                 <Button
                   loading={isLoadingInfoTicket}
-                  type="submit"
-                  form={formId}
+                  onClick={onSubmit}
                 >
                   {getLanguageByKey("Actualizare")}
                 </Button>
