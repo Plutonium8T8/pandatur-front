@@ -4,42 +4,33 @@ import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "@api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
-import { useWorkflowOptions } from "../hooks/useWorkflowOptions";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
 export const AppContext = createContext();
 
 const normalizeLightTickets = (tickets) => {
-  return tickets.map((ticket) => ({
+  const ticketList = tickets.map((ticket) => ({
     ...ticket,
     last_message: ticket.last_message || getLanguageByKey("no_messages"),
     time_sent: ticket.time_sent || null,
     unseen_count: ticket.unseen_count || 0,
   }));
+
+  return ticketList;
 };
 
 export const AppProvider = ({ children }) => {
   const { sendedValue, socketRef } = useSocket();
-  const { enqueueSnackbar } = useSnackbar();
-  const { userId } = useUser();
   const [tickets, setTickets] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const { enqueueSnackbar } = useSnackbar();
+  const { userId } = useUser();
   const [spinnerTickets, setSpinnerTickets] = useState(false);
-  const { storage, changeLocalStorage } = useLocalStorage(SIDEBAR_COLLAPSE, "false");
-
-  const { groupTitleForApi, userGroups } = useWorkflowOptions({ groupTitle: "", userId });
-
-  const {
-    workflowOptions,
-  } = useWorkflowOptions({ groupTitle: groupTitleForApi || "", userId });
-
-  // useEffect(() => {
-  //   console.log("[AppContext] userId:", userId);
-  //   console.log("[AppContext] groupTitleForApi:", groupTitleForApi);
-  //   console.log("[AppContext] userGroups:", userGroups);
-  //   console.log("[AppContext] workflowOptions:", workflowOptions);
-  // }, [userId, groupTitleForApi, workflowOptions, userGroups]);
+  const { storage, changeLocalStorage } = useLocalStorage(
+    SIDEBAR_COLLAPSE,
+    "false",
+  );
 
   const collapsed = () => {
     changeLocalStorage(storage === "true" ? "false" : "true");
@@ -47,26 +38,38 @@ export const AppProvider = ({ children }) => {
 
   const markMessagesAsRead = (ticketId, count) => {
     if (!ticketId) return;
-    setTickets((prev) =>
-      prev.map((t) => (t.id === ticketId ? { ...t, unseen_count: 0 } : t))
+
+    setTickets((prevTickets) =>
+      prevTickets.map((ticket) =>
+        ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket,
+      ),
     );
+
     setUnreadCount((prev) => prev - count);
   };
 
   const getTicketsListRecursively = async (page) => {
     try {
-      const data = await api.tickets.getLightList({ page });
+      const data = await api.tickets.getLightList({ page: page });
+
       if (page >= data.total_pages) {
         setSpinnerTickets(false);
         return;
       }
-      const totalUnread = data.tickets.reduce((sum, t) => sum + t.unseen_count, 0);
+
+      const totalUnread = data.tickets.reduce(
+        (sum, ticket) => sum + ticket.unseen_count,
+        0,
+      );
+
       setUnreadCount((prev) => prev + totalUnread);
-      const processed = normalizeLightTickets(data.tickets);
-      setTickets((prev) => [...prev, ...processed]);
+
+      const processedTickets = normalizeLightTickets(data.tickets);
+      setTickets((prev) => [...prev, ...processedTickets]);
+
       getTicketsListRecursively(page + 1);
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
@@ -74,79 +77,100 @@ export const AppProvider = ({ children }) => {
     try {
       setSpinnerTickets(true);
       await getTicketsListRecursively(1);
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
   const fetchSingleTicket = async (ticketId) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
-      setTickets((prev) => {
-        const existing = prev.find((t) => t.id === ticketId);
-        return existing
-          ? prev.map((t) => (t.id === ticketId ? ticket : t))
-          : [...prev, ticket];
+
+      setTickets((prevTickets) => {
+        const existingTicket = prevTickets.find((t) => t.id === ticketId);
+        if (existingTicket) {
+          return prevTickets.map((t) => (t.id === ticketId ? ticket : t));
+        } else {
+          return [...prevTickets, ticket];
+        }
       });
-      setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
+
+      setUnreadCount((prev) => prev + ticket?.unseen_count || 0);
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
 
-  const handleWebSocketMessage = (msg) => {
-    switch (msg.type) {
+  const handleWebSocketMessage = (message) => {
+    switch (message.type) {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
-        const { ticket_id, message, time_sent, mtype, sender_id } = msg.data;
+        console.log("New message from WebSocket:", message.data);
+
+        const {
+          ticket_id,
+          message: msgText,
+          time_sent,
+          mtype,
+          sender_id,
+        } = message.data;
+
         setUnreadCount((prev) => prev + 1);
-        setTickets((prev) =>
-          prev.map((t) =>
-            t.id === ticket_id
+
+        setTickets((prev) => {
+          return prev.map((ticket) => {
+            return ticket.id === ticket_id
               ? {
-                ...t,
-                unseen_count: t.unseen_count + (sender_id !== userId ? 1 : 0),
-                last_message_type: mtype,
-                last_message: message,
-                time_sent,
-              }
-              : t
-          )
-        );
+                  ...ticket,
+                  unseen_count:
+                    ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                  last_message_type: mtype,
+                  last_message: msgText,
+                  time_sent: time_sent,
+                }
+              : ticket;
+          });
+        });
+
         break;
       }
-
       case TYPE_SOCKET_EVENTS.SEEN: {
-        const { ticket_id } = msg.data;
-        setTickets((prev) =>
-          prev.map((t) => (t.id === ticket_id ? { ...t, unseen_count: 0 } : t))
+        const { ticket_id } = message.data;
+
+        setTickets((prevTickets) =>
+          prevTickets.map((ticket) =>
+            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket,
+          ),
         );
+
         break;
       }
 
       case TYPE_SOCKET_EVENTS.TICKET: {
-        const ticketId = msg.data.ticket_id;
+        const ticketId = message.data.ticket_id;
+
         if (ticketId) {
           fetchSingleTicket(ticketId);
+
           const socketInstance = socketRef.current;
-          if (socketInstance?.readyState === WebSocket.OPEN) {
-            socketInstance.send(
-              JSON.stringify({
-                type: TYPE_SOCKET_EVENTS.CONNECT,
-                data: { ticket_id: [ticketId] },
-              })
-            );
-          } else {
-            enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
-              variant: "error",
+          if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
+            const socketMessage = JSON.stringify({
+              type: TYPE_SOCKET_EVENTS.CONNECT,
+              data: { ticket_id: [ticketId] },
             });
-            console.warn("WebSocket not connected.");
+            socketInstance.send(socketMessage);
+          } else {
+            enqueueSnackbar(
+              getLanguageByKey("errorConnectingToChatRoomWebSocket"),
+              { variant: "error" },
+            );
+            console.warn("Error connecting to chat-room, WebSocket is off.");
           }
         }
         break;
       }
 
       default:
-        console.warn("Unhandled WebSocket message type:", msg.type);
+        console.warn("Invalid message_type from socket:", message.type);
     }
   };
 
@@ -167,12 +191,12 @@ export const AppProvider = ({ children }) => {
         setTickets,
         unreadCount,
         markMessagesAsRead,
+
         spinnerTickets,
         setIsCollapsed: collapsed,
         isCollapsed: storage === "true",
+
         setUnreadCount,
-        workflowOptions,
-        groupTitleForApi,
       }}
     >
       {children}
