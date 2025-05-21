@@ -4,6 +4,7 @@ import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { useWorkflowOptions } from "../hooks/useWorkflowOptions";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
@@ -27,6 +28,7 @@ export const AppProvider = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
   const [spinnerTickets, setSpinnerTickets] = useState(false);
+  const { workflowOptions, groupTitleForApi } = useWorkflowOptions({ userId });
   const { storage, changeLocalStorage } = useLocalStorage(
     SIDEBAR_COLLAPSE,
     "false",
@@ -50,10 +52,11 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page = 1) => {
     try {
-      console.log("📥 [fetchTickets] Fetching page", page);
       const data = await api.tickets.filters({
         page,
         type: "light",
+        group_title: groupTitleForApi,
+        workflow: workflowOptions,
       });
 
       const totalPages = data.pagination?.total_pages || 1;
