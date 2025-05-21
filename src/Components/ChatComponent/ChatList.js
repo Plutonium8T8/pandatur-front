@@ -19,6 +19,7 @@ import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { api } from "../../api";
+import { useDebouncedValue } from "@mantine/hooks";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 
 const SORT_BY = "creation_date";
@@ -45,13 +46,13 @@ const ChatList = ({ selectTicketId }) => {
   const { tickets } = useApp();
   const { userId } = useUser();
   const [showMyTickets, setShowMyTickets] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const [openFilter, setOpenFilter] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
   const [filteredTicketIds, setFilteredTicketIds] = useState(null);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
-
+  const [rawSearchQuery, setRawSearchQuery] = useState("");
+  const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
@@ -175,7 +176,7 @@ const ChatList = ({ selectTicketId }) => {
 
           <TextInput
             placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
-            onInput={(e) => setSearchQuery(e.target.value.trim().toLowerCase())}
+            onInput={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>
 
