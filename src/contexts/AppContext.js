@@ -1,7 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { useSnackbar } from "notistack";
 import { useUser, useLocalStorage, useSocket } from "@hooks";
-import { api } from "@api";
+import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 
@@ -48,18 +48,19 @@ export const AppProvider = ({ children }) => {
     setUnreadCount((prev) => prev - count);
   };
 
-  const getTicketsListRecursively = async (page) => {
+  const getTicketsListRecursively = async (page = 1) => {
     try {
-      const data = await api.tickets.getLightList({ page: page });
+      console.log("📥 [fetchTickets] Fetching page", page);
+      const data = await api.tickets.filters({
+        page,
+        type: "light",
+      });
 
-      if (page >= data.total_pages) {
-        setSpinnerTickets(false);
-        return;
-      }
+      const totalPages = data.pagination?.total_pages || 1;
 
       const totalUnread = data.tickets.reduce(
-        (sum, ticket) => sum + ticket.unseen_count,
-        0,
+        (sum, ticket) => sum + (ticket.unseen_count || 0),
+        0
       );
 
       setUnreadCount((prev) => prev + totalUnread);
@@ -67,9 +68,14 @@ export const AppProvider = ({ children }) => {
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => [...prev, ...processedTickets]);
 
-      getTicketsListRecursively(page + 1);
+      if (page < totalPages) {
+        await getTicketsListRecursively(page + 1);
+      } else {
+        setSpinnerTickets(false);
+      }
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
+      setSpinnerTickets(false);
     }
   };
 
@@ -120,13 +126,13 @@ export const AppProvider = ({ children }) => {
           return prev.map((ticket) => {
             return ticket.id === ticket_id
               ? {
-                  ...ticket,
-                  unseen_count:
-                    ticket.unseen_count + (sender_id !== userId ? 1 : 0),
-                  last_message_type: mtype,
-                  last_message: msgText,
-                  time_sent: time_sent,
-                }
+                ...ticket,
+                unseen_count:
+                  ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                last_message_type: mtype,
+                last_message: msgText,
+                time_sent: time_sent,
+              }
               : ticket;
           });
         });
