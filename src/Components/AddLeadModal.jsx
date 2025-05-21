@@ -17,6 +17,7 @@ import { getLanguageByKey, showServerError } from "@utils";
 import { priorityOptions, workflowOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
+import { groupTitleOptions } from "../FormOptions";
 
 export const AddLeadModal = ({
   open,
@@ -131,12 +132,7 @@ export const AddLeadModal = ({
             placeholder={getLanguageByKey("selectGroup")}
             w="100%"
             label={getLanguageByKey("Grup")}
-            data={[
-              { value: "RO", label: "RO" },
-              { value: "MD", label: "MD" },
-              { value: "Filiale", label: getLanguageByKey("FIL") },
-              { value: "Francize", label: getLanguageByKey("FRA") },
-            ]}
+            data={groupTitleOptions}
             key={form.key("group_title")}
             {...form.getInputProps("group_title")}
           />

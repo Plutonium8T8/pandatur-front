@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, useContext } from "react";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
@@ -13,10 +13,12 @@ import {
   Select,
 } from "@mantine/core";
 import { useApp } from "../../../hooks";
+import { AppContext } from "../../../contexts/AppContext";
 import { VIEW_MODE } from "../utils";
 import { getLanguageByKey } from "../../utils";
 import { PageHeader } from "../../PageHeader";
 import Can from "../../CanComponent/Can";
+import { groupTitleOptions } from "../../../FormOptions";
 import "./LeadsFilter.css";
 
 export const RefLeadsHeader = forwardRef(
@@ -30,7 +32,6 @@ export const RefLeadsHeader = forwardRef(
       onOpenModal,
       setIsFilterOpen,
       deleteTicket,
-      setGroupTitle,
       totalTicketsFiltered,
       hasOpenFiltersModal,
       tickets,
@@ -38,6 +39,7 @@ export const RefLeadsHeader = forwardRef(
     ref,
   ) => {
     const { isCollapsed } = useApp();
+    const { groupTitle, setGroupTitle } = useContext(AppContext);
 
     const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);
     const responsibleId = selectedTicket?.technician_id
@@ -113,19 +115,9 @@ export const RefLeadsHeader = forwardRef(
 
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
-                defaultValue=""
-                data={[
-                  { value: "", label: getLanguageByKey("Toate") },
-                  { value: "RO", label: "RO" },
-                  { value: "MD", label: "MD" },
-                  { value: "Filiale", label: getLanguageByKey("FIL") },
-                  { value: "Francize", label: getLanguageByKey("FRA") },
-                  {
-                    value: "Marketing",
-                    label: getLanguageByKey("marketing"),
-                  },
-                ]}
-                onChange={(group) => setGroupTitle(group)}
+                data={groupTitleOptions}
+                value={groupTitle}
+                onChange={setGroupTitle}
               />
 
               <SegmentedControl
