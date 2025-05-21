@@ -18,7 +18,7 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
                 );
                 setUserGroups(me?.groups || []);
             } catch (err) {
-                console.error("Ошибка при получении списка техников:", err);
+                console.error("error get technician list", err);
                 setUserGroups([]);
             }
         };
