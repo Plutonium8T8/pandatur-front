@@ -33,6 +33,7 @@ export const AppProvider = ({ children }) => {
   const [userGroups, setUserGroups] = useState([]);
   const [loadingWorkflow, setLoadingWorkflow] = useState(true);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
+  const [customGroupTitle, setCustomGroupTitle] = useState(null);
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
@@ -54,14 +55,16 @@ export const AppProvider = ({ children }) => {
     if (userId) fetchTechnicians();
   }, [userId]);
 
-  const groupTitleForApi = useMemo(() => {
-    const found = userGroups.find((group) => {
-      const mapped = userGroupsToGroupTitle[group.name];
-      return mapped && (Array.isArray(mapped) ? mapped.length > 0 : true);
-    });
-    const mapped = found ? userGroupsToGroupTitle[found.name] : null;
-    return Array.isArray(mapped) ? mapped[0] : mapped;
+
+  const accessibleGroupTitles = useMemo(() => {
+    const titles = userGroups.flatMap((group) => userGroupsToGroupTitle[group.name] || []);
+    return [...new Set(titles)];
   }, [userGroups]);
+
+  const groupTitleForApi = useMemo(() => {
+    if (customGroupTitle) return customGroupTitle;
+    return accessibleGroupTitles[0] || null;
+  }, [customGroupTitle, accessibleGroupTitles]);
 
   const isAdmin = useMemo(() => {
     return userGroups.some((g) => g.name === "Admin");
@@ -90,7 +93,7 @@ export const AppProvider = ({ children }) => {
         type: "light",
         group_title: groupTitleForApi,
         workflow: workflowOptions,
-        attributes: lightTicketFilters, // ✅ фильтры из Leads
+        attributes: lightTicketFilters,
       });
 
       const totalPages = data.pagination?.total_pages || 1;
@@ -117,6 +120,8 @@ export const AppProvider = ({ children }) => {
 
   const fetchTickets = async () => {
     setSpinnerTickets(true);
+    setTickets([]);
+    setUnreadCount(0);
     await getTicketsListRecursively(1);
   };
 
@@ -148,12 +153,12 @@ export const AppProvider = ({ children }) => {
           prev.map((ticket) =>
             ticket.id === ticket_id
               ? {
-                  ...ticket,
-                  unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
-                  last_message_type: mtype,
-                  last_message: msgText,
-                  time_sent,
-                }
+                ...ticket,
+                unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                last_message_type: mtype,
+                last_message: msgText,
+                time_sent,
+              }
               : ticket
           )
         );
@@ -215,7 +220,10 @@ export const AppProvider = ({ children }) => {
         isAdmin,
         userGroups,
         fetchTickets,
-        setLightTicketFilters, // ✅ теперь можно использовать в Leads
+        setLightTicketFilters,
+        accessibleGroupTitles,
+        setCustomGroupTitle,
+        customGroupTitle,
       }}
     >
       {children}
