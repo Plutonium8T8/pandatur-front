@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
   TextInput,
@@ -24,13 +24,21 @@ import { Pagination } from "../Pagination";
 import { useUser } from "../../hooks";
 import { useSnackbar } from "notistack";
 import { showServerError } from "../utils";
+import { AppContext } from "../../contexts/AppContext";
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTasks, setFetchTasksRef }) => {
+const TaskComponent = ({
+  updateTaskCount = () => { },
+  userId,
+  tasks = [],
+  setTasks,
+  setFetchTasksRef,
+}) => {
   const { userId: currentUserId } = useUser();
-  const [filters, setFilters] = useState({ created_for: [String(currentUserId)] });
-  const [filtersReady, setFiltersReady] = useState(false);
+  const { accessibleGroupTitles, workflowOptions } = useContext(AppContext);
+
+  const [filters, setFilters] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -49,10 +57,11 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (appliedFilters = filters) => {
+    if (!appliedFilters) return;
     try {
       const res = await api.task.filterTasks({
-        ...filters,
+        ...appliedFilters,
         search: searchQuery,
         page: currentPage,
         sort_by: "scheduled_time",
@@ -73,10 +82,19 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
   }, [setFetchTasksRef, fetchTasks]);
 
   useEffect(() => {
-    if (filtersReady) {
-      fetchTasks();
-    }
-  }, [filters, searchQuery, currentPage, filtersReady]);
+    fetchTasks();
+  }, [filters, searchQuery, currentPage]);
+
+  useEffect(() => {
+    // Применение дефолтных фильтров при монтировании
+    const defaultFilters = {
+      created_for: [String(currentUserId)],
+      group_titles: accessibleGroupTitles,
+      workflows: workflowOptions,
+      status: false,
+    };
+    setFilters(defaultFilters);
+  }, [currentUserId, accessibleGroupTitles, workflowOptions]);
 
   const openNewTask = () => {
     setSelectedTask(null);
@@ -88,12 +106,14 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
     setIsModalOpen(true);
   };
 
-  const hasActiveFilters = Object.entries(filters).some(([key, value]) => {
-    if (key === "created_for") {
-      return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
-    }
-    return value && value.length > 0;
-  });
+  const hasActiveFilters = filters
+    ? Object.entries(filters).some(([key, value]) => {
+      if (key === "created_for") {
+        return JSON.stringify(value) !== JSON.stringify([String(currentUserId)]);
+      }
+      return value && value.length > 0;
+    })
+    : false;
 
   return (
     <Box p="md">
@@ -118,7 +138,9 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
                   value: "list",
                   label: (
                     <Tooltip label={translations["listView"][language]}>
-                      <span><FaList size={16} /></span>
+                      <span>
+                        <FaList size={16} />
+                      </span>
                     </Tooltip>
                   ),
                 },
@@ -126,7 +148,9 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
                   value: "columns",
                   label: (
                     <Tooltip label={translations["columnView"][language]}>
-                      <span><TbLayoutKanbanFilled size={16} /></span>
+                      <span>
+                        <TbLayoutKanbanFilled size={16} />
+                      </span>
                     </Tooltip>
                   ),
                 },
@@ -189,11 +213,10 @@ const TaskComponent = ({ updateTaskCount = () => { }, userId, tasks = [], setTas
       <TaskFilterModal
         opened={filterModalOpen}
         onClose={() => setFilterModalOpen(false)}
-        filters={filters}
+        filters={filters || {}}
         onApply={(newFilters) => {
           setFilters(newFilters);
           setCurrentPage(1);
-          setFiltersReady(true);
         }}
       />
     </Box>

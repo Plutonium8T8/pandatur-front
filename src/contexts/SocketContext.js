@@ -56,9 +56,9 @@ export const SocketProvider = ({ children }) => {
 
         socketRef.current.send(socketMessage);
       } catch (e) {
-        enqueueSnackbar(showServerError(e), {
-          variant: "error",
-        });
+        // enqueueSnackbar(showServerError(e), {
+        //   variant: "error",
+        // });
       }
     };
 
