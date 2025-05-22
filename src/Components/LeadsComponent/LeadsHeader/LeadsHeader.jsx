@@ -17,6 +17,7 @@ import { VIEW_MODE } from "../utils";
 import { getLanguageByKey } from "../../utils";
 import { PageHeader } from "../../PageHeader";
 import Can from "../../CanComponent/Can";
+import { groupTitleOptions } from "../../../FormOptions";
 import "./LeadsFilter.css";
 
 export const RefLeadsHeader = forwardRef(
@@ -41,6 +42,7 @@ export const RefLeadsHeader = forwardRef(
       accessibleGroupTitles,
       customGroupTitle,
       setCustomGroupTitle,
+      groupTitleForApi,
     } = useApp();
 
     const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);
@@ -48,10 +50,9 @@ export const RefLeadsHeader = forwardRef(
       ? String(selectedTicket.technician_id)
       : undefined;
 
-    const groupTitleSelectData = accessibleGroupTitles.map((title) => ({
-      value: title,
-      label: title, // или `label: getGroupTitleLabel(title)` если нужна красивая подпись
-    }));
+    const groupTitleSelectData = groupTitleOptions.filter((option) =>
+      accessibleGroupTitles.includes(option.value)
+    );
 
     return (
       <Flex
@@ -103,7 +104,7 @@ export const RefLeadsHeader = forwardRef(
 
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
-                value={customGroupTitle}
+                value={customGroupTitle ?? groupTitleForApi}
                 data={groupTitleSelectData}
                 onChange={setCustomGroupTitle}
               />
