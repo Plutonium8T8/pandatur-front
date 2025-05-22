@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider } from "@mantine/core";
@@ -31,23 +31,22 @@ import "../css/SnackBarComponent.css";
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
 const HARD_TICKET = "hard";
-const LIGHT_TICKET = "light";
 const NUMBER_PAGE = 1;
-
-const getTicketsIds = (ticketList) => {
-  return ticketList.map(({ id }) => id);
-};
 
 export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
-  const { tickets, spinnerTickets } = useApp();
+  const {
+    tickets,
+    spinnerTickets,
+    setLightTicketFilters,
+    fetchTickets,
+  } = useApp();
   const { ticketId } = useParams();
 
   const [hardTickets, setHardTickets] = useState([]);
-  const [filteredTicketIds, setFilteredTicketIds] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTicket, setCurrentTicket] = useState(null);
@@ -60,7 +59,6 @@ export const Leads = () => {
   const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false);
   const [hardTicketFilters, setHardTicketFilters] = useState({});
-  const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
@@ -69,19 +67,6 @@ export const Leads = () => {
   const deleteBulkLeads = useConfirmPopup({
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
-
-  const filteredTickets = useMemo(() => {
-    let result = tickets;
-    if (filteredTicketIds === null) return result;
-    if (filteredTicketIds.length === 0) return [];
-    result = result.filter((ticket) => filteredTicketIds.includes(ticket.id));
-    if (selectedWorkflow.length > 0) {
-      result = result.filter((ticket) =>
-        selectedWorkflow.includes(ticket.workflow),
-      );
-    }
-    return result;
-  }, [tickets, filteredTicketIds, selectedWorkflow]);
 
   useEffect(() => {
     if (ticketId) {
@@ -98,7 +83,7 @@ export const Leads = () => {
     setSelectedTickets((prev) =>
       prev.includes(ticketId)
         ? prev.filter((id) => id !== ticketId)
-        : [...prev, ticketId],
+        : [...prev, ticketId]
     );
   };
 
@@ -107,25 +92,11 @@ export const Leads = () => {
       try {
         setLoading(true);
         await api.tickets.deleteById(selectedTickets);
-        await fetchTickets(
-          {
-            type: HARD_TICKET,
-            page: currentPage,
-            attributes: hardTicketFilters,
-          },
-          ({ data, pagination }) => {
-            setHardTickets(data);
-            setTotalLeads(pagination?.total || 0);
-          },
-        );
-
+        await fetchHardTickets(currentPage);
         setSelectedTickets([]);
-        enqueueSnackbar(
-          getLanguageByKey("Leadurile au fost șterse cu succes"),
-          {
-            variant: "success",
-          },
-        );
+        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
+          variant: "success",
+        });
       } catch (error) {
         enqueueSnackbar(showServerError(error), { variant: "error" });
       } finally {
@@ -147,30 +118,18 @@ export const Leads = () => {
     setIsOpenAddLeadModal(true);
   };
 
-  const fetchTickets = async (
-    {
-      page,
-      type,
-      sortBy = SORT_BY,
-      order = ORDER,
-      attributes = {},
-      group_title,
-    },
-    cb,
-    showModalLoading,
-  ) => {
+  const fetchHardTickets = async (page) => {
     try {
       setLoading(true);
-      const tickets = await api.tickets.filters({
+      const response = await api.tickets.filters({
         page,
-        sort_by: sortBy,
-        order: order,
-        type,
-        attributes,
-        group_title,
+        type: HARD_TICKET,
+        sort_by: SORT_BY,
+        order: ORDER,
+        attributes: hardTicketFilters,
       });
-
-      cb(tickets);
+      setHardTickets(response.data);
+      setTotalLeads(response.pagination?.total || 0);
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
@@ -178,125 +137,24 @@ export const Leads = () => {
     }
   };
 
-  const closeModal = (resetSelectedTickets) => {
-    setCurrentTicket(null);
-    setIsModalOpen(false);
-
-    if (resetSelectedTickets) {
-      setSelectedTickets([]);
-    }
-  };
-
   const handleApplyFiltersHardTicket = (selectedFilters) => {
-    const isReset = Object.keys(selectedFilters).length === 0;
-
-    const mergedHardTicketFilters = isReset
-      ? {}
-      : {
-        ...hardTicketFilters,
-        ...selectedFilters,
-      };
-
-    fetchTickets(
-      {
-        attributes: mergedHardTicketFilters,
-        page: NUMBER_PAGE,
-        type: HARD_TICKET,
-      },
-      ({ data, pagination }) => {
-        setHardTickets(data);
-        setHardTicketFilters(mergedHardTicketFilters);
-        setTotalLeads(pagination?.total || 0);
-        setCurrentPage(1);
-        setIsOpenListFilterModal(false);
-      },
-      true
-    );
+    const merged = { ...hardTicketFilters, ...selectedFilters };
+    setHardTicketFilters(merged);
+    fetchHardTickets(NUMBER_PAGE);
+    setCurrentPage(1);
+    setIsOpenListFilterModal(false);
   };
 
-  const handleApplyFilterLightTicket = (selectedFilters, source = "ticket") => {
-    if (source === "message") {
-      setLightTicketFilters(selectedFilters);
-
-      fetchTickets(
-        {
-          page: NUMBER_PAGE,
-          type: LIGHT_TICKET,
-          attributes: selectedFilters,
-        },
-        ({ data, pagination }) => {
-          setTotalLeads(pagination?.total || 0);
-          setFilteredTicketIds(getTicketsIds(data) ?? null);
-          setIsOpenKanbanFilterModal(false);
-        }
-      );
-
-      return;
-    }
-
-    const mergedLightTicketFilters = {
-      ...lightTicketFilters,
-      ...selectedFilters,
-    };
-
-    fetchTickets(
-      {
-        page: NUMBER_PAGE,
-        type: LIGHT_TICKET,
-        attributes: mergedLightTicketFilters,
-      },
-      ({ data, pagination }) => {
-        setLightTicketFilters(mergedLightTicketFilters);
-        setTotalLeads(pagination?.total || 0);
-        setFilteredTicketIds(getTicketsIds(data) ?? null);
-        setSelectedWorkflow(
-          mergedLightTicketFilters.workflow || filteredWorkflows
-        );
-        setIsOpenKanbanFilterModal(false);
-      }
-    );
+  const handleApplyFilterLightTicket = (selectedFilters) => {
+    setLightTicketFilters(selectedFilters);
+    fetchTickets();
+    setIsOpenKanbanFilterModal(false);
   };
 
   const handlePaginationWorkflow = (page) => {
-    fetchTickets(
-      { page, type: HARD_TICKET, attributes: hardTicketFilters },
-      ({ data, pagination }) => {
-        setHardTickets(data);
-        setTotalLeads(pagination?.total || 0);
-        setCurrentPage(page);
-      },
-    );
+    fetchHardTickets(page);
+    setCurrentPage(page);
   };
-
-  const fetchTicketList = () => {
-    const isViewModeList = viewMode === VIEW_MODE.LIST;
-
-    fetchTickets(
-      {
-        type: isViewModeList ? HARD_TICKET : LIGHT_TICKET,
-        page: currentPage,
-        attributes: {
-          ...(debouncedSearch && { search: debouncedSearch }),
-          ...(isViewModeList ? hardTicketFilters : lightTicketFilters),
-        },
-        ...(groupTitle && { group_title: groupTitle }),
-      },
-      ({ data, pagination }) => {
-        setTotalLeads(pagination?.total || 0);
-
-        if (isViewModeList) {
-          setHardTickets(data);
-        } else {
-          setFilteredTicketIds(getTicketsIds(data) ?? null);
-        }
-      },
-    );
-  };
-
-  useEffect(() => {
-    fetchTicketList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearch, groupTitle, viewMode]);
 
   return (
     <>
@@ -311,15 +169,15 @@ export const Leads = () => {
         setIsFilterOpen={() => {
           if (viewMode === VIEW_MODE.KANBAN) {
             setIsOpenKanbanFilterModal(true);
-            return;
+          } else {
+            setIsOpenListFilterModal(true);
           }
-          setIsOpenListFilterModal(true);
         }}
         deleteTicket={deleteTicket}
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
-        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : filteredTickets}
+        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : tickets}
       />
 
       <div
@@ -329,7 +187,6 @@ export const Leads = () => {
         className="leads-container"
       >
         <Divider mb="md" />
-
         {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
@@ -342,13 +199,13 @@ export const Leads = () => {
             onSelectRow={toggleSelectTicket}
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
-            fetchTickets={fetchTicketList}
+            fetchTickets={() => fetchHardTickets(currentPage)}
           />
         ) : (
           <WorkflowColumns
-            fetchTickets={fetchTicketList}
+            fetchTickets={fetchTickets}
             selectedWorkflow={selectedWorkflow}
-            tickets={filteredTickets}
+            tickets={tickets}
             searchTerm={debouncedSearch}
             onEditTicket={(ticket) => {
               setCurrentTicket(ticket);
@@ -375,7 +232,7 @@ export const Leads = () => {
         open={isOpenAddLeadModal}
         onClose={() => setIsOpenAddLeadModal(false)}
         selectedGroupTitle={groupTitle}
-        fetchTickets={fetchTicketList}
+        fetchTickets={fetchTickets}
       />
 
       <MantineModal
@@ -384,15 +241,11 @@ export const Leads = () => {
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
         <LeadsKanbanFilter
-          initialData={lightTicketFilters}
+          initialData={{}}
           systemWorkflow={selectedWorkflow}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
-          onApplyWorkflowFilters={(workflows) => {
-            setSelectedWorkflow(workflows);
-            setFilteredTicketIds(filteredTicketIds ?? null);
-            setIsOpenKanbanFilterModal(false);
-          }}
+          onApplyWorkflowFilters={setSelectedWorkflow}
           onSubmitTicket={handleApplyFilterLightTicket}
         />
       </MantineModal>
@@ -416,13 +269,13 @@ export const Leads = () => {
 
       <MantineModal
         open={isModalOpen}
-        onClose={() => closeModal()}
+        onClose={() => setIsModalOpen(false)}
         title={getLanguageByKey("Editarea tichetelor în grup")}
       >
         <ManageLeadInfoTabs
-          onClose={closeModal}
+          onClose={() => setIsModalOpen(false)}
           selectedTickets={selectedTickets}
-          fetchLeads={fetchTicketList}
+          fetchLeads={() => fetchHardTickets(currentPage)}
           id={
             selectedTickets.length === 1
               ? selectedTickets[0]

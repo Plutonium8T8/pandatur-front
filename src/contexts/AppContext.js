@@ -23,19 +23,19 @@ const normalizeLightTickets = (tickets) =>
 
 export const AppProvider = ({ children }) => {
   const { sendedValue, socketRef } = useSocket();
+  const { enqueueSnackbar } = useSnackbar();
+  const { userId } = useUser();
+  const { storage, changeLocalStorage } = useLocalStorage(SIDEBAR_COLLAPSE, "false");
+
   const [tickets, setTickets] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
   const [userGroups, setUserGroups] = useState([]);
   const [loadingWorkflow, setLoadingWorkflow] = useState(true);
-
-  const { enqueueSnackbar } = useSnackbar();
-  const { userId } = useUser();
-  const { storage, changeLocalStorage } = useLocalStorage(SIDEBAR_COLLAPSE, "false");
+  const [lightTicketFilters, setLightTicketFilters] = useState({});
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
-  // ✅ Получение userGroups
   useEffect(() => {
     const fetchTechnicians = async () => {
       try {
@@ -54,7 +54,6 @@ export const AppProvider = ({ children }) => {
     if (userId) fetchTechnicians();
   }, [userId]);
 
-  // ✅ Вычисление groupTitleForApi
   const groupTitleForApi = useMemo(() => {
     const found = userGroups.find((group) => {
       const mapped = userGroupsToGroupTitle[group.name];
@@ -91,6 +90,7 @@ export const AppProvider = ({ children }) => {
         type: "light",
         group_title: groupTitleForApi,
         workflow: workflowOptions,
+        attributes: lightTicketFilters, // ✅ фильтры из Leads
       });
 
       const totalPages = data.pagination?.total_pages || 1;
@@ -120,16 +120,11 @@ export const AppProvider = ({ children }) => {
     await getTicketsListRecursively(1);
   };
 
-  // ✅ Автозапуск при готовности данных
   useEffect(() => {
-    console.log("🔁 [AppContext] Проверка запуска fetchTickets");
-    console.log("🔹 loadingWorkflow:", loadingWorkflow);
-    console.log("🔹 groupTitleForApi:", groupTitleForApi);
-    console.log("🔹 workflowOptions:", workflowOptions);
     if (!loadingWorkflow && groupTitleForApi && workflowOptions.length) {
       fetchTickets();
     }
-  }, [loadingWorkflow, groupTitleForApi, workflowOptions]);
+  }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
 
   const fetchSingleTicket = async (ticketId) => {
     try {
@@ -153,12 +148,12 @@ export const AppProvider = ({ children }) => {
           prev.map((ticket) =>
             ticket.id === ticket_id
               ? {
-                ...ticket,
-                unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
-                last_message_type: mtype,
-                last_message: msgText,
-                time_sent,
-              }
+                  ...ticket,
+                  unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                  last_message_type: mtype,
+                  last_message: msgText,
+                  time_sent,
+                }
               : ticket
           )
         );
@@ -219,6 +214,8 @@ export const AppProvider = ({ children }) => {
         groupTitleForApi,
         isAdmin,
         userGroups,
+        fetchTickets,
+        setLightTicketFilters, // ✅ теперь можно использовать в Leads
       }}
     >
       {children}
