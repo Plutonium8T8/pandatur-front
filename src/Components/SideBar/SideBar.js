@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Sidebar as BaseSideBar, Menu, MenuItem } from "react-pro-sidebar";
 import {
@@ -26,8 +26,8 @@ import Can from "../CanComponent/Can";
 import "./SideBar.css";
 import { safeParseJson } from "../UsersComponent/rolesUtils";
 import { convertRolesToMatrix } from "../UsersComponent/rolesUtils";
-import { hasRouteAccess } from "../utils/permissions";
-import { hasStrictPermission } from "../utils/permissions";
+import { hasRouteAccess, hasStrictPermission } from "../utils/permissions";
+import { AppContext } from "../../contexts/AppContext";
 
 const LOGO = "/logo.png";
 
@@ -37,6 +37,9 @@ export const SideBar = () => {
   const { surname, name, userId, userRoles } = useUser();
   const [loading, setLoading] = useState(false);
   const { toggleLanguage, selectedLanguage } = useLanguageToggle();
+
+  const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
+  const currentGroupTitle = customGroupTitle || groupTitleForApi;
 
   const isActive = (page) => {
     if (page === "chat") return location.pathname.startsWith("/chat");
@@ -98,7 +101,7 @@ export const SideBar = () => {
               icon={<FaClipboardList />}
               component={<Link to="/leads" />}
             >
-              {getLanguageByKey("Leads")}
+              {getLanguageByKey("Leads")} {currentGroupTitle && `(${currentGroupTitle})`}
             </MenuItem>
           </Can>
 
