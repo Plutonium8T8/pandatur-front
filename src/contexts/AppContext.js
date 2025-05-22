@@ -92,8 +92,10 @@ export const AppProvider = ({ children }) => {
         page,
         type: "light",
         group_title: groupTitleForApi,
-        workflow: workflowOptions,
-        attributes: lightTicketFilters,
+        attributes: {
+          ...lightTicketFilters,
+          workflow: lightTicketFilters.workflow ?? workflowOptions,
+        },
       });
 
       const totalPages = data.pagination?.total_pages || 1;
