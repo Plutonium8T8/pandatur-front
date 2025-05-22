@@ -2,12 +2,13 @@ import { useEffect, useState, useMemo } from "react";
 import {
     userGroupsToGroupTitle,
     workflowOptionsLimitedByGroupTitle,
-    workflowOptionsByGroupTitle
+    workflowOptionsByGroupTitle,
 } from "../Components/utils/workflowUtils";
 import { api } from "../api";
 
 export const useWorkflowOptions = ({ groupTitle, userId }) => {
     const [userGroups, setUserGroups] = useState([]);
+    const [loading, setLoading] = useState(true); // ✅ новый флаг
 
     useEffect(() => {
         const fetchTechnicians = async () => {
@@ -20,22 +21,23 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
             } catch (err) {
                 console.error("error get technician list", err);
                 setUserGroups([]);
+            } finally {
+                setLoading(false); // ✅ загрузка завершена
             }
         };
         if (userId) fetchTechnicians();
     }, [userId]);
 
-    const isAdmin = useMemo(() => {
-        return userGroups.some((g) => g.name === "Admin");
-    }, [userGroups]);
+    const isAdmin = useMemo(
+        () => userGroups.some((g) => g.name === "Admin"),
+        [userGroups]
+    );
 
     const hasAccessToGroupTitle = useMemo(() => {
         return userGroups.some((group) => {
             const mapped = userGroupsToGroupTitle[group.name];
             if (!mapped) return false;
-            if (Array.isArray(mapped)) {
-                return mapped.includes(groupTitle);
-            }
+            if (Array.isArray(mapped)) return mapped.includes(groupTitle);
             return mapped === groupTitle;
         });
     }, [userGroups, groupTitle]);
@@ -57,29 +59,15 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         });
 
         const mapped = found ? userGroupsToGroupTitle[found.name] : null;
-
-        if (Array.isArray(mapped)) {
-            return mapped[0];
-        }
-
-        return mapped;
+        return Array.isArray(mapped) ? mapped[0] : mapped;
     }, [userGroups]);
-
-    // useEffect(() => {
-    //     console.log("[useWorkflowOptions] userGroups:", userGroups);
-    //     console.log("[useWorkflowOptions] userId:", userId);
-    //     console.log("[useWorkflowOptions] groupTitle (вход):", groupTitle);
-    //     console.log("[useWorkflowOptions] groupTitleForApi:", groupTitleForApi);
-    //     console.log("[useWorkflowOptions] isAdmin:", isAdmin);
-    //     console.log("[useWorkflowOptions] hasAccessToGroupTitle:", hasAccessToGroupTitle);
-    //     console.log("[useWorkflowOptions] workflowOptions:", workflowOptions);
-    // }, [userGroups, groupTitle, isAdmin, hasAccessToGroupTitle, workflowOptions, groupTitleForApi]);
 
     return {
         workflowOptions,
         isAdmin,
         hasAccessToGroupTitle,
         userGroups,
-        groupTitleForApi
+        groupTitleForApi,
+        loading, // ✅ экспортируем состояние загрузки
     };
 };

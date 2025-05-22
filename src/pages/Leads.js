@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useContext } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider } from "@mantine/core";
@@ -9,6 +9,7 @@ import {
   useConfirmPopup,
 } from "@hooks";
 import { priorityOptions } from "../FormOptions";
+import { workflowOptions } from "../FormOptions/workflowOptions";
 import { LeadTable } from "@components/LeadsComponent/LeadTable";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
 import { api } from "@api";
@@ -22,13 +23,10 @@ import {
   AddLeadModal,
 } from "@components";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
-import { VIEW_MODE } from "@components/LeadsComponent/utils";
+import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
-import { UserContext } from "../contexts/UserContext";
 import "../css/SnackBarComponent.css";
-import { useWorkflowOptions } from "../hooks/useWorkflowOptions";
-import { userGroupsToGroupTitle } from "../Components/utils/workflowUtils";
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -36,16 +34,8 @@ const HARD_TICKET = "hard";
 const LIGHT_TICKET = "light";
 const NUMBER_PAGE = 1;
 
-const getTicketsIds = (ticketList) => ticketList.map(({ id }) => id);
-
-const getDefaultGroupTitle = (userGroups) => {
-  for (let group of userGroups || []) {
-    const mapped = userGroupsToGroupTitle[group.name];
-    if (mapped) {
-      return Array.isArray(mapped) ? mapped[0] : mapped;
-    }
-  }
-  return "";
+const getTicketsIds = (ticketList) => {
+  return ticketList.map(({ id }) => id);
 };
 
 export const Leads = () => {
@@ -55,8 +45,6 @@ export const Leads = () => {
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
   const { tickets, spinnerTickets } = useApp();
   const { ticketId } = useParams();
-
-  const { userId } = useContext(UserContext);
 
   const [hardTickets, setHardTickets] = useState([]);
   const [filteredTicketIds, setFilteredTicketIds] = useState(null);
@@ -69,27 +57,13 @@ export const Leads = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(!!ticketId);
   const [groupTitle, setGroupTitle] = useState("");
+  const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false);
   const [hardTicketFilters, setHardTicketFilters] = useState({});
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
-
-  const { workflowOptions, userGroups: myGroups, groupTitleForApi } = useWorkflowOptions({
-    groupTitle,
-    userId,
-  });
-
-  useEffect(() => {
-    if (!groupTitle && myGroups && myGroups.length > 0) {
-      const defaultGroupTitle = getDefaultGroupTitle(myGroups);
-      if (defaultGroupTitle) {
-        setGroupTitle(defaultGroupTitle);
-      }
-    }
-    // eslint-disable-next-line
-  }, [myGroups]);
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({
@@ -101,13 +75,13 @@ export const Leads = () => {
     if (filteredTicketIds === null) return result;
     if (filteredTicketIds.length === 0) return [];
     result = result.filter((ticket) => filteredTicketIds.includes(ticket.id));
-    if (workflowOptions.length > 0) {
+    if (selectedWorkflow.length > 0) {
       result = result.filter((ticket) =>
-        workflowOptions.includes(ticket.workflow),
+        selectedWorkflow.includes(ticket.workflow),
       );
     }
     return result;
-  }, [tickets, filteredTicketIds, workflowOptions]);
+  }, [tickets, filteredTicketIds, selectedWorkflow]);
 
   useEffect(() => {
     if (ticketId) {
@@ -144,10 +118,13 @@ export const Leads = () => {
             setTotalLeads(pagination?.total || 0);
           },
         );
+
         setSelectedTickets([]);
         enqueueSnackbar(
           getLanguageByKey("Leadurile au fost șterse cu succes"),
-          { variant: "success" },
+          {
+            variant: "success",
+          },
         );
       } catch (error) {
         enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -177,7 +154,7 @@ export const Leads = () => {
       sortBy = SORT_BY,
       order = ORDER,
       attributes = {},
-      group_title = groupTitle,
+      group_title,
     },
     cb,
     showModalLoading,
@@ -189,12 +166,10 @@ export const Leads = () => {
         sort_by: sortBy,
         order: order,
         type,
-        attributes: {
-          ...attributes,
-          workflow: workflowOptions.length > 0 ? workflowOptions : undefined,
-        },
+        attributes,
         group_title,
       });
+
       cb(tickets);
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -239,38 +214,22 @@ export const Leads = () => {
     );
   };
 
-  const fetchValidTicketsPage = async (filters, page = 1) => {
-    const res = await api.tickets.filters({
-      page,
-      type: LIGHT_TICKET,
-      attributes: filters,
-      group_title: groupTitle,
-    });
-
-    const valid = res.data?.filter((ticket) =>
-      workflowOptions.includes(ticket.workflow)
-    );
-
-    if (valid.length > 0 || page >= res.pagination?.total_pages) {
-      return {
-        data: valid,
-        pagination: res.pagination,
-      };
-    }
-
-    return fetchValidTicketsPage(filters, page + 1);
-  };
-
   const handleApplyFilterLightTicket = (selectedFilters, source = "ticket") => {
     if (source === "message") {
       setLightTicketFilters(selectedFilters);
 
-      fetchValidTicketsPage(mergedLightTicketFilters).then(({ data, pagination }) => {
-        setLightTicketFilters(mergedLightTicketFilters);
-        setTotalLeads(pagination?.total || 0);
-        setFilteredTicketIds(getTicketsIds(data) ?? null);
-        setIsOpenKanbanFilterModal(false);
-      });
+      fetchTickets(
+        {
+          page: NUMBER_PAGE,
+          type: LIGHT_TICKET,
+          attributes: selectedFilters,
+        },
+        ({ data, pagination }) => {
+          setTotalLeads(pagination?.total || 0);
+          setFilteredTicketIds(getTicketsIds(data) ?? null);
+          setIsOpenKanbanFilterModal(false);
+        }
+      );
 
       return;
     }
@@ -290,6 +249,9 @@ export const Leads = () => {
         setLightTicketFilters(mergedLightTicketFilters);
         setTotalLeads(pagination?.total || 0);
         setFilteredTicketIds(getTicketsIds(data) ?? null);
+        setSelectedWorkflow(
+          mergedLightTicketFilters.workflow || filteredWorkflows
+        );
         setIsOpenKanbanFilterModal(false);
       }
     );
@@ -297,12 +259,7 @@ export const Leads = () => {
 
   const handlePaginationWorkflow = (page) => {
     fetchTickets(
-      {
-        page,
-        type: HARD_TICKET,
-        attributes: hardTicketFilters,
-        group_title: groupTitle,
-      },
+      { page, type: HARD_TICKET, attributes: hardTicketFilters },
       ({ data, pagination }) => {
         setHardTickets(data);
         setTotalLeads(pagination?.total || 0);
@@ -322,7 +279,7 @@ export const Leads = () => {
           ...(debouncedSearch && { search: debouncedSearch }),
           ...(isViewModeList ? hardTicketFilters : lightTicketFilters),
         },
-        group_title: groupTitle,
+        ...(groupTitle && { group_title: groupTitle }),
       },
       ({ data, pagination }) => {
         setTotalLeads(pagination?.total || 0);
@@ -359,7 +316,6 @@ export const Leads = () => {
           setIsOpenListFilterModal(true);
         }}
         deleteTicket={deleteTicket}
-        groupTitle={groupTitle}
         setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
@@ -387,12 +343,11 @@ export const Leads = () => {
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
             fetchTickets={fetchTicketList}
-            workflowOptions={workflowOptions}
           />
         ) : (
           <WorkflowColumns
             fetchTickets={fetchTicketList}
-            selectedWorkflow={workflowOptions}
+            selectedWorkflow={selectedWorkflow}
             tickets={filteredTickets}
             searchTerm={debouncedSearch}
             onEditTicket={(ticket) => {
@@ -430,10 +385,14 @@ export const Leads = () => {
       >
         <LeadsKanbanFilter
           initialData={lightTicketFilters}
-          systemWorkflow={workflowOptions}
+          systemWorkflow={selectedWorkflow}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
-          onApplyWorkflowFilters={() => { }}
+          onApplyWorkflowFilters={(workflows) => {
+            setSelectedWorkflow(workflows);
+            setFilteredTicketIds(filteredTicketIds ?? null);
+            setIsOpenKanbanFilterModal(false);
+          }}
           onSubmitTicket={handleApplyFilterLightTicket}
         />
       </MantineModal>
