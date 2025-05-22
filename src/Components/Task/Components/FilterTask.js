@@ -36,10 +36,10 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   );
   const [manuallyChangedCreatedFor, setManuallyChangedCreatedFor] = useState(false);
 
-  const { workflowOptions, groupTitleForApi } = useContext(AppContext);
+  const { workflowOptions, accessibleGroupTitles } = useContext(AppContext);
 
   const allowedGroupTitleOptions = groupTitleOptions.filter((g) =>
-    groupTitleForApi ? [groupTitleForApi].includes(g.value) : true
+    accessibleGroupTitles.includes(g.value)
   );
 
   useEffect(() => {
@@ -51,13 +51,13 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             ? filters.created_for
             : [String(userId)],
         status: filters.status === undefined ? false : filters.status,
-        group_titles: groupTitleForApi ? [groupTitleForApi] : [],
+        group_titles: filters.group_titles || [],
       };
       setLocalFilters(defaultFilters);
       setManuallyChangedCreatedFor(false);
       onApply(defaultFilters);
     }
-  }, [opened, groupTitleForApi]);
+  }, [opened]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -83,7 +83,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     const defaultFilters = {
       created_for: [String(userId)],
       status: false,
-      group_titles: groupTitleForApi ? [groupTitleForApi] : [],
+      group_titles: [],
     };
     setLocalFilters(defaultFilters);
     onApply(defaultFilters);
@@ -223,10 +223,16 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             label={translations["groupTitle"][language]}
             placeholder={translations["groupTitle"][language]}
             data={allowedGroupTitleOptions}
-            value={localFilters.group_titles || []}
-            onChange={(val) => handleChange("group_titles", val)}
+            value={localFilters.group_titles?.length ? localFilters.group_titles : accessibleGroupTitles}
+            onChange={(val) =>
+              handleChange(
+                "group_titles",
+                val.length > 0 ? val : accessibleGroupTitles
+              )
+            }
             clearable={false}
             searchable
+            disabled={accessibleGroupTitles.length === 1}
           />
 
           <SelectWorkflow

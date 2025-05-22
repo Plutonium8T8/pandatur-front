@@ -1,10 +1,17 @@
-import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
+import {
+  TextInput,
+  MultiSelect,
+  TagsInput,
+  Flex,
+  Button,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
 import { priorityOptions } from "../../FormOptions";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
-import { workflowOptionsSalesMD } from "../utils/workflowUtils";
+import { AppContext } from "../../contexts/AppContext";
+
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
 export const BasicGeneralForm = ({
@@ -16,8 +23,8 @@ export const BasicGeneralForm = ({
   formId,
 }) => {
   const idForm = formId || GENERAL_FORM_FILTER_ID;
-
   const { technicians } = useGetTechniciansList();
+  const { workflowOptions } = useContext(AppContext);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -46,7 +53,7 @@ export const BasicGeneralForm = ({
         <MultiSelect
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={workflowOptionsSalesMD}
+          data={workflowOptions.map((w) => ({ value: w, label: w }))}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
@@ -73,9 +80,7 @@ export const BasicGeneralForm = ({
         <TagsInput
           mt="md"
           label={getLanguageByKey("Tag-uri")}
-          placeholder={getLanguageByKey(
-            "Introdu tag-uri separate prin virgule",
-          )}
+          placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
           key={form.key("tags")}
           {...form.getInputProps("tags")}
         />
@@ -90,6 +95,7 @@ export const BasicGeneralForm = ({
           {...form.getInputProps("technician_id")}
         />
       </form>
+
       <Flex justify="end" gap="md" mt="md">
         {renderFooterButtons?.(form.reset)}
         <Button variant="default" onClick={onClose}>

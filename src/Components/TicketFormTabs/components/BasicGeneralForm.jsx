@@ -4,8 +4,7 @@ import { useEffect, useContext } from "react";
 import { priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
-import { UserContext } from "../../../contexts/UserContext";
-import { useWorkflowOptions } from "../../../hooks/useWorkflowOptions";
+import { AppContext } from "../../../contexts/AppContext";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
@@ -19,19 +18,12 @@ export const BasicGeneralForm = ({
 }) => {
   const idForm = formId || GENERAL_FORM_FILTER_ID;
   const { technicians } = useGetTechniciansList();
-  const { userGroups, userId } = useContext(UserContext);
-
-  const groupTitle = data?.group_title || "MD";
-  const { workflowOptions: availableWorkflowOptions } = useWorkflowOptions({
-    groupTitle,
-    userGroups,
-    userId,
-  });
+  const { workflowOptions } = useContext(AppContext);
 
   const form = useForm({
     mode: "uncontrolled",
     transformValues: ({ workflow, priority, contact, tags, technician_id }) => ({
-      workflow: workflow ?? availableWorkflowOptions,
+      workflow: workflow ?? workflowOptions,
       priority: priority ?? undefined,
       contact: contact ?? undefined,
       tags: tags ?? undefined,
@@ -41,7 +33,7 @@ export const BasicGeneralForm = ({
 
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
-      form.setFieldValue("workflow", availableWorkflowOptions);
+      form.setFieldValue("workflow", workflowOptions);
     } else {
       form.setFieldValue("workflow", value);
     }
@@ -70,7 +62,7 @@ export const BasicGeneralForm = ({
         <MultiSelect
           label={getLanguageByKey("Workflow")}
           placeholder={getLanguageByKey("Selectează flux de lucru")}
-          data={[getLanguageByKey("selectAll"), ...availableWorkflowOptions]}
+          data={[getLanguageByKey("selectAll"), ...workflowOptions]}
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}

@@ -51,7 +51,7 @@ export const workflowOptionsGreenCard = [
     "Rezervari",
 ];
 
-export const workflowOptionsIndividualsGroups = [
+export const workflowOptionsIndividualGroups = [
     "Interesat",
     "Luat în lucru",
     "Ofertă trimisă",
@@ -62,6 +62,16 @@ export const workflowOptionsIndividualsGroups = [
 ];
 
 export const workflowOptionsBusinessGroups = [
+    "Interesat",
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
+];
+
+export const workflowOptionsFranchise = [
     "Interesat",
     "Luat în lucru",
     "Ofertă trimisă",
@@ -134,7 +144,7 @@ export const workflowOptionsLimitedGreenCard = [
     "Купил (текущий год)",
     "Rezervari",
 ];
-export const workflowOptionsLimitedIndividualsGroups = [
+export const workflowOptionsLimitedIndividualGroups = [
     "Luat în lucru",
     "Ofertă trimisă",
     "Aprobat cu client",
@@ -169,7 +179,7 @@ export const workflowOptionsByGroupTitle = {
     Filiale: workflowOptionsFiliale,
     Agency: workflowOptionsAgency,
     GreenCard: workflowOptionsGreenCard,
-    IndividualGroups: workflowOptionsIndividualsGroups,
+    IndividualGroups: workflowOptionsIndividualGroups,
     BusinessGroups: workflowOptionsBusinessGroups,
     FranchiseOrhei: workflowOptionsFranchiseOrhei,
     FranchiseCantemir: workflowOptionsFranchiseCantemir,
@@ -183,7 +193,7 @@ export const workflowOptionsLimitedByGroupTitle = {
     Filiale: workflowOptionsLimitedFiliale,
     Agency: workflowOptionsLimitedAgency,
     GreenCard: workflowOptionsLimitedGreenCard,
-    IndividualGroups: workflowOptionsLimitedIndividualsGroups,
+    IndividualGroups: workflowOptionsLimitedIndividualGroups,
     BusinessGroups: workflowOptionsLimitedBusinessGroups,
     FranchiseOrhei: workflowOptionsLimitedFranchiseOrhei,
     FranchiseCantemir: workflowOptionsLimitedFranchiseCantemir,
@@ -218,7 +228,7 @@ export const groupTitleOptions = [
     { value: "MD", label: "MD-Sales" },
     { value: "RO", label: "RO-Sales" },
     { value: "Filiale", label: "Filiale" },
-    { value: "Francize", label: "Francize" },
+    { value: "Franchise", label: "Francize" },
     { value: "FranchiseOrhei", label: "Franchise Orhei" },
     { value: "FranchiseCantemir", label: "Franchise Cantemir" },
     { value: "Marketing", label: "Marketing" },

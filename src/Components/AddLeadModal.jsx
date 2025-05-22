@@ -29,7 +29,7 @@ export const AddLeadModal = ({
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [loading, handlers] = useDisclosure(false);
-  const { workflowOptions } = useContext(AppContext);
+  const { workflowOptions, groupTitleForApi } = useContext(AppContext);
 
   const form = useForm({
     mode: "uncontrolled",
@@ -60,8 +60,10 @@ export const AddLeadModal = ({
   useEffect(() => {
     if (selectedGroupTitle) {
       form.setFieldValue("group_title", selectedGroupTitle);
+    } else {
+      form.setFieldValue("group_title", groupTitleForApi);
     }
-  }, [selectedGroupTitle]);
+  }, [selectedGroupTitle, groupTitleForApi]);
 
   return (
     <Modal
@@ -125,8 +127,8 @@ export const AddLeadModal = ({
           />
 
           <Select
-            disabled={!!selectedGroupTitle}
-            value={form.values.group_title || selectedGroupTitle || undefined}
+            disabled
+            value={form.values.group_title || selectedGroupTitle || groupTitleForApi}
             placeholder={getLanguageByKey("selectGroup")}
             w="100%"
             label={getLanguageByKey("Grup")}
@@ -150,7 +152,7 @@ export const AddLeadModal = ({
             w="100%"
             label={getLanguageByKey("Workflow")}
             placeholder={getLanguageByKey("Selectează flux de lucru")}
-            data={workflowOptions}
+            data={workflowOptions.map((step) => ({ value: step, label: step }))}
             key={form.key("workflow")}
             {...form.getInputProps("workflow")}
           />
