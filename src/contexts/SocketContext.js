@@ -1,8 +1,7 @@
 import React, { createContext, useEffect, useRef, useState } from "react";
 import { useSnackbar } from "notistack";
-import { api } from "@api";
-import { TYPE_SOCKET_EVENTS, TYPE_TICKET } from "@app-constants";
-import { showServerError, getLanguageByKey } from "@utils";
+import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { getLanguageByKey } from "@utils";
 
 export const SocketContext = createContext();
 
@@ -40,33 +39,6 @@ export const SocketProvider = ({ children }) => {
       socketRef.current.close();
       socketRef.current = null;
     };
-  }, []);
-
-  useEffect(() => {
-    const getTicketFightIds = async () => {
-      try {
-        const ids = await api.tickets.filters({
-          type: TYPE_TICKET.LIGHT,
-        });
-
-        const socketMessage = JSON.stringify({
-          type: TYPE_SOCKET_EVENTS.CONNECT,
-          data: { ticket_id: ids.data.map(({ id }) => id) },
-        });
-
-        socketRef.current.send(socketMessage);
-      } catch (e) {
-        // enqueueSnackbar(showServerError(e), {
-        //   variant: "error",
-        // });
-      }
-    };
-
-    const socketInstance = socketRef.current;
-
-    if (socketInstance || socketInstance.readyState === WebSocket.OPEN) {
-      getTicketFightIds();
-    }
   }, []);
 
   const seenMessages = (ticketId, userId) => {

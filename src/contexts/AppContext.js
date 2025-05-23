@@ -272,6 +272,42 @@ export const AppProvider = ({ children }) => {
       handleWebSocketMessage(sendedValue);
     }
   }, [sendedValue]);
+  
+  useEffect(() => {
+    const connectToWebSocketRooms = async () => {
+      if (!groupTitleForApi || !workflowOptions.length || !socketRef.current) return;
+
+      try {
+        const res = await api.tickets.filters({
+          type: "id",
+          group_title: groupTitleForApi,
+          attributes: { workflow: workflowOptions },
+        });
+
+        const ticketIds = res?.data?.filter(Boolean) || [];
+        if (!ticketIds.length) return;
+
+        const socketMessage = JSON.stringify({
+          type: TYPE_SOCKET_EVENTS.CONNECT,
+          data: { ticket_id: ticketIds },
+        });
+
+        const trySend = () => {
+          if (socketRef.current?.readyState === WebSocket.OPEN) {
+            socketRef.current.send(socketMessage);
+          } else {
+            setTimeout(trySend, 500);
+          }
+        };
+
+        trySend();
+      } catch (e) {
+        console.error("❌ Ошибка загрузки ID для WebSocket:", e);
+      }
+    };
+
+    connectToWebSocketRooms();
+  }, [groupTitleForApi, workflowOptions, socketRef]);
 
   return (
     <AppContext.Provider

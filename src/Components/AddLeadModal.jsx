@@ -146,6 +146,7 @@ export const AddLeadModal = ({
             placeholder={getLanguageByKey("Selectează prioritate")}
             key={form.key("priority")}
             {...form.getInputProps("priority")}
+            disabled
           />
 
           <Select
