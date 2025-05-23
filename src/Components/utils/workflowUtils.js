@@ -1,4 +1,3 @@
-// Полные workflow по воронкам
 export const workflowOptionsSalesMD = [
     "Interesat",
     "Apel de intrare",
@@ -101,7 +100,7 @@ export const workflowOptionsFranchiseCantemir = [
     "Închis și nerealizat"
 ];
 
-// Урезанные workflow по воронкам
+////////////////////////////////////////////////
 export const workflowOptionsLimitedSalesMD = [
     "Apel de intrare",
     "De prelucrat",
@@ -172,7 +171,6 @@ export const workflowOptionsLimitedFranchiseCantemir = [
     "Contract încheiat",
 ];
 
-// Мапа: groupTitle → workflow (для админа)
 export const workflowOptionsByGroupTitle = {
     MD: workflowOptionsSalesMD,
     RO: workflowOptionsSalesRO,
@@ -186,7 +184,6 @@ export const workflowOptionsByGroupTitle = {
     Default: workflowOptionsSalesMD,
 };
 
-// Мапа: groupTitle → урезанный workflow
 export const workflowOptionsLimitedByGroupTitle = {
     MD: workflowOptionsLimitedSalesMD,
     RO: workflowOptionsLimitedSalesRO,
@@ -200,7 +197,6 @@ export const workflowOptionsLimitedByGroupTitle = {
     Default: workflowOptionsLimitedSalesMD,
 };
 
-// Мапа: название группы пользователя → groupTitle
 export const userGroupsToGroupTitle = {
     "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
     "Front Office": ["MD"],
@@ -214,7 +210,7 @@ export const userGroupsToGroupTitle = {
     "Brasov RO": ["RO"],
     "Iasi RO": ["RO"],
 
-    // другие
+    // other
     "Company branches": ["Filiale"],
     "Franchise Cantemir": ["FranchiseCantemir"],
     "Franchise Orhei": ["FranchiseOrhei"],
