@@ -10,144 +10,92 @@ import {
   Divider,
   ActionIcon,
   Badge,
-  Tabs
+  Tabs,
+  Button,
 } from "@mantine/core";
-import { useSnackbar } from "notistack";
-import { getLanguageByKey, showServerError } from "../utils";
+import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
 import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
-import { api } from "../../api";
-import { useDebouncedValue } from "@mantine/hooks";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
-
-const SORT_BY = "creation_date";
-const ORDER = "DESC";
-const LIGHT_TICKET = "light";
+import { useDebouncedValue } from "@mantine/hooks";
 
 const CHAT_ITEM_HEIGHT = 94;
 
 const parseCustomDate = (dateStr) => {
   if (!dateStr) return 0;
-
   const [datePart, timePart] = dateStr.split(" ");
   if (!datePart || !timePart) return 0;
-
   const [day, month, year] = datePart.split("-").map(Number);
   const [hours, minutes, seconds] = timePart.split(":").map(Number);
-
   return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
 };
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
 const ChatList = ({ selectTicketId }) => {
-  const { tickets } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, setChatFilteredTickets, chatSpinner } = useApp();
   const { userId } = useUser();
+
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
-  const [isLoading, setIsLoading] = useState(false);
-  const [filteredTicketIds, setFilteredTicketIds] = useState(null);
-  const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
 
-  const filterChatList = async (attributes) => {
-    setIsLoading(true);
-    try {
-      const lightTickets = await api.tickets.filters({
-        sort_by: SORT_BY,
-        order: ORDER,
-        type: LIGHT_TICKET,
-        attributes,
-      });
+  const visibleTickets = chatFilteredTickets.length > 0 ? chatFilteredTickets : tickets;
 
-      setOpenFilter(false);
-      setLightTicketFilters(attributes);
-      setFilteredTicketIds(lightTickets.data.map(({ id }) => id));
-    } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    } finally {
-      setIsLoading(false);
-    }
+  const filterChatList = (filters) => {
+    fetchChatFilteredTickets(filters);
+    setOpenFilter(false);
   };
 
-  // FIXME: Need to center `active` chat on the Y axis
+  const resetFilter = () => {
+    setChatFilteredTickets([]);
+    setOpenFilter(false);
+  };
+
   useEffect(() => {
     if (chatListRef.current && selectTicketId) {
       const container = chatListRef.current;
-      const selectedElement = container.querySelector(
-        `[data-ticket-id="${selectTicketId}"]`,
-      );
-
+      const selectedElement = container.querySelector(`[data-ticket-id="${selectTicketId}"]`);
       if (selectedElement) {
         const containerHeight = container.clientHeight;
         const itemTop = selectedElement.offsetTop;
         const itemHeight = selectedElement.clientHeight;
         const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2;
-
-        container.scrollTo({
-          top: scrollTop,
-        });
+        container.scrollTo({ top: scrollTop });
       }
     }
-  }, [selectTicketId, tickets]);
+  }, [selectTicketId, visibleTickets]);
 
-  // TODO: Please refactor me
   const sortedTickets = useMemo(() => {
-    if (!tickets || tickets.length === 0) return [];
-
-    let result = [...tickets];
-
+    let result = [...visibleTickets];
     result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-
     if (showMyTickets) {
       result = result.filter(ticket => ticket.technician_id === userId);
     }
-
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-
       result = result.filter(ticket => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-
-        const tags = ticket.tags
-          ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase())
-          : [];
+        const tags = ticket.tags ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase()) : [];
         const tagMatch = tags.some(tag => tag.includes(query));
-
         const phones = ticket.clients?.map(c => (String(c.phone || "").toLowerCase())) || [];
         const phoneMatch = phones.some(phone => phone.includes(query));
-
         return idMatch || contactMatch || tagMatch || phoneMatch;
       });
     }
-
-    if (filteredTicketIds !== null) {
-      if (filteredTicketIds.length === 0) return [];
-      result = result.filter(ticket => filteredTicketIds.includes(ticket.id));
-    }
-
     return result;
-  }, [tickets, showMyTickets, searchQuery, filteredTicketIds]);
+  }, [visibleTickets, showMyTickets, searchQuery]);
 
-  const ChatItem = ({ index, style }) => {
-    const ticket = sortedTickets[index];
-
-    return (
-      <ChatListItem
-        chat={ticket}
-        style={style}
-        selectTicketId={selectTicketId}
-      />
-    );
-  };
+  const ChatItem = ({ index, style }) => (
+    <ChatListItem chat={sortedTickets[index]} style={style} selectTicketId={selectTicketId} />
+  );
 
   return (
     <>
@@ -158,12 +106,7 @@ const ChatList = ({ selectTicketId }) => {
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
               <Badge bg="#0f824c">{sortedTickets.length}</Badge>
             </Flex>
-
-            <ActionIcon
-              variant="default"
-              size="24"
-              onClick={() => setOpenFilter(true)}
-            >
+            <ActionIcon variant="default" size="24" onClick={() => setOpenFilter(true)}>
               <LuFilter size={12} />
             </ActionIcon>
           </Flex>
@@ -184,7 +127,7 @@ const ChatList = ({ selectTicketId }) => {
         <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
           <FixedSizeList
             height={wrapperChatHeight}
-            itemCount={sortedTickets?.length || 0}
+            itemCount={sortedTickets.length}
             itemSize={CHAT_ITEM_HEIGHT}
             width="100%"
           >
@@ -210,23 +153,29 @@ const ChatList = ({ selectTicketId }) => {
 
           <Tabs.Panel value="filter_ticket" pt="xs">
             <TicketFormTabs
-              initialData={lightTicketFilters}
               orientation="horizontal"
               onClose={() => setOpenFilter(false)}
-              onSubmit={(filters) => filterChatList(filters)}
-              loading={isLoading}
+              onSubmit={filterChatList}
+              loading={chatSpinner}
+              initialData={{}} // можно заменить на сохранённые фильтры, если решишь
             />
           </Tabs.Panel>
 
           <Tabs.Panel value="filter_message" pt="xs">
             <MessageFilterForm
-              initialData={lightTicketFilters}
-              loading={isLoading}
               onClose={() => setOpenFilter(false)}
-              onSubmit={(filters) => filterChatList(filters)}
+              onSubmit={filterChatList}
+              loading={chatSpinner}
+              initialData={{}}
             />
           </Tabs.Panel>
         </Tabs>
+
+        <Box mt="md">
+          <Button fullWidth variant="outline" onClick={resetFilter}>
+            {getLanguageByKey("Resetează filtrele")}
+          </Button>
+        </Box>
       </MantineModal>
     </>
   );

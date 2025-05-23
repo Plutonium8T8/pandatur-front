@@ -39,6 +39,9 @@ export const AppProvider = ({ children }) => {
   const [kanbanTickets, setKanbanTickets] = useState([]);
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
 
+  const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
+  const [chatSpinner, setChatSpinner] = useState(false);
+
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
   useEffect(() => {
@@ -159,6 +162,38 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const fetchChatFilteredTickets = async (filters = {}) => {
+    setChatSpinner(true);
+    setChatFilteredTickets([]);
+
+    try {
+      const loadPage = async (page = 1) => {
+        const res = await api.tickets.filters({
+          page,
+          type: "light",
+          group_title: groupTitleForApi,
+          sort_by: "creation_date",
+          order: "DESC",
+          attributes: filters,
+        });
+
+        const normalized = normalizeLightTickets(res.tickets);
+        setChatFilteredTickets((prev) => [...prev, ...normalized]);
+
+        if (page < res.pagination?.total_pages) {
+          await loadPage(page + 1);
+        } else {
+          setChatSpinner(false);
+        }
+      };
+
+      await loadPage(1);
+    } catch (err) {
+      enqueueSnackbar(showServerError(err), { variant: "error" });
+      setChatSpinner(false);
+    }
+  };
+
   useEffect(() => {
     if (!loadingWorkflow && groupTitleForApi && workflowOptions.length) {
       fetchTickets();
@@ -263,6 +298,12 @@ export const AppProvider = ({ children }) => {
         kanbanTickets,
         fetchKanbanTickets,
         kanbanSpinner,
+
+        //chat
+        chatFilteredTickets,
+        fetchChatFilteredTickets,
+        setChatFilteredTickets,
+        chatSpinner,
       }}
     >
       {children}
