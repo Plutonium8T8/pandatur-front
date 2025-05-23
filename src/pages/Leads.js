@@ -40,6 +40,8 @@ export const Leads = () => {
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
   const {
     tickets,
+    kanbanTickets,
+    fetchKanbanTickets,
     spinnerTickets,
     setLightTicketFilters,
     fetchTickets,
@@ -62,6 +64,8 @@ export const Leads = () => {
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
+  const visibleTickets = kanbanTickets.length > 0 ? kanbanTickets : tickets;
+  const currentFetchTickets = kanbanTickets.length > 0 ? fetchKanbanTickets : fetchTickets;
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({
@@ -203,9 +207,9 @@ export const Leads = () => {
           />
         ) : (
           <WorkflowColumns
-            fetchTickets={fetchTickets}
+            fetchTickets={currentFetchTickets}
             selectedWorkflow={selectedWorkflow}
-            tickets={tickets}
+            tickets={visibleTickets}
             searchTerm={debouncedSearch}
             onEditTicket={(ticket) => {
               setCurrentTicket(ticket);

@@ -2,19 +2,18 @@ import { Tabs } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
+import { useApp } from "../../hooks";
 
-export const LeadsKanbanFilter = ({
-  onClose,
-  loading,
-  initialData,
-  onSubmitTicket,
-}) => {
+export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
+  const { fetchKanbanTickets } = useApp();
+
+  const handleSubmit = (filters) => {
+    fetchKanbanTickets(filters);
+    onClose?.();
+  };
+
   return (
-    <Tabs
-      h="100%"
-      className="leads-modal-filter-tabs"
-      defaultValue="filter_ticket"
-    >
+    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_ticket">
       <Tabs.List>
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
@@ -28,7 +27,7 @@ export const LeadsKanbanFilter = ({
         <TicketFormTabs
           initialData={initialData}
           onClose={onClose}
-          onSubmit={(filters) => onSubmitTicket(filters, "ticket")}
+          onSubmit={handleSubmit}
           loading={loading}
         />
       </Tabs.Panel>
@@ -38,7 +37,7 @@ export const LeadsKanbanFilter = ({
           initialData={initialData}
           loading={loading}
           onClose={onClose}
-          onSubmit={onSubmitTicket}
+          onSubmit={handleSubmit}
         />
       </Tabs.Panel>
     </Tabs>

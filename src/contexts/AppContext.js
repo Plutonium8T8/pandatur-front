@@ -35,6 +35,10 @@ export const AppProvider = ({ children }) => {
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [customGroupTitle, setCustomGroupTitle] = useState(null);
 
+  // Kanban-specific
+  const [kanbanTickets, setKanbanTickets] = useState([]);
+  const [kanbanSpinner, setKanbanSpinner] = useState(false);
+
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
   useEffect(() => {
@@ -54,7 +58,6 @@ export const AppProvider = ({ children }) => {
     };
     if (userId) fetchTechnicians();
   }, [userId]);
-
 
   const accessibleGroupTitles = useMemo(() => {
     const titles = userGroups.flatMap((group) => userGroupsToGroupTitle[group.name] || []);
@@ -99,7 +102,6 @@ export const AppProvider = ({ children }) => {
       });
 
       const totalPages = data.pagination?.total_pages || 1;
-
       const totalUnread = data.tickets.reduce(
         (sum, ticket) => sum + (ticket.unseen_count || 0),
         0
@@ -123,8 +125,38 @@ export const AppProvider = ({ children }) => {
   const fetchTickets = async () => {
     setSpinnerTickets(true);
     setTickets([]);
+    setKanbanTickets([]);
     setUnreadCount(0);
     await getTicketsListRecursively(1);
+  };
+
+  // 🔸 KANBAN тикеты (отдельно от глобальных)
+  const fetchKanbanTickets = async (filters = {}) => {
+    setKanbanSpinner(true);
+    setKanbanTickets([]);
+    try {
+      const loadPage = async (page = 1) => {
+        const res = await api.tickets.filters({
+          page,
+          type: "light",
+          group_title: groupTitleForApi,
+          attributes: filters,
+        });
+
+        const normalized = normalizeLightTickets(res.tickets);
+        setKanbanTickets((prev) => [...prev, ...normalized]);
+
+        if (page < res.pagination?.total_pages) {
+          await loadPage(page + 1);
+        } else {
+          setKanbanSpinner(false);
+        }
+      };
+      await loadPage(1);
+    } catch (err) {
+      enqueueSnackbar(showServerError(err), { variant: "error" });
+      setKanbanSpinner(false);
+    }
   };
 
   useEffect(() => {
@@ -226,6 +258,11 @@ export const AppProvider = ({ children }) => {
         accessibleGroupTitles,
         setCustomGroupTitle,
         customGroupTitle,
+
+        // kanban
+        kanbanTickets,
+        fetchKanbanTickets,
+        kanbanSpinner,
       }}
     >
       {children}
