@@ -2448,6 +2448,26 @@ export const translations = {
   Cantitate: {
     RO: "Cantitate",
     RU: "Количество"
+  },
+  "В работе GC": {
+    RO: "În lucru GC",
+    RU: "В работе GC"
+  },
+  "Сбор данных": {
+    RO: "Colectare date",
+    RU: "Сбор данных"
+  },
+  "Купили (прошлые годы)": {
+    RO: "Au cumpărat (ani anteriori)",
+    RU: "Купили (прошлые годы)"
+  },
+  "Купил (текущий год)": {
+    RO: "A cumpărat (an curent)",
+    RU: "Купил (текущий год)"
+  },
+  "Бронирования": {
+    RO: "Rezervări",
+    RU: "Бронирования"
   }
 
 };
