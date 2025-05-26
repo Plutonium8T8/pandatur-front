@@ -26,30 +26,9 @@ export const LeadsTableFilter = ({
           <TicketFormTabs
             initialData={initialData}
             onClose={onClose}
-            onSubmit={(filters) => onSubmitTicket(filters, "ticket")}
+            onSubmit={(filters) => onSubmitTicket(filters, "hard")}
             loading={loading}
           />
-          {/*TODO NEED FOR REFACTOR */}
-          {/* <Flex justify="end" gap="md" mt="md">
-            <Button
-              variant="outline"
-              onClick={() => {
-                if (onResetFilters) onResetFilters();
-              }}
-            >
-              {getLanguageByKey("Reset filter")}
-            </Button>
-            <Button variant="default" onClick={onClose}>
-              {getLanguageByKey("Închide")}
-            </Button>
-            <Button
-              variant="filled"
-              loading={loading}
-              onClick={() => onSubmitTicket(initialData, "ticket")}
-            >
-              {getLanguageByKey("Aplică")}
-            </Button>
-          </Flex> */}
         </Flex>
       </Tabs.Panel>
 
