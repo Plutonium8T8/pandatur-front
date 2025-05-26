@@ -45,9 +45,9 @@ export const workflowOptionsAgency = [
 export const workflowOptionsGreenCard = [
     "В работе GC",
     "Сбор данных",
-    "КУПИЛИ (предыдущие года)",
+    "Купили (прошлые годы)",
     "Купил (текущий год)",
-    "Rezervari",
+    "Бронирования",
 ];
 
 export const workflowOptionsIndividualGroups = [
@@ -199,6 +199,7 @@ export const workflowOptionsLimitedByGroupTitle = {
 
 export const userGroupsToGroupTitle = {
     "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
+    "IT dep.": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
     "Front Office": ["MD"],
     "Back MD": ["MD", "RO", "GreenCard"],
     "Back Flagman": ["MD", "RO", "GreenCard"],

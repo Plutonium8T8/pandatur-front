@@ -73,7 +73,7 @@ export const AppProvider = ({ children }) => {
   }, [customGroupTitle, accessibleGroupTitles]);
 
   const isAdmin = useMemo(() => {
-    return userGroups.some((g) => g.name === "Admin");
+    return userGroups.some((g) => g.name === "Admin" || g.name === "IT dep.");
   }, [userGroups]);
 
   const workflowOptions = useMemo(() => {
