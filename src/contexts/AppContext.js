@@ -272,7 +272,7 @@ export const AppProvider = ({ children }) => {
       handleWebSocketMessage(sendedValue);
     }
   }, [sendedValue]);
-  
+
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
       if (!groupTitleForApi || !workflowOptions.length || !socketRef.current) return;
