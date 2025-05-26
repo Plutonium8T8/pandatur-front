@@ -31,9 +31,6 @@ import "../css/SnackBarComponent.css";
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
 const HARD_TICKET = "hard";
-const NUMBER_PAGE = 1;
-
-// ...все импорты остаются как есть
 
 export const Leads = () => {
   const refLeadsHeader = useRef();
@@ -79,49 +76,12 @@ export const Leads = () => {
     if (ticketId) setIsChatOpen(true);
   }, [ticketId]);
 
-  const closeChatModal = () => {
-    setIsChatOpen(false);
-    navigate("/leads");
-  };
-
-  const toggleSelectTicket = (ticketId) => {
-    setSelectedTickets((prev) =>
-      prev.includes(ticketId)
-        ? prev.filter((id) => id !== ticketId)
-        : [...prev, ticketId]
-    );
-  };
-
-  const deleteTicket = async () => {
-    deleteBulkLeads(async () => {
-      try {
-        setLoading(true);
-        await api.tickets.deleteById(selectedTickets);
-        await fetchHardTickets(currentPage);
-        setSelectedTickets([]);
-        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
-          variant: "success",
-        });
-      } catch (error) {
-        enqueueSnackbar(showServerError(error), { variant: "error" });
-      } finally {
-        setLoading(false);
-      }
-    });
-  };
-
-  const openCreateTicketModal = () => {
-    setCurrentTicket({
-      contact: "",
-      transport: "",
-      country: "",
-      priority: priorityOptions[0],
-      workflow: defaultWorkflowOptions[0],
-      service_reference: "",
-      technician_id: 0,
-    });
-    setIsOpenAddLeadModal(true);
-  };
+  // ✅ автоматический запрос hard тикетов при изменении фильтра/страницы/режима
+  useEffect(() => {
+    if (viewMode === VIEW_MODE.LIST) {
+      fetchHardTickets(currentPage);
+    }
+  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
@@ -147,18 +107,60 @@ export const Leads = () => {
     }
   };
 
+  const closeChatModal = () => {
+    setIsChatOpen(false);
+    navigate("/leads");
+  };
+
+  const toggleSelectTicket = (ticketId) => {
+    setSelectedTickets((prev) =>
+      prev.includes(ticketId)
+        ? prev.filter((id) => id !== ticketId)
+        : [...prev, ticketId]
+    );
+  };
+
+  const deleteTicket = async () => {
+    deleteBulkLeads(async () => {
+      try {
+        setLoading(true);
+        await api.tickets.deleteById(selectedTickets);
+        setSelectedTickets([]);
+        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
+          variant: "success",
+        });
+        fetchHardTickets(currentPage);
+      } catch (error) {
+        enqueueSnackbar(showServerError(error), { variant: "error" });
+      } finally {
+        setLoading(false);
+      }
+    });
+  };
+
+  const openCreateTicketModal = () => {
+    setCurrentTicket({
+      contact: "",
+      transport: "",
+      country: "",
+      priority: priorityOptions[0],
+      workflow: defaultWorkflowOptions[0],
+      service_reference: "",
+      technician_id: 0,
+    });
+    setIsOpenAddLeadModal(true);
+  };
+
   const handleChangeViewMode = (mode) => {
     setViewMode(mode);
     if (mode === VIEW_MODE.LIST) {
-      fetchHardTickets(1);
-      setCurrentPage(1);
+      setCurrentPage(1); // сброс страницы
     }
   };
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const merged = { ...hardTicketFilters, ...selectedFilters };
     setHardTicketFilters(merged);
-    fetchHardTickets(NUMBER_PAGE);
     setCurrentPage(1);
     setIsOpenListFilterModal(false);
   };
@@ -170,7 +172,6 @@ export const Leads = () => {
   };
 
   const handlePaginationWorkflow = (page) => {
-    fetchHardTickets(page);
     setCurrentPage(page);
   };
 
@@ -197,10 +198,7 @@ export const Leads = () => {
         tickets={viewMode === VIEW_MODE.LIST ? hardTickets : tickets}
       />
 
-      <div
-        style={{ "--leads-filter-height": `${leadsFilterHeight}px` }}
-        className="leads-container"
-      >
+      <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
         <Divider mb="md" />
         {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
@@ -247,7 +245,7 @@ export const Leads = () => {
         open={isOpenAddLeadModal}
         onClose={() => setIsOpenAddLeadModal(false)}
         selectedGroupTitle={groupTitleForApi}
-        fetchTickets={fetchTickets}
+        fetchTickets={() => fetchHardTickets(currentPage)}
       />
 
       <MantineModal
@@ -277,7 +275,7 @@ export const Leads = () => {
           onSubmitTicket={handleApplyFiltersHardTicket}
           onResetFilters={() => {
             setHardTicketFilters({});
-            handleApplyFiltersHardTicket({});
+            setCurrentPage(1);
           }}
         />
       </MantineModal>
