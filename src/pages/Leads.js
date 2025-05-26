@@ -76,7 +76,6 @@ export const Leads = () => {
     if (ticketId) setIsChatOpen(true);
   }, [ticketId]);
 
-  // ✅ автоматический запрос hard тикетов при изменении фильтра/страницы/режима
   useEffect(() => {
     if (viewMode === VIEW_MODE.LIST) {
       fetchHardTickets(currentPage);
@@ -154,7 +153,7 @@ export const Leads = () => {
   const handleChangeViewMode = (mode) => {
     setViewMode(mode);
     if (mode === VIEW_MODE.LIST) {
-      setCurrentPage(1); // сброс страницы
+      setCurrentPage(1);
     }
   };
 
