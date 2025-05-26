@@ -63,6 +63,7 @@ export const RefLeadsHeader = forwardRef(
         }}
       >
         <PageHeader
+          count={tickets.length}
           extraInfo={
             <>
               {selectedTickets.length > 0 && (
@@ -125,7 +126,6 @@ export const RefLeadsHeader = forwardRef(
             </>
           }
           title={getLanguageByKey("Leads")}
-          count={totalTicketsFiltered}
         />
       </Flex>
     );
