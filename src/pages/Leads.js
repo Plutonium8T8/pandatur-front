@@ -9,10 +9,10 @@ import {
   useConfirmPopup,
 } from "@hooks";
 import { priorityOptions } from "../FormOptions";
-import { workflowOptions } from "../FormOptions/workflowOptions";
+import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
 import { LeadTable } from "@components/LeadsComponent/LeadTable";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
-import { api } from "@api";
+import { api } from "../api";
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { Spin } from "@components";
 import { RefLeadsHeader } from "@components/LeadsComponent/LeadsHeader";
@@ -33,6 +33,8 @@ const ORDER = "DESC";
 const HARD_TICKET = "hard";
 const NUMBER_PAGE = 1;
 
+// ...все импорты остаются как есть
+
 export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
@@ -45,6 +47,8 @@ export const Leads = () => {
     spinnerTickets,
     setLightTicketFilters,
     fetchTickets,
+    groupTitleForApi,
+    workflowOptions,
   } = useApp();
   const { ticketId } = useParams();
 
@@ -57,7 +61,6 @@ export const Leads = () => {
   const [totalLeads, setTotalLeads] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [isChatOpen, setIsChatOpen] = useState(!!ticketId);
-  const [groupTitle, setGroupTitle] = useState("");
   const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false);
   const [hardTicketFilters, setHardTicketFilters] = useState({});
@@ -73,9 +76,7 @@ export const Leads = () => {
   });
 
   useEffect(() => {
-    if (ticketId) {
-      setIsChatOpen(true);
-    }
+    if (ticketId) setIsChatOpen(true);
   }, [ticketId]);
 
   const closeChatModal = () => {
@@ -115,14 +116,15 @@ export const Leads = () => {
       transport: "",
       country: "",
       priority: priorityOptions[0],
-      workflow: workflowOptions[0],
+      workflow: defaultWorkflowOptions[0],
       service_reference: "",
       technician_id: 0,
     });
     setIsOpenAddLeadModal(true);
   };
 
-  const fetchHardTickets = async (page) => {
+  const fetchHardTickets = async (page = 1) => {
+    if (!groupTitleForApi || !workflowOptions.length) return;
     try {
       setLoading(true);
       const response = await api.tickets.filters({
@@ -130,7 +132,11 @@ export const Leads = () => {
         type: HARD_TICKET,
         sort_by: SORT_BY,
         order: ORDER,
-        attributes: hardTicketFilters,
+        group_title: groupTitleForApi,
+        attributes: {
+          ...hardTicketFilters,
+          workflow: hardTicketFilters.workflow ?? workflowOptions,
+        },
       });
       setHardTickets(response.data);
       setTotalLeads(response.pagination?.total || 0);
@@ -138,6 +144,14 @@ export const Leads = () => {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChangeViewMode = (mode) => {
+    setViewMode(mode);
+    if (mode === VIEW_MODE.LIST) {
+      fetchHardTickets(1);
+      setCurrentPage(1);
     }
   };
 
@@ -163,7 +177,7 @@ export const Leads = () => {
   return (
     <>
       <RefLeadsHeader
-        onChangeViewMode={setViewMode}
+        onChangeViewMode={handleChangeViewMode}
         ref={refLeadsHeader}
         openCreateTicketModal={openCreateTicketModal}
         setSearchTerm={setSearchTerm}
@@ -178,16 +192,13 @@ export const Leads = () => {
           }
         }}
         deleteTicket={deleteTicket}
-        setGroupTitle={setGroupTitle}
         totalTicketsFiltered={totalLeads}
         hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
         tickets={viewMode === VIEW_MODE.LIST ? hardTickets : tickets}
       />
 
       <div
-        style={{
-          "--leads-filter-height": `${leadsFilterHeight}px`,
-        }}
+        style={{ "--leads-filter-height": `${leadsFilterHeight}px` }}
         className="leads-container"
       >
         <Divider mb="md" />
@@ -235,7 +246,7 @@ export const Leads = () => {
       <AddLeadModal
         open={isOpenAddLeadModal}
         onClose={() => setIsOpenAddLeadModal(false)}
-        selectedGroupTitle={groupTitle}
+        selectedGroupTitle={groupTitleForApi}
         fetchTickets={fetchTickets}
       />
 

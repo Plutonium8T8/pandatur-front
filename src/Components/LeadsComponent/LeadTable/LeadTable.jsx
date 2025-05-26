@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -16,7 +16,7 @@ import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components";
 import { RcTable } from "../../RcTable";
 import { api } from "../../../api";
-import { useConfirmPopup, useUser, useApp } from "../../../hooks";
+import { useConfirmPopup, useUser } from "../../../hooks";
 import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
 import { DateCell } from "../../DateCell";
 import { MantineModal } from "../../MantineModal";
@@ -34,17 +34,17 @@ const renderTags = (tags) => {
 };
 
 export const LeadTable = ({
+  filteredLeads,
+  currentPage,
+  totalLeadsPages,
+  onChangePagination,
   onSelectRow,
   selectTicket,
+  fetchTickets,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
-  const [hardTickets, setHardTickets] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
   const { user } = useUser();
-  const { groupTitleForApi, workflowOptions } = useApp();
 
   const allowedGroupTitles = useMemo(() => {
     if (!user?.technician?.groups) return [];
@@ -56,33 +56,11 @@ export const LeadTable = ({
     return [...new Set(titles)];
   }, [user]);
 
-  const fetchHardTickets = async (page = 1) => {
-    if (!groupTitleForApi || !workflowOptions.length) return;
-    try {
-      const res = await api.tickets.filters({
-        type: "hard",
-        group_title: groupTitleForApi,
-        page,
-        attributes: {
-          workflow: workflowOptions,
-        },
-      });
-      setHardTickets(res.data || []);
-      setTotalPages(res.pagination?.total_pages || 1);
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    }
-  };
-
-  useEffect(() => {
-    fetchHardTickets(currentPage);
-  }, [groupTitleForApi, workflowOptions, currentPage]);
-
   const visibleLeads = useMemo(() => {
-    return hardTickets
-      .filter((ticket) => allowedGroupTitles.includes(ticket.group_title))
-      .filter((ticket) => workflowOptions.includes(ticket.workflow));
-  }, [hardTickets, allowedGroupTitles, workflowOptions]);
+    return filteredLeads.filter((ticket) =>
+      allowedGroupTitles.includes(ticket.group_title)
+    );
+  }, [filteredLeads, allowedGroupTitles]);
 
   const deleteLead = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead"),
@@ -95,7 +73,7 @@ export const LeadTable = ({
         enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
           variant: "success",
         });
-        fetchHardTickets(currentPage);
+        fetchTickets();
       } catch (error) {
         enqueueSnackbar(showServerError(error), {
           variant: "error",
@@ -216,20 +194,17 @@ export const LeadTable = ({
       dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (date) => <DateCell gap={4} direction="row" justify="center" date={date} />,
+      render: (date) => (
+        <DateCell gap={4} direction="row" justify="center" date={date} />
+      ),
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
       dataIndex: "last_interaction_date",
       align: "center",
       width: 200,
-      render: (last_interaction_date) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={last_interaction_date}
-        />
+      render: (date) => (
+        <DateCell gap={4} direction="row" justify="center" date={date} />
       ),
     },
     {
@@ -372,15 +347,34 @@ export const LeadTable = ({
       render: (_, ticket) => {
         const responsibleId = ticket.technician_id?.toString();
         return (
-          <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
+          <Paper
+            pos="absolute"
+            top="0"
+            right="0"
+            bottom="0"
+            shadow="xs"
+            w="100%"
+          >
             <Flex align="center" justify="center" gap="8" h="100%" p="xs">
-              <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
-                <ActionIcon variant="danger" onClick={() => handleDeleteLead(ticket.id)}>
+              <Can
+                permission={{ module: "leads", action: "delete" }}
+                context={{ responsibleId }}
+              >
+                <ActionIcon
+                  variant="danger"
+                  onClick={() => handleDeleteLead(ticket.id)}
+                >
                   <MdDelete />
                 </ActionIcon>
               </Can>
-              <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
-                <ActionIcon variant="outline" onClick={() => setId(ticket.id)}>
+              <Can
+                permission={{ module: "leads", action: "edit" }}
+                context={{ responsibleId }}
+              >
+                <ActionIcon
+                  variant="outline"
+                  onClick={() => setId(ticket.id)}
+                >
                   <MdEdit />
                 </ActionIcon>
               </Can>
@@ -401,12 +395,12 @@ export const LeadTable = ({
           selectedRow={selectTicket}
           bordered
         />
-        {!!totalPages && (
+        {!!totalLeadsPages && (
           <Flex p="20" justify="center" className="leads-table-pagination">
             <Pagination
-              totalPages={totalPages}
+              totalPages={totalLeadsPages}
               currentPage={currentPage}
-              onPaginationChange={setCurrentPage}
+              onPaginationChange={onChangePagination}
             />
           </Flex>
         )}
@@ -416,9 +410,17 @@ export const LeadTable = ({
         opened={!!id}
         onClose={() => setId()}
         size="lg"
-        title={<Text size="xl" fw="bold">{getLanguageByKey("Editează ticketul")}</Text>}
+        title={
+          <Text size="xl" fw="bold">
+            {getLanguageByKey("Editează ticketul")}
+          </Text>
+        }
       >
-        <ManageLeadInfoTabs onClose={() => setId()} fetchLeads={() => fetchHardTickets(currentPage)} id={id} />
+        <ManageLeadInfoTabs
+          onClose={() => setId()}
+          fetchLeads={fetchTickets}
+          id={id}
+        />
       </MantineModal>
     </>
   );
