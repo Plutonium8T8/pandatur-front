@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
@@ -16,7 +16,7 @@ import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components";
 import { RcTable } from "../../RcTable";
 import { api } from "../../../api";
-import { useConfirmPopup, useUser } from "../../../hooks";
+import { useConfirmPopup, useUser, useApp } from "../../../hooks";
 import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
 import { DateCell } from "../../DateCell";
 import { MantineModal } from "../../MantineModal";
@@ -34,41 +34,55 @@ const renderTags = (tags) => {
 };
 
 export const LeadTable = ({
-  selectedTickets,
   onSelectRow,
-  filteredLeads,
-  totalLeadsPages,
-  onChangePagination,
-  currentPage,
   selectTicket,
-  fetchTickets,
-  workflowOptions,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
+  const [hardTickets, setHardTickets] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const { user } = useUser();
+  const { groupTitleForApi, workflowOptions } = useApp();
 
   const allowedGroupTitles = useMemo(() => {
     if (!user?.technician?.groups) return [];
-
     const groupNames = user.technician.groups.map((g) => g.name);
-
     const titles = groupNames
       .map((name) => userGroupsToGroupTitle[name])
       .flat()
       .filter(Boolean);
-
-    const uniqueTitles = [...new Set(titles)];
-
-    return uniqueTitles;
+    return [...new Set(titles)];
   }, [user]);
 
+  const fetchHardTickets = async (page = 1) => {
+    if (!groupTitleForApi || !workflowOptions.length) return;
+    try {
+      const res = await api.tickets.filters({
+        type: "hard",
+        group_title: groupTitleForApi,
+        page,
+        attributes: {
+          workflow: workflowOptions,
+        },
+      });
+      setHardTickets(res.data || []);
+      setTotalPages(res.pagination?.total_pages || 1);
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    }
+  };
+
+  useEffect(() => {
+    fetchHardTickets(currentPage);
+  }, [groupTitleForApi, workflowOptions, currentPage]);
 
   const visibleLeads = useMemo(() => {
-    return filteredLeads
+    return hardTickets
       .filter((ticket) => allowedGroupTitles.includes(ticket.group_title))
       .filter((ticket) => workflowOptions.includes(ticket.workflow));
-  }, [filteredLeads, allowedGroupTitles, workflowOptions]);
+  }, [hardTickets, allowedGroupTitles, workflowOptions]);
 
   const deleteLead = useConfirmPopup({
     subTitle: getLanguageByKey("confirm_delete_lead"),
@@ -81,7 +95,7 @@ export const LeadTable = ({
         enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
           variant: "success",
         });
-        fetchTickets();
+        fetchHardTickets(currentPage);
       } catch (error) {
         enqueueSnackbar(showServerError(error), {
           variant: "error",
@@ -387,12 +401,12 @@ export const LeadTable = ({
           selectedRow={selectTicket}
           bordered
         />
-        {!!totalLeadsPages && (
+        {!!totalPages && (
           <Flex p="20" justify="center" className="leads-table-pagination">
             <Pagination
-              totalPages={totalLeadsPages}
+              totalPages={totalPages}
               currentPage={currentPage}
-              onPaginationChange={onChangePagination}
+              onPaginationChange={setCurrentPage}
             />
           </Flex>
         )}
@@ -404,7 +418,7 @@ export const LeadTable = ({
         size="lg"
         title={<Text size="xl" fw="bold">{getLanguageByKey("Editează ticketul")}</Text>}
       >
-        <ManageLeadInfoTabs onClose={() => setId()} fetchLeads={fetchTickets} id={id} />
+        <ManageLeadInfoTabs onClose={() => setId()} fetchLeads={() => fetchHardTickets(currentPage)} id={id} />
       </MantineModal>
     </>
   );
