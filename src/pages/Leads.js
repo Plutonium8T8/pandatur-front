@@ -47,7 +47,7 @@ export const Leads = () => {
     groupTitleForApi,
     workflowOptions,
   } = useApp();
-  const { ticketId } = useParams();
+  const { ticketId } = useParams(); 
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
