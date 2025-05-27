@@ -86,7 +86,6 @@ const TaskComponent = ({
   }, [filters, searchQuery, currentPage]);
 
   useEffect(() => {
-    // Применение дефолтных фильтров при монтировании
     const defaultFilters = {
       created_for: [String(currentUserId)],
       group_titles: accessibleGroupTitles,

@@ -100,7 +100,6 @@ export const workflowOptionsFranchiseCantemir = [
     "Închis și nerealizat"
 ];
 
-////////////////////////////////////////////////
 export const workflowOptionsLimitedSalesMD = [
     "Apel de intrare",
     "De prelucrat",
