@@ -95,6 +95,20 @@ export const Leads = () => {
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode]);
 
   useEffect(() => {
+    if (viewMode === VIEW_MODE.LIST) {
+      const timeout = setTimeout(() => {
+        setHardTicketFilters((prev) => ({
+          ...prev,
+          search: searchTerm.trim(),
+        }));
+        setCurrentPage(1);
+      }, 500);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [searchTerm]);
+
+  useEffect(() => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
 
@@ -208,8 +222,8 @@ export const Leads = () => {
         onChangeViewMode={handleChangeViewMode}
         ref={refLeadsHeader}
         openCreateTicketModal={openCreateTicketModal}
-        setSearchTerm={setKanbanSearchTerm}
-        searchTerm={kanbanSearchTerm}
+        setSearchTerm={viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm}
+        searchTerm={viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm}
         selectedTickets={selectedTickets}
         onOpenModal={() => setIsModalOpen(true)}
         setIsFilterOpen={() => {
