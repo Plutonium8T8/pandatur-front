@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useMemo } from "react";
+import { createContext, useState, useEffect, useMemo } from "react";
 import { useSnackbar } from "notistack";
 import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -314,7 +314,7 @@ export const AppProvider = ({ children }) => {
 
         trySend();
       } catch (e) {
-        console.error("error get id for conect chat room", e);
+        console.error("error get id for connect chat room", e);
       }
     };
 

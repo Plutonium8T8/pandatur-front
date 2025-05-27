@@ -8,7 +8,7 @@ import { api } from "../api";
 
 export const useWorkflowOptions = ({ groupTitle, userId }) => {
     const [userGroups, setUserGroups] = useState([]);
-    const [loading, setLoading] = useState(true); // ✅ новый флаг
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTechnicians = async () => {
@@ -22,7 +22,7 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
                 console.error("error get technician list", err);
                 setUserGroups([]);
             } finally {
-                setLoading(false); // ✅ загрузка завершена
+                setLoading(false);
             }
         };
         if (userId) fetchTechnicians();
@@ -68,6 +68,6 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         hasAccessToGroupTitle,
         userGroups,
         groupTitleForApi,
-        loading, // ✅ экспортируем состояние загрузки
+        loading,
     };
 };
