@@ -249,15 +249,20 @@ export const AppProvider = ({ children }) => {
         break;
       }
       case TYPE_SOCKET_EVENTS.TICKET: {
-        const ticketId = message.data.ticket_id;
-        if (ticketId) {
-          fetchSingleTicket(ticketId);
+        const { ticket_id, group_title, workflow } = message.data;
+
+        const isMatchingGroup = group_title === groupTitleForApi;
+        const isMatchingWorkflow = workflowOptions.includes(workflow);
+
+        if (ticket_id && isMatchingGroup && isMatchingWorkflow) {
+          fetchSingleTicket(ticket_id);
+
           const socketInstance = socketRef.current;
           if (socketInstance?.readyState === WebSocket.OPEN) {
             socketInstance.send(
               JSON.stringify({
                 type: TYPE_SOCKET_EVENTS.CONNECT,
-                data: { ticket_id: [ticketId] },
+                data: { ticket_id: [ticket_id] },
               })
             );
           } else {
@@ -265,6 +270,13 @@ export const AppProvider = ({ children }) => {
               variant: "error",
             });
           }
+        } else {
+          console.log(
+            "[WS:ticket] skip ticket",
+            ticket_id,
+            "group:", group_title,
+            "workflow:", workflow
+          );
         }
         break;
       }
@@ -343,7 +355,6 @@ export const AppProvider = ({ children }) => {
         kanbanSearchTerm,
         setKanbanSearchTerm,
         setKanbanTickets,
-        kanbanSpinner,
         kanbanFilterActive,
         setKanbanFilterActive,
         //chat
