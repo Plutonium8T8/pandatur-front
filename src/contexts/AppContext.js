@@ -40,6 +40,7 @@ export const AppProvider = ({ children }) => {
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
+  const [kanbanFilters, setKanbanFilters] = useState({});
 
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
@@ -136,6 +137,7 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchKanbanTickets = async (filters = {}) => {
+    setKanbanFilters(filters); // <--- добавь эту строку
     setKanbanSpinner(true);
     setKanbanTickets([]);
 
@@ -350,6 +352,8 @@ export const AppProvider = ({ children }) => {
         setKanbanTickets,
         kanbanFilterActive,
         setKanbanFilterActive,
+        kanbanFilters,
+        setKanbanFilters,
         //chat
         chatFilteredTickets,
         fetchChatFilteredTickets,
