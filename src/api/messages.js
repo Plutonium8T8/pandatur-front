@@ -43,7 +43,7 @@ export const messages = {
     },
 
     whatsapp: async (body) => {
-      const { data } = await baseAxios.post("/messages/whatsapp/send", body)
+      const { data } = await baseAxios.post("/messages/send/whatsapp", body)
 
       return data
     }
