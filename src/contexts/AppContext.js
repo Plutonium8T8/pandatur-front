@@ -26,7 +26,6 @@ export const AppProvider = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { userId } = useUser();
   const { storage, changeLocalStorage } = useLocalStorage(SIDEBAR_COLLAPSE, "false");
-
   const [tickets, setTickets] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
@@ -56,7 +55,7 @@ export const AppProvider = ({ children }) => {
         );
         setUserGroups(me?.groups || []);
       } catch (err) {
-        console.error("❌ [AppContext] error get technician list", err);
+        console.error("[AppContext] error get technician list", err);
         setUserGroups([]);
       } finally {
         setLoadingWorkflow(false);
@@ -137,7 +136,7 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchKanbanTickets = async (filters = {}) => {
-    setKanbanFilters(filters); // <--- добавь эту строку
+    setKanbanFilters(filters);
     setKanbanSpinner(true);
     setKanbanTickets([]);
 
