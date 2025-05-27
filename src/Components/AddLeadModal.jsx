@@ -40,6 +40,8 @@ export const AddLeadModal = ({
         value?.toString().trim() === "" || value === undefined
           ? getLanguageByKey("fileIsMandatory")
           : null,
+      workflow: (value) =>
+        !value ? getLanguageByKey("fileIsMandatory") : null,
     },
   });
 
