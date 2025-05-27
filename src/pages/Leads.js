@@ -46,8 +46,15 @@ export const Leads = () => {
     fetchTickets,
     groupTitleForApi,
     workflowOptions,
+    kanbanSearchTerm,
+    setKanbanSearchTerm,
+    setKanbanTickets,
+    kanbanSpinner,
+    kanbanFilterActive,
+    setKanbanFilterActive
   } = useApp();
-  const { ticketId } = useParams(); 
+
+  const { ticketId } = useParams();
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -64,8 +71,13 @@ export const Leads = () => {
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
-  const visibleTickets = kanbanTickets.length > 0 ? kanbanTickets : tickets;
-  const currentFetchTickets = kanbanTickets.length > 0 ? fetchKanbanTickets : fetchTickets;
+  const isSearching = !!kanbanSearchTerm?.trim();
+  const visibleTickets =
+    isSearching || kanbanSpinner || kanbanFilterActive
+      ? kanbanTickets
+      : tickets;
+
+  const currentFetchTickets = kanbanSearchTerm?.trim() ? fetchKanbanTickets : fetchTickets;
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({
@@ -81,6 +93,21 @@ export const Leads = () => {
       fetchHardTickets(currentPage);
     }
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode]);
+
+  useEffect(() => {
+    const isReady = groupTitleForApi && workflowOptions.length;
+    if (!isReady) return;
+
+    if (kanbanSearchTerm?.trim()) {
+      const timeout = setTimeout(() => {
+        fetchKanbanTickets();
+      }, 1000);
+      return () => clearTimeout(timeout);
+    } else {
+      setKanbanTickets([]);
+      setKanbanFilterActive(false);
+    }
+  }, [kanbanSearchTerm, groupTitleForApi, workflowOptions]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
@@ -166,7 +193,8 @@ export const Leads = () => {
 
   const handleApplyFilterLightTicket = (selectedFilters) => {
     setLightTicketFilters(selectedFilters);
-    fetchTickets();
+    setKanbanFilterActive(true);
+    fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
   };
 
@@ -180,8 +208,8 @@ export const Leads = () => {
         onChangeViewMode={handleChangeViewMode}
         ref={refLeadsHeader}
         openCreateTicketModal={openCreateTicketModal}
-        setSearchTerm={setSearchTerm}
-        searchTerm={searchTerm}
+        setSearchTerm={setKanbanSearchTerm}
+        searchTerm={kanbanSearchTerm}
         selectedTickets={selectedTickets}
         onOpenModal={() => setIsModalOpen(true)}
         setIsFilterOpen={() => {

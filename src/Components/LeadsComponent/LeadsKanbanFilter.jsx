@@ -5,9 +5,10 @@ import { MessageFilterForm } from "./MessageFilterForm";
 import { useApp } from "../../hooks";
 
 export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
-  const { fetchKanbanTickets } = useApp();
+  const { fetchKanbanTickets, setKanbanFilterActive } = useApp();
 
   const handleSubmit = (filters) => {
+    setKanbanFilterActive(true);
     fetchKanbanTickets(filters);
     onClose?.();
   };

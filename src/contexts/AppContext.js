@@ -38,6 +38,8 @@ export const AppProvider = ({ children }) => {
   // Kanban-specific
   const [kanbanTickets, setKanbanTickets] = useState([]);
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
+  const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
+  const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
 
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
@@ -133,17 +135,20 @@ export const AppProvider = ({ children }) => {
     await getTicketsListRecursively(1);
   };
 
-  // 🔸 KANBAN тикеты (отдельно от глобальных)
   const fetchKanbanTickets = async (filters = {}) => {
     setKanbanSpinner(true);
     setKanbanTickets([]);
+
     try {
       const loadPage = async (page = 1) => {
         const res = await api.tickets.filters({
           page,
           type: "light",
           group_title: groupTitleForApi,
-          attributes: filters,
+          attributes: {
+            ...filters,
+            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
+          },
         });
 
         const normalized = normalizeLightTickets(res.tickets);
@@ -155,6 +160,7 @@ export const AppProvider = ({ children }) => {
           setKanbanSpinner(false);
         }
       };
+
       await loadPage(1);
     } catch (err) {
       enqueueSnackbar(showServerError(err), { variant: "error" });
@@ -302,7 +308,7 @@ export const AppProvider = ({ children }) => {
 
         trySend();
       } catch (e) {
-        console.error("❌ Ошибка загрузки ID для WebSocket:", e);
+        console.error("error get id for conect chat room", e);
       }
     };
 
@@ -334,7 +340,12 @@ export const AppProvider = ({ children }) => {
         kanbanTickets,
         fetchKanbanTickets,
         kanbanSpinner,
-
+        kanbanSearchTerm,
+        setKanbanSearchTerm,
+        setKanbanTickets,
+        kanbanSpinner,
+        kanbanFilterActive,
+        setKanbanFilterActive,
         //chat
         chatFilteredTickets,
         fetchChatFilteredTickets,
