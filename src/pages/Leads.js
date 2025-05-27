@@ -51,7 +51,9 @@ export const Leads = () => {
     setKanbanTickets,
     kanbanSpinner,
     kanbanFilterActive,
-    setKanbanFilterActive
+    setKanbanFilterActive,
+    kanbanFilters,
+    setKanbanFilters,
   } = useApp();
 
   const { ticketId } = useParams();
@@ -207,6 +209,7 @@ export const Leads = () => {
 
   const handleApplyFilterLightTicket = (selectedFilters) => {
     setLightTicketFilters(selectedFilters);
+    setKanbanFilters(selectedFilters);
     setKanbanFilterActive(true);
     fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
@@ -295,7 +298,7 @@ export const Leads = () => {
         onClose={() => setIsOpenKanbanFilterModal(false)}
       >
         <LeadsKanbanFilter
-          initialData={{}}
+          initialData={kanbanFilters}
           systemWorkflow={selectedWorkflow}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
