@@ -270,13 +270,6 @@ export const AppProvider = ({ children }) => {
               variant: "error",
             });
           }
-        } else {
-          console.log(
-            "[WS:ticket] skip ticket",
-            ticket_id,
-            "group:", group_title,
-            "workflow:", workflow
-          );
         }
         break;
       }
