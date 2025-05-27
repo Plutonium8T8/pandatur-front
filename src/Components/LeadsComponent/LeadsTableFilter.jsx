@@ -1,4 +1,4 @@
-import { Tabs, Flex, Button } from "@mantine/core";
+import { Tabs, Flex } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
@@ -8,7 +8,6 @@ export const LeadsTableFilter = ({
   loading,
   initialData,
   onSubmitTicket,
-  onResetFilters,
 }) => {
   return (
     <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_ticket">
