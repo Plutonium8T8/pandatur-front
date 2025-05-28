@@ -95,12 +95,12 @@ export const GeneralForm = ({
       <Select
         mt="md"
         label={getLanguageByKey("Grup")}
-        placeholder={getLanguageByKey("Selectează grupul")}
+        placeholder={getLanguageByKey("selectGroup")}
         data={groupTitleOptions}
         searchable
         clearable
-        key={form.key("group_title")}
-        {...form.getInputProps("group_title")}
+        key={formInstance.key("group_title")}
+        {...formInstance.getInputProps("group_title")}
       />
 
       <Select
