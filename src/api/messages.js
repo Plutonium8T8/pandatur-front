@@ -1,4 +1,5 @@
 import { baseAxios } from "./baseAxios"
+import Cookies from "js-cookie"
 
 export const messages = {
   list: async () => {
@@ -25,27 +26,43 @@ export const messages = {
 
   send: {
     create: async (body) => {
-      const { data } = await baseAxios.post("/messages/send", body)
-
-      return data
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/messages/send", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
 
     telegram: async (body) => {
-      const { data } = await baseAxios.post("/messages/send/telegram", body)
-
-      return data
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/messages/send/telegram", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
 
     viber: async (body) => {
-      const { data } = await baseAxios.post("/messages/send/viber", body)
-
-      return data
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/messages/send/viber", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     },
 
     whatsapp: async (body) => {
-      const { data } = await baseAxios.post("/messages/send/whatsapp", body)
-
-      return data
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/messages/send/whatsapp", body, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      return data;
     }
-  }
+  },
 }
