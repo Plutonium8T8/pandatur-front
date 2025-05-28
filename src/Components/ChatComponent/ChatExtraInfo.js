@@ -27,7 +27,6 @@ const ChatExtraInfo = ({
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
-  const [isLoadingPersonalDate, setIsLoadingPersonalDate] = useState(false);
   const [isLoadingCombineLead, setIsLoadingCombineLead] = useState(false);
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
@@ -97,24 +96,6 @@ const ChatExtraInfo = ({
       enqueueSnackbar(showServerError(error), {
         variant: "error",
       });
-    }
-  };
-
-  const submitPersonalData = async (values) => {
-    setIsLoadingPersonalDate(true);
-    try {
-      await api.users.updateExtended(selectedUser.payload?.id, values);
-
-      enqueueSnackbar(
-        getLanguageByKey("Datele despre ticket au fost create cu succes"),
-        { variant: "success" },
-      );
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), {
-        variant: "error",
-      });
-    } finally {
-      setIsLoadingPersonalDate(false);
     }
   };
 
@@ -338,6 +319,7 @@ const ChatExtraInfo = ({
             <PersonalData4ClientForm
               formInstance={form}
               data={selectedUser.payload}
+              ticketId={ticketId}
             />
 
             <Divider my="md" />

@@ -2468,6 +2468,9 @@ export const translations = {
   "Бронирования": {
     RO: "Rezervări",
     RU: "Бронирования"
-  }
-
+  },
+  "Adaugǎ clientul": {
+    RO: "Adaugǎ clientul",
+    RU: "Добавить клиента"
+  },
 };

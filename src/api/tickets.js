@@ -91,6 +91,7 @@ export const tickets = {
 
       return data;
     },
+
     getMediaListByTicketId: async (id) => {
       const { data } = await baseAxios.get(`/ticket-media/${id}`);
 
@@ -102,5 +103,11 @@ export const tickets = {
 
       return data;
     },
-  },
+
+    addClientToTicket: async (body) => {
+      const { data } = await baseAxios.post("/api/users-client", body);
+
+      return data;
+    },
+  }
 };
