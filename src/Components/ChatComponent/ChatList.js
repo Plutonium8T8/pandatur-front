@@ -157,7 +157,7 @@ const ChatList = ({ selectTicketId }) => {
               onClose={() => setOpenFilter(false)}
               onSubmit={filterChatList}
               loading={chatSpinner}
-              initialData={{}} // можно заменить на сохранённые фильтры, если решишь
+              initialData={{}}
             />
           </Tabs.Panel>
 
