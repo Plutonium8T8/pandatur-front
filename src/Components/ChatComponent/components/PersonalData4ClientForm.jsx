@@ -12,6 +12,8 @@ import { useEffect, useState } from "react";
 import { getLanguageByKey } from "../../utils";
 import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
+import { showServerError } from "../../utils";
+import { enqueueSnackbar } from "notistack";
 
 export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   const [showSave, setShowSave] = useState(false);
@@ -43,8 +45,8 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
       });
 
       setShowSave(false);
-    } catch (error) {
-      console.error("error add client in ticket", error);
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     }
   };
 
