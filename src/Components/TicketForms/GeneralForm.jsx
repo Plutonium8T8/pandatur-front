@@ -24,11 +24,7 @@ export const GeneralForm = ({
   formInstance,
 }) => {
   const { technicians } = useGetTechniciansList();
-  const { workflowOptions } = useContext(AppContext);
-
-  const form = useForm({
-    mode: "uncontrolled",
-  });
+  const { workflowOptions, accessibleGroupTitles } = useContext(AppContext);
 
   useEffect(() => {
     if (data) {
@@ -48,11 +44,15 @@ export const GeneralForm = ({
     formInstance.setFieldValue("workflow", value);
   });
 
+  const filteredGroupTitleOptions = groupTitleOptions.filter((g) =>
+    accessibleGroupTitles.includes(g.value)
+  );
+
   return (
     <form
       id={GENERAL_FORM_ID}
       onSubmit={formInstance.onSubmit((values) =>
-        onSubmit(values, () => formInstance.reset()),
+        onSubmit(values, () => formInstance.reset())
       )}
     >
       <Select
@@ -96,7 +96,7 @@ export const GeneralForm = ({
         mt="md"
         label={getLanguageByKey("Grup")}
         placeholder={getLanguageByKey("selectGroup")}
-        data={groupTitleOptions}
+        data={filteredGroupTitleOptions}
         searchable
         clearable
         key={formInstance.key("group_title")}
