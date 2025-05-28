@@ -1412,12 +1412,12 @@ export const translations = {
   },
 
   Tehnician: {
-    RO: "Tehnician",
-    RU: "Техник",
+    RO: "Responsabil lead",
+    RU: "Ответственный лида",
   },
   "Selectează tehnician": {
-    RO: "Selectează tehnician",
-    RU: "Выберите техника",
+    RO: "Selectează utilizator",
+    RU: "Выберите пользователя",
   },
   "Datele au fost actualizate cu success": {
     RO: "Datele au fost actualizate cu success",
