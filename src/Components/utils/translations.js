@@ -2470,7 +2470,7 @@ export const translations = {
     RU: "Бронирования"
   },
   "Adaugǎ clientul": {
-    RO: "Adaugǎ clientul",
+    RO: "Adaugǎ client",
     RU: "Добавить клиента"
   },
 };
