@@ -8,7 +8,7 @@ import {
   useApp,
   useFetchTicketChat,
   useMessagesContext,
-} from "@hooks";
+} from "../../hooks";
 import { PersonalData4ClientForm, Merge, Media } from "./components";
 import {
   ContractForm,
@@ -32,7 +32,7 @@ const ChatExtraInfo = ({
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
 
   const { setTickets } = useApp();
-  const { getUserMessages, mediaFiles } = useMessagesContext();
+  const { mediaFiles } = useMessagesContext();
   const { getTicket } = useFetchTicketChat(selectTicketId);
 
   const {
@@ -48,7 +48,7 @@ const ChatExtraInfo = ({
    */
   const fetchTicketLight = async (mergedTicketId) => {
     try {
-      await Promise.all([getTicket(), getUserMessages(selectTicketId)]);
+      await getTicket();
       setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
