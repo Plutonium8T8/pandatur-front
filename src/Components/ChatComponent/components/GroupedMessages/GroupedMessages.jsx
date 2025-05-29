@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
@@ -36,13 +36,11 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
     fetchTechnicians();
   }, []);
 
-  const getTechnician = useCallback(
-    (id) => {
-      const numericId = Number(id);
-      return technicians.find((t) => t.value === numericId);
-    },
-    [technicians]
-  );
+  const technicianMap = useMemo(() => {
+    const map = new Map();
+    technicians.forEach((t) => map.set(t.value, t));
+    return map;
+  }, [technicians]);
 
   const sortedMessages = messages
     .filter((msg) => msg.ticket_id === selectTicketId)
@@ -112,6 +110,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
                 <Flex direction="column" gap="xs">
                   {messages.map((msg) => {
                     const isClientMessage = clientIds.includes(msg.sender_id);
+                    const technician = technicianMap.get(Number(msg.sender_id));
 
                     return isClientMessage ? (
                       <ReceivedMessage
@@ -123,7 +122,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
                       <SendedMessage
                         key={`${msg.id ?? ""}-${msg.time_sent}`}
                         msg={msg}
-                        technician={getTechnician(msg.sender_id)}
+                        technician={technician}
                       />
                     );
                   })}
