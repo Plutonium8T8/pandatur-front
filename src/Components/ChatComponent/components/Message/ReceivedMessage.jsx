@@ -15,7 +15,6 @@ export const ReceivedMessage = ({ personalInfo, msg }) => {
     getFullName(sender?.name, sender?.surname) ||
     sender?.phone || `#${msg.sender_id}`;
 
-
   return (
     <Flex w="100%">
       {msg.mtype === MEDIA_TYPE.CALL ? (
