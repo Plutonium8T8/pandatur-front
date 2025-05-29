@@ -86,7 +86,7 @@ export const useFetchTicketChat = (id) => {
     if (id) {
       getLightTicketInfo();
     }
-  }, [id]);
+  }, [id, lastMessage]);
 
   return {
     personalInfo,
