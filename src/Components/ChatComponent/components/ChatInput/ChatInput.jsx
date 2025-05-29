@@ -138,6 +138,7 @@ export const ChatInput = ({
           )}
 
           <Select
+            searchable
             onChange={(value) => {
               setMessage(value ? templateOptions[value] : "");
               setTemplate(value);
