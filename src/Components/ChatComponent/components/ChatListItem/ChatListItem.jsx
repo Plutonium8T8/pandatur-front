@@ -8,7 +8,7 @@ import { IoCall } from "react-icons/io5";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
-import { useApp, useSocket, useUser } from "@hooks";
+import { useApp, useSocket, useUser, useMessagesContext } from "@hooks";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "@app-constants";
 import { Tag } from "@components";
 import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
@@ -73,10 +73,12 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const { markMessagesAsRead } = useApp();
   const { seenMessages } = useSocket();
   const { userId } = useUser();
+  const { getUserMessages } = useMessagesContext();
 
   const formatDate = parseServerDate(chat.time_sent);
 
-  const choseChat = (id) => {
+  const choseChat = async (id) => {
+    await getUserMessages(id);
     navigate(`/chat/${id}`);
   };
 
