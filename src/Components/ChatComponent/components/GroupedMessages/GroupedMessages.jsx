@@ -1,31 +1,52 @@
+import { useEffect, useState, useCallback } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
-import { useCallback } from "react";
-import { useUser, useMessagesContext } from "@hooks";
+import { useMessagesContext } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
 import {
   parseServerDate,
   getFullName,
   getLanguageByKey,
   parseDate,
+  showServerError,
 } from "@utils";
+import { api } from "@api";
 import { SendedMessage, ReceivedMessage } from "../Message";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const GroupedMessages = ({
-  personalInfo,
-  selectTicketId,
-  technicians,
-}) => {
-  const { userId } = useUser();
+export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { messages } = useMessagesContext();
+  const [technicians, setTechnicians] = useState([]);
+
+  useEffect(() => {
+    const fetchTechnicians = async () => {
+      try {
+        const data = await api.users.getTechnicianList();
+        const formatted = data.map((item) => ({
+          value: Number(item.id.id),
+          label: `${item.id.surname} ${item.id.name}`,
+        }));
+        setTechnicians(formatted);
+      } catch (err) {
+        showServerError(err);
+      }
+    };
+
+    fetchTechnicians();
+  }, []);
 
   const getTechnician = useCallback(
     (id) => {
-      return technicians?.find(({ value }) => Number(value) === id);
+      const numericId = Number(id);
+      const tech = technicians.find((t) => t.value === numericId);
+      if (!tech) {
+        console.warn("[GroupedMessages] technician not found for sender_id:", id);
+        console.log(technicians);
+      }
+      return tech;
     },
-    [technicians],
+    [technicians]
   );
 
   const sortedMessages = messages
@@ -37,7 +58,6 @@ export const GroupedMessages = ({
 
   sortedMessages.forEach((msg) => {
     const messageDate = parseServerDate(msg.time_sent).format(DD_MM_YYYY);
-
     const currentClientId = Array.isArray(msg.client_id)
       ? msg.client_id[0].toString()
       : msg.client_id.toString();
@@ -72,13 +92,10 @@ export const GroupedMessages = ({
         <Flex direction="column" gap="xs">
           {groupedMessages.map(({ date, clientId, messages, id }) => {
             const clientInfo =
-              personalInfo?.clients?.find(
-                ({ id: clientIdFromInfo }) => clientIdFromInfo === clientId,
-              ) || {};
+              personalInfo?.clients?.find((c) => c.id === clientId) || {};
 
             const clientName =
-              getFullName(clientInfo.name, clientInfo.surname) ||
-              `#${clientId}`;
+              getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
 
             return (
               <Flex pb="xs" direction="column" gap="md" key={id}>

@@ -9,7 +9,7 @@ import { parseServerDate, MESSAGES_STATUS } from "../../../utils";
 import { Call } from "./Call";
 import "./Message.css";
 
-const DEFAULT_TECHNICIAN = "Panda Tur";
+const DEFAULT_SENDER_NAME = "Panda Tur";
 
 const MESSAGE_STATUS_ICONS = {
   [MESSAGES_STATUS.PENDING]: <IoMdCheckmark />,
@@ -23,6 +23,9 @@ const MESSAGE_STATUS_ICONS = {
 
 export const SendedMessage = ({ msg, technician }) => {
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
+
+  const senderName = technician?.label || DEFAULT_SENDER_NAME;
+
   return (
     <Flex w="100%" justify="end">
       {isCall ? (
@@ -30,7 +33,7 @@ export const SendedMessage = ({ msg, technician }) => {
           time={msg.time_sent}
           from={msg.call_metadata?.src_num}
           to={msg.call_metadata?.dst_num}
-          name={technician?.label || DEFAULT_TECHNICIAN}
+          name={senderName}
           src={msg.message}
           status={msg.call_metadata?.status}
         />
@@ -42,7 +45,7 @@ export const SendedMessage = ({ msg, technician }) => {
                 <Flex align="center" gap={8}>
                   <FaHeadphones size={12} />
                   <Text fw="bold" size="sm">
-                    {technician?.label || DEFAULT_TECHNICIAN}
+                    {senderName}
                   </Text>
                 </Flex>
 
