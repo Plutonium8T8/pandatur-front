@@ -39,12 +39,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const getTechnician = useCallback(
     (id) => {
       const numericId = Number(id);
-      const tech = technicians.find((t) => t.value === numericId);
-      if (!tech) {
-        console.warn("[GroupedMessages] technician not found for sender_id:", id);
-        console.log(technicians);
-      }
-      return tech;
+      return technicians.find((t) => t.value === numericId);
     },
     [technicians]
   );
