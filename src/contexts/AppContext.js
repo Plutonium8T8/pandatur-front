@@ -224,22 +224,34 @@ export const AppProvider = ({ children }) => {
     switch (message.type) {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
         const { ticket_id, message: msgText, time_sent, mtype, sender_id } = message.data;
-        setUnreadCount((prev) => prev + 1);
-        setTickets((prev) =>
-          prev.map((ticket) =>
-            ticket.id === ticket_id
-              ? {
+
+        let isTicketMatched = false;
+
+        setTickets((prev) => {
+          const updated = prev.map((ticket) => {
+            if (ticket.id === ticket_id) {
+              isTicketMatched = true;
+              return {
                 ...ticket,
                 unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
                 last_message_type: mtype,
                 last_message: msgText,
                 time_sent,
-              }
-              : ticket
-          )
-        );
+              };
+            }
+            return ticket;
+          });
+
+          return updated;
+        });
+
+        if (isTicketMatched) {
+          setUnreadCount((prev) => prev + 1);
+        }
+
         break;
       }
+
       case TYPE_SOCKET_EVENTS.SEEN: {
         const { ticket_id } = message.data;
         setTickets((prev) =>
@@ -249,10 +261,11 @@ export const AppProvider = ({ children }) => {
         );
         break;
       }
+
       case TYPE_SOCKET_EVENTS.TICKET: {
         const { ticket_id, group_title, workflow } = message.data;
 
-        const isMatchingGroup = group_title === groupTitleForApi;
+        const isMatchingGroup = accessibleGroupTitles.includes(group_title);
         const isMatchingWorkflow = workflowOptions.includes(workflow);
 
         if (ticket_id && isMatchingGroup && isMatchingWorkflow) {
