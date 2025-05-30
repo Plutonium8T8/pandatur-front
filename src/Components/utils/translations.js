@@ -2473,4 +2473,20 @@ export const translations = {
     RO: "Adaugǎ client",
     RU: "Добавить клиента"
   },
+  "Contactate": {
+    RO: "Contactate",
+    RU: "Связались"
+  },
+  "In procesare": {
+    RO: "În procesare",
+    RU: "В обработке"
+  },
+  "Creat Cont In sistem": {
+    RO: "Creat Cont În sistem",
+    RU: "Создан аккаунт в системе"
+  },
+  "Rezervari": {
+    RO: "Rezervări",
+    RU: "Бронирования"
+  }
 };
