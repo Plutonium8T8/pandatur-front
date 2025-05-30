@@ -10,4 +10,5 @@ export const groupTitleOptions = [
     { value: "BusinessGroups", label: "Business groups" },
     { value: "Agency", label: "Agency" },
     { value: "GreenCard", label: "Green Card" },
+    { value: "SalesUA", label: "SALES UA" },
 ];

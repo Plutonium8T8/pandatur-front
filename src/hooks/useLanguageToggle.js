@@ -11,7 +11,16 @@ export const LANGUAGES = {
     label: "RU",
     icon: "🇷🇺",
   },
+  EN: {
+    label: "EN",
+    icon: "🇬🇧",
+  },
 };
+
+export const LANGUAGE_OPTIONS = Object.keys(LANGUAGES).map((key) => ({
+  value: key,
+  label: `${LANGUAGES[key].icon} ${LANGUAGES[key].label}`,
+}));
 
 export const useLanguageToggle = () => {
   const { storage, changeLocalStorage } = useLocalStorage(
@@ -19,15 +28,16 @@ export const useLanguageToggle = () => {
     LANGUAGES.RO.label,
   );
 
-  const toggleLanguage = () => {
-    const newLanguage = storage === "RO" ? "RU" : "RO";
-    changeLocalStorage(newLanguage);
-
-    window.location.reload();
+  const setLanguage = (lang) => {
+    if (LANGUAGES[lang]) {
+      changeLocalStorage(lang);
+      window.location.reload();
+    }
   };
 
   return {
-    toggleLanguage,
+    setLanguage,
     selectedLanguage: storage || "RO",
+    LANGUAGE_OPTIONS,
   };
 };

@@ -100,6 +100,18 @@ export const workflowOptionsFranchiseCantemir = [
     "Închis și nerealizat"
 ];
 
+export const workflowOptionsSalesUA = [
+    "Interesat",
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
+];
+
+// limited
+
 export const workflowOptionsLimitedSalesMD = [
     "Apel de intrare",
     "De prelucrat",
@@ -170,6 +182,13 @@ export const workflowOptionsLimitedFranchiseCantemir = [
     "Contract încheiat",
 ];
 
+export const workflowOptionsLimitedSalesUA = [
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+];
+
 export const workflowOptionsByGroupTitle = {
     MD: workflowOptionsSalesMD,
     RO: workflowOptionsSalesRO,
@@ -180,6 +199,7 @@ export const workflowOptionsByGroupTitle = {
     BusinessGroups: workflowOptionsBusinessGroups,
     FranchiseOrhei: workflowOptionsFranchiseOrhei,
     FranchiseCantemir: workflowOptionsFranchiseCantemir,
+    SalesUA: workflowOptionsSalesUA,
     Default: workflowOptionsSalesMD,
 };
 
@@ -193,12 +213,13 @@ export const workflowOptionsLimitedByGroupTitle = {
     BusinessGroups: workflowOptionsLimitedBusinessGroups,
     FranchiseOrhei: workflowOptionsLimitedFranchiseOrhei,
     FranchiseCantemir: workflowOptionsLimitedFranchiseCantemir,
+    SalesUA: workflowOptionsLimitedSalesUA,
     Default: workflowOptionsLimitedSalesMD,
 };
 
 export const userGroupsToGroupTitle = {
-    "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
-    "IT dep.": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency"],
+    "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
+    "IT dep.": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
     "Front Office": ["MD"],
     "Back MD": ["MD", "RO", "GreenCard"],
     "Back Flagman": ["MD", "RO", "GreenCard"],
@@ -218,18 +239,20 @@ export const userGroupsToGroupTitle = {
     "Private sales": ["IndividualGroups"],
     "Green Card": ["GreenCard"],
     "Agency": ["Agency"],
+    "Sales UA dep.": ["SalesUA"],
 };
 
-export const groupTitleOptions = [
-    { value: "MD", label: "MD-Sales" },
-    { value: "RO", label: "RO-Sales" },
-    { value: "Filiale", label: "Filiale" },
-    { value: "Franchise", label: "Francize" },
-    { value: "FranchiseOrhei", label: "Franchise Orhei" },
-    { value: "FranchiseCantemir", label: "Franchise Cantemir" },
-    { value: "Marketing", label: "Marketing" },
-    { value: "IndividualGroups", label: "Individual groups" },
-    { value: "BusinessGroups", label: "Business groups" },
-    { value: "Agency", label: "Agency" },
-    { value: "GreenCard", label: "Green Card" },
-];
+// export const groupTitleOptions = [
+//     { value: "MD", label: "MD-Sales" },
+//     { value: "RO", label: "RO-Sales" },
+//     { value: "Filiale", label: "Filiale" },
+//     { value: "Franchise", label: "Francize" },
+//     { value: "FranchiseOrhei", label: "Franchise Orhei" },
+//     { value: "FranchiseCantemir", label: "Franchise Cantemir" },
+//     { value: "Marketing", label: "Marketing" },
+//     { value: "IndividualGroups", label: "Individual groups" },
+//     { value: "BusinessGroups", label: "Business groups" },
+//     { value: "Agency", label: "Agency" },
+//     { value: "GreenCard", label: "Green Card" },
+//     { value: "SalesUA", label: "SALES UA" },
+// ];
