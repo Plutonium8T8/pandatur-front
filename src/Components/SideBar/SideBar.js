@@ -11,16 +11,15 @@ import {
   FaHistory,
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
-import { Badge, Flex, Divider } from "@mantine/core";
+import { Badge, Flex, Divider, Select } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
 import {
   useApp,
   useLanguageToggle,
-  LANGUAGES,
   useUser,
-} from "@hooks";
+} from "../../hooks";
 import { getLanguageByKey } from "@utils";
 import Can from "../CanComponent/Can";
 import "./SideBar.css";
@@ -36,7 +35,7 @@ export const SideBar = () => {
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const { surname, name, userId, userRoles } = useUser();
   const [loading, setLoading] = useState(false);
-  const { toggleLanguage, selectedLanguage } = useLanguageToggle();
+  const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS } = useLanguageToggle();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
   const currentGroupTitle = customGroupTitle || groupTitleForApi;
@@ -145,12 +144,23 @@ export const SideBar = () => {
               {getLanguageByKey("logs")}
             </MenuItem>
           )}
-
-          <MenuItem
-            onClick={toggleLanguage}
-            icon={LANGUAGES[selectedLanguage].icon}
-          >
-            {LANGUAGES[selectedLanguage].label}
+          <MenuItem>
+            <Select
+              value={selectedLanguage}
+              onChange={setLanguage}
+              data={LANGUAGE_OPTIONS}
+              styles={{
+                input: {
+                  backgroundColor: "transparent",
+                  color: "white",
+                  border: "1px solid transparent",
+                },
+                dropdown: {
+                  backgroundColor: "white",
+                  color: "black",
+                }
+              }}
+            />
           </MenuItem>
         </Menu>
 

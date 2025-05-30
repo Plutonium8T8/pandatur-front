@@ -6,6 +6,7 @@ export const translations = {
   Interesat: {
     RO: "Interesat",
     RU: "Заинтересован",
+    EN: "Interested",
   },
   "Apel de intrare": {
     RO: "Apel de intrare",
@@ -18,14 +19,32 @@ export const translations = {
   "Luat în lucru": {
     RO: "Luat în lucru",
     RU: "В работе",
+    EN: "In progress",
   },
   "Ofertă trimisă": {
     RO: "Ofertă trimisă",
     RU: "Предложение отправлено",
+    EN: "Offer sent",
   },
   "Aprobat cu client": {
     RO: "Aprobat cu client",
     RU: "Согласовано с клиентом",
+    EN: "Approved with client",
+  },
+  "Contract încheiat": {
+    RO: "Contract încheiat",
+    RU: "Контракт заключён",
+    EN: "Contract signed",
+  },
+  "Realizat cu succes": {
+    RO: "Realizat cu succes",
+    RU: "Успешно реализовано",
+    EN: "Successfully completed",
+  },
+  "Închis și nerealizat": {
+    RO: "Închis și nerealizat",
+    RU: "Закрыт без результата",
+    EN: "Closed and not completed",
   },
   "Contract semnat": {
     RO: "Contract semnat",
@@ -35,21 +54,9 @@ export const translations = {
     RO: "Plată primită",
     RU: "Платеж получен",
   },
-  "Închis și nerealizat": {
-    RO: "Închis și nerealizat",
-    RU: "Закрыто и не реализовано",
-  },
   "Factura trimisă": {
     RO: "Factura trimisǎ",
     RU: "Отправляения фактура"
-  },
-  "Contract încheiat": {
-    RO: "Contract încheiat",
-    RU: "Договор завершён",
-  },
-  "Realizat cu succes": {
-    RO: "Realizat cu succes",
-    RU: "Успешно реализовано",
   },
   "Caută leaduri": {
     RO: "Caută leaduri",
