@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useMemo } from "react";
+import { createContext, useState, useEffect, useMemo, useRef } from "react";
 import { useSnackbar } from "notistack";
 import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -43,6 +43,7 @@ export const AppProvider = ({ children }) => {
 
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
+  const requestIdRef = useRef(0);
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
@@ -94,7 +95,7 @@ export const AppProvider = ({ children }) => {
     setUnreadCount((prev) => prev - count);
   };
 
-  const getTicketsListRecursively = async (page = 1) => {
+  const getTicketsListRecursively = async (page = 1, requestId) => {
     try {
       const data = await api.tickets.filters({
         page,
@@ -105,6 +106,10 @@ export const AppProvider = ({ children }) => {
           workflow: lightTicketFilters.workflow ?? workflowOptions,
         },
       });
+
+      if (requestIdRef.current !== requestId) {
+        return;
+      }
 
       const totalPages = data.pagination?.total_pages || 1;
       const totalUnread = data.tickets.reduce(
@@ -117,22 +122,27 @@ export const AppProvider = ({ children }) => {
       setTickets((prev) => [...prev, ...processedTickets]);
 
       if (page < totalPages) {
-        await getTicketsListRecursively(page + 1);
+        await getTicketsListRecursively(page + 1, requestId);
       } else {
         setSpinnerTickets(false);
       }
     } catch (error) {
+      if (requestIdRef.current !== requestId) return;
       enqueueSnackbar(showServerError(error), { variant: "error" });
       setSpinnerTickets(false);
     }
   };
 
   const fetchTickets = async () => {
+    const currentRequestId = Date.now();
+    requestIdRef.current = currentRequestId;
+
     setSpinnerTickets(true);
     setTickets([]);
     setKanbanTickets([]);
     setUnreadCount(0);
-    await getTicketsListRecursively(1);
+
+    await getTicketsListRecursively(1, currentRequestId);
   };
 
   const fetchKanbanTickets = async (filters = {}) => {
