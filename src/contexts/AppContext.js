@@ -265,13 +265,13 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.TICKET: {
         const { ticket_id, group_title, workflow } = message.data;
 
-        console.log("[SOCKET] Incoming ticket:", {
-          ticket_id,
-          group_title_from_ticket: group_title,
-          current_groupTitleForApi: groupTitleForApi,
-          workflow,
-          workflowOptions,
-        });
+        // console.log("[SOCKET] Incoming ticket:", {
+        //   ticket_id,
+        //   group_title_from_ticket: group_title,
+        //   current_groupTitleForApi: groupTitleForApi,
+        //   workflow,
+        //   workflowOptions,
+        // });
 
         const isMatchingGroup = group_title === groupTitleForApi;
         const isMatchingWorkflow = workflowOptions.includes(workflow);
