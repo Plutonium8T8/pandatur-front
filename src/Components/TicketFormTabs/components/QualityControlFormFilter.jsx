@@ -9,7 +9,7 @@ import {
 
 const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER";
 
-export const QualityControlForm = ({ onSubmit, data, renderFooterButtons }) => {
+export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }) => {
   const form = useForm({
     mode: "uncontrolled",
 

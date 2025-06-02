@@ -10,7 +10,7 @@ import {
 
 const INVOICE_FORM_FILTER_ID = "INVOICE_FORM_FILTER_ID";
 
-export const InvoiceForm = ({
+export const InvoiceFormFilter = ({
   onSubmit,
   data,
   renderFooterButtons,

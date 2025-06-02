@@ -24,7 +24,7 @@ import { DD_MM_YYYY } from "../../../app-constants";
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
 
-export const TicketInfoForm = ({
+export const TicketInfoFormFilter = ({
   onSubmit,
   data,
   hideDisabledInput,

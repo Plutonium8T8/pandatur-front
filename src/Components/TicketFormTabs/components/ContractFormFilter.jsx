@@ -22,7 +22,7 @@ const convertStringOrUndefined = (data) => {
   }
 };
 
-export const ContractForm = ({
+export const ContractFormFilter = ({
   onSubmit,
   data,
   hideDisabledInput,

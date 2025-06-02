@@ -8,7 +8,7 @@ import { AppContext } from "../../../contexts/AppContext";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
-export const BasicGeneralForm = ({
+export const BasicGeneralFormFilter = ({
   onSubmit,
   loading,
   data,
