@@ -12,14 +12,12 @@ import {
 import { useFormTicket } from "../../hooks";
 
 export const ManageLeadInfoTabs = ({
-  open,
   onClose,
   selectedTickets,
   fetchLeads,
   id,
 }) => {
   const { enqueueSnackbar } = useSnackbar();
-
   const [loading, setLoading] = useState(false);
   const [ticketInfo, setTicketInfo] = useState();
   const [generalInfoLightTicket, setGeneralInfoLightTicket] = useState();
@@ -31,30 +29,31 @@ export const ManageLeadInfoTabs = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
-  const submit = async (values, callback) => {
+  const handleSubmit = async () => {
     if (form.validate().hasErrors) {
       enqueueSnackbar(
         getLanguageByKey("please_complete_required_fields_for_workflow_change"),
-        {
-          variant: "error",
-        },
+        { variant: "error" }
       );
       return;
     }
+
     setLoading(true);
     try {
+      const values = form.getValues();
+
       await api.tickets.updateById({
         id: id ? [id] : selectedTickets,
         ...values,
       });
+
       onClose(true);
-      callback();
+
       enqueueSnackbar(
         getLanguageByKey("Datele au fost actualizate cu success"),
-        {
-          variant: "success",
-        },
+        { variant: "success" }
       );
+
       await fetchLeads();
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -81,121 +80,71 @@ export const ManageLeadInfoTabs = ({
     if (id) {
       getTicketInfo(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return (
-    <Tabs h="100%" defaultValue="general_info">
-      <Tabs.List>
-        <Tabs.Tab value="general_info">
-          <Text size="sm" truncate="end">
-            {getLanguageByKey("Informații generale")}
-          </Text>
-        </Tabs.Tab>
-        <Tabs.Tab value="ticket_info">
-          <Text
-            size="sm"
-            c={hasErrorsTicketInfoForm ? "red" : "black"}
-            truncate="end"
-          >
-            {getLanguageByKey("Informații despre tichet")}
-          </Text>
-        </Tabs.Tab>
-        <Tabs.Tab value="contact">
-          <Text size="sm" c={hasErrorsContractForm ? "red" : "black"}>
-            {getLanguageByKey("Contract")}
-          </Text>
-        </Tabs.Tab>
-        <Tabs.Tab value="quality_control">
-          <Text size="sm" c={hasErrorQualityControl ? "red" : "black"}>
-            {getLanguageByKey("Control calitate")}
-          </Text>
-        </Tabs.Tab>
-      </Tabs.List>
+    <Flex direction="column" h="100%">
+      <Tabs defaultValue="general_info" style={{ flex: 1 }}>
+        <Tabs.List>
+          <Tabs.Tab value="general_info">
+            <Text size="sm" truncate="end">
+              {getLanguageByKey("Informații generale")}
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="ticket_info">
+            <Text
+              size="sm"
+              c={hasErrorsTicketInfoForm ? "red" : "black"}
+              truncate="end"
+            >
+              {getLanguageByKey("Informații despre tichet")}
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="contact">
+            <Text
+              size="sm"
+              c={hasErrorsContractForm ? "red" : "black"}
+              truncate="end"
+            >
+              {getLanguageByKey("Contract")}
+            </Text>
+          </Tabs.Tab>
+          <Tabs.Tab value="quality_control">
+            <Text
+              size="sm"
+              c={hasErrorQualityControl ? "red" : "black"}
+              truncate="end"
+            >
+              {getLanguageByKey("Control calitate")}
+            </Text>
+          </Tabs.Tab>
+        </Tabs.List>
 
-      <Tabs.Panel
-        style={{ height: `calc(100% - 42px)` }}
-        value="general_info"
-        pt="xs"
-      >
-        <Flex direction="column" justify="space-between" h="100%">
-          <GeneralForm
-            data={generalInfoLightTicket}
-            formInstance={form}
-            onSubmit={submit}
-            renderFooterButtons={({ formId }) => (
-              <>
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
-                </Button>
-              </>
-            )}
-          />
-        </Flex>
-      </Tabs.Panel>
+        <Tabs.Panel value="general_info" pt="xs">
+          <GeneralForm data={generalInfoLightTicket} formInstance={form} />
+        </Tabs.Panel>
 
-      <Tabs.Panel value="ticket_info" pt="xs" pb="md">
-        <TicketInfoForm
-          formInstance={form}
-          setMinDate={new Date()}
-          data={ticketInfo}
-          onSubmit={submit}
-          renderFooterButtons={({ formId }) => (
-            <>
-              <Button variant="default" onClick={onClose}>
-                {getLanguageByKey("Închide")}
-              </Button>
-              <Button loading={loading} type="submit" form={formId}>
-                {getLanguageByKey("Trimite")}
-              </Button>
-            </>
-          )}
-        />
-      </Tabs.Panel>
-      <Tabs.Panel value="contact" pt="xs" pb="md">
-        <ContractForm
-          formInstance={form}
-          setMinDate={new Date()}
-          data={ticketInfo}
-          onSubmit={submit}
-          renderFooterButtons={({ formId }) => (
-            <>
-              <Button variant="default" onClick={onClose}>
-                {getLanguageByKey("Închide")}
-              </Button>
-              <Button loading={loading} type="submit" form={formId}>
-                {getLanguageByKey("Trimite")}
-              </Button>
-            </>
-          )}
-        />
-      </Tabs.Panel>
+        <Tabs.Panel value="ticket_info" pt="xs">
+          <TicketInfoForm formInstance={form} setMinDate={new Date()} data={ticketInfo} />
+        </Tabs.Panel>
 
-      <Tabs.Panel
-        style={{ height: `calc(100% - 42px)` }}
-        value="quality_control"
-      >
-        <Flex direction="column" justify="space-between" h="100%">
-          <QualityControlForm
-            formInstance={form}
-            data={ticketInfo}
-            onSubmit={submit}
-            renderFooterButtons={({ formId }) => (
-              <>
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Trimite")}
-                </Button>
-              </>
-            )}
-          />
-        </Flex>
-      </Tabs.Panel>
-    </Tabs>
+        <Tabs.Panel value="contact" pt="xs">
+          <ContractForm formInstance={form} setMinDate={new Date()} data={ticketInfo} />
+        </Tabs.Panel>
+
+        <Tabs.Panel value="quality_control" pt="xs">
+          <QualityControlForm formInstance={form} data={ticketInfo} />
+        </Tabs.Panel>
+      </Tabs>
+
+      <Flex justify="flex-end" gap="sm" p="md" mt="auto">
+        <Button variant="default" onClick={onClose}>
+          {getLanguageByKey("Închide")}
+        </Button>
+        <Button loading={loading} onClick={handleSubmit}>
+          {getLanguageByKey("Save")}
+        </Button>
+      </Flex>
+    </Flex>
   );
 };

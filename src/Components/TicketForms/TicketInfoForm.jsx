@@ -15,18 +15,12 @@ import {
 } from "../../FormOptions";
 import { DD_MM_YYYY } from "../../app-constants";
 
-const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
-
 export const TicketInfoForm = ({
-  onSubmit,
   data,
   hideDisabledInput,
   setMinDate,
-  formId,
   formInstance,
 }) => {
-  const idForm = formId || TICKET_FORM_FILTER_ID;
-
   useEffect(() => {
     if (data) {
       formInstance.setValues({
@@ -48,12 +42,7 @@ export const TicketInfoForm = ({
   }, [data]);
 
   return (
-    <form
-      id={idForm}
-      onSubmit={formInstance.onSubmit((values) =>
-        onSubmit(values, () => formInstance.reset()),
-      )}
-    >
+    <>
       <NumberInput
         decimalScale={2}
         fixedDecimalScale
@@ -199,6 +188,6 @@ export const TicketInfoForm = ({
         key={formInstance.key("procesarea_achizitionarii")}
         {...formInstance.getInputProps("procesarea_achizitionarii")}
       />
-    </form>
+    </>
   );
 };
