@@ -1,11 +1,11 @@
 import { Tabs, Flex, Button, ScrollArea } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import {
-  TicketInfoForm,
-  ContractForm,
-  InvoiceForm,
-  QualityControlForm,
-  BasicGeneralForm,
+  TicketInfoFormFilter,
+  ContractFormFilter,
+  InvoiceFormFilter,
+  QualityControlFormFilter,
+  BasicGeneralFormFilter,
 } from "./components";
 import "./TicketFormTabs.css";
 
@@ -62,7 +62,7 @@ export const TicketFormTabs = ({
         value="filter_general_info"
       >
         <Flex direction="column" justify="space-between" h="100%">
-          <BasicGeneralForm
+          <BasicGeneralFormFilter
             data={initialData}
             loading={loading}
             onClose={onClose}
@@ -74,7 +74,7 @@ export const TicketFormTabs = ({
       </Tabs.Panel>
       <Tabs.Panel pl="lg" value="filter_ticket_info">
         <ScrollArea h="100%">
-          <TicketInfoForm
+          <TicketInfoFormFilter
             data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
@@ -95,7 +95,7 @@ export const TicketFormTabs = ({
       </Tabs.Panel>
       <Tabs.Panel pl="lg" value="filter_contract">
         <ScrollArea h="100%">
-          <ContractForm
+          <ContractFormFilter
             data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
@@ -117,7 +117,7 @@ export const TicketFormTabs = ({
 
       <Tabs.Panel pl="lg" value="filter_invoice">
         <Flex direction="column" justify="space-between" h="100%">
-          <InvoiceForm
+          <InvoiceFormFilter
             data={initialData}
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
@@ -138,7 +138,7 @@ export const TicketFormTabs = ({
 
       <Tabs.Panel pl="lg" value="filter_quality_control">
         <Flex direction="column" justify="space-between" h="100%">
-          <QualityControlForm
+          <QualityControlFormFilter
             data={initialData}
             onSubmit={onSubmit}
             renderFooterButtons={({ onResetForm, formId }) => (
