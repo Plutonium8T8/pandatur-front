@@ -43,6 +43,17 @@ export const GeneralForm = ({ data, formInstance }) => {
   return (
     <>
       <Select
+        label={getLanguageByKey("Grup")}
+        placeholder={getLanguageByKey("selectGroup")}
+        data={filteredGroupTitleOptions}
+        searchable
+        clearable
+        key={formInstance.key("group_title")}
+        {...formInstance.getInputProps("group_title")}
+        mb="md"
+      />
+
+      <Select
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
         data={workflowOptions.map((w) => ({ value: w, label: w }))}
@@ -77,17 +88,6 @@ export const GeneralForm = ({ data, formInstance }) => {
         placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
         key={formInstance.key("tags")}
         {...formInstance.getInputProps("tags")}
-      />
-
-      <Select
-        mt="md"
-        label={getLanguageByKey("Grup")}
-        placeholder={getLanguageByKey("selectGroup")}
-        data={filteredGroupTitleOptions}
-        searchable
-        clearable
-        key={formInstance.key("group_title")}
-        {...formInstance.getInputProps("group_title")}
       />
 
       <Select
