@@ -4,7 +4,6 @@ import {
   Textarea,
   TagsInput,
 } from "@mantine/core";
-import { useForm } from "@mantine/form";
 import { useEffect, useContext } from "react";
 import {
   priorityOptions,
@@ -15,14 +14,7 @@ import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
 import { AppContext } from "../../contexts/AppContext";
 
-const GENERAL_FORM_ID = "GENERAL_FORM_ID";
-
-export const GeneralForm = ({
-  onSubmit,
-  data,
-  onClose,
-  formInstance,
-}) => {
+export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { workflowOptions, accessibleGroupTitles } = useContext(AppContext);
 
@@ -49,12 +41,7 @@ export const GeneralForm = ({
   );
 
   return (
-    <form
-      id={GENERAL_FORM_ID}
-      onSubmit={formInstance.onSubmit((values) =>
-        onSubmit(values, () => formInstance.reset())
-      )}
-    >
+    <>
       <Select
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
@@ -123,6 +110,6 @@ export const GeneralForm = ({
         key={formInstance.key("description")}
         {...formInstance.getInputProps("description")}
       />
-    </form>
+    </>
   );
 };
