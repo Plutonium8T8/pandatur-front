@@ -8,7 +8,11 @@ export const activity = {
       query: params
     })
     const { data } = await baseAxios.get(url)
+    return data
+  },
 
+  filterLogs: async (body) => {
+    const { data } = await baseAxios.post("/api/activity/filter", body)
     return data
   }
 }

@@ -1,30 +1,37 @@
 import { Box, Flex, Pagination } from "@mantine/core";
 import { enqueueSnackbar } from "notistack";
 import { useState, useEffect } from "react";
-import { Logs as LogsComponent, PageHeader, Spin } from "@components";
+import { PageHeader, Spin } from "@components";
 import { getLanguageByKey, showServerError } from "@utils";
-import { api } from "@api";
+import { api } from "../api";
+import { LogsComponent } from "../Components/LogsComponent/LogsComponent";
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);
   const [pagination, setPagination] = useState({
     currentPage: 1,
+    totalPages: 1,
   });
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
   useEffect(() => {
-    const getLogList = async () => {
+    const fetchLogs = async () => {
       setLoading(true);
       try {
-        const logs = await api.activity.getLogs({
+        const response = await api.activity.filterLogs({
           page: pagination.currentPage,
+          limit: 50,
+          sort_by: "timestamp",
+          order: "DESC",
+          attributes: {},
         });
-        setLogList(logs.data);
-        setTotalItems(logs.meta.totalItems);
+
+        setLogList(response.data);
+        setTotalItems(response.pagination.total);
         setPagination({
-          totalPages: logs.meta.totalPages,
-          currentPage: logs.meta.currentPage,
+          currentPage: response.pagination.page,
+          totalPages: response.pagination.total_pages,
         });
       } catch (error) {
         enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -32,7 +39,8 @@ export const Logs = () => {
         setLoading(false);
       }
     };
-    getLogList();
+
+    fetchLogs();
   }, [pagination.currentPage]);
 
   return (
