@@ -45,15 +45,18 @@ const ChatList = ({ selectTicketId }) => {
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
+  const [chatFilters, setChatFilters] = useState({});
 
   const visibleTickets = chatFilteredTickets.length > 0 ? chatFilteredTickets : tickets;
 
   const filterChatList = (filters) => {
+    setChatFilters(filters);
     fetchChatFilteredTickets(filters);
     setOpenFilter(false);
   };
 
   const resetFilter = () => {
+    setChatFilters({});
     setChatFilteredTickets([]);
     setOpenFilter(false);
   };
@@ -157,7 +160,7 @@ const ChatList = ({ selectTicketId }) => {
               onClose={() => setOpenFilter(false)}
               onSubmit={filterChatList}
               loading={chatSpinner}
-              initialData={{}}
+              initialData={chatFilters}
             />
           </Tabs.Panel>
 
@@ -166,7 +169,8 @@ const ChatList = ({ selectTicketId }) => {
               onClose={() => setOpenFilter(false)}
               onSubmit={filterChatList}
               loading={chatSpinner}
-              initialData={{}}
+              initialData={chatFilters}
+
             />
           </Tabs.Panel>
         </Tabs>
