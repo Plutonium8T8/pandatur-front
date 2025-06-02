@@ -11,7 +11,7 @@ export const user = {
     return data;
   },
 
-  updateGroupByName: async (body) => {
+  updateGroupData: async ({ body }) => {
     const { data } = await baseAxios.patch("/api/user-groups/update", body);
     return data;
   },
