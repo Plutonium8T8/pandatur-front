@@ -33,6 +33,10 @@ export const InvoiceForm = ({
   });
 
   useEffect(() => {
+    const isFormEmpty = Object.keys(form.getValues()).every((key) => !form.isTouched(key));
+
+    if (!isFormEmpty) return;
+
     const platitorFromClient =
       initialClientData?.platitor ?? `${data?.name ?? ""} ${data?.surname ?? ""}`.trim();
     const nrPlatitorFromClient =
