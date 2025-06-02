@@ -45,6 +45,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 initialState[group.id] = {
                     supervisor_id: group.supervisor_id?.toString() || null,
                     user_ids: group.users?.map(String) || [],
+                    editableName: group.name || "",
                 };
             });
             setGroupState(initialState);
@@ -63,6 +64,16 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             try {
                 const created = await api.user.createGroup({ group_name: trimmed });
                 setGroups((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
+
+                setGroupState((prev) => ({
+                    ...prev,
+                    [created.id]: {
+                        supervisor_id: created.supervisor_id?.toString() || null,
+                        user_ids: created.users?.map(String) || [],
+                        editableName: created.name || "",
+                    },
+                }));
+
                 setNewGroup("");
                 enqueueSnackbar(translations["Grup adăugat cu succes"][language], {
                     variant: "success",
@@ -97,7 +108,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
     const handleSave = async (groupId, groupName) => {
         const current = groupState[groupId];
-        if (!groupName || !current.user_ids.length) {
+        if (!groupName) {
             enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
                 variant: "warning",
             });
@@ -105,6 +116,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         }
 
         const payload = {
+            group_id: groupId,
             group_name: groupName,
             user_ids: current.user_ids.map(Number),
         };
@@ -114,7 +126,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         }
 
         try {
-            await api.user.updateGroupByName(payload);
+            await api.user.updateGroupData({ body: payload });
 
             enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
                 variant: "success",
@@ -194,6 +206,21 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
                             <Collapse in={expandedGroupId === group.id}>
                                 <Stack mt="sm">
+                                    <TextInput
+                                        label={translations["Nume grup"][language]}
+                                        placeholder={translations["Nume grup"][language]}
+                                        value={groupState[group.id]?.editableName || ""}
+                                        onChange={(e) =>
+                                            setGroupState((prev) => ({
+                                                ...prev,
+                                                [group.id]: {
+                                                    ...prev[group.id],
+                                                    editableName: e.target.value,
+                                                },
+                                            }))
+                                        }
+                                        disabled={loading}
+                                    />
                                     <Select
                                         label={translations["Team Lead"][language]}
                                         placeholder={translations["Selectați Team Lead"][language]}
@@ -230,7 +257,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                                         clearable
                                         disabled={loading}
                                     />
-                                    <Button onClick={() => handleSave(group.id, group.name)} disabled={loading}>
+                                    <Button onClick={() => handleSave(group.id, groupState[group.id]?.editableName)} disabled={loading}>
                                         {translations["Salvează"][language]}
                                     </Button>
                                 </Stack>
