@@ -12,6 +12,7 @@ export const Tag = ({ children, type, fontSize, ...props }) => {
     <span
       className={`tag tag-${variants[type] || "default"}`}
       style={fontSize ? { fontSize } : undefined}
+      title={children}
       {...props}
     >
       {children}
