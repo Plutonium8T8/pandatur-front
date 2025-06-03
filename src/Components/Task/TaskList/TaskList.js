@@ -269,16 +269,14 @@ const TaskList = ({
   );
 
   return (
-    <div style={{ margin: "10px" }}>
-      <RcTable
-        rowKey={({ id }) => id}
-        columns={columns}
-        data={tasks}
-        selectedRow={selectedRow}
-        loading={loading}
-        bordered
-      />
-    </div>
+    <RcTable
+      rowKey={({ id }) => id}
+      columns={columns}
+      data={tasks}
+      selectedRow={selectedRow}
+      loading={loading}
+      bordered
+    />
   );
 };
 
