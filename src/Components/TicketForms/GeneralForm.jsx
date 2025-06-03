@@ -3,6 +3,7 @@ import {
   TextInput,
   Textarea,
   TagsInput,
+  Box,
 } from "@mantine/core";
 import { useEffect, useContext } from "react";
 import {
@@ -41,7 +42,7 @@ export const GeneralForm = ({ data, formInstance }) => {
   );
 
   return (
-    <>
+    <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
       <Select
         label={getLanguageByKey("Grup")}
         placeholder={getLanguageByKey("selectGroup")}
@@ -110,6 +111,6 @@ export const GeneralForm = ({ data, formInstance }) => {
         key={formInstance.key("description")}
         {...formInstance.getInputProps("description")}
       />
-    </>
+    </Box>
   );
 };
