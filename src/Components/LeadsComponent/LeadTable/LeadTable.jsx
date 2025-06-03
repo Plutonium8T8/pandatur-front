@@ -388,15 +388,25 @@ export const LeadTable = ({
   return (
     <>
       <Box px="20px">
-        <RcTable
-          rowKey="id"
-          columns={rcColumn}
-          data={visibleLeads}
-          selectedRow={selectTicket}
-          bordered
-        />
+        <div
+          style={{
+            overflowX: "auto",
+            overflowY: "hidden",
+            width: "100%",
+          }}
+        >
+          <div style={{ minWidth: "3000px" }}>
+            <RcTable
+              rowKey="id"
+              columns={rcColumn}
+              data={visibleLeads}
+              selectedRow={selectTicket}
+              bordered
+            />
+          </div>
+        </div>
         {!!totalLeadsPages && (
-          <Flex p="20" justify="center" className="leads-table-pagination">
+          <Flex justify="center" className="leads-table-pagination">
             <Pagination
               totalPages={totalLeadsPages}
               currentPage={currentPage}
