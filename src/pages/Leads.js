@@ -279,7 +279,6 @@ export const Leads = () => {
         fullScreen
         open={isChatOpen && ticketId}
         withCloseButton={false}
-        style={{ padding: 0 }}
         height="100%"
         onClose={closeChatModal}
       >
@@ -309,6 +308,18 @@ export const Leads = () => {
         withCloseButton
         centered
         size="xl"
+        styles={{
+          content: {
+            height: "800px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+          },
+        }}
       >
         <LeadsKanbanFilter
           initialData={kanbanFilters}
