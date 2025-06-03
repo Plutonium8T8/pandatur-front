@@ -291,7 +291,7 @@ export const Leads = () => {
         title={getLanguageByKey("Adaugă lead")}
         withCloseButton
         centered
-        size="xl"
+        size="lg"
       >
         <AddLeadModal
           open
