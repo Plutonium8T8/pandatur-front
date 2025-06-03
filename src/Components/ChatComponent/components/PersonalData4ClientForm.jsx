@@ -9,10 +9,9 @@ import {
   Group,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { getLanguageByKey } from "../../utils";
+import { getLanguageByKey, showServerError } from "../../utils";
 import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
-import { showServerError } from "../../utils";
 import { enqueueSnackbar } from "notistack";
 
 export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
@@ -62,7 +61,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   };
 
   return (
-    <Box>
+    <Box bg="#f1f3f5" p="md" style={{ borderRadius: 8 }}>
       <Flex justify="space-between" align="center">
         <Title order={3}>{getLanguageByKey("Date personale")}</Title>
         <ActionIcon onClick={handleAddClient} variant="filled">

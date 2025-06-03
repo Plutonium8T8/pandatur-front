@@ -1,4 +1,4 @@
-import { TextInput, Select, NumberInput, Flex } from "@mantine/core";
+import { TextInput, Select, NumberInput, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useEffect, useContext } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
@@ -55,194 +55,196 @@ export const ContractForm = ({
 
   return (
     <>
-      <TextInput
-        label={getLanguageByKey("Nr de contract")}
-        placeholder={getLanguageByKey("Nr de contract")}
-        key={formInstance.key("numar_de_contract")}
-        {...formInstance.getInputProps("numar_de_contract")}
-      />
-
-      <DatePickerInput
-        minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
-        clearable
-        mt="md"
-        label={getLanguageByKey("Data contractului")}
-        placeholder={getLanguageByKey("Data contractului")}
-        key={formInstance.key("data_contractului")}
-        {...formInstance.getInputProps("data_contractului")}
-      />
-
-      <DatePickerInput
-        minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
-        clearable
-        mt="md"
-        label={getLanguageByKey("Data avansului")}
-        placeholder={getLanguageByKey("Data avansului")}
-        key={formInstance.key("data_avansului")}
-        {...formInstance.getInputProps("data_avansului")}
-      />
-
-      <DatePickerInput
-        minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
-        clearable
-        mt="md"
-        label={getLanguageByKey("Data de plată integrală")}
-        placeholder={getLanguageByKey("Data de plată integrală")}
-        key={formInstance.key("data_de_plata_integrala")}
-        {...formInstance.getInputProps("data_de_plata_integrala")}
-      />
-
-      <LabelSwitch
-        mt="md"
-        label={getLanguageByKey("Contract trimis")}
-        key={formInstance.key("contract_trimis")}
-        {...formInstance.getInputProps("contract_trimis", {
-          type: "checkbox",
-        })}
-      />
-
-      <LabelSwitch
-        mt="md"
-        label={getLanguageByKey("Contract semnat")}
-        key={formInstance.key("contract_semnat")}
-        {...formInstance.getInputProps("contract_semnat", {
-          type: "checkbox",
-        })}
-      />
-
-      <TextInput
-        mt="md"
-        label={getLanguageByKey("Operator turistic")}
-        placeholder={getLanguageByKey("Operator turistic")}
-        key={formInstance.key("tour_operator")}
-        {...formInstance.getInputProps("tour_operator")}
-      />
-
-      <TextInput
-        mt="md"
-        label={getLanguageByKey("Nr cererii de la operator")}
-        placeholder={getLanguageByKey("Nr cererii de la operator")}
-        key={formInstance.key("numarul_cererii_de_la_operator")}
-        {...formInstance.getInputProps("numarul_cererii_de_la_operator")}
-      />
-
-      <LabelSwitch
-        mt="md"
-        label={getLanguageByKey("Achitare efectuată")}
-        key={formInstance.key("achitare_efectuata")}
-        {...formInstance.getInputProps("achitare_efectuata", {
-          type: "checkbox",
-        })}
-      />
-
-      <LabelSwitch
-        mt="md"
-        label={getLanguageByKey("Rezervare confirmată")}
-        key={formInstance.key("rezervare_confirmata")}
-        {...formInstance.getInputProps("rezervare_confirmata", {
-          type: "checkbox",
-        })}
-      />
-
-      <LabelSwitch
-        mt="md"
-        label={getLanguageByKey("Contract arhivat")}
-        key={formInstance.key("contract_arhivat")}
-        {...formInstance.getInputProps("contract_arhivat", {
-          type: "checkbox",
-        })}
-      />
-
-      <Select
-        mt="md"
-        label={getLanguageByKey("Plată primită")}
-        placeholder={getLanguageByKey("Plată primită")}
-        data={paymentStatusOptions}
-        clearable
-        key={formInstance.key("statutul_platii")}
-        {...formInstance.getInputProps("statutul_platii")}
-      />
-
-      <NumberInput
-        hideControls
-        leftSection={<MdOutlineEuroSymbol />}
-        mt="md"
-        decimalScale={2}
-        fixedDecimalScale
-        label={getLanguageByKey("Avans euro")}
-        placeholder={getLanguageByKey("Avans euro")}
-        key={formInstance.key("avans_euro")}
-        {...formInstance.getInputProps("avans_euro")}
-      />
-
-      <NumberInput
-        hideControls
-        mt="md"
-        decimalScale={2}
-        fixedDecimalScale
-        leftSection={<MdOutlineEuroSymbol />}
-        label={getLanguageByKey("Preț NETTO")}
-        placeholder={getLanguageByKey("Preț NETTO")}
-        key={formInstance.key("pret_netto")}
-        {...formInstance.getInputProps("pret_netto")}
-      />
-
-      <NumberInput
-        hideControls
-        mt="md"
-        label={getLanguageByKey("Achitat client")}
-        decimalScale={2}
-        fixedDecimalScale
-        placeholder={getLanguageByKey("Achitat client")}
-        key={formInstance.key("achitat_client")}
-        {...formInstance.getInputProps("achitat_client")}
-      />
-
-      {!hideDisabledInput && (
-        <NumberInput
-          disabled
-          hideControls
-          mt="md"
-          label={getLanguageByKey("Restanță client")}
-          placeholder={getLanguageByKey("Restanță client")}
-        />
-      )}
-
-      {!hideDisabledInput && (
-        <NumberInput
-          disabled
-          hideControls
-          decimalScale={2}
-          fixedDecimalScale
-          mt="md"
-          leftSection={<MdOutlineEuroSymbol />}
-          label={getLanguageByKey("Comision companie")}
-          placeholder={`${getLanguageByKey("Comision companie")} €`}
-          key={formInstance.key("comision_companie")}
-          {...formInstance.getInputProps("comision_companie")}
-        />
-      )}
-
-      {!hideDisabledInput && (
+      <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
         <TextInput
-          disabled
-          mt="md"
-          label={getLanguageByKey("Statut achitare")}
-          placeholder={getLanguageByKey("Statut achitare")}
+          label={getLanguageByKey("Nr de contract")}
+          placeholder={getLanguageByKey("Nr de contract")}
+          key={formInstance.key("numar_de_contract")}
+          {...formInstance.getInputProps("numar_de_contract")}
         />
-      )}
 
-      {isAdmin && (
+        <DatePickerInput
+          minDate={setMinDate}
+          valueFormat={DD_MM_YYYY}
+          clearable
+          mt="md"
+          label={getLanguageByKey("Data contractului")}
+          placeholder={getLanguageByKey("Data contractului")}
+          key={formInstance.key("data_contractului")}
+          {...formInstance.getInputProps("data_contractului")}
+        />
+
+        <DatePickerInput
+          minDate={setMinDate}
+          valueFormat={DD_MM_YYYY}
+          clearable
+          mt="md"
+          label={getLanguageByKey("Data avansului")}
+          placeholder={getLanguageByKey("Data avansului")}
+          key={formInstance.key("data_avansului")}
+          {...formInstance.getInputProps("data_avansului")}
+        />
+
+        <DatePickerInput
+          minDate={setMinDate}
+          valueFormat={DD_MM_YYYY}
+          clearable
+          mt="md"
+          label={getLanguageByKey("Data de plată integrală")}
+          placeholder={getLanguageByKey("Data de plată integrală")}
+          key={formInstance.key("data_de_plata_integrala")}
+          {...formInstance.getInputProps("data_de_plata_integrala")}
+        />
+
         <LabelSwitch
           mt="md"
-          label={getLanguageByKey("Control Admin")}
-          key={formInstance.key("control")}
-          {...formInstance.getInputProps("control", { type: "checkbox" })}
+          label={getLanguageByKey("Contract trimis")}
+          key={formInstance.key("contract_trimis")}
+          {...formInstance.getInputProps("contract_trimis", {
+            type: "checkbox",
+          })}
         />
-      )}
+
+        <LabelSwitch
+          mt="md"
+          label={getLanguageByKey("Contract semnat")}
+          key={formInstance.key("contract_semnat")}
+          {...formInstance.getInputProps("contract_semnat", {
+            type: "checkbox",
+          })}
+        />
+
+        <TextInput
+          mt="md"
+          label={getLanguageByKey("Operator turistic")}
+          placeholder={getLanguageByKey("Operator turistic")}
+          key={formInstance.key("tour_operator")}
+          {...formInstance.getInputProps("tour_operator")}
+        />
+
+        <TextInput
+          mt="md"
+          label={getLanguageByKey("Nr cererii de la operator")}
+          placeholder={getLanguageByKey("Nr cererii de la operator")}
+          key={formInstance.key("numarul_cererii_de_la_operator")}
+          {...formInstance.getInputProps("numarul_cererii_de_la_operator")}
+        />
+
+        <LabelSwitch
+          mt="md"
+          label={getLanguageByKey("Achitare efectuată")}
+          key={formInstance.key("achitare_efectuata")}
+          {...formInstance.getInputProps("achitare_efectuata", {
+            type: "checkbox",
+          })}
+        />
+
+        <LabelSwitch
+          mt="md"
+          label={getLanguageByKey("Rezervare confirmată")}
+          key={formInstance.key("rezervare_confirmata")}
+          {...formInstance.getInputProps("rezervare_confirmata", {
+            type: "checkbox",
+          })}
+        />
+
+        <LabelSwitch
+          mt="md"
+          label={getLanguageByKey("Contract arhivat")}
+          key={formInstance.key("contract_arhivat")}
+          {...formInstance.getInputProps("contract_arhivat", {
+            type: "checkbox",
+          })}
+        />
+
+        <Select
+          mt="md"
+          label={getLanguageByKey("Plată primită")}
+          placeholder={getLanguageByKey("Plată primită")}
+          data={paymentStatusOptions}
+          clearable
+          key={formInstance.key("statutul_platii")}
+          {...formInstance.getInputProps("statutul_platii")}
+        />
+
+        <NumberInput
+          hideControls
+          leftSection={<MdOutlineEuroSymbol />}
+          mt="md"
+          decimalScale={2}
+          fixedDecimalScale
+          label={getLanguageByKey("Avans euro")}
+          placeholder={getLanguageByKey("Avans euro")}
+          key={formInstance.key("avans_euro")}
+          {...formInstance.getInputProps("avans_euro")}
+        />
+
+        <NumberInput
+          hideControls
+          mt="md"
+          decimalScale={2}
+          fixedDecimalScale
+          leftSection={<MdOutlineEuroSymbol />}
+          label={getLanguageByKey("Preț NETTO")}
+          placeholder={getLanguageByKey("Preț NETTO")}
+          key={formInstance.key("pret_netto")}
+          {...formInstance.getInputProps("pret_netto")}
+        />
+
+        <NumberInput
+          hideControls
+          mt="md"
+          label={getLanguageByKey("Achitat client")}
+          decimalScale={2}
+          fixedDecimalScale
+          placeholder={getLanguageByKey("Achitat client")}
+          key={formInstance.key("achitat_client")}
+          {...formInstance.getInputProps("achitat_client")}
+        />
+
+        {!hideDisabledInput && (
+          <NumberInput
+            disabled
+            hideControls
+            mt="md"
+            label={getLanguageByKey("Restanță client")}
+            placeholder={getLanguageByKey("Restanță client")}
+          />
+        )}
+
+        {!hideDisabledInput && (
+          <NumberInput
+            disabled
+            hideControls
+            decimalScale={2}
+            fixedDecimalScale
+            mt="md"
+            leftSection={<MdOutlineEuroSymbol />}
+            label={getLanguageByKey("Comision companie")}
+            placeholder={`${getLanguageByKey("Comision companie")} €`}
+            key={formInstance.key("comision_companie")}
+            {...formInstance.getInputProps("comision_companie")}
+          />
+        )}
+
+        {!hideDisabledInput && (
+          <TextInput
+            disabled
+            mt="md"
+            label={getLanguageByKey("Statut achitare")}
+            placeholder={getLanguageByKey("Statut achitare")}
+          />
+        )}
+
+        {isAdmin && (
+          <LabelSwitch
+            mt="md"
+            label={getLanguageByKey("Control Admin")}
+            key={formInstance.key("control")}
+            {...formInstance.getInputProps("control", { type: "checkbox" })}
+          />
+        )}
+      </Box>
     </>
   );
 };

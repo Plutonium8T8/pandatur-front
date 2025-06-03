@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Select, TextInput } from "@mantine/core";
+import { Select, TextInput, Box } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import {
   motivulRefuzuluiOptions,
@@ -21,50 +21,52 @@ export const QualityControlForm = ({ data, formInstance }) => {
 
   return (
     <>
-      <Select
-        clearable
-        searchable
-        label={getLanguageByKey("Motivul refuzului")}
-        placeholder={getLanguageByKey("Motivul refuzului")}
-        data={motivulRefuzuluiOptions}
-        key={formInstance.key("motivul_refuzului")}
-        {...formInstance.getInputProps("motivul_refuzului")}
-      />
+      <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
+        <Select
+          clearable
+          searchable
+          label={getLanguageByKey("Motivul refuzului")}
+          placeholder={getLanguageByKey("Motivul refuzului")}
+          data={motivulRefuzuluiOptions}
+          key={formInstance.key("motivul_refuzului")}
+          {...formInstance.getInputProps("motivul_refuzului")}
+        />
 
-      <Select
-        mt="md"
-        clearable
-        searchable
-        label={getLanguageByKey("Evaluare odihnă")}
-        placeholder={getLanguageByKey("Evaluare odihnă")}
-        data={evaluareOdihnaOptions}
-        key={formInstance.key("evaluare_de_odihna")}
-        {...formInstance.getInputProps("evaluare_de_odihna")}
-      />
+        <Select
+          mt="md"
+          clearable
+          searchable
+          label={getLanguageByKey("Evaluare odihnă")}
+          placeholder={getLanguageByKey("Evaluare odihnă")}
+          data={evaluareOdihnaOptions}
+          key={formInstance.key("evaluare_de_odihna")}
+          {...formInstance.getInputProps("evaluare_de_odihna")}
+        />
 
-      <TextInput
-        mt="md"
-        label={getLanguageByKey("Următoarea vacanță")}
-        placeholder={getLanguageByKey("Următoarea vacanță")}
-        key={formInstance.key("urmatoarea_vacanta")}
-        {...formInstance.getInputProps("urmatoarea_vacanta")}
-      />
+        <TextInput
+          mt="md"
+          label={getLanguageByKey("Următoarea vacanță")}
+          placeholder={getLanguageByKey("Următoarea vacanță")}
+          key={formInstance.key("urmatoarea_vacanta")}
+          {...formInstance.getInputProps("urmatoarea_vacanta")}
+        />
 
-      <TextInput
-        mt="md"
-        label={getLanguageByKey("Manager")}
-        placeholder={getLanguageByKey("Manager")}
-        key={formInstance.key("manager")}
-        {...formInstance.getInputProps("manager")}
-      />
+        <TextInput
+          mt="md"
+          label={getLanguageByKey("Manager")}
+          placeholder={getLanguageByKey("Manager")}
+          key={formInstance.key("manager")}
+          {...formInstance.getInputProps("manager")}
+        />
 
-      <TextInput
-        mt="md"
-        label={getLanguageByKey("Vacanța")}
-        placeholder={getLanguageByKey("Vacanța")}
-        key={formInstance.key("vacanta")}
-        {...formInstance.getInputProps("vacanta")}
-      />
+        <TextInput
+          mt="md"
+          label={getLanguageByKey("Vacanța")}
+          placeholder={getLanguageByKey("Vacanța")}
+          key={formInstance.key("vacanta")}
+          {...formInstance.getInputProps("vacanta")}
+        />
+      </Box>
     </>
   );
 };

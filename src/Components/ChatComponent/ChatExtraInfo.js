@@ -314,7 +314,7 @@ const ChatExtraInfo = ({
               onSubmit={updateTicketDate}
             />
 
-            <Divider my="md" />
+            <Divider my="md" size="md" color="green" />
 
             <PersonalData4ClientForm
               formInstance={form}
@@ -322,19 +322,21 @@ const ChatExtraInfo = ({
               ticketId={ticketId}
             />
 
-            <Divider my="md" />
+            <Divider my="md" size="md" color="green" />
 
-            <Merge
-              buttonText={getLanguageByKey("combineTickets")}
-              loading={isLoadingCombineLead}
-              value={ticketId || ""}
-              onSubmit={(values, resetField) =>
-                mergeClientsData(values, resetField)
-              }
-              placeholder={getLanguageByKey("Introduceți ID lead")}
-            />
+            <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
+              <Merge
+                buttonText={getLanguageByKey("combineTickets")}
+                loading={isLoadingCombineLead}
+                value={ticketId || ""}
+                onSubmit={(values, resetField) =>
+                  mergeClientsData(values, resetField)
+                }
+                placeholder={getLanguageByKey("Introduceți ID lead")}
+              />
+            </Box>
 
-            <Box mt="md">
+            <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
               <Merge
                 buttonText={getLanguageByKey("combineClient")}
                 loading={isLoadingCombineClient}
