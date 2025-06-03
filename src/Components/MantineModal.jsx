@@ -6,7 +6,6 @@ export const MantineModal = ({
   title,
   onClose = () => { },
   height = "100vh",
-  size = "calc(100% - 200px)",
   ...props
 }) => {
   const { style, ...rest } = props;
@@ -19,12 +18,19 @@ export const MantineModal = ({
       closeOnClickOutside
       size={false}
       centered={false}
+      overlayProps={{
+        opacity: 0,
+        backgroundOpacity: 0,
+        pointerEvents: "none",
+      }}
       styles={{
         content: {
           position: "absolute",
           left: "250px",
           width: "calc(100% - 250px)",
           height,
+          zIndex: 1001,
+          pointerEvents: "auto",
           ...style,
         },
         body: {
