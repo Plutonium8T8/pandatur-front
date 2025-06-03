@@ -11,12 +11,11 @@ import {
   ActionIcon,
   Badge,
   Tabs,
-  Button,
+  Modal
 } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
-import { MantineModal } from "../MantineModal";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 import { useDebouncedValue } from "@mantine/hooks";
@@ -52,12 +51,6 @@ const ChatList = ({ selectTicketId }) => {
   const filterChatList = (filters) => {
     setChatFilters(filters);
     fetchChatFilteredTickets(filters);
-    setOpenFilter(false);
-  };
-
-  const resetFilter = () => {
-    setChatFilters({});
-    setChatFilteredTickets([]);
     setOpenFilter(false);
   };
 
@@ -139,10 +132,25 @@ const ChatList = ({ selectTicketId }) => {
         </Box>
       </Box>
 
-      <MantineModal
-        title={getLanguageByKey("Filtrează tichete")}
-        open={openFilter}
+      <Modal
+        opened={openFilter}
         onClose={() => setOpenFilter(false)}
+        title={getLanguageByKey("Filtrează tichete")}
+        withCloseButton
+        centered
+        size="xl"
+        styles={{
+          content: {
+            height: "800px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+          },
+        }}
       >
         <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%">
           <Tabs.List>
@@ -170,17 +178,10 @@ const ChatList = ({ selectTicketId }) => {
               onSubmit={filterChatList}
               loading={chatSpinner}
               initialData={chatFilters}
-
             />
           </Tabs.Panel>
         </Tabs>
-
-        <Box mt="md">
-          <Button fullWidth variant="outline" onClick={resetFilter}>
-            {getLanguageByKey("Resetează filtrele")}
-          </Button>
-        </Box>
-      </MantineModal>
+      </Modal>
     </>
   );
 };
