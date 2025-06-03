@@ -4,20 +4,29 @@ export const MantineModal = ({
   children,
   open,
   title,
-  onClose,
-  height = "700px",
-  size = 700,
+  onClose = () => { },
+  height = "100vh",
+  size = "calc(100% - 250px)",
   ...props
 }) => {
   const { style, ...rest } = props;
   return (
     <Modal
-      centered
-      size={size}
       opened={open}
       onClose={onClose}
+      withCloseButton
+      closeOnClickOutside
+      size={size}
+      centered={false}
       styles={{
-        body: { height: `${height}`, ...style },
+        content: {
+          marginLeft: "500px",
+          height,
+          ...style,
+        },
+        body: {
+          height: "100%",
+        },
       }}
       title={
         title && (

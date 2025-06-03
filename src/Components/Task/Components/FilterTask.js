@@ -1,8 +1,7 @@
 import { useContext, useState, useEffect } from "react";
-import { Group, Button, Box, Flex, MultiSelect, Select } from "@mantine/core";
+import { Group, Button, Box, Flex, MultiSelect, Select, Modal } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations, showServerError } from "../../utils";
-import { MantineModal } from "../../MantineModal";
 import { TypeTask } from "../OptionsTaskType";
 import { useGetTechniciansList, useUser } from "../../../hooks";
 import dayjs from "dayjs";
@@ -143,11 +142,13 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   }, [isTeam, localFilters.created_for, teamTechnicians, userId]);
 
   return (
-    <MantineModal
-      open={opened}
+    <Modal
+      opened={opened}
       onClose={onClose}
       title={translations["Filtru"][language]}
-      height="auto"
+      withCloseButton
+      centered
+      size="xl"
     >
       <Box p="sm">
         <Flex gap="sm" direction="column">
@@ -272,7 +273,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           </Button>
         </Group>
       </Box>
-    </MantineModal>
+    </Modal>
   );
 };
 
