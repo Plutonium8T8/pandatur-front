@@ -3175,5 +3175,10 @@ export const translations = {
     RO: "Rezervări",
     RU: "Бронирования",
     EN: "Bookings",
+  },
+  "Informație suplimentară": {
+    "RO": "Informație suplimentară",
+    "RU": "Дополнительная информация",
+    "EN": "Additional Information"
   }
 }
