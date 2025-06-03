@@ -264,7 +264,7 @@ const UserList = ({
       title: "Sipuni ID",
       dataIndex: "sipuni_id",
       key: "sipuni_id",
-      width: 120,
+      width: 100,
       render: (sipuni_id) => <Flex justify="center">{sipuni_id || "—"}</Flex>,
     },
     ...(canEdit || canDelete
