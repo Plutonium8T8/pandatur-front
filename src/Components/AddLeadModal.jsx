@@ -5,9 +5,7 @@ import {
   Select,
   Textarea,
   TagsInput,
-  Button,
-  Modal,
-  Text,
+  Button
 } from "@mantine/core";
 import { useForm, hasLength } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -68,125 +66,114 @@ export const AddLeadModal = ({
   }, [selectedGroupTitle, groupTitleForApi]);
 
   return (
-    <Modal
-      centered
-      size={600}
-      opened={open}
-      onClose={onClose}
-      title={
-        <Text size="xl" fw="bold">
-          {getLanguageByKey("addNewLead")}
-        </Text>
-      }
-    >
-      <form onSubmit={form.onSubmit(createTicket)}>
-        <Flex gap="md">
-          <TextInput
-            withAsterisk
-            w="100%"
-            label={getLanguageByKey("Nume")}
-            placeholder={getLanguageByKey("Nume")}
-            key={form.key("name")}
-            {...form.getInputProps("name")}
-          />
-          <TextInput
-            withAsterisk
-            w="100%"
-            label={getLanguageByKey("Prenume")}
-            placeholder={getLanguageByKey("Prenume")}
-            key={form.key("surname")}
-            {...form.getInputProps("surname")}
-          />
-        </Flex>
 
-        <Flex gap="md">
-          <TextInput
-            type="email"
-            w="100%"
-            label={getLanguageByKey("Email")}
-            placeholder={getLanguageByKey("Email")}
-            key={form.key("email")}
-            {...form.getInputProps("email")}
-          />
-          <NumberInput
-            withAsterisk
-            hideControls
-            w="100%"
-            label={getLanguageByKey("Telefon")}
-            placeholder={getLanguageByKey("Telefon")}
-            key={form.key("phone")}
-            {...form.getInputProps("phone")}
-          />
-        </Flex>
+    <form onSubmit={form.onSubmit(createTicket)}>
+      <Flex gap="md">
+        <TextInput
+          withAsterisk
+          w="100%"
+          label={getLanguageByKey("Nume")}
+          placeholder={getLanguageByKey("Nume")}
+          key={form.key("name")}
+          {...form.getInputProps("name")}
+        />
+        <TextInput
+          withAsterisk
+          w="100%"
+          label={getLanguageByKey("Prenume")}
+          placeholder={getLanguageByKey("Prenume")}
+          key={form.key("surname")}
+          {...form.getInputProps("surname")}
+        />
+      </Flex>
 
-        <Flex gap="md">
-          <TextInput
-            w="100%"
-            label={getLanguageByKey("Contact")}
-            placeholder={getLanguageByKey("Contact")}
-            key={form.key("contact")}
-            {...form.getInputProps("contact")}
-          />
+      <Flex gap="md">
+        <TextInput
+          type="email"
+          w="100%"
+          label={getLanguageByKey("Email")}
+          placeholder={getLanguageByKey("Email")}
+          key={form.key("email")}
+          {...form.getInputProps("email")}
+        />
+        <NumberInput
+          withAsterisk
+          hideControls
+          w="100%"
+          label={getLanguageByKey("Telefon")}
+          placeholder={getLanguageByKey("Telefon")}
+          key={form.key("phone")}
+          {...form.getInputProps("phone")}
+        />
+      </Flex>
 
-          <Select
-            disabled
-            value={form.values.group_title || selectedGroupTitle || groupTitleForApi}
-            placeholder={getLanguageByKey("selectGroup")}
-            w="100%"
-            label={getLanguageByKey("Grup")}
-            data={groupTitleOptions}
-            key={form.key("group_title")}
-            onChange={(value) => form.setFieldValue("group_title", value)}
-          />
-        </Flex>
-
-        <Flex gap="md">
-          <Select
-            data={priorityOptions}
-            w="100%"
-            label={getLanguageByKey("Prioritate")}
-            placeholder={getLanguageByKey("Selectează prioritate")}
-            key={form.key("priority")}
-            {...form.getInputProps("priority")}
-            disabled
-          />
-
-          <Select
-            w="100%"
-            label={getLanguageByKey("Workflow")}
-            placeholder={getLanguageByKey("Selectează flux de lucru")}
-            data={workflowOptions.map((step) => ({ value: step, label: step }))}
-            key={form.key("workflow")}
-            {...form.getInputProps("workflow")}
-          />
-        </Flex>
-
-        <TagsInput
-          label={getLanguageByKey("tags")}
-          placeholder={getLanguageByKey("tags")}
-          clearable
-          key={form.key("tags")}
-          {...form.getInputProps("tags")}
+      <Flex gap="md">
+        <TextInput
+          w="100%"
+          label={getLanguageByKey("Contact")}
+          placeholder={getLanguageByKey("Contact")}
+          key={form.key("contact")}
+          {...form.getInputProps("contact")}
         />
 
-        <Textarea
-          autosize
-          minRows={4}
-          label={getLanguageByKey("Descriere")}
-          placeholder={getLanguageByKey("Descriere")}
-          key={form.key("description")}
-          {...form.getInputProps("description")}
+        <Select
+          disabled
+          value={form.values.group_title || selectedGroupTitle || groupTitleForApi}
+          placeholder={getLanguageByKey("selectGroup")}
+          w="100%"
+          label={getLanguageByKey("Grup")}
+          data={groupTitleOptions}
+          key={form.key("group_title")}
+          onChange={(value) => form.setFieldValue("group_title", value)}
+        />
+      </Flex>
+
+      <Flex gap="md">
+        <Select
+          data={priorityOptions}
+          w="100%"
+          label={getLanguageByKey("Prioritate")}
+          placeholder={getLanguageByKey("Selectează prioritate")}
+          key={form.key("priority")}
+          {...form.getInputProps("priority")}
+          disabled
         />
 
-        <Flex justify="end" mt="md" gap="md">
-          <Button onClick={onClose} variant="outline">
-            {getLanguageByKey("Anulează")}
-          </Button>
-          <Button loading={loading} type="submit">
-            {getLanguageByKey("Creează")}
-          </Button>
-        </Flex>
-      </form>
-    </Modal>
+        <Select
+          w="100%"
+          label={getLanguageByKey("Workflow")}
+          placeholder={getLanguageByKey("Selectează flux de lucru")}
+          data={workflowOptions.map((step) => ({ value: step, label: step }))}
+          key={form.key("workflow")}
+          {...form.getInputProps("workflow")}
+        />
+      </Flex>
+
+      <TagsInput
+        label={getLanguageByKey("tags")}
+        placeholder={getLanguageByKey("tags")}
+        clearable
+        key={form.key("tags")}
+        {...form.getInputProps("tags")}
+      />
+
+      <Textarea
+        autosize
+        minRows={4}
+        label={getLanguageByKey("Descriere")}
+        placeholder={getLanguageByKey("Descriere")}
+        key={form.key("description")}
+        {...form.getInputProps("description")}
+      />
+
+      <Flex justify="end" mt="md" gap="md">
+        <Button onClick={onClose} variant="outline">
+          {getLanguageByKey("Anulează")}
+        </Button>
+        <Button loading={loading} type="submit">
+          {getLanguageByKey("Creează")}
+        </Button>
+      </Flex>
+    </form>
   );
 };

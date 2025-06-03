@@ -1,6 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Button, Group, MultiSelect, Select, Flex } from "@mantine/core";
-import { MantineModal } from "../MantineModal";
+import { Box, Button, Group, MultiSelect, Select, Flex, Modal } from "@mantine/core";
 import { translations } from "../utils";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
@@ -78,7 +77,14 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
     };
 
     return (
-        <MantineModal open={opened} onClose={onClose} title={translations["FilterForUser"][language]}>
+        <Modal
+            opened={opened}
+            onClose={onClose}
+            title={translations["Filtru"][language]}
+            withCloseButton
+            centered
+            size="lg"
+        >
             <Flex direction="column" h="100%" justify="space-between">
                 <Box p="sm">
                     <Flex direction="column" gap="sm">
@@ -135,7 +141,7 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
                     </Group>
                 </Box>
             </Flex>
-        </MantineModal>
+        </Modal>
     );
 };
 

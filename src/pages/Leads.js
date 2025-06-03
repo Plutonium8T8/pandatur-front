@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { Divider } from "@mantine/core";
+import { Divider, Modal } from "@mantine/core";
 import {
   useDOMElementHeight,
   useApp,
@@ -281,21 +281,34 @@ export const Leads = () => {
         withCloseButton={false}
         style={{ padding: 0 }}
         height="100%"
+        onClose={closeChatModal}
       >
         <SingleChat id={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
-      <AddLeadModal
-        open={isOpenAddLeadModal}
+      <Modal
+        opened={isOpenAddLeadModal}
         onClose={() => setIsOpenAddLeadModal(false)}
-        selectedGroupTitle={groupTitleForApi}
-        fetchTickets={() => fetchHardTickets(currentPage)}
-      />
+        title={getLanguageByKey("Adaugă lead")}
+        withCloseButton
+        centered
+        size="xl"
+      >
+        <AddLeadModal
+          open
+          onClose={() => setIsOpenAddLeadModal(false)}
+          selectedGroupTitle={groupTitleForApi}
+          fetchTickets={() => fetchHardTickets(currentPage)}
+        />
+      </Modal>
 
-      <MantineModal
-        title={getLanguageByKey("Filtrează tichete")}
-        open={isOpenKanbanFilterModal}
+      <Modal
+        opened={isOpenKanbanFilterModal}
         onClose={() => setIsOpenKanbanFilterModal(false)}
+        title={getLanguageByKey("Filtrează tichete")}
+        withCloseButton
+        centered
+        size="xl"
       >
         <LeadsKanbanFilter
           initialData={kanbanFilters}
@@ -305,12 +318,15 @@ export const Leads = () => {
           onApplyWorkflowFilters={setSelectedWorkflow}
           onSubmitTicket={handleApplyFilterLightTicket}
         />
-      </MantineModal>
+      </Modal>
 
-      <MantineModal
-        title={getLanguageByKey("Filtrează tichete")}
-        open={isOpenListFilterModal}
+      <Modal
+        opened={isOpenListFilterModal}
         onClose={() => setIsOpenListFilterModal(false)}
+        title={getLanguageByKey("Filtrează tichete")}
+        withCloseButton
+        centered
+        size="xl"
       >
         <LeadsTableFilter
           initialData={hardTicketFilters}
@@ -322,12 +338,15 @@ export const Leads = () => {
             setCurrentPage(1);
           }}
         />
-      </MantineModal>
+      </Modal>
 
-      <MantineModal
-        open={isModalOpen}
+      <Modal
+        opened={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={getLanguageByKey("Editarea tichetelor în grup")}
+        withCloseButton
+        centered
+        size="xl"
       >
         <ManageLeadInfoTabs
           onClose={() => setIsModalOpen(false)}
@@ -339,7 +358,7 @@ export const Leads = () => {
               : currentTicket?.id
           }
         />
-      </MantineModal>
+      </Modal>
     </>
   );
 };
