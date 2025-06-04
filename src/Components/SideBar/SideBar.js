@@ -35,7 +35,7 @@ export const SideBar = () => {
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const { surname, name, userId, userRoles } = useUser();
   const [loading, setLoading] = useState(false);
-  const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS } = useLanguageToggle();
+  const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS, LANGUAGES } = useLanguageToggle();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
   const currentGroupTitle = customGroupTitle || groupTitleForApi;
@@ -145,22 +145,35 @@ export const SideBar = () => {
             </MenuItem>
           )}
           <MenuItem>
-            <Select
-              value={selectedLanguage}
-              onChange={setLanguage}
-              data={LANGUAGE_OPTIONS}
-              styles={{
-                input: {
-                  backgroundColor: "transparent",
-                  color: "white",
-                  border: "1px solid transparent",
-                },
-                dropdown: {
-                  backgroundColor: "white",
-                  color: "black",
-                }
-              }}
-            />
+            {isCollapsed ? (
+              <div
+                style={{ textAlign: "center", fontSize: "20px", cursor: "pointer" }}
+                onClick={() => {
+                  const nextLanguage = selectedLanguage === "RO" ? "RU" : selectedLanguage === "RU" ? "EN" : "RO";
+                  setLanguage(nextLanguage);
+                }}
+                title={selectedLanguage}
+              >
+                {LANGUAGES[selectedLanguage].icon}
+              </div>
+            ) : (
+              <Select
+                value={selectedLanguage}
+                onChange={setLanguage}
+                data={LANGUAGE_OPTIONS}
+                styles={{
+                  input: {
+                    backgroundColor: "transparent",
+                    color: "white",
+                    border: "1px solid transparent",
+                  },
+                  dropdown: {
+                    backgroundColor: "white",
+                    color: "black",
+                  },
+                }}
+              />
+            )}
           </MenuItem>
         </Menu>
 
