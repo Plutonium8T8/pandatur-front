@@ -39,5 +39,6 @@ export const useLanguageToggle = () => {
     setLanguage,
     selectedLanguage: storage || "RO",
     LANGUAGE_OPTIONS,
+    LANGUAGES
   };
 };
