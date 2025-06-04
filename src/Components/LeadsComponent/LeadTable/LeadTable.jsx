@@ -406,7 +406,7 @@ export const LeadTable = ({
           </div>
         </div>
         {!!totalLeadsPages && (
-          <Flex justify="center" className="leads-table-pagination">
+          <Flex justify="center" className="leads-table-pagination" pt="10">
             <Pagination
               totalPages={totalLeadsPages}
               currentPage={currentPage}

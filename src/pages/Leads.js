@@ -338,6 +338,18 @@ export const Leads = () => {
         withCloseButton
         centered
         size="xl"
+        styles={{
+          content: {
+            height: "800px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+          },
+        }}
       >
         <LeadsTableFilter
           initialData={hardTicketFilters}
