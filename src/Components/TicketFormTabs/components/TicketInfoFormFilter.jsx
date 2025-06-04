@@ -169,6 +169,7 @@ export const TicketInfoFormFilter = ({
             placeholder={getLanguageByKey("Status sunet telefonic")}
             data={[]}
             clearable
+            searchable
           />
         )}
 
@@ -180,6 +181,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("sursa_lead")}
           {...form.getInputProps("sursa_lead")}
+          searchable
         />
 
         <MultiSelect
@@ -190,6 +192,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("promo")}
           {...form.getInputProps("promo")}
+          searchable
         />
 
         <MultiSelect
@@ -200,6 +203,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("marketing")}
           {...form.getInputProps("marketing")}
+          searchable
         />
 
         <MultiSelect
@@ -210,6 +214,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("tipul_serviciului")}
           {...form.getInputProps("tipul_serviciului")}
+          searchable
         />
 
         <MultiSelect
@@ -220,6 +225,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("tara")}
           {...form.getInputProps("tara")}
+          searchable
         />
 
         <MultiSelect
@@ -230,6 +236,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("tip_de_transport")}
           {...form.getInputProps("tip_de_transport")}
+          searchable
         />
 
         <MultiSelect
@@ -240,6 +247,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("denumirea_excursiei_turului")}
           {...form.getInputProps("denumirea_excursiei_turului")}
+          searchable
         />
 
         <MultiSelect
@@ -250,6 +258,7 @@ export const TicketInfoFormFilter = ({
           clearable
           key={form.key("procesarea_achizitionarii")}
           {...form.getInputProps("procesarea_achizitionarii")}
+          searchable
         />
       </form>
 

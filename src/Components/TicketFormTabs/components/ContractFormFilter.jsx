@@ -204,6 +204,7 @@ export const ContractFormFilter = ({
           clearable
           key={form.key("statutul_platii")}
           {...form.getInputProps("statutul_platii")}
+          searchable
         />
 
         <NumberInput
