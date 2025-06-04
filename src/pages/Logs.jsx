@@ -56,7 +56,7 @@ export const Logs = () => {
           <LogsComponent logList={logList} />
 
           <Flex
-            pt="20"
+            pt="10"
             justify="center"
             style={{ borderTop: "1px solid var(--mantine-color-gray-4)" }}
           >
