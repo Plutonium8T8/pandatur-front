@@ -139,6 +139,7 @@ export const InvoiceForm = ({
           clearable
           key={form.key("f_valuta_contului")}
           {...form.getInputProps("f_valuta_contului")}
+          searchable
         />
 
         <Select
@@ -149,6 +150,7 @@ export const InvoiceForm = ({
           clearable
           key={form.key("iban")}
           {...form.getInputProps("iban")}
+          searchable
         />
 
         <Flex justify="end" gap="md" mt="md">

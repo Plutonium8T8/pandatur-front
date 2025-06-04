@@ -61,6 +61,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         clearable
         key={formInstance.key("workflow")}
         {...formInstance.getInputProps("workflow")}
+        searchable
       />
 
       <Select
@@ -72,6 +73,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         clearable
         key={formInstance.key("priority")}
         {...formInstance.getInputProps("priority")}
+        searchable
       />
 
       <TextInput

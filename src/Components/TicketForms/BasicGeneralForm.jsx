@@ -57,6 +57,7 @@ export const BasicGeneralForm = ({
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
+          searchable
         />
 
         <MultiSelect
@@ -67,6 +68,7 @@ export const BasicGeneralForm = ({
           clearable
           key={form.key("priority")}
           {...form.getInputProps("priority")}
+          searchable
         />
 
         <TextInput
@@ -93,6 +95,7 @@ export const BasicGeneralForm = ({
           data={technicians}
           key={form.key("technician_id")}
           {...form.getInputProps("technician_id")}
+          searchable
         />
       </form>
 
