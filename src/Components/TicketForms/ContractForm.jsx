@@ -165,6 +165,7 @@ export const ContractForm = ({
           clearable
           key={formInstance.key("statutul_platii")}
           {...formInstance.getInputProps("statutul_platii")}
+          searchable
         />
 
         <NumberInput

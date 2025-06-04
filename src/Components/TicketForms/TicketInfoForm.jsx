@@ -107,6 +107,7 @@ export const TicketInfoForm = ({
             placeholder={getLanguageByKey("Status sunet telefonic")}
             data={[]}
             clearable
+            searchable
           />
         )}
 
@@ -118,6 +119,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("sursa_lead")}
           {...formInstance.getInputProps("sursa_lead")}
+          searchable
         />
 
         <Select
@@ -128,6 +130,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("promo")}
           {...formInstance.getInputProps("promo")}
+          searchable
         />
 
         <Select
@@ -138,6 +141,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("marketing")}
           {...formInstance.getInputProps("marketing")}
+          searchable
         />
 
         <Select
@@ -148,6 +152,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("tipul_serviciului")}
           {...formInstance.getInputProps("tipul_serviciului")}
+          searchable
         />
 
         <Select
@@ -158,6 +163,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("tara")}
           {...formInstance.getInputProps("tara")}
+          searchable
         />
 
         <Select
@@ -168,6 +174,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("tip_de_transport")}
           {...formInstance.getInputProps("tip_de_transport")}
+          searchable
         />
 
         <Select
@@ -178,6 +185,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("denumirea_excursiei_turului")}
           {...formInstance.getInputProps("denumirea_excursiei_turului")}
+          searchable
         />
 
         <Select
@@ -188,6 +196,7 @@ export const TicketInfoForm = ({
           clearable
           key={formInstance.key("procesarea_achizitionarii")}
           {...formInstance.getInputProps("procesarea_achizitionarii")}
+          searchable
         />
       </Box>
     </>
