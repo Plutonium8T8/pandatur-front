@@ -66,6 +66,7 @@ export const BasicGeneralFormFilter = ({
           clearable
           key={form.key("workflow")}
           {...form.getInputProps("workflow")}
+          searchable
         />
 
         <MultiSelect
@@ -76,6 +77,7 @@ export const BasicGeneralFormFilter = ({
           clearable
           key={form.key("priority")}
           {...form.getInputProps("priority")}
+          searchable
         />
 
         <TextInput
