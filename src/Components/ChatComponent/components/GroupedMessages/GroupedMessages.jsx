@@ -26,6 +26,7 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
         const formatted = data.map((item) => ({
           value: Number(item.id.id),
           label: `${item.id.surname} ${item.id.name}`,
+          sipuni_id: item.sipuni_id,
         }));
         setTechnicians(formatted);
       } catch (err) {
@@ -117,12 +118,14 @@ export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
                         key={`${msg.id ?? ""}-${msg.time_sent}`}
                         msg={msg}
                         personalInfo={personalInfo}
+                        technicians={technicians}
                       />
                     ) : (
                       <SendedMessage
                         key={`${msg.id ?? ""}-${msg.time_sent}`}
                         msg={msg}
                         technician={technician}
+                        technicians={technicians}
                       />
                     );
                   })}

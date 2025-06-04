@@ -5,7 +5,7 @@ import { IoMdCheckmark } from "react-icons/io";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { renderContent } from "../../renderContent";
 import { HH_mm, MEDIA_TYPE } from "../../../../app-constants";
-import { parseServerDate, MESSAGES_STATUS } from "../../../utils";
+import { parseServerDate, MESSAGES_STATUS, getFullName } from "../../../utils";
 import { Call } from "./Call";
 import "./Message.css";
 
@@ -21,50 +21,79 @@ const MESSAGE_STATUS_ICONS = {
   [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp />,
 };
 
-export const SendedMessage = ({ msg, technician }) => {
+export const SendedMessage = ({ msg, technician, technicians = [], personalInfo = {} }) => {
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
+  const clients = personalInfo.clients || [];
+
+  const findClientByPhone = (phone) =>
+    clients.find((c) => String(c?.id?.phone) === String(phone));
+  const findTechnicianBySip = (sip) =>
+    technicians.find((t) => String(t.sipuni_id) === String(sip));
 
   const senderName = technician?.label || DEFAULT_SENDER_NAME;
 
-  return (
-    <Flex w="100%" justify="end">
-      {isCall ? (
+  if (isCall) {
+    const { src_num, short_dst_num } = msg.call_metadata || {};
+
+    const callerClient = findClientByPhone(src_num);
+    const callerTechnician = findTechnicianBySip(src_num);
+
+    const receiverClient = findClientByPhone(short_dst_num);
+    const receiverTechnician = findTechnicianBySip(short_dst_num);
+
+    const callerLabel =
+      getFullName(callerClient?.id?.name, callerClient?.id?.surname) ||
+      callerTechnician?.label ||
+      src_num;
+
+    const receiverLabel =
+      getFullName(receiverClient?.id?.name, receiverClient?.id?.surname) ||
+      receiverTechnician?.label ||
+      short_dst_num;
+
+    return (
+      <Flex w="100%" justify="end">
         <Call
           time={msg.time_sent}
-          from={msg.call_metadata?.src_num}
-          to={msg.call_metadata?.dst_num}
-          name={senderName}
+          from={src_num}
+          to={short_dst_num}
+          name={receiverLabel}
           src={msg.message}
           status={msg.call_metadata?.status}
+          technicians={technicians}
         />
-      ) : (
-        <Flex w="90%" direction="column" className="chat-message sent">
-          <Flex justify="end" gap="8">
-            <Flex>
-              <Flex miw="250px" direction="column" p="8" className="text">
-                <Flex align="center" gap={8}>
-                  <FaHeadphones size={12} />
-                  <Text fw="bold" size="sm">
-                    {senderName}
-                  </Text>
+      </Flex>
+    );
+  }
+
+  return (
+    <Flex w="100%" justify="end">
+      <Flex w="90%" direction="column" className="chat-message sent">
+        <Flex justify="end" gap="8">
+          <Flex>
+            <Flex miw="250px" direction="column" p="8" className="text">
+              <Flex align="center" gap={8}>
+                <FaHeadphones size={12} />
+                <Text fw="bold" size="sm">
+                  {senderName}
+                </Text>
+              </Flex>
+
+              {renderContent(msg)}
+
+              <Flex justify="end" align="center" gap={4}>
+                <Flex align="center">
+                  {MESSAGE_STATUS_ICONS[msg.messageStatus]}
                 </Flex>
 
-                {renderContent(msg)}
-
-                <Flex justify="end" align="center" gap={4}>
-                  <Flex align="center">
-                    {MESSAGE_STATUS_ICONS[msg.messageStatus]}
-                  </Flex>
-
-                  <Text size="sm">
-                    {parseServerDate(msg.time_sent).format(HH_mm)}
-                  </Text>
-                </Flex>
+                <Text size="sm">
+                  {parseServerDate(msg.time_sent).format(HH_mm)}
+                </Text>
               </Flex>
             </Flex>
           </Flex>
         </Flex>
-      )}
+      </Flex>
     </Flex>
   );
 };
