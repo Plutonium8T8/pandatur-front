@@ -45,6 +45,14 @@ export const GeneralForm = ({ data, formInstance }) => {
     return map;
   }, [technicians]);
 
+  const multiSelectData = useMemo(() => {
+    return technicians.map((item) =>
+      item.value.startsWith("__group__")
+        ? { ...item, disabled: false }
+        : item
+    );
+  }, [technicians]);
+
   useEffect(() => {
     if (data) {
       formInstance.setValues({
@@ -140,7 +148,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         mt="md"
         label={getLanguageByKey("Test Multiselect")}
         placeholder={getLanguageByKey("Selectează tehnicieni (test)")}
-        data={technicians}
+        data={multiSelectData}
         value={selectedTechnicians}
         onChange={(value) => {
           const last = value[value.length - 1];

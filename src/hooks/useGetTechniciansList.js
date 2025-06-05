@@ -42,6 +42,7 @@ export const useGetTechniciansList = () => {
           formatted.push({
             value: `__group__${groupName}`,
             label: groupName,
+            disabled: true,
           });
           formatted.push(...users);
         }
