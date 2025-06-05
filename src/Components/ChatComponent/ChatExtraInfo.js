@@ -159,7 +159,7 @@ const ChatExtraInfo = ({
   const saveTicketExtraDate = async (type, values) => {
     setIsLoadingInfoTicket(true);
     try {
-      await api.tickets.tickets.create(type, values);
+      await api.tickets.ticket.create(type, values);
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" },

@@ -15,9 +15,11 @@ import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
 import { AppContext } from "../../contexts/AppContext";
 
+const FINAL_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
+
 export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
-  const { workflowOptions, accessibleGroupTitles } = useContext(AppContext);
+  const { workflowOptions, accessibleGroupTitles, isAdmin } = useContext(AppContext);
 
   useEffect(() => {
     if (data) {
@@ -33,13 +35,18 @@ export const GeneralForm = ({ data, formInstance }) => {
     }
   }, [data]);
 
-  formInstance.watch("workflow", ({ value }) => {
-    formInstance.setFieldValue("workflow", value);
-  });
-
   const filteredGroupTitleOptions = groupTitleOptions.filter((g) =>
     accessibleGroupTitles.includes(g.value)
   );
+
+  const currentWorkflow = formInstance.getValues().workflow;
+
+  const isFinalWorkflow = FINAL_WORKFLOWS.includes(currentWorkflow);
+  const isWorkflowDisabled = !isAdmin && isFinalWorkflow;
+
+  const filteredWorkflowOptions = workflowOptions
+    .filter((w) => isAdmin || w !== "Realizat cu succes")
+    .map((w) => ({ value: w, label: w }));
 
   return (
     <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
@@ -57,11 +64,12 @@ export const GeneralForm = ({ data, formInstance }) => {
       <Select
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
-        data={workflowOptions.map((w) => ({ value: w, label: w }))}
+        data={filteredWorkflowOptions}
         clearable
+        searchable
+        disabled={isWorkflowDisabled}
         key={formInstance.key("workflow")}
         {...formInstance.getInputProps("workflow")}
-        searchable
       />
 
       <Select
