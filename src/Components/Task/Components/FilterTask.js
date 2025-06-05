@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { Group, Button, Box, Flex, MultiSelect, Select, Modal } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations, showServerError } from "../../utils";
@@ -11,6 +11,10 @@ import { SelectWorkflow } from "../../SelectWorkflow";
 import { groupTitleOptions } from "../../../FormOptions";
 import { convertRolesToMatrix, safeParseJson } from "../../UsersComponent/rolesUtils";
 import { AppContext } from "../../../contexts/AppContext";
+import {
+  getGroupUserMap,
+  formatMultiSelectData,
+} from "../../utils/multiSelectUtils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -141,6 +145,23 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     }
   }, [isTeam, localFilters.created_for, teamTechnicians, userId]);
 
+  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+
+  const handleCreatedForChange = (val) => {
+    const last = val[val.length - 1];
+    const isGroup = last?.startsWith("__group__");
+
+    if (isGroup) {
+      const groupUsers = groupUserMap.get(last) || [];
+      const current = localFilters.created_for || [];
+      const unique = Array.from(new Set([...current, ...groupUsers]));
+      handleChange("created_for", unique);
+    } else {
+      handleChange("created_for", val);
+    }
+  };
+
   return (
     <Modal
       opened={opened}
@@ -193,17 +214,19 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
             label={translations["Responsabil"][language]}
             data={
               isTeam
-                ? teamTechnicians
+                ? formattedTechnicians.filter((t) =>
+                  teamUserIds.has(String(t.value)) || t.value === String(userId),
+                )
                 : isIfResponsible
-                  ? technicians.filter((tech) => tech.value === String(userId))
-                  : technicians
+                  ? formattedTechnicians.filter((tech) => tech.value === String(userId))
+                  : formattedTechnicians
             }
             value={
               isIfResponsible
                 ? [String(userId)]
                 : localFilters.created_for || []
             }
-            onChange={(val) => handleChange("created_for", val)}
+            onChange={handleCreatedForChange}
             placeholder={translations["Responsabil"][language]}
             clearable={!isIfResponsible}
             searchable
