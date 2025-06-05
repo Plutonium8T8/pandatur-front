@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
     Modal,
     Button,
@@ -17,6 +17,11 @@ import { api } from "../../../api";
 import { translations } from "../../utils/translations";
 import { useConfirmPopup, useGetTechniciansList } from "../../../hooks";
 import { useSnackbar } from "notistack";
+import {
+    getGroupUserMap,
+    formatMultiSelectData,
+    createMultiSelectGroupHandler,
+} from "../../utils/multiSelectUtils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -26,13 +31,16 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     const [expandedGroupId, setExpandedGroupId] = useState(null);
     const [groupState, setGroupState] = useState({});
     const [loading, setLoading] = useState(false);
-    const { enqueueSnackbar } = useSnackbar();
 
+    const { enqueueSnackbar } = useSnackbar();
     const confirmDelete = useConfirmPopup({
         subTitle: translations["Sigur doriți să ștergeți acest grup?"][language],
     });
 
     const { technicians } = useGetTechniciansList();
+    const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+    const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+    const handleMultiSelectChange = createMultiSelectGroupHandler({ groupUserMap, setGroupState });
 
     const fetchGroups = async () => {
         setLoading(true);
@@ -64,7 +72,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             try {
                 const created = await api.user.createGroup({ group_name: trimmed });
                 setGroups((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
-
                 setGroupState((prev) => ({
                     ...prev,
                     [created.id]: {
@@ -73,7 +80,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                         editableName: created.name || "",
                     },
                 }));
-
                 setNewGroup("");
                 enqueueSnackbar(translations["Grup adăugat cu succes"][language], {
                     variant: "success",
@@ -127,11 +133,9 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
         try {
             await api.user.updateGroupData({ body: payload });
-
             enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
                 variant: "success",
             });
-
             fetchGroups();
         } catch (err) {
             enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
@@ -152,12 +156,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     }, [opened]);
 
     return (
-        <Modal
-            opened={opened}
-            onClose={onClose}
-            title={translations["Editează grupurile"][language]}
-            size="md"
-        >
+        <Modal opened={opened} onClose={onClose} title={translations["Editează grupurile"][language]} size="md">
             <Stack>
                 <Flex gap="sm">
                     <TextInput
@@ -169,7 +168,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                     />
                     <Button
                         onClick={handleAdd}
-                        disabled={loading || !newGroup.trim() || groups.some(g => g.name === newGroup.trim())}
+                        disabled={loading || !newGroup.trim() || groups.some((g) => g.name === newGroup.trim())}
                     >
                         {translations["Adaugă"][language]}
                     </Button>
@@ -188,12 +187,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 {!loading &&
                     groups.map((group) => (
                         <Paper key={group.id} withBorder p="sm" radius="md">
-                            <Flex
-                                justify="space-between"
-                                align="center"
-                                onClick={() => handleGroupToggle(group.id)}
-                                className="pointer"
-                            >
+                            <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} className="pointer">
                                 <Text>{group.name}</Text>
                                 <IoTrash
                                     color="red"
@@ -242,17 +236,9 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                                     <MultiSelect
                                         label={translations["Selectează operator"][language]}
                                         placeholder={translations["Selectează operator"][language]}
-                                        data={technicians}
+                                        data={formattedTechnicians}
                                         value={groupState[group.id]?.user_ids || []}
-                                        onChange={(val) =>
-                                            setGroupState((prev) => ({
-                                                ...prev,
-                                                [group.id]: {
-                                                    ...prev[group.id],
-                                                    user_ids: val,
-                                                },
-                                            }))
-                                        }
+                                        onChange={handleMultiSelectChange(group.id)}
                                         searchable
                                         clearable
                                         disabled={loading}
