@@ -1,10 +1,20 @@
-import { TextInput, MultiSelect, TagsInput, Flex, Button } from "@mantine/core";
+import {
+  TextInput,
+  MultiSelect,
+  TagsInput,
+  Flex,
+  Button,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useEffect, useContext } from "react";
+import { useEffect, useMemo, useContext } from "react";
 import { priorityOptions } from "../../../FormOptions";
 import { getLanguageByKey } from "../../utils";
 import { useGetTechniciansList } from "../../../hooks";
 import { AppContext } from "../../../contexts/AppContext";
+import {
+  getGroupUserMap,
+  formatMultiSelectData,
+} from "../../utils/multiSelectUtils";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
@@ -30,6 +40,23 @@ export const BasicGeneralFormFilter = ({
       technician_id: technician_id ?? undefined,
     }),
   });
+
+  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+
+  const handleTechnicianChange = (val) => {
+    const last = val[val.length - 1];
+    const isGroup = last?.startsWith("__group__");
+
+    if (isGroup) {
+      const groupUsers = groupUserMap.get(last) || [];
+      const current = form.getValues().technician_id || [];
+      const unique = Array.from(new Set([...current, ...groupUsers]));
+      form.setFieldValue("technician_id", unique);
+    } else {
+      form.setFieldValue("technician_id", val);
+    }
+  };
 
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
@@ -101,9 +128,10 @@ export const BasicGeneralFormFilter = ({
           label={getLanguageByKey("Tehnician")}
           placeholder={getLanguageByKey("Selectează tehnician")}
           clearable
-          data={technicians}
+          data={formattedTechnicians}
           key={form.key("technician_id")}
-          {...form.getInputProps("technician_id")}
+          value={form.getValues().technician_id || []}
+          onChange={handleTechnicianChange}
           searchable
         />
       </form>
