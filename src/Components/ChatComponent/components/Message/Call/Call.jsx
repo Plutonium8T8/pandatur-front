@@ -10,13 +10,13 @@ import "./Call.css";
 const { colors } = DEFAULT_THEME;
 
 /**
- * @param {string} time - дата звонка
- * @param {string} from - src_num (номер звонящего)
- * @param {string} to - dst_num (номер получателя)
- * @param {string} name - имя техника (если найден по sipuni_id)
- * @param {string} src - ссылка на аудио
- * @param {string} status - статус звонка
- * @param {Array} technicians - список техников [{ sipuni_id, label }]
+ * @param {string} time
+ * @param {string} from
+ * @param {string} to
+ * @param {string} name
+ * @param {string} src
+ * @param {string} status
+ * @param {Array} technicians
  */
 export const Call = ({
   time,
@@ -49,12 +49,12 @@ export const Call = ({
   const callerLabel = findNameByNumber(from);
   const receiverLabel = findNameByNumber(to);
 
-  console.log("%c📞 Звонок", "color: green; font-weight: bold");
-  console.log("⏱ Время:", time);
-  console.log("📍 Статус:", status);
-  console.log("➡️ Звонит:", callerLabel);
-  console.log("⬅️ Получает:", receiverLabel);
-  console.log("🎧 Аудио:", src);
+  // console.log("%c📞 Звонок", "color: green; font-weight: bold");
+  // console.log("⏱ Время:", time);
+  // console.log("📍 Статус:", status);
+  // console.log("➡️ Звонит:", callerLabel);
+  // console.log("⬅️ Получает:", receiverLabel);
+  // console.log("🎧 Аудио:", src);
 
   return (
     <Box maw="700px" p="xs" mx="auto" className="call-message">

@@ -33,31 +33,31 @@ export const SendedMessage = ({ msg, technician, technicians = [], personalInfo 
   const senderName = technician?.label || DEFAULT_SENDER_NAME;
 
   if (isCall) {
-    const { src_num, short_dst_num } = msg.call_metadata || {};
+    const { short_src_num, short_dst_num } = msg.call_metadata || {};
 
-    const callerClient = findClientByPhone(src_num);
-    const callerTechnician = findTechnicianBySip(src_num);
+    const callerClient = findClientByPhone(short_src_num);
+    const callerTechnician = findTechnicianBySip(short_src_num);
 
     const receiverClient = findClientByPhone(short_dst_num);
     const receiverTechnician = findTechnicianBySip(short_dst_num);
 
     const callerLabel =
       getFullName(callerClient?.id?.name, callerClient?.id?.surname) ||
-      callerTechnician?.label ||
-      src_num;
+      getFullName(callerTechnician?.id?.name, callerTechnician?.id?.surname) ||
+      short_src_num;
 
     const receiverLabel =
       getFullName(receiverClient?.id?.name, receiverClient?.id?.surname) ||
-      receiverTechnician?.label ||
+      getFullName(receiverTechnician?.id?.name, receiverTechnician?.id?.surname) ||
       short_dst_num;
 
     return (
       <Flex w="100%" justify="end">
         <Call
           time={msg.time_sent}
-          from={src_num}
+          from={short_src_num}
           to={short_dst_num}
-          name={receiverLabel}
+          name={callerLabel}
           src={msg.message}
           status={msg.call_metadata?.status}
           technicians={technicians}
