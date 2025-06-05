@@ -13,13 +13,40 @@ export const useGetTechniciansList = () => {
         setLoading(true);
         const data = await api.users.getTechnicianList();
 
-        const formattedTechnicians = data.map((item) => ({
-          value: `${item.id.id}`,
-          label: `${item.id.surname} ${item.id.name}`,
-        }));
+        const groupMap = new Map();
 
-        setLoading(false);
-        setTechnicians(formattedTechnicians);
+        data.forEach((item) => {
+          const userId = item?.id?.id;
+          if (!userId) return; // пропускаем если нет ID
+
+          const groupName = item.groups?.[0]?.name || "Fără grupă";
+          const label = `${item.id?.surname || ""} ${item.id?.name || ""}`.trim();
+
+          if (!groupMap.has(groupName)) {
+            groupMap.set(groupName, []);
+          }
+
+          // добавляем только если value не дублируется
+          const groupUsers = groupMap.get(groupName);
+          if (!groupUsers.some((u) => u.value === `${userId}`)) {
+            groupUsers.push({
+              value: `${userId}`,
+              label,
+            });
+          }
+        });
+
+        const formatted = [];
+
+        for (const [groupName, users] of groupMap.entries()) {
+          formatted.push({
+            value: `__group__${groupName}`,
+            label: groupName,
+          });
+          formatted.push(...users);
+        }
+
+        setTechnicians(formatted);
       } catch (error) {
         setErrors(showServerError(error));
       } finally {
