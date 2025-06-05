@@ -4,9 +4,8 @@ import {
   Textarea,
   TagsInput,
   Box,
-  MultiSelect,
 } from "@mantine/core";
-import { useEffect, useContext, useMemo, useState } from "react";
+import { useEffect, useContext } from "react";
 import {
   priorityOptions,
   groupTitleOptions,
@@ -21,37 +20,6 @@ const FINAL_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
 export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { workflowOptions, accessibleGroupTitles, isAdmin } = useContext(AppContext);
-
-  const [selectedTechnicians, setSelectedTechnicians] = useState([]);
-
-  const groupUserMap = useMemo(() => {
-    const map = new Map();
-
-    technicians.forEach((item, index) => {
-      if (item.value.startsWith("__group__")) {
-        const group = item.value;
-        const users = [];
-
-        for (let i = index + 1; i < technicians.length; i++) {
-          const next = technicians[i];
-          if (next.value.startsWith("__group__")) break;
-          users.push(next.value);
-        }
-
-        map.set(group, users);
-      }
-    });
-
-    return map;
-  }, [technicians]);
-
-  const multiSelectData = useMemo(() => {
-    return technicians.map((item) =>
-      item.value.startsWith("__group__")
-        ? { ...item, disabled: false }
-        : item
-    );
-  }, [technicians]);
 
   useEffect(() => {
     if (data) {
@@ -141,28 +109,6 @@ export const GeneralForm = ({ data, formInstance }) => {
         data={technicians}
         key={formInstance.key("technician_id")}
         {...formInstance.getInputProps("technician_id")}
-      />
-
-      <MultiSelect
-        searchable
-        mt="md"
-        label={getLanguageByKey("Test Multiselect")}
-        placeholder={getLanguageByKey("Selectează tehnicieni (test)")}
-        data={multiSelectData}
-        value={selectedTechnicians}
-        onChange={(value) => {
-          const last = value[value.length - 1];
-          if (last?.startsWith("__group__")) {
-            const users = groupUserMap.get(last) || [];
-            const newSet = new Set([
-              ...value.filter((v) => !v.startsWith("__group__")),
-              ...users,
-            ]);
-            setSelectedTechnicians(Array.from(newSet));
-          } else {
-            setSelectedTechnicians(value);
-          }
-        }}
       />
 
       <Textarea
