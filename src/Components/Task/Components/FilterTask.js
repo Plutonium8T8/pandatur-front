@@ -149,6 +149,18 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       withCloseButton
       centered
       size="xl"
+      styles={{
+        content: {
+          height: "800px",
+          display: "flex",
+          flexDirection: "column",
+        },
+        body: {
+          flex: 1,
+          overflowY: "auto",
+          padding: "1rem",
+        },
+      }}
     >
       <Box p="sm">
         <Flex gap="sm" direction="column">

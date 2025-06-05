@@ -83,7 +83,19 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
             title={translations["Filtru"][language]}
             withCloseButton
             centered
-            size="lg"
+            size="xl"
+            styles={{
+                content: {
+                    height: "800px",
+                    display: "flex",
+                    flexDirection: "column",
+                },
+                body: {
+                    flex: 1,
+                    overflowY: "auto",
+                    padding: "1rem",
+                },
+            }}
         >
             <Flex direction="column" h="100%" justify="space-between">
                 <Box p="sm">
