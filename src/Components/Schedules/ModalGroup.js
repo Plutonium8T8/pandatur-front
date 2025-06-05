@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   TextInput,
@@ -12,6 +12,10 @@ import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
 import { useGetTechniciansList } from "../../hooks";
 import { api } from "../../api";
+import {
+  formatMultiSelectData,
+  getGroupUserMap,
+} from "../utils/multiSelectUtils";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -27,6 +31,26 @@ const ModalGroup = ({
   const [selectedSupervisor, setSelectedSupervisor] = useState(null);
   const { technicians, loading } = useGetTechniciansList();
   const { enqueueSnackbar } = useSnackbar();
+
+  const formattedTechnicians = useMemo(
+    () => formatMultiSelectData(technicians),
+    [technicians]
+  );
+
+  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+
+  const handleUserChange = (val) => {
+    const last = val[val.length - 1];
+    const isGroup = last?.startsWith("__group__");
+
+    if (isGroup) {
+      const groupUsers = groupUserMap.get(last) || [];
+      const unique = Array.from(new Set([...selectedUserIds, ...groupUsers]));
+      setSelectedUserIds(unique);
+    } else {
+      setSelectedUserIds(val);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!groupName.trim() || selectedUserIds.length === 0 || !selectedSupervisor) {
@@ -126,11 +150,11 @@ const ModalGroup = ({
         mb="md"
       />
       <MultiSelect
-        data={technicians}
+        data={formattedTechnicians}
         label={translations["Utilizatori"][language]}
         placeholder={translations["Selectează utilizator"][language]}
         value={selectedUserIds}
-        onChange={setSelectedUserIds}
+        onChange={handleUserChange}
         searchable
         rightSection={loading && <Loader size="xs" />}
       />
