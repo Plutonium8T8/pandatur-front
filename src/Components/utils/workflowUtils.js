@@ -120,7 +120,9 @@ export const workflowOptionsLimitedSalesMD = [
     "Aprobat cu client",
     "Contract semnat",
     "Plată primită",
-    "Contract încheiat"
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedSalesRO = [
@@ -129,14 +131,18 @@ export const workflowOptionsLimitedSalesRO = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Factura trimisă",
-    "Contract încheiat"
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedFiliale = [
     "Luat în lucru",
     "Ofertă trimisă",
     "Aprobat cu client",
-    "Contract încheiat"
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedAgency = [
@@ -159,6 +165,8 @@ export const workflowOptionsLimitedIndividualGroups = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedBusinessGroups = [
@@ -166,6 +174,8 @@ export const workflowOptionsLimitedBusinessGroups = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedFranchiseOrhei = [
@@ -173,6 +183,8 @@ export const workflowOptionsLimitedFranchiseOrhei = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedFranchiseCantemir = [
@@ -180,6 +192,8 @@ export const workflowOptionsLimitedFranchiseCantemir = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedSalesUA = [
@@ -187,6 +201,8 @@ export const workflowOptionsLimitedSalesUA = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsByGroupTitle = {
