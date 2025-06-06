@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -44,6 +45,22 @@ export const AppProvider = ({ children }) => {
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
+
+  const [searchParams, setSearchParams] = useSearchParams(); // ✅
+
+  useEffect(() => {
+    const initialFilters = Object.fromEntries(searchParams.entries());
+    if (Object.keys(initialFilters).length > 0) {
+      setLightTicketFilters(initialFilters);
+    }
+  }, []);
+
+  // Обновление фильтра + URL
+  const updateFilters = (filters) => {
+    console.log("[UPDATE FILTERS] Ставим фильтр и в URL", filters);
+    setLightTicketFilters(filters);
+    setSearchParams(filters);
+  };
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
@@ -370,7 +387,7 @@ export const AppProvider = ({ children }) => {
         isAdmin,
         userGroups,
         fetchTickets,
-        setLightTicketFilters,
+        setLightTicketFilters: updateFilters,
         accessibleGroupTitles,
         setCustomGroupTitle,
         customGroupTitle,
