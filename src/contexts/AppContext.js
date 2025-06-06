@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useMemo, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -44,6 +45,7 @@ export const AppProvider = ({ children }) => {
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
 
@@ -149,6 +151,11 @@ export const AppProvider = ({ children }) => {
     setKanbanFilters(filters);
     setKanbanSpinner(true);
     setKanbanTickets([]);
+
+    const cleaned = Object.fromEntries(
+      Object.entries(filters).filter(([_, value]) => value != null && value !== "")
+    );
+    setSearchParams(cleaned);
 
     try {
       const loadPage = async (page = 1) => {
