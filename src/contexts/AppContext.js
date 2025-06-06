@@ -219,10 +219,29 @@ export const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length) {
+    const rawParams = Object.fromEntries([...searchParams.entries()]);
+    const isReady = !loadingWorkflow && groupTitleForApi && workflowOptions.length;
+
+    if (!isReady) return;
+
+    const filtersFromUrl = {
+      ...rawParams,
+      workflow: rawParams.workflow
+        ? [rawParams.workflow]
+        : undefined,
+    };
+
+    const hasQueryParams = Object.keys(rawParams).length > 0;
+
+    if (hasQueryParams) {
+      setKanbanFilterActive(true);
+      setLightTicketFilters(filtersFromUrl);
+      setKanbanFilters(filtersFromUrl);
+      fetchKanbanTickets(filtersFromUrl);
+    } else {
       fetchTickets();
     }
-  }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
+  }, [loadingWorkflow, groupTitleForApi, workflowOptions]);
 
   const fetchSingleTicket = async (ticketId) => {
     try {
