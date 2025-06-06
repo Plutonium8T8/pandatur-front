@@ -3,7 +3,6 @@ import { getLanguageByKey } from "../utils";
 import {
   TicketInfoFormFilter,
   ContractFormFilter,
-  InvoiceFormFilter,
   QualityControlFormFilter,
   BasicGeneralFormFilter,
 } from "./components";
@@ -48,9 +47,6 @@ export const TicketFormTabs = ({
         <Tabs.Tab value="filter_contract">
           {getLanguageByKey("Contract")}
         </Tabs.Tab>
-        {/* <Tabs.Tab value="filter_invoice">
-          {getLanguageByKey("Invoice")}
-        </Tabs.Tab> */}
         <Tabs.Tab value="filter_quality_control">
           {getLanguageByKey("Control calitate")}
         </Tabs.Tab>
@@ -113,27 +109,6 @@ export const TicketFormTabs = ({
             formId={formIds.contract}
           />
         </ScrollArea>
-      </Tabs.Panel>
-
-      <Tabs.Panel pl="lg" value="filter_invoice">
-        <Flex direction="column" justify="space-between" h="100%">
-          <InvoiceFormFilter
-            data={initialData}
-            onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
-            formId={formIds.invoice}
-          />
-        </Flex>
       </Tabs.Panel>
 
       <Tabs.Panel pl="lg" value="filter_quality_control">
