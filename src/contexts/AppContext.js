@@ -155,7 +155,16 @@ export const AppProvider = ({ children }) => {
     const cleaned = Object.fromEntries(
       Object.entries(filters).filter(([_, value]) => value != null && value !== "")
     );
-    setSearchParams(cleaned);
+
+    const query = new URLSearchParams();
+    Object.entries(cleaned).forEach(([key, val]) => {
+      if (Array.isArray(val)) {
+        val.forEach((v) => query.append(key, v));
+      } else {
+        query.set(key, val);
+      }
+    });
+    setSearchParams(query);
 
     try {
       const loadPage = async (page = 1) => {
@@ -219,19 +228,18 @@ export const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const rawParams = Object.fromEntries([...searchParams.entries()]);
     const isReady = !loadingWorkflow && groupTitleForApi && workflowOptions.length;
-
     if (!isReady) return;
 
+    const raw = Object.fromEntries([...searchParams.entries()]);
+    const workflow = searchParams.getAll("workflow");
+
     const filtersFromUrl = {
-      ...rawParams,
-      workflow: rawParams.workflow
-        ? [rawParams.workflow]
-        : undefined,
+      ...raw,
+      workflow: workflow.length > 0 ? workflow : undefined,
     };
 
-    const hasQueryParams = Object.keys(rawParams).length > 0;
+    const hasQueryParams = Object.keys(raw).length > 0 || workflow.length > 0;
 
     if (hasQueryParams) {
       setKanbanFilterActive(true);
