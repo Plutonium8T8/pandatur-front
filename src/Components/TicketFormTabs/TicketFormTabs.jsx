@@ -3,19 +3,11 @@ import { getLanguageByKey } from "../utils";
 import {
   TicketInfoFormFilter,
   ContractFormFilter,
-  InvoiceFormFilter,
   QualityControlFormFilter,
   BasicGeneralFormFilter,
 } from "./components";
+import { useApp } from "../../hooks";
 import "./TicketFormTabs.css";
-
-const renderResetButton = (resetForm) => {
-  return (
-    <Button variant="outline" onClick={resetForm}>
-      {getLanguageByKey("Reset filter")}
-    </Button>
-  );
-};
 
 const formIds = {
   general: "generalForm",
@@ -31,6 +23,23 @@ export const TicketFormTabs = ({
   initialData,
   orientation = "vertical",
 }) => {
+  const { setLightTicketFilters, setKanbanFilterActive, setKanbanFilters } = useApp();
+
+  const renderResetButton = (resetForm) => (
+    <Button
+      variant="outline"
+      onClick={() => {
+        resetForm();
+        setLightTicketFilters({});
+        setKanbanFilters({});
+        setKanbanFilterActive(false);
+        onClose?.();
+      }}
+    >
+      {getLanguageByKey("Reset filter")}
+    </Button>
+  );
+
   return (
     <Tabs
       h="100%"
@@ -48,19 +57,12 @@ export const TicketFormTabs = ({
         <Tabs.Tab value="filter_contract">
           {getLanguageByKey("Contract")}
         </Tabs.Tab>
-        {/* <Tabs.Tab value="filter_invoice">
-          {getLanguageByKey("Invoice")}
-        </Tabs.Tab> */}
         <Tabs.Tab value="filter_quality_control">
           {getLanguageByKey("Control calitate")}
         </Tabs.Tab>
       </Tabs.List>
 
-      <Tabs.Panel
-        className="general-information-filter"
-        pl="lg"
-        value="filter_general_info"
-      >
+      <Tabs.Panel className="general-information-filter" pl="lg" value="filter_general_info">
         <Flex direction="column" justify="space-between" h="100%">
           <BasicGeneralFormFilter
             data={initialData}
@@ -72,6 +74,7 @@ export const TicketFormTabs = ({
           />
         </Flex>
       </Tabs.Panel>
+
       <Tabs.Panel pl="lg" value="filter_ticket_info">
         <ScrollArea h="100%">
           <TicketInfoFormFilter
@@ -93,6 +96,7 @@ export const TicketFormTabs = ({
           />
         </ScrollArea>
       </Tabs.Panel>
+
       <Tabs.Panel pl="lg" value="filter_contract">
         <ScrollArea h="100%">
           <ContractFormFilter
@@ -113,27 +117,6 @@ export const TicketFormTabs = ({
             formId={formIds.contract}
           />
         </ScrollArea>
-      </Tabs.Panel>
-
-      <Tabs.Panel pl="lg" value="filter_invoice">
-        <Flex direction="column" justify="space-between" h="100%">
-          <InvoiceFormFilter
-            data={initialData}
-            onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
-            formId={formIds.invoice}
-          />
-        </Flex>
       </Tabs.Panel>
 
       <Tabs.Panel pl="lg" value="filter_quality_control">

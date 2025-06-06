@@ -46,7 +46,7 @@ export const AppProvider = ({ children }) => {
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
 
-  const [searchParams, setSearchParams] = useSearchParams(); // ✅
+  const [searchParams, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     const initialFilters = Object.fromEntries(searchParams.entries());
@@ -55,7 +55,6 @@ export const AppProvider = ({ children }) => {
     }
   }, []);
 
-  // Обновление фильтра + URL
   const updateFilters = (filters) => {
     console.log("[UPDATE FILTERS] Ставим фильтр и в URL", filters);
     setLightTicketFilters(filters);
