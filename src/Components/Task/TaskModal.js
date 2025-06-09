@@ -124,6 +124,7 @@ const TaskModal = ({
     <Modal
       opened={isOpen}
       onClose={handleClose}
+      centered
       size="xl"
       title={
         selectedTask
