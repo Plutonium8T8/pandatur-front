@@ -1438,9 +1438,9 @@ export const translations = {
     EN: "Message filter"
   },
   "Workflow": {
-    RO: "Flux de lucru",
-    RU: "Рабочий процесс",
-    EN: "Workflow"
+    RO: "Etapa",
+    RU: "Этап",
+    EN: "Stage"
   },
   "Alege workflow pentru afisare in sistem": {
     RO: "Alege workflow pentru afisare in sistem",
@@ -1820,9 +1820,9 @@ export const translations = {
     EN: "Fill in the field"
   },
   "Selectează flux de lucru": {
-    RO: "Selectează flux de lucru",
-    RU: "Выберите рабочий процесс",
-    EN: "Select workflow"
+    RO: "Selectează etapa",
+    RU: "Выберите этап",
+    EN: "Select stage"
   },
   "Selectează prioritate": {
     RO: "Selectează prioritate",
@@ -1984,9 +1984,9 @@ export const translations = {
     EN: "Full name"
   },
   "Grup": {
-    RO: "Grupa",
-    RU: "Група",
-    EN: "Group"
+    RO: "Pâlnie",
+    RU: "Воронка",
+    EN: "Pipeline"
   },
   "Rol": {
     RO: "Rol",
@@ -2810,9 +2810,9 @@ export const translations = {
     EN: "Select interval"
   },
   "groupTitle": {
-    RO: "Grupa de lead-uri",
-    RU: "Группа лидов",
-    EN: "Lead group"
+    RO: "Pâlnie",
+    RU: "Воронка",
+    EN: "Lead pipiline"
   },
   "ChoiseStatus": {
     RO: "Alege statusul",
@@ -2885,9 +2885,9 @@ export const translations = {
     EN: "This field is required"
   },
   "selectGroup": {
-    RO: "Selectează grupa",
-    RU: "Выберите группу",
-    EN: "Select group"
+    RO: "Selectează pâlnia",
+    RU: "Выберите воронку",
+    EN: "Select pipeline"
   },
   "marketing": {
     RO: "Marketing",
