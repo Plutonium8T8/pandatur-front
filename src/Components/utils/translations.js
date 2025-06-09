@@ -3180,5 +3180,10 @@ export const translations = {
     "RO": "Informație suplimentară",
     "RU": "Дополнительная информация",
     "EN": "Additional Information"
+  },
+  "ReadChat": {
+    "RO": "Citește chatul",
+    "RU": "Прочитать чат",
+    "EN": "Read chat"
   }
 }
