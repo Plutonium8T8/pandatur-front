@@ -6,6 +6,8 @@ import {
   Group,
   Stack,
   Grid,
+  Modal,
+  Text,
 } from "@mantine/core";
 import DateQuickInput from "./Components/DateQuickPicker";
 import { useSnackbar } from "notistack";
@@ -15,7 +17,6 @@ import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { parseDate, formatDate } from "../utils/date";
 import { useGetTechniciansList, useUser } from "../../hooks";
-import { MantineModal } from "../MantineModal";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -30,15 +31,12 @@ const TaskModal = ({
   const { enqueueSnackbar } = useSnackbar();
   const [task, setTask] = useState({});
   const [scheduledTime, setScheduledTime] = useState(null);
-  const [ticketIds, setTicketIds] = useState([]);
   const [loading, setLoading] = useState(false);
   const { technicians: userList } = useGetTechniciansList();
   const { userId } = useUser();
 
   useEffect(() => {
     if (!isOpen) return;
-
-    fetchTickets();
 
     if (selectedTask) {
       setTask({
@@ -73,17 +71,6 @@ const TaskModal = ({
     });
     setScheduledTime(null);
     onClose();
-  };
-
-  const fetchTickets = async () => {
-    try {
-      const data = await api.tickets.list();
-      setTicketIds(data.map((ticket) => ticket.id.toString()));
-    } catch (error) {
-      enqueueSnackbar(translations["Eroare la încărcarea tichetelor"][language], {
-        variant: "error",
-      });
-    }
   };
 
   const handleTaskSubmit = async (e) => {
@@ -134,10 +121,10 @@ const TaskModal = ({
   };
 
   return (
-    <MantineModal
-      open={isOpen}
+    <Modal
+      opened={isOpen}
       onClose={handleClose}
-      height=""
+      size="xl"
       title={
         selectedTask
           ? translations["Editare Task"][language]
@@ -146,16 +133,12 @@ const TaskModal = ({
     >
       <form onSubmit={handleTaskSubmit}>
         <Stack spacing="md">
-          <MantineSelect
-            label={translations["Lead ID"][language]}
-            data={ticketIds}
-            value={task.ticketId}
-            onChange={(value) => setTask((prev) => ({ ...prev, ticketId: value }))}
-            searchable
-            placeholder={translations["Lead ID"][language]}
-            required
-            disabled={!!defaultTicketId}
-          />
+          <Text size="sm" fw="800">
+            {translations["Lead ID"][language]}:{" "}
+            <Text span fw={800}>
+              {task.ticketId}
+            </Text>
+          </Text>
 
           <IconSelect
             options={TypeTask}
@@ -218,7 +201,7 @@ const TaskModal = ({
           </Group>
         </Stack>
       </form>
-    </MantineModal>
+    </Modal>
   );
 };
 
