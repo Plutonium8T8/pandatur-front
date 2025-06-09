@@ -231,15 +231,13 @@ export const AppProvider = ({ children }) => {
     const isReady = !loadingWorkflow && groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
 
-    const raw = Object.fromEntries([...searchParams.entries()]);
-    const workflow = searchParams.getAll("workflow");
+    const filtersFromUrl = {};
+    for (const [key] of searchParams.entries()) {
+      const allValues = searchParams.getAll(key);
+      filtersFromUrl[key] = allValues;
+    }
 
-    const filtersFromUrl = {
-      ...raw,
-      workflow: workflow.length > 0 ? workflow : undefined,
-    };
-
-    const hasQueryParams = Object.keys(raw).length > 0 || workflow.length > 0;
+    const hasQueryParams = Object.keys(filtersFromUrl).length > 0;
 
     if (hasQueryParams) {
       setKanbanFilterActive(true);
