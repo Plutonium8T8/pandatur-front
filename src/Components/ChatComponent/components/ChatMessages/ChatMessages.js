@@ -167,6 +167,7 @@ export const ChatMessages = ({
         direction="column"
         className="chat-messages"
         ref={messageContainerRef}
+        bg="#f9fff9"
       >
         {renderMessagesContent()}
       </Flex>

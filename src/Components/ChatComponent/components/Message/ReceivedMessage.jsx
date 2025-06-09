@@ -67,7 +67,7 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
         <Flex gap="8">
           <Image w={36} h={36} radius="50%" fallbackSrc={DEFAULT_PHOTO} />
 
-          <Flex miw="250px" direction="column" p="8" className="text">
+          <Flex miw="250px" direction="column" p="8" className="text" bg="#ccffcc">
             <Flex c={colors.gray[7]} align="center" gap="4">
               <Text size="sm" fw="bold">
                 {senderName}
