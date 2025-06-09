@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Flex, Paper, ActionIcon, Text, Checkbox, Box } from "@mantine/core";
+import { Flex, Paper, ActionIcon, Text, Checkbox, Box, Modal } from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -415,11 +415,23 @@ export const LeadTable = ({
           </Flex>
         )}
       </Box>
-      <MantineModal
+      <Modal
         centered
         opened={!!id}
         onClose={() => setId()}
         size="lg"
+        styles={{
+          content: {
+            height: "850px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem",
+          },
+        }}
         title={
           <Text size="xl" fw="bold">
             {getLanguageByKey("Editează ticketul")}
@@ -431,7 +443,7 @@ export const LeadTable = ({
           fetchLeads={fetchTickets}
           id={id}
         />
-      </MantineModal>
+      </Modal>
     </>
   );
 };
