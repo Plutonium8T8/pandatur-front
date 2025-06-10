@@ -3185,5 +3185,15 @@ export const translations = {
     "RO": "Citește chatul",
     "RU": "Прочитать чат",
     "EN": "Read chat"
+  },
+  "NeedAnswer": {
+    "RO": "Necesită răspuns",
+    "RU": "Нужен ответ",
+    "EN": "Needs answer"
+  },
+  "NoNeedAnswer": {
+    "RO": "Nu necesită răspuns",
+    "RU": "Не требует ответа",
+    "EN": "No answer needed"
   }
 }
