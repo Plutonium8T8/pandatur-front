@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { useUser, useMessagesContext, useFetchTicketChat } from "@hooks";
 import { api } from "@api";
 import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
 import { Spin } from "@components";
-import { DD_MM_YYYY__HH_mm_ss, PLATFORMS } from "@app-constants";
+import { DD_MM_YYYY__HH_mm_ss } from "@app-constants";
 import { ChatInput } from "../ChatInput";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
