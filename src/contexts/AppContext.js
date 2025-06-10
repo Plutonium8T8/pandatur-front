@@ -33,7 +33,6 @@ export const AppProvider = ({ children }) => {
   const [loadingWorkflow, setLoadingWorkflow] = useState(true);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [customGroupTitle, setCustomGroupTitle] = useState(null);
-  const incrementUnreadRef = useRef(false);
 
   // Kanban-specific
   const [kanbanTickets, setKanbanTickets] = useState([]);

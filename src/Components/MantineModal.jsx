@@ -1,4 +1,5 @@
 import { Modal, Text } from "@mantine/core";
+import { useApp } from "../hooks";
 
 export const MantineModal = ({
   children,
@@ -8,6 +9,8 @@ export const MantineModal = ({
   height = "100vh",
   ...props
 }) => {
+  const { isCollapsed } = useApp();
+  const sidebarWidth = isCollapsed ? 80 : 250;
   const { style, ...rest } = props;
 
   return (
@@ -26,8 +29,8 @@ export const MantineModal = ({
       styles={{
         content: {
           position: "absolute",
-          left: "250px",
-          width: "calc(100% - 250px)",
+          left: `${sidebarWidth}px`,
+          width: `calc(100% - ${sidebarWidth}px)`,
           height,
           zIndex: 1001,
           pointerEvents: "auto",
