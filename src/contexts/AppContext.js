@@ -33,6 +33,7 @@ export const AppProvider = ({ children }) => {
   const [loadingWorkflow, setLoadingWorkflow] = useState(true);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [customGroupTitle, setCustomGroupTitle] = useState(null);
+  const incrementUnreadRef = useRef(false);
 
   // Kanban-specific
   const [kanbanTickets, setKanbanTickets] = useState([]);
@@ -235,15 +236,22 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
         const { ticket_id, message: msgText, time_sent, mtype, sender_id } = message.data;
 
-        let isTicketMatched = false;
+        const isFromAnotherUser = String(sender_id) !== String(userId);
+        let increment = 0;
 
         setTickets((prev) => {
+          let found = false;
+
           const updated = prev.map((ticket) => {
             if (ticket.id === ticket_id) {
-              isTicketMatched = true;
+              found = true;
+
+              const newUnseen = ticket.unseen_count + (isFromAnotherUser ? 1 : 0);
+              if (isFromAnotherUser) increment = 1;
+
               return {
                 ...ticket,
-                unseen_count: ticket.unseen_count + (sender_id !== userId ? 1 : 0),
+                unseen_count: newUnseen,
                 last_message_type: mtype,
                 last_message: msgText,
                 time_sent,
@@ -252,13 +260,12 @@ export const AppProvider = ({ children }) => {
             return ticket;
           });
 
+          if (increment > 0 && found) {
+            setUnreadCount((prev) => prev + increment);
+          }
+
           return updated;
         });
-
-        if (isTicketMatched) {
-          setUnreadCount((prev) => prev + 1);
-        }
-
         break;
       }
 
