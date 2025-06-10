@@ -11,7 +11,8 @@ import {
   ActionIcon,
   Badge,
   Tabs,
-  Modal
+  Modal,
+  Text,
 } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
@@ -34,9 +35,10 @@ const parseCustomDate = (dateStr) => {
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
 const ChatList = ({ selectTicketId }) => {
-  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, setChatFilteredTickets, chatSpinner } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner } = useApp();
   const { userId } = useUser();
 
+  const [isFiltered, setIsFiltered] = useState(false); // 👈 Новый флаг
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
@@ -46,9 +48,8 @@ const ChatList = ({ selectTicketId }) => {
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
   const [chatFilters, setChatFilters] = useState({});
 
-  const visibleTickets = chatFilteredTickets.length > 0 ? chatFilteredTickets : tickets;
-
   const filterChatList = (filters) => {
+    setIsFiltered(true); // 👈 отмечаем что фильтр активен
     setChatFilters(filters);
     fetchChatFilteredTickets(filters);
     setOpenFilter(false);
@@ -66,10 +67,11 @@ const ChatList = ({ selectTicketId }) => {
         container.scrollTo({ top: scrollTop });
       }
     }
-  }, [selectTicketId, visibleTickets]);
+  }, [selectTicketId, tickets, chatFilteredTickets]);
 
   const sortedTickets = useMemo(() => {
-    let result = [...visibleTickets];
+    let source = isFiltered ? chatFilteredTickets : tickets;
+    let result = [...source];
     result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
     if (showMyTickets) {
       result = result.filter(ticket => ticket.technician_id === userId);
@@ -87,7 +89,7 @@ const ChatList = ({ selectTicketId }) => {
       });
     }
     return result;
-  }, [visibleTickets, showMyTickets, searchQuery]);
+  }, [tickets, chatFilteredTickets, showMyTickets, searchQuery, isFiltered]);
 
   const ChatItem = ({ index, style }) => (
     <ChatListItem chat={sortedTickets[index]} style={style} selectTicketId={selectTicketId} />
@@ -121,14 +123,20 @@ const ChatList = ({ selectTicketId }) => {
 
         <Divider />
         <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
-          <FixedSizeList
-            height={wrapperChatHeight}
-            itemCount={sortedTickets.length}
-            itemSize={CHAT_ITEM_HEIGHT}
-            width="100%"
-          >
-            {ChatItem}
-          </FixedSizeList>
+          {sortedTickets.length === 0 ? (
+            <Flex h="100%" align="center" justify="center" px="md">
+              <Text c="dimmed">{getLanguageByKey("Nici un lead")}</Text>
+            </Flex>
+          ) : (
+            <FixedSizeList
+              height={wrapperChatHeight}
+              itemCount={sortedTickets.length}
+              itemSize={CHAT_ITEM_HEIGHT}
+              width="100%"
+            >
+              {ChatItem}
+            </FixedSizeList>
+          )}
         </Box>
       </Box>
 
