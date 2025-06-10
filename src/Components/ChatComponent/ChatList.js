@@ -38,7 +38,7 @@ const ChatList = ({ selectTicketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner } = useApp();
   const { userId } = useUser();
 
-  const [isFiltered, setIsFiltered] = useState(false); // 👈 Новый флаг
+  const [isFiltered, setIsFiltered] = useState(false);
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
@@ -49,7 +49,7 @@ const ChatList = ({ selectTicketId }) => {
   const [chatFilters, setChatFilters] = useState({});
 
   const filterChatList = (filters) => {
-    setIsFiltered(true); // 👈 отмечаем что фильтр активен
+    setIsFiltered(true);
     setChatFilters(filters);
     fetchChatFilteredTickets(filters);
     setOpenFilter(false);

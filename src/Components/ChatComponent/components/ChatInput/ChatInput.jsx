@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks } from "react-icons/fa";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
@@ -21,6 +21,7 @@ import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
 import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
+import { api } from "../../../../api";
 
 import "./ChatInput.css";
 
@@ -50,6 +51,7 @@ export const ChatInput = ({
   const [pandaNumber, setPandaNumber] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
+  const [ticket, setTicket] = useState(null);
 
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
@@ -57,6 +59,20 @@ export const ChatInput = ({
   const { markMessagesAsRead } = useApp();
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
+
+  useEffect(() => {
+    const fetchTicket = async () => {
+      if (!ticketId) return;
+      try {
+        const data = await api.tickets.getById(ticketId);
+        setTicket(data);
+      } catch (e) {
+        console.error("Failed to fetch ticket", e);
+      }
+    };
+
+    fetchTicket();
+  }, [ticketId]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -119,6 +135,16 @@ export const ChatInput = ({
     if (ticketId && unseenCount > 0) {
       seenMessages(ticketId, userId);
       markMessagesAsRead(ticketId, unseenCount);
+    }
+  };
+
+  const handleMarkActionResolved = async () => {
+    if (!ticketId) return;
+    try {
+      await api.tickets.updateById({ id: ticketId, action_needed: "false" });
+      setTicket((prev) => ({ ...prev, action_needed: false }));
+    } catch (e) {
+      console.error("Failed to mark action as resolved", e);
     }
   };
 
@@ -213,12 +239,22 @@ export const ChatInput = ({
             <Button onClick={clearState} variant="default">
               {getLanguageByKey("Anulează")}
             </Button>
+
             {unseenCount > 0 && (
-              <Button onClick={handleMarkAsRead} variant="fill" color="gray">
+              <Button onClick={handleMarkAsRead} variant="outline">
                 {getLanguageByKey("ReadChat")}
               </Button>
             )}
+
+            {typeof ticket?.action_needed === "boolean" && (
+              <Button onClick={handleMarkActionResolved} variant="outline">
+                {getLanguageByKey(
+                  ticket.action_needed ? "NeedAnswer" : "NoNeedAnswer"
+                )}
+              </Button>
+            )}
           </Flex>
+
           <Flex>
             <FileButton
               onChange={handleFile}
