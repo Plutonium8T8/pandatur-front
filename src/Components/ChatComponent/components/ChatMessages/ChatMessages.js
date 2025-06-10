@@ -183,6 +183,8 @@ export const ChatMessages = ({
             loading={loading}
             id={selectTicketId}
             clientList={messageSendersByPlatform}
+            ticketId={selectTicketId}
+            unseenCount={personalInfo?.unseen_count || 0}
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {

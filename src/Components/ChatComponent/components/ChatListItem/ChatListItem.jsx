@@ -1,5 +1,4 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
-import { IoMdEye } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
@@ -8,7 +7,7 @@ import { IoCall } from "react-icons/io5";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
-import { useApp, useSocket, useUser, useMessagesContext } from "@hooks";
+import { useMessagesContext } from "@hooks";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "@app-constants";
 import { Tag } from "@components";
 import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
@@ -23,7 +22,6 @@ const MESSAGE_INDICATOR = {
       </Text>
     </Flex>
   ),
-
   [MEDIA_TYPE.VIDEO]: (
     <Flex c="dimmed" align="center" gap="8">
       <IoIosVideocam />
@@ -32,7 +30,6 @@ const MESSAGE_INDICATOR = {
       </Text>
     </Flex>
   ),
-
   [MEDIA_TYPE.AUDIO]: (
     <Flex c="dimmed" align="center" gap="8">
       <HiSpeakerWave />
@@ -41,7 +38,6 @@ const MESSAGE_INDICATOR = {
       </Text>
     </Flex>
   ),
-
   [MEDIA_TYPE.FILE]: (
     <Flex c="dimmed" align="center" gap="8">
       <GrAttachment />
@@ -70,9 +66,6 @@ const MESSAGE_INDICATOR = {
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const navigate = useNavigate();
-  const { markMessagesAsRead } = useApp();
-  const { seenMessages } = useSocket();
-  const { userId } = useUser();
   const { getUserMessages } = useMessagesContext();
 
   const formatDate = parseServerDate(chat.time_sent);
@@ -80,11 +73,6 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const choseChat = async (id) => {
     await getUserMessages(id);
     navigate(`/chat/${id}`);
-  };
-
-  const readChat = (ticketId, count) => {
-    seenMessages(ticketId, userId);
-    markMessagesAsRead(ticketId, count);
   };
 
   return (
@@ -101,41 +89,27 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       >
         {chat.unseen_count > 0 && (
           <Box pos="absolute" right="16px" className="right">
-            <Box pos="relative" w="fit-content" h="fit-content">
-              <Badge size="md" bg="red" circle className="right-count">
-                {chat.unseen_count}
-              </Badge>
-
-              <Flex
-                p="4"
-                pos="absolute"
-                top="50%"
-                left="50%"
-                className="mark-seen-message-button | pointer"
-                onClick={() => readChat(chat.id, chat.unseen_count)}
-              >
-                <IoMdEye className="pointer" />
-              </Flex>
-            </Box>
+            <Badge size="md" bg="red" circle className="right-count">
+              {chat.unseen_count}
+            </Badge>
           </Box>
         )}
+
         <Flex gap="12" align="center" w="100%">
           <Image
             w={36}
             h={36}
             radius="50%"
-            // src={chat?.photo_url}
             fallbackSrc={DEFAULT_PHOTO}
           />
 
           <Box w="75%">
-            <Text truncate>{chat.contact ? chat.contact : "-"}</Text>
+            <Text truncate>{chat.contact || "-"}</Text>
 
             <Flex gap="12">
               <Flex align="center" gap="4">
                 <FaFingerprint />
-
-                <Text>{chat.id ? `${chat.id}` : "-"}</Text>
+                <Text>{chat.id || "-"}</Text>
               </Flex>
 
               <Divider orientation="vertical" />

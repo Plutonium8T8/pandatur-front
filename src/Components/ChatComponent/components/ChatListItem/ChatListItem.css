@@ -2,6 +2,7 @@
   transition:
     background-color 0.3s,
     color 0.3s;
+  cursor: pointer;
 }
 
 .chat-item.active {
@@ -13,20 +14,6 @@
   color: black;
 }
 
-.chat-item .mark-seen-message-button {
-  transform: translate(-50%, -50%);
-  opacity: 0;
+.chat-item .right-count {
   transition: opacity 0.3s ease;
-  background-color: white;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.chat-item .right:hover .right-count {
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.chat-item .right:hover .mark-seen-message-button {
-  opacity: 1;
 }
