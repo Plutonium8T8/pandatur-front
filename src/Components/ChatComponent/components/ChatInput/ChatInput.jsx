@@ -139,12 +139,15 @@ export const ChatInput = ({
   };
 
   const handleMarkActionResolved = async () => {
-    if (!ticketId) return;
+    if (!ticketId || ticket?.action_needed === undefined) return;
+
+    const newValue = String(!ticket.action_needed);
+
     try {
-      await api.tickets.updateById({ id: ticketId, action_needed: "false" });
-      setTicket((prev) => ({ ...prev, action_needed: false }));
+      await api.tickets.updateById({ id: ticketId, action_needed: newValue });
+      setTicket((prev) => ({ ...prev, action_needed: !prev.action_needed }));
     } catch (e) {
-      console.error("Failed to mark action as resolved", e);
+      console.error("Failed to update action_needed", e);
     }
   };
 
@@ -247,7 +250,11 @@ export const ChatInput = ({
             )}
 
             {typeof ticket?.action_needed === "boolean" && (
-              <Button onClick={handleMarkActionResolved} variant="outline">
+              <Button
+                onClick={handleMarkActionResolved}
+                variant="light"
+                color={ticket.action_needed ? "orange" : "green"}
+              >
                 {getLanguageByKey(
                   ticket.action_needed ? "NeedAnswer" : "NoNeedAnswer"
                 )}
