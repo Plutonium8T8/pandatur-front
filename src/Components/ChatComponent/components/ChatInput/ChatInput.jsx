@@ -19,6 +19,7 @@ import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
+import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
 
 import "./ChatInput.css";
@@ -38,6 +39,8 @@ export const ChatInput = ({
   currentClient,
   loading,
   onCreateTask,
+  ticketId,
+  unseenCount,
 }) => {
   const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
@@ -49,6 +52,10 @@ export const ChatInput = ({
   const [isDragOver, setIsDragOver] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
+  const { userId } = useUser();
+  const { seenMessages } = useSocket();
+  const { markMessagesAsRead } = useApp();
+
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
 
   const handleEmojiClickButton = (event) => {
@@ -106,6 +113,13 @@ export const ChatInput = ({
     setIsDragOver(false);
     const file = e.dataTransfer.files?.[0];
     if (file) await handleFile(file);
+  };
+
+  const handleMarkAsRead = () => {
+    if (ticketId && unseenCount > 0) {
+      seenMessages(ticketId, userId);
+      markMessagesAsRead(ticketId, unseenCount);
+    }
   };
 
   return (
@@ -199,6 +213,11 @@ export const ChatInput = ({
             <Button onClick={clearState} variant="default">
               {getLanguageByKey("Anulează")}
             </Button>
+            {unseenCount > 0 && (
+              <Button onClick={handleMarkAsRead} variant="fill" color="gray">
+                {getLanguageByKey("ReadChat")}
+              </Button>
+            )}
           </Flex>
           <Flex>
             <FileButton
