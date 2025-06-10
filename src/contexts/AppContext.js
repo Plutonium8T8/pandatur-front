@@ -269,12 +269,18 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.SEEN: {
-        const { ticket_id } = message.data;
-        setTickets((prev) =>
-          prev.map((ticket) =>
-            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
-          )
-        );
+        
+        const { ticket_id, sender_id } = message.data;
+        const isSeenByAnotherUser = String(sender_id) !== String(userId);
+
+        if (isSeenByAnotherUser) {
+          setTickets((prev) =>
+            prev.map((ticket) =>
+              ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
+            )
+          );
+        }
+
         break;
       }
 
