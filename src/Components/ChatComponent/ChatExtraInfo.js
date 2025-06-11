@@ -69,7 +69,7 @@ const ChatExtraInfo = ({
     setIsLoadingGeneral(true);
     try {
       await api.tickets.updateById({
-        ids: [selectTicketId],
+        id: [selectTicketId],
         ...values,
       });
       enqueueSnackbar(
@@ -218,7 +218,7 @@ const ChatExtraInfo = ({
       setIsLoadingGeneral(true);
 
       await api.tickets.updateById({
-        ids: [selectTicketId],
+        id: [selectTicketId],
         ...generalFields,
       });
 
