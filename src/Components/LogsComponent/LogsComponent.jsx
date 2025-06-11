@@ -110,5 +110,11 @@ export const LogsComponent = ({ logList }) => {
     },
   ];
 
-  return <RcTable bordered rowKey="id" columns={rcColumn} data={logList} />;
+  return <RcTable
+    bordered
+    rowKey="id"
+    columns={rcColumn}
+    data={logList}
+    scroll={{ y: 'calc(100vh - 220px)' }}
+  />;
 };
