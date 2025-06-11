@@ -19,7 +19,6 @@ import { api } from "../../../api";
 import { useConfirmPopup, useUser } from "../../../hooks";
 import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
 import { DateCell } from "../../DateCell";
-import { MantineModal } from "../../MantineModal";
 import "./LeadTable.css";
 import { parseTags } from "../../../stringUtils";
 import Can from "../../CanComponent/Can";
@@ -41,6 +40,7 @@ export const LeadTable = ({
   onSelectRow,
   selectTicket,
   fetchTickets,
+  onToggleAll = () => { }
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
@@ -82,12 +82,25 @@ export const LeadTable = ({
     });
   };
 
+  const isAllSelected = useMemo(() => {
+    return visibleLeads.length > 0 && visibleLeads.every((lead) => selectTicket.includes(lead.id));
+  }, [visibleLeads, selectTicket]);
+
   const rcColumn = [
     {
       width: 100,
       key: "checkbox",
       dataIndex: "id",
       align: "center",
+      title: (
+        <Checkbox
+          checked={isAllSelected}
+          onChange={() => {
+            const allIds = visibleLeads.map((l) => l.id);
+            onToggleAll(allIds);
+          }}
+        />
+      ),
       render: (id) => (
         <Flex justify="center">
           <Checkbox

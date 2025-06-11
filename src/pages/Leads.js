@@ -219,6 +219,12 @@ export const Leads = () => {
     setCurrentPage(page);
   };
 
+  const toggleSelectAll = (ids) => {
+    setSelectedTickets((prev) =>
+      prev.length === ids.length ? [] : ids
+    );
+  };
+
   return (
     <>
       <RefLeadsHeader
@@ -254,6 +260,7 @@ export const Leads = () => {
             filteredLeads={hardTickets}
             selectTicket={selectedTickets}
             onSelectRow={toggleSelectTicket}
+            onToggleAll={toggleSelectAll}
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
             fetchTickets={() => fetchHardTickets(currentPage)}
