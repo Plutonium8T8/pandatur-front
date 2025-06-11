@@ -107,7 +107,6 @@ export const ChatInput = ({
     setMessage("");
     setTemplate(null);
     setUrl(null);
-    setPandaNumber(null);
   };
 
   const sendMessage = () => {
