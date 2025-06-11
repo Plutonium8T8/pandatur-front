@@ -255,13 +255,13 @@ const ChatExtraInfo = ({
         >
           <Tabs.List>
             <Tabs.Tab value="general">
-              <Text fw={700} size="sm">
+              <Text fw={900} size="sm">
                 {getLanguageByKey("General")}
               </Text>
             </Tabs.Tab>
             <Tabs.Tab value="lead">
               <Text
-                fw={700}
+                fw={900}
                 size="sm"
                 c={hasErrorsTicketInfoForm ? "red" : "black"}
                 truncate="end"
@@ -271,7 +271,7 @@ const ChatExtraInfo = ({
             </Tabs.Tab>
             <Tabs.Tab value="contract">
               <Text
-                fw={700}
+                fw={900}
                 size="sm"
                 c={hasErrorsContractForm ? "red" : "black"}
               >
@@ -279,18 +279,18 @@ const ChatExtraInfo = ({
               </Text>
             </Tabs.Tab>
             <Tabs.Tab value="documents">
-              <Text fw={700} size="sm">
+              <Text fw={900} size="sm">
                 {getLanguageByKey("documents")}
               </Text>
             </Tabs.Tab>
             <Tabs.Tab value="media">
-              <Text fw={700} size="sm">
+              <Text fw={900} size="sm">
                 {getLanguageByKey("Media")}
               </Text>
             </Tabs.Tab>
             <Tabs.Tab value="quality_control">
               <Text
-                fw={700}
+                fw={900}
                 size="sm"
                 c={hasErrorQualityControl ? "red" : "black"}
               >

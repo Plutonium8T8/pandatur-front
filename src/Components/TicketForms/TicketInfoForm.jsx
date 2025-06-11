@@ -42,19 +42,10 @@ export const TicketInfoForm = ({
     }
   }, [data]);
 
-  const dateProps = (field) => ({
-    allowDeselect: true,
-    clearable: true,
-    allowFreeInput: true,
-    valueFormat: DD_MM_YYYY,
-    minDate: setMinDate,
-    key: formInstance.key(field),
-    ...formInstance.getInputProps(field),
-    dateParser: (input) => {
-      const parsed = dayjs(input, DD_MM_YYYY);
-      return parsed.isValid() ? parsed.toDate() : new Date(NaN);
-    },
-  });
+  const parseDate = (input) => {
+    const parsed = dayjs(input, DD_MM_YYYY);
+    return parsed.isValid() ? parsed.toDate() : new Date(NaN);
+  };
 
   return (
     <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
@@ -70,31 +61,55 @@ export const TicketInfoForm = ({
       />
 
       <DateInput
+        key={formInstance.key("data_venit_in_oficiu")}
         mt="md"
         label={getLanguageByKey("Data venit in oficiu")}
         placeholder={getLanguageByKey("Selectează data venirii în oficiu")}
-        {...dateProps("data_venit_in_oficiu")}
+        allowDeselect
+        clearable
+        valueFormat={DD_MM_YYYY}
+        minDate={setMinDate}
+        {...formInstance.getInputProps("data_venit_in_oficiu")}
+        dateParser={parseDate}
       />
 
       <DateInput
+        key={formInstance.key("data_plecarii")}
         mt="md"
         label={getLanguageByKey("Data și ora plecării")}
         placeholder={getLanguageByKey("Data și ora plecării")}
-        {...dateProps("data_plecarii")}
+        allowDeselect
+        clearable
+        valueFormat={DD_MM_YYYY}
+        minDate={setMinDate}
+        {...formInstance.getInputProps("data_plecarii")}
+        dateParser={parseDate}
       />
 
       <DateInput
+        key={formInstance.key("data_intoarcerii")}
         mt="md"
         label={getLanguageByKey("Data și ora întoarcerii")}
         placeholder={getLanguageByKey("Data și ora întoarcerii")}
-        {...dateProps("data_intoarcerii")}
+        allowDeselect
+        clearable
+        valueFormat={DD_MM_YYYY}
+        minDate={setMinDate}
+        {...formInstance.getInputProps("data_intoarcerii")}
+        dateParser={parseDate}
       />
 
       <DateInput
+        key={formInstance.key("data_cererii_de_retur")}
         mt="md"
         label={getLanguageByKey("Data cererii de retur")}
         placeholder={getLanguageByKey("Data cererii de retur")}
-        {...dateProps("data_cererii_de_retur")}
+        allowDeselect
+        clearable
+        valueFormat={DD_MM_YYYY}
+        minDate={setMinDate}
+        {...formInstance.getInputProps("data_cererii_de_retur")}
+        dateParser={parseDate}
       />
 
       {!hideDisabledInput && (
