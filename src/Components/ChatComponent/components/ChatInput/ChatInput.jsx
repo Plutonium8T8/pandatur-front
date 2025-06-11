@@ -119,9 +119,9 @@ export const ChatInput = ({
       const isChatWithPhone =
         isWhatsApp || isViber;
       onSendMessage({
-        ...(isWhatsApp
+        ...(isWhatsApp || isViber
           ? { message_text: message.trim() }
-          : { message_text: message.trim() }),
+          : { message: message.trim() }),
         ...url,
         panda_number: isChatWithPhone ? pandaNumber : undefined,
         client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
