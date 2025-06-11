@@ -242,69 +242,72 @@ const ChatExtraInfo = ({
   };
 
   return (
-    <ScrollArea
-      maw="35%"
-      w="100%"
-      h="100%"
-      className="chat-extra-info-scroll-area"
-    >
+    <ScrollArea maw="35%" w="100%" h="100%" className="chat-extra-info-scroll-area">
       <Tabs defaultValue="general" h="100%">
-        <Tabs.List>
-          <Tabs.Tab value="general">
-            <Text fw={700} size="sm">
-              {getLanguageByKey("General")}
-            </Text>
-          </Tabs.Tab>
-          <Tabs.Tab value="lead">
-            <Text
-              fw={700}
-              size="sm"
-              c={hasErrorsTicketInfoForm ? "red" : "black"}
-              truncate="end"
-            >
-              {getLanguageByKey("lead")}
-            </Text>
-          </Tabs.Tab>
-          <Tabs.Tab value="contract">
-            <Text
-              fw={700}
-              size="sm"
-              c={hasErrorsContractForm ? "red" : "black"}
-            >
-              {getLanguageByKey("Contract")}
-            </Text>
-          </Tabs.Tab>
-          <Tabs.Tab value="documents">
-            <Text fw={700} size="sm">
-              {getLanguageByKey("documents")}
-            </Text>
-          </Tabs.Tab>
-          <Tabs.Tab h="100%" value="media">
-            <Text fw={700} size="sm">
-              {getLanguageByKey("Media")}
-            </Text>
-          </Tabs.Tab>
+        <Box
+          style={{
+            position: "sticky",
+            top: 0,
+            zIndex: 10,
+            backgroundColor: "white",
+          }}
+          p="md"
+        >
+          <Tabs.List>
+            <Tabs.Tab value="general">
+              <Text fw={700} size="sm">
+                {getLanguageByKey("General")}
+              </Text>
+            </Tabs.Tab>
+            <Tabs.Tab value="lead">
+              <Text
+                fw={700}
+                size="sm"
+                c={hasErrorsTicketInfoForm ? "red" : "black"}
+                truncate="end"
+              >
+                {getLanguageByKey("lead")}
+              </Text>
+            </Tabs.Tab>
+            <Tabs.Tab value="contract">
+              <Text
+                fw={700}
+                size="sm"
+                c={hasErrorsContractForm ? "red" : "black"}
+              >
+                {getLanguageByKey("Contract")}
+              </Text>
+            </Tabs.Tab>
+            <Tabs.Tab value="documents">
+              <Text fw={700} size="sm">
+                {getLanguageByKey("documents")}
+              </Text>
+            </Tabs.Tab>
+            <Tabs.Tab value="media">
+              <Text fw={700} size="sm">
+                {getLanguageByKey("Media")}
+              </Text>
+            </Tabs.Tab>
+            <Tabs.Tab value="quality_control">
+              <Text
+                fw={700}
+                size="sm"
+                c={hasErrorQualityControl ? "red" : "black"}
+              >
+                {getLanguageByKey("quality")}
+              </Text>
+            </Tabs.Tab>
+          </Tabs.List>
 
-          <Tabs.Tab value="quality_control">
-            <Text
-              fw={700}
-              size="sm"
-              c={hasErrorQualityControl ? "red" : "black"}
-            >
-              {getLanguageByKey("quality")}
-            </Text>
-          </Tabs.Tab>
           <Button
             fullWidth
             mt="md"
-            mb="xs"
-            mx="xs"
             loading={isLoadingGeneral || isLoadingInfoTicket}
             onClick={handleSubmitAllForms}
           >
             {getLanguageByKey("Actualizare")}
           </Button>
-        </Tabs.List>
+        </Box>
 
         <Tabs.Panel value="general">
           <Box p="md">
@@ -390,7 +393,7 @@ const ChatExtraInfo = ({
           </Box>
         </Tabs.Panel>
       </Tabs>
-    </ScrollArea>
+    </ScrollArea >
   );
 };
 
