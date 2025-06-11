@@ -93,13 +93,15 @@ export const LeadTable = ({
       dataIndex: "id",
       align: "center",
       title: (
-        <Checkbox
-          checked={isAllSelected}
-          onChange={() => {
-            const allIds = visibleLeads.map((l) => l.id);
-            onToggleAll(allIds);
-          }}
-        />
+        <Flex justify="center">
+          <Checkbox
+            checked={isAllSelected}
+            onChange={() => {
+              const allIds = visibleLeads.map((l) => l.id);
+              onToggleAll(allIds);
+            }}
+          />
+        </Flex>
       ),
       render: (id) => (
         <Flex justify="center">
@@ -408,15 +410,14 @@ export const LeadTable = ({
             width: "100%",
           }}
         >
-          <div style={{ minWidth: "3000px" }}>
-            <RcTable
-              rowKey="id"
-              columns={rcColumn}
-              data={visibleLeads}
-              selectedRow={selectTicket}
-              bordered
-            />
-          </div>
+          <RcTable
+            rowKey="id"
+            columns={rcColumn}
+            data={visibleLeads}
+            selectedRow={selectTicket}
+            bordered
+            scroll={{ y: "calc(100vh - 230px)" }}
+          />
         </div>
         {!!totalLeadsPages && (
           <Flex justify="center" className="leads-table-pagination" pt="10">
