@@ -121,7 +121,7 @@ export const ChatInput = ({
       onSendMessage({
         ...(isWhatsApp
           ? { message_text: message.trim() }
-          : { message: message.trim() }),
+          : { message_text: message.trim() }),
         ...url,
         panda_number: isChatWithPhone ? pandaNumber : undefined,
         client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
