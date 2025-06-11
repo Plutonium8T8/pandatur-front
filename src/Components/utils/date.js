@@ -15,6 +15,12 @@ export const parseServerDate = (date) => {
   return date ? dayjs(date, DD_MM_YYYY__HH_mm_ss) : null;
 };
 
+export const parseServerDatePicker = (date) => {
+  if (date === "Invalid Date" || !date) return null;
+  const parsed = dayjs(date, DD_MM_YYYY__HH_mm_ss);
+  return parsed.isValid() ? parsed.toDate() : null;
+};
+
 export const parseDate = (dateString) => {
   if (!dateString) return null;
   const [date, time] = dateString.split(" ");
