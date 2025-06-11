@@ -129,12 +129,25 @@ const TaskList = ({
     );
   };
 
+  const allSelected = tasks.length > 0 && selectedRow.length === tasks.length;
+
   const columns = useMemo(
     () => [
       {
         width: 50,
         key: "checkbox",
         align: "center",
+        title: (
+          <Checkbox
+            checked={allSelected}
+            indeterminate={
+              selectedRow.length > 0 && selectedRow.length < tasks.length
+            }
+            onChange={() => {
+              setSelectedRow(allSelected ? [] : tasks.map((t) => t.id));
+            }}
+          />
+        ),
         render: (row) => (
           <Checkbox
             checked={selectedRow.includes(row.id)}
@@ -265,7 +278,7 @@ const TaskList = ({
         render: (_, row) => <ActionMenu row={row} />,
       }
     ],
-    [language, selectedRow, currentUserId]
+    [language, selectedRow, currentUserId, allSelected, tasks]
   );
 
   return (
@@ -276,6 +289,7 @@ const TaskList = ({
       selectedRow={selectedRow}
       loading={loading}
       bordered
+      scroll={{ y: "calc(100vh - 200px)" }}
     />
   );
 };
