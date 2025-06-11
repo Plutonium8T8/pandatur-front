@@ -25,11 +25,15 @@ import { api } from "../../../../api";
 
 import "./ChatInput.css";
 
-const pandaNumbers = [
+const pandaNumbersWhatsup = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" },
   { value: "40720949119", label: "40720949119 - RO / PT_IASI" },
   { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
   { value: "40721205105", label: "40721205105 - RO / PT_BR" },
+];
+
+const pandaNumbersViber = [
+  { value: "37360991919", label: "37360991919 - MD / PT_MD" }
 ];
 
 export const ChatInput = ({
@@ -59,6 +63,7 @@ export const ChatInput = ({
   const { markMessagesAsRead } = useApp();
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
+  const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -111,13 +116,15 @@ export const ChatInput = ({
 
   const sendMessage = () => {
     if (message.trim()) {
+      const isChatWithPhone =
+        isWhatsApp || isViber;
       onSendMessage({
         ...(isWhatsApp
           ? { message_text: message.trim() }
           : { message: message.trim() }),
         ...url,
-        panda_number: isWhatsApp ? pandaNumber : undefined,
-        client_phone: isWhatsApp ? currentClient?.payload?.phone : undefined,
+        panda_number: isChatWithPhone ? pandaNumber : undefined,
+        client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
       });
       clearState();
     }
@@ -175,7 +182,17 @@ export const ChatInput = ({
               placeholder={getLanguageByKey("select_sender_number")}
               value={pandaNumber}
               onChange={setPandaNumber}
-              data={pandaNumbers}
+              data={pandaNumbersWhatsup}
+            />
+          )}
+
+          {isViber && (
+            <Select
+              className="w-full"
+              placeholder={getLanguageByKey("select_sender_number")}
+              value={pandaNumber}
+              onChange={setPandaNumber}
+              data={pandaNumbersViber}
             />
           )}
 
@@ -229,7 +246,8 @@ export const ChatInput = ({
                 !message.trim() ||
                 !currentClient?.payload ||
                 currentClient.payload.platform === "sipuni" ||
-                (isWhatsApp && !pandaNumber)
+                (isWhatsApp && !pandaNumber) ||
+                (isViber && !pandaNumber)
               }
               variant="filled"
               onClick={sendMessage}
