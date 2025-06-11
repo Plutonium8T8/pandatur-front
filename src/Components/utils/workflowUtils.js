@@ -236,6 +236,7 @@ export const workflowOptionsLimitedByGroupTitle = {
 export const userGroupsToGroupTitle = {
     "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
     "IT dep.": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
+    "Quality Department": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
     "Front Office": ["MD"],
     "Back MD": ["MD", "RO", "GreenCard"],
     "Back Flagman": ["MD", "RO", "GreenCard"],
