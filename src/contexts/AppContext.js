@@ -269,7 +269,7 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.SEEN: {
-        
+
         const { ticket_id, sender_id } = message.data;
         const isSeenByAnotherUser = String(sender_id) !== String(userId);
 
@@ -365,6 +365,48 @@ export const AppProvider = ({ children }) => {
 
     connectToWebSocketRooms();
   }, [groupTitleForApi, workflowOptions, socketRef]);
+
+  useEffect(() => {
+    if (!socketRef?.current || !groupTitleForApi || !workflowOptions.length) return;
+
+    const socket = socketRef.current;
+
+    const handleReconnect = async () => {
+      try {
+        const res = await api.tickets.filters({
+          type: "id",
+          group_title: groupTitleForApi,
+          attributes: { workflow: workflowOptions },
+        });
+
+        const ticketIds = res?.data?.filter(Boolean) || [];
+        if (!ticketIds.length) return;
+
+        const socketMessage = JSON.stringify({
+          type: TYPE_SOCKET_EVENTS.CONNECT,
+          data: { ticket_id: ticketIds },
+        });
+
+        socket.send(socketMessage);
+        console.log("[Socket] Reconnected and rejoined chat rooms");
+      } catch (e) {
+        console.error("[Socket] Failed to reconnect to chat rooms", e);
+      }
+    };
+
+    if (socket.readyState === WebSocket.OPEN) {
+      handleReconnect();
+    } else {
+      const interval = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN) {
+          clearInterval(interval);
+          handleReconnect();
+        }
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+  }, [socketRef?.current, groupTitleForApi, workflowOptions]);
 
   return (
     <AppContext.Provider
