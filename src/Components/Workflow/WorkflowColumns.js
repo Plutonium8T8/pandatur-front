@@ -10,7 +10,7 @@ export const WorkflowColumns = ({
   fetchTickets,
 }) => {
   const { technicians } = useGetTechniciansList();
-  const { workflowOptions, isCollapsed } = useApp();
+  const { workflowOptions, isCollapsed, kanbanFilterActive } = useApp();
 
   const wrapperRef = useRef(null);
   const dragRef = useRef({
@@ -19,7 +19,10 @@ export const WorkflowColumns = ({
     scrollLeft: 0,
   });
 
-  const leftOffset = isCollapsed ? 79 : 249;
+  const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat"];
+  const visibleWorkflows = kanbanFilterActive
+    ? workflowOptions
+    : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
   useEffect(() => {
     const el = wrapperRef.current;
@@ -72,7 +75,7 @@ export const WorkflowColumns = ({
       }}
     >
       <Flex gap="xs" w="fit-content" h="100%">
-        {workflowOptions.map((workflow) => (
+        {visibleWorkflows.map((workflow) => (
           <WorkflowColumn
             key={workflow}
             workflow={workflow}

@@ -97,19 +97,21 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
     try {
+      const excluded = ["Realizat cu succes", "Închis și nerealizat"];
+      const baseWorkflow = lightTicketFilters.workflow ?? workflowOptions;
+      const filteredWorkflow = baseWorkflow.filter((w) => !excluded.includes(w));
+
       const data = await api.tickets.filters({
         page,
         type: "light",
         group_title: groupTitleForApi,
         attributes: {
           ...lightTicketFilters,
-          workflow: lightTicketFilters.workflow ?? workflowOptions,
+          workflow: filteredWorkflow,
         },
       });
 
-      if (requestIdRef.current !== requestId) {
-        return;
-      }
+      if (requestIdRef.current !== requestId) return;
 
       const totalPages = data.pagination?.total_pages || 1;
       const totalUnread = data.tickets.reduce(
