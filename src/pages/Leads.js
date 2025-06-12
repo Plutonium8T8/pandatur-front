@@ -243,9 +243,12 @@ export const Leads = () => {
           }
         }}
         deleteTicket={deleteTicket}
-        totalTicketsFiltered={totalLeads}
-        hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
-        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : tickets}
+        totalTicketsFiltered={
+          viewMode === VIEW_MODE.LIST
+            ? hardTickets.length
+            : visibleTickets.length
+        } hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
+        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets}
       />
 
       <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
@@ -330,7 +333,7 @@ export const Leads = () => {
       >
         <LeadsKanbanFilter
           initialData={kanbanFilters}
-          systemWorkflow={selectedWorkflow}
+          systemWorkflow={kanbanFilterActive ? selectedWorkflow : []}
           loading={loading}
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={setSelectedWorkflow}
