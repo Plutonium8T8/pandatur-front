@@ -3111,6 +3111,11 @@ export const translations = {
     RU: "Выбери номер WhatsApp",
     EN: "Select WhatsApp Number",
   },
+  select_sender_number_viber: {
+    RO: "Alege nr Viber",
+    RU: "Выбери номер Viber",
+    EN: "Select Viber Number",
+  },
   Plătitor: {
     RO: "Plătitor",
     RU: "Плательщик",
