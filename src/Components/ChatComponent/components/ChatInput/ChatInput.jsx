@@ -267,11 +267,9 @@ export const ChatInput = ({
               {getLanguageByKey("Anulează")}
             </Button>
 
-            {unseenCount > 0 && (
-              <Button onClick={handleMarkAsRead} variant="outline">
-                {getLanguageByKey("ReadChat")}
-              </Button>
-            )}
+            <Button onClick={handleMarkAsRead} variant="outline">
+              {getLanguageByKey("ReadChat")}
+            </Button>
 
             {typeof ticket?.action_needed === "boolean" && (
               <Button

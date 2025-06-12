@@ -12,37 +12,60 @@ export const SocketProvider = ({ children }) => {
   const [val, setVal] = useState(null);
 
   useEffect(() => {
-    socketRef.current = new WebSocket(process.env.REACT_APP_WS_URL);
+    let socket;
+    let reconnectTimer;
 
-    socketRef.current.onopen = async () => {
-      console.log("Connected to WebSocket");
+    const connect = () => {
+      console.log("[SOCKET] Подключение к WebSocket...");
+      socket = new WebSocket(process.env.REACT_APP_WS_URL);
+      socketRef.current = socket;
+
+      socket.onopen = () => {
+        console.log("[SOCKET] Установлено соединение с WebSocket");
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          console.log("[SOCKET] Получено сообщение:", message);
+          setVal(message);
+        } catch (err) {
+          console.error("[SOCKET] Ошибка при парсинге сообщения:", event.data);
+        }
+      };
+
+      socket.onerror = (error) => {
+        enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), {
+          variant: "error",
+        });
+        console.error("[SOCKET] Ошибка WebSocket:", error);
+      };
+
+      socket.onclose = (event) => {
+        console.warn("[SOCKET] Соединение закрыто. Попытка реконнекта через 1с...", event.reason);
+        reconnectTimer = setTimeout(connect, 1000);
+      };
     };
 
-    socketRef.current.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-
-      setVal(message);
-    };
-
-    socketRef.current.onerror = (error) => {
-      enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), {
-        variant: "error",
-      });
-      console.error("WebSocket error:", error);
-    };
-
-    socketRef.current.onclose = () => {
-      console.log("WebSocket connection closed");
-    };
+    connect();
 
     return () => {
-      socketRef.current.close();
-      socketRef.current = null;
+      if (socket) {
+        console.log("[SOCKET] Отключение от WebSocket");
+        socket.close();
+      }
+      clearTimeout(reconnectTimer);
     };
   }, []);
 
   const seenMessages = (ticketId, userId) => {
     const socketInstance = socketRef.current;
+
+    console.log("[SOCKET] Попытка отправить SEEN:");
+    console.log(" - ticketId:", ticketId);
+    console.log(" - userId:", userId);
+    console.log(" - socket.readyState:", socketInstance?.readyState);
+
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
         type: TYPE_SOCKET_EVENTS.SEEN,
@@ -51,7 +74,11 @@ export const SocketProvider = ({ children }) => {
           sender_id: userId,
         },
       };
+
+      console.log("[SOCKET] Отправка SEEN сообщения:", readMessageData);
       socketInstance.send(JSON.stringify(readMessageData));
+    } else {
+      console.warn("[SOCKET] WebSocket не готов (не OPEN), SEEN не отправлен");
     }
   };
 
@@ -62,6 +89,8 @@ export const SocketProvider = ({ children }) => {
   };
 
   return (
-    <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
+    <SocketContext.Provider value={value}>
+      {children}
+    </SocketContext.Provider>
   );
 };
