@@ -189,7 +189,7 @@ export const ChatInput = ({
           {isViber && (
             <Select
               className="w-full"
-              placeholder={getLanguageByKey("select_sender_number")}
+              placeholder={getLanguageByKey("select_sender_number_viber")}
               value={pandaNumber}
               onChange={setPandaNumber}
               data={pandaNumbersViber}
