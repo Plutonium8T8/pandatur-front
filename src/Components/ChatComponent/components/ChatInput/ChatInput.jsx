@@ -123,20 +123,13 @@ export const ChatInput = ({
     if ((isMedia && url?.media_url) || (!isMedia && trimmedMessage)) {
       const payload = {
         ...url,
+        message: isMedia ? url.media_url : trimmedMessage,
         panda_number: isChatWithPhone ? pandaNumber : undefined,
         client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
       };
 
       if (!isMedia) {
-        Object.assign(
-          payload,
-          isChatWithPhone
-            ? { message_text: trimmedMessage }
-            : { message: trimmedMessage }
-        );
-      } else {
-        delete payload.message;
-        delete payload.message_text;
+        payload.message_text = isChatWithPhone ? trimmedMessage : undefined;
       }
 
       onSendMessage(payload);
