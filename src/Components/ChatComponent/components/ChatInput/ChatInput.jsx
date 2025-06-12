@@ -115,17 +115,31 @@ export const ChatInput = ({
   };
 
   const sendMessage = () => {
-    if (message.trim()) {
-      const isChatWithPhone =
-        isWhatsApp || isViber;
-      onSendMessage({
-        ...(isWhatsApp || isViber
-          ? { message_text: message.trim() }
-          : { message: message.trim() }),
+    const isChatWithPhone = isWhatsApp || isViber;
+    const trimmedMessage = message.trim();
+    const mediaType = url?.media_type;
+    const isMedia = mediaType && mediaType !== "text";
+
+    if ((isMedia && url?.media_url) || (!isMedia && trimmedMessage)) {
+      const payload = {
         ...url,
         panda_number: isChatWithPhone ? pandaNumber : undefined,
         client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
-      });
+      };
+
+      if (!isMedia) {
+        Object.assign(
+          payload,
+          isChatWithPhone
+            ? { message_text: trimmedMessage }
+            : { message: trimmedMessage }
+        );
+      } else {
+        delete payload.message;
+        delete payload.message_text;
+      }
+
+      onSendMessage(payload);
       clearState();
     }
   };
