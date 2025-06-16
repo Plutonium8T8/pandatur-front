@@ -2,6 +2,7 @@ import {
   TextInput,
   MultiSelect,
   TagsInput,
+  Select,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useMemo, useContext } from "react";
@@ -28,12 +29,15 @@ export const BasicGeneralFormFilter = ({
 
   const form = useForm({
     mode: "uncontrolled",
-    transformValues: ({ workflow, priority, contact, tags, technician_id }) => ({
+    transformValues: ({ workflow, priority, contact, tags, technician_id, action_needed, unseen_count, recipient_id }) => ({
       workflow: workflow ?? workflowOptions,
       priority: priority ?? undefined,
       contact: contact ?? undefined,
       tags: tags ?? undefined,
       technician_id: technician_id ?? undefined,
+      action_needed: action_needed ?? undefined,
+      unseen_count: unseen_count ?? undefined,
+      recipient_id: recipient_id ?? undefined,
     }),
   });
 
@@ -70,6 +74,9 @@ export const BasicGeneralFormFilter = ({
         contact: data.contact,
         tags: data.tags,
         technician_id: data.technician_id,
+        action_needed: data.action_needed,
+        unseen_count: data.unseen_count,
+        recipient_id: data.recipient_id,
       });
     }
   }, [data]);
@@ -82,6 +89,14 @@ export const BasicGeneralFormFilter = ({
       form.onSubmit((values) => onSubmit(values, () => form.reset()))();
     };
   }, [form, onSubmit]);
+
+  const formattedTechniciansExtended = useMemo(() => {
+    return [
+      { value: "client", label: getLanguageByKey("Client") },
+      { value: "system", label: getLanguageByKey("System") },
+      ...formatMultiSelectData(technicians),
+    ];
+  }, [technicians]);
 
   return (
     <form id={idForm}>
@@ -133,6 +148,42 @@ export const BasicGeneralFormFilter = ({
         onChange={handleTechnicianChange}
         searchable
       />
+
+      <Select
+        mt="md"
+        label={getLanguageByKey("Acțiune necesară")}
+        placeholder={getLanguageByKey("Alege")}
+        data={[
+          { value: "true", label: getLanguageByKey("Da") },
+          { value: "false", label: getLanguageByKey("Nu") },
+        ]}
+        key={form.key("action_needed")}
+        {...form.getInputProps("action_needed")}
+      />
+
+      <Select
+        mt="md"
+        label={getLanguageByKey("Mesaje necitite")}
+        placeholder={getLanguageByKey("Alege")}
+        data={[
+          { value: "true", label: getLanguageByKey("Da") },
+          { value: "false", label: getLanguageByKey("Nu") },
+        ]}
+        key={form.key("unseen_count")}
+        {...form.getInputProps("unseen_count")}
+      />
+
+      <MultiSelect
+        mt="md"
+        label={getLanguageByKey("Autor ultim mesaj")}
+        placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
+        clearable
+        data={formattedTechniciansExtended}
+        key={form.key("recipient_id")}
+        {...form.getInputProps("recipient_id")}
+        searchable
+      />
+
     </form>
   );
 };
