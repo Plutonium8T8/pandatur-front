@@ -150,7 +150,7 @@ const ChatList = ({ selectTicketId }) => {
         size="xl"
         styles={{
           content: {
-            height: "800px",
+            height: "900px",
             display: "flex",
             flexDirection: "column",
           },
