@@ -241,6 +241,7 @@ export const userGroupsToGroupTitle = {
     "Back MD": ["MD", "RO", "GreenCard"],
     "Back Flagman": ["MD", "RO", "GreenCard"],
     "Back Headline": ["MD", "RO", "GreenCard"],
+    "Back EliteSales": ["MD", "RO", "GreenCard"],
 
     // RO
     "Call Centre RO": ["RO"],

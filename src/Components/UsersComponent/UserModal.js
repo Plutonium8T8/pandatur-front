@@ -433,6 +433,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             onChange={(value) => setForm({ ...form, groups: value || "" })}
             required
             rightSection={groupsLoading ? <Loader size="xs" /> : null}
+            searchable
           />
 
           <TextInput
