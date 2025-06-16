@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Flex, Button, TextInput, Select, MultiSelect, Box } from "@mantine/core";
+import { Flex, TextInput, Select, MultiSelect } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import { MESSAGES_TYPE_OPTIONS, DD_MM_YYYY_DASH } from "../../app-constants";
 import dayjs from "dayjs";
 
-export const MessageFilterForm = ({ initialData, loading, onClose, onSubmit }) => {
+export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
     const [message, setMessage] = useState("");
     const [mtype, setMtype] = useState(null);
     const [senderIds, setSenderIds] = useState([]);
@@ -27,8 +27,12 @@ export const MessageFilterForm = ({ initialData, loading, onClose, onSubmit }) =
             );
             if (initialData.time_sent?.from || initialData.time_sent?.to) {
                 setTimeSent([
-                    initialData.time_sent?.from ? dayjs(initialData.time_sent.from, DD_MM_YYYY_DASH).toDate() : null,
-                    initialData.time_sent?.to ? dayjs(initialData.time_sent.to, DD_MM_YYYY_DASH).toDate() : null,
+                    initialData.time_sent?.from
+                        ? dayjs(initialData.time_sent.from, DD_MM_YYYY_DASH).toDate()
+                        : null,
+                    initialData.time_sent?.to
+                        ? dayjs(initialData.time_sent.to, DD_MM_YYYY_DASH).toDate()
+                        : null,
                 ]);
             } else {
                 setTimeSent([null, null]);
@@ -40,26 +44,33 @@ export const MessageFilterForm = ({ initialData, loading, onClose, onSubmit }) =
         const filters = {};
         if (message) filters.message = message;
         if (mtype) filters.mtype = mtype;
-        if (senderIds.length) filters.sender_id = senderIds.map((id) => parseInt(id, 10));
+        if (senderIds.length)
+            filters.sender_id = senderIds.map((id) => parseInt(id, 10));
         if (timeSent?.[0] || timeSent?.[1]) {
             filters.time_sent = {
-                ...(timeSent[0] && { from: dayjs(timeSent[0]).format(DD_MM_YYYY_DASH) }),
-                ...(timeSent[1] && { to: dayjs(timeSent[1]).format(DD_MM_YYYY_DASH) }),
+                ...(timeSent[0] && {
+                    from: dayjs(timeSent[0]).format(DD_MM_YYYY_DASH),
+                }),
+                ...(timeSent[1] && {
+                    to: dayjs(timeSent[1]).format(DD_MM_YYYY_DASH),
+                }),
             };
         }
         onSubmit(filters, "message");
     };
 
-    const handleReset = () => {
-        setMessage("");
-        setMtype(null);
-        setSenderIds([]);
-        setTimeSent([null, null]);
-        onSubmit({}, "message");
-    };
+    // Авто-сабмит при нажатии на кнопку в родителе
+    useEffect(() => {
+        const form = document.querySelector("form");
+        if (!form) return;
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            handleApply();
+        };
+    }, [message, mtype, senderIds, timeSent]);
 
     return (
-        <Flex direction="column" justify="space-between" h="100%">
+        <form>
             <Flex direction="column" gap="md">
                 <TextInput
                     label={getLanguageByKey("searchByMessages")}
@@ -97,20 +108,6 @@ export const MessageFilterForm = ({ initialData, loading, onClose, onSubmit }) =
                     clearable
                 />
             </Flex>
-
-            <Box mt="md">
-                <Flex justify="end" gap="md">
-                    <Button variant="outline" onClick={handleReset}>
-                        {getLanguageByKey("Reset filter")}
-                    </Button>
-                    <Button variant="default" onClick={onClose}>
-                        {getLanguageByKey("Închide")}
-                    </Button>
-                    <Button variant="filled" loading={loading} onClick={handleApply}>
-                        {getLanguageByKey("Aplică")}
-                    </Button>
-                </Flex>
-            </Box>
-        </Flex>
+        </form>
     );
 };

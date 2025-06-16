@@ -1,16 +1,37 @@
-import { Tabs, Flex } from "@mantine/core";
+import { Tabs, Flex, Button } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
+import { useState } from "react";
 
 export const LeadsTableFilter = ({
   onClose,
   loading,
   initialData,
   onSubmitTicket,
+  onResetFilters,
 }) => {
+  const [activeTab, setActiveTab] = useState("filter_ticket");
+
+  const handleSubmit = () => {
+    const form = document.querySelector("form");
+    if (form) form.requestSubmit();
+  };
+
+  const handleReset = () => {
+    onResetFilters?.();
+    onClose?.();
+  };
+
   return (
-    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_ticket">
+    <Tabs
+      h="100%"
+      className="leads-modal-filter-tabs"
+      defaultValue="filter_ticket"
+      value={activeTab}
+      onChange={setActiveTab}
+      pb="48"
+    >
       <Tabs.List>
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
@@ -39,6 +60,18 @@ export const LeadsTableFilter = ({
           onSubmit={onSubmitTicket}
         />
       </Tabs.Panel>
+
+      <Flex justify="end" gap="md" mt="md" pr="md">
+        <Button variant="outline" onClick={handleReset}>
+          {getLanguageByKey("Reset filter")}
+        </Button>
+        <Button variant="default" onClick={onClose}>
+          {getLanguageByKey("Închide")}
+        </Button>
+        <Button variant="filled" loading={loading} onClick={handleSubmit}>
+          {getLanguageByKey("Aplică")}
+        </Button>
+      </Flex>
     </Tabs>
   );
 };

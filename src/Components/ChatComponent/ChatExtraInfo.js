@@ -211,6 +211,7 @@ const ChatExtraInfo = ({
       name,
       surname,
       phone,
+      email,
       ...extraFields
     } = values;
 
@@ -226,6 +227,7 @@ const ChatExtraInfo = ({
         name,
         surname,
         phone,
+        email
       });
 
       await api.tickets.ticket.create(selectTicketId, extraFields);

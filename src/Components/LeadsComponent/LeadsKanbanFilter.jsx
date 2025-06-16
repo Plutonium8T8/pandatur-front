@@ -1,20 +1,41 @@
-import { Tabs } from "@mantine/core";
+import { Tabs, Button, Flex } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { useApp } from "../../hooks";
+import { useState } from "react";
 
 export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
-  const { fetchKanbanTickets, setKanbanFilterActive } = useApp();
+  const {
+    fetchKanbanTickets,
+    setKanbanFilterActive,
+    setKanbanFilters,
+    setKanbanTickets,
+  } = useApp();
 
-  const handleSubmit = (filters) => {
-    setKanbanFilterActive(true);
-    fetchKanbanTickets(filters);
+  const [activeTab, setActiveTab] = useState("filter_ticket");
+
+  const handleSubmit = () => {
+    const form = document.querySelector("form");
+    if (form) form.requestSubmit();
+  };
+
+  const handleReset = () => {
+    setKanbanFilters({});
+    setKanbanFilterActive(false);
+    setKanbanTickets([]);
     onClose?.();
   };
 
   return (
-    <Tabs h="100%" className="leads-modal-filter-tabs" defaultValue="filter_ticket">
+    <Tabs
+      h="100%"
+      className="leads-modal-filter-tabs"
+      defaultValue="filter_ticket"
+      value={activeTab}
+      onChange={setActiveTab}
+      pb="36px"
+    >
       <Tabs.List>
         <Tabs.Tab value="filter_ticket">
           {getLanguageByKey("Filtru pentru Lead")}
@@ -28,7 +49,11 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
         <TicketFormTabs
           initialData={initialData}
           onClose={onClose}
-          onSubmit={handleSubmit}
+          onSubmit={(filters) => {
+            setKanbanFilterActive(true);
+            fetchKanbanTickets(filters);
+            onClose?.();
+          }}
           loading={loading}
         />
       </Tabs.Panel>
@@ -38,9 +63,25 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
           initialData={initialData}
           loading={loading}
           onClose={onClose}
-          onSubmit={handleSubmit}
+          onSubmit={(filters) => {
+            setKanbanFilterActive(true);
+            fetchKanbanTickets(filters);
+            onClose?.();
+          }}
         />
       </Tabs.Panel>
-    </Tabs>
+
+      <Flex justify="end" gap="md">
+        <Button variant="outline" onClick={handleReset}>
+          {getLanguageByKey("Reset filter")}
+        </Button>
+        <Button variant="default" onClick={onClose}>
+          {getLanguageByKey("Închide")}
+        </Button>
+        <Button variant="filled" loading={loading} onClick={handleSubmit}>
+          {getLanguageByKey("Aplică")}
+        </Button>
+      </Flex>
+    </Tabs >
   );
 };

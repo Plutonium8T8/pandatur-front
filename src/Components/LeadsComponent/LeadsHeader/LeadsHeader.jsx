@@ -45,6 +45,8 @@ export const RefLeadsHeader = forwardRef(
       groupTitleForApi,
     } = useApp();
 
+    const { kanbanFilterActive } = useApp();
+
     const selectedTicket = tickets.find((t) => t.id === selectedTickets?.[0]);
     const responsibleId = selectedTicket?.technician_id
       ? String(selectedTicket.technician_id)
@@ -83,7 +85,7 @@ export const RefLeadsHeader = forwardRef(
               )}
 
               <ActionIcon
-                variant={hasOpenFiltersModal ? "filled" : "default"}
+                variant={hasOpenFiltersModal || kanbanFilterActive ? "filled" : "default"} // 🔥 изменено
                 size="36"
                 onClick={() => setIsFilterOpen(true)}
               >
