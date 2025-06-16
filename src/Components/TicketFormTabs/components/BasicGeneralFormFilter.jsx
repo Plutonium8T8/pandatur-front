@@ -29,7 +29,7 @@ export const BasicGeneralFormFilter = ({
 
   const form = useForm({
     mode: "uncontrolled",
-    transformValues: ({ workflow, priority, contact, tags, technician_id, action_needed, unseen_count, recipient_id }) => ({
+    transformValues: ({ workflow, priority, contact, tags, technician_id, action_needed, unseen_count, autor_messages, recipient_id }) => ({
       workflow: workflow ?? workflowOptions,
       priority: priority ?? undefined,
       contact: contact ?? undefined,
@@ -37,6 +37,7 @@ export const BasicGeneralFormFilter = ({
       technician_id: technician_id ?? undefined,
       action_needed: action_needed ?? undefined,
       unseen_count: unseen_count ?? undefined,
+      autor_messages: autor_messages ?? undefined,
       recipient_id: recipient_id ?? undefined,
     }),
   });
@@ -58,6 +59,20 @@ export const BasicGeneralFormFilter = ({
     }
   };
 
+  const handleRecipientChange = (val) => {
+    const last = val[val.length - 1];
+    const isGroup = last?.startsWith("__group__");
+
+    if (isGroup) {
+      const groupUsers = groupUserMap.get(last) || [];
+      const current = form.getValues().recipient_id || [];
+      const unique = Array.from(new Set([...current, ...groupUsers]));
+      form.setFieldValue("recipient_id", unique);
+    } else {
+      form.setFieldValue("recipient_id", val);
+    }
+  };
+
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
       form.setFieldValue("workflow", workflowOptions);
@@ -76,6 +91,7 @@ export const BasicGeneralFormFilter = ({
         technician_id: data.technician_id,
         action_needed: data.action_needed,
         unseen_count: data.unseen_count,
+        autor_messages: data.autor_messages,
         recipient_id: data.recipient_id,
       });
     }
@@ -149,6 +165,18 @@ export const BasicGeneralFormFilter = ({
         searchable
       />
 
+      <MultiSelect
+        mt="md"
+        label={getLanguageByKey("Autor ultim mesaj")}
+        placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
+        clearable
+        data={formattedTechniciansExtended}
+        key={form.key("recipient_id")}
+        value={form.getValues().recipient_id || []}
+        onChange={handleRecipientChange}
+        searchable
+      />
+
       <Select
         mt="md"
         label={getLanguageByKey("Acțiune necesară")}
@@ -172,18 +200,6 @@ export const BasicGeneralFormFilter = ({
         key={form.key("unseen_count")}
         {...form.getInputProps("unseen_count")}
       />
-
-      <MultiSelect
-        mt="md"
-        label={getLanguageByKey("Autor ultim mesaj")}
-        placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
-        clearable
-        data={formattedTechniciansExtended}
-        key={form.key("recipient_id")}
-        {...form.getInputProps("recipient_id")}
-        searchable
-      />
-
     </form>
   );
 };
