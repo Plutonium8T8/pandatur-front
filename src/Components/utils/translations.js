@@ -3200,5 +3200,45 @@ export const translations = {
     "RO": "Nu necesită răspuns",
     "RU": "Не требует ответа",
     "EN": "No answer needed"
+  },
+  "Acțiune necesară": {
+    RO: "Acțiune necesară",
+    RU: "Требуется действие",
+    EN: "Action needed"
+  },
+  "Mesaje necitite": {
+    RO: "Mesaje necitite",
+    RU: "Непрочитанные сообщения",
+    EN: "Unread messages"
+  },
+  "Alege": {
+    RO: "Alege",
+    RU: "Выбрать",
+    EN: "Select"
+  },
+  "Da": {
+    RO: "Da",
+    RU: "Да",
+    EN: "Yes"
+  },
+  "Nu": {
+    RO: "Nu",
+    RU: "Нет",
+    EN: "No"
+  },
+  "System": {
+    RU: "Система",
+    RO: "Sistem",
+    EN: "System"
+  },
+  "Autor ultim mesaj": {
+    RO: "Autor ultim mesaj",
+    RU: "Автор последнего сообщения",
+    EN: "Last message author"
+  },
+  "Selectează autor ultim mesaj": {
+    RO: "Selectează autor ultim mesaj",
+    RU: "Выберите автора последнего сообщения",
+    EN: "Select last message author"
   }
 }
