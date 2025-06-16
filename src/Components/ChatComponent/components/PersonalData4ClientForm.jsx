@@ -23,12 +23,13 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         name: data.name || "",
         surname: data.surname || "",
         phone: data.phone || "",
+        email: data.email || "",
       });
     }
   }, [data, showSave]);
 
   const handleAddClient = () => {
-    formInstance.setValues({ name: "", surname: "", phone: "" });
+    formInstance.setValues({ name: "", surname: "", phone: "", email: "" });
     setShowSave(true);
   };
 
@@ -41,6 +42,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         name: values.name,
         surname: values.surname,
         phone: values.phone,
+        email: values.email,
       });
 
       setShowSave(false);
@@ -56,6 +58,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         name: data.name || "",
         surname: data.surname || "",
         phone: data.phone || "",
+        email: data.email || "",
       });
     }
   };
@@ -83,6 +86,14 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         placeholder={getLanguageByKey("Prenume")}
         key={formInstance.key("surname")}
         {...formInstance.getInputProps("surname")}
+      />
+
+      <TextInput
+        mt="md"
+        label={getLanguageByKey("Email")}
+        placeholder={getLanguageByKey("Email")}
+        key={formInstance.key("email")}
+        {...formInstance.getInputProps("email")}
       />
 
       <NumberInput
