@@ -13,6 +13,7 @@ import {
   Tabs,
   Modal,
   Text,
+  Button
 } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
@@ -156,11 +157,15 @@ const ChatList = ({ selectTicketId }) => {
           body: {
             flex: 1,
             overflowY: "auto",
-            padding: "1rem",
           },
         }}
       >
-        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%">
+        <Tabs
+          defaultValue="filter_ticket"
+          className="leads-modal-filter-tabs"
+          h="100%"
+          pb="48"
+        >
           <Tabs.List>
             <Tabs.Tab value="filter_ticket">
               {getLanguageByKey("Filtru pentru Lead")}
@@ -188,6 +193,32 @@ const ChatList = ({ selectTicketId }) => {
               initialData={chatFilters}
             />
           </Tabs.Panel>
+
+          <Flex justify="end" gap="md" mt="md" pr="md">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsFiltered(false);
+                setChatFilters({});
+                setOpenFilter(false);
+              }}
+            >
+              {getLanguageByKey("Reset filter")}
+            </Button>
+            <Button variant="default" onClick={() => setOpenFilter(false)}>
+              {getLanguageByKey("Închide")}
+            </Button>
+            <Button
+              variant="filled"
+              loading={chatSpinner}
+              onClick={() => {
+                const form = document.querySelector("form");
+                if (form) form.requestSubmit();
+              }}
+            >
+              {getLanguageByKey("Aplică")}
+            </Button>
+          </Flex>
         </Tabs>
       </Modal>
     </>

@@ -24,7 +24,7 @@ import {
 } from "@components";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
 import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
-import { LeadsKanbanFilter } from "@components/LeadsComponent/LeadsKanbanFilter";
+import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
 import "../css/SnackBarComponent.css";
 
@@ -325,9 +325,8 @@ export const Leads = () => {
             flexDirection: "column",
           },
           body: {
-            flex: 1,
+            flex: "1",
             overflowY: "auto",
-            padding: "1rem",
           },
         }}
       >
@@ -357,7 +356,6 @@ export const Leads = () => {
           body: {
             flex: 1,
             overflowY: "auto",
-            padding: "1rem",
           },
         }}
       >

@@ -1,4 +1,4 @@
-import { Tabs, Flex, Button, ScrollArea } from "@mantine/core";
+import { Tabs, Flex, ScrollArea } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import {
   TicketInfoFormFilter,
@@ -8,14 +8,6 @@ import {
   BasicGeneralFormFilter,
 } from "./components";
 import "./TicketFormTabs.css";
-
-const renderResetButton = (resetForm) => {
-  return (
-    <Button variant="outline" onClick={resetForm}>
-      {getLanguageByKey("Reset filter")}
-    </Button>
-  );
-};
 
 const formIds = {
   general: "generalForm",
@@ -67,49 +59,28 @@ export const TicketFormTabs = ({
             loading={loading}
             onClose={onClose}
             onSubmit={onSubmit}
-            renderFooterButtons={renderResetButton}
             formId={formIds.general}
           />
         </Flex>
       </Tabs.Panel>
+
       <Tabs.Panel pl="lg" value="filter_ticket_info">
         <ScrollArea h="100%">
           <TicketInfoFormFilter
             data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
             formId={formIds.ticketInfo}
           />
         </ScrollArea>
       </Tabs.Panel>
+
       <Tabs.Panel pl="lg" value="filter_contract">
         <ScrollArea h="100%">
           <ContractFormFilter
             data={initialData}
             hideDisabledInput
             onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
             formId={formIds.contract}
           />
         </ScrollArea>
@@ -120,17 +91,6 @@ export const TicketFormTabs = ({
           <InvoiceFormFilter
             data={initialData}
             onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
             formId={formIds.invoice}
           />
         </Flex>
@@ -141,17 +101,6 @@ export const TicketFormTabs = ({
           <QualityControlFormFilter
             data={initialData}
             onSubmit={onSubmit}
-            renderFooterButtons={({ onResetForm, formId }) => (
-              <>
-                {renderResetButton(onResetForm)}
-                <Button variant="default" onClick={onClose}>
-                  {getLanguageByKey("Închide")}
-                </Button>
-                <Button loading={loading} type="submit" form={formId}>
-                  {getLanguageByKey("Aplică")}
-                </Button>
-              </>
-            )}
           />
         </Flex>
       </Tabs.Panel>
