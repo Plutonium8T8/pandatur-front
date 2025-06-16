@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect, useMemo } from "react";
-import { Group, Button, Box, Flex, MultiSelect, Select, Modal } from "@mantine/core";
+import { Group, Button, Flex, MultiSelect, Select, Modal } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations, showServerError } from "../../utils";
 import { TypeTask } from "../OptionsTaskType";
@@ -172,7 +172,6 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       size="xl"
       styles={{
         content: {
-          height: "790px",
           display: "flex",
           flexDirection: "column",
         },
