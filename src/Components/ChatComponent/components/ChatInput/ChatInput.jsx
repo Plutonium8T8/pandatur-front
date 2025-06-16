@@ -302,7 +302,7 @@ export const ChatInput = ({
                     color={ticket.action_needed ? "orange" : "green"}
                   >
                     {getLanguageByKey(
-                      ticket.action_needed ? "NeedAnswer" : "NoNeedAnswer"
+                      ticket.action_needed ? "Acțiune necesară" : "Nu acțiune necesară"
                     )}
                   </Button>
                 )}

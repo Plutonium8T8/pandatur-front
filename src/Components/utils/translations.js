@@ -3202,9 +3202,14 @@ export const translations = {
     "EN": "No answer needed"
   },
   "Acțiune necesară": {
-    RO: "Acțiune necesară",
+    RO: "Necesită acțiune",
     RU: "Требуется действие",
     EN: "Action needed"
+  },
+  "Nu acțiune necesară": {
+    RO: "Nu necesită acțiune",
+    RU: "Не требуется действие",
+    EN: "No action needed"
   },
   "Mesaje necitite": {
     RO: "Mesaje necitite",
