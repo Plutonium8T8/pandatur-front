@@ -2,12 +2,16 @@ import { useState, useEffect } from "react";
 import { api } from "@api";
 import { showServerError } from "@utils";
 
+let cachedTechnicians = null;
+
 export const useGetTechniciansList = () => {
-  const [technicians, setTechnicians] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [technicians, setTechnicians] = useState(cachedTechnicians || []);
+  const [loading, setLoading] = useState(!cachedTechnicians);
   const [errors, setErrors] = useState(null);
 
   useEffect(() => {
+    if (cachedTechnicians) return;
+
     const fetchTechnicians = async () => {
       try {
         setLoading(true);
@@ -17,7 +21,7 @@ export const useGetTechniciansList = () => {
 
         data.forEach((item) => {
           const userId = item?.id?.id;
-          if (!userId) return; // пропускаем если нет ID
+          if (!userId) return;
 
           const groupName = item.groups?.[0]?.name || "Fără grupă";
           const label = `${item.id?.surname || ""} ${item.id?.name || ""}`.trim();
@@ -26,7 +30,6 @@ export const useGetTechniciansList = () => {
             groupMap.set(groupName, []);
           }
 
-          // добавляем только если value не дублируется
           const groupUsers = groupMap.get(groupName);
           if (!groupUsers.some((u) => u.value === `${userId}`)) {
             groupUsers.push({
@@ -47,6 +50,7 @@ export const useGetTechniciansList = () => {
           formatted.push(...users);
         }
 
+        cachedTechnicians = formatted;
         setTechnicians(formatted);
       } catch (error) {
         setErrors(showServerError(error));
@@ -59,8 +63,8 @@ export const useGetTechniciansList = () => {
   }, []);
 
   return {
-    errors,
-    loading,
     technicians,
+    loading,
+    errors,
   };
 };

@@ -1,15 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
-import { useMessagesContext } from "@hooks";
+import { useMessagesContext, useGetTechniciansList } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
 import {
   parseServerDate,
   getFullName,
   getLanguageByKey,
   parseDate,
-  showServerError,
 } from "@utils";
-import { api } from "@api";
 import { SendedMessage, ReceivedMessage } from "../Message";
 import "./GroupedMessages.css";
 
@@ -17,25 +15,7 @@ const { colors } = DEFAULT_THEME;
 
 export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
   const { messages } = useMessagesContext();
-  const [technicians, setTechnicians] = useState([]);
-
-  useEffect(() => {
-    const fetchTechnicians = async () => {
-      try {
-        const data = await api.users.getTechnicianList();
-        const formatted = data.map((item) => ({
-          value: Number(item.id.id),
-          label: `${item.id.surname} ${item.id.name}`,
-          sipuni_id: item.sipuni_id,
-        }));
-        setTechnicians(formatted);
-      } catch (err) {
-        showServerError(err);
-      }
-    };
-
-    fetchTechnicians();
-  }, []);
+  const { technicians } = useGetTechniciansList();
 
   const technicianMap = useMemo(() => {
     const map = new Map();

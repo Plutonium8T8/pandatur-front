@@ -12,39 +12,29 @@ import {
   ScrollArea,
 } from "@mantine/core";
 import { groupSchedules } from "../../api/groupSchedules";
-import { api } from "../../api";
 import ScheduleView from "./ScheduleView";
 import { useSnackbar } from "notistack";
 import { FaTrash, FaEdit } from "react-icons/fa";
 import { translations } from "../utils/translations";
 import ModalGroup from "./ModalGroup";
-import { useConfirmPopup } from "../../hooks";
+import { useConfirmPopup, useGetTechniciansList } from "../../hooks";
 import Can from "../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
 const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const [groups, setGroups] = useState([]);
-  const [technicians, setTechnicians] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [editOpened, setEditOpened] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
   const { enqueueSnackbar } = useSnackbar();
   const confirmDelete = useConfirmPopup({ loading: false });
 
+  const { technicians } = useGetTechniciansList(); // ✅ кэшированные техники
+
   const fetchData = async () => {
     try {
-      const [groupData, userData] = await Promise.all([
-        groupSchedules.getAllGroups(),
-        api.users.getTechnicianList(),
-      ]);
-
-      const users = userData.map((item) => ({
-        id: item.id.id,
-        username: item.id.user?.username || "N/A",
-        photo: item.id.photo,
-      }));
-      setTechnicians(users);
+      const groupData = await groupSchedules.getAllGroups();
 
       const formattedGroups = groupData.map((group) => ({
         id: group.id,
@@ -52,6 +42,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         user_ids: group.user_ids,
         supervisor_id: group.supervisor_id,
       }));
+
       setGroups(formattedGroups);
     } catch (err) {
       enqueueSnackbar(translations["Eroare la încărcare"][language], {
@@ -119,9 +110,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
 
   const handleGroupUpdate = async (updatedGroup) => {
     try {
-      const usersInGroup = await groupSchedules.getTechniciansInGroup(
-        updatedGroup.id,
-      );
+      const usersInGroup = await groupSchedules.getTechniciansInGroup(updatedGroup.id);
 
       const updatedSelectedGroup = {
         ...updatedGroup,
@@ -131,12 +120,9 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
       setSelectedGroup(updatedSelectedGroup);
       fetchData();
     } catch (err) {
-      enqueueSnackbar(
-        translations["Eroare la actualizarea grupului"][language],
-        {
-          variant: "error",
-        },
-      );
+      enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
+        variant: "error",
+      });
     }
   };
 
@@ -150,7 +136,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
           groupId={selectedGroup.id}
           groupName={selectedGroup.name}
           groupUsers={technicians.filter((t) =>
-            selectedGroup.user_ids.includes(t.id),
+            selectedGroup.user_ids.includes(t.id)
           )}
           onGroupUpdate={handleGroupUpdate}
         />
@@ -164,7 +150,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         <Stack spacing="md">
           {groups.map((group) => {
             const groupUsers = technicians.filter((u) =>
-              group.user_ids.includes(u.id),
+              group.user_ids.includes(u.id)
             );
 
             return (
@@ -237,7 +223,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
                         <FaEdit />
                       </ActionIcon>
                     </Can>
-                    
+
                     <Can
                       permission={{ module: "schedules", action: "delete" }}
                       context={{ responsibleId: group.supervisor_id }}

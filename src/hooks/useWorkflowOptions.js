@@ -4,29 +4,21 @@ import {
     workflowOptionsLimitedByGroupTitle,
     workflowOptionsByGroupTitle,
 } from "../Components/utils/workflowUtils";
-import { api } from "../api";
+import { useGetTechniciansList } from "../hooks";
 
 export const useWorkflowOptions = ({ groupTitle, userId }) => {
+    const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
     const [userGroups, setUserGroups] = useState([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchTechnicians = async () => {
-            try {
-                const technicians = await api.users.getTechnicianList();
-                const me = technicians.find(
-                    (t) => t.id && t.id.user && String(t.id.user.id) === String(userId)
-                );
-                setUserGroups(me?.groups || []);
-            } catch (err) {
-                console.error("error get technician list", err);
-                setUserGroups([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-        if (userId) fetchTechnicians();
-    }, [userId]);
+        if (!userId || !technicians.length) return;
+
+        const me = technicians.find(
+            (t) => t.id?.user?.id && String(t.id.user.id) === String(userId)
+        );
+
+        setUserGroups(me?.groups || []);
+    }, [userId, technicians]);
 
     const isAdmin = useMemo(
         () => userGroups.some((g) => g.name === "Admin"),
@@ -68,6 +60,6 @@ export const useWorkflowOptions = ({ groupTitle, userId }) => {
         hasAccessToGroupTitle,
         userGroups,
         groupTitleForApi,
-        loading,
+        loading: loadingTechnicians,
     };
 };
