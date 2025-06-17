@@ -26,6 +26,7 @@ import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTab
 import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
+import { useGetTechniciansList } from "../hooks";
 import "../css/SnackBarComponent.css";
 
 const SORT_BY = "creation_date";
@@ -57,6 +58,7 @@ export const Leads = () => {
   } = useApp();
 
   const { ticketId } = useParams();
+  const { technicians } = useGetTechniciansList();
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -292,7 +294,7 @@ export const Leads = () => {
         height="100%"
         onClose={closeChatModal}
       >
-        <SingleChat ticketId={ticketId} onClose={closeChatModal} />
+        <SingleChat ticketId={ticketId} onClose={closeChatModal} technicians={technicians} />
       </MantineModal>
 
       <Modal
@@ -349,7 +351,7 @@ export const Leads = () => {
         size="xl"
         styles={{
           content: {
-            height: "800px",
+            height: "900px",
             display: "flex",
             flexDirection: "column",
           },

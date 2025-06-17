@@ -7,7 +7,7 @@ import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
 import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
-const SingleChat = ({ ticketId, onClose, tasks = [] }) => {
+const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { setTickets } = useApp();
   const { getUserMessages } = useMessagesContext();
 
@@ -49,6 +49,7 @@ const SingleChat = ({ ticketId, onClose, tasks = [] }) => {
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
             loading={loading}
+            technicians={technicians}
           />
         </Flex>
       </Can>
@@ -58,6 +59,7 @@ const SingleChat = ({ ticketId, onClose, tasks = [] }) => {
         context={{ responsibleId }}
       >
         <ChatExtraInfo
+          technicians={technicians}
           selectedUser={selectedUser}
           ticketId={ticketId}
           updatedTicket={personalInfo}

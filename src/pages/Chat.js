@@ -16,8 +16,6 @@ export const Chat = () => {
   const ticketId = Number(ticketIdParam);
 
   const { technicians } = useGetTechniciansList();
-  // console.log("🧪 Chat.jsx -> technicians:", technicians);
-  // console.log("🚀 Chat mounted");
 
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Flex, Text } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { FaHeadphones } from "react-icons/fa6";
@@ -28,11 +27,6 @@ export const SendedMessage = ({
   technicians = [],
   personalInfo = {},
 }) => {
-  // useEffect(() => {
-  //   console.log("🧪 SendedMessage:");
-  //   console.log("msg.sender_id:", msg.sender_id);
-  //   console.log("technicians:", technicians);
-  // }, [msg, technicians]);
 
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
   const clients = personalInfo.clients || [];
