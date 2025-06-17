@@ -27,6 +27,21 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
     onClose?.();
   };
 
+  const handleFiltersSubmit = (filters) => {
+    const hasValues = Object.values(filters).some(
+      (v) => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0)
+    );
+
+    if (!hasValues) {
+      handleReset();
+      return;
+    }
+
+    setKanbanFilterActive(true);
+    fetchKanbanTickets(filters);
+    onClose?.();
+  };
+
   return (
     <Tabs
       h="100%"
@@ -49,11 +64,7 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
         <TicketFormTabs
           initialData={initialData}
           onClose={onClose}
-          onSubmit={(filters) => {
-            setKanbanFilterActive(true);
-            fetchKanbanTickets(filters);
-            onClose?.();
-          }}
+          onSubmit={handleFiltersSubmit}
           loading={loading}
         />
       </Tabs.Panel>
@@ -63,11 +74,7 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
           initialData={initialData}
           loading={loading}
           onClose={onClose}
-          onSubmit={(filters) => {
-            setKanbanFilterActive(true);
-            fetchKanbanTickets(filters);
-            onClose?.();
-          }}
+          onSubmit={handleFiltersSubmit}
         />
       </Tabs.Panel>
 
@@ -82,6 +89,6 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
           {getLanguageByKey("Aplică")}
         </Button>
       </Flex>
-    </Tabs >
+    </Tabs>
   );
 };
