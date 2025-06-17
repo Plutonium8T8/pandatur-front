@@ -35,6 +35,8 @@ export const useGetTechniciansList = () => {
             groupUsers.push({
               value: `${userId}`,
               label,
+              id: item.id,
+              sipuni_id: item.sipuni_id,
             });
           }
         });

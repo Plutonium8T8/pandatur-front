@@ -30,7 +30,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const { enqueueSnackbar } = useSnackbar();
   const confirmDelete = useConfirmPopup({ loading: false });
 
-  const { technicians } = useGetTechniciansList(); // ✅ кэшированные техники
+  const { technicians } = useGetTechniciansList();
 
   const fetchData = async () => {
     try {
