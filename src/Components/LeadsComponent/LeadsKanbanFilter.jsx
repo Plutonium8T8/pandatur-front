@@ -13,6 +13,7 @@ export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
     setKanbanTickets,
   } = useApp();
 
+  
   const [activeTab, setActiveTab] = useState("filter_ticket");
 
   const handleSubmit = () => {
