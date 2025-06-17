@@ -10,7 +10,10 @@ export const useGetTechniciansList = () => {
   const [errors, setErrors] = useState(null);
 
   useEffect(() => {
-    if (cachedTechnicians) return;
+    if (cachedTechnicians) {
+      setTechnicians(cachedTechnicians);
+      return;
+    }
 
     const fetchTechnicians = async () => {
       try {
@@ -26,34 +29,37 @@ export const useGetTechniciansList = () => {
           const groupName = item.groups?.[0]?.name || "Fără grupă";
           const label = `${item.id?.surname || ""} ${item.id?.name || ""}`.trim();
 
+          const userItem = {
+            value: `${userId}`,
+            label,
+            id: item.id,
+            sipuni_id: item.sipuni_id,
+            groupName,
+          };
+
           if (!groupMap.has(groupName)) {
             groupMap.set(groupName, []);
           }
 
           const groupUsers = groupMap.get(groupName);
-          if (!groupUsers.some((u) => u.value === `${userId}`)) {
-            groupUsers.push({
-              value: `${userId}`,
-              label,
-              id: item.id,
-              sipuni_id: item.sipuni_id,
-            });
+          if (!groupUsers.some((u) => u.value === userItem.value)) {
+            groupUsers.push(userItem);
           }
         });
 
-        const formatted = [];
+        const merged = [];
 
         for (const [groupName, users] of groupMap.entries()) {
-          formatted.push({
+          merged.push({
             value: `__group__${groupName}`,
             label: groupName,
             disabled: true,
           });
-          formatted.push(...users);
+          merged.push(...users);
         }
 
-        cachedTechnicians = formatted;
-        setTechnicians(formatted);
+        cachedTechnicians = merged;
+        setTechnicians(merged);
       } catch (error) {
         setErrors(showServerError(error));
       } finally {

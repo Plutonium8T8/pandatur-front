@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Flex, Text } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { FaHeadphones } from "react-icons/fa6";
@@ -21,16 +22,39 @@ const MESSAGE_STATUS_ICONS = {
   [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp />,
 };
 
-export const SendedMessage = ({ msg, technician, technicians = [], personalInfo = {} }) => {
+export const SendedMessage = ({
+  msg,
+  technician,
+  technicians = [],
+  personalInfo = {},
+}) => {
+  // useEffect(() => {
+  //   console.log("🧪 SendedMessage:");
+  //   console.log("msg.sender_id:", msg.sender_id);
+  //   console.log("technicians:", technicians);
+  // }, [msg, technicians]);
+
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
   const clients = personalInfo.clients || [];
 
   const findClientByPhone = (phone) =>
     clients.find((c) => String(c?.id?.phone) === String(phone));
-  const findTechnicianBySip = (sip) =>
-    technicians.find((t) => String(t.sipuni_id) === String(sip));
 
-  const senderName = technician?.label || DEFAULT_SENDER_NAME;
+  const findTechnicianBySip = (sip) =>
+    technicians.find(
+      (t) => !String(t.value).startsWith("__group__") && t.sipuni_id === String(sip)
+    );
+
+  const findTechnicianById = (id) =>
+    technicians.find(
+      (t) => !String(t.value).startsWith("__group__") && String(t.value) === String(id)
+    );
+
+  const resolvedTechnician = technician || findTechnicianById(msg.sender_id);
+  const senderName =
+    getFullName(resolvedTechnician?.id?.name, resolvedTechnician?.id?.surname) ||
+    resolvedTechnician?.label ||
+    DEFAULT_SENDER_NAME;
 
   if (isCall) {
     const { short_src_num, short_dst_num } = msg.call_metadata || {};

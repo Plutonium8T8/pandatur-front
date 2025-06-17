@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { FixedSizeList } from "react-window";
 import { LuFilter } from "react-icons/lu";
 import {
@@ -15,12 +15,14 @@ import {
   Text,
   Button
 } from "@mantine/core";
+import { useDebouncedValue } from "@mantine/hooks";
+import isEqual from "lodash.isequal";
+
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
-import { useDebouncedValue } from "@mantine/hooks";
 
 const CHAT_ITEM_HEIGHT = 94;
 
@@ -35,7 +37,7 @@ const parseCustomDate = (dateStr) => {
 
 const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
 
-const ChatList = ({ selectTicketId }) => {
+const ChatList = ({ ticketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner } = useApp();
   const { userId } = useUser();
 
@@ -44,57 +46,75 @@ const ChatList = ({ selectTicketId }) => {
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
+  const [chatFilters, setChatFilters] = useState({});
+
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
-  const [chatFilters, setChatFilters] = useState({});
 
-  const filterChatList = (filters) => {
-    setIsFiltered(true);
-    setChatFilters(filters);
-    fetchChatFilteredTickets(filters);
-    setOpenFilter(false);
-  };
+  const baseTickets = useMemo(() => {
+    return isFiltered ? chatFilteredTickets : tickets;
+  }, [isFiltered, chatFilteredTickets, tickets]);
 
-  useEffect(() => {
-    if (chatListRef.current && selectTicketId) {
-      const container = chatListRef.current;
-      const selectedElement = container.querySelector(`[data-ticket-id="${selectTicketId}"]`);
-      if (selectedElement) {
-        const containerHeight = container.clientHeight;
-        const itemTop = selectedElement.offsetTop;
-        const itemHeight = selectedElement.clientHeight;
-        const scrollTop = itemTop - containerHeight / 2 + itemHeight / 2;
-        container.scrollTo({ top: scrollTop });
-      }
-    }
-  }, [selectTicketId, tickets, chatFilteredTickets]);
+  const filteredTickets = useMemo(() => {
+    let result = [...baseTickets];
 
-  const sortedTickets = useMemo(() => {
-    let source = isFiltered ? chatFilteredTickets : tickets;
-    let result = [...source];
-    result.sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
     if (showMyTickets) {
-      result = result.filter(ticket => ticket.technician_id === userId);
+      result = result.filter((t) => t.technician_id === userId);
     }
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter(ticket => {
+      result = result.filter((ticket) => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        const tags = ticket.tags ? ticket.tags.replace(/[{}]/g, "").split(",").map(tag => tag.trim().toLowerCase()) : [];
-        const tagMatch = tags.some(tag => tag.includes(query));
-        const phones = ticket.clients?.map(c => (String(c.phone || "").toLowerCase())) || [];
-        const phoneMatch = phones.some(phone => phone.includes(query));
+        const tags = ticket.tags
+          ? ticket.tags.replace(/[{}]/g, "").split(",").map((tag) => tag.trim().toLowerCase())
+          : [];
+        const tagMatch = tags.some((tag) => tag.includes(query));
+        const phones = ticket.clients?.map((c) => String(c.phone || "").toLowerCase()) || [];
+        const phoneMatch = phones.some((phone) => phone.includes(query));
         return idMatch || contactMatch || tagMatch || phoneMatch;
       });
     }
-    return result;
-  }, [tickets, chatFilteredTickets, showMyTickets, searchQuery, isFiltered]);
 
-  const ChatItem = ({ index, style }) => (
-    <ChatListItem chat={sortedTickets[index]} style={style} selectTicketId={selectTicketId} />
+    return result;
+  }, [baseTickets, showMyTickets, searchQuery, userId]);
+
+  const sortedTickets = useMemo(() => {
+    return [...filteredTickets].sort(
+      (a, b) => getLastMessageTime(b) - getLastMessageTime(a)
+    );
+  }, [filteredTickets]);
+
+  useEffect(() => {
+    if (chatListRef.current && ticketId) {
+      const element = chatListRef.current.querySelector(`[data-ticket-id="${ticketId}"]`);
+      if (element) {
+        element.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+    }
+  }, [ticketId]);
+
+  const ChatItem = useCallback(
+    ({ index, style }) => (
+      <ChatListItem
+        chat={sortedTickets[index]}
+        style={style}
+        selectTicketId={ticketId}
+      />
+    ),
+    [sortedTickets, ticketId]
   );
+
+  const handleFilterApply = (filters) => {
+    if (!isEqual(filters, chatFilters)) {
+      fetchChatFilteredTickets(filters);
+      setChatFilters(filters);
+      setIsFiltered(true);
+    }
+    setOpenFilter(false);
+  };
 
   return (
     <>
@@ -123,6 +143,7 @@ const ChatList = ({ selectTicketId }) => {
         </Flex>
 
         <Divider />
+
         <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
           {sortedTickets.length === 0 ? (
             <Flex h="100%" align="center" justify="center" px="md">
@@ -160,12 +181,7 @@ const ChatList = ({ selectTicketId }) => {
           },
         }}
       >
-        <Tabs
-          defaultValue="filter_ticket"
-          className="leads-modal-filter-tabs"
-          h="100%"
-          pb="48"
-        >
+        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%" pb="48">
           <Tabs.List>
             <Tabs.Tab value="filter_ticket">
               {getLanguageByKey("Filtru pentru Lead")}
@@ -179,7 +195,7 @@ const ChatList = ({ selectTicketId }) => {
             <TicketFormTabs
               orientation="horizontal"
               onClose={() => setOpenFilter(false)}
-              onSubmit={filterChatList}
+              onSubmit={handleFilterApply}
               loading={chatSpinner}
               initialData={chatFilters}
             />
@@ -188,7 +204,7 @@ const ChatList = ({ selectTicketId }) => {
           <Tabs.Panel value="filter_message" pt="xs">
             <MessageFilterForm
               onClose={() => setOpenFilter(false)}
-              onSubmit={filterChatList}
+              onSubmit={handleFilterApply}
               loading={chatSpinner}
               initialData={chatFilters}
             />

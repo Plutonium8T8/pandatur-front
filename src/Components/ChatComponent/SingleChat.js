@@ -7,7 +7,7 @@ import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
 import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
-const SingleChat = ({ id, onClose, tasks = [] }) => {
+const SingleChat = ({ ticketId, onClose, tasks = [] }) => {
   const { setTickets } = useApp();
   const { getUserMessages } = useMessagesContext();
 
@@ -20,15 +20,15 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
     setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
-  } = useFetchTicketChat(id);
+  } = useFetchTicketChat(ticketId);
 
   const responsibleId = personalInfo?.technician_id?.toString() ?? null;
 
   useEffect(() => {
-    if (id) {
-      getUserMessages(Number(id));
+    if (ticketId) {
+      getUserMessages(Number(ticketId));
     }
-  }, [id]);
+  }, [ticketId]);
 
   return (
     <div className="chat-container">
@@ -44,7 +44,7 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
         <Flex w="70%">
           <ChatMessages
             selectedClient={selectedUser}
-            selectTicketId={id ? Number(id) : undefined}
+            ticketId={ticketId ? Number(ticketId) : undefined}
             personalInfo={personalInfo}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
@@ -59,8 +59,7 @@ const SingleChat = ({ id, onClose, tasks = [] }) => {
       >
         <ChatExtraInfo
           selectedUser={selectedUser}
-          ticketId={id}
-          selectTicketId={id}
+          ticketId={ticketId}
           updatedTicket={personalInfo}
           onUpdatePersonalInfo={(payload, values) => {
             const identifier =

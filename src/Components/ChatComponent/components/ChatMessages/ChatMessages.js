@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
-import { useUser, useMessagesContext, useFetchTicketChat } from "@hooks";
+import { useUser, useMessagesContext } from "@hooks";
 import { api } from "@api";
 import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
 import { Spin } from "@components";
@@ -20,7 +20,7 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
 };
 
 export const ChatMessages = ({
-  selectTicketId,
+  ticketId,
   selectedClient,
   personalInfo,
   messageSendersByPlatform,
@@ -29,9 +29,6 @@ export const ChatMessages = ({
   technicians,
 }) => {
   const { userId } = useUser();
-
-  const { setMessageSendersByPlatform, setSelectedUser } =
-    useFetchTicketChat(selectTicketId);
 
   const {
     setMessages,
@@ -54,9 +51,7 @@ export const ChatMessages = ({
 
       setMessages((prevMessages) => [...prevMessages, normalizedMessage]);
 
-
       let apiUrl = api.messages.send.create;
-
       const normalizedPlatform = metadataMsj.platform?.toUpperCase?.();
 
       if (normalizedPlatform === "TELEGRAM") {
@@ -69,20 +64,19 @@ export const ChatMessages = ({
 
       await apiUrl(metadataMsj);
 
-      setMessages((prev) => {
-        return prev.map((msj) =>
+      setMessages((prev) =>
+        prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
-        );
-      });
+        )
+      );
     } catch (error) {
-      setMessages((prev) => {
-        return prev.map((msj) =>
+      setMessages((prev) =>
+        prev.map((msj) =>
           getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
-        );
-      });
+        )
+      );
     }
     console.log("📨 sending via:", metadataMsj.platform);
-
   };
 
   const handleScroll = () => {
@@ -99,7 +93,7 @@ export const ChatMessages = ({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages, selectTicketId]);
+  }, [messages, ticketId]);
 
   useEffect(() => {
     const container = messageContainerRef.current;
@@ -114,13 +108,10 @@ export const ChatMessages = ({
   }, []);
 
   useEffect(() => {
-    if (selectTicketId) {
-      setSelectedUser({});
-      setMessageSendersByPlatform([]);
-
-      getUserMessages(Number(selectTicketId));
+    if (ticketId) {
+      getUserMessages(Number(ticketId));
     }
-  }, [selectTicketId]);
+  }, [ticketId]);
 
   const renderMessagesContent = () => {
     if (messages.error) {
@@ -140,11 +131,11 @@ export const ChatMessages = ({
       );
     }
 
-    if (selectTicketId) {
+    if (ticketId) {
       return (
         <GroupedMessages
           personalInfo={personalInfo}
-          selectTicketId={selectTicketId}
+          ticketId={ticketId}
           technicians={technicians}
         />
       );
@@ -172,30 +163,28 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {selectTicketId && !messagesLoading && (
+      {ticketId && !messagesLoading && (
         <>
           <TaskListOverlay
-            ticketId={selectTicketId}
+            ticketId={ticketId}
             creatingTask={creatingTask}
             setCreatingTask={setCreatingTask}
           />
           <ChatInput
             loading={loading}
-            id={selectTicketId}
+            id={ticketId}
             clientList={messageSendersByPlatform}
-            ticketId={selectTicketId}
+            ticketId={ticketId}
             unseenCount={personalInfo?.unseen_count || 0}
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {
-              if (!selectedClient.payload) {
-                return;
-              }
+              if (!selectedClient.payload) return;
               sendMessage({
                 sender_id: Number(userId),
-                client_id: selectedClient.payload?.id,
-                platform: selectedClient.payload?.platform,
-                ticket_id: selectTicketId,
+                client_id: selectedClient.payload.id,
+                platform: selectedClient.payload.platform,
+                ticket_id: ticketId,
                 time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
                 messageStatus: MESSAGES_STATUS.PENDING,
                 ...value,
@@ -204,9 +193,7 @@ export const ChatMessages = ({
             onChangeClient={(value) => {
               if (!value) return;
               const [clientId, platform] = value.split("-");
-              const selectUserId = Number(clientId);
-
-              onChangeSelectedUser(selectUserId, platform);
+              onChangeSelectedUser(Number(clientId), platform);
             }}
           />
         </>

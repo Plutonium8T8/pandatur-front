@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
-import { useMessagesContext, useGetTechniciansList } from "@hooks";
+import { useMessagesContext } from "@hooks";
 import { DD_MM_YYYY } from "@app-constants";
 import {
   parseServerDate,
@@ -13,18 +13,17 @@ import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const GroupedMessages = ({ personalInfo, selectTicketId }) => {
+export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
   const { messages } = useMessagesContext();
-  const { technicians } = useGetTechniciansList();
 
   const technicianMap = useMemo(() => {
     const map = new Map();
-    technicians.forEach((t) => map.set(t.value, t));
+    technicians?.forEach((t) => map.set(t.value, t));
     return map;
   }, [technicians]);
 
   const sortedMessages = messages
-    .filter((msg) => msg.ticket_id === selectTicketId)
+    .filter((msg) => msg.ticket_id === ticketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
 
   const groupedMessages = [];

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
-import { api } from "@api";
+import { api } from "../api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
 import { useMessagesContext } from "@hooks";
 

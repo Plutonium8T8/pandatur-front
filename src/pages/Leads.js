@@ -292,7 +292,7 @@ export const Leads = () => {
         height="100%"
         onClose={closeChatModal}
       >
-        <SingleChat id={ticketId} onClose={closeChatModal} />
+        <SingleChat ticketId={ticketId} onClose={closeChatModal} />
       </MantineModal>
 
       <Modal

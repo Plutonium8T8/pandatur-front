@@ -33,7 +33,7 @@ const ChatExtraInfo = ({
 
   const { setTickets } = useApp();
   const { getUserMessages, mediaFiles } = useMessagesContext();
-  const { getTicket } = useFetchTicketChat(selectTicketId);
+  const { getTicket } = useFetchTicketChat(ticketId);
 
   const {
     form,
@@ -48,7 +48,7 @@ const ChatExtraInfo = ({
    */
   const fetchTicketLight = async (mergedTicketId) => {
     try {
-      await Promise.all([getTicket(), getUserMessages(selectTicketId)]);
+      await Promise.all([getTicket(), getUserMessages(ticketId)]);
       setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -69,7 +69,7 @@ const ChatExtraInfo = ({
     setIsLoadingGeneral(true);
     try {
       await api.tickets.updateById({
-        id: [selectTicketId],
+        id: [ticketId],
         ...values,
       });
       enqueueSnackbar(
@@ -105,7 +105,7 @@ const ChatExtraInfo = ({
    * @param {() => void} resetField
    */
   const mergeClientsData = async (id, resetField) => {
-    const ticketOld = selectTicketId;
+    const ticketOld = ticketId;
 
     setIsLoadingCombineLead(true);
     try {
@@ -174,10 +174,10 @@ const ChatExtraInfo = ({
   };
 
   useEffect(() => {
-    if (selectTicketId) {
-      fetchTicketExtraInfo(selectTicketId);
+    if (ticketId) {
+      fetchTicketExtraInfo(ticketId);
     }
-  }, [selectTicketId]);
+  }, [ticketId]);
 
   const handleSubmitAllForms = async () => {
     const values = form.getValues();
@@ -219,7 +219,7 @@ const ChatExtraInfo = ({
       setIsLoadingGeneral(true);
 
       await api.tickets.updateById({
-        id: [selectTicketId],
+        id: [ticketId],
         ...generalFields,
       });
 
@@ -230,7 +230,7 @@ const ChatExtraInfo = ({
         email
       });
 
-      await api.tickets.ticket.create(selectTicketId, extraFields);
+      await api.tickets.ticket.create(ticketId, extraFields);
 
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
@@ -381,7 +381,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="media" h="100%">
           <Box pb="md" pr="md" pl="md" h="100%">
-            <Media messages={mediaFiles} id={selectTicketId} />
+            <Media messages={mediaFiles} id={ticketId} />
           </Box>
         </Tabs.Panel>
 

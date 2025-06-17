@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useFetchTicketChat, useGetTechniciansList } from "@hooks";
+import { useApp, useFetchTicketChat } from "@hooks";
+import { useGetTechniciansList } from "../hooks";
 import ChatExtraInfo from "@components/ChatComponent/ChatExtraInfo";
 import ChatList from "@components/ChatComponent/ChatList";
 import { getFullName } from "@utils";
@@ -11,11 +12,14 @@ import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
   const { setTickets } = useApp();
-  const { ticketId } = useParams();
-  const { technicians } = useGetTechniciansList();
-  const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const { ticketId: ticketIdParam } = useParams();
+  const ticketId = Number(ticketIdParam);
 
-  const ticketIdToNumber = ticketId ? Number(ticketId) : undefined;
+  const { technicians } = useGetTechniciansList();
+  // console.log("🧪 Chat.jsx -> technicians:", technicians);
+  // console.log("🚀 Chat mounted");
+
+  const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const {
     personalInfo,
@@ -33,9 +37,7 @@ export const Chat = () => {
   return (
     <Flex h="100%" className="chat-wrapper">
       <Flex w="100%" h="100%" className="chat-container">
-        {isChatListVisible && (
-          <ChatList selectTicketId={ticketIdToNumber} />
-        )}
+        {isChatListVisible && <ChatList ticketId={ticketId} />}
 
         <Can
           permission={{ module: "chat", action: "edit" }}
@@ -56,7 +58,7 @@ export const Chat = () => {
             </Box>
 
             <ChatMessages
-              selectTicketId={ticketIdToNumber}
+              ticketId={ticketId}
               selectedClient={selectedUser}
               personalInfo={personalInfo}
               messageSendersByPlatform={messageSendersByPlatform || []}
@@ -75,14 +77,14 @@ export const Chat = () => {
             <ChatExtraInfo
               selectedUser={selectedUser}
               ticketId={ticketId}
-              selectTicketId={ticketIdToNumber}
+              updatedTicket={personalInfo}
               onUpdatePersonalInfo={(payload, values) => {
                 const identifier =
                   getFullName(values.name, values.surname) || `#${payload.id}`;
                 const clientTicketList = personalInfo.clients.map((client) =>
                   client.id === payload.id
                     ? { ...client, ...values }
-                    : client,
+                    : client
                 );
 
                 setSelectedUser((prev) => ({
@@ -100,16 +102,20 @@ export const Chat = () => {
                         label: `${identifier} - ${payload.platform}`,
                         payload: { ...payload, ...values },
                       }
-                      : client,
-                  ),
+                      : client
+                  )
                 );
 
                 setTickets((prev) =>
                   prev.map((ticket) =>
                     ticket.id === personalInfo.id
-                      ? { ...ticket, ...personalInfo, clients: clientTicketList }
-                      : ticket,
-                  ),
+                      ? {
+                        ...ticket,
+                        ...personalInfo,
+                        clients: clientTicketList,
+                      }
+                      : ticket
+                  )
                 );
 
                 setPersonalInfo((prev) => ({
@@ -117,7 +123,6 @@ export const Chat = () => {
                   clients: clientTicketList,
                 }));
               }}
-              updatedTicket={personalInfo}
             />
           </Can>
         )}
