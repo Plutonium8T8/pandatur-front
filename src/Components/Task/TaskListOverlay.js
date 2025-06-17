@@ -332,7 +332,6 @@ const TaskListOverlay = ({
                     variant="filled"
                     onClick={() => handleMarkDone(id)}
                     leftSection={<FaCheck />}
-                    disabled={!taskEdits[id]?.description?.trim()}
                   >
                     {translations["Done"][language]}
                   </Button>
