@@ -142,6 +142,8 @@ const TaskList = ({
             checked={allSelected}
             indeterminate={
               selectedRow.length > 0 && selectedRow.length < tasks.length
+                ? true
+                : undefined
             }
             onChange={() => {
               setSelectedRow(allSelected ? [] : tasks.map((t) => t.id));
