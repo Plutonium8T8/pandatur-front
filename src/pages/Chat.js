@@ -67,7 +67,7 @@ export const Chat = () => {
           </Flex>
         </Can>
 
-        {ticketId && (
+        {!isNaN(ticketId) && (
           <Can
             permission={{ module: "chat", action: "edit" }}
             context={{ responsibleId }}
