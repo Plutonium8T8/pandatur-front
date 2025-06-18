@@ -16,6 +16,7 @@ import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
 import { AppContext } from "../contexts/AppContext";
+import { useNavigate } from "react-router-dom";
 
 export const AddLeadModal = ({
   open,
@@ -27,6 +28,7 @@ export const AddLeadModal = ({
   const { enqueueSnackbar } = useSnackbar();
   const [loading, handlers] = useDisclosure(false);
   const { workflowOptions, groupTitleForApi } = useContext(AppContext);
+  const navigate = useNavigate();
 
   const form = useForm({
     mode: "uncontrolled",
@@ -58,10 +60,17 @@ export const AddLeadModal = ({
   const createTicket = async (values) => {
     handlers.open();
     try {
-      await api.tickets.createTickets({ ...values, technician_id: userId });
+      const response = await api.tickets.createTickets({
+        ...values,
+        technician_id: userId,
+      });
+
       form.reset();
       await fetchTickets();
       onClose();
+      if (response?.ticket_id) {
+        navigate(`/leads/${response.ticket_id}`);
+      }
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {

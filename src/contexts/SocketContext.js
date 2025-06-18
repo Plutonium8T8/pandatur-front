@@ -7,7 +7,6 @@ export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
-
   const socketRef = useRef(null);
   const [val, setVal] = useState(null);
 
@@ -16,33 +15,27 @@ export const SocketProvider = ({ children }) => {
     let reconnectTimer;
 
     const connect = () => {
-      console.log("[SOCKET] Подключение к WebSocket...");
       socket = new WebSocket(process.env.REACT_APP_WS_URL);
       socketRef.current = socket;
 
-      socket.onopen = () => {
-        console.log("[SOCKET] Установлено соединение с WebSocket");
-      };
+      socket.onopen = () => { };
 
       socket.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          console.log("[SOCKET] Получено сообщение:", message);
           setVal(message);
         } catch (err) {
           console.error("[SOCKET] Ошибка при парсинге сообщения:", event.data);
         }
       };
 
-      socket.onerror = (error) => {
+      socket.onerror = () => {
         enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), {
           variant: "error",
         });
-        console.error("[SOCKET] Ошибка WebSocket:", error);
       };
 
-      socket.onclose = (event) => {
-        console.warn("[SOCKET] Соединение закрыто. Попытка реконнекта через 1с...", event.reason);
+      socket.onclose = () => {
         reconnectTimer = setTimeout(connect, 1000);
       };
     };
@@ -50,21 +43,13 @@ export const SocketProvider = ({ children }) => {
     connect();
 
     return () => {
-      if (socket) {
-        console.log("[SOCKET] Отключение от WebSocket");
-        socket.close();
-      }
+      if (socket) socket.close();
       clearTimeout(reconnectTimer);
     };
   }, []);
 
   const seenMessages = (ticketId, userId) => {
     const socketInstance = socketRef.current;
-
-    console.log("[SOCKET] Попытка отправить SEEN:");
-    console.log(" - ticketId:", ticketId);
-    console.log(" - userId:", userId);
-    console.log(" - socket.readyState:", socketInstance?.readyState);
 
     if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
       const readMessageData = {
@@ -74,11 +59,7 @@ export const SocketProvider = ({ children }) => {
           sender_id: userId,
         },
       };
-
-      console.log("[SOCKET] Отправка SEEN сообщения:", readMessageData);
       socketInstance.send(JSON.stringify(readMessageData));
-    } else {
-      console.warn("[SOCKET] WebSocket не готов (не OPEN), SEEN не отправлен");
     }
   };
 
