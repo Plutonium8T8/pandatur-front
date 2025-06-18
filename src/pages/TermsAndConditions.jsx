@@ -8,7 +8,7 @@ import {
   Flex,
   Image,
 } from "@mantine/core";
-import { getLanguageByKey } from "@utils";
+import { getLanguageByKey } from "../Components/utils";
 
 const LOGO = "/logo.png";
 
@@ -245,9 +245,26 @@ export const TermsAndConditions = () => {
           />
         </Box>
 
+        <Box mb="md">
+          <Text fw="bold" fs="italic">
+            11. {`${getLanguageByKey("UsingMetaAPIs")}`}
+          </Text>
+
+          <Text
+            c={gray}
+            size="sm"
+            style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}
+            dangerouslySetInnerHTML={{
+              __html: convertMarkdownToHTML(
+                getLanguageByKey("UsingMetaAPIsDetails"),
+              ),
+            }}
+          />
+        </Box>
+
         <Box>
           <Text fw="bold" fs="italic">
-            11. {`${getLanguageByKey("contact")}`}
+            12. {`${getLanguageByKey("contact")}`}
           </Text>
 
           <Text
