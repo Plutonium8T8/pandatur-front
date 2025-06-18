@@ -1,8 +1,7 @@
 import {
   TextInput,
   MultiSelect,
-  TagsInput,
-  Select,
+  TagsInput
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useEffect, useMemo, useContext } from "react";
@@ -29,15 +28,12 @@ export const BasicGeneralFormFilter = ({
 
   const form = useForm({
     mode: "uncontrolled",
-    transformValues: ({ workflow, priority, contact, tags, technician_id, action_needed, unseen_count, autor_messages }) => ({
+    transformValues: ({ workflow, priority, contact, tags, technician_id }) => ({
       workflow: workflow ?? workflowOptions,
       priority: priority ?? undefined,
       contact: contact ?? undefined,
       tags: tags ?? undefined,
-      technician_id: technician_id ?? undefined,
-      action_needed: action_needed ?? undefined,
-      unseen_count: unseen_count ?? undefined,
-      autor_messages: autor_messages ?? undefined,
+      technician_id: technician_id ?? undefined
     }),
   });
 
@@ -58,20 +54,6 @@ export const BasicGeneralFormFilter = ({
     }
   };
 
-  const handlAutorMessagesChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroup = last?.startsWith("__group__");
-
-    if (isGroup) {
-      const groupUsers = groupUserMap.get(last) || [];
-      const current = form.getValues().autor_messages || [];
-      const unique = Array.from(new Set([...current, ...groupUsers]));
-      form.setFieldValue("autor_messages", unique);
-    } else {
-      form.setFieldValue("autor_messages", val);
-    }
-  };
-
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
       form.setFieldValue("workflow", workflowOptions);
@@ -88,9 +70,6 @@ export const BasicGeneralFormFilter = ({
         contact: data.contact,
         tags: data.tags,
         technician_id: data.technician_id,
-        action_needed: data.action_needed,
-        unseen_count: data.unseen_count,
-        autor_messages: data.autor_messages,
       });
     }
   }, [data]);
@@ -103,14 +82,6 @@ export const BasicGeneralFormFilter = ({
       form.onSubmit((values) => onSubmit(values, () => form.reset()))();
     };
   }, [form, onSubmit]);
-
-  const formattedTechniciansExtended = useMemo(() => {
-    return [
-      { value: "client", label: getLanguageByKey("Client") },
-      { value: "system", label: getLanguageByKey("System") },
-      ...formatMultiSelectData(technicians),
-    ];
-  }, [technicians]);
 
   return (
     <form id={idForm}>
@@ -161,42 +132,6 @@ export const BasicGeneralFormFilter = ({
         value={form.getValues().technician_id || []}
         onChange={handleTechnicianChange}
         searchable
-      />
-
-      <MultiSelect
-        mt="md"
-        label={getLanguageByKey("Autor ultim mesaj")}
-        placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
-        clearable
-        data={formattedTechniciansExtended}
-        key={form.key("autor_messages")}
-        value={form.getValues().autor_messages || []}
-        onChange={handlAutorMessagesChange}
-        searchable
-      />
-
-      <Select
-        mt="md"
-        label={getLanguageByKey("Acțiune necesară")}
-        placeholder={getLanguageByKey("Alege")}
-        data={[
-          { value: "true", label: getLanguageByKey("Da") },
-          { value: "false", label: getLanguageByKey("Nu") },
-        ]}
-        key={form.key("action_needed")}
-        {...form.getInputProps("action_needed")}
-      />
-
-      <Select
-        mt="md"
-        label={getLanguageByKey("Mesaje necitite")}
-        placeholder={getLanguageByKey("Alege")}
-        data={[
-          { value: "true", label: getLanguageByKey("Da") },
-          { value: "false", label: getLanguageByKey("Nu") },
-        ]}
-        key={form.key("unseen_count")}
-        {...form.getInputProps("unseen_count")}
       />
     </form>
   );
