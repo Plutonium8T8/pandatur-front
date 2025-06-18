@@ -7,15 +7,14 @@ import {
   TagsInput,
   Button
 } from "@mantine/core";
-import { useForm, hasLength } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import { getLanguageByKey, showServerError } from "@utils";
-import { priorityOptions } from "../FormOptions";
+import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { api } from "@api";
 import { useUser } from "@hooks";
-import { groupTitleOptions } from "../FormOptions";
 import { AppContext } from "../contexts/AppContext";
 
 export const AddLeadModal = ({
@@ -31,15 +30,28 @@ export const AddLeadModal = ({
 
   const form = useForm({
     mode: "uncontrolled",
-    validate: {
-      name: hasLength({ min: 3 }, getLanguageByKey("mustBeAtLeast3Characters")),
-      surname: hasLength({ min: 3 }, getLanguageByKey("mustBeAtLeast3Characters")),
-      phone: (value) =>
-        value?.toString().trim() === "" || value === undefined
-          ? getLanguageByKey("fileIsMandatory")
-          : null,
-      workflow: (value) =>
-        !value ? getLanguageByKey("fileIsMandatory") : null,
+    validate: (values) => {
+      const errors = {};
+      const isContract = values.workflow === "Contract încheiat";
+
+      if (!values.workflow) {
+        errors.workflow = getLanguageByKey("fileIsMandatory");
+      }
+
+      if (!values.phone?.toString().trim()) {
+        errors.phone = getLanguageByKey("fileIsMandatory");
+      }
+
+      if (isContract) {
+        if (!values.name || values.name.length < 3) {
+          errors.name = getLanguageByKey("mustBeAtLeast3Characters");
+        }
+        if (!values.surname || values.surname.length < 3) {
+          errors.surname = getLanguageByKey("mustBeAtLeast3Characters");
+        }
+      }
+
+      return errors;
     },
   });
 
@@ -66,11 +78,9 @@ export const AddLeadModal = ({
   }, [selectedGroupTitle, groupTitleForApi]);
 
   return (
-
     <form onSubmit={form.onSubmit(createTicket)}>
       <Flex gap="md">
         <TextInput
-          withAsterisk
           w="100%"
           label={getLanguageByKey("Nume")}
           placeholder={getLanguageByKey("Nume")}
@@ -78,7 +88,6 @@ export const AddLeadModal = ({
           {...form.getInputProps("name")}
         />
         <TextInput
-          withAsterisk
           w="100%"
           label={getLanguageByKey("Prenume")}
           placeholder={getLanguageByKey("Prenume")}
