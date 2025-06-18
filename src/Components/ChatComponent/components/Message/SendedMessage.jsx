@@ -7,6 +7,7 @@ import { renderContent } from "../../renderContent";
 import { HH_mm, MEDIA_TYPE } from "../../../../app-constants";
 import { parseServerDate, MESSAGES_STATUS, getFullName } from "../../../utils";
 import { Call } from "./Call";
+import { socialMediaIcons } from "../../../utils";
 import "./Message.css";
 
 const DEFAULT_SENDER_NAME = "Panda Tur";
@@ -95,6 +96,7 @@ export const SendedMessage = ({
                 <Text fw="bold" size="sm">
                   {senderName}
                 </Text>
+                {socialMediaIcons[msg.platform] || null}
               </Flex>
 
               {renderContent(msg)}
