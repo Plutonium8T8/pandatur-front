@@ -2,7 +2,6 @@ import {
   TextInput,
   Title,
   Box,
-  NumberInput,
   ActionIcon,
   Flex,
   Button,
@@ -16,20 +15,24 @@ import { enqueueSnackbar } from "notistack";
 
 export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   const [showSave, setShowSave] = useState(false);
+  const [phoneValue, setPhoneValue] = useState("");
 
   useEffect(() => {
     if (data && !showSave) {
-      formInstance.setValues({
+      const values = {
         name: data.name || "",
         surname: data.surname || "",
         phone: data.phone || "",
         email: data.email || "",
-      });
+      };
+      formInstance.setValues(values);
+      setPhoneValue(values.phone);
     }
   }, [data, showSave]);
 
   const handleAddClient = () => {
     formInstance.setValues({ name: "", surname: "", phone: "", email: "" });
+    setPhoneValue("");
     setShowSave(true);
   };
 
@@ -54,13 +57,21 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   const handleCancel = () => {
     setShowSave(false);
     if (data) {
-      formInstance.setValues({
+      const values = {
         name: data.name || "",
         surname: data.surname || "",
         phone: data.phone || "",
         email: data.email || "",
-      });
+      };
+      formInstance.setValues(values);
+      setPhoneValue(values.phone);
     }
+  };
+
+  const handlePhoneChange = (e) => {
+    const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
+    setPhoneValue(onlyDigits);
+    formInstance.setFieldValue("phone", onlyDigits);
   };
 
   return (
@@ -96,13 +107,13 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         {...formInstance.getInputProps("email")}
       />
 
-      <NumberInput
-        hideControls
+      <TextInput
         mt="md"
         label={getLanguageByKey("Telefon")}
         placeholder={getLanguageByKey("Telefon")}
-        key={formInstance.key("phone")}
-        {...formInstance.getInputProps("phone")}
+        value={phoneValue}
+        onChange={handlePhoneChange}
+        inputMode="numeric"
       />
 
       {showSave && (
