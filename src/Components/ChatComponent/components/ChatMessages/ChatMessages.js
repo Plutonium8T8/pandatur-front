@@ -76,7 +76,6 @@ export const ChatMessages = ({
         )
       );
     }
-    console.log("📨 sending via:", metadataMsj.platform);
   };
 
   const handleScroll = () => {
