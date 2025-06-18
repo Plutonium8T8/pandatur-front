@@ -88,20 +88,20 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                 </Flex>
 
                 <Flex direction="column" gap="xs">
-                  {messages.map((msg) => {
+                  {messages.map((msg, index) => {
                     const isClientMessage = clientIds.includes(msg.sender_id);
                     const technician = technicianMap.get(Number(msg.sender_id));
 
                     return isClientMessage ? (
                       <ReceivedMessage
-                        key={`${msg.id ?? ""}-${msg.time_sent}`}
+                        key={`${msg.id}-${index}`}
                         msg={msg}
                         personalInfo={personalInfo}
                         technicians={technicians}
                       />
                     ) : (
                       <SendedMessage
-                        key={`${msg.id ?? ""}-${msg.time_sent}`}
+                        key={`${msg.id}-${index}`}
                         msg={msg}
                         technician={technician}
                         technicians={technicians}
