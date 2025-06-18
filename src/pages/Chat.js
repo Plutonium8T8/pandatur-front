@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
@@ -13,7 +13,10 @@ import Can from "@components/CanComponent/Can";
 export const Chat = () => {
   const { setTickets } = useApp();
   const { ticketId: ticketIdParam } = useParams();
-  const ticketId = Number(ticketIdParam);
+  const ticketId = useMemo(() => {
+    const parsed = Number(ticketIdParam);
+    return Number.isNaN(parsed) ? undefined : parsed;
+  }, [ticketIdParam]);
 
   const { technicians } = useGetTechniciansList();
 
