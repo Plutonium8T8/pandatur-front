@@ -3056,6 +3056,16 @@ export const translations = {
     RU: "Panda Tur оставляет за собой право периодически изменять настоящий документ. Изменения вступают в силу с момента их публикации на сайте.",
     EN: "Panda Tur reserves the right to periodically modify this document. Changes take effect upon publication on the website."
   },
+  UsingMetaAPIs: {
+    RO: "Utilizarea API-urilor Meta",
+    RU: "Использование API Meta",
+    EN: "Using Meta APIs"
+  },
+  UsingMetaAPIsDetails: {
+    RO: "Panda Tur utilizează API-urile Meta (WhatsApp Cloud API, Instagram Graph API, Facebook Messenger API) exclusiv pentru a comunica cu propriii clienți și pentru a oferi suport în cadrul serviciilor sale turistice. Nu furnizăm servicii de integrare sau procesare a mesajelor pentru alte afaceri. Nu oferim API-ul nostru sau infrastructura noastră altor companii. Utilizarea API-urilor este strict limitată la scopuri proprii, în cadrul activității Panda Tur.",
+    RU: "Panda Tur использует API Meta (WhatsApp Cloud API, Instagram Graph API, Facebook Messenger API) исключительно для общения с собственными клиентами и оказания поддержки в рамках своих туристических услуг. Мы не предоставляем услуги интеграции или обработки сообщений для других компаний. Мы не предоставляем наш API или инфраструктуру другим организациям. Использование API строго ограничено внутренними целями компании Panda Tur.",
+    EN: "Panda Tur uses Meta APIs (WhatsApp Cloud API, Instagram Graph API, Facebook Messenger API) exclusively to communicate with its own clients and provide support within its travel services. We do not offer integration or message processing services for other businesses. We do not provide our API or infrastructure to other companies. API usage is strictly limited to internal purposes within Panda Tur's operations."
+  },
   contact: {
     RO: "Contact",
     RU: "Контакт",
