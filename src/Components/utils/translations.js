@@ -3255,5 +3255,10 @@ export const translations = {
     RO: "Selectează autor ultim mesaj",
     RU: "Выберите автора последнего сообщения",
     EN: "Select last message author"
-  }
+  },
+  "Selectează autor mesaj": {
+    RO: "Selectează autor mesaj",
+    RU: "Выберите автора сообщения",
+    EN: "Select message author"
+  },
 }

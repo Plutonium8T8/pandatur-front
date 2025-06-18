@@ -135,8 +135,8 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                 />
 
                 <MultiSelect
-                    label={getLanguageByKey("Selectează operator")}
-                    placeholder={getLanguageByKey("Selectează operator")}
+                    label={getLanguageByKey("Selectează autor mesaj")}
+                    placeholder={getLanguageByKey("Selectează autor mesaj")}
                     data={formattedTechnicians}
                     value={senderIds}
                     onChange={setSenderIds}
