@@ -118,8 +118,8 @@ export const ChatListItem = ({ chat, style, ticketId }) => {
           </Box>
         </Flex>
 
-        <Flex justify="space-between" gap="6">
-          <Box mt="4px" w="80%">
+        <Flex justify="space-between" gap="6" align="center">
+          <Box mt="4px" w="60%">
             {MESSAGE_INDICATOR[chat.last_message_type] || (
               <Text h="20px" c="dimmed" size="sm" truncate>
                 {chat.last_message}
@@ -127,7 +127,12 @@ export const ChatListItem = ({ chat, style, ticketId }) => {
             )}
           </Box>
           <Text size="sm" c="dimmed">
-            {formatDate ? formatDate.format(HH_mm) : null}
+            {formatDate ? formatDate.format("DD.MM.YYYY")
+              : null}
+          </Text>
+          <Text size="sm" c="dimmed">
+            {formatDate ? formatDate.format(HH_mm)
+              : null}
           </Text>
         </Flex>
       </Box>
