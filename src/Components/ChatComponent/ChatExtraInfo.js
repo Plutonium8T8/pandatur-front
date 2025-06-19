@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
-import { Tabs, ScrollArea, Divider, Box, Button, Text } from "@mantine/core";
+import {
+  Tabs,
+  ScrollArea,
+  Divider,
+  Box,
+  Button,
+  Text,
+  Flex,
+  Loader,
+} from "@mantine/core";
 import { getLanguageByKey, showServerError } from "@utils";
 import { api } from "../../api";
 import {
@@ -26,6 +35,7 @@ const ChatExtraInfo = ({
   selectedUser,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
+  const [isLoadingExtraInfo, setIsLoadingExtraInfo] = useState(true);
   const [isLoadingGeneral, setIsLoadingGeneral] = useState(false);
   const [isLoadingCombineLead, setIsLoadingCombineLead] = useState(false);
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
@@ -89,13 +99,14 @@ const ChatExtraInfo = ({
 
   const fetchTicketExtraInfo = async (ticketId) => {
     try {
+      setIsLoadingExtraInfo(true);
       const data = await api.tickets.ticket.getInfo(ticketId);
 
       setExtraInfo(data);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), {
-        variant: "error",
-      });
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    } finally {
+      setIsLoadingExtraInfo(false);
     }
   };
 
@@ -242,6 +253,14 @@ const ChatExtraInfo = ({
       setIsLoadingGeneral(false);
     }
   };
+
+  if (isLoadingExtraInfo) {
+    return (
+      <Flex h="100%" justify="center" align="center" maw="35%" w="100%" className="chat-extra-info-scroll-area">
+        <Loader />
+      </Flex>
+    );
+  }
 
   return (
     <ScrollArea maw="35%" w="100%" h="100%" className="chat-extra-info-scroll-area">
