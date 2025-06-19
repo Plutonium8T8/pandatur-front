@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import {
@@ -26,13 +26,13 @@ import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workfl
 import {
   SpinnerRightBottom,
   MantineModal,
-  WorkflowColumns,
   AddLeadModal,
   PageHeader,
   Spin,
 } from "@components";
+import { WorkflowColumns } from "../Components/Workflow/WorkflowColumns";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
-import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
+import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
 import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
@@ -100,6 +100,52 @@ export const Leads = () => {
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
+
+  const debouncedSearch = useDebounce(searchTerm);
+  const deleteBulkLeads = useConfirmPopup({
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
+  });
+
+  const fetchKanbanTickets = async (filters = {}) => {
+    setKanbanFilters(filters);
+    setKanbanSpinner(true);
+    setKanbanTickets([]);
+
+    try {
+      const loadPage = async (page = 1) => {
+        const res = await api.tickets.filters({
+          page,
+          type: "light",
+          group_title: groupTitleForApi,
+          attributes: {
+            ...filters,
+            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
+          },
+        });
+
+        const normalized = res.tickets.map((ticket) => ({
+          ...ticket,
+          last_message: ticket.last_message || getLanguageByKey("no_messages"),
+          time_sent: ticket.time_sent || null,
+          unseen_count: ticket.unseen_count || 0,
+        }));
+
+        setKanbanTickets((prev) => [...prev, ...normalized]);
+
+        if (page < res.pagination?.total_pages) {
+          await loadPage(page + 1);
+        } else {
+          setKanbanSpinner(false);
+        }
+      };
+
+      await loadPage(1);
+    } catch (err) {
+      enqueueSnackbar(showServerError(err), { variant: "error" });
+      setKanbanSpinner(false);
+    }
+  };
+
   const visibleTickets =
     isSearching || kanbanSpinner || kanbanFilterActive
       ? kanbanTickets
@@ -108,11 +154,6 @@ export const Leads = () => {
   const currentFetchTickets = kanbanSearchTerm?.trim()
     ? fetchKanbanTickets
     : fetchTickets;
-
-  const debouncedSearch = useDebounce(searchTerm);
-  const deleteBulkLeads = useConfirmPopup({
-    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
-  });
 
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
@@ -265,46 +306,6 @@ export const Leads = () => {
     : undefined;
 
   const hasOpenFiltersModal = isOpenKanbanFilterModal || isOpenListFilterModal;
-
-  const fetchKanbanTickets = async (filters = {}) => {
-    setKanbanFilters(filters);
-    setKanbanSpinner(true);
-    setKanbanTickets([]);
-
-    try {
-      const loadPage = async (page = 1) => {
-        const res = await api.tickets.filters({
-          page,
-          type: "light",
-          group_title: groupTitleForApi,
-          attributes: {
-            ...filters,
-            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
-          },
-        });
-
-        const normalized = res.tickets.map((ticket) => ({
-          ...ticket,
-          last_message: ticket.last_message || getLanguageByKey("no_messages"),
-          time_sent: ticket.time_sent || null,
-          unseen_count: ticket.unseen_count || 0,
-        }));
-
-        setKanbanTickets((prev) => [...prev, ...normalized]);
-
-        if (page < res.pagination?.total_pages) {
-          await loadPage(page + 1);
-        } else {
-          setKanbanSpinner(false);
-        }
-      };
-
-      await loadPage(1);
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
-      setKanbanSpinner(false);
-    }
-  };
 
   return (
     <>
