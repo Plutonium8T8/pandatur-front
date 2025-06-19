@@ -3261,4 +3261,9 @@ export const translations = {
     RU: "Выберите автора сообщения",
     EN: "Select message author"
   },
+  "Auxiliar": {
+    "RO": "Auxiliar",
+    "RU": "Auxiliar",
+    "EN": "Auxiliar"
+  }
 }

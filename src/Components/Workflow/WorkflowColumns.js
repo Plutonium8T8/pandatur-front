@@ -20,7 +20,7 @@ export const WorkflowColumns = ({
     scrollLeft: 0,
   });
 
-  const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat"];
+  const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
   const visibleWorkflows = kanbanFilterActive
     ? workflowOptions
     : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
