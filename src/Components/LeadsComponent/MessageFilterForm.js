@@ -49,6 +49,21 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
         }
     };
 
+    const handleSenderIdsChange = (val) => {
+        const last = val[val.length - 1];
+        const isGroup = last?.startsWith("__group__");
+
+        if (isGroup) {
+            const groupUsers = groupUserMap.get(last) || [];
+            const current = senderIds || [];
+            const unique = Array.from(new Set([...current, ...groupUsers]));
+            setSenderIds(unique);
+        } else {
+            setSenderIds(val);
+        }
+    };
+
+
     useEffect(() => {
         if (initialData && typeof initialData === "object") {
             setMessage(initialData.message || "");
@@ -139,7 +154,7 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                     placeholder={getLanguageByKey("Selectează autor mesaj")}
                     data={formattedTechnicians}
                     value={senderIds}
-                    onChange={setSenderIds}
+                    onChange={handleSenderIdsChange}
                     searchable
                     clearable
                 />
