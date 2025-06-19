@@ -6,11 +6,12 @@
 }
 
 .chat-item.active {
-  background-color: #eee;
+  background-color: #e6f4ea;
+  border-left: 4px solid #2f9e44;
 }
 
 .chat-item:hover {
-  background-color: #eee;
+  background-color: #f1f3f5;
   color: black;
 }
 

@@ -64,7 +64,7 @@ const MESSAGE_INDICATOR = {
   ),
 };
 
-export const ChatListItem = ({ chat, style, ticketId }) => {
+export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const navigate = useNavigate();
   const { getUserMessages } = useMessagesContext();
 
@@ -82,7 +82,7 @@ export const ChatListItem = ({ chat, style, ticketId }) => {
         pr="16px"
         pl="24px"
         key={chat.id}
-        className={`chat-item ${chat.id === ticketId ? "active" : ""} pointer`}
+        className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
         onClick={() => choseChat(chat.id)}
         data-ticket-id={chat.id}
         pos="relative"
