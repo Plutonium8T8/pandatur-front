@@ -117,7 +117,8 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
         }
         if (lastMessageAuthor.length)
             filters.last_message_author = lastMessageAuthor.map((id) => parseInt(id, 10));
-        if (action_needed) filters.action_needed = action_needed;
+        if (action_needed !== null)
+            filters.action_needed = action_needed === "true";
         if (unseen) filters.unseen = unseen;
 
         onSubmit(filters, "message");
