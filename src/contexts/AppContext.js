@@ -164,7 +164,13 @@ export const AppProvider = ({ children }) => {
           },
         });
 
-        const normalized = normalizeLightTickets(res.tickets);
+        const normalized = res.tickets.map((ticket) => ({
+          ...ticket,
+          last_message: ticket.last_message || getLanguageByKey("no_messages"),
+          time_sent: ticket.time_sent || null,
+          unseen_count: ticket.unseen_count || 0,
+        }));
+
         setKanbanTickets((prev) => [...prev, ...normalized]);
 
         if (page < res.pagination?.total_pages) {
@@ -431,17 +437,6 @@ export const AppProvider = ({ children }) => {
         setCustomGroupTitle,
         customGroupTitle,
 
-        // kanban
-        kanbanTickets,
-        fetchKanbanTickets,
-        kanbanSpinner,
-        kanbanSearchTerm,
-        setKanbanSearchTerm,
-        setKanbanTickets,
-        kanbanFilterActive,
-        setKanbanFilterActive,
-        kanbanFilters,
-        setKanbanFilters,
         //chat
         chatFilteredTickets,
         fetchChatFilteredTickets,

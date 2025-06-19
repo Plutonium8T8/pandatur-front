@@ -65,25 +65,15 @@ export const Leads = () => {
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
   const {
     tickets,
-    kanbanTickets,
-    fetchKanbanTickets,
     spinnerTickets,
     setLightTicketFilters,
     fetchTickets,
     groupTitleForApi,
     workflowOptions,
-    kanbanSearchTerm,
-    setKanbanSearchTerm,
-    setKanbanTickets,
-    kanbanSpinner,
-    kanbanFilterActive,
-    setKanbanFilterActive,
-    kanbanFilters,
-    setKanbanFilters,
     isCollapsed,
     accessibleGroupTitles,
     customGroupTitle,
-    setCustomGroupTitle,
+    setCustomGroupTitle
   } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
@@ -102,6 +92,12 @@ export const Leads = () => {
   const [hardTicketFilters, setHardTicketFilters] = useState({});
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
+  const [kanbanTickets, setKanbanTickets] = useState([]);
+  const [kanbanFilters, setKanbanFilters] = useState({});
+  const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
+  const [kanbanSpinner, setKanbanSpinner] = useState(false);
+  const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
+
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
   const visibleTickets =
@@ -269,6 +265,46 @@ export const Leads = () => {
     : undefined;
 
   const hasOpenFiltersModal = isOpenKanbanFilterModal || isOpenListFilterModal;
+
+  const fetchKanbanTickets = async (filters = {}) => {
+    setKanbanFilters(filters);
+    setKanbanSpinner(true);
+    setKanbanTickets([]);
+
+    try {
+      const loadPage = async (page = 1) => {
+        const res = await api.tickets.filters({
+          page,
+          type: "light",
+          group_title: groupTitleForApi,
+          attributes: {
+            ...filters,
+            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
+          },
+        });
+
+        const normalized = res.tickets.map((ticket) => ({
+          ...ticket,
+          last_message: ticket.last_message || getLanguageByKey("no_messages"),
+          time_sent: ticket.time_sent || null,
+          unseen_count: ticket.unseen_count || 0,
+        }));
+
+        setKanbanTickets((prev) => [...prev, ...normalized]);
+
+        if (page < res.pagination?.total_pages) {
+          await loadPage(page + 1);
+        } else {
+          setKanbanSpinner(false);
+        }
+      };
+
+      await loadPage(1);
+    } catch (err) {
+      enqueueSnackbar(showServerError(err), { variant: "error" });
+      setKanbanSpinner(false);
+    }
+  };
 
   return (
     <>
@@ -438,6 +474,10 @@ export const Leads = () => {
           onClose={() => setIsOpenKanbanFilterModal(false)}
           onApplyWorkflowFilters={setSelectedWorkflow}
           onSubmitTicket={handleApplyFilterLightTicket}
+          fetchKanbanTickets={fetchKanbanTickets}
+          setKanbanFilterActive={setKanbanFilterActive}
+          setKanbanFilters={setKanbanFilters}
+          setKanbanTickets={setKanbanTickets}
         />
       </Modal>
 
