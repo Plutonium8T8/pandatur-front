@@ -1,33 +1,58 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { Divider, Modal } from "@mantine/core";
+import {
+  Divider,
+  Modal,
+  Button,
+  ActionIcon,
+  Input,
+  SegmentedControl,
+  Flex,
+  Select,
+} from "@mantine/core";
 import {
   useDOMElementHeight,
   useApp,
   useDebounce,
   useConfirmPopup,
+  useGetTechniciansList,
 } from "@hooks";
-import { priorityOptions } from "../FormOptions";
+import {
+  priorityOptions,
+  groupTitleOptions,
+} from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
-import { LeadTable } from "@components/LeadsComponent/LeadTable";
-import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
-import { api } from "../api";
-import SingleChat from "@components/ChatComponent/SingleChat";
-import { Spin } from "@components";
-import { RefLeadsHeader } from "@components/LeadsComponent/LeadsHeader";
 import {
   SpinnerRightBottom,
   MantineModal,
   WorkflowColumns,
   AddLeadModal,
+  PageHeader,
+  Spin,
 } from "@components";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
-import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
-import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import { LeadsTableFilter } from "@components/LeadsComponent/LeadsTableFilter";
-import { useGetTechniciansList } from "../hooks";
+import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
+import SingleChat from "@components/ChatComponent/SingleChat";
+import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
+import Can from "../Components/CanComponent/Can";
+import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
+import { api } from "../api";
+import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
+import {
+  FaTrash,
+  FaEdit,
+  FaList,
+} from "react-icons/fa";
+import {
+  IoMdAdd,
+  IoMdClose,
+} from "react-icons/io";
+import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
+import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
 
 const SORT_BY = "creation_date";
 const ORDER = "DESC";
@@ -55,8 +80,11 @@ export const Leads = () => {
     setKanbanFilterActive,
     kanbanFilters,
     setKanbanFilters,
+    isCollapsed,
+    accessibleGroupTitles,
+    customGroupTitle,
+    setCustomGroupTitle,
   } = useApp();
-
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
 
@@ -81,7 +109,9 @@ export const Leads = () => {
       ? kanbanTickets
       : tickets;
 
-  const currentFetchTickets = kanbanSearchTerm?.trim() ? fetchKanbanTickets : fetchTickets;
+  const currentFetchTickets = kanbanSearchTerm?.trim()
+    ? fetchKanbanTickets
+    : fetchTickets;
 
   const debouncedSearch = useDebounce(searchTerm);
   const deleteBulkLeads = useConfirmPopup({
@@ -227,31 +257,100 @@ export const Leads = () => {
     );
   };
 
+  const groupTitleSelectData = groupTitleOptions.filter((option) =>
+    accessibleGroupTitles.includes(option.value)
+  );
+
+  const selectedTicket = (viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets).find(
+    (t) => t.id === selectedTickets?.[0]
+  );
+  const responsibleId = selectedTicket?.technician_id
+    ? String(selectedTicket.technician_id)
+    : undefined;
+
+  const hasOpenFiltersModal = isOpenKanbanFilterModal || isOpenListFilterModal;
+
   return (
     <>
-      <RefLeadsHeader
-        onChangeViewMode={handleChangeViewMode}
+      <Flex
         ref={refLeadsHeader}
-        openCreateTicketModal={openCreateTicketModal}
-        setSearchTerm={viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm}
-        searchTerm={viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm}
-        selectedTickets={selectedTickets}
-        onOpenModal={() => setIsModalOpen(true)}
-        setIsFilterOpen={() => {
-          if (viewMode === VIEW_MODE.KANBAN) {
-            setIsOpenKanbanFilterModal(true);
-          } else {
-            setIsOpenListFilterModal(true);
+        style={{ "--side-bar-width": isCollapsed ? "79px" : "249px" }}
+        className="leads-header-container"
+      >
+        <PageHeader
+          count={(viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets).length}
+          title={getLanguageByKey("Leads")}
+          extraInfo={
+            <>
+              {selectedTickets.length > 0 && (
+                <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
+                  <Button variant="danger" leftSection={<FaTrash size={16} />} onClick={deleteTicket}>
+                    {getLanguageByKey("Ștergere")} ({selectedTickets.length})
+                  </Button>
+                </Can>
+              )}
+              {selectedTickets.length > 0 && (
+                <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
+                  <Button variant="warning" leftSection={<FaEdit size={16} />} onClick={() => setIsModalOpen(true)}>
+                    {getLanguageByKey("Editare")} ({selectedTickets.length})
+                  </Button>
+                </Can>
+              )}
+              <ActionIcon
+                variant={hasOpenFiltersModal || kanbanFilterActive ? "filled" : "default"}
+                size="36"
+                onClick={() => {
+                  if (viewMode === VIEW_MODE.KANBAN) {
+                    setIsOpenKanbanFilterModal(true);
+                  } else {
+                    setIsOpenListFilterModal(true);
+                  }
+                }}
+              >
+                <LuFilter size={16} />
+              </ActionIcon>
+              <Input
+                value={viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm}
+                onChange={(e) =>
+                  (viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm)(e.target.value)
+                }
+                placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+                className="min-w-300"
+                rightSectionPointerEvents="all"
+                rightSection={
+                  (viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm) && (
+                    <IoMdClose
+                      className="pointer"
+                      onClick={() =>
+                        (viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm)("")
+                      }
+                    />
+                  )
+                }
+              />
+              <Select
+                placeholder={getLanguageByKey("filter_by_group")}
+                value={customGroupTitle ?? groupTitleForApi}
+                data={groupTitleSelectData}
+                onChange={setCustomGroupTitle}
+              />
+              <SegmentedControl
+                onChange={handleChangeViewMode}
+                value={viewMode}
+                data={[
+                  { value: VIEW_MODE.KANBAN, label: <TbLayoutKanbanFilled /> },
+                  { value: VIEW_MODE.LIST, label: <FaList /> },
+                ]}
+              />
+              <Can permission={{ module: "leads", action: "create" }}>
+                <Button onClick={openCreateTicketModal} leftSection={<IoMdAdd size={16} />}>
+                  {getLanguageByKey("Adaugă lead")}
+                </Button>
+              </Can>
+            </>
           }
-        }}
-        deleteTicket={deleteTicket}
-        totalTicketsFiltered={
-          viewMode === VIEW_MODE.LIST
-            ? hardTickets.length
-            : visibleTickets.length
-        } hasOpenFiltersModal={isOpenKanbanFilterModal || isOpenListFilterModal}
-        tickets={viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets}
-      />
+        />
+      </Flex>
 
       <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
         <Divider mb="md" />
