@@ -8,9 +8,10 @@ export const WorkflowColumns = ({
   searchTerm,
   onEditTicket,
   fetchTickets,
+  kanbanFilterActive
 }) => {
   const { technicians } = useGetTechniciansList();
-  const { workflowOptions, isCollapsed, kanbanFilterActive } = useApp();
+  const { workflowOptions, isCollapsed } = useApp();
 
   const wrapperRef = useRef(null);
   const dragRef = useRef({

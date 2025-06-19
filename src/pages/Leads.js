@@ -284,6 +284,8 @@ export const Leads = () => {
     setIsOpenKanbanFilterModal(false);
   };
 
+  console.log("selectedWorkflow", selectedWorkflow);
+
   const handlePaginationWorkflow = (page) => {
     setCurrentPage(page);
   };
@@ -408,6 +410,7 @@ export const Leads = () => {
           />
         ) : (
           <WorkflowColumns
+            kanbanFilterActive={kanbanFilterActive}
             fetchTickets={currentFetchTickets}
             selectedWorkflow={selectedWorkflow}
             tickets={visibleTickets}
