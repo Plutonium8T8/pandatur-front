@@ -1,9 +1,13 @@
+import {
+  useState,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { Tabs, Flex, ScrollArea } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import {
   TicketInfoFormFilter,
   ContractFormFilter,
-  InvoiceFormFilter,
   QualityControlFormFilter,
   BasicGeneralFormFilter,
 } from "./components";
@@ -16,94 +20,95 @@ const formIds = {
   invoice: "invoiceForm",
 };
 
-export const TicketFormTabs = ({
-  onClose,
-  onSubmit,
-  loading,
-  initialData,
-  orientation = "vertical",
-}) => {
-  return (
-    <Tabs
-      h="100%"
-      defaultValue="filter_general_info"
-      orientation={orientation}
-      className="leads-modal-filter-tabs"
-    >
-      <Tabs.List>
-        <Tabs.Tab value="filter_general_info">
-          {getLanguageByKey("Informații generale")}
-        </Tabs.Tab>
-        <Tabs.Tab value="filter_ticket_info">
-          {getLanguageByKey("Informații despre tichet")}
-        </Tabs.Tab>
-        <Tabs.Tab value="filter_contract">
-          {getLanguageByKey("Contract")}
-        </Tabs.Tab>
-        {/* <Tabs.Tab value="filter_invoice">
-          {getLanguageByKey("Invoice")}
-        </Tabs.Tab> */}
-        <Tabs.Tab value="filter_quality_control">
-          {getLanguageByKey("Control calitate")}
-        </Tabs.Tab>
-      </Tabs.List>
+export const TicketFormTabs = forwardRef(
+  (
+    {
+      onClose,
+      loading,
+      initialData,
+      orientation = "vertical",
+    },
+    ref
+  ) => {
+    const [generalData, setGeneralData] = useState({});
+    const [ticketInfoData, setTicketInfoData] = useState({});
+    const [contractData, setContractData] = useState({});
+    const [qualityData, setQualityData] = useState({});
 
-      <Tabs.Panel
-        className="general-information-filter"
-        pl="lg"
-        value="filter_general_info"
+    useImperativeHandle(ref, () => ({
+      getValues: () => ({
+        ...generalData,
+        ...ticketInfoData,
+        ...contractData,
+        ...qualityData,
+      }),
+    }));
+
+    return (
+      <Tabs
+        h="100%"
+        defaultValue="filter_general_info"
+        orientation={orientation}
+        className="leads-modal-filter-tabs"
       >
-        <Flex direction="column" justify="space-between" h="100%">
-          <BasicGeneralFormFilter
-            data={initialData}
-            loading={loading}
-            onClose={onClose}
-            onSubmit={onSubmit}
-            formId={formIds.general}
-          />
-        </Flex>
-      </Tabs.Panel>
+        <Tabs.List>
+          <Tabs.Tab value="filter_general_info">
+            {getLanguageByKey("Informații generale")}
+          </Tabs.Tab>
+          <Tabs.Tab value="filter_ticket_info">
+            {getLanguageByKey("Informații despre tichet")}
+          </Tabs.Tab>
+          <Tabs.Tab value="filter_contract">
+            {getLanguageByKey("Contract")}
+          </Tabs.Tab>
+          <Tabs.Tab value="filter_quality_control">
+            {getLanguageByKey("Control calitate")}
+          </Tabs.Tab>
+        </Tabs.List>
 
-      <Tabs.Panel pl="lg" value="filter_ticket_info">
-        <ScrollArea h="100%">
-          <TicketInfoFormFilter
-            data={initialData}
-            hideDisabledInput
-            onSubmit={onSubmit}
-            formId={formIds.ticketInfo}
-          />
-        </ScrollArea>
-      </Tabs.Panel>
+        <Tabs.Panel value="filter_general_info" pl="lg">
+          <Flex direction="column" justify="space-between" h="100%">
+            <BasicGeneralFormFilter
+              data={initialData}
+              loading={loading}
+              onClose={onClose}
+              onSubmit={(values) => setGeneralData(values)}
+              formId={formIds.general}
+            />
+          </Flex>
+        </Tabs.Panel>
 
-      <Tabs.Panel pl="lg" value="filter_contract">
-        <ScrollArea h="100%">
-          <ContractFormFilter
-            data={initialData}
-            hideDisabledInput
-            onSubmit={onSubmit}
-            formId={formIds.contract}
-          />
-        </ScrollArea>
-      </Tabs.Panel>
+        <Tabs.Panel value="filter_ticket_info" pl="lg">
+          <ScrollArea h="100%">
+            <TicketInfoFormFilter
+              data={initialData}
+              hideDisabledInput
+              onSubmit={(values) => setTicketInfoData(values)}
+              formId={formIds.ticketInfo}
+            />
+          </ScrollArea>
+        </Tabs.Panel>
 
-      <Tabs.Panel pl="lg" value="filter_invoice">
-        <Flex direction="column" justify="space-between" h="100%">
-          <InvoiceFormFilter
-            data={initialData}
-            onSubmit={onSubmit}
-            formId={formIds.invoice}
-          />
-        </Flex>
-      </Tabs.Panel>
+        <Tabs.Panel value="filter_contract" pl="lg">
+          <ScrollArea h="100%">
+            <ContractFormFilter
+              data={initialData}
+              hideDisabledInput
+              onSubmit={(values) => setContractData(values)}
+              formId={formIds.contract}
+            />
+          </ScrollArea>
+        </Tabs.Panel>
 
-      <Tabs.Panel pl="lg" value="filter_quality_control">
-        <Flex direction="column" justify="space-between" h="100%">
-          <QualityControlFormFilter
-            data={initialData}
-            onSubmit={onSubmit}
-          />
-        </Flex>
-      </Tabs.Panel>
-    </Tabs>
-  );
-};
+        <Tabs.Panel value="filter_quality_control" pl="lg">
+          <Flex direction="column" justify="space-between" h="100%">
+            <QualityControlFormFilter
+              data={initialData}
+              onSubmit={(values) => setQualityData(values)}
+            />
+          </Flex>
+        </Tabs.Panel>
+      </Tabs>
+    );
+  }
+);

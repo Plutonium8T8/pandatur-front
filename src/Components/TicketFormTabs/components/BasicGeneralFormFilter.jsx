@@ -27,18 +27,31 @@ export const BasicGeneralFormFilter = ({
   const { workflowOptions } = useContext(AppContext);
 
   const form = useForm({
-    mode: "uncontrolled",
+    mode: "controlled",
+    initialValues: {
+      workflow: [],
+      priority: [],
+      contact: "",
+      tags: [],
+      technician_id: [],
+    },
     transformValues: ({ workflow, priority, contact, tags, technician_id }) => ({
-      workflow: workflow ?? workflowOptions,
-      priority: priority ?? undefined,
-      contact: contact ?? undefined,
-      tags: tags ?? undefined,
-      technician_id: technician_id ?? undefined
+      workflow: workflow?.length ? workflow : undefined,
+      priority: priority?.length ? priority : undefined,
+      contact: contact?.trim() ? contact : undefined,
+      tags: tags?.length ? tags : undefined,
+      technician_id: technician_id?.length ? technician_id : undefined,
     }),
   });
 
-  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+  const formattedTechnicians = useMemo(
+    () => formatMultiSelectData(technicians),
+    [technicians]
+  );
+  const groupUserMap = useMemo(
+    () => getGroupUserMap(technicians),
+    [technicians]
+  );
 
   const handleTechnicianChange = (val) => {
     const last = val[val.length - 1];
@@ -65,27 +78,28 @@ export const BasicGeneralFormFilter = ({
   useEffect(() => {
     if (data) {
       form.setValues({
-        workflow: data.workflow,
-        priority: data.priority,
-        contact: data.contact,
-        tags: data.tags,
-        technician_id: data.technician_id,
+        workflow: data.workflow || [],
+        priority: data.priority || [],
+        contact: data.contact || "",
+        tags: data.tags || [],
+        technician_id: data.technician_id || [],
       });
+      onSubmit?.(form.getTransformedValues());
     }
   }, [data]);
 
-  useEffect(() => {
-    const formEl = document.getElementById(idForm);
-    if (!formEl) return;
-    formEl.onsubmit = (e) => {
-      e.preventDefault();
-      form.onSubmit((values) => onSubmit(values, () => form.reset()))();
-    };
-  }, [form, onSubmit]);
-
   return (
-    <form id={idForm}>
+    <form
+      id={idForm}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const values = form.getTransformedValues();
+        console.log("[FORM SUBMIT]", values);
+        onSubmit?.(values);
+      }}
+    >
       <MultiSelect
+        name="workflow"
         label={getLanguageByKey("Workflow")}
         placeholder={getLanguageByKey("Selectează flux de lucru")}
         data={[getLanguageByKey("selectAll"), ...workflowOptions]}
@@ -96,6 +110,7 @@ export const BasicGeneralFormFilter = ({
       />
 
       <MultiSelect
+        name="priority"
         mt="md"
         label={getLanguageByKey("Prioritate")}
         placeholder={getLanguageByKey("Selectează prioritate")}
@@ -107,6 +122,7 @@ export const BasicGeneralFormFilter = ({
       />
 
       <TextInput
+        name="contact"
         mt="md"
         label={getLanguageByKey("Contact")}
         placeholder={getLanguageByKey("Selectează contact")}
@@ -115,6 +131,7 @@ export const BasicGeneralFormFilter = ({
       />
 
       <TagsInput
+        name="tags"
         mt="md"
         label={getLanguageByKey("Tag-uri")}
         placeholder={getLanguageByKey("Introdu tag-uri separate prin virgule")}
@@ -123,13 +140,13 @@ export const BasicGeneralFormFilter = ({
       />
 
       <MultiSelect
+        name="technician_id"
         mt="md"
         label={getLanguageByKey("Tehnician")}
         placeholder={getLanguageByKey("Selectează tehnician")}
         clearable
         data={formattedTechnicians}
         key={form.key("technician_id")}
-        value={form.getValues().technician_id || []}
         onChange={handleTechnicianChange}
         searchable
       />

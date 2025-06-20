@@ -107,41 +107,32 @@ export const Leads = () => {
   });
 
   const fetchKanbanTickets = async (filters = {}) => {
-    setKanbanFilters(filters);
     setKanbanSpinner(true);
+    setKanbanFilters(filters);
     setKanbanTickets([]);
 
     try {
-      const loadPage = async (page = 1) => {
-        const res = await api.tickets.filters({
-          page,
-          type: "light",
-          group_title: groupTitleForApi,
-          attributes: {
-            ...filters,
-            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
-          },
-        });
+      const res = await api.tickets.filters({
+        page: 1,
+        type: "light",
+        group_title: groupTitleForApi,
+        attributes: {
+          ...filters,
+          ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
+        },
+      });
 
-        const normalized = res.tickets.map((ticket) => ({
-          ...ticket,
-          last_message: ticket.last_message || getLanguageByKey("no_messages"),
-          time_sent: ticket.time_sent || null,
-          unseen_count: ticket.unseen_count || 0,
-        }));
-
-        setKanbanTickets((prev) => [...prev, ...normalized]);
-
-        if (page < res.pagination?.total_pages) {
-          await loadPage(page + 1);
-        } else {
-          setKanbanSpinner(false);
-        }
-      };
-
-      await loadPage(1);
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
+      const normalized = res.tickets.map(t => ({
+        ...t,
+        last_message: t.last_message || getLanguageByKey("no_messages"),
+        time_sent: t.time_sent || null,
+        unseen_count: t.unseen_count || 0,
+      }));
+      console.log("leads filtersssss aapiiii",filters);
+      setKanbanTickets(normalized);
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
       setKanbanSpinner(false);
     }
   };

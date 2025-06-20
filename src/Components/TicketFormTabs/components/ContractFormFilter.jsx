@@ -17,9 +17,8 @@ import {
 const CONTRACT_FORM_FILTER_ID = "CONTRACT_FORM_FILTER_ID";
 
 const convertStringOrUndefined = (data) => {
-  if (typeof data === "boolean") {
-    return String(data);
-  }
+  if (typeof data === "boolean") return String(data);
+  return undefined;
 };
 
 export const ContractFormFilter = ({
@@ -35,39 +34,29 @@ export const ContractFormFilter = ({
   const form = useForm({
     mode: "uncontrolled",
 
-    transformValues: ({
-      data_contractului,
-      data_avansului,
-      data_de_plata_integrala,
-      contract_trimis,
-      contract_semnat,
-      achitare_efectuata,
-      rezervare_confirmata,
-      contract_arhivat,
-      avans_euro,
-      pret_netto,
-      achitat_client,
-      control,
-      numar_de_contract,
-      ...rest
-    }) => {
-      const formattedData = {
-        numar_de_contract: numar_de_contract ?? undefined,
-        data_contractului: formatDateOrUndefined(data_contractului),
-        data_avansului: formatDateOrUndefined(data_avansului),
-        data_de_plata_integrala: formatDateOrUndefined(data_de_plata_integrala),
-        contract_trimis: convertStringOrUndefined(contract_trimis),
-        contract_semnat: convertStringOrUndefined(contract_semnat),
-        achitare_efectuata: convertStringOrUndefined(achitare_efectuata),
-        rezervare_confirmata: convertStringOrUndefined(rezervare_confirmata),
-        contract_arhivat: convertStringOrUndefined(contract_arhivat),
-        control: convertStringOrUndefined(control),
-        avans_euro: formatNumericValue(avans_euro),
-        achitat_client: formatNumericValue(achitat_client),
-        pret_netto: formatNumericValue(pret_netto),
+    transformValues: (values) => {
+      const transformed = {
+        numar_de_contract: values.numar_de_contract ?? undefined,
+        data_contractului: formatDateOrUndefined(values.data_contractului),
+        data_avansului: formatDateOrUndefined(values.data_avansului),
+        data_de_plata_integrala: formatDateOrUndefined(values.data_de_plata_integrala),
+        contract_trimis: convertStringOrUndefined(values.contract_trimis),
+        contract_semnat: convertStringOrUndefined(values.contract_semnat),
+        tour_operator: values.tour_operator ?? undefined,
+        numarul_cererii_de_la_operator: values.numarul_cererii_de_la_operator ?? undefined,
+        achitare_efectuata: convertStringOrUndefined(values.achitare_efectuata),
+        rezervare_confirmata: convertStringOrUndefined(values.rezervare_confirmata),
+        contract_arhivat: convertStringOrUndefined(values.contract_arhivat),
+        statutul_platii: values.statutul_platii ?? undefined,
+        avans_euro: formatNumericValue(values.avans_euro),
+        pret_netto: formatNumericValue(values.pret_netto),
+        achitat_client: formatNumericValue(values.achitat_client),
+        control: convertStringOrUndefined(values.control),
       };
 
-      return { ...formattedData, ...rest };
+      return Object.fromEntries(
+        Object.entries(transformed).filter(([_, v]) => v !== undefined && v !== null && v !== "")
+      );
     },
   });
 
@@ -98,9 +87,11 @@ export const ContractFormFilter = ({
     <>
       <form
         id={idForm}
-        onSubmit={form.onSubmit((values) => {
-          onSubmit(values, () => form.reset());
-        })}
+        onSubmit={(e) => {
+          e.preventDefault();
+          const values = form.getTransformedValues();
+          onSubmit?.(values, () => form.reset());
+        }}
       >
         <TextInput
           label={getLanguageByKey("Nr de contract")}

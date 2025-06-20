@@ -36,42 +36,21 @@ export const TicketInfoFormFilter = ({
 
   const form = useForm({
     mode: "uncontrolled",
-
-    transformValues: ({
-      data_venit_in_oficiu,
-      data_plecarii,
-      data_intoarcerii,
-      data_cererii_de_retur,
-      buget,
-      sursa_lead,
-      promo,
-      marketing,
-      tipul_serviciului,
-      tara,
-      tip_de_transport,
-      denumirea_excursiei_turului,
-      procesarea_achizitionarii,
-      ...rest
-    }) => {
-      const formattedData = {
-        data_plecarii: formatDateOrUndefined(data_plecarii),
-        data_venit_in_oficiu: formatDateOrUndefined(data_venit_in_oficiu),
-
-        data_intoarcerii: formatDateOrUndefined(data_intoarcerii),
-        data_cererii_de_retur: formatDateOrUndefined(data_cererii_de_retur),
-        buget: formatNumericValue(buget),
-        sursa_lead: sursa_lead ?? undefined,
-        promo: promo ?? undefined,
-        marketing: marketing ?? undefined,
-        tipul_serviciului: tipul_serviciului ?? undefined,
-        tara: tara ?? undefined,
-        tip_de_transport: tip_de_transport ?? undefined,
-        denumirea_excursiei_turului: denumirea_excursiei_turului ?? undefined,
-        procesarea_achizitionarii: procesarea_achizitionarii ?? undefined,
-      };
-
-      return { ...formattedData, ...rest };
-    },
+    transformValues: (values) => ({
+      data_plecarii: formatDateOrUndefined(values.data_plecarii),
+      data_venit_in_oficiu: formatDateOrUndefined(values.data_venit_in_oficiu),
+      data_intoarcerii: formatDateOrUndefined(values.data_intoarcerii),
+      data_cererii_de_retur: formatDateOrUndefined(values.data_cererii_de_retur),
+      buget: formatNumericValue(values.buget),
+      sursa_lead: values.sursa_lead ?? undefined,
+      promo: values.promo ?? undefined,
+      marketing: values.marketing ?? undefined,
+      tipul_serviciului: values.tipul_serviciului ?? undefined,
+      tara: values.tara ?? undefined,
+      tip_de_transport: values.tip_de_transport ?? undefined,
+      denumirea_excursiei_turului: values.denumirea_excursiei_turului ?? undefined,
+      procesarea_achizitionarii: values.procesarea_achizitionarii ?? undefined,
+    }),
   });
 
   useEffect(() => {
@@ -91,6 +70,8 @@ export const TicketInfoFormFilter = ({
         denumirea_excursiei_turului: data.denumirea_excursiei_turului,
         procesarea_achizitionarii: data.procesarea_achizitionarii,
       });
+
+      onSubmit?.(form.getTransformedValues());
     }
   }, [data]);
 
@@ -98,9 +79,10 @@ export const TicketInfoFormFilter = ({
     <>
       <form
         id={idForm}
-        onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset()),
-        )}
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSubmit?.(form.getTransformedValues());
+        }}
       >
         <NumberInput
           hideControls
