@@ -119,7 +119,11 @@ const ChatList = ({ ticketId }) => {
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
               <Badge bg="#0f824c">{sortedTickets.length}</Badge>
             </Flex>
-            <ActionIcon variant="default" size="24" onClick={() => setOpenFilter(true)}>
+            <ActionIcon
+              variant={isFiltered ? "filled" : "default"}
+              size="24"
+              onClick={() => setOpenFilter(true)}
+            >
               <LuFilter size={12} />
             </ActionIcon>
           </Flex>
