@@ -211,6 +211,11 @@ export const Leads = () => {
             ? workflowOptions
             : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
+      const cleanFilters = { ...hardTicketFilters };
+      if (cleanFilters.search?.trim() === "") {
+        delete cleanFilters.search;
+      }
+
       const response = await api.tickets.filters({
         page,
         type: "hard",
@@ -218,7 +223,7 @@ export const Leads = () => {
         sort_by: "creation_date",
         order: "DESC",
         attributes: {
-          ...hardTicketFilters,
+          ...cleanFilters,
           workflow: effectiveWorkflow,
         },
       });
@@ -284,7 +289,14 @@ export const Leads = () => {
   };
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
-    const merged = { ...hardTicketFilters, ...selectedFilters };
+    const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
+
+    const merged = {
+      ...hardTicketFilters,
+      ...selectedFilters,
+      workflow: hasWorkflow ? selectedFilters.workflow : workflowOptions,
+    };
+
     setHardTicketFilters(merged);
     setCurrentPage(1);
     setIsOpenListFilterModal(false);
