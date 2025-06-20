@@ -196,19 +196,29 @@ export const Leads = () => {
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
+
     try {
       setLoading(true);
+
+      const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+
+      const effectiveWorkflow =
+        hardTicketFilters.workflow?.length > 0
+          ? hardTicketFilters.workflow
+          : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
+
       const response = await api.tickets.filters({
         page,
-        type: HARD_TICKET,
-        sort_by: SORT_BY,
-        order: ORDER,
+        type: "hard",
         group_title: groupTitleForApi,
+        sort_by: "creation_date",
+        order: "DESC",
         attributes: {
           ...hardTicketFilters,
-          workflow: hardTicketFilters.workflow ?? workflowOptions,
+          workflow: effectiveWorkflow,
         },
       });
+
       setHardTickets(response.data);
       setTotalLeads(response.pagination?.total || 0);
     } catch (error) {
@@ -307,6 +317,15 @@ export const Leads = () => {
 
   const hasOpenFiltersModal = isOpenKanbanFilterModal || isOpenListFilterModal;
 
+  const hasHardFilters = Object.values(hardTicketFilters).some(
+    (v) =>
+      v !== undefined &&
+      v !== null &&
+      v !== "" &&
+      (!Array.isArray(v) || v.length > 0) &&
+      (typeof v !== "object" || Object.keys(v).length > 0)
+  );
+
   return (
     <>
       <Flex
@@ -334,7 +353,15 @@ export const Leads = () => {
                 </Can>
               )}
               <ActionIcon
-                variant={hasOpenFiltersModal || kanbanFilterActive ? "filled" : "default"}
+                variant={
+                  viewMode === VIEW_MODE.KANBAN
+                    ? kanbanFilterActive
+                      ? "filled"
+                      : "default"
+                    : hasHardFilters
+                      ? "filled"
+                      : "default"
+                }
                 size="36"
                 onClick={() => {
                   if (viewMode === VIEW_MODE.KANBAN) {
