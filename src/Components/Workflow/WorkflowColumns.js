@@ -8,7 +8,8 @@ export const WorkflowColumns = ({
   searchTerm,
   onEditTicket,
   fetchTickets,
-  kanbanFilterActive
+  kanbanFilterActive,
+  selectedWorkflow,
 }) => {
   const { technicians } = useGetTechniciansList();
   const { workflowOptions, isCollapsed } = useApp();
@@ -21,8 +22,11 @@ export const WorkflowColumns = ({
   });
 
   const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+
   const visibleWorkflows = kanbanFilterActive
-    ? workflowOptions
+    ? selectedWorkflow?.length
+      ? selectedWorkflow
+      : workflowOptions
     : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
   useEffect(() => {

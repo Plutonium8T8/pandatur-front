@@ -97,6 +97,7 @@ export const Leads = () => {
   const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
+  const [choiceWorkflow, setChoiceWorkflow] = useState([]);
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
@@ -111,25 +112,33 @@ export const Leads = () => {
     setKanbanFilters(filters);
     setKanbanTickets([]);
 
-    try {
-      const res = await api.tickets.filters({
-        page: 1,
-        type: "light",
-        group_title: groupTitleForApi,
-        attributes: {
-          ...filters,
-          ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
-        },
-      });
+    let currentPage = 1;
+    let totalPages = 1;
 
-      const normalized = res.tickets.map(t => ({
-        ...t,
-        last_message: t.last_message || getLanguageByKey("no_messages"),
-        time_sent: t.time_sent || null,
-        unseen_count: t.unseen_count || 0,
-      }));
-      console.log("leads filtersssss aapiiii",filters);
-      setKanbanTickets(normalized);
+    try {
+      while (currentPage <= totalPages) {
+        const res = await api.tickets.filters({
+          page: currentPage,
+          type: "light",
+          group_title: groupTitleForApi,
+          attributes: {
+            ...filters,
+            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
+          },
+        });
+
+        const normalized = res.tickets.map(t => ({
+          ...t,
+          last_message: t.last_message || getLanguageByKey("no_messages"),
+          time_sent: t.time_sent || null,
+          unseen_count: t.unseen_count || 0,
+        }));
+
+        setKanbanTickets(prev => [...prev, ...normalized]);
+
+        totalPages = res.pagination?.total_pages || 1;
+        currentPage += 1;
+      }
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {
@@ -382,26 +391,32 @@ export const Leads = () => {
 
       <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
         <Divider mb="md" />
-        {loading ? (
+        {viewMode === VIEW_MODE.LIST ? (
+          loading ? (
+            <div className="d-flex align-items-center justify-content-center h-full">
+              <Spin />
+            </div>
+          ) : (
+            <LeadTable
+              currentPage={currentPage}
+              filteredLeads={hardTickets}
+              selectTicket={selectedTickets}
+              onSelectRow={toggleSelectTicket}
+              onToggleAll={toggleSelectAll}
+              totalLeadsPages={getTotalPages(totalLeads)}
+              onChangePagination={handlePaginationWorkflow}
+              fetchTickets={() => fetchHardTickets(currentPage)}
+            />
+          )
+        ) : kanbanSpinner ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
           </div>
-        ) : viewMode === VIEW_MODE.LIST ? (
-          <LeadTable
-            currentPage={currentPage}
-            filteredLeads={hardTickets}
-            selectTicket={selectedTickets}
-            onSelectRow={toggleSelectTicket}
-            onToggleAll={toggleSelectAll}
-            totalLeadsPages={getTotalPages(totalLeads)}
-            onChangePagination={handlePaginationWorkflow}
-            fetchTickets={() => fetchHardTickets(currentPage)}
-          />
         ) : (
           <WorkflowColumns
+            selectedWorkflow={choiceWorkflow}
             kanbanFilterActive={kanbanFilterActive}
             fetchTickets={currentFetchTickets}
-            selectedWorkflow={selectedWorkflow}
             tickets={visibleTickets}
             searchTerm={debouncedSearch}
             onEditTicket={(ticket) => {
@@ -471,6 +486,7 @@ export const Leads = () => {
           setKanbanFilterActive={setKanbanFilterActive}
           setKanbanFilters={setKanbanFilters}
           setKanbanTickets={setKanbanTickets}
+          onWorkflowSelected={(workflow) => setChoiceWorkflow(workflow)}
         />
       </Modal>
 
