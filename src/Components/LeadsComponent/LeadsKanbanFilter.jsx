@@ -2,17 +2,17 @@ import { Tabs, Button, Flex } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
-import { useApp } from "../../hooks";
 import { useState } from "react";
 
-export const LeadsKanbanFilter = ({ onClose, loading, initialData }) => {
-  const {
-    fetchKanbanTickets,
-    setKanbanFilterActive,
-    setKanbanFilters,
-    setKanbanTickets,
-  } = useApp();
-
+export const LeadsKanbanFilter = ({
+  onClose,
+  loading,
+  initialData,
+  fetchKanbanTickets,
+  setKanbanFilterActive,
+  setKanbanFilters,
+  setKanbanTickets,
+}) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
 
   const handleSubmit = () => {

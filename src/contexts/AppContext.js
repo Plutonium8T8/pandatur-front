@@ -34,13 +34,6 @@ export const AppProvider = ({ children }) => {
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [customGroupTitle, setCustomGroupTitle] = useState(null);
 
-  // Kanban-specific
-  const [kanbanTickets, setKanbanTickets] = useState([]);
-  const [kanbanSpinner, setKanbanSpinner] = useState(false);
-  const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
-  const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
-  const [kanbanFilters, setKanbanFilters] = useState({});
-
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
@@ -97,7 +90,7 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
     try {
-      const excluded = ["Realizat cu succes", "Închis și nerealizat"];
+      const excluded = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
       const baseWorkflow = lightTicketFilters.workflow ?? workflowOptions;
       const filteredWorkflow = baseWorkflow.filter((w) => !excluded.includes(w));
 
@@ -141,44 +134,9 @@ export const AppProvider = ({ children }) => {
 
     setSpinnerTickets(true);
     setTickets([]);
-    setKanbanTickets([]);
     setUnreadCount(0);
 
     await getTicketsListRecursively(1, currentRequestId);
-  };
-
-  const fetchKanbanTickets = async (filters = {}) => {
-    setKanbanFilters(filters);
-    setKanbanSpinner(true);
-    setKanbanTickets([]);
-
-    try {
-      const loadPage = async (page = 1) => {
-        const res = await api.tickets.filters({
-          page,
-          type: "light",
-          group_title: groupTitleForApi,
-          attributes: {
-            ...filters,
-            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
-          },
-        });
-
-        const normalized = normalizeLightTickets(res.tickets);
-        setKanbanTickets((prev) => [...prev, ...normalized]);
-
-        if (page < res.pagination?.total_pages) {
-          await loadPage(page + 1);
-        } else {
-          setKanbanSpinner(false);
-        }
-      };
-
-      await loadPage(1);
-    } catch (err) {
-      enqueueSnackbar(showServerError(err), { variant: "error" });
-      setKanbanSpinner(false);
-    }
   };
 
   const fetchChatFilteredTickets = async (filters = {}) => {
@@ -431,17 +389,6 @@ export const AppProvider = ({ children }) => {
         setCustomGroupTitle,
         customGroupTitle,
 
-        // kanban
-        kanbanTickets,
-        fetchKanbanTickets,
-        kanbanSpinner,
-        kanbanSearchTerm,
-        setKanbanSearchTerm,
-        setKanbanTickets,
-        kanbanFilterActive,
-        setKanbanFilterActive,
-        kanbanFilters,
-        setKanbanFilters,
         //chat
         chatFilteredTickets,
         fetchChatFilteredTickets,

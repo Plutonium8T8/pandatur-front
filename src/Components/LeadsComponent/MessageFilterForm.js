@@ -10,42 +10,59 @@ import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import { MESSAGES_TYPE_OPTIONS, DD_MM_YYYY_DASH } from "../../app-constants";
 import dayjs from "dayjs";
-import { getGroupUserMap, formatMultiSelectData } from "../utils/multiSelectUtils";
-import { } from "../utils/multiSelectUtils";
+import {
+    getGroupUserMap,
+    formatMultiSelectData,
+} from "../utils/multiSelectUtils";
 
 export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
     const [message, setMessage] = useState("");
     const [mtype, setMtype] = useState(null);
     const [senderIds, setSenderIds] = useState([]);
     const [timeSent, setTimeSent] = useState([null, null]);
-    const [autorMessages, setAutorMessages] = useState([]);
-    const [actionNeeded, setActionNeeded] = useState(null);
-    const [unseenCount, setUnseenCount] = useState(null);
+    const [lastMessageAuthor, setLastMessageAuthor] = useState([]);
+    const [action_needed, setActionNeeded] = useState(null);
+    const [unseen, setUnseen] = useState(null);
 
     const { technicians = [] } = useGetTechniciansList();
 
-    const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+    const formattedTechnicians = useMemo(
+        () => formatMultiSelectData(technicians),
+        [technicians]
+    );
     const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
     const extendedTechnicians = useMemo(() => {
         return [
-            { value: "client", label: getLanguageByKey("Client") },
-            { value: "system", label: getLanguageByKey("System") },
+            { value: "0", label: getLanguageByKey("Client") },
+            { value: "1", label: getLanguageByKey("System") },
             ...formattedTechnicians,
         ];
     }, [formattedTechnicians]);
 
-    const handleAutorMessagesChange = (val) => {
+    const handleSenderIdsChange = (val) => {
         const last = val[val.length - 1];
         const isGroup = last?.startsWith("__group__");
 
         if (isGroup) {
             const groupUsers = groupUserMap.get(last) || [];
-            const current = autorMessages || [];
-            const unique = Array.from(new Set([...current, ...groupUsers]));
-            setAutorMessages(unique);
+            const unique = Array.from(new Set([...senderIds, ...groupUsers]));
+            setSenderIds(unique);
         } else {
-            setAutorMessages(val);
+            setSenderIds(val);
+        }
+    };
+
+    const handleLastMessageAuthorChange = (val) => {
+        const last = val[val.length - 1];
+        const isGroup = last?.startsWith("__group__");
+
+        if (isGroup) {
+            const groupUsers = groupUserMap.get(last) || [];
+            const unique = Array.from(new Set([...lastMessageAuthor, ...groupUsers]));
+            setLastMessageAuthor(unique);
+        } else {
+            setLastMessageAuthor(val);
         }
     };
 
@@ -72,9 +89,13 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
             } else {
                 setTimeSent([null, null]);
             }
-            setAutorMessages(initialData.autor_messages || []);
+            setLastMessageAuthor(
+                Array.isArray(initialData.last_message_author)
+                    ? initialData.last_message_author.map(String)
+                    : []
+            );
             setActionNeeded(initialData.action_needed || null);
-            setUnseenCount(initialData.unseen_count || null);
+            setUnseen(initialData.unseen || null);
         }
     }, [initialData]);
 
@@ -82,16 +103,23 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
         const filters = {};
         if (message) filters.message = message;
         if (mtype) filters.mtype = mtype;
-        if (senderIds.length) filters.sender_id = senderIds.map((id) => parseInt(id, 10));
+        if (senderIds.length)
+            filters.sender_id = senderIds.map((id) => parseInt(id, 10));
         if (timeSent?.[0] || timeSent?.[1]) {
             filters.time_sent = {
-                ...(timeSent[0] && { from: dayjs(timeSent[0]).format(DD_MM_YYYY_DASH) }),
-                ...(timeSent[1] && { to: dayjs(timeSent[1]).format(DD_MM_YYYY_DASH) }),
+                ...(timeSent[0] && {
+                    from: dayjs(timeSent[0]).format(DD_MM_YYYY_DASH),
+                }),
+                ...(timeSent[1] && {
+                    to: dayjs(timeSent[1]).format(DD_MM_YYYY_DASH),
+                }),
             };
         }
-        if (autorMessages.length) filters.autor_messages = autorMessages;
-        if (actionNeeded) filters.action_needed = actionNeeded;
-        if (unseenCount) filters.unseen_count = unseenCount;
+        if (lastMessageAuthor.length)
+            filters.last_message_author = lastMessageAuthor.map((id) => parseInt(id, 10));
+        if (action_needed !== null)
+            filters.action_needed = action_needed === "true";
+        if (unseen) filters.unseen = unseen;
 
         onSubmit(filters, "message");
     };
@@ -103,7 +131,7 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
             e.preventDefault();
             handleApply();
         };
-    }, [message, mtype, senderIds, timeSent, autorMessages, actionNeeded, unseenCount]);
+    }, [message, mtype, senderIds, timeSent, lastMessageAuthor, action_needed, unseen]);
 
     return (
         <form>
@@ -139,7 +167,7 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                     placeholder={getLanguageByKey("Selectează autor mesaj")}
                     data={formattedTechnicians}
                     value={senderIds}
-                    onChange={setSenderIds}
+                    onChange={handleSenderIdsChange}
                     searchable
                     clearable
                 />
@@ -148,8 +176,8 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                     label={getLanguageByKey("Autor ultim mesaj")}
                     placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
                     data={extendedTechnicians}
-                    value={autorMessages}
-                    onChange={handleAutorMessagesChange}
+                    value={lastMessageAuthor}
+                    onChange={handleLastMessageAuthorChange}
                     searchable
                     clearable
                 />
@@ -161,7 +189,7 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                         { value: "true", label: getLanguageByKey("Da") },
                         { value: "false", label: getLanguageByKey("Nu") },
                     ]}
-                    value={actionNeeded}
+                    value={action_needed}
                     onChange={setActionNeeded}
                     clearable
                 />
@@ -173,8 +201,8 @@ export const MessageFilterForm = ({ initialData, loading, onSubmit }) => {
                         { value: "true", label: getLanguageByKey("Da") },
                         { value: "false", label: getLanguageByKey("Nu") },
                     ]}
-                    value={unseenCount}
-                    onChange={setUnseenCount}
+                    value={unseen}
+                    onChange={setUnseen}
                     clearable
                 />
             </Flex>
