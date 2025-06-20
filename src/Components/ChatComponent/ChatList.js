@@ -13,10 +13,10 @@ import {
   Tabs,
   Modal,
   Text,
-  Button
+  Button,
+  Loader
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-import isEqual from "lodash.isequal";
 
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
@@ -110,15 +110,6 @@ const ChatList = ({ ticketId }) => {
     [sortedTickets, ticketId]
   );
 
-  const handleFilterApply = (filters) => {
-    if (!isEqual(filters, chatFilters)) {
-      fetchChatFilteredTickets(filters);
-      setChatFilters(filters);
-      setIsFiltered(true);
-    }
-    setOpenFilter(false);
-  };
-
   return (
     <>
       <Box direction="column" w="20%" ref={chatListRef}>
@@ -148,7 +139,11 @@ const ChatList = ({ ticketId }) => {
         <Divider />
 
         <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
-          {sortedTickets.length === 0 ? (
+          {chatSpinner ? (
+            <Flex h="100%" align="center" justify="center">
+              <Loader size="sm" color="green" />
+            </Flex>
+          ) : sortedTickets.length === 0 ? (
             <Flex h="100%" align="center" justify="center" px="md">
               <Text c="dimmed">{getLanguageByKey("Nici un lead")}</Text>
             </Flex>
