@@ -202,10 +202,14 @@ export const Leads = () => {
 
       const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
 
+      const isSearchingInList = !!searchTerm?.trim();
+
       const effectiveWorkflow =
         hardTicketFilters.workflow?.length > 0
           ? hardTicketFilters.workflow
-          : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
+          : isSearchingInList
+            ? workflowOptions
+            : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
       const response = await api.tickets.filters({
         page,
