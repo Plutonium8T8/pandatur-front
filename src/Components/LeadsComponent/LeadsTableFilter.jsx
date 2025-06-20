@@ -2,7 +2,7 @@ import { Tabs, Flex, Button } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export const LeadsTableFilter = ({
   onClose,
@@ -12,10 +12,30 @@ export const LeadsTableFilter = ({
   onResetFilters,
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
+  const ticketFormRef = useRef();
+  const messageFormRef = useRef();
+
+  const isEmpty = (v) =>
+    v === undefined ||
+    v === null ||
+    v === "" ||
+    (Array.isArray(v) && v.length === 0) ||
+    (typeof v === "object" && Object.keys(v).length === 0);
+
+  const mergeFilters = (...filters) =>
+    Object.fromEntries(
+      Object.entries(Object.assign({}, ...filters)).filter(
+        ([_, v]) => !isEmpty(v)
+      )
+    );
 
   const handleSubmit = () => {
-    const form = document.querySelector("form");
-    if (form) form.requestSubmit();
+    const ticketValues = ticketFormRef.current?.getValues?.() || {};
+    const messageValues = messageFormRef.current?.getValues?.() || {};
+    const combinedFilters = mergeFilters(ticketValues, messageValues);
+
+    onSubmitTicket(combinedFilters, "hard");
+    onClose?.();
   };
 
   const handleReset = () => {
@@ -44,9 +64,8 @@ export const LeadsTableFilter = ({
       <Tabs.Panel value="filter_ticket" pt="xs">
         <Flex direction="column" justify="space-between" h="100%">
           <TicketFormTabs
+            ref={ticketFormRef}
             initialData={initialData}
-            onClose={onClose}
-            onSubmit={(filters) => onSubmitTicket(filters, "hard")}
             loading={loading}
           />
         </Flex>
@@ -54,10 +73,9 @@ export const LeadsTableFilter = ({
 
       <Tabs.Panel value="filter_message" pt="xs">
         <MessageFilterForm
+          ref={messageFormRef}
           initialData={initialData}
           loading={loading}
-          onClose={onClose}
-          onSubmit={onSubmitTicket}
         />
       </Tabs.Panel>
 
