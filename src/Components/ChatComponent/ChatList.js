@@ -17,7 +17,6 @@ import {
   Loader
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
-
 import { getLanguageByKey } from "../utils";
 import { useUser, useApp, useDOMElementHeight } from "../../hooks";
 import { ChatListItem } from "./components";
@@ -142,12 +141,8 @@ const ChatList = ({ ticketId }) => {
 
         <Divider />
 
-        <Box style={{ height: "calc(100% - 127px)" }} ref={wrapperChatItemRef}>
-          {chatSpinner ? (
-            <Flex h="100%" align="center" justify="center">
-              <Loader size="sm" color="green" />
-            </Flex>
-          ) : sortedTickets.length === 0 ? (
+        <Box style={{ height: "calc(100% - 127px)", position: "relative" }} ref={wrapperChatItemRef}>
+          {sortedTickets.length === 0 ? (
             <Flex h="100%" align="center" justify="center" px="md">
               <Text c="dimmed">{getLanguageByKey("Nici un lead")}</Text>
             </Flex>
@@ -160,6 +155,12 @@ const ChatList = ({ ticketId }) => {
             >
               {ChatItem}
             </FixedSizeList>
+          )}
+
+          {chatSpinner && (
+            <Box style={{ position: "absolute", bottom: 10, right: 10 }}>
+              <Loader size="xl" color="green" />
+            </Box>
           )}
         </Box>
       </Box>
