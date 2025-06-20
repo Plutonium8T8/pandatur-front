@@ -37,6 +37,18 @@ export const formatDateOrUndefined = (date) => {
     : undefined;
 };
 
+export const formatDateOrUndefinedFilter = (date) => {
+  const minDate = date?.[0];
+  const maxDate = date?.[1];
+
+  return minDate && maxDate
+    ? {
+      from: dayjs(minDate).format(DD_MM_YYYY),
+      to: dayjs(maxDate).format(DD_MM_YYYY),
+    }
+    : undefined;
+};
+
 export const formatNumericValue = (value) => {
   const rangeValue = value ? { from: value, to: value } : value;
   return rangeValue;

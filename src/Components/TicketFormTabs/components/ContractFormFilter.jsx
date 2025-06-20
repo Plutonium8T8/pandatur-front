@@ -17,7 +17,7 @@ import { LabelSwitch } from "../../LabelSwitch";
 import { paymentStatusOptions } from "../../../FormOptions";
 import { DD_MM_YYYY } from "../../../app-constants";
 import {
-  formatDateOrUndefined,
+  formatDateOrUndefinedFilter,
   formatNumericValue,
   convertDateToArrayFilter,
   convertNumberRangeToSingleValue,
@@ -66,9 +66,9 @@ export const ContractFormFilter = forwardRef(
       transformValues: (values) => {
         const transformed = {
           numar_de_contract: values.numar_de_contract || undefined,
-          data_contractului: formatDateOrUndefined(values.data_contractului),
-          data_avansului: formatDateOrUndefined(values.data_avansului),
-          data_de_plata_integrala: formatDateOrUndefined(values.data_de_plata_integrala),
+          data_contractului: formatDateOrUndefinedFilter(values.data_contractului),
+          data_avansului: formatDateOrUndefinedFilter(values.data_avansului),
+          data_de_plata_integrala: formatDateOrUndefinedFilter(values.data_de_plata_integrala),
           contract_trimis: convertBooleanOrUndefined(values.contract_trimis),
           contract_semnat: convertBooleanOrUndefined(values.contract_semnat),
           tour_operator: values.tour_operator || undefined,
