@@ -13,20 +13,19 @@ export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }
   const form = useForm({
     mode: "uncontrolled",
 
-    transformValues: ({
-      motivul_refuzului,
-      evaluare_de_odihna,
-      urmatoarea_vacanta,
-      manager,
-      vacanta,
-    }) => {
-      return {
-        motivul_refuzului: motivul_refuzului ?? undefined,
-        evaluare_de_odihna: evaluare_de_odihna ?? undefined,
-        urmatoarea_vacanta: urmatoarea_vacanta ?? undefined,
-        manager: manager ?? undefined,
-        vacanta: vacanta ?? undefined,
-      };
+    transformValues: (values) => {
+      const cleaned = Object.entries(values).reduce((acc, [key, val]) => {
+        if (
+          val !== undefined &&
+          val !== null &&
+          !(Array.isArray(val) && val.length === 0) &&
+          val !== ""
+        ) {
+          acc[key] = val;
+        }
+        return acc;
+      }, {});
+      return cleaned;
     },
   });
 
@@ -46,21 +45,21 @@ export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }
     <>
       <form
         id={QUALITY_CONTROL_FORM_FILTER}
-        onSubmit={form.onSubmit((values) =>
-          onSubmit(values, () => form.reset()),
-        )}
+        onSubmit={(e) => {
+          e.preventDefault();
+          const values = form.getTransformedValues();
+          onSubmit?.(values, () => form.reset());
+        }}
       >
-        {
-          <MultiSelect
-            clearable
-            searchable
-            label={getLanguageByKey("Motivul refuzului")}
-            placeholder={getLanguageByKey("Motivul refuzului")}
-            data={motivulRefuzuluiOptions}
-            key={form.key("motivul_refuzului")}
-            {...form.getInputProps("motivul_refuzului")}
-          />
-        }
+        <MultiSelect
+          clearable
+          searchable
+          label={getLanguageByKey("Motivul refuzului")}
+          placeholder={getLanguageByKey("Motivul refuzului")}
+          data={motivulRefuzuluiOptions}
+          key={form.key("motivul_refuzului")}
+          {...form.getInputProps("motivul_refuzului")}
+        />
 
         <MultiSelect
           mt="md"

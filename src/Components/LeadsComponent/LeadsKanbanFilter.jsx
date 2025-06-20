@@ -2,7 +2,7 @@ import { Tabs, Button, Flex } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -15,10 +15,22 @@ export const LeadsKanbanFilter = ({
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
 
-  const handleSubmit = () => {
-    const form = document.querySelector("form");
-    if (form) form.requestSubmit();
-  };
+  const ticketFormRef = useRef();
+  const messageFormRef = useRef();
+
+  const isEmpty = (v) =>
+    v === undefined ||
+    v === null ||
+    v === "" ||
+    (Array.isArray(v) && v.length === 0) ||
+    (typeof v === "object" && Object.keys(v).length === 0);
+
+  const mergeFilters = (...filters) =>
+    Object.fromEntries(
+      Object.entries(Object.assign({}, ...filters)).filter(
+        ([_, v]) => !isEmpty(v)
+      )
+    );
 
   const handleReset = () => {
     setKanbanFilters({});
@@ -27,18 +39,25 @@ export const LeadsKanbanFilter = ({
     onClose?.();
   };
 
-  const handleFiltersSubmit = (filters) => {
-    const hasValues = Object.values(filters).some(
-      (v) => v !== undefined && v !== null && v !== "" && !(Array.isArray(v) && v.length === 0)
-    );
+  const handleSubmit = () => {
+    console.log("[APLICĂ] Попытка сабмита всех форм");
 
-    if (!hasValues) {
+    const ticketValues = ticketFormRef.current?.getValues?.() || {};
+    const messageValues = messageFormRef.current?.getValues?.() || {};
+
+    const combinedFilters = mergeFilters(ticketValues, messageValues);
+
+    console.log("[APLICĂ] Собраны фильтры:", combinedFilters);
+
+    if (Object.keys(combinedFilters).length === 0) {
+      console.log("[APLICĂ] Фильтры пустые — сбрасываем");
       handleReset();
       return;
     }
 
     setKanbanFilterActive(true);
-    fetchKanbanTickets(filters);
+    setKanbanFilters(combinedFilters);
+    fetchKanbanTickets(combinedFilters);
     onClose?.();
   };
 
@@ -62,23 +81,21 @@ export const LeadsKanbanFilter = ({
 
       <Tabs.Panel value="filter_ticket" pt="xs">
         <TicketFormTabs
+          ref={ticketFormRef}
           initialData={initialData}
-          onClose={onClose}
-          onSubmit={handleFiltersSubmit}
           loading={loading}
         />
       </Tabs.Panel>
 
       <Tabs.Panel value="filter_message" pt="xs">
         <MessageFilterForm
+          ref={messageFormRef}
           initialData={initialData}
           loading={loading}
-          onClose={onClose}
-          onSubmit={handleFiltersSubmit}
         />
       </Tabs.Panel>
 
-      <Flex justify="end" gap="md">
+      <Flex justify="end" gap="md" mt="md">
         <Button variant="outline" onClick={handleReset}>
           {getLanguageByKey("Reset filter")}
         </Button>
