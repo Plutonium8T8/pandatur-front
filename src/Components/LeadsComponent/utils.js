@@ -1,6 +1,6 @@
-import { workflowOptionsSalesMD} from "../../Components/utils/workflowUtils";
+import { workflowOptionsSalesMD } from "../../Components/utils/workflowUtils";
 import dayjs from "dayjs";
-import { DD_MM_YYYY__HH_mm_ss } from "../../app-constants";
+import { DD_MM_YYYY__HH_mm_ss, DD_MM_YYYY } from "../../app-constants";
 
 export const VIEW_MODE = {
   KANBAN: "KANBAN",
@@ -31,9 +31,9 @@ export const formatDateOrUndefined = (date) => {
 
   return minDate && maxDate
     ? {
-        from: dayjs(minDate).format(DD_MM_YYYY__HH_mm_ss),
-        to: dayjs(maxDate).format(DD_MM_YYYY__HH_mm_ss),
-      }
+      from: dayjs(minDate).format(DD_MM_YYYY__HH_mm_ss),
+      to: dayjs(maxDate).format(DD_MM_YYYY__HH_mm_ss),
+    }
     : undefined;
 };
 
@@ -48,6 +48,15 @@ export const convertDateToArray = (rangeDate = {}) => {
   return [
     from ? dayjs(from, DD_MM_YYYY__HH_mm_ss) : undefined,
     to ? dayjs(to, DD_MM_YYYY__HH_mm_ss) : undefined,
+  ];
+};
+
+export const convertDateToArrayFilter = (rangeDate = {}) => {
+  const { from, to } = rangeDate;
+
+  return [
+    from ? dayjs(from, DD_MM_YYYY) : undefined,
+    to ? dayjs(to, DD_MM_YYYY) : undefined,
   ];
 };
 

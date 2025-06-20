@@ -41,17 +41,13 @@ export const LeadsKanbanFilter = ({
   };
 
   const handleSubmit = () => {
-    console.log("[APLICĂ] Попытка сабмита всех форм");
 
     const ticketValues = ticketFormRef.current?.getValues?.() || {};
     const messageValues = messageFormRef.current?.getValues?.() || {};
 
     const combinedFilters = mergeFilters(ticketValues, messageValues);
 
-    console.log("[APLICĂ] Собраны фильтры:", combinedFilters);
-
     if (Object.keys(combinedFilters).length === 0) {
-      console.log("[APLICĂ] Фильтры пустые — сбрасываем");
       handleReset();
       return;
     }
