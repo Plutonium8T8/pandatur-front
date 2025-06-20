@@ -315,7 +315,7 @@ export const Leads = () => {
         className="leads-header-container"
       >
         <PageHeader
-          count={(viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets).length}
+          count={viewMode === VIEW_MODE.LIST ? totalLeads : visibleTickets.length}
           title={getLanguageByKey("Leads")}
           extraInfo={
             <>
