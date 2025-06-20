@@ -12,6 +12,7 @@ export const LeadsKanbanFilter = ({
   setKanbanFilterActive,
   setKanbanFilters,
   setKanbanTickets,
+  onWorkflowSelected
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
 
@@ -58,6 +59,7 @@ export const LeadsKanbanFilter = ({
     setKanbanFilterActive(true);
     setKanbanFilters(combinedFilters);
     fetchKanbanTickets(combinedFilters);
+    onWorkflowSelected?.(ticketValues.workflow || []);
     onClose?.();
   };
 
