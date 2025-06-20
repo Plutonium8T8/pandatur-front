@@ -12,20 +12,16 @@ const QUALITY_CONTROL_FORM_FILTER = "QUALITY_CONTROL_FORM_FILTER";
 export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }) => {
   const form = useForm({
     mode: "uncontrolled",
-
     transformValues: (values) => {
-      const cleaned = Object.entries(values).reduce((acc, [key, val]) => {
-        if (
-          val !== undefined &&
-          val !== null &&
-          !(Array.isArray(val) && val.length === 0) &&
-          val !== ""
-        ) {
-          acc[key] = val;
-        }
-        return acc;
-      }, {});
-      return cleaned;
+      return Object.fromEntries(
+        Object.entries(values).filter(
+          ([_, val]) =>
+            val !== undefined &&
+            val !== null &&
+            !(Array.isArray(val) && val.length === 0) &&
+            val !== ""
+        )
+      );
     },
   });
 
@@ -38,6 +34,8 @@ export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }
         manager: data.manager,
         vacanta: data.vacanta,
       });
+
+      onSubmit?.(form.getTransformedValues());
     }
   }, [data]);
 
@@ -47,8 +45,7 @@ export const QualityControlFormFilter = ({ onSubmit, data, renderFooterButtons }
         id={QUALITY_CONTROL_FORM_FILTER}
         onSubmit={(e) => {
           e.preventDefault();
-          const values = form.getTransformedValues();
-          onSubmit?.(values, () => form.reset());
+          onSubmit?.(form.getTransformedValues());
         }}
       >
         <MultiSelect

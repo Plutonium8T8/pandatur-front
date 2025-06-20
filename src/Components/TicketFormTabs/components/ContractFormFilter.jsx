@@ -33,7 +33,6 @@ export const ContractFormFilter = ({
 
   const form = useForm({
     mode: "uncontrolled",
-
     transformValues: (values) => {
       const transformed = {
         numar_de_contract: values.numar_de_contract ?? undefined,
@@ -80,6 +79,8 @@ export const ContractFormFilter = ({
         achitat_client: convertNumberRangeToSingleValue(data.achitat_client),
         control: data.control,
       });
+
+      onSubmit?.(form.getTransformedValues());
     }
   }, [data]);
 
@@ -89,8 +90,7 @@ export const ContractFormFilter = ({
         id={idForm}
         onSubmit={(e) => {
           e.preventDefault();
-          const values = form.getTransformedValues();
-          onSubmit?.(values, () => form.reset());
+          onSubmit?.(form.getTransformedValues());
         }}
       >
         <TextInput

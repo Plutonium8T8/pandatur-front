@@ -1,5 +1,5 @@
 import {
-  useState,
+  useRef,
   useImperativeHandle,
   forwardRef,
 } from "react";
@@ -13,13 +13,6 @@ import {
 } from "./components";
 import "./TicketFormTabs.css";
 
-const formIds = {
-  general: "generalForm",
-  ticketInfo: "ticketInfoForm",
-  contract: "contractForm",
-  invoice: "invoiceForm",
-};
-
 export const TicketFormTabs = forwardRef(
   (
     {
@@ -30,17 +23,17 @@ export const TicketFormTabs = forwardRef(
     },
     ref
   ) => {
-    const [generalData, setGeneralData] = useState({});
-    const [ticketInfoData, setTicketInfoData] = useState({});
-    const [contractData, setContractData] = useState({});
-    const [qualityData, setQualityData] = useState({});
+    const generalRef = useRef();
+    const ticketInfoRef = useRef();
+    const contractRef = useRef();
+    const qualityRef = useRef();
 
     useImperativeHandle(ref, () => ({
       getValues: () => ({
-        ...generalData,
-        ...ticketInfoData,
-        ...contractData,
-        ...qualityData,
+        ...(generalRef.current?.getValues?.() || {}),
+        ...(ticketInfoRef.current?.getValues?.() || {}),
+        ...(contractRef.current?.getValues?.() || {}),
+        ...(qualityRef.current?.getValues?.() || {}),
       }),
     }));
 
@@ -69,11 +62,10 @@ export const TicketFormTabs = forwardRef(
         <Tabs.Panel value="filter_general_info" pl="lg">
           <Flex direction="column" justify="space-between" h="100%">
             <BasicGeneralFormFilter
+              ref={generalRef}
               data={initialData}
               loading={loading}
               onClose={onClose}
-              onSubmit={(values) => setGeneralData(values)}
-              formId={formIds.general}
             />
           </Flex>
         </Tabs.Panel>
@@ -81,10 +73,9 @@ export const TicketFormTabs = forwardRef(
         <Tabs.Panel value="filter_ticket_info" pl="lg">
           <ScrollArea h="100%">
             <TicketInfoFormFilter
+              ref={ticketInfoRef}
               data={initialData}
               hideDisabledInput
-              onSubmit={(values) => setTicketInfoData(values)}
-              formId={formIds.ticketInfo}
             />
           </ScrollArea>
         </Tabs.Panel>
@@ -92,10 +83,9 @@ export const TicketFormTabs = forwardRef(
         <Tabs.Panel value="filter_contract" pl="lg">
           <ScrollArea h="100%">
             <ContractFormFilter
+              ref={contractRef}
               data={initialData}
               hideDisabledInput
-              onSubmit={(values) => setContractData(values)}
-              formId={formIds.contract}
             />
           </ScrollArea>
         </Tabs.Panel>
@@ -103,8 +93,8 @@ export const TicketFormTabs = forwardRef(
         <Tabs.Panel value="filter_quality_control" pl="lg">
           <Flex direction="column" justify="space-between" h="100%">
             <QualityControlFormFilter
+              ref={qualityRef}
               data={initialData}
-              onSubmit={(values) => setQualityData(values)}
             />
           </Flex>
         </Tabs.Panel>
