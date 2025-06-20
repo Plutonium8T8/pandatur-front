@@ -391,32 +391,26 @@ export const Leads = () => {
 
       <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
         <Divider mb="md" />
-        {viewMode === VIEW_MODE.LIST ? (
-          loading ? (
-            <div className="d-flex align-items-center justify-content-center h-full">
-              <Spin />
-            </div>
-          ) : (
-            <LeadTable
-              currentPage={currentPage}
-              filteredLeads={hardTickets}
-              selectTicket={selectedTickets}
-              onSelectRow={toggleSelectTicket}
-              onToggleAll={toggleSelectAll}
-              totalLeadsPages={getTotalPages(totalLeads)}
-              onChangePagination={handlePaginationWorkflow}
-              fetchTickets={() => fetchHardTickets(currentPage)}
-            />
-          )
-        ) : kanbanSpinner ? (
+        {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
           </div>
+        ) : viewMode === VIEW_MODE.LIST ? (
+          <LeadTable
+            currentPage={currentPage}
+            filteredLeads={hardTickets}
+            selectTicket={selectedTickets}
+            onSelectRow={toggleSelectTicket}
+            onToggleAll={toggleSelectAll}
+            totalLeadsPages={getTotalPages(totalLeads)}
+            onChangePagination={handlePaginationWorkflow}
+            fetchTickets={() => fetchHardTickets(currentPage)}
+          />
         ) : (
           <WorkflowColumns
-            selectedWorkflow={choiceWorkflow}
             kanbanFilterActive={kanbanFilterActive}
             fetchTickets={currentFetchTickets}
+            selectedWorkflow={choiceWorkflow}
             tickets={visibleTickets}
             searchTerm={debouncedSearch}
             onEditTicket={(ticket) => {
@@ -428,6 +422,7 @@ export const Leads = () => {
       </div>
 
       {spinnerTickets && <SpinnerRightBottom />}
+      {kanbanSpinner && viewMode === VIEW_MODE.KANBAN && <SpinnerRightBottom />}
 
       <MantineModal
         title={false}
