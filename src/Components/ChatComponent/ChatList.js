@@ -51,6 +51,9 @@ const ChatList = ({ ticketId }) => {
   const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
+  const [activeTab, setActiveTab] = useState("filter_ticket");
+  const ticketFormRef = useRef();
+  const messageFormRef = useRef();
 
   const baseTickets = useMemo(() => {
     return isFiltered ? chatFilteredTickets : tickets;
@@ -181,32 +184,32 @@ const ChatList = ({ ticketId }) => {
           },
         }}
       >
-        <Tabs defaultValue="filter_ticket" className="leads-modal-filter-tabs" h="100%" pb="48">
+        <Tabs
+          h="100%"
+          className="leads-modal-filter-tabs"
+          defaultValue="filter_ticket"
+          value={activeTab}
+          onChange={setActiveTab}
+          pb="48"
+        >
           <Tabs.List>
-            <Tabs.Tab value="filter_ticket">
-              {getLanguageByKey("Filtru pentru Lead")}
-            </Tabs.Tab>
-            <Tabs.Tab value="filter_message">
-              {getLanguageByKey("Filtru dupǎ mesaje")}
-            </Tabs.Tab>
+            <Tabs.Tab value="filter_ticket">{getLanguageByKey("Filtru pentru Lead")}</Tabs.Tab>
+            <Tabs.Tab value="filter_message">{getLanguageByKey("Filtru dupǎ mesaje")}</Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="filter_ticket" pt="xs">
             <TicketFormTabs
-              orientation="horizontal"
-              onClose={() => setOpenFilter(false)}
-              onSubmit={handleFilterApply}
-              loading={chatSpinner}
+              ref={ticketFormRef}
               initialData={chatFilters}
+              loading={chatSpinner}
             />
           </Tabs.Panel>
 
           <Tabs.Panel value="filter_message" pt="xs">
             <MessageFilterForm
-              onClose={() => setOpenFilter(false)}
-              onSubmit={handleFilterApply}
-              loading={chatSpinner}
+              ref={messageFormRef}
               initialData={chatFilters}
+              loading={chatSpinner}
             />
           </Tabs.Panel>
 
@@ -228,8 +231,35 @@ const ChatList = ({ ticketId }) => {
               variant="filled"
               loading={chatSpinner}
               onClick={() => {
-                const form = document.querySelector("form");
-                if (form) form.requestSubmit();
+                const isEmpty = (v) =>
+                  v === undefined ||
+                  v === null ||
+                  v === "" ||
+                  (Array.isArray(v) && v.length === 0) ||
+                  (typeof v === "object" && Object.keys(v).length === 0);
+
+                const mergeFilters = (...filters) =>
+                  Object.fromEntries(
+                    Object.entries(Object.assign({}, ...filters)).filter(
+                      ([_, v]) => !isEmpty(v)
+                    )
+                  );
+
+                const ticketValues = ticketFormRef.current?.getValues?.() || {};
+                const messageValues = messageFormRef.current?.getValues?.() || {};
+
+                const combined = mergeFilters(ticketValues, messageValues);
+
+                if (Object.keys(combined).length === 0) {
+                  setIsFiltered(false);
+                  setChatFilters({});
+                } else {
+                  fetchChatFilteredTickets(combined);
+                  setChatFilters(combined);
+                  setIsFiltered(true);
+                }
+
+                setOpenFilter(false);
               }}
             >
               {getLanguageByKey("Aplică")}
