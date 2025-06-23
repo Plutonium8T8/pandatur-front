@@ -42,9 +42,27 @@ export const ManageLeadInfoTabs = ({
     try {
       const values = form.getValues();
 
+      const booleanFields = [
+        "contract_trimis",
+        "contract_semnat",
+        "achitare_efectuata",
+        "rezervare_confirmata",
+        "contract_arhivat",
+        "control",
+      ];
+
+      const stringifiedBooleans = Object.fromEntries(
+        booleanFields.map((key) => [key, String(values[key])])
+      );
+
+      const payload = {
+        ...values,
+        ...stringifiedBooleans,
+      };
+
       await api.tickets.updateById({
         id: id ? [id] : selectedTickets,
-        ...values,
+        ...payload,
       });
 
       onClose(true);
