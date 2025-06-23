@@ -10,6 +10,7 @@ import {
   Tooltip,
   ActionIcon,
   ScrollArea,
+  Loader,
 } from "@mantine/core";
 import { groupSchedules } from "../../api/groupSchedules";
 import ScheduleView from "./ScheduleView";
@@ -27,9 +28,10 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [editOpened, setEditOpened] = useState(false);
   const [editingGroup, setEditingGroup] = useState(null);
+  const [loadingGroup, setLoadingGroup] = useState(false);
+
   const { enqueueSnackbar } = useSnackbar();
   const confirmDelete = useConfirmPopup({ loading: false });
-
   const { technicians } = useGetTechniciansList();
 
   const fetchData = async () => {
@@ -57,6 +59,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
 
   const handleGroupClick = async (group) => {
     try {
+      setLoadingGroup(true);
       const usersInGroup = await groupSchedules.getTechniciansInGroup(group.id);
 
       const fullGroup = {
@@ -69,7 +72,11 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
       setSelectedGroup(fullGroup);
       setInGroupView?.(true);
     } catch (err) {
-      enqueueSnackbar("Eroare la încărcare utilizatori grup", { variant: "error" });
+      enqueueSnackbar("Eroare la încărcare utilizatori grup", {
+        variant: "error",
+      });
+    } finally {
+      setLoadingGroup(false);
     }
   };
 
@@ -135,9 +142,7 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
         <ScheduleView
           groupId={selectedGroup.id}
           groupName={selectedGroup.name}
-          groupUsers={technicians.filter((t) =>
-            selectedGroup.user_ids.includes(t.id)
-          )}
+          groupUsers={selectedGroup.users}
           onGroupUpdate={handleGroupUpdate}
         />
       </div>
@@ -146,103 +151,118 @@ const SchedulesGroupList = ({ reload, setInGroupView }) => {
 
   return (
     <>
-      <ScrollArea h="90vh" type="auto">
-        <Stack spacing="md">
-          {groups.map((group) => {
-            const groupUsers = technicians.filter((u) =>
-              group.user_ids.includes(u.id)
-            );
+      {loadingGroup ? (
+        <Group position="center" mt="xl">
+          <Loader />
+        </Group>
+      ) : (
+        <ScrollArea h="90vh" type="auto">
+          <Stack spacing="md">
+            {groups.map((group) => {
+              const groupUsers = technicians.filter((u) =>
+                group.user_ids.includes(u.id)
+              );
 
-            return (
-              <Card
-                key={group.id}
-                shadow="xs"
-                padding="lg"
-                radius="md"
-                withBorder
-                className="group-card"
-              >
-                <Group position="apart" align="start">
-                  <div
-                    style={{ flex: 1, cursor: "pointer" }}
-                    onClick={() => handleGroupClick(group)}
-                  >
-                    <Group spacing="xs" mb={10}>
-                      <Text size="md" fw={600}>
-                        {group.name}
-                      </Text>
-                      <Badge color="blue" variant="light">
-                        {translations["Pentru o săptămână"][language]}
-                      </Badge>
-                    </Group>
+              return (
+                <Card
+                  key={group.id}
+                  shadow="xs"
+                  padding="lg"
+                  radius="md"
+                  withBorder
+                  className="group-card"
+                >
+                  <Group position="apart" align="start">
+                    <div
+                      style={{ flex: 1, cursor: "pointer" }}
+                      onClick={() => handleGroupClick(group)}
+                    >
+                      <Group spacing="xs" mb={10}>
+                        <Text size="md" fw={600}>
+                          {group.name}
+                        </Text>
+                        <Badge color="blue" variant="light">
+                          {translations["Pentru o săptămână"][language]}
+                        </Badge>
+                      </Group>
 
-                    <Tooltip.Group openDelay={300} closeDelay={100}>
-                      <Avatar.Group spacing="sm">
-                        {groupUsers.slice(0, 5).map((u) => (
-                          <Tooltip label={u.username} withArrow key={u.id}>
-                            <Avatar
-                              size="md"
-                              radius="xl"
-                              src={u.photo || undefined}
-                              color="blue"
+                      <Tooltip.Group openDelay={300} closeDelay={100}>
+                        <Avatar.Group spacing="sm">
+                          {groupUsers.slice(0, 5).map((u) => (
+                            <Tooltip
+                              label={
+                                u.username ||
+                                `${u.name || ""} ${u.surname || ""}`.trim()
+                              }
+                              withArrow
+                              key={u.id}
                             >
-                              {u.username?.[0]?.toUpperCase() || "?"}
-                            </Avatar>
-                          </Tooltip>
-                        ))}
-                        {groupUsers.length > 5 && (
-                          <Tooltip
-                            withArrow
-                            label={
-                              <>
-                                {groupUsers.slice(5).map((u) => (
-                                  <div key={u.id}>{u.username}</div>
-                                ))}
-                              </>
-                            }
-                          >
-                            <Avatar size="md" radius="xl" color="blue">
-                              +{groupUsers.length - 5}
-                            </Avatar>
-                          </Tooltip>
-                        )}
-                      </Avatar.Group>
-                    </Tooltip.Group>
-                  </div>
+                              <Avatar
+                                size="md"
+                                radius="xl"
+                                src={u.photo || undefined}
+                                color="blue"
+                              >
+                                {(u.username || u.name?.[0] || "?").toUpperCase()}
+                              </Avatar>
+                            </Tooltip>
+                          ))}
+                          {groupUsers.length > 5 && (
+                            <Tooltip
+                              withArrow
+                              label={
+                                <>
+                                  {groupUsers.slice(5).map((u) => (
+                                    <div key={u.id}>
+                                      {u.username || `${u.name} ${u.surname}`}
+                                    </div>
+                                  ))}
+                                </>
+                              }
+                            >
+                              <Avatar size="md" radius="xl" color="blue">
+                                +{groupUsers.length - 5}
+                              </Avatar>
+                            </Tooltip>
+                          )}
+                        </Avatar.Group>
+                      </Tooltip.Group>
+                    </div>
 
-                  <Group>
-                    <Can
-                      permission={{ module: "schedules", action: "edit" }}
-                      context={{ responsibleId: group.supervisor_id }}
-                    >
-                      <ActionIcon
-                        color="blue"
-                        variant="light"
-                        onClick={() => handleEdit(group)}
+                    <Group>
+                      <Can
+                        permission={{ module: "schedules", action: "edit" }}
+                        context={{ responsibleId: group.supervisor_id }}
                       >
-                        <FaEdit />
-                      </ActionIcon>
-                    </Can>
+                        <ActionIcon
+                          color="blue"
+                          variant="light"
+                          onClick={() => handleEdit(group)}
+                        >
+                          <FaEdit />
+                        </ActionIcon>
+                      </Can>
 
-                    <Can
-                      permission={{ module: "schedules", action: "delete" }}
-                      context={{ responsibleId: group.supervisor_id }}
-                    >
-                      <ActionIcon
-                        color="red"
-                        variant="light"
-                        onClick={() => handleClickDelete(group)}
+                      <Can
+                        permission={{ module: "schedules", action: "delete" }}
+                        context={{ responsibleId: group.supervisor_id }}
                       >
-                        <FaTrash />
-                      </ActionIcon>
-                    </Can>
+                        <ActionIcon
+                          color="red"
+                          variant="light"
+                          onClick={() => handleClickDelete(group)}
+                        >
+                          <FaTrash />
+                        </ActionIcon>
+                      </Can>
+                    </Group>
                   </Group>
-                </Group>
-              </Card>
-            );
-          })}
-        </Stack>
-      </ScrollArea>
+                </Card>
+              );
+            })}
+          </Stack>
+        </ScrollArea>
+      )}
 
       <ModalGroup
         opened={editOpened}
