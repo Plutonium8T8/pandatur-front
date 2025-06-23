@@ -36,7 +36,7 @@ export const SocketProvider = ({ children }) => {
       };
 
       socket.onclose = () => {
-        reconnectTimer = setTimeout(connect, 1000);
+        reconnectTimer = setTimeout(connect, 10000);
       };
     };
 
