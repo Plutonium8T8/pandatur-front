@@ -9,17 +9,26 @@ export const SocketProvider = ({ children }) => {
   const { enqueueSnackbar } = useSnackbar();
   const socketRef = useRef(null);
   const [val, setVal] = useState(null);
+  const reconnectAttempts = useRef(0);
+  const maxReconnectAttempts = 3;
+  const reconnectDelay = 10000;
 
   useEffect(() => {
     let socket;
     let reconnectTimer;
 
     const connect = () => {
+      if (reconnectAttempts.current >= maxReconnectAttempts) {
+        console.warn("[SOCKET] Превышено максимальное число попыток подключения");
+        return;
+      }
+
       socket = new WebSocket(process.env.REACT_APP_WS_URL);
       socketRef.current = socket;
 
       socket.onopen = () => {
         console.log("[SOCKET] Соединение установлено");
+        reconnectAttempts.current = 0;
         enqueueSnackbar(getLanguageByKey("socketConnectionEstablished"), {
           variant: "success",
         });
@@ -41,7 +50,9 @@ export const SocketProvider = ({ children }) => {
       };
 
       socket.onclose = () => {
-        reconnectTimer = setTimeout(connect, 10000);
+        reconnectAttempts.current += 1;
+        console.warn(`[SOCKET] Попытка реконнекта #${reconnectAttempts.current}`);
+        reconnectTimer = setTimeout(connect, reconnectDelay);
       };
     };
 
@@ -68,14 +79,14 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const value = {
-    socketRef,
-    sendedValue: val,
-    seenMessages,
-  };
-
   return (
-    <SocketContext.Provider value={value}>
+    <SocketContext.Provider
+      value={{
+        socketRef,
+        sendedValue: val,
+        seenMessages,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );
