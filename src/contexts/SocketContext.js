@@ -18,7 +18,12 @@ export const SocketProvider = ({ children }) => {
       socket = new WebSocket(process.env.REACT_APP_WS_URL);
       socketRef.current = socket;
 
-      socket.onopen = () => { };
+      socket.onopen = () => {
+        console.log("[SOCKET] Соединение установлено");
+        enqueueSnackbar(getLanguageByKey("socketConnectionEstablished"), {
+          variant: "success",
+        });
+      };
 
       socket.onmessage = (event) => {
         try {
@@ -31,7 +36,7 @@ export const SocketProvider = ({ children }) => {
 
       socket.onerror = () => {
         enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), {
-          variant: "error",
+          variant: "info",
         });
       };
 
