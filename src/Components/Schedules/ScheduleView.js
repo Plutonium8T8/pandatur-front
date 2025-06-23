@@ -47,15 +47,17 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
       const combined = groupUsers.map((user) => {
         const userId = user.id;
         const userSchedule = scheduleData.find(
-          (s) => s.technician_id === userId,
+          (s) => s.technician_id === userId
         );
         const weeklySchedule = userSchedule?.weekly_schedule || {};
 
         const shifts = dayKeys.map((day) =>
-          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : [],
+          Array.isArray(weeklySchedule[day]) ? weeklySchedule[day] : []
         );
 
-        return { id: userId, name: user.username, shifts };
+        const fullName = `${user.name || ""} ${user.surname || ""}`.trim();
+
+        return { id: userId, name: fullName, shifts };
       });
 
       setSchedule(combined);
