@@ -258,7 +258,7 @@ export const userGroupsToGroupTitle = {
     "Corporate sales": ["BusinessGroups", "IndividualGroups"],
     "Private sales": ["IndividualGroups"],
     "Green Card": ["GreenCard"],
-    "Agency": ["Agency"],
+    "Agency": ["Agency", "MD"],
     "Sales UA dep.": ["SalesUA"],
 };
 
