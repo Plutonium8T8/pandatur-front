@@ -3270,5 +3270,15 @@ export const translations = {
     RO: "Conectare la server reușită",
     RU: "Успешное подключение к серверу",
     EN: "Connected to server successfully"
+  },
+  "Data creării": {
+    "RO": "Data creării",
+    "RU": "Дата создания",
+    "EN": "Creation date"
+  },
+  "Ultima modificare": {
+    "RO": "Ultima modificare",
+    "RU": "Последнее изменение",
+    "EN": "Last modification"
   }
 }
