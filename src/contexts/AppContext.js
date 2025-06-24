@@ -78,14 +78,43 @@ export const AppProvider = ({ children }) => {
     return workflowOptionsLimitedByGroupTitle[groupTitleForApi] || [];
   }, [groupTitleForApi, isAdmin]);
 
-  const markMessagesAsRead = (ticketId, count) => {
+  const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
+
+    let updatedGlobal = false;
+    let updatedFiltered = false;
+
     setTickets((prev) =>
-      prev.map((ticket) =>
-        ticket.id === ticketId ? { ...ticket, unseen_count: 0 } : ticket
-      )
+      prev.map((t) => {
+        if (t.id === ticketId) {
+          updatedGlobal = true;
+          return { ...t, unseen_count: 0 };
+        }
+        return t;
+      })
     );
-    setUnreadCount((prev) => prev - count);
+
+    setChatFilteredTickets((prev) =>
+      prev.map((t) => {
+        if (t.id === ticketId) {
+          updatedFiltered = true;
+          return { ...t, unseen_count: 0 };
+        }
+        return t;
+      })
+    );
+
+    setTimeout(() => {
+      if (updatedGlobal && updatedFiltered) {
+        console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
+      } else if (updatedGlobal) {
+        console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
+      } else if (updatedFiltered) {
+        console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
+      } else {
+        console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
+      }
+    }, 0);
   };
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
@@ -225,6 +254,21 @@ export const AppProvider = ({ children }) => {
 
           return updated;
         });
+
+        setChatFilteredTickets((prev) =>
+          prev.map((ticket) =>
+            ticket.id === ticket_id
+              ? {
+                ...ticket,
+                unseen_count: ticket.unseen_count + (isFromAnotherUser ? 1 : 0),
+                last_message_type: mtype,
+                last_message: msgText,
+                time_sent,
+              }
+              : ticket
+          )
+        );
+
         break;
       }
 
