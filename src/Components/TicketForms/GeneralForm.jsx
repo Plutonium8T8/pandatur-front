@@ -84,7 +84,6 @@ export const GeneralForm = ({ data, formInstance }) => {
       />
 
       <TextInput
-        disabled
         mt="md"
         label={getLanguageByKey("Contact")}
         placeholder={getLanguageByKey("Selectează contact")}
