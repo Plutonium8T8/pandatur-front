@@ -33,6 +33,7 @@ export const AppProvider = ({ children }) => {
   const [loadingWorkflow, setLoadingWorkflow] = useState(true);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [customGroupTitle, setCustomGroupTitle] = useState(null);
+  const [skipInitialFetch, setSkipInitialFetch] = useState(false);
 
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
@@ -172,10 +173,10 @@ export const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length) {
+    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length && !skipInitialFetch) {
       fetchTickets();
     }
-  }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
+  }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters, skipInitialFetch]);
 
   const fetchSingleTicket = async (ticketId) => {
     try {
@@ -388,6 +389,7 @@ export const AppProvider = ({ children }) => {
         accessibleGroupTitles,
         setCustomGroupTitle,
         customGroupTitle,
+        setSkipInitialFetch,
 
         //chat
         chatFilteredTickets,

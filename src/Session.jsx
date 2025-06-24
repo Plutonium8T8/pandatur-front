@@ -10,14 +10,13 @@ import { privatePaths } from "./routes";
 
 export const Session = ({ children }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const [loading, setLoading] = useState(true);
   const { setUserId, setName, setSurname } = useUser();
 
   const navigateToRightPath = (path) => {
     const firstPathUrl = path.split("/").filter(Boolean)[0];
 
-    // Special case: Opening a new window with the lead's ID in the format `/leads/{id}`
     if (path.startsWith("/leads")) {
       return path;
     }
@@ -39,7 +38,8 @@ export const Session = ({ children }) => {
       setUserId(data.user_id);
       setName(data.username || "");
       setSurname(data.surname || "");
-      navigate(navigateToRightPath(pathname));
+
+      navigate(navigateToRightPath(pathname + search));
     } catch (error) {
       navigate("/auth");
       handleLogout();

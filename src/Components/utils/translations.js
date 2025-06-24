@@ -1984,9 +1984,9 @@ export const translations = {
     EN: "Full name"
   },
   "Grup": {
-    RO: "Pâlnie",
-    RU: "Воронка",
-    EN: "Pipeline"
+    RO: "Grup utilizatori",
+    RU: "Группа пользователей",
+    EN: "Group users"
   },
   "Rol": {
     RO: "Rol",

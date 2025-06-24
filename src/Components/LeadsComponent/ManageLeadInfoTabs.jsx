@@ -52,7 +52,10 @@ export const ManageLeadInfoTabs = ({
       ];
 
       const stringifiedBooleans = Object.fromEntries(
-        booleanFields.map((key) => [key, String(values[key])])
+        booleanFields.map((key) => [
+          key,
+          values[key] !== undefined ? String(values[key]) : undefined,
+        ])
       );
 
       const payload = {

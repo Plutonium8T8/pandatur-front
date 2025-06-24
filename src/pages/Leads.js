@@ -35,6 +35,8 @@ import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTab
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
 import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import SingleChat from "@components/ChatComponent/SingleChat";
+import { AppContext } from "../contexts/AppContext";
+import { useContext } from "react";
 import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
 import Can from "../Components/CanComponent/Can";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
@@ -51,6 +53,7 @@ import {
 } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { LuFilter } from "react-icons/lu";
+import { useSearchParams } from "react-router-dom";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
 
@@ -73,6 +76,7 @@ export const Leads = () => {
   } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -94,6 +98,7 @@ export const Leads = () => {
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
   const [choiceWorkflow, setChoiceWorkflow] = useState([]);
+  const { setSkipInitialFetch } = useContext(AppContext);
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
@@ -102,6 +107,53 @@ export const Leads = () => {
   const deleteBulkLeads = useConfirmPopup({
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
+
+  useEffect(() => {
+    const hasFilterInUrl = searchParams.get("workflow") || searchParams.get("groupTitle") || searchParams.get("filters");
+
+    if (hasFilterInUrl) {
+      setSkipInitialFetch(true);
+
+      const groupTitleFromUrl = searchParams.get("groupTitle");
+
+      if (groupTitleFromUrl) {
+        setCustomGroupTitle(groupTitleFromUrl);
+      } else if (accessibleGroupTitles.length > 0) {
+        setCustomGroupTitle(accessibleGroupTitles[0]);
+      }
+    }
+  }, [searchParams, accessibleGroupTitles]);
+
+  useEffect(() => {
+    const mode = searchParams.get("viewMode");
+    const search = searchParams.get("searchTerm");
+    const rawFilters = searchParams.get("filters");
+
+    if (mode === VIEW_MODE.LIST || mode === VIEW_MODE.KANBAN) {
+      setViewMode(mode);
+    }
+
+    if (search) {
+      setSearchTerm(search);
+      setKanbanSearchTerm(search);
+    }
+
+    if (rawFilters) {
+      try {
+        const filters = JSON.parse(decodeURIComponent(rawFilters));
+        if (mode === VIEW_MODE.LIST) {
+          setHardTicketFilters(filters);
+          setCurrentPage(1);
+        } else {
+          setKanbanFilters(filters);
+          setKanbanFilterActive(true);
+          fetchKanbanTickets(filters);
+        }
+      } catch (e) {
+        console.error("Failed to parse filters from URL", e);
+      }
+    }
+  }, []);
 
   const fetchKanbanTickets = async (filters = {}) => {
     setKanbanSpinner(true);
@@ -279,14 +331,20 @@ export const Leads = () => {
 
   const handleChangeViewMode = (mode) => {
     setViewMode(mode);
-    if (mode === VIEW_MODE.LIST) {
-      setCurrentPage(1);
-    }
+    setCurrentPage(1);
+
+    setSearchParams((prev) => {
+      const filters = mode === VIEW_MODE.LIST ? hardTicketFilters : kanbanFilters;
+      return {
+        viewMode: mode,
+        searchTerm: (mode === VIEW_MODE.LIST ? searchTerm : kanbanSearchTerm) || "",
+        filters: encodeURIComponent(JSON.stringify(filters)),
+      };
+    });
   };
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
-
     const merged = {
       ...hardTicketFilters,
       ...selectedFilters,
@@ -296,6 +354,12 @@ export const Leads = () => {
     setHardTicketFilters(merged);
     setCurrentPage(1);
     setIsOpenListFilterModal(false);
+
+    setSearchParams({
+      viewMode: VIEW_MODE.LIST,
+      searchTerm: searchTerm || "",
+      filters: encodeURIComponent(JSON.stringify(merged)),
+    });
   };
 
   const handleApplyFilterLightTicket = (selectedFilters) => {
@@ -304,6 +368,12 @@ export const Leads = () => {
     setKanbanFilterActive(true);
     fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
+
+    setSearchParams({
+      viewMode: VIEW_MODE.KANBAN,
+      searchTerm: kanbanSearchTerm || "",
+      filters: encodeURIComponent(JSON.stringify(selectedFilters)),
+    });
   };
 
   const handlePaginationWorkflow = (page) => {
@@ -395,9 +465,17 @@ export const Leads = () => {
                   (viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm) && (
                     <IoMdClose
                       className="pointer"
-                      onClick={() =>
-                        (viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm)("")
-                      }
+                      onClick={() => {
+                        (viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm)("");
+                        setSearchParams((prev) => {
+                          const filters = viewMode === VIEW_MODE.KANBAN ? kanbanFilters : hardTicketFilters;
+                          return {
+                            ...Object.fromEntries(prev.entries()),
+                            searchTerm: "",
+                            filters: encodeURIComponent(JSON.stringify(filters)),
+                          };
+                        });
+                      }}
                     />
                   )
                 }
