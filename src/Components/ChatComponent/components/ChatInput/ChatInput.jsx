@@ -23,6 +23,7 @@ import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
 import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
+import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 
 import "./ChatInput.css";
@@ -61,7 +62,7 @@ export const ChatInput = ({
 
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
-  const { seenMessages } = useSocket();
+  const { seenMessages, socketRef } = useSocket();
   const { markMessagesAsRead } = useApp();
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
@@ -154,10 +155,21 @@ export const ChatInput = ({
   };
 
   const handleMarkAsRead = () => {
-    if (ticketId && unseenCount > 0) {
-      seenMessages(ticketId, userId);
-      markMessagesAsRead(ticketId, unseenCount);
+    if (!ticketId) return;
+
+    if (socketRef?.current?.readyState === WebSocket.OPEN) {
+      const connectPayload = {
+        type: TYPE_SOCKET_EVENTS.CONNECT,
+        data: { ticket_id: [ticketId] },
+      };
+      socketRef.current.send(JSON.stringify(connectPayload));
+      console.log("[READ] CONNECT отправлен вручную для тикета:", ticketId);
+    } else {
+      console.warn("[READ] Сокет не готов к CONNECT");
     }
+
+    seenMessages(ticketId, userId);
+    markMessagesAsRead(ticketId, unseenCount);
   };
 
   const handleMarkActionResolved = async () => {

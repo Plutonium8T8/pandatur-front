@@ -67,15 +67,43 @@ export const SocketProvider = ({ children }) => {
   const seenMessages = (ticketId, userId) => {
     const socketInstance = socketRef.current;
 
-    if (socketInstance && socketInstance.readyState === WebSocket.OPEN) {
-      const readMessageData = {
-        type: TYPE_SOCKET_EVENTS.SEEN,
-        data: {
-          ticket_id: ticketId,
-          sender_id: userId,
-        },
-      };
-      socketInstance.send(JSON.stringify(readMessageData));
+    console.log("[SEEN] Попытка отправки seen-сообщения", {
+      socketExists: !!socketInstance,
+      readyState: socketInstance?.readyState,
+      ticketId,
+      userId,
+    });
+
+    if (!socketInstance) {
+      console.warn("[SEEN] socketInstance не существует");
+      return;
+    }
+
+    if (socketInstance.readyState !== WebSocket.OPEN) {
+      console.warn("[SEEN] Сокет не в состоянии OPEN:", socketInstance.readyState);
+      return;
+    }
+
+    if (!ticketId || !userId) {
+      console.warn("[SEEN] ticketId или userId отсутствует", { ticketId, userId });
+      return;
+    }
+
+    const readMessageData = {
+      type: TYPE_SOCKET_EVENTS.SEEN,
+      data: {
+        ticket_id: ticketId,
+        sender_id: userId,
+      },
+    };
+
+    const payload = JSON.stringify(readMessageData);
+
+    try {
+      socketInstance.send(payload);
+      console.log("[SEEN] Сообщение отправлено в сокет:", payload);
+    } catch (err) {
+      console.error("[SEEN] Ошибка при отправке сообщения в сокет:", err);
     }
   };
 
