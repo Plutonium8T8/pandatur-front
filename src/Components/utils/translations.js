@@ -3267,9 +3267,9 @@ export const translations = {
     "EN": "Auxiliar"
   },
   "socketConnectionEstablished": {
-    RO: "Conectare la server reușită",
-    RU: "Успешное подключение к серверу",
-    EN: "Connected to server successfully"
+    RO: "Conectare la socket reușită",
+    RU: "Успешное подключение к socket",
+    EN: "Connected to socket successfully"
   },
   "Data creării": {
     "RO": "Data creării",
