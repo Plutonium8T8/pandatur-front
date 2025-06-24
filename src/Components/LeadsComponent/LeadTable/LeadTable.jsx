@@ -16,7 +16,7 @@ import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components";
 import { RcTable } from "../../RcTable";
 import { api } from "../../../api";
-import { useConfirmPopup, useUser } from "../../../hooks";
+import { useConfirmPopup, useUser, useGetTechniciansList } from "../../../hooks";
 import { ManageLeadInfoTabs } from "../../LeadsComponent/ManageLeadInfoTabs";
 import { DateCell } from "../../DateCell";
 import "./LeadTable.css";
@@ -45,6 +45,17 @@ export const LeadTable = ({
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
   const { user } = useUser();
+  const { technicians } = useGetTechniciansList();
+
+  const technicianMap = useMemo(() => {
+    if (!technicians || technicians.length === 0) return new Map();
+
+    return new Map(
+      technicians
+        .filter((t) => t?.id && t.id.id)
+        .map((t) => [Number(t.id.id), `${t.id.surname || ""} ${t.id.name || ""}`.trim()])
+    );
+  }, [technicians]);
 
   const allowedGroupTitles = useMemo(() => {
     if (!user?.technician?.groups) return [];
@@ -128,20 +139,54 @@ export const LeadTable = ({
       ),
     },
     {
-      title: getLanguageByKey("Nume"),
-      key: "name",
-      dataIndex: "name",
-      width: 200,
+      title: getLanguageByKey("Responsabil"),
+      dataIndex: "technician_id",
+      key: "technician_id",
       align: "center",
-      render: (name) => (name ? name : cleanValue()),
+      width: 200,
+      render: (technicianId) =>
+        technicianMap.get(Number(technicianId)) || cleanValue(),
     },
     {
-      title: getLanguageByKey("Prenume"),
-      key: "surname",
-      dataIndex: "surname",
+      title: getLanguageByKey("Workflow"),
+      dataIndex: "workflow",
+      align: "center",
+      width: 150,
+      render: (workflow) => <WorkflowTag type={workflow} />,
+    },
+    {
+      title: getLanguageByKey("Prioritate"),
+      dataIndex: "priority",
+      align: "center",
+      width: 100,
+      render: (priority) => (
+        <Tag type={priorityTagColors[priority]}>{priority}</Tag>
+      ),
+    },
+    {
+      title: getLanguageByKey("Data de creare"),
+      dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (surname) => (surname ? surname : cleanValue()),
+      render: (date) => (
+        <DateCell gap={4} direction="row" justify="center" date={date} />
+      ),
+    },
+    {
+      title: getLanguageByKey("Ultima interacțiune"),
+      dataIndex: "last_interaction_date",
+      align: "center",
+      width: 200,
+      render: (date) => (
+        <DateCell gap={4} direction="row" justify="center" date={date} />
+      ),
+    },
+    {
+      title: getLanguageByKey("Telefon"),
+      dataIndex: "phone",
+      align: "center",
+      width: 150,
+      render: (phone) => (phone ? phone : cleanValue()),
     },
     {
       title: getLanguageByKey("Email"),
@@ -153,11 +198,26 @@ export const LeadTable = ({
         email ? <div className="break-word">{email}</div> : cleanValue(),
     },
     {
-      title: getLanguageByKey("Telefon"),
-      dataIndex: "phone",
+      title: getLanguageByKey("Prenume"),
+      key: "surname",
+      dataIndex: "surname",
       align: "center",
-      width: 150,
-      render: (phone) => (phone ? phone : cleanValue()),
+      width: 200,
+      render: (surname) => (surname ? surname : cleanValue()),
+    },
+    {
+      title: getLanguageByKey("Nume"),
+      key: "name",
+      dataIndex: "name",
+      width: 200,
+      align: "center",
+      render: (name) => (name ? name : cleanValue()),
+    },
+    {
+      title: getLanguageByKey("Contact"),
+      dataIndex: "contact",
+      align: "center",
+      width: 200,
     },
     {
       title: getLanguageByKey("Descriere"),
@@ -180,46 +240,6 @@ export const LeadTable = ({
         <Flex gap="8" wrap="wrap">
           {renderTags(tags)}
         </Flex>
-      ),
-    },
-    {
-      title: getLanguageByKey("Prioritate"),
-      dataIndex: "priority",
-      align: "center",
-      width: 100,
-      render: (priority) => (
-        <Tag type={priorityTagColors[priority]}>{priority}</Tag>
-      ),
-    },
-    {
-      title: getLanguageByKey("Workflow"),
-      dataIndex: "workflow",
-      align: "center",
-      width: 150,
-      render: (workflow) => <WorkflowTag type={workflow} />,
-    },
-    {
-      title: getLanguageByKey("Contact"),
-      dataIndex: "contact",
-      align: "center",
-      width: 200,
-    },
-    {
-      title: getLanguageByKey("Data de creare"),
-      dataIndex: "creation_date",
-      align: "center",
-      width: 200,
-      render: (date) => (
-        <DateCell gap={4} direction="row" justify="center" date={date} />
-      ),
-    },
-    {
-      title: getLanguageByKey("Ultima interacțiune"),
-      dataIndex: "last_interaction_date",
-      align: "center",
-      width: 200,
-      render: (date) => (
-        <DateCell gap={4} direction="row" justify="center" date={date} />
       ),
     },
     {
