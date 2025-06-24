@@ -4,6 +4,7 @@ import { useUser, useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
 import {
   workflowOptionsByGroupTitle,
   workflowOptionsLimitedByGroupTitle,
@@ -201,7 +202,8 @@ export const AppProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length) {
+    const isLeadsItemView = /^\/leads\/\d+$/.test(window.location.pathname);
+    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length && !isLeadsItemView) {
       fetchTickets();
     }
   }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
@@ -333,6 +335,22 @@ export const AppProvider = ({ children }) => {
       handleWebSocketMessage(sendedValue);
     }
   }, [sendedValue]);
+
+  usePathnameWatcher((pathname) => {
+    const isLeadsListView = pathname === "/leads";
+
+    if (
+      isLeadsListView &&
+      !spinnerTickets &&
+      !tickets.length &&
+      !loadingWorkflow &&
+      groupTitleForApi &&
+      workflowOptions.length
+    ) {
+      console.log("📥 Загрузка тикетов при переходе на /leads");
+      fetchTickets();
+    }
+  });
 
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
