@@ -54,10 +54,6 @@ import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
 
-const SORT_BY = "creation_date";
-const ORDER = "DESC";
-const HARD_TICKET = "hard";
-
 export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
@@ -330,8 +326,6 @@ export const Leads = () => {
   const responsibleId = selectedTicket?.technician_id
     ? String(selectedTicket.technician_id)
     : undefined;
-
-  const hasOpenFiltersModal = isOpenKanbanFilterModal || isOpenListFilterModal;
 
   const hasHardFilters = Object.values(hardTicketFilters).some(
     (v) =>
