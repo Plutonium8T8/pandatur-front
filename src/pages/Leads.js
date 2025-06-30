@@ -1,35 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import {
-  Divider,
-  Modal,
-  Button,
-  ActionIcon,
-  Input,
-  SegmentedControl,
-  Flex,
-  Select,
-} from "@mantine/core";
-import {
-  useDOMElementHeight,
-  useApp,
-  useDebounce,
-  useConfirmPopup,
-  useGetTechniciansList,
-} from "@hooks";
-import {
-  priorityOptions,
-  groupTitleOptions,
-} from "../FormOptions";
+import { Divider, Modal, Button, ActionIcon, Input, SegmentedControl, Flex, Select } from "@mantine/core";
+import { useDOMElementHeight, useApp, useDebounce, useConfirmPopup, useGetTechniciansList } from "@hooks";
+import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
-import {
-  SpinnerRightBottom,
-  MantineModal,
-  AddLeadModal,
-  PageHeader,
-  Spin,
-} from "@components";
+import { SpinnerRightBottom, MantineModal, AddLeadModal, PageHeader, Spin } from "@components";
+import { useSearchParams } from "react-router-dom";
 import { WorkflowColumns } from "../Components/Workflow/WorkflowColumns";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
@@ -40,15 +17,8 @@ import Can from "../Components/CanComponent/Can";
 import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
 import { api } from "../api";
 import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
-import {
-  FaTrash,
-  FaEdit,
-  FaList,
-} from "react-icons/fa";
-import {
-  IoMdAdd,
-  IoMdClose,
-} from "react-icons/io";
+import { FaTrash, FaEdit, FaList } from "react-icons/fa";
+import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
@@ -73,6 +43,7 @@ export const Leads = () => {
   } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -274,8 +245,21 @@ export const Leads = () => {
     setIsOpenAddLeadModal(true);
   };
 
+  useEffect(() => {
+    const urlView = searchParams.get("view");
+    if (urlView === VIEW_MODE.LIST || urlView === VIEW_MODE.KANBAN) {
+      setViewMode(urlView);
+    }
+  }, []);
+
   const handleChangeViewMode = (mode) => {
     setViewMode(mode);
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set("view", mode);
+      return newParams;
+    });
+
     if (mode === VIEW_MODE.LIST) {
       setCurrentPage(1);
     }
