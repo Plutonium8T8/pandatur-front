@@ -20,6 +20,7 @@ import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
+import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
@@ -44,6 +45,7 @@ export const Leads = () => {
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [params] = useSearchParams();
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -339,34 +341,21 @@ export const Leads = () => {
   );
 
   useEffect(() => {
-    const urlView = searchParams.get("view");
-    if (urlView === VIEW_MODE.LIST || urlView === VIEW_MODE.KANBAN) {
-      setViewMode(urlView);
-    }
+    // Только если есть хотя бы один фильтр (кроме view)
+    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view");
+    if (filterKeys.length === 0) return;
 
-    const filtersFromUrl = {};
-    for (const [key, value] of searchParams.entries()) {
-      if (key !== "view" && value) {
-        try {
-          filtersFromUrl[key] = JSON.parse(value);
-        } catch {
-          filtersFromUrl[key] = value;
-        }
-      }
-    }
+    const parsedFilters = parseFiltersFromUrl(params);
 
-    const hasAnyFilters = Object.keys(filtersFromUrl).length > 0;
-
-    if (hasAnyFilters) {
-      if (urlView === VIEW_MODE.LIST) {
-        setHardTicketFilters(filtersFromUrl);
-      } else {
-        setKanbanFilters(filtersFromUrl);
-        setKanbanFilterActive(true);
-        fetchKanbanTickets(filtersFromUrl);
-      }
+    if (viewMode === VIEW_MODE.KANBAN) {
+      setKanbanFilters(parsedFilters);
+      setKanbanFilterActive(true);
+      fetchKanbanTickets(parsedFilters);
+    } else {
+      setHardTicketFilters(parsedFilters);
+      fetchHardTickets(1);
     }
-  }, []);
+  }, [viewMode]);
 
   return (
     <>

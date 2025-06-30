@@ -6,24 +6,12 @@ import { useUser } from "@hooks";
 import { api } from "@api";
 import { showServerError } from "@utils";
 import { LoadingOverlay } from "@components";
-import { privatePaths } from "./routes";
 
 export const Session = ({ children }) => {
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const [loading, setLoading] = useState(true);
   const { setUserId, setName, setSurname } = useUser();
-
-  const navigateToRightPath = (path) => {
-    const firstPathUrl = path.split("/").filter(Boolean)[0];
-
-    // Special case: Opening a new window with the lead's ID in the format `/leads/{id}`
-    if (path.startsWith("/leads")) {
-      return path;
-    }
-
-    return privatePaths.includes(firstPathUrl) ? path : "/leads";
-  };
 
   const handleLogout = () => {
     Cookies.remove("jwt");
@@ -39,7 +27,12 @@ export const Session = ({ children }) => {
       setUserId(data.user_id);
       setName(data.username || "");
       setSurname(data.surname || "");
-      navigate(navigateToRightPath(pathname));
+
+      // если уже на нужном path — не делать navigate
+      if (pathname === "/auth") return;
+
+      // остаёмся на текущем пути с сохранением query-параметров
+      navigate(`${pathname}${search}`, { replace: true });
     } catch (error) {
       navigate("/auth");
       handleLogout();
