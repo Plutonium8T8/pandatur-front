@@ -70,9 +70,7 @@ export const Leads = () => {
   const isSearching = !!kanbanSearchTerm?.trim();
 
   const debouncedSearch = useDebounce(searchTerm);
-  const deleteBulkLeads = useConfirmPopup({
-    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
-  });
+  const deleteBulkLeads = useConfirmPopup({ subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"), });
 
   const fetchKanbanTickets = async (filters = {}) => {
     setKanbanSpinner(true);
