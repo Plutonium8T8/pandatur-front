@@ -63,11 +63,23 @@ export const LeadsKanbanFilter = ({
 
     const newParams = new URLSearchParams();
     Object.entries(combinedFilters).forEach(([key, value]) => {
+      if (
+        value &&
+        typeof value === "object" &&
+        !Array.isArray(value) &&
+        ("from" in value || "to" in value)
+      ) {
+        if (value.from) newParams.set(`${key}_from`, value.from);
+        if (value.to) newParams.set(`${key}_to`, value.to);
+        return;
+      }
+
       if (Array.isArray(value)) {
         value.forEach((v) => newParams.append(key, v));
-      } else {
-        newParams.set(key, value);
+        return;
       }
+
+      newParams.set(key, value);
     });
     newParams.set("view", "kanban");
     setSearchParams(newParams, { replace: true });
