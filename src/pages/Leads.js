@@ -197,7 +197,6 @@ export const Leads = () => {
       setLoading(true);
 
       const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
-
       const isSearchingInList = !!searchTerm?.trim();
 
       const effectiveWorkflow =
@@ -207,10 +206,7 @@ export const Leads = () => {
             ? workflowOptions
             : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
-      const cleanFilters = { ...hardTicketFilters };
-      if (cleanFilters.search?.trim() === "") {
-        delete cleanFilters.search;
-      }
+      const { search, group_title, workflow, ...restFilters } = hardTicketFilters;
 
       const response = await api.tickets.filters({
         page,
@@ -218,8 +214,9 @@ export const Leads = () => {
         group_title: groupTitleForApi,
         sort_by: "creation_date",
         order: "DESC",
+        ...(search?.trim() ? { search: search.trim() } : {}),
         attributes: {
-          ...cleanFilters,
+          ...restFilters,
           workflow: effectiveWorkflow,
         },
       });
@@ -552,6 +549,7 @@ export const Leads = () => {
             setHardTicketFilters({});
             setCurrentPage(1);
           }}
+          groupTitleForApi={groupTitleForApi}
         />
       </Modal>
 

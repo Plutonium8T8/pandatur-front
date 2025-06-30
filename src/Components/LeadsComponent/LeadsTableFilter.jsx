@@ -11,6 +11,7 @@ export const LeadsTableFilter = ({
   initialData,
   onSubmitTicket,
   onResetFilters,
+  groupTitleForApi,
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,7 +35,12 @@ export const LeadsTableFilter = ({
   const handleSubmit = () => {
     const ticketValues = ticketFormRef.current?.getValues?.() || {};
     const messageValues = messageFormRef.current?.getValues?.() || {};
-    const combinedFilters = mergeFilters(ticketValues, messageValues);
+
+    const combinedFilters = mergeFilters(
+      ticketValues,
+      messageValues,
+      groupTitleForApi ? { group_title: groupTitleForApi } : {}
+    );
 
     const newParams = new URLSearchParams();
     Object.entries(combinedFilters).forEach(([key, value]) => {
