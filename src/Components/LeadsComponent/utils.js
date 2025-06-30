@@ -32,8 +32,8 @@ export const formatDateOrUndefined = (date) => {
 
   return minDate && maxDate
     ? {
-      from: dayjs(minDate).format(DD_MM_YYYY__HH_mm_ss),
-      to: dayjs(maxDate).format(DD_MM_YYYY__HH_mm_ss),
+      from: dayjs(minDate).format(DD_MM_YYYY_DASH),
+      to: dayjs(maxDate).format(DD_MM_YYYY_DASH),
     }
     : undefined;
 };
@@ -59,8 +59,8 @@ export const convertDateToArray = (rangeDate = {}) => {
   const { from, to } = rangeDate;
 
   return [
-    from ? dayjs(from, DD_MM_YYYY__HH_mm_ss) : undefined,
-    to ? dayjs(to, DD_MM_YYYY__HH_mm_ss) : undefined,
+    from ? dayjs(from, DD_MM_YYYY_DASH) : undefined,
+    to ? dayjs(to, DD_MM_YYYY_DASH) : undefined,
   ];
 };
 
