@@ -286,18 +286,15 @@ export const Leads = () => {
     fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
 
-    // обновление параметров в URL
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
 
-      // сначала очищаем старые параметры (кроме view)
       for (const key of Array.from(newParams.keys())) {
         if (key !== "view") {
           newParams.delete(key);
         }
       }
 
-      // добавляем новые параметры фильтра
       Object.entries(selectedFilters).forEach(([key, value]) => {
         if (
           value !== undefined &&
