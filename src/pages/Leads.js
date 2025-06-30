@@ -112,15 +112,15 @@ export const Leads = () => {
     let totalPages = 1;
 
     try {
+      const { group_title, search, ...attributes } = filters;
+
       while (currentPage <= totalPages) {
         const res = await api.tickets.filters({
           page: currentPage,
           type: "light",
-          group_title: groupTitleForApi,
-          attributes: {
-            ...filters,
-            ...(kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm } : {}),
-          },
+          group_title: group_title || groupTitleForApi,
+          ...(search?.trim() ? { search: search.trim() } : {}),
+          attributes,
         });
 
         const normalized = res.tickets.map(t => ({
@@ -519,6 +519,8 @@ export const Leads = () => {
           setKanbanFilters={setKanbanFilters}
           setKanbanTickets={setKanbanTickets}
           onWorkflowSelected={(workflow) => setChoiceWorkflow(workflow)}
+          groupTitleForApi={groupTitleForApi}
+          kanbanSearchTerm={kanbanSearchTerm}
         />
       </Modal>
 

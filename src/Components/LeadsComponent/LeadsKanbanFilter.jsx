@@ -3,6 +3,7 @@ import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -12,9 +13,12 @@ export const LeadsKanbanFilter = ({
   setKanbanFilterActive,
   setKanbanFilters,
   setKanbanTickets,
-  onWorkflowSelected
+  onWorkflowSelected,
+  groupTitleForApi,
+  kanbanSearchTerm,
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const ticketFormRef = useRef();
   const messageFormRef = useRef();
@@ -37,20 +41,36 @@ export const LeadsKanbanFilter = ({
     setKanbanFilters({});
     setKanbanFilterActive(false);
     setKanbanTickets([]);
+    setSearchParams({ view: "kanban" }, { replace: true });
     onClose?.();
   };
 
   const handleSubmit = () => {
-
     const ticketValues = ticketFormRef.current?.getValues?.() || {};
     const messageValues = messageFormRef.current?.getValues?.() || {};
 
-    const combinedFilters = mergeFilters(ticketValues, messageValues);
+    const combinedFilters = mergeFilters(
+      ticketValues,
+      messageValues,
+      groupTitleForApi ? { group_title: groupTitleForApi } : {},
+      kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm.trim() } : {}
+    );
 
     if (Object.keys(combinedFilters).length === 0) {
       handleReset();
       return;
     }
+
+    const newParams = new URLSearchParams();
+    Object.entries(combinedFilters).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => newParams.append(key, v));
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    newParams.set("view", "kanban");
+    setSearchParams(newParams, { replace: true });
 
     setKanbanFilterActive(true);
     setKanbanFilters(combinedFilters);

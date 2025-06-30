@@ -3,6 +3,7 @@ import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 export const LeadsTableFilter = ({
   onClose,
@@ -12,6 +13,7 @@ export const LeadsTableFilter = ({
   onResetFilters,
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
+  const [searchParams, setSearchParams] = useSearchParams();
   const ticketFormRef = useRef();
   const messageFormRef = useRef();
 
@@ -34,11 +36,23 @@ export const LeadsTableFilter = ({
     const messageValues = messageFormRef.current?.getValues?.() || {};
     const combinedFilters = mergeFilters(ticketValues, messageValues);
 
+    const newParams = new URLSearchParams();
+    Object.entries(combinedFilters).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) => newParams.append(key, v));
+      } else {
+        newParams.set(key, value);
+      }
+    });
+    newParams.set("view", "list");
+    setSearchParams(newParams, { replace: true });
+
     onSubmitTicket(combinedFilters, "hard");
     onClose?.();
   };
 
   const handleReset = () => {
+    setSearchParams({ view: "list" }, { replace: true });
     onResetFilters?.();
     onClose?.();
   };
