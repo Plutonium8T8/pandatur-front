@@ -285,6 +285,32 @@ export const Leads = () => {
     setKanbanFilterActive(true);
     fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
+
+    // обновление параметров в URL
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+
+      // сначала очищаем старые параметры (кроме view)
+      for (const key of Array.from(newParams.keys())) {
+        if (key !== "view") {
+          newParams.delete(key);
+        }
+      }
+
+      // добавляем новые параметры фильтра
+      Object.entries(selectedFilters).forEach(([key, value]) => {
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          (!Array.isArray(value) || value.length > 0)
+        ) {
+          newParams.set(key, JSON.stringify(value));
+        }
+      });
+
+      return newParams;
+    });
   };
 
   const handlePaginationWorkflow = (page) => {
@@ -316,6 +342,36 @@ export const Leads = () => {
       (!Array.isArray(v) || v.length > 0) &&
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
+
+  useEffect(() => {
+    const urlView = searchParams.get("view");
+    if (urlView === VIEW_MODE.LIST || urlView === VIEW_MODE.KANBAN) {
+      setViewMode(urlView);
+    }
+
+    const filtersFromUrl = {};
+    for (const [key, value] of searchParams.entries()) {
+      if (key !== "view" && value) {
+        try {
+          filtersFromUrl[key] = JSON.parse(value);
+        } catch {
+          filtersFromUrl[key] = value;
+        }
+      }
+    }
+
+    const hasAnyFilters = Object.keys(filtersFromUrl).length > 0;
+
+    if (hasAnyFilters) {
+      if (urlView === VIEW_MODE.LIST) {
+        setHardTicketFilters(filtersFromUrl);
+      } else {
+        setKanbanFilters(filtersFromUrl);
+        setKanbanFilterActive(true);
+        fetchKanbanTickets(filtersFromUrl);
+      }
+    }
+  }, []);
 
   return (
     <>
