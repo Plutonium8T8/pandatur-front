@@ -67,7 +67,6 @@ export const Leads = () => {
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
   const [choiceWorkflow, setChoiceWorkflow] = useState([]);
-  const type = searchParams.get("type");
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
@@ -151,7 +150,7 @@ export const Leads = () => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
     const type = searchParams.get("type");
-    if (type !== "light") return; // Только если нужен kanban!
+    if (type !== "light") return;
 
     if (kanbanSearchTerm?.trim()) {
       const timeout = setTimeout(() => {
@@ -318,7 +317,7 @@ export const Leads = () => {
         }
       });
 
-      newParams.set("type", "light"); // <-- обязательно!
+      newParams.set("type", "light");
       return newParams;
     });
   };

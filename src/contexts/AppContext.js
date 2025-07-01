@@ -347,7 +347,9 @@ export const AppProvider = ({ children }) => {
 
   const hasLeadsFilterInUrl = () => {
     const params = new URLSearchParams(window.location.search);
-    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view");
+    const filterKeys = Array.from(params.keys()).filter(
+      (key) => key !== "view" && key !== "type"
+    );
     return filterKeys.length > 0;
   };
 
