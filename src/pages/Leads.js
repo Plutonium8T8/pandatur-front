@@ -248,13 +248,22 @@ export const Leads = () => {
   const handleChangeViewMode = (mode) => {
     const upperMode = mode.toUpperCase();
     setViewMode(upperMode);
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
+    setSearchParams(() => {
+      const newParams = new URLSearchParams();
       newParams.set("view", upperMode);
       return newParams;
     });
 
     if (upperMode === VIEW_MODE.LIST) setCurrentPage(1);
+
+    if (upperMode === VIEW_MODE.LIST) {
+      setHardTicketFilters({});
+      setSearchTerm("");
+    } else {
+      setKanbanFilters({});
+      setKanbanSearchTerm("");
+      setKanbanFilterActive(false);
+    }
   };
 
   useEffect(() => {
