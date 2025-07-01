@@ -203,7 +203,14 @@ export const AppProvider = ({ children }) => {
 
   useEffect(() => {
     const isLeadsItemView = /^\/leads\/\d+$/.test(window.location.pathname);
-    if (!loadingWorkflow && groupTitleForApi && workflowOptions.length && !isLeadsItemView) {
+    // Вот тут добавь проверку на фильтр!
+    if (
+      !loadingWorkflow &&
+      groupTitleForApi &&
+      workflowOptions.length &&
+      !isLeadsItemView &&
+      !hasLeadsFilterInUrl() // <--- вот здесь!
+    ) {
       fetchTickets();
     }
   }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
@@ -336,16 +343,22 @@ export const AppProvider = ({ children }) => {
     }
   }, [sendedValue]);
 
+  const hasLeadsFilterInUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view");
+    return filterKeys.length > 0;
+  };
+
   usePathnameWatcher((pathname) => {
     const isLeadsListView = pathname === "/leads";
-
     if (
       isLeadsListView &&
       !spinnerTickets &&
       !tickets.length &&
       !loadingWorkflow &&
       groupTitleForApi &&
-      workflowOptions.length
+      workflowOptions.length &&
+      !hasLeadsFilterInUrl() // <--- вот здесь!
     ) {
       console.log("📥 Загрузка тикетов при переходе на /leads");
       fetchTickets();
