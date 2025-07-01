@@ -245,25 +245,25 @@ export const Leads = () => {
     setIsOpenAddLeadModal(true);
   };
 
-  useEffect(() => {
-    const urlView = searchParams.get("view");
-    if (urlView === VIEW_MODE.LIST || urlView === VIEW_MODE.KANBAN) {
-      setViewMode(urlView);
-    }
-  }, []);
-
   const handleChangeViewMode = (mode) => {
-    setViewMode(mode);
+    const upperMode = mode.toUpperCase();
+    setViewMode(upperMode);
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set("view", mode);
+      newParams.set("view", upperMode);
       return newParams;
     });
 
-    if (mode === VIEW_MODE.LIST) {
-      setCurrentPage(1);
-    }
+    if (upperMode === VIEW_MODE.LIST) setCurrentPage(1);
   };
+
+  useEffect(() => {
+    const urlView = searchParams.get("view");
+    const urlViewUpper = urlView ? urlView.toUpperCase() : undefined;
+    if (urlViewUpper && urlViewUpper !== viewMode) {
+      setViewMode(urlViewUpper);
+    }
+  }, [searchParams]);
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
