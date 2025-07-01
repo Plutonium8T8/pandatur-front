@@ -41,7 +41,7 @@ export const LeadsKanbanFilter = ({
     setKanbanFilters({});
     setKanbanFilterActive(false);
     setKanbanTickets([]);
-    setSearchParams({ view: "kanban" }, { replace: true });
+    setSearchParams({ view: "kanban", type: "light" }, { replace: true });
     onClose?.();
   };
 
@@ -82,6 +82,7 @@ export const LeadsKanbanFilter = ({
       newParams.set(key, value);
     });
     newParams.set("view", "kanban");
+    newParams.set("type", "light");
     setSearchParams(newParams, { replace: true });
 
     setKanbanFilterActive(true);

@@ -67,6 +67,7 @@ export const Leads = () => {
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
   const [choiceWorkflow, setChoiceWorkflow] = useState([]);
+  const type = searchParams.get("type");
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
@@ -149,6 +150,8 @@ export const Leads = () => {
   useEffect(() => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
+    const type = searchParams.get("type");
+    if (type !== "light") return; // Только если нужен kanban!
 
     if (kanbanSearchTerm?.trim()) {
       const timeout = setTimeout(() => {
@@ -315,6 +318,7 @@ export const Leads = () => {
         }
       });
 
+      newParams.set("type", "light"); // <-- обязательно!
       return newParams;
     });
   };
@@ -350,17 +354,17 @@ export const Leads = () => {
   );
 
   useEffect(() => {
-    // Только если есть хотя бы один фильтр (кроме view)
-    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view");
+    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view" && key !== "type");
     if (filterKeys.length === 0) return;
 
     const parsedFilters = parseFiltersFromUrl(params);
+    const type = params.get("type");
 
-    if (viewMode === VIEW_MODE.KANBAN) {
+    if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
       setKanbanFilters(parsedFilters);
       setKanbanFilterActive(true);
       fetchKanbanTickets(parsedFilters);
-    } else {
+    } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
       setHardTicketFilters(parsedFilters);
       fetchHardTickets(1);
     }

@@ -51,6 +51,7 @@ export const LeadsTableFilter = ({
       }
     });
     newParams.set("view", "list");
+    newParams.set("type", "hard");
     setSearchParams(newParams, { replace: true });
 
     onSubmitTicket(combinedFilters, "hard");
@@ -58,7 +59,7 @@ export const LeadsTableFilter = ({
   };
 
   const handleReset = () => {
-    setSearchParams({ view: "list" }, { replace: true });
+    setSearchParams({ view: "list", type: "hard" }, { replace: true });
     onResetFilters?.();
     onClose?.();
   };
