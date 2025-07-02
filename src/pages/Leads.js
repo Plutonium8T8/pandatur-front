@@ -261,15 +261,16 @@ export const Leads = () => {
       return newParams;
     });
 
-    if (upperMode === VIEW_MODE.LIST) setCurrentPage(1);
-
     if (upperMode === VIEW_MODE.LIST) {
+      setCurrentPage(1);
       setHardTicketFilters({});
       setSearchTerm("");
     } else {
       setKanbanFilters({});
       setKanbanSearchTerm("");
       setKanbanFilterActive(false);
+      setKanbanTickets([]);
+      fetchTickets();
     }
   };
 
