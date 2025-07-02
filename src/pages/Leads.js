@@ -368,6 +368,12 @@ export const Leads = () => {
       setKanbanFilters(parsedFilters);
       setKanbanFilterActive(true);
       fetchKanbanTickets(parsedFilters);
+
+      if (parsedFilters.workflow && parsedFilters.workflow.length > 0) {
+        setChoiceWorkflow(parsedFilters.workflow);
+      } else {
+        setChoiceWorkflow([]);
+      }
     } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
       setHardTicketFilters(parsedFilters);
       fetchHardTickets(1);
