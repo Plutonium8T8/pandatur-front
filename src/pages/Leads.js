@@ -552,6 +552,7 @@ export const Leads = () => {
         }}
       >
         <LeadsKanbanFilter
+          fetchTickets={fetchTickets}
           initialData={kanbanFilters}
           systemWorkflow={kanbanFilterActive ? selectedWorkflow : []}
           loading={loading}

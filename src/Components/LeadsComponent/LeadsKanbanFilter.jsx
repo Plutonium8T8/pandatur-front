@@ -16,6 +16,7 @@ export const LeadsKanbanFilter = ({
   onWorkflowSelected,
   groupTitleForApi,
   kanbanSearchTerm,
+  fetchTickets
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -41,7 +42,9 @@ export const LeadsKanbanFilter = ({
     setKanbanFilters({});
     setKanbanFilterActive(false);
     setKanbanTickets([]);
-    setSearchParams({ view: "kanban", type: "light" }, { replace: true });
+    setSearchParams({ view: "kanban" }, { replace: true });
+
+    fetchTickets?.();
     onClose?.();
   };
 
