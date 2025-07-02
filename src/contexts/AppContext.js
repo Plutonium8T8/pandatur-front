@@ -5,13 +5,10 @@ import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
-import {
-  workflowOptionsByGroupTitle,
-  workflowOptionsLimitedByGroupTitle,
-  userGroupsToGroupTitle,
-} from "../Components/utils/workflowUtils";
+import { workflowOptionsByGroupTitle, workflowOptionsLimitedByGroupTitle, userGroupsToGroupTitle } from "../Components/utils/workflowUtils";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
+
 export const AppContext = createContext();
 
 const normalizeLightTickets = (tickets) =>

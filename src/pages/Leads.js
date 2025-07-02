@@ -150,6 +150,11 @@ export const Leads = () => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
     const type = searchParams.get("type");
+
+    const hasUrlFilters = Array.from(searchParams.keys()).some(
+      (key) => !["view", "type"].includes(key)
+    );
+
     if (type !== "light") return;
 
     if (kanbanSearchTerm?.trim()) {
@@ -157,11 +162,11 @@ export const Leads = () => {
         fetchKanbanTickets();
       }, 1000);
       return () => clearTimeout(timeout);
-    } else {
+    } else if (!hasUrlFilters) {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
     }
-  }, [kanbanSearchTerm, groupTitleForApi, workflowOptions]);
+  }, [kanbanSearchTerm, groupTitleForApi, workflowOptions, searchParams]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
