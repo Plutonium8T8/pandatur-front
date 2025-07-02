@@ -67,6 +67,7 @@ export const Leads = () => {
   const [kanbanSpinner, setKanbanSpinner] = useState(false);
   const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
   const [choiceWorkflow, setChoiceWorkflow] = useState([]);
+  const isGroupTitleSyncedRef = useRef(false);
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
@@ -358,28 +359,79 @@ export const Leads = () => {
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
 
-  useEffect(() => {
-    const filterKeys = Array.from(params.keys()).filter((key) => key !== "view" && key !== "type");
-    if (filterKeys.length === 0) return;
+  // useEffect(() => {
+  //   const filterKeys = Array.from(params.keys()).filter((key) => key !== "view" && key !== "type");
+  //   if (filterKeys.length === 0) return;
 
+  //   const parsedFilters = parseFiltersFromUrl(params);
+  //   const type = params.get("type");
+
+  //   if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
+  //     setKanbanFilters(parsedFilters);
+  //     setKanbanFilterActive(true);
+  //     fetchKanbanTickets(parsedFilters);
+
+  //     if (parsedFilters.workflow && parsedFilters.workflow.length > 0) {
+  //       setChoiceWorkflow(parsedFilters.workflow);
+  //     } else {
+  //       setChoiceWorkflow([]);
+  //     }
+  //   } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
+  //     setHardTicketFilters(parsedFilters);
+  //     fetchHardTickets(1);
+  //   }
+  // }, [viewMode]);
+
+  useEffect(() => {
+    // Парсим group_title из url
     const parsedFilters = parseFiltersFromUrl(params);
+    const urlGroupTitle = parsedFilters.group_title;
+
+    // Если urlGroupTitle разрешён и он не выбран сейчас — ставим в select
+    if (
+      urlGroupTitle &&
+      accessibleGroupTitles.includes(urlGroupTitle) &&
+      customGroupTitle !== urlGroupTitle
+    ) {
+      setCustomGroupTitle(urlGroupTitle);
+      isGroupTitleSyncedRef.current = true; // это sync из url!
+    }
+    // Если urlGroupTitle нет в разрешённых — ничего не делаем
+  }, [params, accessibleGroupTitles, customGroupTitle, setCustomGroupTitle]);
+
+  useEffect(() => {
+    const parsedFilters = parseFiltersFromUrl(params);
+    const urlGroupTitle = parsedFilters.group_title;
     const type = params.get("type");
 
-    if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-      setKanbanFilters(parsedFilters);
-      setKanbanFilterActive(true);
-      fetchKanbanTickets(parsedFilters);
-
-      if (parsedFilters.workflow && parsedFilters.workflow.length > 0) {
-        setChoiceWorkflow(parsedFilters.workflow);
-      } else {
-        setChoiceWorkflow([]);
+    // fetch делаем только если:
+    // - sync из url ещё не был (или был только что)
+    // - customGroupTitle совпадает с urlGroupTitle
+    if (
+      isGroupTitleSyncedRef.current &&
+      urlGroupTitle &&
+      customGroupTitle === urlGroupTitle
+    ) {
+      if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
+        setKanbanFilters(parsedFilters);
+        setKanbanFilterActive(true);
+        fetchKanbanTickets(parsedFilters);
+        setChoiceWorkflow(parsedFilters.workflow || []);
+      } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
+        setHardTicketFilters(parsedFilters);
+        fetchHardTickets(1);
       }
-    } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-      setHardTicketFilters(parsedFilters);
-      fetchHardTickets(1);
+      // Важно! Сбросить флаг, чтобы не делать повторно!
+      isGroupTitleSyncedRef.current = false;
     }
-  }, [viewMode]);
+    // Если пользователь вручную выбирает customGroupTitle — fetch работает по onChange селекта
+  }, [
+    customGroupTitle,
+    params,
+    fetchKanbanTickets,
+    fetchHardTickets,
+    viewMode,
+  ]);
 
   return (
     <>
