@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -491,7 +492,20 @@ export const Leads = () => {
                 placeholder={getLanguageByKey("filter_by_group")}
                 value={customGroupTitle ?? groupTitleForApi}
                 data={groupTitleSelectData}
-                onChange={setCustomGroupTitle}
+                onChange={(val) => {
+                  setCustomGroupTitle(val);
+
+                  if (viewMode === VIEW_MODE.LIST) {
+                    setCurrentPage(1);
+                    setHardTicketFilters({});
+                  } else {
+                    setKanbanFilters({});
+                    setKanbanSearchTerm("");
+                    setKanbanFilterActive(false);
+                    setKanbanTickets([]);
+                    didLoadGlobalTicketsRef.current = false;
+                  }
+                }}
               />
               <SegmentedControl
                 onChange={handleChangeViewMode}

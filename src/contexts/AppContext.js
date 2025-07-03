@@ -19,6 +19,18 @@ const normalizeLightTickets = (tickets) =>
     unseen_count: ticket.unseen_count || 0,
   }));
 
+const getLeadsUrlType = () => {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  return params.get("type");
+};
+
+const getLeadsUrlViewMode = () => {
+  if (typeof window === "undefined") return null;
+  const params = new URLSearchParams(window.location.search);
+  return (params.get("view") || "").toUpperCase();
+};
+
 export const AppProvider = ({ children }) => {
   const { sendedValue, socketRef } = useSocket();
   const { enqueueSnackbar } = useSnackbar();
@@ -201,6 +213,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const isLeadsItemView = /^\/leads\/\d+$/.test(window.location.pathname);
     const urlType = getLeadsUrlType();
+    const urlViewMode = getLeadsUrlViewMode();
 
     if (
       !loadingWorkflow &&
@@ -208,7 +221,8 @@ export const AppProvider = ({ children }) => {
       workflowOptions.length &&
       !isLeadsItemView &&
       !hasLeadsFilterInUrl() &&
-      (!urlType || urlType === "light") // <--- важно!
+      (!urlType || urlType === "light") &&
+      (urlViewMode === "KANBAN" || !urlViewMode)
     ) {
       fetchTickets();
     }
