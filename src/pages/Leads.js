@@ -312,7 +312,6 @@ export const Leads = () => {
     setLightTicketFilters(selectedFilters);
     setKanbanFilters(selectedFilters);
     setKanbanFilterActive(true);
-    fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
     didLoadGlobalTicketsRef.current = false;
 
@@ -370,29 +369,6 @@ export const Leads = () => {
       (!Array.isArray(v) || v.length > 0) &&
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
-
-  // useEffect(() => {
-  //   const filterKeys = Array.from(params.keys()).filter((key) => key !== "view" && key !== "type");
-  //   if (filterKeys.length === 0) return;
-
-  //   const parsedFilters = parseFiltersFromUrl(params);
-  //   const type = params.get("type");
-
-  //   if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-  //     setKanbanFilters(parsedFilters);
-  //     setKanbanFilterActive(true);
-  //     fetchKanbanTickets(parsedFilters);
-
-  //     if (parsedFilters.workflow && parsedFilters.workflow.length > 0) {
-  //       setChoiceWorkflow(parsedFilters.workflow);
-  //     } else {
-  //       setChoiceWorkflow([]);
-  //     }
-  //   } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-  //     setHardTicketFilters(parsedFilters);
-  //     fetchHardTickets(1);
-  //   }
-  // }, [viewMode]);
 
   useEffect(() => {
     // Парсим group_title из url

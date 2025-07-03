@@ -88,7 +88,7 @@ export const LeadsKanbanFilter = ({
 
     setKanbanFilterActive(true);
     setKanbanFilters(combinedFilters);
-    fetchKanbanTickets(combinedFilters);
+    // fetchKanbanTickets(combinedFilters);
     onWorkflowSelected?.(ticketValues.workflow || []);
     onClose?.();
   };
