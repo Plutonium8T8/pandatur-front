@@ -46,6 +46,7 @@ export const Leads = () => {
   const { technicians } = useGetTechniciansList();
   const [searchParams, setSearchParams] = useSearchParams();
   const [params] = useSearchParams();
+  const didLoadGlobalTicketsRef = useRef(false);
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -271,11 +272,19 @@ export const Leads = () => {
       setKanbanSearchTerm("");
       setKanbanFilterActive(false);
       setKanbanTickets([]);
-      if (tickets.length === 0) {
-        fetchTickets();
+      // --- Суть здесь:
+      if (!didLoadGlobalTicketsRef.current) {
+        fetchTickets().then(() => {
+          didLoadGlobalTicketsRef.current = true;
+        });
       }
     }
   };
+
+  useEffect(() => {
+    didLoadGlobalTicketsRef.current = false;
+  }, [groupTitleForApi]);
+
 
   useEffect(() => {
     const urlView = searchParams.get("view");
@@ -305,6 +314,7 @@ export const Leads = () => {
     setKanbanFilterActive(true);
     fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
+    didLoadGlobalTicketsRef.current = false;
 
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
