@@ -271,9 +271,7 @@ export const Leads = () => {
       setKanbanSearchTerm("");
       setKanbanFilterActive(false);
       setKanbanTickets([]);
-      if (tickets.length === 0) {
-        fetchTickets();
-      }
+      fetchTickets();
     }
   };
 
