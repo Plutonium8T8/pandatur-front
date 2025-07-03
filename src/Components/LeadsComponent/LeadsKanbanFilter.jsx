@@ -2,8 +2,9 @@ import { Tabs, Button, Flex } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 import { useSearchParams } from "react-router-dom";
+import { AppContext } from "../../contexts/AppContext";
 
 export const LeadsKanbanFilter = ({
   onClose,
@@ -20,6 +21,8 @@ export const LeadsKanbanFilter = ({
 }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const { tickets } = useContext(AppContext);
 
   const ticketFormRef = useRef();
   const messageFormRef = useRef();
@@ -44,7 +47,9 @@ export const LeadsKanbanFilter = ({
     setKanbanTickets([]);
     setSearchParams({ view: "kanban" }, { replace: true });
 
-    fetchTickets?.();
+    if (!tickets || tickets.length === 0) {
+      fetchTickets?.();
+    }
     onClose?.();
   };
 
