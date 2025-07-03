@@ -9,7 +9,6 @@ export const LeadsKanbanFilter = ({
   onClose,
   loading,
   initialData,
-  fetchKanbanTickets,
   setKanbanFilterActive,
   setKanbanFilters,
   setKanbanTickets,
@@ -90,7 +89,6 @@ export const LeadsKanbanFilter = ({
 
     setKanbanFilterActive(true);
     setKanbanFilters(combinedFilters);
-    fetchKanbanTickets(combinedFilters);
     onWorkflowSelected?.(ticketValues.workflow || []);
     onClose?.();
   };

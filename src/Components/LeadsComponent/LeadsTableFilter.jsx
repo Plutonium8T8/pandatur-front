@@ -54,7 +54,7 @@ export const LeadsTableFilter = ({
     newParams.set("type", "hard");
     setSearchParams(newParams, { replace: true });
 
-    onSubmitTicket(combinedFilters, "hard");
+    // Больше ничего здесь не вызываем! Всё, фильтр ушёл в url, родитель сам обработает по useEffect
     onClose?.();
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -283,36 +284,88 @@ export const Leads = () => {
     }
   }, [searchParams]);
 
+  // 1. Функция фильтра для LIST:
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
-
     const merged = {
       ...hardTicketFilters,
       ...selectedFilters,
       workflow: hasWorkflow ? selectedFilters.workflow : workflowOptions,
     };
-
     setHardTicketFilters(merged);
     setCurrentPage(1);
     setIsOpenListFilterModal(false);
+
+    setSearchParams(prev => {
+      const newParams = new URLSearchParams(prev);
+      // очищаем старые фильтры кроме view
+      for (const key of Array.from(newParams.keys())) {
+        if (key !== "view") newParams.delete(key);
+      }
+      // выставляем новые фильтры
+      Object.entries(merged).forEach(([key, value]) => {
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          (!Array.isArray(value) || value.length > 0)
+        ) {
+          newParams.set(key, JSON.stringify(value));
+        }
+      });
+      newParams.set("type", "hard");
+      return newParams;
+    });
+    // fetchHardTickets здесь НЕ вызываем!
   };
 
+  // 2. useEffect для LIST:
+  useEffect(() => {
+    if (viewMode !== VIEW_MODE.LIST) return;
+    if (!groupTitleForApi || !workflowOptions.length) return;
+    const type = params.get("type");
+    if (type !== "hard") return;
+
+    const parsedFilters = parseFiltersFromUrl(params);
+    if (Object.keys(parsedFilters).length === 0) {
+      setHardTickets([]);
+      setCurrentPage(1);
+      return;
+    }
+    setHardTicketFilters(parsedFilters);
+    fetchHardTickets(1);
+  }, [params, viewMode, groupTitleForApi, workflowOptions]);
+
+  // 2. useEffect для LIST:
+  useEffect(() => {
+    if (viewMode !== VIEW_MODE.LIST) return;
+    if (!groupTitleForApi || !workflowOptions.length) return;
+    const type = params.get("type");
+    if (type !== "hard") return;
+
+    const parsedFilters = parseFiltersFromUrl(params);
+    if (Object.keys(parsedFilters).length === 0) {
+      setHardTickets([]);
+      setCurrentPage(1);
+      return;
+    }
+    setHardTicketFilters(parsedFilters);
+    fetchHardTickets(1);
+  }, [params, viewMode, groupTitleForApi, workflowOptions]);
+
+  // 1. Функция фильтра: только обновляет URL и локальный стейт, fetch вызывается useEffect-ом
   const handleApplyFilterLightTicket = (selectedFilters) => {
     setLightTicketFilters(selectedFilters);
     setKanbanFilters(selectedFilters);
     setKanbanFilterActive(true);
-    fetchKanbanTickets(selectedFilters);
     setIsOpenKanbanFilterModal(false);
-
-    setSearchParams((prev) => {
+    setSearchParams(prev => {
       const newParams = new URLSearchParams(prev);
-
+      // очищаем старые фильтры кроме view
       for (const key of Array.from(newParams.keys())) {
-        if (key !== "view") {
-          newParams.delete(key);
-        }
+        if (key !== "view") newParams.delete(key);
       }
-
+      // выставляем новые фильтры
       Object.entries(selectedFilters).forEach(([key, value]) => {
         if (
           value !== undefined &&
@@ -323,7 +376,6 @@ export const Leads = () => {
           newParams.set(key, JSON.stringify(value));
         }
       });
-
       newParams.set("type", "light");
       return newParams;
     });
@@ -359,79 +411,39 @@ export const Leads = () => {
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
 
-  // useEffect(() => {
-  //   const filterKeys = Array.from(params.keys()).filter((key) => key !== "view" && key !== "type");
-  //   if (filterKeys.length === 0) return;
-
-  //   const parsedFilters = parseFiltersFromUrl(params);
-  //   const type = params.get("type");
-
-  //   if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-  //     setKanbanFilters(parsedFilters);
-  //     setKanbanFilterActive(true);
-  //     fetchKanbanTickets(parsedFilters);
-
-  //     if (parsedFilters.workflow && parsedFilters.workflow.length > 0) {
-  //       setChoiceWorkflow(parsedFilters.workflow);
-  //     } else {
-  //       setChoiceWorkflow([]);
-  //     }
-  //   } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-  //     setHardTicketFilters(parsedFilters);
-  //     fetchHardTickets(1);
-  //   }
-  // }, [viewMode]);
-
+  // 2. Синхронизация groupTitle из url → только для select, не fetch
   useEffect(() => {
-    // Парсим group_title из url
     const parsedFilters = parseFiltersFromUrl(params);
     const urlGroupTitle = parsedFilters.group_title;
 
-    // Если urlGroupTitle разрешён и он не выбран сейчас — ставим в select
     if (
       urlGroupTitle &&
       accessibleGroupTitles.includes(urlGroupTitle) &&
       customGroupTitle !== urlGroupTitle
     ) {
       setCustomGroupTitle(urlGroupTitle);
-      isGroupTitleSyncedRef.current = true; // это sync из url!
+      isGroupTitleSyncedRef.current = true; // просто отмечаем sync
     }
-    // Если urlGroupTitle нет в разрешённых — ничего не делаем
   }, [params, accessibleGroupTitles, customGroupTitle, setCustomGroupTitle]);
 
+  // 3. Единственный useEffect для Kanban фильтрации
   useEffect(() => {
-    const parsedFilters = parseFiltersFromUrl(params);
-    const urlGroupTitle = parsedFilters.group_title;
+    if (viewMode !== VIEW_MODE.KANBAN) return;
+    if (!groupTitleForApi || !workflowOptions.length) return;
     const type = params.get("type");
+    if (type !== "light") return;
 
-    // fetch делаем только если:
-    // - sync из url ещё не был (или был только что)
-    // - customGroupTitle совпадает с urlGroupTitle
-    if (
-      isGroupTitleSyncedRef.current &&
-      urlGroupTitle &&
-      customGroupTitle === urlGroupTitle
-    ) {
-      if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-        setKanbanFilters(parsedFilters);
-        setKanbanFilterActive(true);
-        fetchKanbanTickets(parsedFilters);
-        setChoiceWorkflow(parsedFilters.workflow || []);
-      } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-        setHardTicketFilters(parsedFilters);
-        fetchHardTickets(1);
-      }
-      // Важно! Сбросить флаг, чтобы не делать повторно!
-      isGroupTitleSyncedRef.current = false;
+    const parsedFilters = parseFiltersFromUrl(params);
+    if (Object.keys(parsedFilters).length === 0) {
+      setKanbanTickets([]);
+      setKanbanFilterActive(false);
+      return;
     }
-    // Если пользователь вручную выбирает customGroupTitle — fetch работает по onChange селекта
-  }, [
-    customGroupTitle,
-    params,
-    fetchKanbanTickets,
-    fetchHardTickets,
-    viewMode,
-  ]);
+    setKanbanFilters(parsedFilters);
+    setKanbanFilterActive(true);
+    fetchKanbanTickets(parsedFilters);
+    setChoiceWorkflow(parsedFilters.workflow || []);
+  }, [params, viewMode, groupTitleForApi, workflowOptions]);
 
   return (
     <>
