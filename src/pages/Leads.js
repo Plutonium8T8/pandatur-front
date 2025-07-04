@@ -149,27 +149,6 @@ export const Leads = () => {
     }
   }, [searchTerm]);
 
-  useEffect(() => {
-    const isReady = groupTitleForApi && workflowOptions.length;
-    if (!isReady) return;
-
-    const type = searchParams.get("type");
-    const parsedFilters = parseFiltersFromUrl(searchParams);
-    const hasUrlFilters = Object.keys(parsedFilters).length > 0;
-
-    if (type !== "light") return;
-
-    if (hasUrlFilters) {
-      setKanbanFilters(parsedFilters);
-      setKanbanFilterActive(true);
-      fetchKanbanTickets(parsedFilters);
-      setChoiceWorkflow(parsedFilters.workflow || []);
-    } else {
-      setKanbanTickets([]);
-      setKanbanFilterActive(false);
-    }
-  }, [searchParams.toString(), groupTitleForApi, workflowOptions]);
-
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
 
@@ -369,32 +348,28 @@ export const Leads = () => {
       (!Array.isArray(v) || v.length > 0) &&
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
-
+  
   useEffect(() => {
-    // Парсим group_title из url
-    const parsedFilters = parseFiltersFromUrl(params);
-    const urlGroupTitle = parsedFilters.group_title;
+    const isReady = groupTitleForApi && workflowOptions.length;
+    if (!isReady) return;
 
-    // Если urlGroupTitle разрешён и он не выбран сейчас — ставим в select
+    const parsedFilters = parseFiltersFromUrl(searchParams);
+    const urlGroupTitle = parsedFilters.group_title;
+    const type = searchParams.get("type");
+    const hasUrlFilters = Object.keys(parsedFilters).length > 0;
+
+    // 1. Синхронизируем group_title из URL в select
     if (
       urlGroupTitle &&
       accessibleGroupTitles.includes(urlGroupTitle) &&
       customGroupTitle !== urlGroupTitle
     ) {
       setCustomGroupTitle(urlGroupTitle);
-      isGroupTitleSyncedRef.current = true; // это sync из url!
+      isGroupTitleSyncedRef.current = true;
+      return; // подождём следующего вызова, когда customGroupTitle обновится
     }
-    // Если urlGroupTitle нет в разрешённых — ничего не делаем
-  }, [params, accessibleGroupTitles, customGroupTitle, setCustomGroupTitle]);
 
-  useEffect(() => {
-    const parsedFilters = parseFiltersFromUrl(params);
-    const urlGroupTitle = parsedFilters.group_title;
-    const type = params.get("type");
-
-    // fetch делаем только если:
-    // - sync из url ещё не был (или был только что)
-    // - customGroupTitle совпадает с urlGroupTitle
+    // 2. Выполняем fetch, только если sync был из URL и groupTitle совпадает
     if (
       isGroupTitleSyncedRef.current &&
       urlGroupTitle &&
@@ -403,24 +378,46 @@ export const Leads = () => {
       if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
         setKanbanFilters(parsedFilters);
         setKanbanFilterActive(true);
-        // fetchKanbanTickets(parsedFilters);
+        fetchKanbanTickets(parsedFilters);
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);
         fetchHardTickets(1);
       }
-      // Важно! Сбросить флаг, чтобы не делать повторно!
+
       isGroupTitleSyncedRef.current = false;
+      return; // ✅ предотвращаем дублирующий fetch ниже
     }
-    // Если пользователь вручную выбирает customGroupTitle — fetch работает по onChange селекта
+
+    // 3. Альтернативный сценарий: если group_title уже выбран и просто зашли по ссылке с фильтрами
+    if (
+      !isGroupTitleSyncedRef.current &&
+      customGroupTitle === urlGroupTitle &&
+      hasUrlFilters
+    ) {
+      if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
+        setKanbanFilters(parsedFilters);
+        setKanbanFilterActive(true);
+        fetchKanbanTickets(parsedFilters);
+        setChoiceWorkflow(parsedFilters.workflow || []);
+      } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
+        setHardTicketFilters(parsedFilters);
+        fetchHardTickets(1);
+      }
+    }
+
+    // Если фильтров нет и режим "light", сбрасываем kanban
+    if (type === "light" && !hasUrlFilters) {
+      setKanbanTickets([]);
+      setKanbanFilterActive(false);
+    }
   }, [
+    searchParams.toString(),
+    groupTitleForApi,
+    workflowOptions,
     customGroupTitle,
-    params,
-    fetchKanbanTickets,
-    fetchHardTickets,
     viewMode,
   ]);
-
   return (
     <>
       <Flex
