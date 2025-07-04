@@ -152,24 +152,23 @@ export const Leads = () => {
   useEffect(() => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
-    const type = searchParams.get("type");
 
-    const hasUrlFilters = Array.from(searchParams.keys()).some(
-      (key) => !["view", "type"].includes(key)
-    );
+    const type = searchParams.get("type");
+    const parsedFilters = parseFiltersFromUrl(searchParams);
+    const hasUrlFilters = Object.keys(parsedFilters).length > 0;
 
     if (type !== "light") return;
 
-    if (kanbanSearchTerm?.trim()) {
-      const timeout = setTimeout(() => {
-        fetchKanbanTickets();
-      }, 1000);
-      return () => clearTimeout(timeout);
-    } else if (!hasUrlFilters) {
+    if (hasUrlFilters) {
+      setKanbanFilters(parsedFilters);
+      setKanbanFilterActive(true);
+      fetchKanbanTickets(parsedFilters);
+      setChoiceWorkflow(parsedFilters.workflow || []);
+    } else {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
     }
-  }, [kanbanSearchTerm, groupTitleForApi, workflowOptions, searchParams]);
+  }, [searchParams.toString(), groupTitleForApi, workflowOptions]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
@@ -404,7 +403,7 @@ export const Leads = () => {
       if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
         setKanbanFilters(parsedFilters);
         setKanbanFilterActive(true);
-        fetchKanbanTickets(parsedFilters);
+        // fetchKanbanTickets(parsedFilters);
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);

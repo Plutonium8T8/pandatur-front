@@ -48,51 +48,52 @@ export const LeadsKanbanFilter = ({
   };
 
   const handleSubmit = () => {
-    const ticketValues = ticketFormRef.current?.getValues?.() || {};
-    const messageValues = messageFormRef.current?.getValues?.() || {};
+  const ticketValues = ticketFormRef.current?.getValues?.() || {};
+  const messageValues = messageFormRef.current?.getValues?.() || {};
 
-    const combinedFilters = mergeFilters(
-      ticketValues,
-      messageValues,
-      groupTitleForApi ? { group_title: groupTitleForApi } : {},
-      kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm.trim() } : {}
-    );
+  const combinedFilters = mergeFilters(
+    ticketValues,
+    messageValues,
+    groupTitleForApi ? { group_title: groupTitleForApi } : {},
+    kanbanSearchTerm?.trim() ? { search: kanbanSearchTerm.trim() } : {}
+  );
 
-    if (Object.keys(combinedFilters).length === 0) {
-      handleReset();
+  if (Object.keys(combinedFilters).length === 0) {
+    handleReset();
+    return;
+  }
+
+  const newParams = new URLSearchParams();
+  Object.entries(combinedFilters).forEach(([key, value]) => {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      ("from" in value || "to" in value)
+    ) {
+      if (value.from) newParams.set(`${key}_from`, value.from);
+      if (value.to) newParams.set(`${key}_to`, value.to);
       return;
     }
 
-    const newParams = new URLSearchParams();
-    Object.entries(combinedFilters).forEach(([key, value]) => {
-      if (
-        value &&
-        typeof value === "object" &&
-        !Array.isArray(value) &&
-        ("from" in value || "to" in value)
-      ) {
-        if (value.from) newParams.set(`${key}_from`, value.from);
-        if (value.to) newParams.set(`${key}_to`, value.to);
-        return;
-      }
+    if (Array.isArray(value)) {
+      value.forEach((v) => newParams.append(key, v));
+      return;
+    }
 
-      if (Array.isArray(value)) {
-        value.forEach((v) => newParams.append(key, v));
-        return;
-      }
+    newParams.set(key, value);
+  });
+  newParams.set("view", "kanban");
+  newParams.set("type", "light");
 
-      newParams.set(key, value);
-    });
-    newParams.set("view", "kanban");
-    newParams.set("type", "light");
-    setSearchParams(newParams, { replace: true });
+  setKanbanFilterActive(true);
+  setKanbanFilters(combinedFilters);
+  onWorkflowSelected?.(ticketValues.workflow || []);
 
-    setKanbanFilterActive(true);
-    setKanbanFilters(combinedFilters);
-    fetchKanbanTickets(combinedFilters);
-    onWorkflowSelected?.(ticketValues.workflow || []);
-    onClose?.();
-  };
+  setSearchParams(newParams, { replace: true }); // 🟢 Этого достаточно
+  onClose?.();
+};
+
 
   return (
     <Tabs
