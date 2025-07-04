@@ -101,7 +101,7 @@ export const LeadsKanbanFilter = ({
       defaultValue="filter_ticket"
       value={activeTab}
       onChange={setActiveTab}
-      pb="36px"
+      pb="48px"
     >
       <Tabs.List>
         <Tabs.Tab value="filter_ticket">
@@ -128,7 +128,7 @@ export const LeadsKanbanFilter = ({
         />
       </Tabs.Panel>
 
-      <Flex justify="end" gap="md" mt="md">
+      <Flex justify="end" gap="md" mt="md" pr="md">
         <Button variant="outline" onClick={handleReset}>
           {getLanguageByKey("Reset filter")}
         </Button>
