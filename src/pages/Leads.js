@@ -48,6 +48,7 @@ export const Leads = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [params] = useSearchParams();
   const didLoadGlobalTicketsRef = useRef(false);
+  const [filtersReady, setFiltersReady] = useState(false);
 
   const [hardTickets, setHardTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -130,10 +131,10 @@ export const Leads = () => {
   }, [ticketId]);
 
   useEffect(() => {
-    if (viewMode === VIEW_MODE.LIST) {
+    if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
-  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode]);
+  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady]);
 
   useEffect(() => {
     if (viewMode === VIEW_MODE.LIST) {
@@ -165,7 +166,7 @@ export const Leads = () => {
             ? workflowOptions
             : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
 
-      const { search, group_title, workflow, ...restFilters } = hardTicketFilters;
+      const { search, group_title, workflow, type, view, ...restFilters } = hardTicketFilters;
 
       const response = await api.tickets.filters({
         page,
@@ -276,10 +277,15 @@ export const Leads = () => {
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
 
+    const workflow =
+      typeof selectedFilters.workflow === "string"
+        ? [selectedFilters.workflow] // превращаем строку в массив
+        : selectedFilters.workflow;
+
     const merged = {
       ...hardTicketFilters,
       ...selectedFilters,
-      workflow: hasWorkflow ? selectedFilters.workflow : workflowOptions,
+      workflow: hasWorkflow ? workflow : workflowOptions,
     };
 
     setHardTicketFilters(merged);
@@ -348,7 +354,7 @@ export const Leads = () => {
       (!Array.isArray(v) || v.length > 0) &&
       (typeof v !== "object" || Object.keys(v).length > 0)
   );
-  
+
   useEffect(() => {
     const isReady = groupTitleForApi && workflowOptions.length;
     if (!isReady) return;
@@ -382,7 +388,7 @@ export const Leads = () => {
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);
-        fetchHardTickets(1);
+        // fetchHardTickets(1);
       }
 
       isGroupTitleSyncedRef.current = false;
@@ -402,7 +408,7 @@ export const Leads = () => {
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);
-        fetchHardTickets(1);
+        // fetchHardTickets(1);
       }
     }
 
@@ -418,6 +424,18 @@ export const Leads = () => {
     customGroupTitle,
     viewMode,
   ]);
+
+  useEffect(() => {
+    const parsedFilters = Object.fromEntries([...params.entries()]);
+
+    if (parsedFilters?.type === "hard") {
+      handleApplyFiltersHardTicket(parsedFilters);
+      setFiltersReady(true);
+    } else {
+      setFiltersReady(true);
+    }
+  }, []);
+
   return (
     <>
       <Flex
@@ -536,7 +554,7 @@ export const Leads = () => {
             onToggleAll={toggleSelectAll}
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
-            fetchTickets={() => fetchHardTickets(currentPage)}
+          // fetchTickets={() => fetchHardTickets(currentPage)}
           />
         ) : (
           <WorkflowColumns
