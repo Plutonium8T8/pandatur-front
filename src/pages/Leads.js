@@ -21,7 +21,7 @@ import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
-import { parseFiltersFromUrl, prepareFiltersForUrl } from "../Components/utils/parseFiltersFromUrl";
+import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
@@ -75,7 +75,8 @@ export const Leads = () => {
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
   const isSearching = !!kanbanSearchTerm?.trim();
 
-  const debouncedSearch = useDebounce(searchTerm);
+  const currentSearch = viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm;
+  const debouncedSearch = useDebounce(currentSearch);
   const deleteBulkLeads = useConfirmPopup({ subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"), });
 
   const fetchKanbanTickets = async (filters = {}) => {
@@ -94,8 +95,10 @@ export const Leads = () => {
           page: currentPage,
           type: "light",
           group_title: group_title || groupTitleForApi,
-          ...(search?.trim() ? { search: search.trim() } : {}),
-          attributes,
+          attributes: {
+            ...attributes,
+            ...(search?.trim() ? { search: search.trim() } : {}),
+          },
         });
 
         const normalized = res.tickets.map(t => ({
@@ -137,18 +140,33 @@ export const Leads = () => {
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady]);
 
   useEffect(() => {
-    if (viewMode === VIEW_MODE.LIST) {
-      const timeout = setTimeout(() => {
-        setHardTicketFilters((prev) => ({
-          ...prev,
-          search: searchTerm.trim(),
-        }));
-        setCurrentPage(1);
-      }, 500);
+    if (!filtersReady || !groupTitleForApi) return;
 
-      return () => clearTimeout(timeout);
+    // Если поле поиска НЕ пустое
+    if (viewMode === VIEW_MODE.KANBAN && debouncedSearch.trim()) {
+      setKanbanFilterActive(true); // активируем фильтр
+      fetchKanbanTickets({
+        ...kanbanFilters,
+        search: debouncedSearch.trim(),
+      });
+      return;
     }
-  }, [searchTerm]);
+
+    // Если очистили поиск — показываем tickets, а не делаем запрос
+    if (viewMode === VIEW_MODE.KANBAN && !debouncedSearch.trim()) {
+      setKanbanTickets([]);
+      setKanbanFilterActive(false);
+      return;
+    }
+
+    if (viewMode === VIEW_MODE.LIST) {
+      setHardTicketFilters((prev) => ({
+        ...prev,
+        search: debouncedSearch.trim(),
+      }));
+      setCurrentPage(1);
+    }
+  }, [debouncedSearch, viewMode]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
@@ -174,10 +192,10 @@ export const Leads = () => {
         group_title: groupTitleForApi,
         sort_by: "creation_date",
         order: "DESC",
-        ...(search?.trim() ? { search: search.trim() } : {}),
         attributes: {
           ...restFilters,
           workflow: effectiveWorkflow,
+          ...(search?.trim() ? { search: search.trim() } : {}),
         },
       });
 
@@ -363,7 +381,6 @@ export const Leads = () => {
     const type = searchParams.get("type");
     const hasUrlFilters = Object.keys(parsedFilters).length > 0;
 
-    // 1. Синхронизируем group_title из URL в select
     if (
       urlGroupTitle &&
       accessibleGroupTitles.includes(urlGroupTitle) &&
@@ -371,10 +388,9 @@ export const Leads = () => {
     ) {
       setCustomGroupTitle(urlGroupTitle);
       isGroupTitleSyncedRef.current = true;
-      return; // подождём следующего вызова, когда customGroupTitle обновится
+      return;
     }
 
-    // 2. Выполняем fetch, только если sync был из URL и groupTitle совпадает
     if (
       isGroupTitleSyncedRef.current &&
       urlGroupTitle &&
@@ -387,14 +403,12 @@ export const Leads = () => {
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);
-        // fetchHardTickets(1);
       }
 
       isGroupTitleSyncedRef.current = false;
-      return; // ✅ предотвращаем дублирующий fetch ниже
+      return;
     }
 
-    // 3. Альтернативный сценарий: если group_title уже выбран и просто зашли по ссылке с фильтрами
     if (
       !isGroupTitleSyncedRef.current &&
       customGroupTitle === urlGroupTitle &&
@@ -407,11 +421,9 @@ export const Leads = () => {
         setChoiceWorkflow(parsedFilters.workflow || []);
       } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
         setHardTicketFilters(parsedFilters);
-        // fetchHardTickets(1);
       }
     }
 
-    // Если фильтров нет и режим "light", сбрасываем kanban
     if (type === "light" && !hasUrlFilters) {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
@@ -428,10 +440,10 @@ export const Leads = () => {
     const type = params.get("type");
     if (type === "hard") {
       const parsedFilters = parseFiltersFromUrl(params);
-      handleApplyFiltersHardTicket(parsedFilters); // применяем фильтры как надо
-      setFiltersReady(true); // всё готово
+      handleApplyFiltersHardTicket(parsedFilters);
+      setFiltersReady(true);
     } else {
-      setFiltersReady(true); // если не hard, тоже готово
+      setFiltersReady(true);
     }
   }, []);
 
@@ -484,9 +496,14 @@ export const Leads = () => {
               </ActionIcon>
               <Input
                 value={viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm}
-                onChange={(e) =>
-                  (viewMode === VIEW_MODE.KANBAN ? setKanbanSearchTerm : setSearchTerm)(e.target.value)
-                }
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (viewMode === VIEW_MODE.KANBAN) {
+                    setKanbanSearchTerm(value);
+                  } else {
+                    setSearchTerm(value);
+                  }
+                }}
                 placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
                 className="min-w-300"
                 rightSectionPointerEvents="all"
@@ -553,7 +570,6 @@ export const Leads = () => {
             onToggleAll={toggleSelectAll}
             totalLeadsPages={getTotalPages(totalLeads)}
             onChangePagination={handlePaginationWorkflow}
-          // fetchTickets={() => fetchHardTickets(currentPage)}
           />
         ) : (
           <WorkflowColumns
