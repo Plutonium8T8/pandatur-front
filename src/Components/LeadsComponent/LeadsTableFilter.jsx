@@ -4,6 +4,7 @@ import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "./MessageFilterForm";
 import { useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { prepareFiltersForUrl } from "../utils/parseFiltersFromUrl";
 
 export const LeadsTableFilter = ({
   onClose,
@@ -42,18 +43,13 @@ export const LeadsTableFilter = ({
       groupTitleForApi ? { group_title: groupTitleForApi } : {}
     );
 
-    const newParams = new URLSearchParams();
-    Object.entries(combinedFilters).forEach(([key, value]) => {
-      if (Array.isArray(value)) {
-        value.forEach((v) => newParams.append(key, v));
-      } else {
-        newParams.set(key, value);
-      }
+    const urlParams = prepareFiltersForUrl({
+      ...combinedFilters,
+      type: "hard",
+      view: "list",
     });
-    newParams.set("view", "list");
-    newParams.set("type", "hard");
-    setSearchParams(newParams, { replace: true });
 
+    setSearchParams(urlParams, { replace: true });
     onSubmitTicket(combinedFilters, "hard");
     onClose?.();
   };

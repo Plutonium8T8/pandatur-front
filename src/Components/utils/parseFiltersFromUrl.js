@@ -103,3 +103,29 @@ export const parseFiltersFromUrl = (params) => ({
     // group_title всегда строка!
     group_title: params.get("group_title") || undefined,
 });
+
+export const prepareFiltersForUrl = (filters) => {
+    const params = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+
+        // массив → дублирующиеся ключи
+        if (Array.isArray(value)) {
+            value.forEach((val) => params.append(key, val));
+            return;
+        }
+
+        // диапазон → from/to
+        if (typeof value === "object" && ("from" in value || "to" in value)) {
+            if (value.from) params.set(`${key}_from`, value.from);
+            if (value.to) params.set(`${key}_to`, value.to);
+            return;
+        }
+
+        // булевы значения и строки/числа
+        params.set(key, String(value));
+    });
+
+    return params;
+};

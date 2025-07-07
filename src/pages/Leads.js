@@ -21,7 +21,7 @@ import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
-import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
+import { parseFiltersFromUrl, prepareFiltersForUrl } from "../Components/utils/parseFiltersFromUrl";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
@@ -252,7 +252,6 @@ export const Leads = () => {
       setKanbanSearchTerm("");
       setKanbanFilterActive(false);
       setKanbanTickets([]);
-      // --- Суть здесь:
       if (!didLoadGlobalTicketsRef.current) {
         fetchTickets().then(() => {
           didLoadGlobalTicketsRef.current = true;
@@ -279,7 +278,7 @@ export const Leads = () => {
 
     const workflow =
       typeof selectedFilters.workflow === "string"
-        ? [selectedFilters.workflow] // превращаем строку в массив
+        ? [selectedFilters.workflow]
         : selectedFilters.workflow;
 
     const merged = {
@@ -426,13 +425,13 @@ export const Leads = () => {
   ]);
 
   useEffect(() => {
-    const parsedFilters = Object.fromEntries([...params.entries()]);
-
-    if (parsedFilters?.type === "hard") {
-      handleApplyFiltersHardTicket(parsedFilters);
-      setFiltersReady(true);
+    const type = params.get("type");
+    if (type === "hard") {
+      const parsedFilters = parseFiltersFromUrl(params);
+      handleApplyFiltersHardTicket(parsedFilters); // применяем фильтры как надо
+      setFiltersReady(true); // всё готово
     } else {
-      setFiltersReady(true);
+      setFiltersReady(true); // если не hard, тоже готово
     }
   }, []);
 
