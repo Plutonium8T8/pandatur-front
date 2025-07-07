@@ -90,7 +90,7 @@ export const LeadsKanbanFilter = ({
   setKanbanFilters(combinedFilters);
   onWorkflowSelected?.(ticketValues.workflow || []);
 
-  setSearchParams(newParams, { replace: true }); // 🟢 Этого достаточно
+  setSearchParams(newParams, { replace: true });
   onClose?.();
 };
 
