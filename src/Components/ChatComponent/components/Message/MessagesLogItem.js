@@ -43,10 +43,23 @@ export const MessagesLogItem = ({ log, technicians }) => {
         description = `Изменено поле "${log.subject}": ${from} → ${to}`;
     }
 
+    // Тип лога
+    const logType =
+        log.type === "task"
+            ? `TASK${log.task_id ? ` #${log.task_id}` : ""}`
+            : log.type === "ticket"
+                ? "TICKET"
+                : log.type || "";
+
     return (
         <Flex pl="md" pr="md" pt={4} pb={4} direction="row" justify="space-between">
             <Flex direction="column">
-                <Text size="xs">{description}</Text>
+                <Text size="xs" >
+                    <Text span c="dimmed" mr={6}>
+                        [{logType}]
+                    </Text>
+                    {description}
+                </Text>
                 <Text size="xs" c="dimmed">
                     {author} • {date}
                 </Text>
