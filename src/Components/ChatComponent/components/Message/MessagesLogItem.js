@@ -10,7 +10,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
         return tech?.label || `ID ${id}`;
     };
 
-    // Автор лога (created_by для таска, by для других)
     let author = "";
     if (log.type === "task" && log.created_by) {
         const tech = technicians?.find((t) => String(t.value) === String(log.created_by));
@@ -32,7 +31,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
     const from = getTechLabel(log.from);
     const to = getTechLabel(log.to);
 
-    // Для отображения названия поля в логе
     const SUBJECT_LABELS = {
         created_for: "Ответственный",
         technician_id: "Техник",
@@ -54,7 +52,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
         description = `Изменено поле "${log.subject}": ${from} → ${to}`;
     }
 
-    // Тип лога
     const logType =
         log.type === "task"
             ? `TASK${log.task_id ? ` #${log.task_id}` : ""}`
