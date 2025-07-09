@@ -8,13 +8,13 @@ import {
   getLanguageByKey,
   parseDate,
 } from "@utils";
-import { SendedMessage, ReceivedMessage } from "../Message";
+import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
-  const { messages } = useMessagesContext();
+  const { messages: rawMessages = [], logs = [] } = useMessagesContext();
 
   const technicianMap = useMemo(() => {
     const map = new Map();
@@ -22,7 +22,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
     return map;
   }, [technicians]);
 
-  const sortedMessages = messages
+  const sortedMessages = rawMessages
     .filter((msg) => msg.ticket_id === ticketId)
     .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
 
@@ -58,6 +58,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
   });
 
   const clientIds = (personalInfo?.clients || []).map((c) => c.id);
+  const logsForTicket = logs.filter((log) => log.ticket_id === ticketId);
 
   return (
     <Flex direction="column" gap="xl" h="100%">
@@ -66,7 +67,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
           {groupedMessages.map(({ date, clientId, messages, id }) => {
             const clientInfo =
               personalInfo?.clients?.find((c) => c.id === clientId) || {};
-
             const clientName =
               getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
 
@@ -112,6 +112,16 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
               </Flex>
             );
           })}
+
+          {logsForTicket.length > 0 && (
+            <>
+              <Divider label={<Badge size="lg">{getLanguageByKey("Logs")}</Badge>} />
+              {logsForTicket.map((log) => (
+                <MessagesLogItem key={log.id} log={log} technicians={technicians} />
+              ))}
+            </>
+          )}
+
         </Flex>
       ) : (
         <Flex h="100%" align="center" justify="center">
