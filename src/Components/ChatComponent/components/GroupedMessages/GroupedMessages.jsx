@@ -14,7 +14,7 @@ import "./GroupedMessages.css";
 const { colors } = DEFAULT_THEME;
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
-  const { messages: rawMessages = [], logs = [] } = useMessagesContext();
+  const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
 
   const technicianMap = useMemo(() => {
     const map = new Map();
@@ -22,56 +22,85 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
     return map;
   }, [technicians]);
 
-  const sortedMessages = rawMessages
+  const clientIds = useMemo(
+    () => (personalInfo?.clients || []).map((c) => c.id),
+    [personalInfo]
+  );
+
+  const messages = rawMessages
     .filter((msg) => msg.ticket_id === ticketId)
-    .sort((a, b) => parseDate(a.time_sent) - parseDate(b.time_sent));
+    .map((msg) => ({
+      ...msg,
+      itemType: "message",
+      sortTime: parseDate(msg.time_sent).valueOf(),
+      dateDivider: parseServerDate(msg.time_sent).format(DD_MM_YYYY),
+      clientId: Array.isArray(msg.client_id)
+        ? msg.client_id[0]
+        : msg.client_id,
+    }));
 
-  const groupedMessages = [];
-  let lastClientId = null;
+  const logs = rawLogs
+    .filter((log) => log.ticket_id === ticketId)
+    .map((log) => ({
+      ...log,
+      itemType: "log",
+      sortTime: parseServerDate(log.timestamp).valueOf(),
+      dateDivider: parseServerDate(log.timestamp).format(DD_MM_YYYY),
+    }));
 
-  sortedMessages.forEach((msg) => {
-    const messageDate = parseServerDate(msg.time_sent).format(DD_MM_YYYY);
-    const currentClientId = Array.isArray(msg.client_id)
-      ? msg.client_id[0].toString()
-      : msg.client_id.toString();
+  const allItems = useMemo(() => {
+    return [...messages, ...logs].sort((a, b) => a.sortTime - b.sortTime);
+  }, [messages, logs]);
 
-    let lastGroup =
-      groupedMessages.length > 0
-        ? groupedMessages[groupedMessages.length - 1]
-        : null;
+  const itemsByDate = useMemo(() => {
+    const map = {};
+    allItems.forEach((item) => {
+      if (!map[item.dateDivider]) map[item.dateDivider] = [];
+      map[item.dateDivider].push(item);
+    });
+    return map;
+  }, [allItems]);
 
-    if (
-      !lastGroup ||
-      lastGroup.date !== messageDate ||
-      lastClientId !== currentClientId
-    ) {
-      lastClientId = currentClientId;
-      groupedMessages.push({
-        date: messageDate,
-        clientId: Number(currentClientId),
-        messages: [msg],
-        id: `${messageDate}-${Number(currentClientId)}-${msg.id}`,
-      });
-    } else {
-      lastGroup.messages.push(msg);
-    }
-  });
-
-  const clientIds = (personalInfo?.clients || []).map((c) => c.id);
-  const logsForTicket = logs.filter((log) => log.ticket_id === ticketId);
+  const allDates = useMemo(
+    () => Object.keys(itemsByDate).sort((a, b) => parseDate(a) - parseDate(b)),
+    [itemsByDate]
+  );
 
   return (
     <Flex direction="column" gap="xl" h="100%">
-      {groupedMessages.length ? (
+      {allDates.length ? (
         <Flex direction="column" gap="xs">
-          {groupedMessages.map(({ date, clientId, messages, id }) => {
-            const clientInfo =
-              personalInfo?.clients?.find((c) => c.id === clientId) || {};
-            const clientName =
-              getFullName(clientInfo.name, clientInfo.surname) || `#${clientId}`;
+          {allDates.map((date) => {
+            const dayItems = itemsByDate[date];
+
+            const clientBlocks = [];
+            let lastClientId = null;
+            let currentBlock = null;
+
+            dayItems.forEach((item, idx) => {
+              if (item.itemType === "message") {
+                const currentClientId = item.clientId?.toString();
+                if (
+                  !currentBlock ||
+                  lastClientId !== currentClientId
+                ) {
+                  lastClientId = currentClientId;
+                  currentBlock = {
+                    clientId: Number(currentClientId),
+                    items: [item],
+                  };
+                  clientBlocks.push(currentBlock);
+                } else {
+                  currentBlock.items.push(item);
+                }
+              } else {
+                currentBlock = null;
+                clientBlocks.push({ log: item });
+              }
+            });
 
             return (
-              <Flex pb="xs" direction="column" gap="md" key={id}>
+              <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
                   label={
                     <Badge c="black" size="lg" bg={colors.gray[2]}>
@@ -81,47 +110,57 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                   labelPosition="center"
                 />
 
-                <Flex justify="center">
-                  <Badge c="black" size="lg" bg={colors.gray[2]}>
-                    {getLanguageByKey("Mesajele clientului")}: {clientName}
-                  </Badge>
-                </Flex>
-
-                <Flex direction="column" gap="xs">
-                  {messages.map((msg, index) => {
-                    const isClientMessage = clientIds.includes(msg.sender_id);
-                    const technician = technicianMap.get(Number(msg.sender_id));
-
-                    return isClientMessage ? (
-                      <ReceivedMessage
-                        key={`${msg.id}-${index}`}
-                        msg={msg}
-                        personalInfo={personalInfo}
-                        technicians={technicians}
-                      />
-                    ) : (
-                      <SendedMessage
-                        key={`${msg.id}-${index}`}
-                        msg={msg}
-                        technician={technician}
+                {clientBlocks.map((block, i) => {
+                  if (block.log) {
+                    return (
+                      <MessagesLogItem
+                        key={`log-${block.log.id}-${block.log.timestamp}`}
+                        log={block.log}
                         technicians={technicians}
                       />
                     );
-                  })}
-                </Flex>
+                  }
+
+                  const clientInfo =
+                    personalInfo?.clients?.find(
+                      (c) => c.id === block.clientId
+                    ) || {};
+                  const clientName =
+                    getFullName(clientInfo.name, clientInfo.surname) ||
+                    `#${block.clientId}`;
+
+                  return (
+                    <Flex direction="column" gap="xs" key={`msgs-${date}-${block.clientId}-${i}`}>
+                      <Flex justify="center">
+                        <Badge c="black" size="lg" bg={colors.gray[2]}>
+                          {getLanguageByKey("Mesajele clientului")}: {clientName}
+                        </Badge>
+                      </Flex>
+                      {block.items.map((msg, idx) => {
+                        const isClientMessage = clientIds.includes(msg.sender_id);
+                        const technician = technicianMap.get(Number(msg.sender_id));
+                        return isClientMessage ? (
+                          <ReceivedMessage
+                            key={`${msg.id}-${idx}`}
+                            msg={msg}
+                            personalInfo={personalInfo}
+                            technicians={technicians}
+                          />
+                        ) : (
+                          <SendedMessage
+                            key={`${msg.id}-${idx}`}
+                            msg={msg}
+                            technician={technician}
+                            technicians={technicians}
+                          />
+                        );
+                      })}
+                    </Flex>
+                  );
+                })}
               </Flex>
             );
           })}
-
-          {logsForTicket.length > 0 && (
-            <>
-              <Divider label={<Badge size="lg">{getLanguageByKey("Logs")}</Badge>} />
-              {logsForTicket.map((log) => (
-                <MessagesLogItem key={log.id} log={log} technicians={technicians} />
-              ))}
-            </>
-          )}
-
         </Flex>
       ) : (
         <Flex h="100%" align="center" justify="center">
