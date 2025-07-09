@@ -236,7 +236,20 @@ const TaskListOverlay = ({
             <Group justify="space-between" align="center">
               <Group gap="xs">
                 {getTaskIcon(taskEdits[id]?.task_type)}
-                <Text fw={500}>{taskEdits[id]?.task_type}</Text>
+                <Text fw={500}>
+                  {taskEdits[id]?.task_type}
+                  {!isNew && id && (
+                    <Text
+                      span
+                      size="sm"
+                      c="dimmed"
+                      ml={6}
+                      style={{ fontWeight: 400 }}
+                    >
+                      #{id}
+                    </Text>
+                  )}
+                </Text>
               </Group>
               <Group gap="xs">
                 <Text
