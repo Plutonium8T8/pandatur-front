@@ -9,6 +9,7 @@ import {
   parseDate,
 } from "@utils";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
+import { socialMediaIcons } from "../../../utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
@@ -37,6 +38,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
       clientId: Array.isArray(msg.client_id)
         ? msg.client_id[0]
         : msg.client_id,
+      platform: msg.platform?.toLowerCase?.() || "",
     }));
 
   const logs = rawLogs
@@ -73,20 +75,27 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
 
+            // Теперь группируем по clientId и platform
             const clientBlocks = [];
             let lastClientId = null;
+            let lastPlatform = null;
             let currentBlock = null;
 
             dayItems.forEach((item, idx) => {
               if (item.itemType === "message") {
                 const currentClientId = item.clientId?.toString();
+                const currentPlatform = item.platform || "";
+                // новая группа, если сменился клиент или платформа
                 if (
                   !currentBlock ||
-                  lastClientId !== currentClientId
+                  lastClientId !== currentClientId ||
+                  lastPlatform !== currentPlatform
                 ) {
                   lastClientId = currentClientId;
+                  lastPlatform = currentPlatform;
                   currentBlock = {
                     clientId: Number(currentClientId),
+                    platform: currentPlatform,
                     items: [item],
                   };
                   clientBlocks.push(currentBlock);
@@ -95,6 +104,8 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                 }
               } else {
                 currentBlock = null;
+                lastClientId = null;
+                lastPlatform = null;
                 clientBlocks.push({ log: item });
               }
             });
@@ -129,11 +140,27 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                     getFullName(clientInfo.name, clientInfo.surname) ||
                     `#${block.clientId}`;
 
+                  const platform = block.platform;
+                  const platformIcon = socialMediaIcons[platform] || null;
+                  const platformLabel = platform
+                    ? platform[0].toUpperCase() + platform.slice(1)
+                    : "";
+
                   return (
-                    <Flex direction="column" gap="xs" key={`msgs-${date}-${block.clientId}-${i}`}>
-                      <Flex justify="center">
-                        <Badge c="black" size="lg" bg={colors.gray[2]}>
+                    <Flex direction="column" gap="xs" key={`msgs-${date}-${block.clientId}-${platform}-${i}`}>
+                      <Flex justify="center" align="center" gap={6}>
+                        <Badge c="black" size="lg" bg={colors.gray[2]} px={12}>
                           {getLanguageByKey("Mesajele clientului")}: {clientName}
+                          {platformIcon && (
+                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>
+                              {platformIcon}
+                            </span>
+                          )}
+                          {!platformIcon && platformLabel && (
+                            <span style={{ marginLeft: 8, color: "#777" }}>
+                              {platformLabel}
+                            </span>
+                          )}
                         </Badge>
                       </Flex>
                       {block.items.map((msg, idx) => {
