@@ -75,7 +75,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
 
-            // Теперь группируем по clientId и platform
             const clientBlocks = [];
             let lastClientId = null;
             let lastPlatform = null;
@@ -85,7 +84,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
               if (item.itemType === "message") {
                 const currentClientId = item.clientId?.toString();
                 const currentPlatform = item.platform || "";
-                // новая группа, если сменился клиент или платформа
                 if (
                   !currentBlock ||
                   lastClientId !== currentClientId ||
