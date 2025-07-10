@@ -24,7 +24,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
   }, [technicians]);
 
   const clientIds = useMemo(
-    () => (personalInfo?.clients || []).map((c) => c.id),
+    () => (personalInfo?.clients || []).map((c) => String(c.id)),
     [personalInfo]
   );
 
@@ -162,7 +162,14 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                         </Badge>
                       </Flex>
                       {block.items.map((msg, idx) => {
-                        const isClientMessage = msg.sender_id === msg.client_id;
+                        const senderIdStr = String(msg.sender_id);
+                        const msgClientIds = Array.isArray(msg.client_id)
+                          ? msg.client_id.map(String)
+                          : [String(msg.client_id)];
+                        const isClientMessage =
+                          msgClientIds.includes(senderIdStr) ||
+                          clientIds.includes(senderIdStr);
+
                         const technician = technicianMap.get(Number(msg.sender_id));
                         return isClientMessage ? (
                           <ReceivedMessage
