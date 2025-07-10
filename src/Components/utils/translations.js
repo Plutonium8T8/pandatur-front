@@ -3280,5 +3280,35 @@ export const translations = {
     "RO": "Ultima modificare",
     "RU": "Последнее изменение",
     "EN": "Last modification"
+  },
+  "Task creat": {
+    RO: "Task creat",
+    RU: "Создана задача",
+    EN: "Task created"
+  },
+  "Câmp actualizat": {
+    RO: "Câmp actualizat",
+    RU: "Обновлено поле",
+    EN: "Field updated"
+  },
+  "Task șters": {
+    RO: "Task șters",
+    RU: "Задача удалена",
+    EN: "Task deleted"
+  },
+  "Task finalizat": {
+    RO: "Task finalizat",
+    RU: "Задача выполнена",
+    EN: "Task completed"
+  },
+  "Câmp modificat": {
+    RO: "Câmp modificat",
+    RU: "Изменено поле",
+    EN: "Field changed"
+  },
+  "Etapă": {
+    RO: "Etapă",
+    RU: "Этап",
+    EN: "Workflow"
   }
 }

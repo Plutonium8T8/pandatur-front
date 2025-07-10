@@ -1,11 +1,14 @@
 import { Flex, Text } from "@mantine/core";
 import { parseServerDate, getFullName } from "@utils";
+import { translations } from "../../../utils";
+
+const language = localStorage.getItem("language") || "RO";
 
 const SUBJECT_LABELS = {
-    created_for: "Ответственный",
-    technician_id: "Ответственный",
-    created_by: "Автор",
-    workflow: "Этап",
+    created_for: translations["Responsabil"][language],
+    technician_id: translations["Responsabil"][language],
+    created_by: translations["Autor"][language],
+    workflow: translations["Etapă"][language],
 };
 
 export const MessagesLogItem = ({ log, technicians }) => {
@@ -33,26 +36,26 @@ export const MessagesLogItem = ({ log, technicians }) => {
 
     if (isTask) {
         if (["create", "created"].includes(log.action)) {
-            description = `Создана задача #${log.task_id}`;
+            description = `${translations["Task creat"][language]} #${log.task_id}`;
         } else if (["update", "updated"].includes(log.action)) {
             if (
                 log.subject === "status" &&
                 String(from) === "false" &&
                 String(to) === "true"
             ) {
-                description = `Задача выполнена`;
+                description = translations["Task finalizat"][language];
             } else {
                 const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
-                description = `Обновлено поле "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
+                description = `${translations["Câmp actualizat"][language]} "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
             }
         } else if (["delete", "deleted"].includes(log.action)) {
-            description = `Задача удалена`;
+            description = translations["Task șters"][language];
         } else {
             description = `${log.action} ${log.subject ?? ""}`.trim();
         }
     } else {
         const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
-        description = `Изменено поле "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
+        description = `${translations["Câmp modificat"][language]} "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
     }
 
     const logType =
