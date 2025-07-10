@@ -17,7 +17,7 @@ export const MessagesLogItem = ({ log, technicians }) => {
     const getTechLabel = (id) => {
         if (!id) return "-";
         const tech = technicians?.find((t) => String(t.value) === String(id));
-        return tech?.label || `ID ${id}`;
+        return tech?.label || ` ${id}`;
     };
 
     const tech =
