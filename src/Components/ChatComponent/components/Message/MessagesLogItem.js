@@ -1,6 +1,13 @@
 import { Flex, Text } from "@mantine/core";
 import { parseServerDate, getFullName } from "@utils";
 
+const SUBJECT_LABELS = {
+    created_for: "Ответственный",
+    technician_id: "Ответственный",
+    created_by: "Автор",
+    workflow: "Этап",
+};
+
 export const MessagesLogItem = ({ log, technicians }) => {
     const date = parseServerDate(log.timestamp).format("DD.MM.YYYY HH:mm");
 
@@ -10,46 +17,42 @@ export const MessagesLogItem = ({ log, technicians }) => {
         return tech?.label || `ID ${id}`;
     };
 
-    let author = "";
-    if (log.type === "task" && log.created_by) {
-        const tech = technicians?.find((t) => String(t.value) === String(log.created_by));
-        author =
-            tech?.label ||
-            getFullName(tech?.name, tech?.surname) ||
-            tech?.name ||
-            `ID ${log.created_by}`;
-    } else {
-        const tech = technicians?.find((t) => String(t.value) === String(log.by));
-        author =
-            tech?.label ||
-            getFullName(tech?.name, tech?.surname) ||
-            tech?.name ||
-            `ID ${log.by}`;
-    }
+    const tech =
+        technicians?.find((t) => String(t.value) === String(log.by)) || {};
+    const author =
+        tech.label ||
+        getFullName(tech.name, tech.surname) ||
+        tech.name ||
+        ` ${log.by}`;
 
     const isTask = log.type === "task";
-    const from = getTechLabel(log.from);
-    const to = getTechLabel(log.to);
-
-    const SUBJECT_LABELS = {
-        created_for: "Ответственный",
-        technician_id: "Техник",
-        created_by: "Автор",
-    };
+    const from = log.from;
+    const to = log.to;
 
     let description = "";
 
     if (isTask) {
         if (["create", "created"].includes(log.action)) {
             description = `Создана задача #${log.task_id}`;
-        } else if (log.action === "update" || log.action === "updated") {
-            const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
-            description = `Обновлено поле "${subjectLabel}": ${from} → ${to}`;
+        } else if (["update", "updated"].includes(log.action)) {
+            if (
+                log.subject === "status" &&
+                String(from) === "false" &&
+                String(to) === "true"
+            ) {
+                description = `Задача выполнена`;
+            } else {
+                const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
+                description = `Обновлено поле "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
+            }
+        } else if (["delete", "deleted"].includes(log.action)) {
+            description = `Задача удалена`;
         } else {
-            description = `${log.action} ${log.subject}`;
+            description = `${log.action} ${log.subject ?? ""}`.trim();
         }
     } else {
-        description = `Изменено поле "${log.subject}": ${from} → ${to}`;
+        const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
+        description = `Изменено поле "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
     }
 
     const logType =
