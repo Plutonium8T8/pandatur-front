@@ -162,7 +162,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                         </Badge>
                       </Flex>
                       {block.items.map((msg, idx) => {
-                        const isClientMessage = clientIds.includes(msg.sender_id);
+                        const isClientMessage = msg.sender_id === msg.client_id;
                         const technician = technicianMap.get(Number(msg.sender_id));
                         return isClientMessage ? (
                           <ReceivedMessage
