@@ -54,9 +54,6 @@ const TaskListOverlay = ({
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [originalTaskValues, setOriginalTaskValues] = useState({});
-  const { user } = useUser();
-  const currentUserId = String(user?.id);
-  const userGroups = user?.groups || [];
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
@@ -97,10 +94,8 @@ const TaskListOverlay = ({
   }, [creatingTask, userId]);
 
   useEffect(() => {
-    setCreatingTask(false);
-    setListCollapsed(true);
-    fetchTasks();
-  }, [ticketId]);
+  fetchTasks();
+}, []);
 
   useEffect(() => {
     setTaskEdits((prev) => {
