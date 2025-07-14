@@ -83,15 +83,15 @@ export const AppProvider = ({ children }) => {
     );
 
     setTimeout(() => {
-      if (updatedGlobal && updatedFiltered) {
-        console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
-      } else if (updatedGlobal) {
-        console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
-      } else if (updatedFiltered) {
-        console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
-      } else {
-        console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
-      }
+      // if (updatedGlobal && updatedFiltered) {
+      //   console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
+      // } else if (updatedGlobal) {
+      //   console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
+      // } else if (updatedFiltered) {
+      //   console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
+      // } else {
+      //   console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
+      // }
     }, 0);
   };
 
