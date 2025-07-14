@@ -3,6 +3,7 @@ import { api } from "@api";
 import { showServerError } from "@utils";
 
 let cachedTechnicians = null;
+let fetchingPromise = null;
 
 export const useGetTechniciansList = () => {
   const [technicians, setTechnicians] = useState(cachedTechnicians || []);
@@ -12,10 +13,25 @@ export const useGetTechniciansList = () => {
   useEffect(() => {
     if (cachedTechnicians) {
       setTechnicians(cachedTechnicians);
+      setLoading(false);
       return;
     }
 
-    const fetchTechnicians = async () => {
+    if (fetchingPromise) {
+      setLoading(true);
+      fetchingPromise
+        .then((merged) => {
+          setTechnicians(merged);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setErrors(showServerError(error));
+          setLoading(false);
+        });
+      return;
+    }
+
+    fetchingPromise = new Promise(async (resolve, reject) => {
       try {
         setLoading(true);
         const data = await api.users.getTechnicianList();
@@ -40,7 +56,6 @@ export const useGetTechniciansList = () => {
           if (!groupMap.has(groupName)) {
             groupMap.set(groupName, []);
           }
-
           const groupUsers = groupMap.get(groupName);
           if (!groupUsers.some((u) => u.value === userItem.value)) {
             groupUsers.push(userItem);
@@ -48,7 +63,6 @@ export const useGetTechniciansList = () => {
         });
 
         const merged = [];
-
         for (const [groupName, users] of groupMap.entries()) {
           merged.push({
             value: `__group__${groupName}`,
@@ -60,14 +74,17 @@ export const useGetTechniciansList = () => {
 
         cachedTechnicians = merged;
         setTechnicians(merged);
+        setLoading(false);
+
+        resolve(merged);
       } catch (error) {
         setErrors(showServerError(error));
-      } finally {
         setLoading(false);
+        reject(error);
+      } finally {
+        fetchingPromise = null;
       }
-    };
-
-    fetchTechnicians();
+    });
   }, []);
 
   return {
