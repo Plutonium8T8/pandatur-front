@@ -24,10 +24,14 @@ export const MessagesLogItem = ({ log, technicians }) => {
     const tech = technicians?.find((t) => String(t.value) === String(log.by)) || {};
 
     const author =
-        tech.label ||
-        getFullName(tech.name, tech.surname) ||
-        tech.name ||
-        ` ${log.by}`;
+        String(log.by) === "1"
+            ? "System"
+            : (
+                tech.label ||
+                getFullName(tech.name, tech.surname) ||
+                tech.name ||
+                ` ${log.by}`
+            );
 
     const isTask = log.type === "task";
     const from = log.from;
