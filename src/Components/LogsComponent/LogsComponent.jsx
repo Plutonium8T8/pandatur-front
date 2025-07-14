@@ -3,7 +3,7 @@ import { RcTable } from "../RcTable";
 import { DateCell } from "../DateCell";
 import { cleanValue, getLanguageByKey } from "../utils";
 
-function parsePossibleJson(str) {
+const parsePossibleJson = (str) => {
   try {
     if (typeof str === "string" && str.startsWith("[") && str.endsWith("]")) {
       return JSON.parse(str);
@@ -12,17 +12,17 @@ function parsePossibleJson(str) {
   } catch {
     return str;
   }
-}
+};
 
-function arrayDiff(before, after) {
+const arrayDiff = (before, after) => {
   const beforeArr = Array.isArray(before) ? before : [];
   const afterArr = Array.isArray(after) ? after : [];
   const removed = beforeArr.filter((item) => !afterArr.includes(item));
   const added = afterArr.filter((item) => !beforeArr.includes(item));
   return { removed, added };
-}
+};
 
-function getChangedFields(before = {}, after = {}) {
+const getChangedFields = (before = {}, after = {}) => {
   if (!before || !after) return [];
   const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
   const changes = [];
@@ -48,7 +48,7 @@ function getChangedFields(before = {}, after = {}) {
     }
   }
   return changes;
-}
+};
 
 export const LogsComponent = ({ logList }) => {
   const rcColumn = [
