@@ -22,7 +22,7 @@ export const Logs = () => {
         const response = await api.activity.filterLogs({
           page: pagination.currentPage,
           limit: 50,
-          sort_by: "timestamp",
+          sort_by: "id",
           order: "DESC",
           attributes: {},
         });
