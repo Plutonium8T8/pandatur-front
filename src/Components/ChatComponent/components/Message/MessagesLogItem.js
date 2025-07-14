@@ -12,6 +12,7 @@ const SUBJECT_LABELS = {
 };
 
 export const MessagesLogItem = ({ log, technicians }) => {
+
     const date = parseServerDate(log.timestamp).format("DD.MM.YYYY HH:mm");
 
     const getTechLabel = (id) => {
@@ -20,8 +21,8 @@ export const MessagesLogItem = ({ log, technicians }) => {
         return tech?.label || ` ${id}`;
     };
 
-    const tech =
-        technicians?.find((t) => String(t.value) === String(log.by)) || {};
+    const tech = technicians?.find((t) => String(t.value) === String(log.by)) || {};
+
     const author =
         tech.label ||
         getFullName(tech.name, tech.surname) ||
