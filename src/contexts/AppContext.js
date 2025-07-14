@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useMemo, useRef, useContext } from "react";
+import { createContext, useState, useEffect, useRef, useContext } from "react";
 import { useSnackbar } from "notistack";
 import { useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -43,7 +43,6 @@ export const AppProvider = ({ children }) => {
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
 
-  // Получаем всё, что связано с пользователем, из UserContext
   const {
     userId,
     isAdmin,
@@ -56,8 +55,6 @@ export const AppProvider = ({ children }) => {
   } = useContext(UserContext);
 
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
-
-  // ---- Основная логика ----
 
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
@@ -181,8 +178,6 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // ---- Автозагрузка тикетов при первом входе ----
-
   const hasLeadsFilterInUrl = () => {
     const params = new URLSearchParams(window.location.search);
     const filterKeys = Array.from(params.keys()).filter(
@@ -225,8 +220,6 @@ export const AppProvider = ({ children }) => {
       fetchTickets();
     }
   });
-
-  // ---- WebSocket обработка ----
 
   const fetchSingleTicket = async (ticketId) => {
     try {
@@ -353,8 +346,6 @@ export const AppProvider = ({ children }) => {
     }
     // eslint-disable-next-line
   }, [sendedValue]);
-
-  // ---- WebSocket подключение к чатам ----
 
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
