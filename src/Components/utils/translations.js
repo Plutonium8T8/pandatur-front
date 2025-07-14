@@ -3310,5 +3310,15 @@ export const translations = {
     RO: "Etapă",
     RU: "Этап",
     EN: "Workflow"
-  }
+  },
+  "Detalii": {
+    RO: "Detalii",
+    RU: "Детали",
+    EN: "Details"
+  },
+  "LogEvent": {
+    RO: "Eveniment",
+    RU: "Событие",
+    EN: "Event"
+  },
 }

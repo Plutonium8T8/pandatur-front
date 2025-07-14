@@ -1,7 +1,54 @@
-import { Text, Box } from "@mantine/core";
-import { cleanValue, getLanguageByKey } from "../utils";
+import { Box, Text } from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { DateCell } from "../DateCell";
+import { cleanValue, getLanguageByKey } from "../utils";
+
+function parsePossibleJson(str) {
+  try {
+    if (typeof str === "string" && str.startsWith("[") && str.endsWith("]")) {
+      return JSON.parse(str);
+    }
+    return str;
+  } catch {
+    return str;
+  }
+}
+
+function arrayDiff(before, after) {
+  const beforeArr = Array.isArray(before) ? before : [];
+  const afterArr = Array.isArray(after) ? after : [];
+  const removed = beforeArr.filter((item) => !afterArr.includes(item));
+  const added = afterArr.filter((item) => !beforeArr.includes(item));
+  return { removed, added };
+}
+
+function getChangedFields(before = {}, after = {}) {
+  if (!before || !after) return [];
+  const allKeys = new Set([...Object.keys(before), ...Object.keys(after)]);
+  const changes = [];
+  for (const key of allKeys) {
+    const valBefore = parsePossibleJson(before[key]);
+    const valAfter = parsePossibleJson(after[key]);
+    if (Array.isArray(valBefore) && Array.isArray(valAfter)) {
+      const diff = arrayDiff(valBefore, valAfter);
+      if (diff.removed.length || diff.added.length) {
+        changes.push({
+          field: key,
+          from: diff.removed.length ? diff.removed.join(", ") : "-",
+          to: diff.added.length ? diff.added.join(", ") : "-",
+          type: "array",
+        });
+      }
+    } else if (valBefore !== valAfter) {
+      changes.push({
+        field: key,
+        from: valBefore ?? "-",
+        to: valAfter ?? "-",
+      });
+    }
+  }
+  return changes;
+}
 
 export const LogsComponent = ({ logList }) => {
   const rcColumn = [
@@ -13,25 +60,29 @@ export const LogsComponent = ({ logList }) => {
       align: "center",
     },
     {
-      width: 300,
+      width: 220,
       key: "user_identifier",
       title: getLanguageByKey("Identificator utilizator"),
       dataIndex: "user_identifier",
       align: "center",
     },
+    // {
+    //   width: 100,
+    //   key: "user_id",
+    //   title: getLanguageByKey("ID-ul utilizatorului"),
+    //   dataIndex: "user_id",
+    //   align: "center",
+    // },
     {
-      width: 110,
-      key: "user_id",
-      title: getLanguageByKey("ID-ul utilizatorului"),
-      dataIndex: "user_id",
+      width: 180,
+      key: "event",
+      title: getLanguageByKey("LogEvent"),
+      dataIndex: "object",
       align: "center",
-    },
-    {
-      width: 150,
-      key: "activity_type",
-      title: getLanguageByKey("Tip activitate"),
-      dataIndex: "activity_type",
-      align: "center",
+      render: (object, record) =>
+        object?.type
+          ? object.type
+          : record.event || cleanValue(),
     },
     {
       width: 150,
@@ -41,80 +92,83 @@ export const LogsComponent = ({ logList }) => {
       align: "center",
     },
     {
-      width: 200,
+      width: 160,
       key: "timestamp",
       title: getLanguageByKey("Data și ora log-ului"),
       dataIndex: "timestamp",
       align: "center",
-      render: (timestamp) => (
-        <DateCell gap="8" direction="row" date={timestamp} justify="center" />
-      ),
+      render: (timestamp) =>
+        <DateCell gap="8" direction="row" date={timestamp} justify="center" />,
     },
     {
-      width: 300,
-      key: "user_agent",
-      title: getLanguageByKey("Sistem și browser"),
-      dataIndex: "user_agent",
-      align: "center",
-      render: (user_agent) => (
-        <Box w="100%">
-          <Text truncate>{user_agent ? user_agent : cleanValue()}</Text>
-        </Box>
-      ),
-    },
-    {
-      width: 600,
-      key: "additional_data",
-      title: getLanguageByKey("Informație suplimentară"),
-      dataIndex: "additional_data",
+      width: 500,
+      key: "changes",
+      title: getLanguageByKey("Detalii"),
+      dataIndex: "data",
       align: "left",
       render: (data, record) => {
-        if (!data) return cleanValue();
-
-        const type = record.activity_type;
-
-        if (type === "message_error") {
+        const obj = record.object || {};
+        const hasObjInfo = obj?.id || obj?.type;
+        if (!data) {
           return (
             <Box>
-              <Text size="sm" fw={500}>
-                {data.message}
-              </Text>
-              <Text size="xs" color="red">
-                {data.error}
-              </Text>
+              {hasObjInfo && (
+                <Text size="xs" color="dimmed" mb={4}>
+                  <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>Тип:</b> {obj.type ? obj.type : "-"}
+                </Text>
+              )}
+              <Text size="sm">{getLanguageByKey("Нет изменений")}</Text>
             </Box>
           );
         }
-
-        if (type === "ticket_created" || type === "ticket_deleted") {
-          const ticket =
-            data.ticket || (Array.isArray(data.deleted_ticket) ? data.deleted_ticket[0] : null);
-
-          if (!ticket) return cleanValue();
-
+        const changes = getChangedFields(data.before, data.after);
+        if (changes.length === 0) {
           return (
             <Box>
-              <Text size="sm">{`ID: ${ticket.id}`}</Text>
-              <Text size="sm">{`Workflow: ${ticket.workflow}`}</Text>
-              <Text size="sm">{`Prioritate: ${ticket.priority}`}</Text>
+              {hasObjInfo && (
+                <Text size="xs" color="dimmed" mb={4}>
+                  <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>Тип:</b> {obj.type ? obj.type : "-"}
+                </Text>
+              )}
+              <Text size="sm">{getLanguageByKey("Нет изменений")}</Text>
             </Box>
           );
         }
-
         return (
-          <Box style={{ whiteSpace: "pre-wrap" }}>
-            <Text size="xs">{JSON.stringify(data, null, 2)}</Text>
+          <Box>
+            {hasObjInfo && (
+              <Text size="xs" color="dimmed" mb={4}>
+                <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
+                <b>Тип:</b> {obj.type ? obj.type : "-"}
+              </Text>
+            )}
+            {changes.map((ch, i) =>
+              <Text size="xs" key={i}>
+                <b>{ch.field}:</b>{" "}
+                <span style={{ color: "red" }}>{String(ch.from)}</span>
+                <span style={{
+                  fontWeight: 700,
+                  color: "#bbb",
+                  margin: "0 6px"
+                }}>→</span>
+                <span style={{ color: "green" }}>{String(ch.to)}</span>
+              </Text>
+            )}
           </Box>
         );
       },
     },
   ];
 
-  return <RcTable
-    bordered
-    rowKey="id"
-    columns={rcColumn}
-    data={logList}
-    scroll={{ y: 'calc(100vh - 220px)' }}
-  />;
+  return (
+    <RcTable
+      bordered
+      rowKey="id"
+      columns={rcColumn}
+      data={logList}
+      scroll={{ y: 'calc(100vh - 220px)' }}
+    />
+  );
 };
