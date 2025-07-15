@@ -60,12 +60,22 @@ export const LogsComponent = ({ logList }) => {
       align: "center",
     },
     {
+      width: 160,
+      key: "timestamp",
+      title: getLanguageByKey("Data și ora log-ului"),
+      dataIndex: "timestamp",
+      align: "center",
+      render: (timestamp) =>
+        <DateCell gap="8" direction="row" date={timestamp} justify="center" />,
+    },
+    {
       width: 220,
       key: "user_identifier",
       title: getLanguageByKey("Identificator utilizator"),
       dataIndex: "user_identifier",
       align: "center",
     },
+    // Если понадобится — раскомментируй ниже
     // {
     //   width: 100,
     //   key: "user_id",
@@ -84,22 +94,13 @@ export const LogsComponent = ({ logList }) => {
           ? object.type
           : record.event || cleanValue(),
     },
-    {
-      width: 150,
-      key: "ip_address",
-      title: getLanguageByKey("Adresă IP"),
-      dataIndex: "ip_address",
-      align: "center",
-    },
-    {
-      width: 160,
-      key: "timestamp",
-      title: getLanguageByKey("Data și ora log-ului"),
-      dataIndex: "timestamp",
-      align: "center",
-      render: (timestamp) =>
-        <DateCell gap="8" direction="row" date={timestamp} justify="center" />,
-    },
+    // {
+    //   width: 150,
+    //   key: "ip_address",
+    //   title: getLanguageByKey("Adresă IP"),
+    //   dataIndex: "ip_address",
+    //   align: "center",
+    // },
     {
       width: 500,
       key: "changes",
@@ -113,12 +114,12 @@ export const LogsComponent = ({ logList }) => {
           return (
             <Box>
               {hasObjInfo && (
-                <Text size="xs" color="dimmed" mb={4}>
-                  <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
-                  <b>Тип:</b> {obj.type ? obj.type : "-"}
+                <Text size="xs" mb={4}>
+                  <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
-              <Text size="sm">{getLanguageByKey("Нет изменений")}</Text>
+              <Text size="sm">{getLanguageByKey("Fără modificări")}</Text>
             </Box>
           );
         }
@@ -127,21 +128,21 @@ export const LogsComponent = ({ logList }) => {
           return (
             <Box>
               {hasObjInfo && (
-                <Text size="xs" color="dimmed" mb={4}>
-                  <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
-                  <b>Тип:</b> {obj.type ? obj.type : "-"}
+                <Text size="xs" mb={4}>
+                  <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
-              <Text size="sm">{getLanguageByKey("Нет изменений")}</Text>
+              <Text size="sm">{getLanguageByKey("Fără modificări")}</Text>
             </Box>
           );
         }
         return (
           <Box>
             {hasObjInfo && (
-              <Text size="xs" color="dimmed" mb={4}>
-                <b>ID объекта:</b> {obj.id ? obj.id : "-"}{" "}
-                <b>Тип:</b> {obj.type ? obj.type : "-"}
+              <Text size="xs" mb={4}>
+                <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
               </Text>
             )}
             {changes.map((ch, i) =>
