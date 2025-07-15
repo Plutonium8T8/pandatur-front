@@ -12,21 +12,26 @@ const SUBJECT_LABELS = {
 };
 
 export const MessagesLogItem = ({ log, technicians }) => {
+
     const date = parseServerDate(log.timestamp).format("DD.MM.YYYY HH:mm");
 
     const getTechLabel = (id) => {
         if (!id) return "-";
         const tech = technicians?.find((t) => String(t.value) === String(id));
-        return tech?.label || `ID ${id}`;
+        return tech?.label || ` ${id}`;
     };
 
-    const tech =
-        technicians?.find((t) => String(t.value) === String(log.by)) || {};
+    const tech = technicians?.find((t) => String(t.value) === String(log.by)) || {};
+
     const author =
-        tech.label ||
-        getFullName(tech.name, tech.surname) ||
-        tech.name ||
-        ` ${log.by}`;
+        String(log.by) === "1"
+            ? "System"
+            : (
+                tech.label ||
+                getFullName(tech.name, tech.surname) ||
+                tech.name ||
+                ` ${log.by}`
+            );
 
     const isTask = log.type === "task";
     const from = log.from;

@@ -19,7 +19,7 @@ export const SocketProvider = ({ children }) => {
 
     const connect = () => {
       if (reconnectAttempts.current >= maxReconnectAttempts) {
-        console.warn("[SOCKET] Превышено максимальное число попыток подключения");
+        // console.warn("[SOCKET] Превышено максимальное число попыток подключения");
         return;
       }
 
@@ -27,7 +27,7 @@ export const SocketProvider = ({ children }) => {
       socketRef.current = socket;
 
       socket.onopen = () => {
-        console.log("[SOCKET] Соединение установлено");
+        // console.log("[SOCKET] Соединение установлено");
         reconnectAttempts.current = 0;
         enqueueSnackbar(getLanguageByKey("socketConnectionEstablished"), {
           variant: "success",
@@ -39,7 +39,7 @@ export const SocketProvider = ({ children }) => {
           const message = JSON.parse(event.data);
           setVal(message);
         } catch (err) {
-          console.error("[SOCKET] Ошибка при парсинге сообщения:", event.data);
+          // console.error("[SOCKET] Ошибка при парсинге сообщения:", event.data);
         }
       };
 
@@ -51,7 +51,7 @@ export const SocketProvider = ({ children }) => {
 
       socket.onclose = () => {
         reconnectAttempts.current += 1;
-        console.warn(`[SOCKET] Попытка реконнекта #${reconnectAttempts.current}`);
+        // console.warn(`[SOCKET] Попытка реконнекта #${reconnectAttempts.current}`);
         reconnectTimer = setTimeout(connect, reconnectDelay);
       };
     };
@@ -67,25 +67,25 @@ export const SocketProvider = ({ children }) => {
   const seenMessages = (ticketId, userId) => {
     const socketInstance = socketRef.current;
 
-    console.log("[SEEN] Попытка отправки seen-сообщения", {
-      socketExists: !!socketInstance,
-      readyState: socketInstance?.readyState,
-      ticketId,
-      userId,
-    });
+    // console.log("[SEEN] Попытка отправки seen-сообщения", {
+    //   socketExists: !!socketInstance,
+    //   readyState: socketInstance?.readyState,
+    //   ticketId,
+    //   userId,
+    // });
 
     if (!socketInstance) {
-      console.warn("[SEEN] socketInstance не существует");
+      // console.warn("[SEEN] socketInstance не существует");
       return;
     }
 
     if (socketInstance.readyState !== WebSocket.OPEN) {
-      console.warn("[SEEN] Сокет не в состоянии OPEN:", socketInstance.readyState);
+      // console.warn("[SEEN] Сокет не в состоянии OPEN:", socketInstance.readyState);
       return;
     }
 
     if (!ticketId || !userId) {
-      console.warn("[SEEN] ticketId или userId отсутствует", { ticketId, userId });
+      // console.warn("[SEEN] ticketId или userId отсутствует", { ticketId, userId });
       return;
     }
 
@@ -101,9 +101,9 @@ export const SocketProvider = ({ children }) => {
 
     try {
       socketInstance.send(payload);
-      console.log("[SEEN] Сообщение отправлено в сокет:", payload);
+      // console.log("[SEEN] Сообщение отправлено в сокет:", payload);
     } catch (err) {
-      console.error("[SEEN] Ошибка при отправке сообщения в сокет:", err);
+      // console.error("[SEEN] Ошибка при отправке сообщения в сокет:", err);
     }
   };
 

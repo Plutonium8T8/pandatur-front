@@ -1,11 +1,11 @@
-import { createContext, useState, useEffect, useMemo, useRef } from "react";
+import { createContext, useState, useEffect, useRef, useContext } from "react";
 import { useSnackbar } from "notistack";
-import { useUser, useLocalStorage, useSocket } from "@hooks";
+import { useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
-import { workflowOptionsByGroupTitle, workflowOptionsLimitedByGroupTitle, userGroupsToGroupTitle } from "../Components/utils/workflowUtils";
+import { UserContext } from "./UserContext";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
@@ -34,59 +34,27 @@ const getLeadsUrlViewMode = () => {
 export const AppProvider = ({ children }) => {
   const { sendedValue, socketRef } = useSocket();
   const { enqueueSnackbar } = useSnackbar();
-  const { userId } = useUser();
   const { storage, changeLocalStorage } = useLocalStorage(SIDEBAR_COLLAPSE, "false");
   const [tickets, setTickets] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [spinnerTickets, setSpinnerTickets] = useState(false);
-  const [userGroups, setUserGroups] = useState([]);
-  const [loadingWorkflow, setLoadingWorkflow] = useState(true);
   const [lightTicketFilters, setLightTicketFilters] = useState({});
-  const [customGroupTitle, setCustomGroupTitle] = useState(null);
-
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
 
+  const {
+    userId,
+    isAdmin,
+    workflowOptions,
+    groupTitleForApi,
+    accessibleGroupTitles,
+    customGroupTitle,
+    setCustomGroupTitle,
+    userGroups,
+  } = useContext(UserContext);
+
   const collapsed = () => changeLocalStorage(storage === "true" ? "false" : "true");
-
-  useEffect(() => {
-    const fetchTechnicians = async () => {
-      try {
-        const technicians = await api.users.getTechnicianList();
-        const me = technicians.find(
-          (t) => t.id?.user?.id && String(t.id.user.id) === String(userId)
-        );
-        setUserGroups(me?.groups || []);
-      } catch (err) {
-        console.error("[AppContext] error get technician list", err);
-        setUserGroups([]);
-      } finally {
-        setLoadingWorkflow(false);
-      }
-    };
-    if (userId) fetchTechnicians();
-  }, [userId]);
-
-  const accessibleGroupTitles = useMemo(() => {
-    const titles = userGroups.flatMap((group) => userGroupsToGroupTitle[group.name] || []);
-    return [...new Set(titles)];
-  }, [userGroups]);
-
-  const groupTitleForApi = useMemo(() => {
-    if (customGroupTitle) return customGroupTitle;
-    return accessibleGroupTitles[0] || null;
-  }, [customGroupTitle, accessibleGroupTitles]);
-
-  const isAdmin = useMemo(() => {
-    return userGroups.some((g) => g.name === "Admin" || g.name === "IT dep.");
-  }, [userGroups]);
-
-  const workflowOptions = useMemo(() => {
-    if (!groupTitleForApi) return [];
-    if (isAdmin) return workflowOptionsByGroupTitle[groupTitleForApi] || [];
-    return workflowOptionsLimitedByGroupTitle[groupTitleForApi] || [];
-  }, [groupTitleForApi, isAdmin]);
 
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
@@ -115,15 +83,15 @@ export const AppProvider = ({ children }) => {
     );
 
     setTimeout(() => {
-      if (updatedGlobal && updatedFiltered) {
-        console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
-      } else if (updatedGlobal) {
-        console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
-      } else if (updatedFiltered) {
-        console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
-      } else {
-        console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
-      }
+      // if (updatedGlobal && updatedFiltered) {
+      //   console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
+      // } else if (updatedGlobal) {
+      //   console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
+      // } else if (updatedFiltered) {
+      //   console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
+      // } else {
+      //   console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
+      // }
     }, 0);
   };
 
@@ -210,13 +178,20 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  const hasLeadsFilterInUrl = () => {
+    const params = new URLSearchParams(window.location.search);
+    const filterKeys = Array.from(params.keys()).filter(
+      (key) => key !== "view" && key !== "type"
+    );
+    return filterKeys.length > 0;
+  };
+
   useEffect(() => {
     const isLeadsItemView = /^\/leads\/\d+$/.test(window.location.pathname);
     const urlType = getLeadsUrlType();
     const urlViewMode = getLeadsUrlViewMode();
 
     if (
-      !loadingWorkflow &&
       groupTitleForApi &&
       workflowOptions.length &&
       !isLeadsItemView &&
@@ -226,7 +201,25 @@ export const AppProvider = ({ children }) => {
     ) {
       fetchTickets();
     }
-  }, [loadingWorkflow, groupTitleForApi, workflowOptions, lightTicketFilters]);
+    // eslint-disable-next-line
+  }, [groupTitleForApi, workflowOptions, lightTicketFilters]);
+
+  usePathnameWatcher((pathname) => {
+    const isLeadsListView = pathname === "/leads";
+    const urlType = getLeadsUrlType();
+
+    if (
+      isLeadsListView &&
+      !spinnerTickets &&
+      !tickets.length &&
+      groupTitleForApi &&
+      workflowOptions.length &&
+      !hasLeadsFilterInUrl() &&
+      (!urlType || urlType === "light")
+    ) {
+      fetchTickets();
+    }
+  });
 
   const fetchSingleTicket = async (ticketId) => {
     try {
@@ -255,10 +248,8 @@ export const AppProvider = ({ children }) => {
           const updated = prev.map((ticket) => {
             if (ticket.id === ticket_id) {
               found = true;
-
               const newUnseen = ticket.unseen_count + (isFromAnotherUser ? 1 : 0);
               if (isFromAnotherUser) increment = 1;
-
               return {
                 ...ticket,
                 unseen_count: newUnseen,
@@ -295,7 +286,6 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.SEEN: {
-
         const { ticket_id, sender_id } = message.data;
         const isSeenByAnotherUser = String(sender_id) !== String(userId);
 
@@ -354,40 +344,8 @@ export const AppProvider = ({ children }) => {
     if (sendedValue) {
       handleWebSocketMessage(sendedValue);
     }
+    // eslint-disable-next-line
   }, [sendedValue]);
-
-  const hasLeadsFilterInUrl = () => {
-    const params = new URLSearchParams(window.location.search);
-    const filterKeys = Array.from(params.keys()).filter(
-      (key) => key !== "view" && key !== "type"
-    );
-    return filterKeys.length > 0;
-  };
-
-  const getLeadsUrlType = () => {
-    if (typeof window === "undefined") return null;
-    const params = new URLSearchParams(window.location.search);
-    return params.get("type");
-  };
-
-  usePathnameWatcher((pathname) => {
-    const isLeadsListView = pathname === "/leads";
-    const urlType = getLeadsUrlType();
-
-    if (
-      isLeadsListView &&
-      !spinnerTickets &&
-      !tickets.length &&
-      !loadingWorkflow &&
-      groupTitleForApi &&
-      workflowOptions.length &&
-      !hasLeadsFilterInUrl() &&
-      (!urlType || urlType === "light")
-    ) {
-      console.log("📥 Загрузка тикетов при переходе на /leads");
-      fetchTickets();
-    }
-  });
 
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
@@ -423,6 +381,7 @@ export const AppProvider = ({ children }) => {
     };
 
     connectToWebSocketRooms();
+    // eslint-disable-next-line
   }, [groupTitleForApi, workflowOptions, socketRef]);
 
   useEffect(() => {
@@ -488,7 +447,7 @@ export const AppProvider = ({ children }) => {
         setCustomGroupTitle,
         customGroupTitle,
 
-        //chat
+        // chat
         chatFilteredTickets,
         fetchChatFilteredTickets,
         setChatFilteredTickets,

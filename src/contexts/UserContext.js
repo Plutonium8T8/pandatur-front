@@ -1,6 +1,11 @@
 import React, { createContext, useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { api } from "../api";
+import {
+  workflowOptionsByGroupTitle,
+  workflowOptionsLimitedByGroupTitle,
+  userGroupsToGroupTitle,
+} from "../Components/utils/workflowUtils";
 
 export const UserContext = createContext();
 
@@ -20,6 +25,8 @@ export const UserProvider = ({ children }) => {
   const [technician, setTechnician] = useState(null);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
 
+  const [customGroupTitle, setCustomGroupTitle] = useState(null);
+
   const teamUserIds = useMemo(() => {
     const groups = userGroups || [];
     const all = groups
@@ -33,6 +40,29 @@ export const UserProvider = ({ children }) => {
     return teamUserIds.has(String(responsibleId));
   };
 
+  const isAdmin = useMemo(
+    () => userGroups.some((g) =>
+      ["Admin", "IT dep.", "Quality Department"].includes(g.name)
+    ),
+    [userGroups]
+  );
+
+  const accessibleGroupTitles = useMemo(() => {
+    const titles = userGroups.flatMap((group) => userGroupsToGroupTitle[group.name] || []);
+    return [...new Set(titles)];
+  }, [userGroups]);
+
+  const groupTitleForApi = useMemo(
+    () => customGroupTitle || accessibleGroupTitles[0] || null,
+    [customGroupTitle, accessibleGroupTitles]
+  );
+
+  const workflowOptions = useMemo(() => {
+    if (!groupTitleForApi) return [];
+    if (isAdmin) return workflowOptionsByGroupTitle[groupTitleForApi] || [];
+    return workflowOptionsLimitedByGroupTitle[groupTitleForApi] || [];
+  }, [groupTitleForApi, isAdmin]);
+
   useEffect(() => {
     if (userId) {
       localStorage.setItem("user_id", userId);
@@ -44,6 +74,7 @@ export const UserProvider = ({ children }) => {
       setTechnician(null);
       setIsLoadingRoles(false);
     }
+    // eslint-disable-next-line
   }, [userId]);
 
   useEffect(() => {
@@ -79,11 +110,13 @@ export const UserProvider = ({ children }) => {
       const data = await api.users.getById(userId);
       const rawRoles = JSON.parse(data.roles);
       const groups = await api.user.getGroupsList();
+      const myGroups = (groups || []).filter((g) => (g.users || []).includes(userId));
+
       const technicians = await api.users.getTechnicianList();
       const me = technicians.find((t) => t.id?.user?.id === userId);
 
       setUserRoles(rawRoles);
-      setUserGroups(groups);
+      setUserGroups(myGroups);
       setTechnician(me || null);
       localStorage.setItem("user_roles", JSON.stringify(rawRoles));
     } catch (error) {
@@ -103,6 +136,10 @@ export const UserProvider = ({ children }) => {
     roles: userRoles,
     groups: userGroups,
     technician,
+    isAdmin,
+    workflowOptions,
+    accessibleGroupTitles,
+    groupTitleForApi,
   };
 
   return (
@@ -120,6 +157,13 @@ export const UserProvider = ({ children }) => {
         teamUserIds,
         isSameTeam,
         isLoadingRoles,
+        technician,
+        isAdmin,
+        accessibleGroupTitles,
+        customGroupTitle,
+        setCustomGroupTitle,
+        groupTitleForApi,
+        workflowOptions,
         user,
       }}
     >

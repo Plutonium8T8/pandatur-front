@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
-import { useMessagesContext } from "@hooks";
+import { useMessagesContext } from "./useMessagesContext";
 
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
@@ -86,7 +86,7 @@ export const useFetchTicketChat = (id) => {
     if (id) {
       getLightTicketInfo();
     }
-  }, [id, lastMessage]);
+  }, [id]);
 
   return {
     personalInfo,
