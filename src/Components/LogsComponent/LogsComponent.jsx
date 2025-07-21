@@ -139,8 +139,8 @@ export const LogsComponent = ({ logList }) => {
             <Box>
               {hasObjInfo && (
                 <Text size="md" mb={4}>
+                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}<b> </b>
                   <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
-                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
               <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
@@ -151,8 +151,8 @@ export const LogsComponent = ({ logList }) => {
           <Box>
             {hasObjInfo && (
               <Text size="md" mb={4}>
+                <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}<b> </b>
                 <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
-                <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
               </Text>
             )}
             {changes.map((ch, i) =>
