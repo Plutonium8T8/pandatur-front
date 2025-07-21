@@ -114,12 +114,12 @@ export const LogsComponent = ({ logList }) => {
           return (
             <Box>
               {hasObjInfo && (
-                <Text size="xs" mb={4}>
+                <Text size="md" mb={4}>
                   <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
                   <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
-              <Text size="sm">{getLanguageByKey("Fără modificări")}</Text>
+              <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
             </Box>
           );
         }
@@ -128,25 +128,25 @@ export const LogsComponent = ({ logList }) => {
           return (
             <Box>
               {hasObjInfo && (
-                <Text size="xs" mb={4}>
+                <Text size="md" mb={4}>
                   <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
                   <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
-              <Text size="sm">{getLanguageByKey("Fără modificări")}</Text>
+              <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
             </Box>
           );
         }
         return (
           <Box>
             {hasObjInfo && (
-              <Text size="xs" mb={4}>
+              <Text size="md" mb={4}>
                 <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
                 <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
               </Text>
             )}
             {changes.map((ch, i) =>
-              <Text size="xs" key={i}>
+              <Text size="md" key={i}>
                 <b>{ch.field}:</b>{" "}
                 <span style={{ color: "red" }}>{String(ch.from)}</span>
                 <span style={{
