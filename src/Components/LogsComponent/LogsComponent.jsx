@@ -2,6 +2,7 @@ import { Box, Text } from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { DateCell } from "../DateCell";
 import { cleanValue, getLanguageByKey } from "../utils";
+import { useGetTechniciansList } from "../../hooks/useGetTechniciansList";
 
 const parsePossibleJson = (str) => {
   try {
@@ -51,6 +52,13 @@ const getChangedFields = (before = {}, after = {}) => {
 };
 
 export const LogsComponent = ({ logList }) => {
+  const { technicians, loading } = useGetTechniciansList();
+
+  const getNameById = (userId) => {
+    const tech = technicians.find((t) => String(t.id?.id) === String(userId));
+    return tech?.label || userId;
+  };
+
   const rcColumn = [
     {
       width: 70,
@@ -75,7 +83,6 @@ export const LogsComponent = ({ logList }) => {
       dataIndex: "user_identifier",
       align: "center",
     },
-    // Если понадобится — раскомментируй ниже
     // {
     //   width: 100,
     //   key: "user_id",
@@ -110,12 +117,15 @@ export const LogsComponent = ({ logList }) => {
       render: (data, record) => {
         const obj = record.object || {};
         const hasObjInfo = obj?.id || obj?.type;
+        const objectIdLabel =
+          obj.id && !loading ? getNameById(obj.id) : obj.id || "-";
+
         if (!data) {
           return (
             <Box>
               {hasObjInfo && (
                 <Text size="md" mb={4}>
-                  <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
                   <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
@@ -129,7 +139,7 @@ export const LogsComponent = ({ logList }) => {
             <Box>
               {hasObjInfo && (
                 <Text size="md" mb={4}>
-                  <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                  <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
                   <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
                 </Text>
               )}
@@ -141,7 +151,7 @@ export const LogsComponent = ({ logList }) => {
           <Box>
             {hasObjInfo && (
               <Text size="md" mb={4}>
-                <b>{getLanguageByKey("ID obiect:")}</b> {obj.id ? obj.id : "-"}{" "}
+                <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
                 <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}
               </Text>
             )}
