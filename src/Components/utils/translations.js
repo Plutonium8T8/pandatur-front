@@ -3522,5 +3522,35 @@ export const translations = {
     RO: "Sarcină",
     RU: "Задача",
     EN: "Task"
+  },
+  "Changed field (key)": {
+    RO: "Câmp schimbat (cheie)",
+    RU: "Изменённое поле (ключ)",
+    EN: "Changed field (key)"
+  },
+  "Field name (example: status)": {
+    RO: "Nume câmp (exemplu: status)",
+    RU: "Название поля (например: status)",
+    EN: "Field name (e.g. status)"
+  },
+  "Before value": {
+    RO: "Valoare înainte",
+    RU: "Значение до",
+    EN: "Before value"
+  },
+  "Old value (optional)": {
+    RO: "Valoare veche (opțional)",
+    RU: "Старое значение (необязательно)",
+    EN: "Old value (optional)"
+  },
+  "After value": {
+    RO: "Valoare după",
+    RU: "Значение после",
+    EN: "After value"
+  },
+  "New value (optional)": {
+    RO: "Valoare nouă (opțional)",
+    RU: "Новое значение (необязательно)",
+    EN: "New value (optional)"
   }
 }
