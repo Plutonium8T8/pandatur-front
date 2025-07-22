@@ -3335,5 +3335,198 @@ export const translations = {
     RO: "Tip:",
     RU: "Тип:",
     EN: "Type:"
+  },
+  "Log filter": {
+    RO: "Filtru jurnal",
+    RU: "Фильтр логов",
+    EN: "Log filter"
+  },
+  "User (user_identifier)": {
+    RO: "Utilizator (user_identifier)",
+    RU: "Пользователь (user_identifier)",
+    EN: "User (user_identifier)"
+  },
+  "User name": {
+    RO: "Nume utilizator",
+    RU: "Имя пользователя",
+    EN: "User name"
+  },
+  "Events (event)": {
+    RO: "Evenimente (event)",
+    RU: "События (event)",
+    EN: "Events (event)"
+  },
+  "Select events": {
+    RO: "Alege evenimente",
+    RU: "Выберите события",
+    EN: "Select events"
+  },
+  "Types (type)": {
+    RO: "Tipuri (type)",
+    RU: "Типы (type)",
+    EN: "Types (type)"
+  },
+  "Select type": {
+    RO: "Alege tipul",
+    RU: "Выберите тип",
+    EN: "Select type"
+  },
+  "IP address": {
+    RO: "Adresa IP",
+    RU: "IP адрес",
+    EN: "IP address"
+  },
+  "For example, 192.168.1.1": {
+    RO: "De exemplu, 192.168.1.1",
+    RU: "Например, 192.168.1.1",
+    EN: "For example, 192.168.1.1"
+  },
+  "Date from": {
+    RO: "Data de la",
+    RU: "Дата с",
+    EN: "Date from"
+  },
+  "Start date": {
+    RO: "Data începutului",
+    RU: "Дата начала",
+    EN: "Start date"
+  },
+  "Date to": {
+    RO: "Data până la",
+    RU: "Дата по",
+    EN: "Date to"
+  },
+  "End date": {
+    RO: "Data sfârșitului",
+    RU: "Дата окончания",
+    EN: "End date"
+  },
+  "Search": {
+    RO: "Căutare",
+    RU: "Поиск",
+    EN: "Search"
+  },
+  "Search text": {
+    RO: "Text de căutare",
+    RU: "Текст для поиска",
+    EN: "Search text"
+  },
+  "Reset": {
+    RO: "Resetare",
+    RU: "Сбросить",
+    EN: "Reset"
+  },
+  "Apply": {
+    RO: "Aplică",
+    RU: "Применить",
+    EN: "Apply"
+  },
+
+  // Event options
+  "User logged-in": {
+    RO: "Utilizator autentificat",
+    RU: "Пользователь вошёл",
+    EN: "User logged-in"
+  },
+  "User logged-out": {
+    RO: "Utilizator deconectat",
+    RU: "Пользователь вышел",
+    EN: "User logged-out"
+  },
+  "User created": {
+    RO: "Utilizator creat",
+    RU: "Пользователь создан",
+    EN: "User created"
+  },
+  "User updated": {
+    RO: "Utilizator actualizat",
+    RU: "Пользователь обновлён",
+    EN: "User updated"
+  },
+  "User deleted": {
+    RO: "Utilizator șters",
+    RU: "Пользователь удалён",
+    EN: "User deleted"
+  },
+  "Lead created": {
+    RO: "Lead creat",
+    RU: "Лид создан",
+    EN: "Lead created"
+  },
+  "Lead deleted": {
+    RO: "Lead șters",
+    RU: "Лид удалён",
+    EN: "Lead deleted"
+  },
+  "Lead updated": {
+    RO: "Lead actualizat",
+    RU: "Лид обновлён",
+    EN: "Lead updated"
+  },
+  "Lead merged": {
+    RO: "Lead combinat",
+    RU: "Лид объединён",
+    EN: "Lead merged"
+  },
+  "Task created": {
+    RO: "Sarcină creată",
+    RU: "Задача создана",
+    EN: "Task created"
+  },
+  "Task deleted": {
+    RO: "Sarcină ștearsă",
+    RU: "Задача удалена",
+    EN: "Task deleted"
+  },
+  "Task updated": {
+    RO: "Sarcină actualizată",
+    RU: "Задача обновлена",
+    EN: "Task updated"
+  },
+  "Task completed": {
+    RO: "Sarcină finalizată",
+    RU: "Задача выполнена",
+    EN: "Task completed"
+  },
+  "Client created": {
+    RO: "Client creat",
+    RU: "Клиент создан",
+    EN: "Client created"
+  },
+  "Client updated": {
+    RO: "Client actualizat",
+    RU: "Клиент обновлён",
+    EN: "Client updated"
+  },
+  "Message received": {
+    RO: "Mesaj primit",
+    RU: "Сообщение получено",
+    EN: "Message received"
+  },
+  "Message sent": {
+    RO: "Mesaj trimis",
+    RU: "Сообщение отправлено",
+    EN: "Message sent"
+  },
+  "Message 24h error": {
+    RO: "Eroare mesaj 24h",
+    RU: "Ошибка сообщения 24ч",
+    EN: "Message 24h error"
+  },
+  "Message error": {
+    RO: "Eroare mesaj",
+    RU: "Ошибка сообщения",
+    EN: "Message error"
+  },
+
+  "User": {
+    RO: "Utilizator",
+    RU: "Пользователь",
+    EN: "User"
+  },
+  "Task": {
+    RO: "Sarcină",
+    RU: "Задача",
+    EN: "Task"
   }
 }

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import TaskComponent from "@components/Task/TaskComponent";
+import TaskComponent from "../Components/Task/TaskComponent";
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { MantineModal } from "@components";
 import { useGetTechniciansList } from "../hooks";
