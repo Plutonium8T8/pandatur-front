@@ -1,10 +1,12 @@
-import { Box, Flex, Pagination } from "@mantine/core";
+import { Box, Flex, Pagination, ActionIcon } from "@mantine/core";
 import { enqueueSnackbar } from "notistack";
 import { useState, useEffect } from "react";
 import { PageHeader, Spin } from "@components";
 import { getLanguageByKey, showServerError } from "@utils";
 import { api } from "../api";
 import { LogsComponent } from "../Components/LogsComponent/LogsComponent";
+import { LogFilterModal } from "../Components/LogsComponent/LogFilterModal";
+import { LuFilter } from "react-icons/lu";
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);
@@ -15,6 +17,9 @@ export const Logs = () => {
   const [loading, setLoading] = useState(true);
   const [totalItems, setTotalItems] = useState(0);
 
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({});
+
   useEffect(() => {
     const fetchLogs = async () => {
       setLoading(true);
@@ -24,7 +29,7 @@ export const Logs = () => {
           limit: 50,
           sort_by: "id",
           order: "DESC",
-          attributes: {},
+          attributes: filters,
         });
 
         setLogList(response.data);
@@ -41,11 +46,33 @@ export const Logs = () => {
     };
 
     fetchLogs();
-  }, [pagination.currentPage]);
+  }, [pagination.currentPage, filters]);
+
+  const handleApplyFilter = (attrs) => {
+    setFilters(attrs);
+    setPagination((prev) => ({ ...prev, currentPage: 1 }));
+  };
 
   return (
     <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
-      <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
+      <Flex align="center" justify="space-between" mb={20}>
+        <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
+        <ActionIcon
+          variant="default"
+          size="lg"
+          onClick={() => setFilterModalOpen(true)}
+          title="Фильтр"
+        >
+          <LuFilter size={22} />
+        </ActionIcon>
+      </Flex>
+
+      <LogFilterModal
+        opened={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        filters={filters}
+        onApply={handleApplyFilter}
+      />
 
       {loading ? (
         <Flex h="100%" align="center" justify="center">
