@@ -3337,7 +3337,7 @@ export const translations = {
     EN: "Type:"
   },
   "Log filter": {
-    RO: "Filtru jurnal",
+    RO: "Filtru log-uri",
     RU: "Фильтр логов",
     EN: "Log filter"
   },
