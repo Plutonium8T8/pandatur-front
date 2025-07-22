@@ -3341,30 +3341,30 @@ export const translations = {
     RU: "Фильтр логов",
     EN: "Log filter"
   },
-  "User (user_identifier)": {
-    RO: "Utilizator (user_identifier)",
-    RU: "Пользователь (user_identifier)",
-    EN: "User (user_identifier)"
+  "User": {
+    RO: "Utilizator",
+    RU: "Пользователь",
+    EN: "User"
   },
   "User name": {
     RO: "Nume utilizator",
     RU: "Имя пользователя",
     EN: "User name"
   },
-  "Events (event)": {
-    RO: "Evenimente (event)",
-    RU: "События (event)",
-    EN: "Events (event)"
+  "Events": {
+    RO: "Evenimente",
+    RU: "События",
+    EN: "Events"
   },
   "Select events": {
     RO: "Alege evenimente",
     RU: "Выберите события",
     EN: "Select events"
   },
-  "Types (type)": {
-    RO: "Tipuri (type)",
-    RU: "Типы (type)",
-    EN: "Types (type)"
+  "Types": {
+    RO: "Tipuri",
+    RU: "Типы",
+    EN: "Types"
   },
   "Select type": {
     RO: "Alege tipul",
