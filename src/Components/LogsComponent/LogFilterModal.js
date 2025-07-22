@@ -92,7 +92,7 @@ export const LogFilterModal = ({
         <Modal
             opened={opened}
             onClose={onClose}
-            title={getLanguageByKey("Log filter") || "Log filter"}
+            title={getLanguageByKey("Log filter")}
             centered
             withCloseButton
             size="xl"
@@ -115,43 +115,43 @@ export const LogFilterModal = ({
                 style={{ display: "flex", flexDirection: "column", gap: 12, height: "100%" }}
             >
                 <TextInput
-                    label={getLanguageByKey("User (user_identifier)") || "User (user_identifier)"}
-                    placeholder={getLanguageByKey("User name") || "User name"}
+                    label={getLanguageByKey("User")}
+                    placeholder={getLanguageByKey("User name")}
                     {...form.getInputProps("user_identifier")}
                 />
                 <MultiSelect
                     data={translatedEventOptions}
-                    label={getLanguageByKey("Events (event)") || "Events (event)"}
-                    placeholder={getLanguageByKey("Select events") || "Select events"}
+                    label={getLanguageByKey("Types")}
+                    placeholder={getLanguageByKey("Select events")}
                     {...form.getInputProps("event")}
                     searchable
                     clearable
                 />
                 <MultiSelect
                     data={translatedTypeOptions}
-                    label={getLanguageByKey("Types (type)") || "Types (type)"}
-                    placeholder={getLanguageByKey("Select type") || "Select type"}
+                    label={getLanguageByKey("Events")}
+                    placeholder={getLanguageByKey("Select type")}
                     {...form.getInputProps("type")}
                     searchable
                     clearable
                 />
-                <TextInput
+                {/* <TextInput
                     label={getLanguageByKey("IP address") || "IP address"}
                     placeholder={getLanguageByKey("For example, 192.168.1.1") || "For example, 192.168.1.1"}
                     {...form.getInputProps("ip_address")}
-                />
+                /> */}
                 <Flex gap={8}>
                     <DateInput
-                        label={getLanguageByKey("Date from") || "Date from"}
-                        placeholder={getLanguageByKey("Start date") || "Start date"}
+                        label={getLanguageByKey("Date from")}
+                        placeholder={getLanguageByKey("Start date")}
                         {...form.getInputProps("timestamp_from")}
                         valueFormat="DD-MM-YYYY"
                         style={{ flex: 1 }}
                         clearable
                     />
                     <DateInput
-                        label={getLanguageByKey("Date to") || "Date to"}
-                        placeholder={getLanguageByKey("End date") || "End date"}
+                        label={getLanguageByKey("Date to")}
+                        placeholder={getLanguageByKey("End date")}
                         {...form.getInputProps("timestamp_until")}
                         valueFormat="DD-MM-YYYY"
                         style={{ flex: 1 }}
@@ -159,8 +159,8 @@ export const LogFilterModal = ({
                     />
                 </Flex>
                 <TextInput
-                    label={getLanguageByKey("Search") || "Search"}
-                    placeholder={getLanguageByKey("Search text") || "Search text"}
+                    label={getLanguageByKey("Search")}
+                    placeholder={getLanguageByKey("Search text")}
                     {...form.getInputProps("search")}
                 />
 
@@ -178,10 +178,10 @@ export const LogFilterModal = ({
                     }}
                 >
                     <Button variant="outline" onClick={handleReset}>
-                        {getLanguageByKey("Reset") || "Reset"}
+                        {getLanguageByKey("Reset")}
                     </Button>
                     <Button type="submit">
-                        {getLanguageByKey("Apply") || "Apply"}
+                        {getLanguageByKey("Apply")}
                     </Button>
                 </Flex>
             </form>
