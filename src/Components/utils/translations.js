@@ -3518,12 +3518,6 @@ export const translations = {
     RU: "Ошибка сообщения",
     EN: "Message error"
   },
-
-  "User": {
-    RO: "Utilizator",
-    RU: "Пользователь",
-    EN: "User"
-  },
   "Task": {
     RO: "Sarcină",
     RU: "Задача",
