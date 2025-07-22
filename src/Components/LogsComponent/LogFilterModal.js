@@ -49,6 +49,9 @@ export const LogFilterModal = ({
             search: filters.search || "",
             timestamp_from: filters.timestamp_from || null,
             timestamp_until: filters.timestamp_until || null,
+            data_changes_key: filters.data_changes?.key || "",
+            data_changes_before: filters.data_changes?.before_value || "",
+            data_changes_after: filters.data_changes?.after_value || "",
         },
     });
 
@@ -66,6 +69,13 @@ export const LogFilterModal = ({
                 attributes.timestamp.from = dayjs(values.timestamp_from).format("DD-MM-YYYY");
             if (values.timestamp_until)
                 attributes.timestamp.until = dayjs(values.timestamp_until).format("DD-MM-YYYY");
+        }
+        if (values.data_changes_key) {
+            attributes.data_changes = { key: values.data_changes_key };
+            if (values.data_changes_before)
+                attributes.data_changes.before_value = values.data_changes_before;
+            if (values.data_changes_after)
+                attributes.data_changes.after_value = values.data_changes_after;
         }
 
         onApply && onApply(attributes);
@@ -121,7 +131,7 @@ export const LogFilterModal = ({
                 />
                 <MultiSelect
                     data={translatedEventOptions}
-                    label={getLanguageByKey("Types")}
+                    label={getLanguageByKey("Events")}
                     placeholder={getLanguageByKey("Select events")}
                     {...form.getInputProps("event")}
                     searchable
@@ -129,17 +139,17 @@ export const LogFilterModal = ({
                 />
                 <MultiSelect
                     data={translatedTypeOptions}
-                    label={getLanguageByKey("Events")}
+                    label={getLanguageByKey("Types")}
                     placeholder={getLanguageByKey("Select type")}
                     {...form.getInputProps("type")}
                     searchable
                     clearable
                 />
-                {/* <TextInput
-                    label={getLanguageByKey("IP address") || "IP address"}
-                    placeholder={getLanguageByKey("For example, 192.168.1.1") || "For example, 192.168.1.1"}
+                <TextInput
+                    label={getLanguageByKey("IP address")}
+                    placeholder={getLanguageByKey("For example, 192.168.1.1")}
                     {...form.getInputProps("ip_address")}
-                /> */}
+                />
                 <Flex gap={8}>
                     <DateInput
                         label={getLanguageByKey("Date from")}
@@ -163,6 +173,27 @@ export const LogFilterModal = ({
                     placeholder={getLanguageByKey("Search text")}
                     {...form.getInputProps("search")}
                 />
+
+                <Flex gap={8}>
+                    <TextInput
+                        label={getLanguageByKey("Changed field (key)") || "Changed field (key)"}
+                        placeholder={getLanguageByKey("Field name (example: status)") || "Field name (example: status)"}
+                        {...form.getInputProps("data_changes_key")}
+                        style={{ flex: 1 }}
+                    />
+                    <TextInput
+                        label={getLanguageByKey("Before value") || "Before value"}
+                        placeholder={getLanguageByKey("Old value (optional)") || "Old value (optional)"}
+                        {...form.getInputProps("data_changes_before")}
+                        style={{ flex: 1 }}
+                    />
+                    <TextInput
+                        label={getLanguageByKey("After value") || "After value"}
+                        placeholder={getLanguageByKey("New value (optional)") || "New value (optional)"}
+                        {...form.getInputProps("data_changes_after")}
+                        style={{ flex: 1 }}
+                    />
+                </Flex>
 
                 <Flex
                     justify="flex-end"
