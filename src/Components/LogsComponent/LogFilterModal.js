@@ -1,8 +1,11 @@
 import { useForm } from "@mantine/form";
+import { useMemo } from "react";
 import { Modal, Button, Flex, MultiSelect, TextInput } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getLanguageByKey } from "../utils";
+import { useGetTechniciansList } from "../../hooks";
+import { getGroupUserMap, formatMultiSelectData } from "../utils/multiSelectUtils";
 
 const TYPE_OPTIONS = [
     "User logged-in",
@@ -40,8 +43,13 @@ export const LogFilterModal = ({
     filters = {},
     onApply,
 }) => {
+    const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+    const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+    const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
+
     const form = useForm({
         initialValues: {
+            user_id: filters.user_id || [],
             user_identifier: filters.user_identifier || "",
             event: filters.event || [],
             type: filters.type || [],
@@ -55,9 +63,24 @@ export const LogFilterModal = ({
         },
     });
 
+    const handleUserChange = (val) => {
+        const last = val[val.length - 1];
+        const isGroup = last?.startsWith("__group__");
+
+        if (isGroup) {
+            const groupUsers = groupUserMap.get(last) || [];
+            const current = form.values.user_id || [];
+            const unique = Array.from(new Set([...current, ...groupUsers]));
+            form.setFieldValue("user_id", unique);
+        } else {
+            form.setFieldValue("user_id", val);
+        }
+    };
+
     const handleSubmit = (values) => {
         const attributes = {};
 
+        if (values.user_id && values.user_id.length) attributes.user_id = values.user_id.map(Number);
         if (values.user_identifier) attributes.user_identifier = values.user_identifier;
         if (values.event.length) attributes.event = values.event;
         if (values.type.length) attributes.type = values.type;
@@ -124,10 +147,15 @@ export const LogFilterModal = ({
                 onSubmit={form.onSubmit(handleSubmit)}
                 style={{ display: "flex", flexDirection: "column", gap: 12, height: "100%" }}
             >
-                <TextInput
-                    label={getLanguageByKey("User")}
-                    placeholder={getLanguageByKey("User name")}
-                    {...form.getInputProps("user_identifier")}
+                <MultiSelect
+                    data={formattedTechnicians}
+                    label={getLanguageByKey("Users")}
+                    placeholder={getLanguageByKey("Users")}
+                    value={form.values.user_id}
+                    onChange={handleUserChange}
+                    searchable
+                    clearable
+                    loading={loadingTechnicians}
                 />
                 <MultiSelect
                     data={translatedEventOptions}
@@ -145,12 +173,7 @@ export const LogFilterModal = ({
                     searchable
                     clearable
                 />
-                <TextInput
-                    label={getLanguageByKey("IP address")}
-                    placeholder={getLanguageByKey("For example, 192.168.1.1")}
-                    {...form.getInputProps("ip_address")}
-                />
-                <Flex gap={8}>
+                <Flex gap={8} direction="column">
                     <DateInput
                         label={getLanguageByKey("Date from")}
                         placeholder={getLanguageByKey("Start date")}
