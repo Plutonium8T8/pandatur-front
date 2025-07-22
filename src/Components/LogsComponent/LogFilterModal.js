@@ -2,7 +2,6 @@ import { useForm } from "@mantine/form";
 import {
     Modal,
     Button,
-    Group,
     Flex,
     MultiSelect,
     TextInput,
@@ -85,7 +84,6 @@ export const LogFilterModal = ({
         onClose();
     };
 
-    // перевод опций для select
     const translatedEventOptions = EVENT_OPTIONS.map(e => ({
         value: e,
         label: getLanguageByKey(e) || e,
@@ -111,14 +109,16 @@ export const LogFilterModal = ({
                     flexDirection: "column",
                 },
                 body: {
-                    flex: "1",
+                    flex: "1 1 auto",
                     overflowY: "auto",
+                    position: "relative",
+                    paddingBottom: 80,
                 },
             }}
         >
             <form
                 onSubmit={form.onSubmit(handleSubmit)}
-                style={{ display: "flex", flexDirection: "column", gap: 12 }}
+                style={{ display: "flex", flexDirection: "column", gap: 12, height: "100%" }}
             >
                 <TextInput
                     label={getLanguageByKey("User (user_identifier)") || "User (user_identifier)"}
@@ -169,14 +169,27 @@ export const LogFilterModal = ({
                     placeholder={getLanguageByKey("Search text") || "Search text"}
                     {...form.getInputProps("search")}
                 />
-                <Group mt="md" justify="flex-end">
+
+                <Flex
+                    justify="flex-end"
+                    gap={8}
+                    style={{
+                        position: "absolute",
+                        bottom: 16,
+                        right: 24,
+                        left: 24,
+                        background: "var(--mantine-color-body, #fff)",
+                        zIndex: 10,
+                        paddingTop: 12,
+                    }}
+                >
                     <Button variant="outline" onClick={handleReset}>
                         {getLanguageByKey("Reset") || "Reset"}
                     </Button>
                     <Button type="submit">
                         {getLanguageByKey("Apply") || "Apply"}
                     </Button>
-                </Group>
+                </Flex>
             </form>
         </Modal>
     );
