@@ -3352,24 +3352,24 @@ export const translations = {
     EN: "User name"
   },
   "Events": {
-    RO: "Evenimente",
-    RU: "События",
-    EN: "Events"
+    RO: "Obiectul evenimentului",
+    RU: "Объект события",
+    EN: "Event object"
   },
   "Select events": {
-    RO: "Alege evenimente",
-    RU: "Выберите события",
-    EN: "Select events"
+    RO: "Alege obiect eveniment",
+    RU: "Выберите объект события",
+    EN: "Select event objects"
   },
   "Types": {
-    RO: "Tipuri",
-    RU: "Типы",
-    EN: "Types"
+    RO: "Tipuri de eveniment",
+    RU: "Типы событий",
+    EN: "Event types"
   },
   "Select type": {
-    RO: "Alege tipul",
-    RU: "Выберите тип",
-    EN: "Select type"
+    RO: "Alege tipul evenimentului",
+    RU: "Выберите тип события",
+    EN: "Select event type"
   },
   "IP address": {
     RO: "Adresa IP",
