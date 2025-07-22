@@ -1,12 +1,22 @@
 import { Box, Flex, Pagination, ActionIcon } from "@mantine/core";
-import { enqueueSnackbar } from "notistack";
 import { useState, useEffect } from "react";
+import { enqueueSnackbar } from "notistack";
 import { PageHeader, Spin } from "@components";
 import { getLanguageByKey, showServerError } from "@utils";
 import { api } from "../api";
 import { LogsComponent } from "../Components/LogsComponent/LogsComponent";
 import { LogFilterModal } from "../Components/LogsComponent/LogFilterModal";
 import { LuFilter } from "react-icons/lu";
+
+const isFilterActive = (filters) => {
+  if (!filters) return false;
+  return Object.entries(filters).some(([key, value]) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "object" && value !== null)
+      return Object.keys(value).length > 0;
+    return value !== undefined && value !== null && value !== "";
+  });
+};
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);
@@ -58,7 +68,8 @@ export const Logs = () => {
       <Flex align="center" justify="space-between" mb={20}>
         <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
         <ActionIcon
-          variant="default"
+          variant={isFilterActive(filters) ? "filled" : "default"}
+          color={isFilterActive(filters) ? "#0f824c" : "gray"}
           size="lg"
           onClick={() => setFilterModalOpen(true)}
           title="Фильтр"
