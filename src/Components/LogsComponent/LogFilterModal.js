@@ -10,7 +10,7 @@ import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getLanguageByKey } from "../utils";
 
-const EVENT_OPTIONS = [
+const TYPE_OPTIONS = [
     "User logged-in",
     "User logged-out",
     "User created",
@@ -32,7 +32,7 @@ const EVENT_OPTIONS = [
     "Message error",
 ];
 
-const TYPE_OPTIONS = [
+const EVENT_OPTIONS = [
     "User",
     "Lead",
     "Task",
