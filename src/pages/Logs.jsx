@@ -176,13 +176,6 @@ export const Logs = () => {
       <Flex align="center" justify="space-between" mb={20}>
         <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
         <Flex align="center" gap={8}>
-          <TextInput
-            w={350}
-            placeholder={getLanguageByKey("Search text")}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ minWidth: 260 }}
-          />
           <ActionIcon
             variant={isFilterActive(filters) ? "filled" : "default"}
             color={isFilterActive(filters) ? "#0f824c" : "gray"}
@@ -192,6 +185,13 @@ export const Logs = () => {
           >
             <LuFilter size={22} />
           </ActionIcon>
+          <TextInput
+            w={350}
+            placeholder={getLanguageByKey("Search text")}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ minWidth: 260 }}
+          />
         </Flex>
       </Flex>
 
