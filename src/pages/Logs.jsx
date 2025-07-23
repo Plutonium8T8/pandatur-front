@@ -1,5 +1,6 @@
-import { Box, Flex, Pagination, ActionIcon, Text } from "@mantine/core";
+import { Box, Flex, Pagination, ActionIcon, Text, TextInput } from "@mantine/core";
 import { useState, useEffect } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
 import { enqueueSnackbar } from "notistack";
 import { PageHeader, Spin } from "@components";
 import { getLanguageByKey, showServerError, cleanValue } from "@utils";
@@ -22,6 +23,8 @@ export const Logs = () => {
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState({});
+  const [search, setSearch] = useState(filters.search || "");
+  const [debouncedSearch] = useDebouncedValue(search, 400);
 
   const { technicians, loading: loadingTechs } = useGetTechniciansList();
 
@@ -34,7 +37,10 @@ export const Logs = () => {
           limit: 50,
           sort_by: "id",
           order: "DESC",
-          attributes: filters,
+          attributes: {
+            ...filters,
+            search: debouncedSearch ? debouncedSearch : undefined,
+          },
         });
 
         setLogList(response.data);
@@ -51,11 +57,13 @@ export const Logs = () => {
     };
 
     fetchLogs();
-  }, [pagination.currentPage, filters]);
+  }, [pagination.currentPage, filters, debouncedSearch]);
 
   const handleApplyFilter = (attrs) => {
     setFilters(attrs);
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
+    // Если нужно сбрасывать поиск при смене фильтра, раскомментируй:
+    setSearch("");
   };
 
   const getNameById = (userId) => {
@@ -167,15 +175,38 @@ export const Logs = () => {
     <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
       <Flex align="center" justify="space-between" mb={20}>
         <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
-        <ActionIcon
-          variant={isFilterActive(filters) ? "filled" : "default"}
-          color={isFilterActive(filters) ? "#0f824c" : "gray"}
-          size="lg"
-          onClick={() => setFilterModalOpen(true)}
-          title="Фильтр"
-        >
-          <LuFilter size={22} />
-        </ActionIcon>
+        <Flex align="center" gap={8}>
+          <TextInput
+            w={350}
+            placeholder={getLanguageByKey("Search text")}
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            style={{ minWidth: 260 }}
+            rightSectionWidth={36}
+            rightSection={
+              search && (
+                <ActionIcon
+                  onClick={() => setSearch("")}
+                  size="sm"
+                  radius="xl"
+                  color="gray"
+                  variant="light"
+                >
+                  ×
+                </ActionIcon>
+              )
+            }
+          />
+          <ActionIcon
+            variant={isFilterActive(filters) ? "filled" : "default"}
+            color={isFilterActive(filters) ? "#0f824c" : "gray"}
+            size="lg"
+            onClick={() => setFilterModalOpen(true)}
+            title="Фильтр"
+          >
+            <LuFilter size={22} />
+          </ActionIcon>
+        </Flex>
       </Flex>
 
       <LogFilterModal
