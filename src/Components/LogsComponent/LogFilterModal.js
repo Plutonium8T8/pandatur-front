@@ -37,12 +37,7 @@ const EVENT_OPTIONS = [
     "Chat",
 ];
 
-export const LogFilterModal = ({
-    opened,
-    onClose,
-    filters = {},
-    onApply,
-}) => {
+export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
     const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
     const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
@@ -173,7 +168,7 @@ export const LogFilterModal = ({
                     searchable
                     clearable
                 />
-                <Flex gap={8} direction="column">
+                <Flex gap={8} direction="row">
                     <DateInput
                         label={getLanguageByKey("Date from")}
                         placeholder={getLanguageByKey("Start date")}
