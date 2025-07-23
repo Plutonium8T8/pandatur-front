@@ -148,7 +148,7 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                     onChange={handleUserChange}
                     searchable
                     clearable
-                    loading={loadingTechnicians}
+                    loading={loadingTechnicians ? true : undefined}
                 />
                 <MultiSelect
                     data={translatedEventOptions}

@@ -3412,7 +3412,7 @@ export const translations = {
     EN: "Search text"
   },
   "Reset": {
-    RO: "Resetare",
+    RO: "Reset",
     RU: "Сбросить",
     EN: "Reset"
   },
