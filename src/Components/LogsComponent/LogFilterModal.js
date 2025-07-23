@@ -186,12 +186,6 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                         clearable
                     />
                 </Flex>
-                <TextInput
-                    label={getLanguageByKey("Search")}
-                    placeholder={getLanguageByKey("Search text")}
-                    {...form.getInputProps("search")}
-                />
-
                 <Flex gap={8}>
                     <TextInput
                         label={getLanguageByKey("Changed field (key)") || "Changed field (key)"}
