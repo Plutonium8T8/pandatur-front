@@ -120,10 +120,10 @@ const ChatList = ({ ticketId }) => {
             </Flex>
             <ActionIcon
               variant={isFiltered ? "filled" : "default"}
-              size="24"
+              size="36"
               onClick={() => setOpenFilter(true)}
             >
-              <LuFilter size={12} />
+              <LuFilter size={16} />
             </ActionIcon>
           </Flex>
 
