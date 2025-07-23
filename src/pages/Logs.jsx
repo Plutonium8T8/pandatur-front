@@ -1,22 +1,15 @@
-import { Box, Flex, Pagination, ActionIcon } from "@mantine/core";
+import { Box, Flex, Pagination, ActionIcon, Text } from "@mantine/core";
 import { useState, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import { PageHeader, Spin } from "@components";
-import { getLanguageByKey, showServerError } from "@utils";
+import { getLanguageByKey, showServerError, cleanValue } from "@utils";
 import { api } from "../api";
-import { LogsComponent } from "../Components/LogsComponent/LogsComponent";
+import { RcTable } from "../Components/RcTable";
+import { DateCell } from "../Components/DateCell";
 import { LogFilterModal } from "../Components/LogsComponent/LogFilterModal";
+import { useGetTechniciansList } from "../hooks";
 import { LuFilter } from "react-icons/lu";
-
-const isFilterActive = (filters) => {
-  if (!filters) return false;
-  return Object.entries(filters).some(([key, value]) => {
-    if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === "object" && value !== null)
-      return Object.keys(value).length > 0;
-    return value !== undefined && value !== null && value !== "";
-  });
-};
+import { getChangedFields, isFilterActive } from "../Components/utils/logsUtils";
 
 export const Logs = () => {
   const [logList, setLogList] = useState([]);
@@ -29,6 +22,8 @@ export const Logs = () => {
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [filters, setFilters] = useState({});
+
+  const { technicians, loading: loadingTechs } = useGetTechniciansList();
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -63,6 +58,111 @@ export const Logs = () => {
     setPagination((prev) => ({ ...prev, currentPage: 1 }));
   };
 
+  const getNameById = (userId) => {
+    const tech = technicians?.find((t) => String(t.id?.id) === String(userId));
+    return tech?.label || userId;
+  };
+
+  const rcColumn = [
+    {
+      width: 70,
+      key: "id",
+      title: "ID",
+      dataIndex: "id",
+      align: "center",
+    },
+    {
+      width: 160,
+      key: "timestamp",
+      title: getLanguageByKey("Data și ora log-ului"),
+      dataIndex: "timestamp",
+      align: "center",
+      render: (timestamp) =>
+        <DateCell gap="8" direction="row" date={timestamp} justify="center" />,
+    },
+    {
+      width: 220,
+      key: "user_identifier",
+      title: getLanguageByKey("Identificator utilizator"),
+      dataIndex: "user_identifier",
+      align: "center",
+    },
+    {
+      width: 180,
+      key: "event",
+      title: getLanguageByKey("LogEvent"),
+      dataIndex: "object",
+      align: "center",
+      render: (object, record) =>
+        object?.type
+          ? object.type
+          : record.event || cleanValue(),
+    },
+    {
+      width: 500,
+      key: "changes",
+      title: getLanguageByKey("Detalii"),
+      dataIndex: "data",
+      align: "left",
+      render: (data, record) => {
+        const obj = record.object || {};
+        const hasObjInfo = obj?.id || obj?.type;
+        const objectIdLabel =
+          obj.id && !loadingTechs ? getNameById(obj.id) : obj.id || "-";
+
+        if (!data) {
+          return (
+            <Box>
+              {hasObjInfo && (
+                <Text size="md" mb={4}>
+                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}<b> </b>
+                  <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+                </Text>
+              )}
+              <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
+            </Box>
+          );
+        }
+        const changes = getChangedFields(data.before, data.after);
+        if (changes.length === 0) {
+          return (
+            <Box>
+              {hasObjInfo && (
+                <Text size="md" mb={4}>
+                  <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}<b> </b>
+                  <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+                </Text>
+              )}
+              <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
+            </Box>
+          );
+        }
+        return (
+          <Box>
+            {hasObjInfo && (
+              <Text size="md" mb={4}>
+                <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}<b> </b>
+                <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+              </Text>
+            )}
+            {changes.map((ch, i) =>
+              <Text size="md" key={i}>
+                <b>{ch.field}:</b>{" "}
+                <span style={{ color: "red" }}>{String(ch.from)}</span>
+                <span style={{
+                  fontWeight: 700,
+                  color: "#bbb",
+                  margin: "0 6px"
+                }}>→</span>
+                <span style={{ color: "green" }}>{String(ch.to)}</span>
+              </Text>
+            )}
+          </Box>
+        );
+      },
+    },
+  ];
+
   return (
     <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
       <Flex align="center" justify="space-between" mb={20}>
@@ -91,8 +191,13 @@ export const Logs = () => {
         </Flex>
       ) : (
         <>
-          <LogsComponent logList={logList} />
-
+          <RcTable
+            bordered
+            rowKey="id"
+            columns={rcColumn}
+            data={logList}
+            scroll={{ y: 'calc(100vh - 220px)' }}
+          />
           <Flex
             pt="10"
             justify="center"
