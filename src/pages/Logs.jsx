@@ -182,20 +182,6 @@ export const Logs = () => {
             value={search}
             onChange={e => setSearch(e.target.value)}
             style={{ minWidth: 260 }}
-            rightSectionWidth={36}
-            rightSection={
-              search && (
-                <ActionIcon
-                  onClick={() => setSearch("")}
-                  size="sm"
-                  radius="xl"
-                  color="gray"
-                  variant="light"
-                >
-                  ×
-                </ActionIcon>
-              )
-            }
           />
           <ActionIcon
             variant={isFilterActive(filters) ? "filled" : "default"}

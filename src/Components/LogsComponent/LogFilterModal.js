@@ -49,7 +49,6 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
             event: filters.event || [],
             type: filters.type || [],
             ip_address: filters.ip_address || "",
-            search: filters.search || "",
             timestamp_from: filters.timestamp_from || null,
             timestamp_until: filters.timestamp_until || null,
             data_changes_key: filters.data_changes?.key || "",
@@ -80,7 +79,6 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
         if (values.event.length) attributes.event = values.event;
         if (values.type.length) attributes.type = values.type;
         if (values.ip_address) attributes.ip_address = values.ip_address;
-        if (values.search) attributes.search = values.search;
         if (values.timestamp_from || values.timestamp_until) {
             attributes.timestamp = {};
             if (values.timestamp_from)
