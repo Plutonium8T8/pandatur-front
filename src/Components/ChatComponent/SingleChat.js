@@ -8,7 +8,7 @@ import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
-  const { setTickets } = useApp();
+  const { setTickets, tickets } = useApp(); // добавили tickets!
   const { getUserMessages } = useMessagesContext();
 
   const {
@@ -30,6 +30,9 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     }
   }, [ticketId]);
 
+  // Всегда актуальное значение!
+  const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
+
   return (
     <div className="chat-container">
       <Box pos="absolute" left="10px" top="16px">
@@ -37,10 +40,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
           <FaArrowLeft size="12" />
         </ActionIcon>
       </Box>
-      <Can
-        permission={{ module: "chat", action: "edit" }}
-        context={{ responsibleId }}
-      >
+      <Can permission={{ module: "chat", action: "edit" }} context={{ responsibleId }}>
         <Flex w="70%">
           <ChatMessages
             selectedClient={selectedUser}
@@ -50,14 +50,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             onChangeSelectedUser={changeUser}
             loading={loading}
             technicians={technicians}
+            unseenCount={unseenCount} // <- пробрасываем сюда
           />
         </Flex>
       </Can>
-
-      <Can
-        permission={{ module: "chat", action: "edit" }}
-        context={{ responsibleId }}
-      >
+      <Can permission={{ module: "chat", action: "edit" }} context={{ responsibleId }}>
         <ChatExtraInfo
           technicians={technicians}
           selectedUser={selectedUser}
@@ -71,13 +68,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
                 ? { ...client, ...values }
                 : client,
             );
-
             setSelectedUser((prev) => ({
               ...prev,
               label: identifier,
               payload: { ...prev.payload, ...values },
             }));
-
             setMessageSendersByPlatform((prev) =>
               prev.map((client) =>
                 client.payload.id === payload.id &&
@@ -90,7 +85,6 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
                   : client,
               ),
             );
-
             setTickets((prev) =>
               prev.map((ticket) =>
                 ticket.id === personalInfo.id
@@ -98,7 +92,6 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
                   : ticket,
               ),
             );
-
             setPersonalInfo((prev) => ({
               ...prev,
               clients: clientTicketList,
