@@ -3469,22 +3469,22 @@ export const translations = {
     EN: "Lead merged"
   },
   "Task created": {
-    RO: "Sarcină creată",
+    RO: "Task creat",
     RU: "Задача создана",
     EN: "Task created"
   },
   "Task deleted": {
-    RO: "Sarcină ștearsă",
+    RO: "Task ștears",
     RU: "Задача удалена",
     EN: "Task deleted"
   },
   "Task updated": {
-    RO: "Sarcină actualizată",
+    RO: "Task actualizat",
     RU: "Задача обновлена",
     EN: "Task updated"
   },
   "Task completed": {
-    RO: "Sarcină finalizată",
+    RO: "Task finalizat",
     RU: "Задача выполнена",
     EN: "Task completed"
   },
@@ -3519,7 +3519,7 @@ export const translations = {
     EN: "Message error"
   },
   "Task": {
-    RO: "Sarcină",
+    RO: "Task",
     RU: "Задача",
     EN: "Task"
   },
