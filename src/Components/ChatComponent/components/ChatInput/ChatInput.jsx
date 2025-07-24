@@ -10,8 +10,7 @@ import {
   TextInput
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { FaTasks } from "react-icons/fa";
-import { FaEnvelope } from "react-icons/fa";
+import { FaTasks, FaEnvelope } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
@@ -34,7 +33,6 @@ const pandaNumbersWhatsup = [
   { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
   { value: "40721205105", label: "40721205105 - RO / PT_BR" },
 ];
-
 const pandaNumbersViber = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" }
 ];
@@ -60,6 +58,8 @@ export const ChatInput = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
 
+  const [actionNeeded, setActionNeeded] = useState(false);
+
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
   const { seenMessages, socketRef } = useSocket();
@@ -76,6 +76,14 @@ export const ChatInput = ({
   });
 
   useEffect(() => {
+    if (typeof unseenCount === "number" && unseenCount > 0) {
+      setActionNeeded(true);
+    } else if (typeof unseenCount === "number" && unseenCount === 0) {
+      setActionNeeded(false);
+    }
+  }, [unseenCount]);
+
+  useEffect(() => {
     const fetchTicket = async () => {
       if (!ticketId) return;
       try {
@@ -85,19 +93,16 @@ export const ChatInput = ({
         console.error("Failed to fetch ticket", e);
       }
     };
-
     fetchTicket();
   }, [ticketId]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
     const emojiPickerHeight = 450;
-
     setEmojiPickerPosition({
       top: rect.top + window.scrollY - emojiPickerHeight,
       left: rect.left + window.scrollX,
     });
-
     setShowEmojiPicker((prev) => !prev);
   };
 
@@ -105,9 +110,7 @@ export const ChatInput = ({
     handlers.open();
     const url = await uploadFile(file);
     handlers.close();
-
     const mediaType = getMediaType(file.type);
-
     if (url) {
       setUrl({
         media_url: url,
@@ -129,7 +132,6 @@ export const ChatInput = ({
     const trimmedMessage = message.trim();
     const mediaType = url?.media_type;
     const isMedia = mediaType && mediaType !== "text";
-
     if ((isMedia && url?.media_url) || (!isMedia && trimmedMessage)) {
       const payload = {
         ...url,
@@ -137,11 +139,9 @@ export const ChatInput = ({
         panda_number: isChatWithPhone ? pandaNumber : undefined,
         client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
       };
-
       if (!isMedia) {
         payload.message_text = isChatWithPhone ? trimmedMessage : undefined;
       }
-
       onSendMessage(payload);
       clearState();
     }
@@ -156,7 +156,6 @@ export const ChatInput = ({
 
   const handleMarkAsRead = () => {
     if (!ticketId) return;
-
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
       const connectPayload = {
         type: TYPE_SOCKET_EVENTS.CONNECT,
@@ -167,19 +166,19 @@ export const ChatInput = ({
     } else {
       console.warn("[READ] Сокет не готов к CONNECT");
     }
-
     seenMessages(ticketId, userId);
     markMessagesAsRead(ticketId, unseenCount);
   };
 
   const handleMarkActionResolved = async () => {
-    if (!ticketId || ticket?.action_needed === undefined) return;
-
-    const newValue = String(!ticket.action_needed);
-
+    if (!ticketId) return;
+    const newValue = !actionNeeded;
     try {
-      await api.tickets.updateById({ id: ticketId, action_needed: newValue });
-      setTicket((prev) => ({ ...prev, action_needed: !prev.action_needed }));
+      await api.tickets.updateById({
+        id: ticketId,
+        action_needed: newValue ? "true" : "false",
+      });
+      setActionNeeded(newValue);
     } catch (e) {
       console.error("Failed to update action_needed", e);
     }
@@ -315,17 +314,15 @@ export const ChatInput = ({
                   </Button>
                 </Flex>
 
-                {typeof ticket?.action_needed === "boolean" && (
-                  <Button
-                    onClick={handleMarkActionResolved}
-                    variant="light"
-                    color={ticket.action_needed ? "orange" : "green"}
-                  >
-                    {getLanguageByKey(
-                      ticket.action_needed ? "Acțiune necesară" : "Nu acțiune necesară"
-                    )}
-                  </Button>
-                )}
+                <Button
+                  onClick={handleMarkActionResolved}
+                  variant="light"
+                  color={actionNeeded ? "orange" : "green"}
+                >
+                  {getLanguageByKey(
+                    actionNeeded ? "Acțiune necesară" : "Nu acțiune necesară"
+                  )}
+                </Button>
               </Flex>
 
               <Flex>
@@ -373,7 +370,6 @@ export const ChatInput = ({
                 ← {getLanguageByKey("Înapoi la chat")}
               </Button>
             </Flex>
-
             <Flex direction="column" gap="xs">
               <TextInput
                 placeholder="From"
