@@ -11,7 +11,7 @@ import { ChatMessages } from "@components/ChatComponent/components";
 import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
-  const { setTickets } = useApp();
+  const { tickets, setTickets } = useApp();
   const { ticketId: ticketIdParam } = useParams();
   const ticketId = useMemo(() => {
     const parsed = Number(ticketIdParam);
@@ -19,7 +19,6 @@ export const Chat = () => {
   }, [ticketIdParam]);
 
   const { technicians } = useGetTechniciansList();
-
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const {
@@ -32,6 +31,12 @@ export const Chat = () => {
     setMessageSendersByPlatform,
     setSelectedUser,
   } = useFetchTicketChat(ticketId);
+
+  // Найди нужный чат из tickets по ticketId
+  const currentChat = useMemo(
+    () => tickets?.find((t) => t.id === ticketId),
+    [tickets, ticketId]
+  );
 
   const responsibleId = personalInfo?.technician_id?.toString() ?? null;
 
@@ -66,6 +71,7 @@ export const Chat = () => {
               onChangeSelectedUser={changeUser}
               loading={loading}
               technicians={technicians}
+              unseenCount={currentChat?.unseen_count || 0} // <-- вот это главное!
             />
           </Flex>
         </Can>

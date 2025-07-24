@@ -303,9 +303,17 @@ export const ChatInput = ({
                   {getLanguageByKey("Anulează")}
                 </Button>
 
-                <Button onClick={handleMarkAsRead} variant="outline">
-                  {getLanguageByKey("ReadChat")}
-                </Button>
+                <Flex gap="xs">
+                  <Button
+                    onClick={handleMarkAsRead}
+                    variant={unseenCount > 0 ? "filled" : "light"}
+                    color={unseenCount > 0 ? "red" : "green"}
+                  >
+                    {unseenCount > 0
+                      ? getLanguageByKey("ReadChat")
+                      : getLanguageByKey("ChatRead")}
+                  </Button>
+                </Flex>
 
                 {typeof ticket?.action_needed === "boolean" && (
                   <Button
