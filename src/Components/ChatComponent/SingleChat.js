@@ -8,7 +8,7 @@ import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
-  const { setTickets, tickets } = useApp(); // добавили tickets!
+  const { setTickets, tickets } = useApp();
   const { getUserMessages } = useMessagesContext();
 
   const {
@@ -30,7 +30,6 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     }
   }, [ticketId]);
 
-  // Всегда актуальное значение!
   const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
 
   return (
@@ -50,7 +49,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             onChangeSelectedUser={changeUser}
             loading={loading}
             technicians={technicians}
-            unseenCount={unseenCount} // <- пробрасываем сюда
+            unseenCount={unseenCount}
           />
         </Flex>
       </Can>
