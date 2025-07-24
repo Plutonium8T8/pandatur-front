@@ -27,6 +27,7 @@ export const ChatMessages = ({
   onChangeSelectedUser,
   loading,
   technicians,
+  unseenCount = 0, // <--- добавь сюда unseenCount как проп
 }) => {
   const { userId } = useUser();
 
@@ -174,7 +175,7 @@ export const ChatMessages = ({
             id={ticketId}
             clientList={messageSendersByPlatform}
             ticketId={ticketId}
-            unseenCount={personalInfo?.unseen_count || 0}
+            unseenCount={unseenCount} // <-- только этот unseenCount, не из personalInfo
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
             onSendMessage={(value) => {
