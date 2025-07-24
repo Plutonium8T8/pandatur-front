@@ -3553,15 +3553,9 @@ export const translations = {
     RU: "Новое значение (необязательно)",
     EN: "New value (optional)"
   },
-  "ReadChat": {
-    RO: "Marchează ca citit",
-    RU: "Прочитать чат",
-    EN: "Read chat"
-  },
   "ChatRead": {
     RO: "Chat citit",
     RU: "Чат прочитан",
     EN: "Chat read"
-  },
-
+  }
 }
