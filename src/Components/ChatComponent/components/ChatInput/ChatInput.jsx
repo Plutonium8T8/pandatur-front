@@ -59,7 +59,8 @@ export const ChatInput = ({
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
-  const actionNeededInit = useRef(undefined); // для контроля первой инициализации
+  // Локальный actionNeeded (всегда источник истины)
+  const actionNeededInit = useRef(undefined); // Только для первого получения тикета
   const [actionNeeded, setActionNeeded] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
@@ -70,7 +71,7 @@ export const ChatInput = ({
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
 
-  // Получаем тикет и action_needed из API только при инициализации тикета
+  // 1. При первом получении тикета — синхронизируем actionNeeded
   useEffect(() => {
     if (!ticketId) return;
     let mounted = true;
@@ -90,18 +91,18 @@ export const ChatInput = ({
     return () => { mounted = false; };
   }, [ticketId]);
 
-  // Контролируем логику actionNeeded: первый раз — тикет, далее только локально
   useEffect(() => {
-    // если unseenCount > 0, всегда true (локальное состояние)
+    if (actionNeededInit.current === undefined && ticket) {
+      setActionNeeded(Boolean(ticket.action_needed));
+      actionNeededInit.current = Boolean(ticket.action_needed);
+    }
+  }, [ticket, ticketId]);
+
+  useEffect(() => {
     if (unseenCount > 0) {
       setActionNeeded(true);
     }
-    // если unseenCount = 0, только при первом рендере берём из тикета
-    if (unseenCount === 0 && actionNeededInit.current !== undefined) {
-      setActionNeeded(actionNeededInit.current);
-    }
-    // eslint-disable-next-line
-  }, [unseenCount, ticketId]);
+  }, [unseenCount]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -161,6 +162,7 @@ export const ChatInput = ({
     if (file) await handleFile(file);
   };
 
+  // Кнопка "Прочитать чат" — только unseenCount, actionNeeded не трогаем!
   const handleMarkAsRead = () => {
     if (!ticketId) return;
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
@@ -177,6 +179,7 @@ export const ChatInput = ({
     markMessagesAsRead(ticketId, unseenCount);
   };
 
+  // Меняем actionNeeded только вручную
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
@@ -186,7 +189,6 @@ export const ChatInput = ({
         action_needed: newValue ? "true" : "false",
       });
       setActionNeeded(newValue);
-      // Локально обновим и ticket, чтобы не терять актуальность
       setTicket((prev) => ({ ...prev, action_needed: newValue }));
       actionNeededInit.current = newValue;
     } catch (e) {
