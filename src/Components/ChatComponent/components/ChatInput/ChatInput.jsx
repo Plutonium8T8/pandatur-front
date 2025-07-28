@@ -59,8 +59,7 @@ export const ChatInput = ({
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
-  // Локальный actionNeeded (всегда источник истины)
-  const actionNeededInit = useRef(undefined); // Только для первого получения тикета
+  const actionNeededInit = useRef(undefined);
   const [actionNeeded, setActionNeeded] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
@@ -71,7 +70,6 @@ export const ChatInput = ({
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
 
-  // 1. При первом получении тикета — синхронизируем actionNeeded
   useEffect(() => {
     if (!ticketId) return;
     let mounted = true;
@@ -162,7 +160,6 @@ export const ChatInput = ({
     if (file) await handleFile(file);
   };
 
-  // Кнопка "Прочитать чат" — только unseenCount, actionNeeded не трогаем!
   const handleMarkAsRead = () => {
     if (!ticketId) return;
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
@@ -179,7 +176,6 @@ export const ChatInput = ({
     markMessagesAsRead(ticketId, unseenCount);
   };
 
-  // Меняем actionNeeded только вручную
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
