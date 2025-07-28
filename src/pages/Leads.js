@@ -15,7 +15,7 @@ import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilte
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
 import Can from "../Components/CanComponent/Can";
-import { showServerError, getTotalPages, getLanguageByKey } from "@utils";
+import { showServerError, getTotalPages, getLanguageByKey } from "../Components/utils";
 import { api } from "../api";
 import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
@@ -78,6 +78,7 @@ export const Leads = () => {
   const currentSearch = viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm;
   const debouncedSearch = useDebounce(currentSearch);
   const deleteBulkLeads = useConfirmPopup({ subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"), });
+  const [perPage, setPerPage] = useState(50);
 
   const fetchKanbanTickets = async (filters = {}) => {
     setKanbanSpinner(true);
@@ -137,14 +138,13 @@ export const Leads = () => {
     if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
-  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady]);
+  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage]);
 
   useEffect(() => {
     if (!filtersReady || !groupTitleForApi) return;
 
-    // Если поле поиска НЕ пустое
     if (viewMode === VIEW_MODE.KANBAN && debouncedSearch.trim()) {
-      setKanbanFilterActive(true); // активируем фильтр
+      setKanbanFilterActive(true);
       fetchKanbanTickets({
         ...kanbanFilters,
         search: debouncedSearch.trim(),
@@ -152,7 +152,6 @@ export const Leads = () => {
       return;
     }
 
-    // Если очистили поиск — показываем tickets, а не делаем запрос
     if (viewMode === VIEW_MODE.KANBAN && !debouncedSearch.trim()) {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
@@ -192,7 +191,7 @@ export const Leads = () => {
         group_title: groupTitleForApi,
         sort_by: "creation_date",
         order: "DESC",
-        limit: 100, // вот задается лимит елементов для загрузки 25 50 и 100 из leadtable
+        limit: perPage,
         attributes: {
           ...restFilters,
           workflow: effectiveWorkflow,
@@ -569,8 +568,13 @@ export const Leads = () => {
             selectTicket={selectedTickets}
             onSelectRow={toggleSelectTicket}
             onToggleAll={toggleSelectAll}
-            totalLeadsPages={getTotalPages(totalLeads)}
+            totalLeadsPages={getTotalPages(totalLeads, perPage)}
             onChangePagination={handlePaginationWorkflow}
+            perPage={perPage}
+            setPerPage={val => {
+              setPerPage(val);
+              setCurrentPage(1);
+            }}
           />
         ) : (
           <WorkflowColumns

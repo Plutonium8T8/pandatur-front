@@ -465,20 +465,20 @@ export const LeadTable = ({
             />
             <Select
               size="xs"
-              w={100}
+              w={70}
               value={String(perPage)}
               onChange={val => setPerPage(Number(val))}
               data={[
                 { value: "25", label: "25" },
                 { value: "50", label: "50" },
                 { value: "100", label: "100" },
+                { value: "200", label: "200" },
               ]}
               label=""
               style={{
                 position: "absolute",
                 right: 0,
                 bottom: 0,
-                minWidth: 80,
                 margin: "0 10px 2px 0",
                 zIndex: 2,
               }}
