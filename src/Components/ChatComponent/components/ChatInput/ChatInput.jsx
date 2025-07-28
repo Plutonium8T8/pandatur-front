@@ -7,11 +7,11 @@ import {
   Select,
   Loader,
   FileButton,
-  TextInput
+  TextInput,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile } from "react-icons/lu";
@@ -24,7 +24,6 @@ import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
-
 import "./ChatInput.css";
 
 const pandaNumbersWhatsup = [
@@ -57,7 +56,10 @@ export const ChatInput = ({
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
+  const actionNeededInit = useRef(undefined); // для контроля первой инициализации
   const [actionNeeded, setActionNeeded] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
@@ -67,34 +69,39 @@ export const ChatInput = ({
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
-  const [showEmailForm, setShowEmailForm] = useState(false);
-  const [emailFields, setEmailFields] = useState({
-    from: "",
-    to: "",
-    subject: "",
-    body: "",
-  });
 
+  // Получаем тикет и action_needed из API только при инициализации тикета
   useEffect(() => {
-    if (typeof unseenCount === "number" && unseenCount > 0) {
-      setActionNeeded(true);
-    } else if (typeof unseenCount === "number" && unseenCount === 0) {
-      setActionNeeded(false);
-    }
-  }, [unseenCount]);
-
-  useEffect(() => {
+    if (!ticketId) return;
+    let mounted = true;
     const fetchTicket = async () => {
-      if (!ticketId) return;
       try {
         const data = await api.tickets.getById(ticketId);
-        setTicket(data);
+        if (mounted) {
+          setTicket(data);
+          setActionNeeded(Boolean(data.action_needed));
+          actionNeededInit.current = Boolean(data.action_needed);
+        }
       } catch (e) {
         console.error("Failed to fetch ticket", e);
       }
     };
     fetchTicket();
+    return () => { mounted = false; };
   }, [ticketId]);
+
+  // Контролируем логику actionNeeded: первый раз — тикет, далее только локально
+  useEffect(() => {
+    // если unseenCount > 0, всегда true (локальное состояние)
+    if (unseenCount > 0) {
+      setActionNeeded(true);
+    }
+    // если unseenCount = 0, только при первом рендере берём из тикета
+    if (unseenCount === 0 && actionNeededInit.current !== undefined) {
+      setActionNeeded(actionNeededInit.current);
+    }
+    // eslint-disable-next-line
+  }, [unseenCount, ticketId]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.target.getBoundingClientRect();
@@ -179,9 +186,13 @@ export const ChatInput = ({
         action_needed: newValue ? "true" : "false",
       });
       setActionNeeded(newValue);
+      // Локально обновим и ticket, чтобы не терять актуальность
+      setTicket((prev) => ({ ...prev, action_needed: newValue }));
+      actionNeededInit.current = newValue;
     } catch (e) {
       console.error("Failed to update action_needed", e);
     }
+    handleMarkAsRead();
   };
 
   const sendEmail = async () => {
@@ -217,7 +228,6 @@ export const ChatInput = ({
                   data={clientList}
                 />
               )}
-
               {isWhatsApp && (
                 <Select
                   className="w-full"
@@ -227,7 +237,6 @@ export const ChatInput = ({
                   data={pandaNumbersWhatsup}
                 />
               )}
-
               {isViber && (
                 <Select
                   className="w-full"
@@ -237,7 +246,6 @@ export const ChatInput = ({
                   data={pandaNumbersViber}
                 />
               )}
-
               <Select
                 searchable
                 onChange={(value) => {
