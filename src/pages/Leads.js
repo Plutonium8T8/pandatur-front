@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useSnackbar } from "notistack";
@@ -31,18 +30,7 @@ export const Leads = () => {
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
-  const {
-    tickets,
-    spinnerTickets,
-    setLightTicketFilters,
-    fetchTickets,
-    groupTitleForApi,
-    workflowOptions,
-    isCollapsed,
-    accessibleGroupTitles,
-    customGroupTitle,
-    setCustomGroupTitle
-  } = useApp();
+  const { tickets, spinnerTickets, setLightTicketFilters, fetchTickets, groupTitleForApi, workflowOptions, isCollapsed, accessibleGroupTitles, customGroupTitle, setCustomGroupTitle } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -76,7 +64,7 @@ export const Leads = () => {
   const isSearching = !!kanbanSearchTerm?.trim();
 
   const currentSearch = viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm;
-  const debouncedSearch = useDebounce(currentSearch);
+  const debouncedSearch = useDebounce(currentSearch, 2000);
   const deleteBulkLeads = useConfirmPopup({ subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"), });
   const [perPage, setPerPage] = useState(50);
 
@@ -428,13 +416,7 @@ export const Leads = () => {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
     }
-  }, [
-    searchParams.toString(),
-    groupTitleForApi,
-    workflowOptions,
-    customGroupTitle,
-    viewMode,
-  ]);
+  }, [searchParams.toString(), groupTitleForApi, workflowOptions, customGroupTitle, viewMode]);
 
   useEffect(() => {
     const type = params.get("type");
