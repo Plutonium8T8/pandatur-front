@@ -1,10 +1,19 @@
 import { useState, useMemo } from "react";
-import { Flex, Paper, ActionIcon, Text, Checkbox, Box, Modal } from "@mantine/core";
+import {
+  Flex,
+  Paper,
+  ActionIcon,
+  Text,
+  Checkbox,
+  Box,
+  Modal,
+  Select,
+  Pagination,
+} from "@mantine/core";
 import { FaFingerprint } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { MdDelete, MdEdit } from "react-icons/md";
-import { Pagination } from "../../Pagination";
 import {
   getLanguageByKey,
   cleanValue,
@@ -40,7 +49,9 @@ export const LeadTable = ({
   onSelectRow,
   selectTicket,
   fetchTickets,
-  onToggleAll = () => { }
+  onToggleAll = () => { },
+  perPage = 25,
+  setPerPage = () => { },
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
@@ -440,11 +451,38 @@ export const LeadTable = ({
           />
         </div>
         {!!totalLeadsPages && (
-          <Flex justify="center" className="leads-table-pagination" pt="10">
+          <Flex
+            justify="center"
+            align="center"
+            className="leads-table-pagination"
+            pt="10"
+            style={{ position: "relative", minHeight: 48 }}
+          >
             <Pagination
-              totalPages={totalLeadsPages}
-              currentPage={currentPage}
-              onPaginationChange={onChangePagination}
+              total={totalLeadsPages}
+              value={currentPage}
+              onChange={onChangePagination}
+            />
+            <Select
+              size="xs"
+              w={100}
+              value={String(perPage)}
+              onChange={val => setPerPage(Number(val))}
+              data={[
+                { value: "25", label: "25" },
+                { value: "50", label: "50" },
+                { value: "100", label: "100" },
+              ]}
+              label=""
+              style={{
+                position: "absolute",
+                right: 0,
+                bottom: 0,
+                minWidth: 80,
+                margin: "0 10px 2px 0",
+                zIndex: 2,
+              }}
+              placeholder="на стр."
             />
           </Flex>
         )}

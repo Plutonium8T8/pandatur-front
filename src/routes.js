@@ -2,7 +2,6 @@ import {
   Logs,
   Leads,
   TaskPage,
-  Test,
   Schedules,
   Users,
   Login,
@@ -68,7 +67,6 @@ export const privateRoutes = (userRoles) => {
     routes.push({ path: "/logs", component: Logs });
   }
 
-  routes.push({ path: "/test", component: Test });
   routes.push({ path: "/terms-and-conditions", component: TermsAndConditions });
 
   return routes;
