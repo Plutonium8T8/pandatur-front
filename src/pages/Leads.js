@@ -192,6 +192,7 @@ export const Leads = () => {
         group_title: groupTitleForApi,
         sort_by: "creation_date",
         order: "DESC",
+        limit: 100, // вот задается лимит елементов для загрузки 25 50 и 100 из leadtable
         attributes: {
           ...restFilters,
           workflow: effectiveWorkflow,

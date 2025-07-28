@@ -1,7 +1,6 @@
 export * from "./Logs";
 export * from "./Leads";
 export * from "./TaskPage";
-export * from "./Test";
 export * from "./Schedules";
 export * from "./Login";
 export * from "./Users";

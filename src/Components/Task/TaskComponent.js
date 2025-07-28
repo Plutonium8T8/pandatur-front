@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext } from "react";
 import {
   Button,
@@ -8,6 +9,7 @@ import {
   Tooltip,
   Flex,
   ActionIcon,
+  Pagination
 } from "@mantine/core";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
@@ -20,7 +22,6 @@ import TaskList from "./TaskList/TaskList";
 import TaskColumnsView from "./Kanban/TaskColumnsView";
 import TaskFilterModal from "./Components/FilterTask";
 import { PageHeader } from "../PageHeader";
-import { Pagination } from "../Pagination";
 import { useUser } from "../../hooks";
 import { useSnackbar } from "notistack";
 import { showServerError } from "../utils";
@@ -194,9 +195,9 @@ const TaskComponent = ({
       {totalPages > 1 && (
         <Flex p="20" justify="center" className="leads-table-pagination">
           <Pagination
-            totalPages={totalPages}
-            currentPage={currentPage}
-            onPaginationChange={setCurrentPage}
+            total={totalPages}
+            value={currentPage}
+            onChange={setCurrentPage}
           />
         </Flex>
       )}
