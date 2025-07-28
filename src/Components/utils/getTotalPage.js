@@ -1,5 +1,4 @@
-import { MAX_PAGE_SIZE } from "../../app-constants"
-
-export const getTotalPages = (items) => {
-  return Math.ceil(items / MAX_PAGE_SIZE)
-}
+export const getTotalPages = (items, pageSize = 50) => {
+  if (!items || !pageSize) return 1;
+  return Math.ceil(items / pageSize);
+};
