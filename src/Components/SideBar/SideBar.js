@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
 import { useLocation, Link } from "react-router-dom";
 import { Sidebar as BaseSideBar, Menu, MenuItem } from "react-pro-sidebar";
 import {
@@ -8,18 +8,15 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaCalendar,
-  FaHistory,
+  FaHistory
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
+import { LuPhoneCall } from "react-icons/lu";
 import { Badge, Flex, Divider, Select } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
-import {
-  useApp,
-  useLanguageToggle,
-  useUser,
-} from "../../hooks";
+import { useApp, useLanguageToggle, useUser } from "../../hooks";
 import { getLanguageByKey } from "@utils";
 import Can from "../CanComponent/Can";
 import "./SideBar.css";
@@ -115,6 +112,14 @@ export const SideBar = () => {
             </MenuItem>
           </Can>
 
+          <MenuItem
+            active={isActive("call-stats")}
+            icon={<LuPhoneCall />}
+            component={<Link to="/call-stats" />}
+          >
+            {getLanguageByKey("Call Stats")}
+          </MenuItem>
+
           {hasRouteAccess(convertRolesToMatrix(safeParseJson(userRoles)), "TASK", "VIEW") && (
             <MenuItem
               active={isActive("tasks")}
@@ -144,6 +149,7 @@ export const SideBar = () => {
               {getLanguageByKey("logs")}
             </MenuItem>
           )}
+
           <MenuItem>
             {isCollapsed ? (
               <div

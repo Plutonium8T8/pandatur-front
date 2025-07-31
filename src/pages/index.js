@@ -7,3 +7,4 @@ export * from "./Users";
 export * from "./Chat";
 export * from "./Dashboard";
 export * from "./TermsAndConditions";
+export * from "./CallStatsChart"
