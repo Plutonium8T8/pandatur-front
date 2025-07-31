@@ -94,13 +94,13 @@ export const CallListTable = ({
     ], [techniciansMap]);
 
     return (
-        <Box>
+        <Box p={"xs"}>
             <RcTable
                 columns={columns}
                 data={data}
                 bordered
                 loading={loading}
-                scroll={{ y: "calc(100vh - 330px)" }}
+                scroll={{ y: "calc(100vh - 250px)" }}
             />
 
             <Flex justify="center" mt="md">

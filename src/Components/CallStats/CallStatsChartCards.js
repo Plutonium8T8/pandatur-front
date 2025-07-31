@@ -26,7 +26,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
             withBorder
             radius="lg"
             p="lg"
-            mb="xl"
+            mb="xs"
             style={{
                 background: COLORS.bgCard,
                 boxShadow: "0 2px 18px 0 rgba(44,59,99,0.18)",

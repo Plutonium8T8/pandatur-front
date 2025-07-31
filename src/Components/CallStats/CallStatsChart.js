@@ -5,7 +5,7 @@ import { useGetTechniciansList } from "../../hooks";
 import { PageHeader } from "../PageHeader";
 import { LuFilter } from "react-icons/lu";
 import { CallStatsChartCard } from "./CallStatsChartCards";
-// import { Spin } from "@components"; // раскомментируй если нужен loader
+import { Spin } from "@components";
 
 const COLORS = {
     total: "#0f824c",
@@ -188,8 +188,7 @@ export const CallStatsChart = () => {
             </Box>
             <Box px={32}>
                 {loading ? (
-                    // <Spin /> // если используешь компонент лоадера
-                    <Text c="dimmed" ta="center" mt={48}>Загрузка...</Text>
+                    <Spin />
                 ) : (
                     filteredData.length === 0
                         ? <Text c="dimmed" ta="center" mt={48}>Нет данных за выбранный период</Text>
