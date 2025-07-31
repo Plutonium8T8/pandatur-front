@@ -9,7 +9,7 @@ import {
   Dashboard,
   TermsAndConditions
 } from "@pages";
-import CallStatsChart from "./pages/CallStatsChart";
+import { CallStatsChart } from "./pages";
 import { hasStrictPermission, hasRouteAccess } from "./Components/utils/permissions";
 import { convertRolesToMatrix, safeParseJson } from "./Components/UsersComponent/rolesUtils";
 

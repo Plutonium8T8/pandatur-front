@@ -1,16 +1,17 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Text, Flex, Paper, Group, Badge } from "@mantine/core";
+import { Box, Text, Flex, Paper, Group, Badge, ActionIcon, TextInput } from "@mantine/core";
 import { dashboard } from "../api/dashboard";
 import { HiArrowDownLeft, HiArrowUpRight } from "react-icons/hi2";
 import { useGetTechniciansList } from "../hooks";
 import { PageHeader } from "../Components/PageHeader";
+import { LuFilter } from "react-icons/lu";
 
 const COLORS = {
-  from: "#4fc3f7",  // ярко-голубой
-  to: "#81c784",    // зелёный
-  total: "#0f824c", // жёлтый для итога
-  bgCard: "#232b3a", // фон карточки
-  bgMain: "white", // фон всей страницы
+  from: "#4fc3f7",
+  to: "#81c784",
+  total: "#0f824c",
+  bgCard: "#232b3a",
+  bgMain: "white",
   textDark: "#222",
 };
 
@@ -23,7 +24,16 @@ const formatDuration = (totalSeconds) => {
     .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
 };
 
-function UserStatsCard({ user, fullName }) {
+const isFilterActive = (filters) => {
+  if (!filters) return false;
+  return Object.entries(filters).some(([_, value]) => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === "object" && value !== null) return Object.keys(value).length > 0;
+    return value !== undefined && value !== null && value !== "";
+  });
+}
+
+const UserStatsCard = ({ user, fullName }) => {
   const totalCalls = (user.calls_from || 0) + (user.calls_to || 0);
   return (
     <Paper
@@ -111,7 +121,7 @@ function UserStatsCard({ user, fullName }) {
   );
 }
 
-export default function CallStatsChart() {
+export const CallStatsChart = () => {
   const [stats, setStats] = useState({
     data: [],
     total_all_users: 0,
@@ -123,6 +133,16 @@ export default function CallStatsChart() {
   });
 
   const { technicians } = useGetTechniciansList();
+
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState({});
+  const [search, setSearch] = useState("");
+  const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    const timeout = setTimeout(() => setSearchValue(search), 400);
+    return () => clearTimeout(timeout);
+  }, [search]);
 
   const techniciansMap = useMemo(() => {
     const map = new Map();
@@ -140,6 +160,7 @@ export default function CallStatsChart() {
         sort_by: "total_duration",
         order: "DESC",
         attributes: {
+          ...filters,
           timestamp: {
             from: "01-07-2025",
             until: "30-07-2025",
@@ -160,7 +181,16 @@ export default function CallStatsChart() {
       .catch((err) => {
         console.error("Ошибка загрузки статистики:", err);
       });
-  }, []);
+  }, [filters]);
+
+  const filteredData = useMemo(() => {
+    if (!searchValue) return stats.data || [];
+    const searchLC = searchValue.toLowerCase();
+    return (stats.data || []).filter((user) => {
+      const name = techniciansMap.get(String(user.user_id)) || "";
+      return name.toLowerCase().includes(searchLC);
+    });
+  }, [searchValue, stats.data, techniciansMap]);
 
   return (
     <Box
@@ -173,12 +203,42 @@ export default function CallStatsChart() {
       }}
     >
       <Box px={32} mb={32}>
-        <PageHeader
-          title={"Статистика звонков"}
-          count={stats.data?.length}
-          badgeColor={COLORS.total}
-          withDivider
-        />
+        <Flex align="center" justify="space-between" mb={20}>
+          <PageHeader
+            title="Статистика звонков"
+            count={filteredData.length}
+            badgeColor={COLORS.total}
+            withDivider={false}
+          />
+          <Flex align="center" gap={12}>
+            <ActionIcon
+              variant={isFilterActive(filters) ? "filled" : "default"}
+              color={isFilterActive(filters) ? COLORS.total : "gray"}
+              size="lg"
+              onClick={() => setFilterModalOpen(true)}
+              title="Фильтр"
+              style={{
+                border: isFilterActive(filters)
+                  ? `1.5px solid ${COLORS.total}`
+                  : undefined,
+                background: isFilterActive(filters) ? COLORS.total : undefined,
+                color: isFilterActive(filters) ? "white" : undefined,
+                boxShadow: isFilterActive(filters)
+                  ? "0 2px 12px 0 rgba(15,130,76,0.12)"
+                  : undefined,
+              }}
+            >
+              <LuFilter size={22} />
+            </ActionIcon>
+            <TextInput
+              w={320}
+              placeholder="Поиск по имени техника"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              style={{ minWidth: 220 }}
+            />
+          </Flex>
+        </Flex>
       </Box>
       <Box px={32} mb={32}>
         <Paper
@@ -222,7 +282,7 @@ export default function CallStatsChart() {
         </Paper>
       </Box>
       <Box px={32}>
-        {(stats.data || []).map((user) => (
+        {filteredData.map((user) => (
           <UserStatsCard
             key={user.user_id}
             user={user}
@@ -230,6 +290,8 @@ export default function CallStatsChart() {
           />
         ))}
       </Box>
+      {/* Тут можешь подключить свою модалку фильтра */}
+      {/* <YourFilterModal opened={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={setFilters} filters={filters} /> */}
     </Box>
   );
 }
