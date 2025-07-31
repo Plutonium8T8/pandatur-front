@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Text, Flex, Paper, Group, Badge, ActionIcon, TextInput } from "@mantine/core";
+import { Box, Text, Flex, Paper, Group, Badge, ActionIcon, TextInput, SegmentedControl } from "@mantine/core";
 import { dashboard } from "../api/dashboard";
 import { HiArrowDownLeft, HiArrowUpRight } from "react-icons/hi2";
 import { useGetTechniciansList } from "../hooks";
@@ -35,6 +35,8 @@ const isFilterActive = (filters) => {
 
 const UserStatsCard = ({ user, fullName }) => {
   const totalCalls = (user.calls_from || 0) + (user.calls_to || 0);
+  const totalDuration = user.total_duration || 0;
+
   return (
     <Paper
       withBorder
@@ -116,10 +118,29 @@ const UserStatsCard = ({ user, fullName }) => {
             {formatDuration(user.duration_to || 0)}
           </Text>
         </Group>
+        <Group gap={8}>
+          <Badge
+            color="blue"
+            size="lg"
+            variant="light"
+            radius="md"
+            style={{
+              background: "#fff",
+              color: COLORS.bgCard,
+              fontWeight: 700,
+              fontSize: 16,
+              minWidth: 180,
+              textAlign: "center",
+              marginLeft: 8,
+            }}
+          >
+            Общее время: {formatDuration(totalDuration)}
+          </Badge>
+        </Group>
       </Group>
     </Paper>
   );
-}
+};
 
 export const CallStatsChart = () => {
   const [stats, setStats] = useState({
