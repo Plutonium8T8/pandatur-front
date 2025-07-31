@@ -6,9 +6,12 @@ import { useGetTechniciansList } from "../hooks";
 import { PageHeader } from "../Components/PageHeader";
 
 const COLORS = {
-  from: "#3FA6C6",
-  to: "#6EC7DB",
-  total: "#BFC9D9",
+  from: "#4fc3f7",  // ярко-голубой
+  to: "#81c784",    // зелёный
+  total: "#0f824c", // жёлтый для итога
+  bgCard: "#232b3a", // фон карточки
+  bgMain: "white", // фон всей страницы
+  textDark: "#222",
 };
 
 const formatDuration = (totalSeconds) => {
@@ -25,50 +28,81 @@ function UserStatsCard({ user, fullName }) {
   return (
     <Paper
       withBorder
-      radius="md"
-      p="md"
-      mb="md"
-      style={{ background: "#0f824c" }}
+      radius="lg"
+      p="lg"
+      mb="xl"
+      style={{
+        background: COLORS.bgCard,
+        boxShadow: "0 2px 18px 0 rgba(44,59,99,0.18)",
+        minWidth: 340,
+      }}
     >
-      <Flex justify="space-between" align="flex-start" gap="md" wrap="wrap">
+      <Flex justify="space-between" align="flex-start" gap={24} wrap="wrap">
         <Box>
-          <Text fw={700} c="white">
+          <Text fw={700} size="lg" c="white" mb={2}>
             {fullName || `User ${user.user_id}`}
           </Text>
-          <Text size="xs" c="white">
+          <Text size="xs" c="#9bb1c8">
             ID: {user.user_id}
           </Text>
         </Box>
-        <Badge color="white" size="lg" variant="filled" radius="sm" style={{ background: COLORS.total, color: "#222" }}>
+        <Badge
+          color="yellow"
+          size="lg"
+          variant="light"
+          radius="md"
+          style={{
+            background: COLORS.total,
+            color: COLORS.textDark,
+            fontWeight: 600,
+            fontSize: 16,
+            minWidth: 150,
+            textAlign: "center",
+          }}
+        >
           Всего звонков: {totalCalls}
         </Badge>
       </Flex>
-      <Group mt="sm" gap="xl">
-        <Group>
+      <Group mt="xl" gap="xl" align="center">
+        <Group gap={8}>
           <Box
-            w={26}
-            h={26}
-            style={{ background: COLORS.to, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+            w={32}
+            h={32}
+            style={{
+              background: COLORS.to,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 8px 0 rgba(80,180,120,0.13)",
+            }}
           >
-            <HiArrowDownLeft color="white" size={16} />
+            <HiArrowDownLeft color="white" size={18} />
           </Box>
-          <Text fw={500} c="white">Входящие:</Text>
-          <Text fw={600} c={COLORS.to}>{user.calls_from || 0}</Text>
-          <Text size="md" c="white" ml="xs">
+          <Text fw={500} c="#cde8d2" size="md">Входящие</Text>
+          <Text fw={700} c={COLORS.to} size="lg">{user.calls_from || 0}</Text>
+          <Text size="md" c="#a5aec6" ml="xs">
             {formatDuration(user.duration_from || 0)}
           </Text>
         </Group>
-        <Group>
+        <Group gap={8}>
           <Box
-            w={26}
-            h={26}
-            style={{ background: COLORS.from, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}
+            w={32}
+            h={32}
+            style={{
+              background: COLORS.from,
+              borderRadius: "50%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              boxShadow: "0 2px 8px 0 rgba(44,159,199,0.13)",
+            }}
           >
-            <HiArrowUpRight color="white" size={16} />
+            <HiArrowUpRight color="white" size={18} />
           </Box>
-          <Text fw={500} c="white">Исходящие:</Text>
-          <Text fw={600} c={COLORS.from}>{user.calls_to || 0}</Text>
-          <Text size="md" c="white" ml="xs">
+          <Text fw={500} c="#b2e2f9" size="md">Исходящие</Text>
+          <Text fw={700} c={COLORS.from} size="lg">{user.calls_to || 0}</Text>
+          <Text size="md" c="#a5aec6" ml="xs">
             {formatDuration(user.duration_to || 0)}
           </Text>
         </Group>
@@ -129,61 +163,73 @@ export default function CallStatsChart() {
   }, []);
 
   return (
-    <Box h="calc(100vh - 10px)" style={{ overflowY: "auto", paddingRight: 8 }}>
-      <PageHeader
-        title={"Статистика звонков"}
-        count={stats.data?.length}
-        badgeColor="#0f824c"
-        withDivider
-      />
-
-      <Paper
-        withBorder
-        radius="md"
-        p="md"
-        mb="lg"
-        style={{
-          background: "linear-gradient(90deg, #0f824c 60%, #0f824c 100%)",
-          boxShadow: "0 4px 18px 0 rgba(0,0,0,.08)",
-        }}
-      >
-        <Flex align="center" gap="xl" wrap="wrap">
-          <Group>
-            <Text fw={700} c="white" size="lg">
-              Всего звонков:
-            </Text>
-            <Text fw={700} c={COLORS.total} size="lg">
-              {stats.total_all_users}
-            </Text>
-          </Group>
-          <Group>
-            <Text c={COLORS.to} fw={600}>Входящие:</Text>
-            <Text fw={700} c={COLORS.to}>{stats.total_calls_from}</Text>
-            <Text c={COLORS.from} fw={600} ml="xl">Исходящие:</Text>
-            <Text fw={700} c={COLORS.from}>{stats.total_calls_to}</Text>
-          </Group>
-          <Group>
-            <Text c="white" fw={600}>Общая длительность:</Text>
-            <Text fw={700} c={COLORS.total}>
-              {formatDuration(stats.total_duration)}
-            </Text>
-          </Group>
-          <Group>
-            <Text c={COLORS.to} fw={600}>Длительность входящих:</Text>
-            <Text fw={700} c={COLORS.to}>{formatDuration(stats.total_duration_from)}</Text>
-            <Text c={COLORS.from} fw={600} ml="xl">Длительность исходящих:</Text>
-            <Text fw={700} c={COLORS.from}>{formatDuration(stats.total_duration_to)}</Text>
-          </Group>
-        </Flex>
-      </Paper>
-
-      {(stats.data || []).map((user) => (
-        <UserStatsCard
-          key={user.user_id}
-          user={user}
-          fullName={techniciansMap.get(String(user.user_id))}
+    <Box
+      h="calc(100vh - 24px)"
+      style={{
+        overflowY: "auto",
+        padding: "32px 0 32px 0",
+        background: COLORS.bgMain,
+        minHeight: "100vh",
+      }}
+    >
+      <Box px={32} mb={32}>
+        <PageHeader
+          title={"Статистика звонков"}
+          count={stats.data?.length}
+          badgeColor={COLORS.total}
+          withDivider
         />
-      ))}
+      </Box>
+      <Box px={32} mb={32}>
+        <Paper
+          withBorder
+          radius="lg"
+          p="xl"
+          mb="xl"
+          style={{
+            background: "linear-gradient(90deg, #222e45 60%, #202834 100%)",
+            boxShadow: "0 4px 32px 0 rgba(18,36,64,0.19)",
+          }}
+        >
+          <Flex align="center" gap={40} wrap="wrap">
+            <Group>
+              <Text fw={700} c="white" size="xl">
+                Всего звонков:
+              </Text>
+              <Text fw={700} c={COLORS.total} size="xl">
+                {stats.total_all_users}
+              </Text>
+            </Group>
+            <Group>
+              <Text c={COLORS.to} fw={600} size="lg">Входящие:</Text>
+              <Text fw={700} c={COLORS.to} size="xl">{stats.total_calls_from}</Text>
+              <Text c={COLORS.from} fw={600} ml="xl" size="lg">Исходящие:</Text>
+              <Text fw={700} c={COLORS.from} size="xl">{stats.total_calls_to}</Text>
+            </Group>
+            <Group>
+              <Text c="white" fw={600} size="lg">Общая длительность:</Text>
+              <Text fw={700} c={COLORS.total} size="xl">
+                {formatDuration(stats.total_duration)}
+              </Text>
+            </Group>
+            <Group>
+              <Text c={COLORS.to} fw={600} size="lg">Длительность входящих:</Text>
+              <Text fw={700} c={COLORS.to} size="xl">{formatDuration(stats.total_duration_from)}</Text>
+              <Text c={COLORS.from} fw={600} ml="xl" size="lg">Длительность исходящих:</Text>
+              <Text fw={700} c={COLORS.from} size="xl">{formatDuration(stats.total_duration_to)}</Text>
+            </Group>
+          </Flex>
+        </Paper>
+      </Box>
+      <Box px={32}>
+        {(stats.data || []).map((user) => (
+          <UserStatsCard
+            key={user.user_id}
+            user={user}
+            fullName={techniciansMap.get(String(user.user_id))}
+          />
+        ))}
+      </Box>
     </Box>
   );
 }
