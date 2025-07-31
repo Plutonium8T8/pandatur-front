@@ -1,5 +1,6 @@
 import { Paper, Flex, Box, Text, Group, Badge } from "@mantine/core";
 import { HiArrowDownLeft, HiArrowUpRight } from "react-icons/hi2";
+import { getLanguageByKey } from "../utils"; // обязательно проверь путь!
 
 const COLORS = {
     from: "#4fc3f7",
@@ -36,10 +37,10 @@ export const CallStatsChartCard = ({ user, fullName }) => {
             <Flex justify="space-between" align="flex-start" gap={24} wrap="wrap">
                 <Box>
                     <Text fw={700} size="lg" c="white" mb={2}>
-                        {fullName || `User ${user.user_id}`}
+                        {fullName || `${getLanguageByKey("User")} ${user.user_id}`}
                     </Text>
                     <Text size="xs" c="#9bb1c8">
-                        ID: {user.user_id}
+                        {getLanguageByKey("ID")}: {user.user_id}
                     </Text>
                 </Box>
                 <Badge
@@ -56,7 +57,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                         textAlign: "center",
                     }}
                 >
-                    Всего звонков: {totalCalls}
+                    {getLanguageByKey("TotalCalls")}: {totalCalls}
                 </Badge>
             </Flex>
             <Group mt="xl" gap="xl" align="center">
@@ -75,7 +76,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                     >
                         <HiArrowDownLeft color="white" size={18} />
                     </Box>
-                    <Text fw={500} c="#cde8d2" size="md">Входящие</Text>
+                    <Text fw={500} c="#cde8d2" size="md">{getLanguageByKey("Incoming")}</Text>
                     <Text fw={700} c={COLORS.to} size="lg">{user.calls_from || 0}</Text>
                     <Text size="md" c="#a5aec6" ml="xs">
                         {formatDuration(user.duration_from || 0)}
@@ -96,7 +97,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                     >
                         <HiArrowUpRight color="white" size={18} />
                     </Box>
-                    <Text fw={500} c="#b2e2f9" size="md">Исходящие</Text>
+                    <Text fw={500} c="#b2e2f9" size="md">{getLanguageByKey("Outgoing")}</Text>
                     <Text fw={700} c={COLORS.from} size="lg">{user.calls_to || 0}</Text>
                     <Text size="md" c="#a5aec6" ml="xs">
                         {formatDuration(user.duration_to || 0)}
@@ -118,7 +119,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                             marginLeft: 8,
                         }}
                     >
-                        Общее время: {formatDuration(totalDuration)}
+                        {getLanguageByKey("TotalDuration")}: {formatDuration(totalDuration)}
                     </Badge>
                 </Group>
             </Group>
