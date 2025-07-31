@@ -6,6 +6,7 @@ import { PageHeader } from "../Components/PageHeader";
 import { LuFilter } from "react-icons/lu";
 import { CallListTable } from "../Components/CallStats/CallListTable";
 import { CallStatsChartCard } from "../Components/CallStats/CallStatsChartCards";
+import { Spin } from "@components";
 
 const COLORS = {
   total: "#0f824c",
@@ -250,7 +251,7 @@ export const CallStatsPage = () => {
       <Box px={32}>
         {mode === "stats" && (
           loading ? (
-            <Text c="dimmed" ta="center" mt={48}>Загрузка...</Text>
+            <Flex align="center" justify="center" mt={48}><Spin /></Flex>
           ) : (
             filteredStats.length === 0 ? (
               <Text c="dimmed" ta="center" mt={48}>Нет данных</Text>
