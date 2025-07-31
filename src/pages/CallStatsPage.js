@@ -7,6 +7,7 @@ import { LuFilter } from "react-icons/lu";
 import { CallListTable } from "../Components/CallStats/CallListTable";
 import { CallStatsChartCard } from "../Components/CallStats/CallStatsChartCards";
 import { Spin } from "@components";
+import { getLanguageByKey } from "../Components/utils";
 
 const COLORS = {
   total: "#0f824c",
@@ -156,7 +157,10 @@ export const CallStatsPage = () => {
       <Box px={32} mb={32}>
         <Flex align="center" justify="space-between" mb={20} gap={24}>
           <PageHeader
-            title={mode === "stats" ? "Статистика звонков" : "Все звонки"}
+            title={mode === "stats"
+              ? getLanguageByKey("CallStats")
+              : getLanguageByKey("AllCalls")
+            }
             count={mode === "stats" ? filteredStats.length : pagination.total}
             badgeColor={COLORS.total}
             withDivider={false}
@@ -166,8 +170,8 @@ export const CallStatsPage = () => {
               value={mode}
               onChange={setMode}
               data={[
-                { label: "Статистика", value: "stats" },
-                { label: "Звонки", value: "calls" },
+                { label: getLanguageByKey("Stats"), value: "stats" },
+                { label: getLanguageByKey("Calls"), value: "calls" },
               ]}
               color="teal"
               radius="xl"
@@ -179,7 +183,7 @@ export const CallStatsPage = () => {
               color={isFilterActive(filters) ? COLORS.total : "gray"}
               size="lg"
               onClick={() => setFilterModalOpen(true)}
-              title="Фильтр"
+              title={getLanguageByKey("Filter")}
               style={{
                 border: isFilterActive(filters)
                   ? `1.5px solid ${COLORS.total}`
@@ -197,8 +201,8 @@ export const CallStatsPage = () => {
               w={320}
               placeholder={
                 mode === "stats"
-                  ? "Поиск по имени техника"
-                  : "Поиск по имени или номеру"
+                  ? getLanguageByKey("SearchTechnician")
+                  : getLanguageByKey("SearchNameOrPhone")
               }
               value={search}
               onChange={e => setSearch(e.target.value)}
@@ -222,25 +226,25 @@ export const CallStatsPage = () => {
           >
             <Flex align="center" gap={40} wrap="wrap">
               <Group>
-                <Text fw={700} c="white" size="xl">Всего звонков:</Text>
+                <Text fw={700} c="white" size="xl">{getLanguageByKey("TotalCalls")}</Text>
                 <Text fw={700} c={COLORS.total} size="xl">{statsSummary.total_all_users}</Text>
               </Group>
               <Group>
-                <Text c={COLORS.to} fw={600} size="lg">Входящие:</Text>
+                <Text c={COLORS.to} fw={600} size="lg">{getLanguageByKey("Incoming")}</Text>
                 <Text fw={700} c={COLORS.to} size="xl">{statsSummary.total_calls_from}</Text>
-                <Text c={COLORS.from} fw={600} ml="xl" size="lg">Исходящие:</Text>
+                <Text c={COLORS.from} fw={600} ml="xl" size="lg">{getLanguageByKey("Outgoing")}</Text>
                 <Text fw={700} c={COLORS.from} size="xl">{statsSummary.total_calls_to}</Text>
               </Group>
               <Group>
-                <Text c="white" fw={600} size="lg">Общая длительность:</Text>
+                <Text c="white" fw={600} size="lg">{getLanguageByKey("TotalDuration")}</Text>
                 <Text fw={700} c={COLORS.total} size="xl">
                   {formatDuration(statsSummary.total_duration)}
                 </Text>
               </Group>
               <Group>
-                <Text c={COLORS.to} fw={600} size="lg">Длительность входящих:</Text>
+                <Text c={COLORS.to} fw={600} size="lg">{getLanguageByKey("IncomingDuration")}</Text>
                 <Text fw={700} c={COLORS.to} size="xl">{formatDuration(statsSummary.total_duration_from)}</Text>
-                <Text c={COLORS.from} fw={600} ml="xl" size="lg">Длительность исходящих:</Text>
+                <Text c={COLORS.from} fw={600} ml="xl" size="lg">{getLanguageByKey("OutgoingDuration")}</Text>
                 <Text fw={700} c={COLORS.from} size="xl">{formatDuration(statsSummary.total_duration_to)}</Text>
               </Group>
             </Flex>
@@ -254,7 +258,7 @@ export const CallStatsPage = () => {
             <Flex align="center" justify="center" mt={48}><Spin /></Flex>
           ) : (
             filteredStats.length === 0 ? (
-              <Text c="dimmed" ta="center" mt={48}>Нет данных</Text>
+              <Text c="dimmed" ta="center" mt={48}>{getLanguageByKey("NoData")}</Text>
             ) : (
               filteredStats.map((user) => (
                 <CallStatsChartCard

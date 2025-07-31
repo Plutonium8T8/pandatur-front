@@ -3557,5 +3557,135 @@ export const translations = {
     RO: "Chat citit",
     RU: "Чат прочитан",
     EN: "Chat read"
+  },
+  "CallStats": {
+    RO: "Statistici apeluri",
+    RU: "Статистика звонков",
+    EN: "Call stats"
+  },
+  "AllCalls": {
+    RO: "Toate apelurile",
+    RU: "Все звонки",
+    EN: "All calls"
+  },
+  "Stats": {
+    RO: "Statistici",
+    RU: "Статистика",
+    EN: "Stats"
+  },
+  "Calls": {
+    RO: "Apeluri",
+    RU: "Звонки",
+    EN: "Calls"
+  },
+  "Filter": {
+    RO: "Filtru",
+    RU: "Фильтр",
+    EN: "Filter"
+  },
+  "SearchTechnician": {
+    RO: "Caută după tehnician",
+    RU: "Поиск по имени техника",
+    EN: "Search by technician"
+  },
+  "SearchNameOrPhone": {
+    RO: "Caută după nume sau număr",
+    RU: "Поиск по имени или номеру",
+    EN: "Search by name or phone"
+  },
+  "TotalCalls": {
+    RO: "Total apeluri:",
+    RU: "Всего звонков:",
+    EN: "Total calls:"
+  },
+  "Incoming": {
+    RO: "Intrare:",
+    RU: "Входящие:",
+    EN: "Incoming:"
+  },
+  "Outgoing": {
+    RO: "Ieșire:",
+    RU: "Исходящие:",
+    EN: "Outgoing:"
+  },
+  "TotalDuration": {
+    RO: "Durata totală:",
+    RU: "Общая длительность:",
+    EN: "Total duration:"
+  },
+  "IncomingDuration": {
+    RO: "Durata intrărilor:",
+    RU: "Длительность входящих:",
+    EN: "Incoming duration:"
+  },
+  "OutgoingDuration": {
+    RO: "Durata ieșirilor:",
+    RU: "Длительность исходящих:",
+    EN: "Outgoing duration:"
+  },
+  "NoData": {
+    RO: "Nu există date",
+    RU: "Нет данных",
+    EN: "No data"
+  },
+  "DateTime": {
+    RU: "Дата/Время",
+    RO: "Data/Ora",
+    EN: "Date/Time"
+  },
+  "Technician": {
+    RU: "Техник",
+    RO: "Tehnician",
+    EN: "Technician"
+  },
+  "ClientNumber": {
+    RU: "Номер клиента",
+    RO: "Număr client",
+    EN: "Client number"
+  },
+  "Ticket": {
+    RU: "Тикет",
+    RO: "Tichet",
+    EN: "Ticket"
+  },
+  "WhoCalled": {
+    RU: "Кто звонил",
+    RO: "Cine a sunat",
+    EN: "Who called"
+  },
+  "Answer": {
+    RU: "Ответ",
+    RO: "Răspuns",
+    EN: "Answer"
+  },
+  "NoAnswer": {
+    RU: "Нет ответа",
+    RO: "Nu răspunde",
+    EN: "No answer"
+  },
+  "Record": {
+    RU: "Запись",
+    RO: "Înregistrare",
+    EN: "Record"
+  },
+  "DownloadListen": {
+    RU: "Скачать/Послушать",
+    RO: "Descarcă/Ascultă",
+    EN: "Download/Listen"
+  },
+  "CallStatsTitle": {
+    RU: "Статистика звонков",
+    RO: "Statistici apeluri",
+    EN: "Call statistics"
+  },
+  "SearchByTechnicianName": {
+    RU: "Поиск по имени техника",
+    RO: "Căutare după tehnician",
+    EN: "Search by technician name"
+  },
+  "NoDataForPeriod": {
+    RU: "Нет данных за выбранный период",
+    RO: "Nu există date pentru perioada selectată",
+    EN: "No data for the selected period"
   }
 }

@@ -24,7 +24,7 @@ export const CallListTable = ({
 }) => {
     const columns = useMemo(() => [
         {
-            title: "Дата/Время",
+            title: getLanguageByKey("DateTime"),
             dataIndex: "timestamp",
             width: 180,
             render: (ts) => (
@@ -32,47 +32,47 @@ export const CallListTable = ({
             ),
         },
         {
-            title: "Техник",
+            title: getLanguageByKey("Users"),
             dataIndex: "user_id",
             width: 200,
             render: (userId) => techniciansMap.get(String(userId)) || userId,
         },
         {
-            title: "Номер клиента",
+            title: getLanguageByKey("ClientNumber"),
             dataIndex: "client_fullname",
             width: 160,
             render: (val) => val || "-",
         },
         {
-            title: "Тикет",
+            title: getLanguageByKey("Ticket"),
             dataIndex: "ticket_id",
             width: 110,
             render: (id) => id || "-",
         },
         {
-            title: "Кто звонил",
+            title: getLanguageByKey("WhoCalled"),
             dataIndex: "who_called",
             width: 120,
             render: (v) =>
                 v === "user"
-                    ? <Badge color="blue">Техник</Badge>
+                    ? <Badge color="blue">{getLanguageByKey("User")}</Badge>
                     : v === "client"
-                        ? <Badge color="green">Клиент</Badge>
+                        ? <Badge color="green">{getLanguageByKey("Client")}</Badge>
                         : v,
         },
         {
-            title: "Статус",
+            title: getLanguageByKey("Status"),
             dataIndex: "status",
             width: 110,
             render: (v) =>
                 v === "ANSWER"
-                    ? <Badge color="teal">Ответ</Badge>
+                    ? <Badge color="teal">{getLanguageByKey("Answer")}</Badge>
                     : v === "NOANSWER"
-                        ? <Badge color="red">Нет ответа</Badge>
+                        ? <Badge color="red">{getLanguageByKey("NoAnswer")}</Badge>
                         : v,
         },
         {
-            title: "Запись",
+            title: getLanguageByKey("Record"),
             dataIndex: "call_url",
             width: 110,
             render: (url) =>
@@ -84,7 +84,7 @@ export const CallListTable = ({
                             target="_blank"
                             color="blue"
                             variant="light"
-                            title="Скачать/Послушать"
+                            title={getLanguageByKey("DownloadListen")}
                         >
                             <FaDownload size={16} />
                         </ActionIcon>
