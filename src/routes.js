@@ -9,7 +9,7 @@ import {
   Dashboard,
   TermsAndConditions
 } from "@pages";
-import { CallStatsChart } from "./pages";
+import { CallStatsPage } from "./pages";
 import { hasStrictPermission, hasRouteAccess } from "./Components/utils/permissions";
 import { convertRolesToMatrix, safeParseJson } from "./Components/UsersComponent/rolesUtils";
 
@@ -69,7 +69,7 @@ export const privateRoutes = (userRoles) => {
   }
 
   routes.push({ path: "/terms-and-conditions", component: TermsAndConditions });
-  routes.push({ path: "/call-stats", component: CallStatsChart });
+  routes.push({ path: "/call-stats", component: CallStatsPage });
 
   return routes;
 };
