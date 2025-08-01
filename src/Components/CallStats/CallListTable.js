@@ -100,7 +100,7 @@ export const CallListTable = ({
                 data={data}
                 bordered
                 loading={loading}
-                scroll={{ y: "calc(100vh - 400px)" }}
+                scroll={{ y: "calc(100vh - 350px)" }}
             />
 
             <Flex justify="center" mt="md">

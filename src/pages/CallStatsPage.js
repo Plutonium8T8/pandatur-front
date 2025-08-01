@@ -149,7 +149,6 @@ export const CallStatsPage = () => {
       h="calc(100vh - 24px)"
       style={{
         overflowY: "auto",
-        padding: "32px 0 32px 0",
         background: COLORS.bgMain,
         minHeight: "100vh",
       }}
