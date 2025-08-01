@@ -3687,5 +3687,15 @@ export const translations = {
     RU: "Нет данных за выбранный период",
     RO: "Nu există date pentru perioada selectată",
     EN: "No data for the selected period"
+  },
+  "Analytics": {
+    RU: "Аналитика",
+    RO: "Analitică",
+    EN: "Analytics"
+  },
+  "NoEventsYet": {
+    RU: "Список событий будет доступен скоро",
+    RO: "Lista evenimentelor va fi disponibilă curând",
+    EN: "Events list coming soon"
   }
 }

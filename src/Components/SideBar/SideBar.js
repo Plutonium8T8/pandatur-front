@@ -8,10 +8,10 @@ import {
   FaClipboardList,
   FaSignOutAlt,
   FaCalendar,
-  FaHistory
+  FaHistory,
+  FaChartPie
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
-import { LuPhoneCall } from "react-icons/lu";
 import { Badge, Flex, Divider, Select } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
@@ -84,7 +84,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "DASHBOARD", "VIEW") && (
             <MenuItem
               active={isActive("dashboard")}
-              icon={<FaChartBar />}
+              icon={<FaChartPie />}
               component={<Link to="/dashboard" />}
             >
               {getLanguageByKey("Dashboard")}
@@ -112,14 +112,6 @@ export const SideBar = () => {
             </MenuItem>
           </Can>
 
-          <MenuItem
-            active={isActive("call-stats")}
-            icon={<LuPhoneCall />}
-            component={<Link to="/call-stats" />}
-          >
-            {getLanguageByKey("Call Stats")}
-          </MenuItem>
-
           {hasRouteAccess(convertRolesToMatrix(safeParseJson(userRoles)), "TASK", "VIEW") && (
             <MenuItem
               active={isActive("tasks")}
@@ -139,6 +131,14 @@ export const SideBar = () => {
               {getLanguageByKey("schedules")}
             </MenuItem>
           )}
+
+          <MenuItem
+            active={isActive("analytics")}
+            icon={<FaChartBar />}
+            component={<Link to="/analytics" />}
+          >
+            {getLanguageByKey("Analytics")}
+          </MenuItem>
 
           {hasStrictPermission(userRoles, "LOGS", "VIEW") && (
             <MenuItem
