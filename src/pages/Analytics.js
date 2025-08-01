@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Box, Tabs } from "@mantine/core";
+import { Box, Group, Button, Paper } from "@mantine/core";
 import { FaChartBar, FaRegCalendarCheck } from "react-icons/fa";
 import { getLanguageByKey } from "../Components/utils";
 import { CallStatsPage } from "./CallStatsPage";
@@ -10,15 +10,12 @@ export const Analytics = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Определяем активный таб из url
     const tab = location.pathname.endsWith("/events") ? "events" : "calls";
 
-    // Когда пользователь переключает таб — меняем url
     const handleTabChange = (tabValue) => {
         navigate(tabValue === "calls" ? "/analytics/calls" : "/analytics/events", { replace: true });
     };
 
-    // Если пользователь зашёл просто по /analytics, то редиректим на calls (по дефолту)
     useEffect(() => {
         if (location.pathname === "/analytics") {
             navigate("/analytics/calls", { replace: true });
@@ -27,32 +24,68 @@ export const Analytics = () => {
 
     return (
         <Box p={0} h="100%">
-            <Tabs
-                value={tab}
-                onChange={handleTabChange}
-                variant="outline"
-                color="teal"
-                radius="md"
+            <Paper
+                radius={24}
+                p={0}
+                my={28}
+                mx={32}
+                style={{
+                    background: "#222e45",
+                    minHeight: 74,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
             >
-                <Tabs.List>
-                    <Tabs.Tab value="calls" leftSection={<FaChartBar size={18} />}>
+                <Group gap={20} p={12}>
+                    <Button
+                        variant={tab === "calls" ? "filled" : "subtle"}
+                        color="teal"
+                        size="lg"
+                        radius="lg"
+                        leftSection={<FaChartBar size={20} />}
+                        style={{
+                            fontWeight: 700,
+                            fontSize: 18,
+                            background: tab === "calls" ? "rgba(15,130,76,0.18)" : "transparent",
+                            color: tab === "calls" ? "#0f824c" : "#b7c9e2",
+                            boxShadow: tab === "calls" ? "0 2px 8px 0 rgba(15,130,76,0.11)" : "none",
+                            transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
+                        }}
+                        onClick={() => handleTabChange("calls")}
+                    >
                         {getLanguageByKey("Calls")}
-                    </Tabs.Tab>
-                    <Tabs.Tab value="events" leftSection={<FaRegCalendarCheck size={18} />}>
+                    </Button>
+                    <Button
+                        variant={tab === "events" ? "filled" : "subtle"}
+                        color="teal"
+                        size="lg"
+                        radius="lg"
+                        leftSection={<FaRegCalendarCheck size={20} />}
+                        style={{
+                            fontWeight: 700,
+                            fontSize: 18,
+                            background: tab === "events" ? "rgba(15,130,76,0.18)" : "transparent",
+                            color: tab === "events" ? "#0f824c" : "#b7c9e2",
+                            boxShadow: tab === "events" ? "0 2px 8px 0 rgba(15,130,76,0.11)" : "none",
+                            transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
+                        }}
+                        onClick={() => handleTabChange("events")}
+                    >
                         {getLanguageByKey("Events")}
-                    </Tabs.Tab>
-                </Tabs.List>
+                    </Button>
+                </Group>
+            </Paper>
 
-                <Tabs.Panel value="calls" pt="md">
-                    <CallStatsPage />
-                </Tabs.Panel>
-                <Tabs.Panel value="events" pt="md">
-                    {/* <EventsList /> */}
-                    <div style={{ padding: 24, textAlign: "center", color: "#888" }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+                {tab === "calls" && <CallStatsPage />}
+                {tab === "events" && (
+                    // <EventsList />
+                    <div style={{ padding: 48, textAlign: "center", color: "#888", fontSize: 18 }}>
                         {getLanguageByKey("NoEventsYet")}
                     </div>
-                </Tabs.Panel>
-            </Tabs>
+                )}
+            </div>
         </Box>
     );
 };
