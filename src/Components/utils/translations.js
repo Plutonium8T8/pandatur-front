@@ -3697,5 +3697,40 @@ export const translations = {
     RU: "Список событий будет доступен скоро",
     RO: "Lista evenimentelor va fi disponibilă curând",
     EN: "Events list coming soon"
+  },
+  "IP Address": {
+    RU: "IP адрес",
+    RO: "Adresa IP",
+    EN: "IP Address"
+  },
+  "Event": {
+    RU: "Событие",
+    RO: "Eveniment",
+    EN: "Event"
+  },
+  "Object Type": {
+    RU: "Тип объекта",
+    RO: "Tip obiect",
+    EN: "Object Type"
+  },
+  "Object ID": {
+    RU: "ID объекта",
+    RO: "ID obiect",
+    EN: "Object ID"
+  },
+  "Changes": {
+    RU: "Изменения",
+    RO: "Modificări",
+    EN: "Changes"
+  },
+  "SearchUserOrObject": {
+    RU: "Поиск по пользователю, IP, событию, типу объекта",
+    RO: "Căutare după utilizator, IP, eveniment sau tipul obiectului",
+    EN: "Search by user, IP, event or object type"
+  },
+  "OnlyEventsShown": {
+    RU: "Показываются только события: Lead, Task, Client",
+    RO: "Sunt afișate doar evenimentele: Lead, Task, Client",
+    EN: "Only events shown: Lead, Task, Client"
   }
 }

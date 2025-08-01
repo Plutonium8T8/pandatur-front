@@ -4,7 +4,6 @@ import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
 import { format } from "date-fns";
 import { FaDownload } from "react-icons/fa";
-import { Spin } from "@components";
 
 const formatDate = (ts) => {
     if (!ts) return "-";
@@ -100,7 +99,7 @@ export const CallListTable = ({
                 data={data}
                 bordered
                 loading={loading}
-                scroll={{ y: "calc(100vh - 350px)" }}
+                scroll={{ y: "calc(100vh - 330px)" }}
             />
 
             <Flex justify="center" mt="md">

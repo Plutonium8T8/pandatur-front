@@ -3,7 +3,7 @@ import { Box, Group, Button, Paper } from "@mantine/core";
 import { FaChartBar, FaRegCalendarCheck } from "react-icons/fa";
 import { getLanguageByKey } from "../Components/utils";
 import { CallStatsPage } from "./CallStatsPage";
-// import { EventsList } from "./EventsList";
+import { EventsList } from "../Components/CallStats/EventsList";
 import { useNavigate, useLocation } from "react-router-dom";
 
 export const Analytics = () => {
@@ -80,10 +80,7 @@ export const Analytics = () => {
             <div style={{ flex: 1, minWidth: 0 }}>
                 {tab === "calls" && <CallStatsPage />}
                 {tab === "events" && (
-                    // <EventsList />
-                    <div style={{ padding: 48, textAlign: "center", color: "#888", fontSize: 18 }}>
-                        {getLanguageByKey("NoEventsYet")}
-                    </div>
+                    <EventsList />
                 )}
             </div>
         </Box>

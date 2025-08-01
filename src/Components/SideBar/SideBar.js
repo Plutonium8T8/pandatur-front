@@ -39,6 +39,7 @@ export const SideBar = () => {
 
   const isActive = (page) => {
     if (page === "chat") return location.pathname.startsWith("/chat");
+    if (page === "analytics") return location.pathname.startsWith("/analytics");
     return location.pathname === `/${page}`;
   };
 
