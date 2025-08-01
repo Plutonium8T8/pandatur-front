@@ -9,9 +9,9 @@ import {
   Dashboard,
   TermsAndConditions
 } from "@pages";
-import { CallStatsPage } from "./pages";
 import { hasStrictPermission, hasRouteAccess } from "./Components/utils/permissions";
 import { convertRolesToMatrix, safeParseJson } from "./Components/UsersComponent/rolesUtils";
+import { Analytics } from "./pages/Analytics";
 
 export const privatePaths = [
   "dashboard",
@@ -69,7 +69,7 @@ export const privateRoutes = (userRoles) => {
   }
 
   routes.push({ path: "/terms-and-conditions", component: TermsAndConditions });
-  routes.push({ path: "/call-stats", component: CallStatsPage });
+  routes.push({ path: "/analytics/*", component: Analytics });
 
   return routes;
 };
