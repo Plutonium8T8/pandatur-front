@@ -6,6 +6,14 @@ import { CallStatsPage } from "./CallStatsPage";
 import { EventsList } from "../Components/CallStats/EventsList";
 import { useNavigate, useLocation } from "react-router-dom";
 
+const COLORS = {
+    main: "#0f824c",
+    bg: "#fff",
+    tabInactive: "#e8f3ef",
+    textDark: "#232b3a",
+    textInactive: "#000",
+};
+
 export const Analytics = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -23,23 +31,25 @@ export const Analytics = () => {
     }, [location.pathname, navigate]);
 
     return (
-        <Box p={0} h="100%">
+        <Box p={0} h="100%" style={{ background: COLORS.bg }}>
             <Paper
                 radius={24}
                 p={0}
                 my={28}
                 mx={32}
+                withBorder
                 style={{
-                    background: "#222e45",
+                    background: COLORS.bg,
                     minHeight: 74,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    boxShadow: "0 4px 24px 0 rgba(18,36,64,0.06)",
                 }}
             >
                 <Group gap={20} p={12}>
                     <Button
-                        variant={tab === "calls" ? "filled" : "subtle"}
+                        variant={tab === "calls" ? "filled" : "light"}
                         color="teal"
                         size="lg"
                         radius="lg"
@@ -47,9 +57,10 @@ export const Analytics = () => {
                         style={{
                             fontWeight: 700,
                             fontSize: 18,
-                            background: tab === "calls" ? "rgba(15,130,76,0.18)" : "transparent",
-                            color: tab === "calls" ? "#0f824c" : "#b7c9e2",
-                            boxShadow: tab === "calls" ? "0 2px 8px 0 rgba(15,130,76,0.11)" : "none",
+                            background: tab === "calls" ? COLORS.tabInactive : COLORS.bg,
+                            color: tab === "calls" ? COLORS.main : COLORS.textInactive,
+                            boxShadow: tab === "calls" ? "0 2px 8px 0 rgba(15,130,76,0.10)" : "none",
+                            border: tab === "calls" ? `1.5px solid ${COLORS.main}` : "1.5px solid transparent",
                             transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
                         }}
                         onClick={() => handleTabChange("calls")}
@@ -57,7 +68,7 @@ export const Analytics = () => {
                         {getLanguageByKey("Calls")}
                     </Button>
                     <Button
-                        variant={tab === "events" ? "filled" : "subtle"}
+                        variant={tab === "events" ? "filled" : "light"}
                         color="teal"
                         size="lg"
                         radius="lg"
@@ -65,9 +76,10 @@ export const Analytics = () => {
                         style={{
                             fontWeight: 700,
                             fontSize: 18,
-                            background: tab === "events" ? "rgba(15,130,76,0.18)" : "transparent",
-                            color: tab === "events" ? "#0f824c" : "#b7c9e2",
-                            boxShadow: tab === "events" ? "0 2px 8px 0 rgba(15,130,76,0.11)" : "none",
+                            background: tab === "events" ? COLORS.tabInactive : COLORS.bg,
+                            color: tab === "events" ? COLORS.main : COLORS.textInactive,
+                            boxShadow: tab === "events" ? "0 2px 8px 0 rgba(15,130,76,0.10)" : "none",
+                            border: tab === "events" ? `1.5px solid ${COLORS.main}` : "1.5px solid transparent",
                             transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
                         }}
                         onClick={() => handleTabChange("events")}
@@ -79,9 +91,7 @@ export const Analytics = () => {
 
             <div style={{ flex: 1, minWidth: 0 }}>
                 {tab === "calls" && <CallStatsPage />}
-                {tab === "events" && (
-                    <EventsList />
-                )}
+                {tab === "events" && <EventsList />}
             </div>
         </Box>
     );

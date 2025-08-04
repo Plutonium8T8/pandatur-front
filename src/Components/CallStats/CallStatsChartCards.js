@@ -6,7 +6,7 @@ const COLORS = {
     from: "#4fc3f7",
     to: "#81c784",
     total: "#0f824c",
-    bgCard: "#232b3a",
+    bgCard: "#fff", // Белый фон
     textDark: "#222",
 };
 
@@ -30,16 +30,16 @@ export const CallStatsChartCard = ({ user, fullName }) => {
             mb="xs"
             style={{
                 background: COLORS.bgCard,
-                boxShadow: "0 2px 18px 0 rgba(44,59,99,0.18)",
+                boxShadow: "0 2px 18px 0 rgba(44,59,99,0.08)",
                 minWidth: 340,
             }}
         >
             <Flex justify="space-between" align="flex-start" gap={24} wrap="wrap">
                 <Box>
-                    <Text fw={700} size="lg" c="white" mb={2}>
+                    <Text fw={700} size="lg" c={COLORS.textDark} mb={2}>
                         {fullName || `${getLanguageByKey("User")} ${user.user_id}`}
                     </Text>
-                    <Text size="xs" c="#9bb1c8">
+                    <Text size="xs" c="#8793a7">
                         {getLanguageByKey("ID")}: {user.user_id}
                     </Text>
                 </Box>
@@ -50,7 +50,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                     radius="md"
                     style={{
                         background: COLORS.total,
-                        color: COLORS.textDark,
+                        color: "#fff",
                         fontWeight: 600,
                         fontSize: 16,
                         minWidth: 150,
@@ -76,9 +76,9 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                     >
                         <HiArrowDownLeft color="white" size={18} />
                     </Box>
-                    <Text fw={500} c="#cde8d2" size="md">{getLanguageByKey("Incoming")}</Text>
+                    <Text fw={500} c={COLORS.textDark} size="md">{getLanguageByKey("Incoming")}</Text>
                     <Text fw={700} c={COLORS.to} size="lg">{user.calls_from || 0}</Text>
-                    <Text size="md" c="#a5aec6" ml="xs">
+                    <Text size="md" c="#757575" ml="xs">
                         {formatDuration(user.duration_from || 0)}
                     </Text>
                 </Group>
@@ -97,9 +97,9 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                     >
                         <HiArrowUpRight color="white" size={18} />
                     </Box>
-                    <Text fw={500} c="#b2e2f9" size="md">{getLanguageByKey("Outgoing")}</Text>
+                    <Text fw={500} c={COLORS.textDark} size="md">{getLanguageByKey("Outgoing")}</Text>
                     <Text fw={700} c={COLORS.from} size="lg">{user.calls_to || 0}</Text>
-                    <Text size="md" c="#a5aec6" ml="xs">
+                    <Text size="md" c="#757575" ml="xs">
                         {formatDuration(user.duration_to || 0)}
                     </Text>
                 </Group>
@@ -110,8 +110,8 @@ export const CallStatsChartCard = ({ user, fullName }) => {
                         variant="light"
                         radius="md"
                         style={{
-                            background: "#fff",
-                            color: COLORS.bgCard,
+                            background: "#f2f2f2",
+                            color: COLORS.textDark,
                             fontWeight: 700,
                             fontSize: 16,
                             minWidth: 180,
