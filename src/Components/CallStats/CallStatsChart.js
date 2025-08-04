@@ -6,7 +6,7 @@ import { PageHeader } from "../PageHeader";
 import { LuFilter } from "react-icons/lu";
 import { CallStatsChartCard } from "./CallStatsChartCards";
 import { Spin } from "@components";
-import { getLanguageByKey } from "../utils"; // путь скорректируй под себя
+import { getLanguageByKey } from "../utils";
 
 const COLORS = {
     total: "#0f824c",

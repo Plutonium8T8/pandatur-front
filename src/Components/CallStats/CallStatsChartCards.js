@@ -1,6 +1,6 @@
 import { Paper, Flex, Box, Text, Group, Badge } from "@mantine/core";
 import { HiArrowDownLeft, HiArrowUpRight } from "react-icons/hi2";
-import { getLanguageByKey } from "../utils"; // обязательно проверь путь!
+import { getLanguageByKey } from "../utils";
 
 const COLORS = {
     from: "#4fc3f7",

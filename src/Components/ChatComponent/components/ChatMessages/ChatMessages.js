@@ -27,7 +27,7 @@ export const ChatMessages = ({
   onChangeSelectedUser,
   loading,
   technicians,
-  unseenCount = 0, // <--- добавь сюда unseenCount как проп
+  unseenCount = 0,
 }) => {
   const { userId } = useUser();
 
