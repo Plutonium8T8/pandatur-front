@@ -37,7 +37,7 @@ export const CallListTable = ({
             render: (userId) => techniciansMap.get(String(userId)) || userId,
         },
         {
-            title: getLanguageByKey("ClientNumber"),
+            title: getLanguageByKey("Client"),
             dataIndex: "client_fullname",
             width: 160,
             render: (val) => val || "-",
@@ -100,6 +100,7 @@ export const CallListTable = ({
                 bordered
                 loading={loading}
                 scroll={{ y: "calc(100vh - 330px)" }}
+                rowKey={(_, index) => `row_${index}`}
             />
 
             <Flex justify="center" mt="md">
