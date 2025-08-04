@@ -11,9 +11,10 @@ import { getLanguageByKey } from "../Components/utils";
 
 const COLORS = {
   total: "#0f824c",
-  bgMain: "white",
+  bgMain: "#fff",
   to: "#81c784",
   from: "#4fc3f7",
+  textMain: "#232b3a",
 };
 
 const formatDuration = (totalSeconds = 0) => {
@@ -151,15 +152,16 @@ export const CallStatsPage = () => {
         overflowY: "auto",
         background: COLORS.bgMain,
         minHeight: "100vh",
-        paddingBottom: 130
+        paddingBottom: 130,
       }}
     >
       <Box px={32} mb={32}>
         <Flex align="center" justify="space-between" mb={20} gap={24}>
           <PageHeader
-            title={mode === "stats"
-              ? getLanguageByKey("CallStats")
-              : getLanguageByKey("AllCalls")
+            title={
+              mode === "stats"
+                ? getLanguageByKey("CallStats")
+                : getLanguageByKey("AllCalls")
             }
             count={mode === "stats" ? filteredStats.length : pagination.total}
             badgeColor={COLORS.total}
@@ -176,7 +178,11 @@ export const CallStatsPage = () => {
               color="teal"
               radius="xl"
               size="md"
-              style={{ minWidth: 220, background: "#f7f7fa", fontWeight: 700 }}
+              style={{
+                minWidth: 220,
+                background: "#f7f7fa",
+                fontWeight: 700,
+              }}
             />
             <ActionIcon
               variant={isFilterActive(filters) ? "filled" : "default"}
@@ -220,13 +226,13 @@ export const CallStatsPage = () => {
             p="xl"
             mb="xl"
             style={{
-              background: "linear-gradient(90deg, #222e45 60%, #202834 100%)",
-              boxShadow: "0 4px 32px 0 rgba(18,36,64,0.19)",
+              background: "#fff",
+              boxShadow: "0 4px 24px 0 rgba(18,36,64,0.08)",
             }}
           >
             <Flex align="center" gap={40} wrap="wrap">
               <Group>
-                <Text fw={700} c="white" size="xl">{getLanguageByKey("TotalCalls")}</Text>
+                <Text fw={700} c={COLORS.textMain} size="xl">{getLanguageByKey("TotalCalls")}</Text>
                 <Text fw={700} c={COLORS.total} size="xl">{statsSummary.total_all_users}</Text>
               </Group>
               <Group>
@@ -236,7 +242,7 @@ export const CallStatsPage = () => {
                 <Text fw={700} c={COLORS.from} size="xl">{statsSummary.total_calls_to}</Text>
               </Group>
               <Group>
-                <Text c="white" fw={600} size="lg">{getLanguageByKey("TotalDuration")}</Text>
+                <Text c={COLORS.textMain} fw={600} size="lg">{getLanguageByKey("TotalDuration")}</Text>
                 <Text fw={700} c={COLORS.total} size="xl">
                   {formatDuration(statsSummary.total_duration)}
                 </Text>

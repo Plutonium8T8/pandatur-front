@@ -10,9 +10,10 @@ import { getLanguageByKey } from "../utils";
 
 const COLORS = {
     total: "#0f824c",
-    bgMain: "white",
+    bgMain: "#fff",
     to: "#81c784",
     from: "#4fc3f7",
+    textMain: "#232b3a",
 };
 
 const formatDuration = (totalSeconds = 0) => {
@@ -115,7 +116,7 @@ export const CallStatsChart = () => {
             <Box px={32} mb={32}>
                 <Flex align="center" justify="space-between" mb={20}>
                     <PageHeader
-                        title={getLanguageByKey("CallStatsTitle")} // "Call statistics"
+                        title={getLanguageByKey("CallStatsTitle")}
                         count={filteredData.length}
                         badgeColor={COLORS.total}
                         withDivider={false}
@@ -157,13 +158,13 @@ export const CallStatsChart = () => {
                     p="xl"
                     mb="xl"
                     style={{
-                        background: "linear-gradient(90deg, #222e45 60%, #202834 100%)",
-                        boxShadow: "0 4px 32px 0 rgba(18,36,64,0.19)",
+                        background: "#fff",
+                        boxShadow: "0 4px 24px 0 rgba(18,36,64,0.08)",
                     }}
                 >
                     <Flex align="center" gap={40} wrap="wrap">
                         <Group>
-                            <Text fw={700} c="white" size="xl">{getLanguageByKey("TotalCalls")}:</Text>
+                            <Text fw={700} c={COLORS.textMain} size="xl">{getLanguageByKey("TotalCalls")}:</Text>
                             <Text fw={700} c={COLORS.total} size="xl">{stats.total_all_users}</Text>
                         </Group>
                         <Group>
@@ -173,7 +174,7 @@ export const CallStatsChart = () => {
                             <Text fw={700} c={COLORS.from} size="xl">{stats.total_calls_to}</Text>
                         </Group>
                         <Group>
-                            <Text c="white" fw={600} size="lg">{getLanguageByKey("TotalDuration")}:</Text>
+                            <Text c={COLORS.textMain} fw={600} size="lg">{getLanguageByKey("TotalDuration")}:</Text>
                             <Text fw={700} c={COLORS.total} size="xl">
                                 {formatDuration(stats.total_duration)}
                             </Text>
