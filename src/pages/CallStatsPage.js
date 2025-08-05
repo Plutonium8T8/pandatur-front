@@ -8,6 +8,7 @@ import { CallListTable } from "../Components/CallStats/CallListTable";
 import { CallStatsChartCard } from "../Components/CallStats/CallStatsChartCards";
 import { Spin } from "@components";
 import { getLanguageByKey } from "../Components/utils";
+import { CallStatsFilterModal } from "../Components/CallStats/CallStatsFilterModal";
 
 const COLORS = {
   total: "#0f824c",
@@ -79,10 +80,6 @@ export const CallStatsPage = () => {
           order: "DESC",
           attributes: {
             ...filters,
-            timestamp: {
-              from: "01-07-2025",
-              until: "30-07-2025",
-            },
           },
         })
         .then((res) => {
@@ -170,7 +167,10 @@ export const CallStatsPage = () => {
           <Flex align="center" gap={12}>
             <SegmentedControl
               value={mode}
-              onChange={setMode}
+              onChange={value => {
+                setMode(value);
+                setPagination({ page: 1, total_pages: 1, total: 0 });
+              }}
               data={[
                 { label: getLanguageByKey("Stats"), value: "stats" },
                 { label: getLanguageByKey("Calls"), value: "calls" },
@@ -287,6 +287,17 @@ export const CallStatsPage = () => {
           />
         )}
       </Box>
+      <CallStatsFilterModal
+        opened={filterModalOpen}
+        onClose={() => setFilterModalOpen(false)}
+        onApply={(newFilters) => {
+          setFilters(newFilters);
+          setPagination((prev) => ({ ...prev, page: 1 }));
+        }}
+        initialFilters={filters}
+        technicians={technicians}
+        mode={mode}
+      />
     </Box>
   );
 };

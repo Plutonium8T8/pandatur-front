@@ -3732,5 +3732,40 @@ export const translations = {
     RU: "Показываются только события: Lead, Task, Client",
     RO: "Sunt afișate doar evenimentele: Lead, Task, Client",
     EN: "Only events shown: Lead, Task, Client"
+  },
+  FilterCalls: {
+    RU: "Фильтр звонков",
+    RO: "Filtru apeluri",
+    EN: "Call filter",
+  },
+  Technicians: {
+    RU: "Техники",
+    RO: "Tehnicieni",
+    EN: "Technicians",
+  },
+  SelectTechnicians: {
+    RU: "Выберите техников",
+    RO: "Selectează tehnicieni",
+    EN: "Select technicians",
+  },
+  Answered: {
+    RU: "Отвечен",
+    RO: "Răspuns",
+    EN: "Answered",
+  },
+  SelectStatus: {
+    RU: "Выберите статус",
+    RO: "Selectează starea",
+    EN: "Select status",
+  },
+  DateFrom: {
+    RU: "Дата с",
+    RO: "Data de la",
+    EN: "Date from",
+  },
+  DateTo: {
+    RU: "Дата по",
+    RO: "Data până la",
+    EN: "Date to",
   }
 }
