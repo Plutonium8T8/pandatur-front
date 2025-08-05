@@ -139,7 +139,7 @@ export const EventsList = () => {
                 minHeight: "100vh",
             }}
         >
-            <Box px={32} mb={32} mt={32}>
+            <Box px={32} mb={32}>
                 <Flex align="center" justify="space-between" gap={24}>
                     <PageHeader
                         title={getLanguageByKey("Events")}
