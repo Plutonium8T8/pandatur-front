@@ -1,5 +1,3 @@
-// utils/multiSelectUtils.js
-
 /**
  * Возвращает мапу: ключ — ID группы, значение — массив ID техников из этой группы
  * @param {Array} technicians
