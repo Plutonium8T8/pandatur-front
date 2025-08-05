@@ -3352,9 +3352,9 @@ export const translations = {
     EN: "User name"
   },
   "Events": {
-    RO: "Eveniment",
+    RO: "Evenimente",
     RU: "События",
-    EN: "Event"
+    EN: "Events"
   },
   "Select events": {
     RO: "Alege obiect eveniment",
