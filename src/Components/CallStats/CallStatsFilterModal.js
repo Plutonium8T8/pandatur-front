@@ -107,7 +107,7 @@ export const CallStatsFilterModal = ({
                 ) : (
                     <Flex direction="column" gap={16} style={{ flex: 1 }}>
                         <MultiSelect
-                            label={getLanguageByKey("Technicians")}
+                            label={getLanguageByKey("Users")}
                             data={formattedTechs}
                             value={filteredValues}
                             onChange={handleTechniciansChange}
@@ -118,13 +118,6 @@ export const CallStatsFilterModal = ({
 
                         {mode === "calls" && (
                             <>
-                                <TextInput
-                                    label={getLanguageByKey("SearchByPhone") || "Поиск по телефону или имени"}
-                                    placeholder={getLanguageByKey("SearchPhoneOrName") || "Введите телефон или имя"}
-                                    value={searchPhone}
-                                    onChange={(e) => setSearchPhone(e.target.value)}
-                                    clearable
-                                />
                                 <Select
                                     label={getLanguageByKey("Status")}
                                     data={[

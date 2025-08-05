@@ -3569,7 +3569,7 @@ export const translations = {
     EN: "All calls"
   },
   "Stats": {
-    RO: "Statistici",
+    RO: "Statisticǎ",
     RU: "Статистика",
     EN: "Stats"
   },
@@ -3584,9 +3584,9 @@ export const translations = {
     EN: "Filter"
   },
   "SearchTechnician": {
-    RO: "Caută după tehnician",
-    RU: "Поиск по имени техника",
-    EN: "Search by technician"
+    RO: "Caută după utilizator",
+    RU: "Поиск по имени пользователя",
+    EN: "Search by users"
   },
   "SearchNameOrPhone": {
     RO: "Caută după nume sau număr",
