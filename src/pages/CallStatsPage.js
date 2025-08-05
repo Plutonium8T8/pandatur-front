@@ -56,9 +56,11 @@ export const CallStatsPage = () => {
   const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
-    const timeout = setTimeout(() => setSearchValue(search), 400);
-    return () => clearTimeout(timeout);
-  }, [search]);
+    if (mode === "stats") {
+      const timeout = setTimeout(() => setSearchValue(search), 400);
+      return () => clearTimeout(timeout);
+    }
+  }, [search, mode]);
 
   const techniciansMap = useMemo(() => {
     const map = new Map();
@@ -130,15 +132,8 @@ export const CallStatsPage = () => {
     });
   }, [searchValue, statsData, techniciansMap]);
 
-  const filteredCalls = useMemo(() => {
-    if (!searchValue) return callList || [];
-    const searchLC = searchValue.toLowerCase();
-    return (callList || []).filter((row) => {
-      const tech = techniciansMap.get(String(row.user_id)) || "";
-      const client = row.client_fullname || "";
-      return tech.toLowerCase().includes(searchLC) || client.toLowerCase().includes(searchLC);
-    });
-  }, [searchValue, callList, techniciansMap]);
+  // для calls всегда без поиска по строке
+  const filteredCalls = useMemo(() => callList || [], [callList]);
 
   const handlePageChange = (p) => setPagination((prev) => ({ ...prev, page: p }));
 
@@ -165,25 +160,6 @@ export const CallStatsPage = () => {
             withDivider={false}
           />
           <Flex align="center" gap={12}>
-            <SegmentedControl
-              value={mode}
-              onChange={value => {
-                setMode(value);
-                setPagination({ page: 1, total_pages: 1, total: 0 });
-              }}
-              data={[
-                { label: getLanguageByKey("Stats"), value: "stats" },
-                { label: getLanguageByKey("Calls"), value: "calls" },
-              ]}
-              color="teal"
-              radius="xl"
-              size="md"
-              style={{
-                minWidth: 220,
-                background: "#f7f7fa",
-                fontWeight: 700,
-              }}
-            />
             <ActionIcon
               variant={isFilterActive(filters) ? "filled" : "default"}
               color={isFilterActive(filters) ? COLORS.total : "gray"}
@@ -203,16 +179,33 @@ export const CallStatsPage = () => {
             >
               <LuFilter size={22} />
             </ActionIcon>
-            <TextInput
-              w={320}
-              placeholder={
-                mode === "stats"
-                  ? getLanguageByKey("SearchTechnician")
-                  : getLanguageByKey("SearchNameOrPhone")
-              }
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              style={{ minWidth: 220 }}
+            {mode === "stats" && (
+              <TextInput
+                w={320}
+                placeholder={getLanguageByKey("SearchTechnician")}
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                style={{ minWidth: 220 }}
+              />
+            )}
+            <SegmentedControl
+              value={mode}
+              onChange={value => {
+                setMode(value);
+                setPagination({ page: 1, total_pages: 1, total: 0 });
+              }}
+              data={[
+                { label: getLanguageByKey("Stats"), value: "stats" },
+                { label: getLanguageByKey("Calls"), value: "calls" },
+              ]}
+              color="teal"
+              radius="xl"
+              size="md"
+              style={{
+                minWidth: 220,
+                background: "#f7f7fa",
+                fontWeight: 700,
+              }}
             />
           </Flex>
         </Flex>
