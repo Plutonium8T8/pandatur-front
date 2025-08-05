@@ -1,10 +1,11 @@
-import { useEffect, useState, useMemo } from "react";
-import { Box, Flex, ActionIcon, TextInput, Pagination, Tooltip } from "@mantine/core";
+import { useEffect, useState } from "react";
+import { Box, Flex, ActionIcon, Pagination, Tooltip } from "@mantine/core";
 import { activity } from "../../api/activity";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "../utils";
 import { LuFilter } from "react-icons/lu";
 import { PageHeader } from "../PageHeader";
+import { EventsFilterModal } from "./EventsFilterModal";
 
 const COLORS = {
     total: "#0f824c",
@@ -22,18 +23,17 @@ export const EventsList = () => {
         total_pages: 1
     });
     const [loading, setLoading] = useState(false);
-    const [search, setSearch] = useState("");
-    const [searchValue, setSearchValue] = useState("");
 
-    const EVENT_FILTER = ["Lead", "Task", "Client"];
+    const [filters, setFilters] = useState({ event: ["Lead", "Task", "Client"] });
+    const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-    const fetchData = async (page = 1) => {
+    const fetchData = async (page = 1, customFilters = filters) => {
         setLoading(true);
         try {
             const res = await activity.filterLogs({
                 page,
                 limit: PAGE_SIZE,
-                attributes: { event: EVENT_FILTER }
+                attributes: { ...customFilters }
             });
             setData(res.data || []);
             setPagination({
@@ -50,26 +50,14 @@ export const EventsList = () => {
     };
 
     useEffect(() => {
-        fetchData(1);
+        fetchData(1, filters);
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        const timeout = setTimeout(() => setSearchValue(search), 350);
-        return () => clearTimeout(timeout);
-    }, [search]);
-
-    const filteredData = useMemo(() => {
-        if (!searchValue) return data || [];
-        const searchLC = searchValue.toLowerCase();
-        return (data || []).filter((row) => {
-            return (
-                (row.user_identifier || "").toLowerCase().includes(searchLC) ||
-                (row.ip_address || "").toLowerCase().includes(searchLC) ||
-                (row.event || "").toLowerCase().includes(searchLC) ||
-                (row.object?.type || "").toLowerCase().includes(searchLC)
-            );
-        });
-    }, [searchValue, data]);
+        fetchData(1, filters);
+        // eslint-disable-next-line
+    }, [filters]);
 
     const columns = [
         {
@@ -130,6 +118,11 @@ export const EventsList = () => {
         }
     ];
 
+    const handleApplyFilters = (newFilters) => {
+        setFilters(newFilters);
+        setPagination(prev => ({ ...prev, page: 1 }));
+    };
+
     return (
         <Box
             h="calc(100vh - 24px)"
@@ -150,21 +143,15 @@ export const EventsList = () => {
                     <Flex align="center" gap={12}>
                         <Tooltip label={getLanguageByKey("Filter")} position="bottom">
                             <ActionIcon
-                                variant="default"
+                                variant="filled"
                                 size="lg"
-                                disabled
-                                style={{ color: "#a6a6a6" }}
+                                color={filters.event?.length > 0 ? COLORS.total : "gray"}
+                                onClick={() => setFilterModalOpen(true)}
+                                style={{ color: filters.event?.length > 0 ? "white" : "#a6a6a6" }}
                             >
                                 <LuFilter size={22} />
                             </ActionIcon>
                         </Tooltip>
-                        <TextInput
-                            w={320}
-                            placeholder={getLanguageByKey("SearchUserOrObject") || "Поиск по пользователю, IP, событию, типу объекта"}
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                            style={{ minWidth: 220 }}
-                        />
                     </Flex>
                 </Flex>
             </Box>
@@ -172,7 +159,7 @@ export const EventsList = () => {
             <Box px={32}>
                 <RcTable
                     columns={columns}
-                    data={filteredData}
+                    data={data}
                     loading={loading}
                     rowKey="id"
                     style={{ minWidth: 920 }}
@@ -182,11 +169,20 @@ export const EventsList = () => {
                     <Pagination
                         total={pagination.total_pages}
                         value={pagination.page}
-                        onChange={fetchData}
+                        onChange={page => {
+                            setPagination(prev => ({ ...prev, page }));
+                            fetchData(page, filters);
+                        }}
                         size="md"
                     />
                 </Flex>
             </Box>
+            <EventsFilterModal
+                opened={filterModalOpen}
+                onClose={() => setFilterModalOpen(false)}
+                onApply={handleApplyFilters}
+                initialFilters={filters}
+            />
         </Box>
     );
 };
