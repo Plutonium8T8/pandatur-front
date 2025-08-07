@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Box, Flex, ActionIcon, Pagination, Tooltip } from "@mantine/core";
+import { Box, Flex, ActionIcon, Pagination, Tooltip, Text } from "@mantine/core";
 import { activity } from "../../api/activity";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "../utils";
 import { LuFilter } from "react-icons/lu";
 import { PageHeader } from "../PageHeader";
 import { EventsFilterModal } from "./EventsFilterModal";
+import { getChangedFields } from "../utils/logsUtils";
 
 const COLORS = {
     total: "#0f824c",
@@ -13,6 +14,7 @@ const COLORS = {
 };
 
 const PAGE_SIZE = 20;
+const DEFAULT_EVENTS = ["Lead", "Task", "Client"];
 
 export const EventsList = () => {
     const [data, setData] = useState([]);
@@ -20,11 +22,11 @@ export const EventsList = () => {
         page: 1,
         limit: PAGE_SIZE,
         total: 0,
-        total_pages: 1
+        total_pages: 1,
     });
     const [loading, setLoading] = useState(false);
 
-    const [filters, setFilters] = useState({ event: ["Lead", "Task", "Client"] });
+    const [filters, setFilters] = useState({ event: DEFAULT_EVENTS });
     const [filterModalOpen, setFilterModalOpen] = useState(false);
 
     const fetchData = async (page = 1, customFilters = filters) => {
@@ -33,7 +35,7 @@ export const EventsList = () => {
             const res = await activity.filterLogs({
                 page,
                 limit: PAGE_SIZE,
-                attributes: { ...customFilters }
+                attributes: { ...customFilters, event: customFilters.event?.length ? customFilters.event : DEFAULT_EVENTS }
             });
             setData(res.data || []);
             setPagination({
@@ -56,6 +58,7 @@ export const EventsList = () => {
 
     useEffect(() => {
         fetchData(1, filters);
+        setPagination((prev) => ({ ...prev, page: 1 }));
         // eslint-disable-next-line
     }, [filters]);
 
@@ -101,26 +104,71 @@ export const EventsList = () => {
             align: "center",
         },
         {
-            title: getLanguageByKey("Changes"),
+            width: 500,
+            key: "changes",
+            title: getLanguageByKey("Detalii"),
             dataIndex: "data",
-            width: 220,
-            render: (_, row) => {
-                const before = row.data?.before ?? {};
-                const after = row.data?.after ?? {};
-                const keys = Object.keys({ ...before, ...after });
-                if (keys.length === 0) return "-";
-                return keys.map((key) => (
-                    <span key={key} style={{ color: before[key] !== after[key] ? "red" : "gray", fontSize: 12 }}>
-                        {key}: {String(before[key])} → <b>{String(after[key])}</b>
-                    </span>
-                ));
-            }
-        }
+            align: "left",
+            render: (data, record) => {
+                const obj = record.object || {};
+                const hasObjInfo = obj?.id || obj?.type;
+                const objectIdLabel = obj.id || "-";
+
+                if (!data) {
+                    return (
+                        <Box>
+                            {hasObjInfo && (
+                                <Text size="md" mb={4}>
+                                    <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}{" "}
+                                    <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+                                </Text>
+                            )}
+                            <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
+                        </Box>
+                    );
+                }
+                const changes = getChangedFields(data.before, data.after);
+                if (changes.length === 0) {
+                    return (
+                        <Box>
+                            {hasObjInfo && (
+                                <Text size="md" mb={4}>
+                                    <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}{" "}
+                                    <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+                                </Text>
+                            )}
+                            <Text size="md">{getLanguageByKey("Fără modificări")}</Text>
+                        </Box>
+                    );
+                }
+                return (
+                    <Box>
+                        {hasObjInfo && (
+                            <Text size="md" mb={4}>
+                                <b>{getLanguageByKey("Tip:")}</b> {obj.type ? obj.type : "-"}{" "}
+                                <b>{getLanguageByKey("ID obiect:")}</b> {objectIdLabel}{" "}
+                            </Text>
+                        )}
+                        {changes.map((ch, i) =>
+                            <Text size="md" key={i}>
+                                <b>{ch.field}:</b>{" "}
+                                <span style={{ color: "red" }}>{String(ch.from)}</span>
+                                <span style={{
+                                    fontWeight: 700,
+                                    color: "#bbb",
+                                    margin: "0 6px"
+                                }}>→</span>
+                                <span style={{ color: "green" }}>{String(ch.to)}</span>
+                            </Text>
+                        )}
+                    </Box>
+                );
+            },
+        },
     ];
 
     const handleApplyFilters = (newFilters) => {
-        setFilters(newFilters);
-        setPagination(prev => ({ ...prev, page: 1 }));
+        setFilters({ ...newFilters, event: newFilters.event?.length ? newFilters.event : DEFAULT_EVENTS });
     };
 
     return (
@@ -155,7 +203,6 @@ export const EventsList = () => {
                     </Flex>
                 </Flex>
             </Box>
-
             <Box px={32}>
                 <RcTable
                     columns={columns}
