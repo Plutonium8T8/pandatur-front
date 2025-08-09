@@ -32,7 +32,6 @@ export const Chat = () => {
     setSelectedUser,
   } = useFetchTicketChat(ticketId);
 
-  // Найди нужный чат из tickets по ticketId
   const currentChat = useMemo(
     () => tickets?.find((t) => t.id === ticketId),
     [tickets, ticketId]
@@ -71,7 +70,7 @@ export const Chat = () => {
               onChangeSelectedUser={changeUser}
               loading={loading}
               technicians={technicians}
-              unseenCount={currentChat?.unseen_count || 0} // <-- вот это главное!
+              unseenCount={currentChat?.unseen_count || 0}
             />
           </Flex>
         </Can>

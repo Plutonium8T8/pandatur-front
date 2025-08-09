@@ -14,7 +14,7 @@ import { FaTasks, FaEnvelope } from "react-icons/fa";
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
-import { LuSmile } from "react-icons/lu";
+import { LuSmile, LuStickyNote } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { templateOptions } from "../../../../FormOptions";
@@ -46,6 +46,7 @@ export const ChatInput = ({
   onCreateTask,
   ticketId,
   unseenCount,
+  onToggleNoteComposer,
 }) => {
   const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
@@ -354,6 +355,15 @@ export const ChatInput = ({
 
                 <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
                   <LuSmile size={20} />
+                </ActionIcon>
+
+                <ActionIcon
+                  onClick={onToggleNoteComposer}
+                  c="black"
+                  bg="white"
+                  title={getLanguageByKey("Заметка")}
+                >
+                  <LuStickyNote size={20} />
                 </ActionIcon>
 
                 <Can permission={{ module: "TASK", action: "CREATE" }}>

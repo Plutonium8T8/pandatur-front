@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Flex, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { useUser, useMessagesContext } from "@hooks";
@@ -9,15 +9,15 @@ import { DD_MM_YYYY__HH_mm_ss } from "@app-constants";
 import { ChatInput } from "../ChatInput";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
+import { InlineNoteComposer } from "../../../InlineNoteComposer";
 import "./ChatMessages.css";
 
-const getSendedMessage = (msj, currentMsj, statusMessage) => {
-  return msj.sender_id === currentMsj.sender_id &&
+const getSendedMessage = (msj, currentMsj, statusMessage) =>
+  msj.sender_id === currentMsj.sender_id &&
     msj.message === currentMsj.message &&
     msj.time_sent === currentMsj.time_sent
     ? { ...msj, messageStatus: statusMessage }
     : msj;
-};
 
 export const ChatMessages = ({
   ticketId,
@@ -42,50 +42,64 @@ export const ChatMessages = ({
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
 
-  const sendMessage = async (metadataMsj) => {
-    try {
-      const normalizedMessage = {
-        ...metadataMsj,
-        message: metadataMsj.message || metadataMsj.message_text,
-        seenAt: false,
+  const [localNotes, setLocalNotes] = useState([]);
+  const [noteMode, setNoteMode] = useState(false);
+  const [noteSaving, setNoteSaving] = useState(false);
+
+  const addLocalNote = useCallback(
+    (text) => {
+      const now = dayjs().format(DD_MM_YYYY__HH_mm_ss);
+      const note = {
+        id: `note-${Date.now()}`,
+        ticket_id: ticketId,
+        text,
+        author_id: Number(userId),
+        author_name: getLanguageByKey("Вы"),
+        time_created: now,
       };
+      setLocalNotes((prev) => [...prev, note]);
+    },
+    [ticketId, userId]
+  );
 
-      setMessages((prevMessages) => [...prevMessages, normalizedMessage]);
+  const sendMessage = useCallback(
+    async (metadataMsj) => {
+      try {
+        const normalizedMessage = {
+          ...metadataMsj,
+          message: metadataMsj.message || metadataMsj.message_text,
+          seenAt: false,
+        };
 
-      let apiUrl = api.messages.send.create;
-      const normalizedPlatform = metadataMsj.platform?.toUpperCase?.();
+        setMessages((prev) => [...prev, normalizedMessage]);
 
-      if (normalizedPlatform === "TELEGRAM") {
-        apiUrl = api.messages.send.telegram;
-      } else if (normalizedPlatform === "VIBER") {
-        apiUrl = api.messages.send.viber;
-      } else if (normalizedPlatform === "WHATSAPP") {
-        apiUrl = api.messages.send.whatsapp;
+        let apiUrl = api.messages.send.create;
+        const normalizedPlatform = metadataMsj.platform?.toUpperCase?.();
+
+        if (normalizedPlatform === "TELEGRAM") apiUrl = api.messages.send.telegram;
+        else if (normalizedPlatform === "VIBER") apiUrl = api.messages.send.viber;
+        else if (normalizedPlatform === "WHATSAPP") apiUrl = api.messages.send.whatsapp;
+
+        await apiUrl(metadataMsj);
+
+        setMessages((prev) =>
+          prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS))
+        );
+      } catch (error) {
+        setMessages((prev) =>
+          prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR))
+        );
       }
+    },
+    [setMessages]
+  );
 
-      await apiUrl(metadataMsj);
-
-      setMessages((prev) =>
-        prev.map((msj) =>
-          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS),
-        )
-      );
-    } catch (error) {
-      setMessages((prev) =>
-        prev.map((msj) =>
-          getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR),
-        )
-      );
-    }
-  };
-
-  const handleScroll = () => {
-    if (messageContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } =
-        messageContainerRef.current;
-      setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
-    }
-  };
+  const handleScroll = useCallback(() => {
+    const el = messageContainerRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
+  }, []);
 
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
@@ -93,24 +107,21 @@ export const ChatMessages = ({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages, ticketId]);
+  }, [messages, ticketId, localNotes, isUserAtBottom]);
 
   useEffect(() => {
-    const container = messageContainerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-    }
-    return () => {
-      if (container) {
-        container.removeEventListener("scroll", handleScroll);
-      }
-    };
-  }, []);
+    const el = messageContainerRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
   useEffect(() => {
-    if (ticketId) {
-      getUserMessages(Number(ticketId));
-    }
+    if (!ticketId) return;
+    getUserMessages(Number(ticketId));
+    setLocalNotes([]);   
+    setNoteMode(false);  
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
 
   const renderMessagesContent = () => {
@@ -137,6 +148,7 @@ export const ChatMessages = ({
           personalInfo={personalInfo}
           ticketId={ticketId}
           technicians={technicians}
+          localNotes={localNotes}
         />
       );
     }
@@ -149,6 +161,23 @@ export const ChatMessages = ({
       </Flex>
     );
   };
+
+  const handleToggleNoteComposer = useCallback(() => {
+    setNoteMode((v) => !v);
+  }, []);
+
+  const handleSaveNote = useCallback(
+    async (text) => {
+      setNoteSaving(true);
+      try {
+        addLocalNote(text);
+        setNoteMode(false);
+      } finally {
+        setNoteSaving(false);
+      }
+    },
+    [addLocalNote]
+  );
 
   return (
     <Flex w="100%" direction="column" className="chat-area">
@@ -165,19 +194,31 @@ export const ChatMessages = ({
 
       {ticketId && !messagesLoading && (
         <>
+          {noteMode && (
+            <div style={{ padding: 16 }}>
+              <InlineNoteComposer
+                loading={noteSaving}
+                onCancel={() => setNoteMode(false)}
+                onSave={handleSaveNote}
+              />
+            </div>
+          )}
+
           <TaskListOverlay
             ticketId={ticketId}
             creatingTask={creatingTask}
             setCreatingTask={setCreatingTask}
           />
+
           <ChatInput
             loading={loading}
             id={ticketId}
             clientList={messageSendersByPlatform}
             ticketId={ticketId}
-            unseenCount={unseenCount} // <-- только этот unseenCount, не из personalInfo
+            unseenCount={unseenCount}
             currentClient={selectedClient}
             onCreateTask={() => setCreatingTask(true)}
+            onToggleNoteComposer={handleToggleNoteComposer}
             onSendMessage={(value) => {
               if (!selectedClient.payload) return;
               sendMessage({
