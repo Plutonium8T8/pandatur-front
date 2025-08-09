@@ -1,20 +1,21 @@
 import { useMemo } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text, Paper } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
-import { DD_MM_YYYY } from "@app-constants";
+import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "@app-constants";
 import {
   parseServerDate,
   getFullName,
   getLanguageByKey,
   parseDate,
 } from "@utils";
+import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import { socialMediaIcons } from "../../../utils";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
+export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
 
   const technicianMap = useMemo(() => {
@@ -35,9 +36,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
       itemType: "message",
       sortTime: parseDate(msg.time_sent).valueOf(),
       dateDivider: parseServerDate(msg.time_sent).format(DD_MM_YYYY),
-      clientId: Array.isArray(msg.client_id)
-        ? msg.client_id[0]
-        : msg.client_id,
+      clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
       platform: msg.platform?.toLowerCase?.() || "",
     }));
 
@@ -50,9 +49,23 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
       dateDivider: parseServerDate(log.timestamp).format(DD_MM_YYYY),
     }));
 
+  const notes = (localNotes || [])
+    .filter((n) => n.ticket_id === ticketId)
+    .map((n) => {
+      let ts = dayjs(n.time_created, DD_MM_YYYY__HH_mm_ss, true);
+      if (!ts.isValid()) ts = dayjs(n.time_created); 
+      if (!ts.isValid()) ts = dayjs();              
+      return {
+        ...n,
+        itemType: "note",
+        sortTime: ts.valueOf(),
+        dateDivider: ts.format(DD_MM_YYYY),
+      };
+    });
+
   const allItems = useMemo(() => {
-    return [...messages, ...logs].sort((a, b) => a.sortTime - b.sortTime);
-  }, [messages, logs]);
+    return [...messages, ...logs, ...notes].sort((a, b) => a.sortTime - b.sortTime);
+  }, [messages, logs, notes]);
 
   const itemsByDate = useMemo(() => {
     const map = {};
@@ -80,31 +93,28 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
             let lastPlatform = null;
             let currentBlock = null;
 
-            dayItems.forEach((item, idx) => {
+            dayItems.forEach((item) => {
               if (item.itemType === "message") {
                 const currentClientId = item.clientId?.toString();
                 const currentPlatform = item.platform || "";
-                if (
-                  !currentBlock ||
-                  lastClientId !== currentClientId ||
-                  lastPlatform !== currentPlatform
-                ) {
+                if (!currentBlock || lastClientId !== currentClientId || lastPlatform !== currentPlatform) {
                   lastClientId = currentClientId;
                   lastPlatform = currentPlatform;
-                  currentBlock = {
-                    clientId: Number(currentClientId),
-                    platform: currentPlatform,
-                    items: [item],
-                  };
+                  currentBlock = { clientId: Number(currentClientId), platform: currentPlatform, items: [item] };
                   clientBlocks.push(currentBlock);
                 } else {
                   currentBlock.items.push(item);
                 }
-              } else {
+              } else if (item.itemType === "log") {
                 currentBlock = null;
                 lastClientId = null;
                 lastPlatform = null;
                 clientBlocks.push({ log: item });
+              } else if (item.itemType === "note") {
+                currentBlock = null;
+                lastClientId = null;
+                lastPlatform = null;
+                clientBlocks.push({ note: item });
               }
             });
 
@@ -123,17 +133,33 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians }) => {
                   if (block.log) {
                     return (
                       <MessagesLogItem
-                        key={`log-${block.log.id}-${block.log.timestamp}`}
+                        key={`log-${block.log.id}-${block.log.timestamp}-${i}`}
                         log={block.log}
                         technicians={technicians}
                       />
                     );
                   }
 
+                  if (block.note) {
+                    const n = block.note;
+                    return (
+                      <Paper
+                        key={`note-${n.id}-${i}`}
+                        p="10"
+                        radius="md"
+                        withBorder
+                        style={{ background: "#fffbe6", borderColor: "#ffe58f" }}
+                      >
+                        <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>{n.text}</Text>
+                        <Text size="xs" c="dimmed" mt={6}>
+                          {getLanguageByKey("Заметка")} · {n.author_name || `#${n.author_id}`} · {n.time_created}
+                        </Text>
+                      </Paper>
+                    );
+                  }
+
                   const clientInfo =
-                    personalInfo?.clients?.find(
-                      (c) => c.id === block.clientId
-                    ) || {};
+                    personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
                   const clientName =
                     getFullName(clientInfo.name, clientInfo.surname) ||
                     `#${block.clientId}`;
