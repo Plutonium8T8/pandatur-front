@@ -114,17 +114,28 @@ export const ChatInput = ({
   };
 
   const handleFile = async (file) => {
+    if (!file) return;
     handlers.open();
-    const url = await uploadFile(file);
+    const uploadedUrl = await uploadFile(file);
     handlers.close();
     const mediaType = getMediaType(file.type);
-    if (url) {
-      setUrl({
-        media_url: url,
+    if (uploadedUrl) {
+      const payload = {
+        media_url: uploadedUrl,
         media_type: mediaType,
         last_message_type: mediaType,
-      });
-      setMessage(url);
+      };
+      setUrl(payload);
+      setMessage(uploadedUrl);
+    }
+  };
+
+  const handlePaste = async (e) => {
+    const files = Array.from(e.clipboardData?.files || []);
+    if (!files.length) return;
+    e.preventDefault();
+    for (const file of files) {
+      await handleFile(file);
     }
   };
 
@@ -270,6 +281,7 @@ export const ChatInput = ({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={getLanguageByKey("Introduceți mesaj")}
+              onPaste={handlePaste}
               onDragEnter={(e) => {
                 e.preventDefault();
                 setIsDragOver(true);

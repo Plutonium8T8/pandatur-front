@@ -17,10 +17,10 @@ export const InlineNoteComposer = ({ onCancel, onSave, loading }) => {
                 />
                 <Flex gap="8" justify="flex-end">
                     <Button variant="subtle" color="gray" onClick={onCancel}>
-                        {getLanguageByKey("Отмена")}
+                        {getLanguageByKey("Anulare")}
                     </Button>
                     <Button onClick={() => onSave(text.trim())} disabled={!text.trim() || loading}>
-                        {getLanguageByKey("Сохранить")}
+                        {getLanguageByKey("Save")}
                     </Button>
                 </Flex>
             </Flex>
