@@ -2450,7 +2450,8 @@ export const translations = {
     RO: "Salvează modificările",
     RU: "Сохранить изменения",
     EN: "Save changes"
-  }, "Șterge grupul": {
+  },
+  "Șterge grupul": {
     RO: "Șterge grupul",
     RU: "Удалить группу",
     EN: "Delete group"
@@ -3767,5 +3768,10 @@ export const translations = {
     RU: "Дата по",
     RO: "Data până la",
     EN: "Date to",
+  },
+  Notice: {
+    RU: "Заметка",
+    RO: "Notiță",
+    EN: "Notice",
   }
 }

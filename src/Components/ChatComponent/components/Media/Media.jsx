@@ -1,12 +1,12 @@
 import { Flex, FileButton, Button, Tabs, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { IoMdAdd } from "react-icons/io";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import { getLanguageByKey, showServerError } from "@utils";
 import { DD_MM_YYYY__HH_mm_ss } from "@app-constants";
-import { api } from "@api";
+import { api } from "../../../../api";
 import { useUploadMediaFile, useConfirmPopup } from "@hooks";
 import { getMediaType } from "../../renderContent";
 import { renderFile, renderMedia, renderCall } from "./utils";
@@ -15,45 +15,46 @@ import "./Media.css";
 export const Media = ({ messages, id }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { uploadFile } = useUploadMediaFile();
-  const [opened, handlers] = useDisclosure(false);
+
+  const [opened, handlers] = useDisclosure(false); // индикатор загрузки
   const [mediaList, setMediaList] = useState([]);
+  const [uploadTab, setUploadTab] = useState("media"); // media | files | audio
+  const [isDragOver, setIsDragOver] = useState(false);
+
+  const dropRef = useRef(null); // зона для dnd/paste
+
   const deleteMedia = useConfirmPopup({
     subTitle: getLanguageByKey("confirmDeleteAttachment"),
   });
 
-  const deleteAttachment = async (id) => {
+  const deleteAttachment = async (mediaId) => {
     deleteMedia(async () => {
       try {
-        await api.tickets.ticket.deleteMediaById(id);
+        await api.tickets.ticket.deleteMediaById(mediaId);
         await getMediaFiles();
       } catch (e) {
-        enqueueSnackbar(showServerError(e), {
-          variant: "error",
-        });
+        enqueueSnackbar(showServerError(e), { variant: "error" });
       }
     });
   };
 
   const getMediaFiles = async () => {
     handlers.open();
-
     try {
-      const mediaList = await api.tickets.ticket.getMediaListByTicketId(id);
-      setMediaList(mediaList);
+      const list = await api.tickets.ticket.getMediaListByTicketId(id);
+      setMediaList(list || []);
     } catch (e) {
-      enqueueSnackbar(showServerError(e), {
-        variant: "error",
-      });
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {
       handlers.close();
     }
   };
 
   const sendAttachment = async (file) => {
+    if (!file) return;
     handlers.open();
     try {
       const url = await uploadFile(file);
-
       if (url) {
         await api.tickets.ticket.uploadMedia({
           url,
@@ -61,40 +62,147 @@ export const Media = ({ messages, id }) => {
           time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
           mtype: getMediaType(file.type),
         });
-
         await getMediaFiles();
       }
     } catch (e) {
-      enqueueSnackbar(showServerError(e), {
-        variant: "error",
-      });
+      enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {
       handlers.close();
     }
   };
 
   useEffect(() => {
-    if (id) {
-      getMediaFiles();
-    }
+    if (id) getMediaFiles();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
+
+  // --- фильтры типов по активному подтабу ---
+  const getAcceptForTab = (tab) => {
+    if (tab === "media") return "image/*,video/*";
+    if (tab === "files") return ".pdf";
+    if (tab === "audio") return "audio/*";
+    return "*";
+  };
+
+  const isAccepted = (file, tab) => {
+    if (tab === "files") return /\.pdf$/i.test(file.name);
+    if (tab === "media") return file.type.startsWith("image/") || file.type.startsWith("video/");
+    if (tab === "audio") return file.type.startsWith("audio/");
+    return true;
+  };
+
+  // --- Drag & Drop ---
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!opened) setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = useCallback(
+    async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsDragOver(false);
+      if (opened) return;
+
+      const files = Array.from(e.dataTransfer?.files || []);
+      if (!files.length) return;
+
+      const accepted = files.filter((f) => isAccepted(f, uploadTab));
+      const rejected = files.filter((f) => !isAccepted(f, uploadTab));
+
+      if (rejected.length) {
+        enqueueSnackbar(
+          getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу",
+          { variant: "warning" }
+        );
+      }
+
+      for (const file of accepted) {
+        await sendAttachment(file); // последовательно
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [uploadTab, opened, id]
+  );
+
+  // --- Paste (Ctrl/Cmd + V) ---
+  const handlePaste = useCallback(
+    async (e) => {
+      if (opened) return;
+      const files = Array.from(e.clipboardData?.files || []);
+      if (!files.length) return;
+
+      const accepted = files.filter((f) => isAccepted(f, uploadTab));
+      const rejected = files.filter((f) => !isAccepted(f, uploadTab));
+
+      if (rejected.length) {
+        enqueueSnackbar(
+          getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу",
+          { variant: "warning" }
+        );
+      }
+
+      for (const file of accepted) {
+        await sendAttachment(file);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [uploadTab, opened, id]
+  );
+
+  // Обёртка зоны для dnd/paste (только uploaded-media)
+  const DropZone = ({ children }) => (
+    <div
+      ref={dropRef}
+      tabIndex={0}                 // чтобы получать фокус и paste
+      onPaste={handlePaste}        // React-событие paste
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{
+        outline: isDragOver ? "2px dashed var(--mantine-color-blue-6)" : "2px dashed transparent",
+        borderRadius: 12,
+        transition: "outline-color .15s ease",
+      }}
+    >
+      {isDragOver && (
+        <div
+          style={{
+            pointerEvents: "none",
+            userSelect: "none",
+            textAlign: "center",
+            padding: 12,
+            fontWeight: 600,
+            opacity: 0.9,
+          }}
+        >
+          {getLanguageByKey("dragOrPasteToUpload") || "Перетащите или вставьте файлы сюда"}
+        </div>
+      )}
+      {children}
+    </div>
+  );
 
   return (
     <>
       <Tabs h="100%" className="media-tabs" defaultValue="messages-media">
         <Tabs.List>
           <Tabs.Tab h="100%" value="messages-media">
-            <Text fw={700} size="sm">
-              {getLanguageByKey("messageAttachments")}
-            </Text>
+            <Text fw={700} size="sm">{getLanguageByKey("messageAttachments")}</Text>
           </Tabs.Tab>
           <Tabs.Tab value="uploaded-media">
-            <Text fw={700} size="sm">
-              {getLanguageByKey("uploadedFiles")}
-            </Text>
+            <Text fw={700} size="sm">{getLanguageByKey("uploadedFiles")}</Text>
           </Tabs.Tab>
         </Tabs.List>
 
+        {/* Вложения из сообщений */}
         <Tabs.Panel h="calc(100% - 36px)" value="messages-media">
           <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
@@ -108,13 +216,11 @@ export const Media = ({ messages, id }) => {
                 {renderMedia({ media: messages })}
               </Flex>
             </Tabs.Panel>
-
             <Tabs.Panel className="media-tabs" h="100%" value="files">
               <Flex h="100%" direction="column" mt="md">
                 {renderFile({ media: messages })}
               </Flex>
             </Tabs.Panel>
-
             <Tabs.Panel className="media-tabs" h="100%" value="audio">
               <Flex h="100%" direction="column" mt="md">
                 {renderCall({ media: messages })}
@@ -123,8 +229,9 @@ export const Media = ({ messages, id }) => {
           </Tabs>
         </Tabs.Panel>
 
+        {/* Загруженные пользователем + DnD + Paste */}
         <Tabs.Panel h="calc(100% - 36px)" value="uploaded-media">
-          <Tabs className="media-tabs" defaultValue="media">
+          <Tabs className="media-tabs" value={uploadTab} onChange={setUploadTab}>
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
               <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
@@ -132,89 +239,84 @@ export const Media = ({ messages, id }) => {
             </Tabs.List>
 
             <Tabs.Panel className="media-tabs" h="100%" value="media">
-              <Flex h="100%" mt="md" direction="column">
-                {renderMedia({
-                  media: mediaList,
-                  deleteAttachment,
-                  shouldDelete: true,
-                  renderAddAttachments: () => {
-                    return (
-                      <FileButton
-                        loading={opened}
-                        onChange={sendAttachment}
-                        accept="image/*,video/*"
-                      >
+              <DropZone>
+                <Flex h="100%" mt="md" direction="column">
+                  {renderMedia({
+                    media: mediaList,
+                    deleteAttachment,
+                    shouldDelete: true,
+                    renderAddAttachments: () => (
+                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("media")}>
                         {(props) => (
                           <Button
                             leftSection={<IoMdAdd size={16} />}
                             variant="outline"
+                            loading={opened}
+                            disabled={opened || props.disabled}
                             {...props}
                           >
                             {getLanguageByKey("addMedia")}
                           </Button>
                         )}
                       </FileButton>
-                    );
-                  },
-                })}
-              </Flex>
+                    ),
+                  })}
+                </Flex>
+              </DropZone>
             </Tabs.Panel>
 
             <Tabs.Panel className="media-tabs" h="100%" value="files">
-              <Flex h="100%" mt="md" direction="column">
-                {renderFile({
-                  deleteAttachment,
-                  media: mediaList,
-                  shouldDelete: true,
-                  renderAddAttachments: () => {
-                    return (
-                      <FileButton
-                        loading={opened}
-                        onChange={sendAttachment}
-                        accept=".pdf"
-                      >
+              <DropZone>
+                <Flex h="100%" mt="md" direction="column">
+                  {renderFile({
+                    media: mediaList,
+                    deleteAttachment,
+                    shouldDelete: true,
+                    renderAddAttachments: () => (
+                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("files")}>
                         {(props) => (
                           <Button
                             leftSection={<IoMdAdd size={16} />}
                             variant="outline"
+                            loading={opened}
+                            disabled={opened || props.disabled}
                             {...props}
                           >
                             {getLanguageByKey("addMedia")}
                           </Button>
                         )}
                       </FileButton>
-                    );
-                  },
-                })}
-              </Flex>
+                    ),
+                  })}
+                </Flex>
+              </DropZone>
             </Tabs.Panel>
+
             <Tabs.Panel className="media-tabs" h="100%" value="audio">
-              <Flex h="100%" direction="column" mt="md">
-                {renderCall({
-                  media: mediaList,
-                  deleteAttachment,
-                  shouldDelete: true,
-                  renderAddAttachments: () => {
-                    return (
-                      <FileButton
-                        loading={opened}
-                        onChange={sendAttachment}
-                        accept="audio/*"
-                      >
+              <DropZone>
+                <Flex h="100%" direction="column" mt="md">
+                  {renderCall({
+                    media: mediaList,
+                    deleteAttachment,
+                    shouldDelete: true,
+                    renderAddAttachments: () => (
+                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("audio")}>
                         {(props) => (
                           <Button
                             leftSection={<IoMdAdd size={16} />}
                             variant="outline"
+                            loading={opened}
+                            disabled={opened || props.disabled}
                             {...props}
                           >
                             {getLanguageByKey("addMedia")}
                           </Button>
                         )}
                       </FileButton>
-                    );
-                  },
-                })}
-              </Flex>
+                    ),
+                  })}
+                </Flex>
+              </DropZone>
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>
