@@ -16,12 +16,12 @@ export const Media = ({ messages, id }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { uploadFile } = useUploadMediaFile();
 
-  const [opened, handlers] = useDisclosure(false); // индикатор загрузки
+  const [opened, handlers] = useDisclosure(false);
   const [mediaList, setMediaList] = useState([]);
-  const [uploadTab, setUploadTab] = useState("media"); // media | files | audio
+  const [uploadTab, setUploadTab] = useState("media");
   const [isDragOver, setIsDragOver] = useState(false);
 
-  const dropRef = useRef(null); // зона для dnd/paste
+  const dropRef = useRef(null);
 
   const deleteMedia = useConfirmPopup({
     subTitle: getLanguageByKey("confirmDeleteAttachment"),
@@ -76,7 +76,6 @@ export const Media = ({ messages, id }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  // --- фильтры типов по активному подтабу ---
   const getAcceptForTab = (tab) => {
     if (tab === "media") return "image/*,video/*";
     if (tab === "files") return ".pdf";
@@ -91,7 +90,6 @@ export const Media = ({ messages, id }) => {
     return true;
   };
 
-  // --- Drag & Drop ---
   const handleDragOver = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -125,14 +123,13 @@ export const Media = ({ messages, id }) => {
       }
 
       for (const file of accepted) {
-        await sendAttachment(file); // последовательно
+        await sendAttachment(file);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [uploadTab, opened, id]
   );
 
-  // --- Paste (Ctrl/Cmd + V) ---
   const handlePaste = useCallback(
     async (e) => {
       if (opened) return;
@@ -157,12 +154,11 @@ export const Media = ({ messages, id }) => {
     [uploadTab, opened, id]
   );
 
-  // Обёртка зоны для dnd/paste (только uploaded-media)
   const DropZone = ({ children }) => (
     <div
       ref={dropRef}
-      tabIndex={0}                 // чтобы получать фокус и paste
-      onPaste={handlePaste}        // React-событие paste
+      tabIndex={0}
+      onPaste={handlePaste}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
@@ -202,7 +198,6 @@ export const Media = ({ messages, id }) => {
           </Tabs.Tab>
         </Tabs.List>
 
-        {/* Вложения из сообщений */}
         <Tabs.Panel h="calc(100% - 36px)" value="messages-media">
           <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
@@ -229,7 +224,6 @@ export const Media = ({ messages, id }) => {
           </Tabs>
         </Tabs.Panel>
 
-        {/* Загруженные пользователем + DnD + Paste */}
         <Tabs.Panel h="calc(100% - 36px)" value="uploaded-media">
           <Tabs className="media-tabs" value={uploadTab} onChange={setUploadTab}>
             <Tabs.List>
