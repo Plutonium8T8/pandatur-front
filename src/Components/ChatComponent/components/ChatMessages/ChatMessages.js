@@ -36,12 +36,14 @@ export const ChatMessages = ({
     getUserMessages,
     loading: messagesLoading,
     messages,
+    notes: apiNotesFromCtx = [],          // <-- ЗАБИРАЕМ ЗАМЕТКИ ИЗ КОНТЕКСТА
   } = useMessagesContext();
 
   const messageContainerRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
 
+  // локальные заметки (пока без API)
   const [localNotes, setLocalNotes] = useState([]);
   const [noteMode, setNoteMode] = useState(false);
   const [noteSaving, setNoteSaving] = useState(false);
@@ -49,18 +51,33 @@ export const ChatMessages = ({
   const addLocalNote = useCallback(
     (text) => {
       const now = dayjs().format(DD_MM_YYYY__HH_mm_ss);
-      const note = {
-        id: `note-${Date.now()}`,
-        ticket_id: ticketId,
-        text,
-        author_id: Number(userId),
-        author_name: getLanguageByKey("Вы"),
-        time_created: now,
-      };
-      setLocalNotes((prev) => [...prev, note]);
+      setLocalNotes((prev) => [
+        ...prev,
+        {
+          id: `note-${Date.now()}`,
+          ticket_id: ticketId,
+          text,
+          author_id: Number(userId),
+          author_name: getLanguageByKey("Вы"),
+          time_created: now,
+        },
+      ]);
     },
     [ticketId, userId]
   );
+
+  // нормализуем локальные заметки к формату API и объединяем
+  const mergedNotes = [
+    ...apiNotesFromCtx,
+    ...localNotes.map((n) => ({
+      id: n.id,
+      ticket_id: n.ticket_id,
+      type: "text",
+      value: n.text,
+      technician_id: n.author_id,
+      created_at: n.time_created,
+    })),
+  ];
 
   const sendMessage = useCallback(
     async (metadataMsj) => {
@@ -85,7 +102,7 @@ export const ChatMessages = ({
         setMessages((prev) =>
           prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS))
         );
-      } catch (error) {
+      } catch {
         setMessages((prev) =>
           prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR))
         );
@@ -101,14 +118,16 @@ export const ChatMessages = ({
     setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
   }, []);
 
+  // автоскролл при новых сообщениях/заметках
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
         top: messageContainerRef.current.scrollHeight,
       });
     }
-  }, [messages, ticketId, localNotes, isUserAtBottom]);
+  }, [messages, ticketId, localNotes, apiNotesFromCtx, isUserAtBottom]);
 
+  // подписка на скролл
   useEffect(() => {
     const el = messageContainerRef.current;
     if (!el) return;
@@ -116,11 +135,12 @@ export const ChatMessages = ({
     return () => el.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
+  // загрузка при смене тикета
   useEffect(() => {
     if (!ticketId) return;
     getUserMessages(Number(ticketId));
-    setLocalNotes([]);   
-    setNoteMode(false);  
+    setLocalNotes([]);
+    setNoteMode(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
 
@@ -128,9 +148,7 @@ export const ChatMessages = ({
     if (messages.error) {
       return (
         <Flex h="100%" align="center" justify="center">
-          <Text size="lg" c="red">
-            {getLanguageByKey("loadMessagesError")}
-          </Text>
+          <Text size="lg" c="red">{getLanguageByKey("loadMessagesError")}</Text>
         </Flex>
       );
     }
@@ -148,16 +166,14 @@ export const ChatMessages = ({
           personalInfo={personalInfo}
           ticketId={ticketId}
           technicians={technicians}
-          localNotes={localNotes}
+          apiNotes={mergedNotes}
         />
       );
     }
 
     return (
       <Flex h="100%" align="center" justify="center">
-        <Text size="lg" c="dimmed">
-          {getLanguageByKey("Alege lead")}
-        </Text>
+        <Text size="lg" c="dimmed">{getLanguageByKey("Alege lead")}</Text>
       </Flex>
     );
   };

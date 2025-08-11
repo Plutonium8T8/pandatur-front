@@ -1,21 +1,17 @@
 import { useMemo } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text, Paper } from "@mantine/core";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "@app-constants";
-import {
-  parseServerDate,
-  getFullName,
-  getLanguageByKey,
-  parseDate,
-} from "@utils";
+import { parseServerDate, getFullName, getLanguageByKey, parseDate } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import { socialMediaIcons } from "../../../utils";
+import { ChatNoteCard } from "../../../ChatNoteCard";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
-export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNotes = [] }) => {
+export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
 
   const technicianMap = useMemo(() => {
@@ -30,7 +26,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
   );
 
   const messages = rawMessages
-    .filter((msg) => msg.ticket_id === ticketId)
+    .filter((msg) => Number(msg.ticket_id) === Number(ticketId))
     .map((msg) => ({
       ...msg,
       itemType: "message",
@@ -41,7 +37,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
     }));
 
   const logs = rawLogs
-    .filter((log) => log.ticket_id === ticketId)
+    .filter((log) => Number(log.ticket_id) === Number(ticketId))
     .map((log) => ({
       ...log,
       itemType: "log",
@@ -49,23 +45,25 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
       dateDivider: parseServerDate(log.timestamp).format(DD_MM_YYYY),
     }));
 
-  const notes = (localNotes || [])
-    .filter((n) => n.ticket_id === ticketId)
+  const notes = (apiNotes || [])
+    .filter((n) => Number(n.ticket_id) == Number(ticketId))
     .map((n) => {
-      let ts = dayjs(n.time_created, DD_MM_YYYY__HH_mm_ss, true);
-      if (!ts.isValid()) ts = dayjs(n.time_created); 
-      if (!ts.isValid()) ts = dayjs();              
+      let ts = dayjs(n.created_at, DD_MM_YYYY__HH_mm_ss, true);
+      if (!ts.isValid()) ts = dayjs(n.created_at);
+      if (!ts.isValid()) ts = dayjs();
       return {
         ...n,
         itemType: "note",
         sortTime: ts.valueOf(),
         dateDivider: ts.format(DD_MM_YYYY),
+        timeCreatedDisplay: ts.format(DD_MM_YYYY__HH_mm_ss),
       };
     });
 
-  const allItems = useMemo(() => {
-    return [...messages, ...logs, ...notes].sort((a, b) => a.sortTime - b.sortTime);
-  }, [messages, logs, notes]);
+  const allItems = useMemo(
+    () => [...messages, ...logs, ...notes].sort((a, b) => a.sortTime - b.sortTime),
+    [messages, logs, notes]
+  );
 
   const itemsByDate = useMemo(() => {
     const map = {};
@@ -121,11 +119,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
-                  label={
-                    <Badge c="black" size="lg" bg={colors.gray[2]}>
-                      {date}
-                    </Badge>
-                  }
+                  label={<Badge c="black" size="lg" bg={colors.gray[2]}>{date}</Badge>}
                   labelPosition="center"
                 />
 
@@ -142,75 +136,51 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
 
                   if (block.note) {
                     const n = block.note;
+                    const tech =
+                      technicians?.find?.((t) => Number(t.value) === Number(n.technician_id)) ||
+                      { label: `#${n.technician_id}` };
+
                     return (
-                      <Paper
+                      <ChatNoteCard
                         key={`note-${n.id}-${i}`}
-                        p="10"
-                        radius="md"
-                        withBorder
-                        style={{ background: "#fffbe6", borderColor: "#ffe58f" }}
-                      >
-                        <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>{n.text}</Text>
-                        <Text size="xs" c="dimmed" mt={6}>
-                          {getLanguageByKey("Заметка")} · {n.author_name || `#${n.author_id}`} · {n.time_created}
-                        </Text>
-                      </Paper>
+                        note={n}
+                        techLabel={tech.label}
+                      />
                     );
                   }
 
-                  const clientInfo =
-                    personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
-                  const clientName =
-                    getFullName(clientInfo.name, clientInfo.surname) ||
-                    `#${block.clientId}`;
+                  const clientInfo = personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
+                  const clientName = getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
 
                   const platform = block.platform;
                   const platformIcon = socialMediaIcons[platform] || null;
-                  const platformLabel = platform
-                    ? platform[0].toUpperCase() + platform.slice(1)
-                    : "";
+                  const platformLabel = platform ? platform[0].toUpperCase() + platform.slice(1) : "";
 
                   return (
                     <Flex direction="column" gap="xs" key={`msgs-${date}-${block.clientId}-${platform}-${i}`}>
                       <Flex justify="center" align="center" gap={6}>
                         <Badge c="black" size="lg" bg={colors.gray[2]} px={12}>
                           {getLanguageByKey("Mesajele clientului")}: {clientName}
-                          {platformIcon && (
-                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>
-                              {platformIcon}
-                            </span>
-                          )}
-                          {!platformIcon && platformLabel && (
-                            <span style={{ marginLeft: 8, color: "#777" }}>
-                              {platformLabel}
-                            </span>
-                          )}
+                          {platformIcon ? (
+                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>{platformIcon}</span>
+                          ) : platformLabel ? (
+                            <span style={{ marginLeft: 8, color: "#777" }}>{platformLabel}</span>
+                          ) : null}
                         </Badge>
                       </Flex>
+
                       {block.items.map((msg, idx) => {
                         const senderIdStr = String(msg.sender_id);
                         const msgClientIds = Array.isArray(msg.client_id)
                           ? msg.client_id.map(String)
                           : [String(msg.client_id)];
-                        const isClientMessage =
-                          msgClientIds.includes(senderIdStr) ||
-                          clientIds.includes(senderIdStr);
+                        const isClientMessage = msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
 
                         const technician = technicianMap.get(Number(msg.sender_id));
                         return isClientMessage ? (
-                          <ReceivedMessage
-                            key={`${msg.id}-${idx}`}
-                            msg={msg}
-                            personalInfo={personalInfo}
-                            technicians={technicians}
-                          />
+                          <ReceivedMessage key={`${msg.id}-${idx}`} msg={msg} personalInfo={personalInfo} technicians={technicians} />
                         ) : (
-                          <SendedMessage
-                            key={`${msg.id}-${idx}`}
-                            msg={msg}
-                            technician={technician}
-                            technicians={technicians}
-                          />
+                          <SendedMessage key={`${msg.id}-${idx}`} msg={msg} technician={technician} technicians={technicians} />
                         );
                       })}
                     </Flex>
@@ -222,9 +192,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, localNote
         </Flex>
       ) : (
         <Flex h="100%" align="center" justify="center">
-          <Text c="dimmed">
-            {getLanguageByKey("noConversationStartedForThisLead")}
-          </Text>
+          <Text c="dimmed">{getLanguageByKey("noConversationStartedForThisLead")}</Text>
         </Flex>
       )}
     </Flex>
