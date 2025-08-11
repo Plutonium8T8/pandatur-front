@@ -3773,5 +3773,55 @@ export const translations = {
     RU: "Заметка",
     RO: "Notiță",
     EN: "Notice",
-  }
+  },
+  Notice: {
+    RU: "Заметка",
+    RO: "Notiță",
+    EN: "Notice",
+  },
+  OpenDownload: {
+    RU: "Открыть/скачать",
+    RO: "Deschide/descărcă",
+    EN: "Open/Download",
+  },
+  OpenInNewTab: {
+    RU: "Открыть в новой вкладке",
+    RO: "Deschide în filă nouă",
+    EN: "Open in new tab",
+  },
+  Download: {
+    RU: "Скачать",
+    RO: "Descărcă",
+    EN: "Download",
+  },
+  FileNotice: {
+    RU: "Файл заметки",
+    RO: "Fișier notiță",
+    EN: "Notice file",
+  },
+  Text: {
+    RU: "Текст",
+    RO: "Text",
+    EN: "Text",
+  },
+  Image: {
+    RU: "Изображение",
+    RO: "Imagine",
+    EN: "Image",
+  },
+  Video: {
+    RU: "Видео",
+    RO: "Video",
+    EN: "Video",
+  },
+  Audio: {
+    RU: "Аудио",
+    RO: "Audio",
+    EN: "Audio",
+  },
+  File: {
+    RU: "Файл",
+    RO: "Fișier",
+    EN: "File",
+  },
 }

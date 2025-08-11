@@ -22,6 +22,7 @@ export const useMessages = () => {
 
   const [messages, setMessages] = useState([]);
   const [logs, setLogs] = useState([]);
+  const [notes, setNotes] = useState([]);           // <-- NEW
   const [loading, setLoading] = useState(false);
   const [lastMessage, setLastMessage] = useState();
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -33,14 +34,15 @@ export const useMessages = () => {
       const response = await api.messages.messagesTicketById(id);
       const data = Array.isArray(response?.messages) ? response.messages : [];
       const logsData = Array.isArray(response?.logs) ? response.logs : [];
+      const notesData = Array.isArray(response?.notes) ? response.notes : []; // <-- NEW
 
       setMessages(data);
       setLogs(logsData);
+      setNotes(notesData);                                                      // <-- NEW
 
       const sortedMessages = data.filter(
         ({ sender_id }) => sender_id !== 1 && sender_id !== userId,
       );
-
       setLastMessage(sortedMessages[sortedMessages.length - 1]);
       setMediaFiles(getMediaFileMessages(data));
     } catch (error) {
@@ -81,6 +83,7 @@ export const useMessages = () => {
     () => ({
       messages,
       logs,
+      notes,                 // <-- NEW (экспортируем)
       lastMessage,
       loading,
       mediaFiles,
@@ -89,7 +92,9 @@ export const useMessages = () => {
       updateMessage,
       markMessageSeen,
       setMessages,
+      setLogs,
+      setNotes,              // <-- опционально, если где-то понадобится править
     }),
-    [messages, logs, lastMessage, mediaFiles, loading],
+    [messages, logs, notes, lastMessage, mediaFiles, loading],
   );
 };
