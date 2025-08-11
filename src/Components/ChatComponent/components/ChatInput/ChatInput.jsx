@@ -8,6 +8,8 @@ import {
   Loader,
   FileButton,
   TextInput,
+  Badge,
+  CloseButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
@@ -25,6 +27,8 @@ import Can from "../../../CanComponent/Can";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 import "./ChatInput.css";
+
+const SEND_AS_SINGLE_BATCH = false; // <-- поставь true, если API поддерживает attachments[]
 
 const pandaNumbersWhatsup = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" },
@@ -52,13 +56,16 @@ export const ChatInput = ({
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [template, setTemplate] = useState();
-  const [url, setUrl] = useState({});
   const [pandaNumber, setPandaNumber] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
+
+  // новые состояния для мульти-вложений
+  const [attachments, setAttachments] = useState([]); // [{ media_url, media_type, name, size }]
+  const textAreaRef = useRef(null);
 
   const actionNeededInit = useRef(undefined);
   const [actionNeeded, setActionNeeded] = useState(false);
@@ -70,6 +77,7 @@ export const ChatInput = ({
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
+  const isPhoneChat = isWhatsApp || isViber;
 
   useEffect(() => {
     if (!ticketId) return;
@@ -98,13 +106,11 @@ export const ChatInput = ({
   }, [ticket, ticketId]);
 
   useEffect(() => {
-    if (unseenCount > 0) {
-      setActionNeeded(true);
-    }
+    if (unseenCount > 0) setActionNeeded(true);
   }, [unseenCount]);
 
   const handleEmojiClickButton = (event) => {
-    const rect = event.target.getBoundingClientRect();
+    const rect = event.currentTarget.getBoundingClientRect();
     const emojiPickerHeight = 450;
     setEmojiPickerPosition({
       top: rect.top + window.scrollY - emojiPickerHeight,
@@ -113,63 +119,112 @@ export const ChatInput = ({
     setShowEmojiPicker((prev) => !prev);
   };
 
-  const handleFile = async (file) => {
-    if (!file) return;
+  // ====== загрузка файлов (кнопка / dnd / paste) ======
+  const uploadAndAddFiles = async (files) => {
+    if (!files?.length) return;
     handlers.open();
-    const uploadedUrl = await uploadFile(file);
-    handlers.close();
-    const mediaType = getMediaType(file.type);
-    if (uploadedUrl) {
-      const payload = {
-        media_url: uploadedUrl,
-        media_type: mediaType,
-        last_message_type: mediaType,
-      };
-      setUrl(payload);
-      setMessage(uploadedUrl);
-    }
-  };
-
-  const handlePaste = async (e) => {
-    const files = Array.from(e.clipboardData?.files || []);
-    if (!files.length) return;
-    e.preventDefault();
-    for (const file of files) {
-      await handleFile(file);
-    }
-  };
-
-  const clearState = () => {
-    setMessage("");
-    setTemplate(null);
-    setUrl(null);
-  };
-
-  const sendMessage = () => {
-    const isChatWithPhone = isWhatsApp || isViber;
-    const trimmedMessage = message.trim();
-    const mediaType = url?.media_type;
-    const isMedia = mediaType && mediaType !== "text";
-    if ((isMedia && url?.media_url) || (!isMedia && trimmedMessage)) {
-      const payload = {
-        ...url,
-        message: isMedia ? url.media_url : trimmedMessage,
-        panda_number: isChatWithPhone ? pandaNumber : undefined,
-        client_phone: isChatWithPhone ? currentClient?.payload?.phone : undefined,
-      };
-      if (!isMedia) {
-        payload.message_text = isChatWithPhone ? trimmedMessage : undefined;
+    try {
+      for (const file of files) {
+        const url = await uploadFile(file);
+        if (url) {
+          const media_type = getMediaType(file.type);
+          setAttachments((prev) => [
+            ...prev,
+            { media_url: url, media_type, name: file.name, size: file.size },
+          ]);
+        }
       }
-      onSendMessage(payload);
-      clearState();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      handlers.close();
+      // после вставки/дропа фокус обратно в текст
+      requestAnimationFrame(() => textAreaRef.current?.focus());
     }
+  };
+
+  const handleFileButton = async (fileOrFiles) => {
+    const files = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
+    await uploadAndAddFiles(files);
   };
 
   const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) await handleFile(file);
+    const files = Array.from(e.dataTransfer.files || []);
+    await uploadAndAddFiles(files);
+  };
+
+  const handlePaste = async (e) => {
+    const files = Array.from(e.clipboardData?.files || []);
+    if (!files.length) return; // текст идёт как обычно
+    e.preventDefault();
+    await uploadAndAddFiles(files);
+  };
+
+  const removeAttachment = (url) => {
+    setAttachments((prev) => prev.filter((a) => a.media_url !== url));
+  };
+
+  // ====== отправка ======
+  const clearState = () => {
+    setMessage("");
+    setAttachments([]);
+    setTemplate(null);
+  };
+
+  const buildBasePayload = () => ({
+    panda_number: isPhoneChat ? pandaNumber : undefined,
+    client_phone: isPhoneChat ? currentClient?.payload?.phone : undefined,
+  });
+
+  const sendMessage = async () => {
+    const trimmedText = message.trim();
+    const hasText = !!trimmedText;
+    const hasFiles = attachments.length > 0;
+
+    if (!hasText && !hasFiles) return;
+
+    if (SEND_AS_SINGLE_BATCH) {
+      // один payload с массивом attachments (если бэкенд поддерживает)
+      const payload = {
+        ...buildBasePayload(),
+        message: hasText ? trimmedText : attachments[0]?.media_url, // fallback
+        message_text: isPhoneChat && hasText ? trimmedText : undefined,
+        last_message_type: hasFiles ? attachments[0].media_type : "text",
+        attachments: attachments.map(({ media_url, media_type, name, size }) => ({
+          media_url,
+          media_type,
+          name,
+          size,
+        })),
+      };
+      onSendMessage(payload);
+    } else {
+      // fallback: шлём последовательно: все файлы отдельными сообщениями + текст (если есть)
+      for (const att of attachments) {
+        const payloadFile = {
+          ...buildBasePayload(),
+          message: att.media_url,
+          media_url: att.media_url,
+          media_type: att.media_type,
+          last_message_type: att.media_type,
+        };
+        // для WA/Viber текст можно дублировать как message_text при необходимости — обычно не нужно
+        onSendMessage(payloadFile);
+      }
+      if (hasText) {
+        const payloadText = {
+          ...buildBasePayload(),
+          message: trimmedText,
+          message_text: isPhoneChat ? trimmedText : undefined,
+          last_message_type: "text",
+        };
+        onSendMessage(payloadText);
+      }
+    }
+
+    clearState();
   };
 
   const handleMarkAsRead = () => {
@@ -216,6 +271,51 @@ export const ChatInput = ({
     } catch (e) {
       console.error("Failed to send email", e);
     }
+  };
+
+  // предпросмотр вложений (простая сетка)
+  const AttachmentsPreview = () => {
+    if (!attachments.length) return null;
+    return (
+      <Flex gap={8} wrap="wrap" mb="xs">
+        {attachments.map((att) => {
+          const isImage = att.media_type === "image" || att.media_type === "photo" || att.media_type === "image_url";
+          return (
+            <Box
+              key={att.media_url}
+              style={{
+                position: "relative",
+                width: 72,
+                height: 72,
+                borderRadius: 8,
+                overflow: "hidden",
+                border: "1px solid var(--mantine-color-gray-3)",
+                background: "#fafafa",
+              }}
+              title={att.name}
+            >
+              {isImage ? (
+                // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                <img
+                  src={att.media_url}
+                  alt={att.name || "attachment"}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <Flex w="100%" h="100%" align="center" justify="center">
+                  <Badge size="xs">{att.media_type}</Badge>
+                </Flex>
+              )}
+              <CloseButton
+                size="sm"
+                onClick={() => removeAttachment(att.media_url)}
+                style={{ position: "absolute", top: 2, right: 2, background: "white" }}
+              />
+            </Box>
+          );
+        })}
+      </Flex>
+    );
   };
 
   return (
@@ -272,7 +372,11 @@ export const ChatInput = ({
               />
             </Flex>
 
+            {/* предпросмотр выбранных вложений */}
+            <AttachmentsPreview />
+
             <Textarea
+              ref={textAreaRef}
               autosize
               minRows={6}
               maxRows={8}
@@ -304,7 +408,7 @@ export const ChatInput = ({
               <Flex gap="xs">
                 <Button
                   disabled={
-                    !message.trim() ||
+                    (!message.trim() && attachments.length === 0) ||
                     !currentClient?.payload ||
                     currentClient.payload.platform === "sipuni" ||
                     (isWhatsApp && !pandaNumber) ||
@@ -355,11 +459,12 @@ export const ChatInput = ({
                 </ActionIcon>
 
                 <FileButton
-                  onChange={handleFile}
-                  accept="image/*,video/*,audio/*, .pdf"
+                  onChange={handleFileButton}
+                  accept="image/*,video/*,audio/*,.pdf"
+                  multiple // <— выбрать сразу несколько
                 >
                   {(props) => (
-                    <ActionIcon {...props} c="black" bg="white">
+                    <ActionIcon {...props} c="black" bg="white" title={getLanguageByKey("attachFiles")}>
                       <RiAttachment2 size={20} />
                     </ActionIcon>
                   )}
