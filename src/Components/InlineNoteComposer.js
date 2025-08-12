@@ -191,11 +191,21 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
             </Flex>
         );
     };
-    console.log('ticketId', ticketId, 'technicianId', technicianId, 'canSend', canSend);
 
     return (
         <Paper p="12" radius="md" withBorder style={{ background: "#fffef7" }}>
             <Flex direction="column" gap="8">
+                <Flex
+                    align="center"
+                    justify="space-between"
+                    mb={4}
+                    style={{ borderBottom: "1px solid #ffe58f", paddingBottom: 6 }}
+                >
+                    <Badge variant="light" color="yellow">
+                        {getLanguageByKey("Notice")}
+                    </Badge>
+                </Flex>
+
                 <Textarea
                     ref={taRef}
                     placeholder={getLanguageByKey("Write a note…")}
