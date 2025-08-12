@@ -301,35 +301,48 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.TICKET: {
-        const { ticket_id, group_title, workflow } = message.data;
+        const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
 
-        // console.log("[SOCKET] Incoming ticket:", {
-        //   ticket_id,
-        //   group_title_from_ticket: group_title,
-        //   current_groupTitleForApi: groupTitleForApi,
-        //   workflow,
-        //   workflowOptions,
-        // });
+        const idsRaw = Array.isArray(ticket_ids)
+          ? ticket_ids
+          : (ticket_id ? [ticket_id] : []);
+
+        const ids = [...new Set(
+          idsRaw
+            .map((v) => Number(v))
+            .filter((v) => Number.isFinite(v))
+        )];
 
         const isMatchingGroup = group_title === groupTitleForApi;
-        const isMatchingWorkflow = workflowOptions.includes(workflow);
+        const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
 
-        if (ticket_id && isMatchingGroup && isMatchingWorkflow) {
-          fetchSingleTicket(ticket_id);
+        if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
+          break;
+        }
 
-          const socketInstance = socketRef.current;
-          if (socketInstance?.readyState === WebSocket.OPEN) {
+        ids.forEach((id) => {
+          try {
+            fetchSingleTicket(id);
+          } catch (e) {
+          }
+        });
+
+        const socketInstance = socketRef.current;
+        if (socketInstance?.readyState === WebSocket.OPEN) {
+          const CHUNK_SIZE = 50;
+          for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
+            const chunk = ids.slice(i, i + CHUNK_SIZE);
             socketInstance.send(
               JSON.stringify({
                 type: TYPE_SOCKET_EVENTS.CONNECT,
-                data: { ticket_id: [ticket_id] },
+                data: { ticket_id: chunk },
               })
             );
-          } else {
-            enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
-              variant: "error",
-            });
           }
+        } else {
+          enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
+            variant: "error",
+          });
         }
 
         break;
