@@ -19,7 +19,7 @@ export const MEDIA_TYPE = {
   URL: "url",
   CALL: "call",
   IG_REEL: "ig_reel",
-  SHARE: "share",     
+  SHARE: "share",
 };
 
 export const MESSAGES_TYPE_OPTIONS = [
@@ -45,6 +45,7 @@ export const TYPE_SOCKET_EVENTS = {
   MESSAGE: "message",
   TICKET: "ticket",
   CONNECT: "connect",
+  TICKET_UPDATE: "ticket_update",
 };
 
 export const TYPE_TICKET = {
