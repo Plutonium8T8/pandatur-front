@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider, Modal, Button, ActionIcon, Input, SegmentedControl, Flex, Select } from "@mantine/core";
 import { useDOMElementHeight, useApp, useDebounce, useConfirmPopup, useGetTechniciansList } from "@hooks";
 import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
 import { SpinnerRightBottom, MantineModal, AddLeadModal, PageHeader, Spin } from "@components";
-import { useSearchParams } from "react-router-dom";
 import { WorkflowColumns } from "../Components/Workflow/WorkflowColumns";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
@@ -23,14 +22,25 @@ import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
-import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css"
+import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css";
 
 export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
-  const { tickets, spinnerTickets, setLightTicketFilters, fetchTickets, groupTitleForApi, workflowOptions, isCollapsed, accessibleGroupTitles, customGroupTitle, setCustomGroupTitle } = useApp();
+  const {
+    tickets,
+    spinnerTickets,
+    setLightTicketFilters,
+    fetchTickets,
+    groupTitleForApi,
+    workflowOptions,
+    isCollapsed,
+    accessibleGroupTitles,
+    customGroupTitle,
+    setCustomGroupTitle,
+  } = useApp();
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -65,23 +75,28 @@ export const Leads = () => {
 
   const currentSearch = viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm;
   const debouncedSearch = useDebounce(currentSearch, 2000);
-  const deleteBulkLeads = useConfirmPopup({ subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"), });
+  const deleteBulkLeads = useConfirmPopup({
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
+  });
   const [perPage, setPerPage] = useState(50);
+
+  // маркер последнего hard-запроса (вместо AbortController -> не слать signal в API)
+  const hardReqIdRef = useRef(0);
 
   const fetchKanbanTickets = async (filters = {}) => {
     setKanbanSpinner(true);
     setKanbanFilters(filters);
     setKanbanTickets([]);
 
-    let currentPage = 1;
+    let page = 1;
     let totalPages = 1;
 
     try {
       const { group_title, search, ...attributes } = filters;
 
-      while (currentPage <= totalPages) {
+      while (page <= totalPages) {
         const res = await api.tickets.filters({
-          page: currentPage,
+          page,
           type: "light",
           group_title: group_title || groupTitleForApi,
           attributes: {
@@ -90,17 +105,17 @@ export const Leads = () => {
           },
         });
 
-        const normalized = res.tickets.map(t => ({
+        const normalized = res.tickets.map((t) => ({
           ...t,
           last_message: t.last_message || getLanguageByKey("no_messages"),
           time_sent: t.time_sent || null,
           unseen_count: t.unseen_count || 0,
         }));
 
-        setKanbanTickets(prev => [...prev, ...normalized]);
+        setKanbanTickets((prev) => [...prev, ...normalized]);
 
         totalPages = res.pagination?.total_pages || 1;
-        currentPage += 1;
+        page += 1;
       }
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
@@ -109,14 +124,9 @@ export const Leads = () => {
     }
   };
 
-  const visibleTickets =
-    isSearching || kanbanSpinner || kanbanFilterActive
-      ? kanbanTickets
-      : tickets;
+  const visibleTickets = isSearching || kanbanSpinner || kanbanFilterActive ? kanbanTickets : tickets;
 
-  const currentFetchTickets = kanbanSearchTerm?.trim()
-    ? fetchKanbanTickets
-    : fetchTickets;
+  const currentFetchTickets = kanbanSearchTerm?.trim() ? fetchKanbanTickets : fetchTickets;
 
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
@@ -126,6 +136,7 @@ export const Leads = () => {
     if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage]);
 
   useEffect(() => {
@@ -153,11 +164,12 @@ export const Leads = () => {
       }));
       setCurrentPage(1);
     }
-  }, [debouncedSearch, viewMode]);
+  }, [debouncedSearch, viewMode, groupTitleForApi, filtersReady]);
 
   const fetchHardTickets = async (page = 1) => {
     if (!groupTitleForApi || !workflowOptions.length) return;
 
+    const reqId = ++hardReqIdRef.current;
     try {
       setLoading(true);
 
@@ -179,7 +191,7 @@ export const Leads = () => {
         group_title: groupTitleForApi,
         sort_by: "creation_date",
         order: "DESC",
-        limit: perPage,
+        limit: perPage, // <-- сервер ожидает limit
         attributes: {
           ...restFilters,
           workflow: effectiveWorkflow,
@@ -187,12 +199,19 @@ export const Leads = () => {
         },
       });
 
+      // если прилетел не последний ответ — игнор
+      if (reqId !== hardReqIdRef.current) return;
+
       setHardTickets(response.data);
       setTotalLeads(response.pagination?.total || 0);
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
+      if (reqId === hardReqIdRef.current) {
+        enqueueSnackbar(showServerError(error), { variant: "error" });
+      }
     } finally {
-      setLoading(false);
+      if (reqId === hardReqIdRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -203,9 +222,7 @@ export const Leads = () => {
 
   const toggleSelectTicket = (ticketId) => {
     setSelectedTickets((prev) =>
-      prev.includes(ticketId)
-        ? prev.filter((id) => id !== ticketId)
-        : [...prev, ticketId]
+      prev.includes(ticketId) ? prev.filter((id) => id !== ticketId) : [...prev, ticketId]
     );
   };
 
@@ -215,9 +232,7 @@ export const Leads = () => {
         setLoading(true);
         await api.tickets.deleteById(selectedTickets);
         setSelectedTickets([]);
-        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), {
-          variant: "success",
-        });
+        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), { variant: "success" });
         fetchHardTickets(currentPage);
       } catch (error) {
         enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -270,14 +285,13 @@ export const Leads = () => {
     didLoadGlobalTicketsRef.current = false;
   }, [groupTitleForApi]);
 
-
   useEffect(() => {
     const urlView = searchParams.get("view");
     const urlViewUpper = urlView ? urlView.toUpperCase() : undefined;
     if (urlViewUpper && urlViewUpper !== viewMode) {
       setViewMode(urlViewUpper);
     }
-  }, [searchParams]);
+  }, [searchParams, viewMode]);
 
   const handleApplyFiltersHardTicket = (selectedFilters) => {
     const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
@@ -335,21 +349,15 @@ export const Leads = () => {
   };
 
   const toggleSelectAll = (ids) => {
-    setSelectedTickets((prev) =>
-      prev.length === ids.length ? [] : ids
-    );
+    setSelectedTickets((prev) => (prev.length === ids.length ? [] : ids));
   };
 
-  const groupTitleSelectData = groupTitleOptions.filter((option) =>
-    accessibleGroupTitles.includes(option.value)
-  );
+  const groupTitleSelectData = groupTitleOptions.filter((option) => accessibleGroupTitles.includes(option.value));
 
   const selectedTicket = (viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets).find(
     (t) => t.id === selectedTickets?.[0]
   );
-  const responsibleId = selectedTicket?.technician_id
-    ? String(selectedTicket.technician_id)
-    : undefined;
+  const responsibleId = selectedTicket?.technician_id ? String(selectedTicket.technician_id) : undefined;
 
   const hasHardFilters = Object.values(hardTicketFilters).some(
     (v) =>
@@ -369,21 +377,13 @@ export const Leads = () => {
     const type = searchParams.get("type");
     const hasUrlFilters = Object.keys(parsedFilters).length > 0;
 
-    if (
-      urlGroupTitle &&
-      accessibleGroupTitles.includes(urlGroupTitle) &&
-      customGroupTitle !== urlGroupTitle
-    ) {
+    if (urlGroupTitle && accessibleGroupTitles.includes(urlGroupTitle) && customGroupTitle !== urlGroupTitle) {
       setCustomGroupTitle(urlGroupTitle);
       isGroupTitleSyncedRef.current = true;
       return;
     }
 
-    if (
-      isGroupTitleSyncedRef.current &&
-      urlGroupTitle &&
-      customGroupTitle === urlGroupTitle
-    ) {
+    if (isGroupTitleSyncedRef.current && urlGroupTitle && customGroupTitle === urlGroupTitle) {
       if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
         setKanbanFilters(parsedFilters);
         setKanbanFilterActive(true);
@@ -397,11 +397,7 @@ export const Leads = () => {
       return;
     }
 
-    if (
-      !isGroupTitleSyncedRef.current &&
-      customGroupTitle === urlGroupTitle &&
-      hasUrlFilters
-    ) {
+    if (!isGroupTitleSyncedRef.current && customGroupTitle === urlGroupTitle && hasUrlFilters) {
       if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
         setKanbanFilters(parsedFilters);
         setKanbanFilterActive(true);
@@ -416,7 +412,7 @@ export const Leads = () => {
       setKanbanTickets([]);
       setKanbanFilterActive(false);
     }
-  }, [searchParams.toString(), groupTitleForApi, workflowOptions, customGroupTitle, viewMode]);
+  }, [searchParams.toString(), groupTitleForApi, workflowOptions, customGroupTitle, viewMode, accessibleGroupTitles]);
 
   useEffect(() => {
     const type = params.get("type");
@@ -427,7 +423,16 @@ export const Leads = () => {
     } else {
       setFiltersReady(true);
     }
-  }, []);
+  }, [params]);
+
+  // единый обработчик смены лимита
+  const handlePerPageChange = (next) => {
+    const n = Number(next);
+    if (!n || n === perPage) return;
+    setCurrentPage(1);
+    setPerPage(n);
+    // запрос уйдет из эффекта один раз
+  };
 
   return (
     <>
@@ -553,10 +558,7 @@ export const Leads = () => {
             totalLeadsPages={getTotalPages(totalLeads, perPage)}
             onChangePagination={handlePaginationWorkflow}
             perPage={perPage}
-            setPerPage={val => {
-              setPerPage(val);
-              setCurrentPage(1);
-            }}
+            setPerPage={handlePerPageChange}
           />
         ) : (
           <WorkflowColumns
@@ -611,15 +613,8 @@ export const Leads = () => {
         centered
         size="xl"
         styles={{
-          content: {
-            height: "900px",
-            display: "flex",
-            flexDirection: "column",
-          },
-          body: {
-            flex: "1",
-            overflowY: "auto",
-          },
+          content: { height: "900px", display: "flex", flexDirection: "column" },
+          body: { flex: "1", overflowY: "auto" },
         }}
       >
         <LeadsKanbanFilter
@@ -648,15 +643,8 @@ export const Leads = () => {
         centered
         size="xl"
         styles={{
-          content: {
-            height: "900px",
-            display: "flex",
-            flexDirection: "column",
-          },
-          body: {
-            flex: 1,
-            overflowY: "auto",
-          },
+          content: { height: "900px", display: "flex", flexDirection: "column" },
+          body: { flex: 1, overflowY: "auto" },
         }}
       >
         <LeadsTableFilter
@@ -684,11 +672,7 @@ export const Leads = () => {
           onClose={() => setIsModalOpen(false)}
           selectedTickets={selectedTickets}
           fetchLeads={() => fetchHardTickets(currentPage)}
-          id={
-            selectedTickets.length === 1
-              ? selectedTickets[0]
-              : currentTicket?.id
-          }
+          id={selectedTickets.length === 1 ? selectedTickets[0] : currentTicket?.id}
         />
       </Modal>
     </>
