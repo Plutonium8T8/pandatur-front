@@ -128,7 +128,6 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
         }
     }, [attachments, canSend, technicianId, ticketId, text, onSave]);
 
-    // хоткеи
     useEffect(() => {
         const el = taRef.current;
         if (!el) return;
