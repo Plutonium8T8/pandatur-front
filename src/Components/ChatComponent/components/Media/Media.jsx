@@ -1,7 +1,6 @@
-import { Flex, FileButton, Button, Tabs, Text } from "@mantine/core";
+import { Flex, Tabs, Text, ActionIcon, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState, useEffect, useCallback, useRef } from "react";
-import { IoMdAdd } from "react-icons/io";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import { getLanguageByKey, showServerError } from "@utils";
@@ -10,6 +9,8 @@ import { api } from "../../../../api";
 import { useUploadMediaFile, useConfirmPopup } from "@hooks";
 import { getMediaType } from "../../renderContent";
 import { renderFile, renderMedia, renderCall } from "./utils";
+import { ChatNoteCard } from "../../../ChatNoteCard";
+import { FiTrash2 } from "react-icons/fi";
 import "./Media.css";
 
 export const Media = ({ messages, id }) => {
@@ -18,20 +19,39 @@ export const Media = ({ messages, id }) => {
 
   const [opened, handlers] = useDisclosure(false);
   const [mediaList, setMediaList] = useState([]);
+
+  const [notes, setNotes] = useState([]);
+  const [notesLoading, setNotesLoading] = useState(false);
+
   const [uploadTab, setUploadTab] = useState("media");
   const [isDragOver, setIsDragOver] = useState(false);
 
   const dropRef = useRef(null);
 
-  const deleteMedia = useConfirmPopup({
+  const confirmDeleteMedia = useConfirmPopup({
     subTitle: getLanguageByKey("confirmDeleteAttachment"),
   });
 
+  const confirmDeleteNote = useConfirmPopup({
+    subTitle: getLanguageByKey("confirmDeleteNote") || "Удалить заметку?",
+  });
+
   const deleteAttachment = async (mediaId) => {
-    deleteMedia(async () => {
+    confirmDeleteMedia(async () => {
       try {
         await api.tickets.ticket.deleteMediaById(mediaId);
         await getMediaFiles();
+      } catch (e) {
+        enqueueSnackbar(showServerError(e), { variant: "error" });
+      }
+    });
+  };
+
+  const deleteNoteById = async (noteId) => {
+    confirmDeleteNote(async () => {
+      try {
+        await api.messages.notes.deleteById(noteId); // <-- проверь, что есть в API
+        await getTicketNotes();
       } catch (e) {
         enqueueSnackbar(showServerError(e), { variant: "error" });
       }
@@ -47,6 +67,18 @@ export const Media = ({ messages, id }) => {
       enqueueSnackbar(showServerError(e), { variant: "error" });
     } finally {
       handlers.close();
+    }
+  };
+
+  const getTicketNotes = async () => {
+    setNotesLoading(true);
+    try {
+      const list = await api.messages.notes.getByTicketId(id);
+      setNotes(Array.isArray(list) ? list : []);
+    } catch (e) {
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
+      setNotesLoading(false);
     }
   };
 
@@ -72,7 +104,10 @@ export const Media = ({ messages, id }) => {
   };
 
   useEffect(() => {
-    if (id) getMediaFiles();
+    if (id) {
+      getMediaFiles();
+      getTicketNotes();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
@@ -116,10 +151,9 @@ export const Media = ({ messages, id }) => {
       const rejected = files.filter((f) => !isAccepted(f, uploadTab));
 
       if (rejected.length) {
-        enqueueSnackbar(
-          getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу",
-          { variant: "warning" }
-        );
+        enqueueSnackbar(getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу", {
+          variant: "warning",
+        });
       }
 
       for (const file of accepted) {
@@ -140,10 +174,9 @@ export const Media = ({ messages, id }) => {
       const rejected = files.filter((f) => !isAccepted(f, uploadTab));
 
       if (rejected.length) {
-        enqueueSnackbar(
-          getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу",
-          { variant: "warning" }
-        );
+        enqueueSnackbar(getLanguageByKey("someFilesRejected") || "Некоторые файлы отклонены по типу", {
+          variant: "warning",
+        });
       }
 
       for (const file of accepted) {
@@ -168,23 +201,17 @@ export const Media = ({ messages, id }) => {
         transition: "outline-color .15s ease",
       }}
     >
-      {isDragOver && (
-        <div
-          style={{
-            pointerEvents: "none",
-            userSelect: "none",
-            textAlign: "center",
-            padding: 12,
-            fontWeight: 600,
-            opacity: 0.9,
-          }}
-        >
-          {getLanguageByKey("dragOrPasteToUpload") || "Перетащите или вставьте файлы сюда"}
-        </div>
-      )}
       {children}
     </div>
   );
+
+  // нормализация заметки под ChatNoteCard (формат времени)
+  const normalizeNote = (n) => ({
+    ...n,
+    timeCreatedDisplay: dayjs(n.created_at || n.time_created).isValid()
+      ? dayjs(n.created_at || n.time_created).format(DD_MM_YYYY__HH_mm_ss)
+      : "",
+  });
 
   return (
     <>
@@ -194,10 +221,11 @@ export const Media = ({ messages, id }) => {
             <Text fw={700} size="sm">{getLanguageByKey("messageAttachments")}</Text>
           </Tabs.Tab>
           <Tabs.Tab value="uploaded-media">
-            <Text fw={700} size="sm">{getLanguageByKey("uploadedFiles")}</Text>
+            <Text fw={700} size="sm">{getLanguageByKey("FileNotice")}</Text>
           </Tabs.Tab>
         </Tabs.List>
 
+        {/* Вложения из сообщений (read-only) */}
         <Tabs.Panel h="calc(100% - 36px)" value="messages-media">
           <Tabs className="media-tabs" defaultValue="media">
             <Tabs.List>
@@ -224,93 +252,86 @@ export const Media = ({ messages, id }) => {
           </Tabs>
         </Tabs.Panel>
 
+        {/* Загрузки тикета + заметки (с удалением) */}
         <Tabs.Panel h="calc(100% - 36px)" value="uploaded-media">
           <Tabs className="media-tabs" value={uploadTab} onChange={setUploadTab}>
             <Tabs.List>
               <Tabs.Tab value="media">{getLanguageByKey("Media")}</Tabs.Tab>
               <Tabs.Tab value="files">{getLanguageByKey("files")}</Tabs.Tab>
               <Tabs.Tab value="audio">{getLanguageByKey("audio")}</Tabs.Tab>
+              <Tabs.Tab value="notes">{getLanguageByKey("Notice") || "Заметки"}</Tabs.Tab>
             </Tabs.List>
 
+            {/* MEDIA */}
             <Tabs.Panel className="media-tabs" h="100%" value="media">
               <DropZone>
-                <Flex h="100%" mt="md" direction="column">
+                <Flex h="100%" direction="column" mt="md">
                   {renderMedia({
                     media: mediaList,
-                    deleteAttachment,
-                    shouldDelete: true,
-                    renderAddAttachments: () => (
-                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("media")}>
-                        {(props) => (
-                          <Button
-                            leftSection={<IoMdAdd size={16} />}
-                            variant="outline"
-                            loading={opened}
-                            disabled={opened || props.disabled}
-                            {...props}
-                          >
-                            {getLanguageByKey("addMedia")}
-                          </Button>
-                        )}
-                      </FileButton>
-                    ),
+                    deleteAttachment,     // <- вернул
+                    shouldDelete: true,   // <- вернул
                   })}
                 </Flex>
               </DropZone>
             </Tabs.Panel>
 
+            {/* FILES */}
             <Tabs.Panel className="media-tabs" h="100%" value="files">
               <DropZone>
-                <Flex h="100%" mt="md" direction="column">
+                <Flex h="100%" direction="column" mt="md">
                   {renderFile({
                     media: mediaList,
-                    deleteAttachment,
-                    shouldDelete: true,
-                    renderAddAttachments: () => (
-                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("files")}>
-                        {(props) => (
-                          <Button
-                            leftSection={<IoMdAdd size={16} />}
-                            variant="outline"
-                            loading={opened}
-                            disabled={opened || props.disabled}
-                            {...props}
-                          >
-                            {getLanguageByKey("addMedia")}
-                          </Button>
-                        )}
-                      </FileButton>
-                    ),
+                    deleteAttachment,     // <- вернул
+                    shouldDelete: true,   // <- вернул
                   })}
                 </Flex>
               </DropZone>
             </Tabs.Panel>
 
+            {/* AUDIO */}
             <Tabs.Panel className="media-tabs" h="100%" value="audio">
               <DropZone>
                 <Flex h="100%" direction="column" mt="md">
                   {renderCall({
                     media: mediaList,
-                    deleteAttachment,
-                    shouldDelete: true,
-                    renderAddAttachments: () => (
-                      <FileButton onChange={sendAttachment} accept={getAcceptForTab("audio")}>
-                        {(props) => (
-                          <Button
-                            leftSection={<IoMdAdd size={16} />}
-                            variant="outline"
-                            loading={opened}
-                            disabled={opened || props.disabled}
-                            {...props}
-                          >
-                            {getLanguageByKey("addMedia")}
-                          </Button>
-                        )}
-                      </FileButton>
-                    ),
+                    deleteAttachment,     // <- вернул
+                    shouldDelete: true,   // <- вернул
                   })}
                 </Flex>
               </DropZone>
+            </Tabs.Panel>
+
+            {/* NOTES */}
+            <Tabs.Panel className="media-tabs" h="100%" value="notes">
+              <Flex direction="column" gap="12" mt="md">
+                {notesLoading ? (
+                  <Text size="sm">{getLanguageByKey("loading")}...</Text>
+                ) : notes.length ? (
+                  notes.map((n) => (
+                    <Flex key={n.id} align="stretch" gap={8}>
+                      <ChatNoteCard
+                        note={normalizeNote(n)}
+                        techLabel={`#${n.technician_id || ""}`}
+                        showActions
+                        style={{ flex: 1 }}
+                      />
+                      <Tooltip label={getLanguageByKey("delete") || "Удалить"}>
+                        <ActionIcon
+                          color="red"
+                          variant="subtle"
+                          onClick={() => deleteNoteById(n.id)}
+                          aria-label="delete-note"
+                          mt={4}
+                        >
+                          <FiTrash2 />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Flex>
+                  ))
+                ) : (
+                  <Text c="dimmed">{getLanguageByKey("noNotesYet") || "Заметок пока нет"}</Text>
+                )}
+              </Flex>
             </Tabs.Panel>
           </Tabs>
         </Tabs.Panel>

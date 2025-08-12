@@ -1,27 +1,263 @@
-import { useState } from "react";
-import { Paper, Flex, Textarea, Button } from "@mantine/core";
+import { useEffect, useRef, useState, useCallback } from "react";
+import {
+    Paper,
+    Flex,
+    Textarea,
+    Button,
+    ActionIcon,
+    FileButton,
+    Box,
+    Badge,
+    CloseButton,
+    Loader,
+} from "@mantine/core";
 import { getLanguageByKey } from "@utils";
+import { RiAttachment2 } from "react-icons/ri";
+import { useUploadMediaFile } from "../hooks";
+import { getMediaType } from "./ChatComponent/renderContent";
+import { messages } from "../api/messages";
 
-export const InlineNoteComposer = ({ onCancel, onSave, loading }) => {
+export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, loading }) => {
     const [text, setText] = useState("");
+    const [attachments, setAttachments] = useState([]);
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const [sending, setSending] = useState(false);
+
+    const taRef = useRef(null);
+    const { uploadFile } = useUploadMediaFile();
+
+    const canSend =
+        (text.trim().length > 0 || attachments.length > 0) &&
+        !uploading &&
+        !loading &&
+        !sending;
+
+    const removeAttachment = (url) => {
+        setAttachments((prev) => prev.filter((a) => a.media_url !== url));
+    };
+
+    const uploadAndAddFiles = async (files) => {
+        if (!files?.length) return;
+        setUploading(true);
+        try {
+            for (const file of files) {
+                const url = await uploadFile(file);
+                if (url) {
+                    const media_type = getMediaType(file.type);
+                    setAttachments((prev) => [
+                        ...prev,
+                        { media_url: url, media_type, name: file.name, size: file.size },
+                    ]);
+                }
+            }
+        } catch (e) {
+            console.error("InlineNote upload error:", e);
+        } finally {
+            setUploading(false);
+            requestAnimationFrame(() => taRef.current?.focus());
+        }
+    };
+
+    const handleFileButton = async (fileOrFiles) => {
+        const files = Array.isArray(fileOrFiles) ? fileOrFiles : [fileOrFiles];
+        await uploadAndAddFiles(files);
+    };
+
+    const handleDrop = async (e) => {
+        e.preventDefault();
+        setIsDragOver(false);
+        const files = Array.from(e.dataTransfer.files || []);
+        await uploadAndAddFiles(files);
+    };
+
+    const handlePaste = async (e) => {
+        const files = Array.from(e.clipboardData?.files || []);
+        if (!files.length) return;
+        e.preventDefault();
+        await uploadAndAddFiles(files);
+    };
+
+    const clearState = () => {
+        setText("");
+        setAttachments([]);
+    };
+
+    const mapMediaToType = (t = "") => {
+        const mt = String(t).toLowerCase();
+        if (mt.includes("image")) return "image";
+        if (mt.includes("video")) return "video";
+        if (mt.includes("audio")) return "audio";
+        return "file";
+    };
+
+    const handleSend = useCallback(async () => {
+        if (!canSend || !ticketId || !technicianId) return;
+        const trimmed = text.trim();
+        setSending(true);
+        try {
+            const results = [];
+
+            if (trimmed) {
+                const res = await messages.notes.create({
+                    ticket_id: ticketId,
+                    type: "text",
+                    value: trimmed,
+                    technician_id: technicianId,
+                });
+                results.push(res);
+            }
+
+            for (const att of attachments) {
+                // eslint-disable-next-line no-await-in-loop
+                const res = await messages.notes.create({
+                    ticket_id: ticketId,
+                    type: mapMediaToType(att.media_type),
+                    value: att.media_url,
+                    technician_id: technicianId,
+                });
+                results.push(res);
+            }
+
+            onSave?.(results);
+            clearState();
+        } catch (e) {
+            console.error("InlineNote send error:", e);
+        } finally {
+            setSending(false);
+        }
+    }, [attachments, canSend, technicianId, ticketId, text, onSave]);
+
+    // хоткеи
+    useEffect(() => {
+        const el = taRef.current;
+        if (!el) return;
+        const onKey = (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+                e.preventDefault();
+                handleSend();
+            }
+            if (e.key === "Escape") {
+                e.preventDefault();
+                onCancel?.();
+            }
+        };
+        el.addEventListener("keydown", onKey);
+        return () => el.removeEventListener("keydown", onKey);
+    }, [handleSend, onCancel]);
+
+    const AttachmentsPreview = () => {
+        if (!attachments.length) return null;
+        return (
+            <Flex gap={8} wrap="wrap">
+                {attachments.map((att) => {
+                    const isImage =
+                        att.media_type === "image" ||
+                        att.media_type === "photo" ||
+                        att.media_type === "image_url";
+                    return (
+                        <Box
+                            key={att.media_url}
+                            style={{
+                                position: "relative",
+                                width: 72,
+                                height: 72,
+                                borderRadius: 8,
+                                overflow: "hidden",
+                                border: "1px solid var(--mantine-color-gray-3)",
+                                background: "#fafafa",
+                            }}
+                            title={att.name}
+                        >
+                            {isImage ? (
+                                // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                                <img
+                                    src={att.media_url}
+                                    alt={att.name || "attachment"}
+                                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                            ) : (
+                                <Flex w="100%" h="100%" align="center" justify="center">
+                                    <Badge size="xs">{att.media_type}</Badge>
+                                </Flex>
+                            )}
+                            <CloseButton
+                                size="sm"
+                                onClick={() => removeAttachment(att.media_url)}
+                                style={{ position: "absolute", top: 2, right: 2, background: "white" }}
+                            />
+                        </Box>
+                    );
+                })}
+            </Flex>
+        );
+    };
+    console.log('ticketId', ticketId, 'technicianId', technicianId, 'canSend', canSend);
+
     return (
         <Paper p="12" radius="md" withBorder style={{ background: "#fffef7" }}>
             <Flex direction="column" gap="8">
                 <Textarea
-                    placeholder={getLanguageByKey("Напишите заметку…")}
+                    ref={taRef}
+                    placeholder={getLanguageByKey("Write a note…")}
                     autosize
                     minRows={3}
                     maxRows={8}
                     value={text}
                     onChange={(e) => setText(e.currentTarget.value)}
+                    onPaste={handlePaste}
+                    onDragEnter={(e) => {
+                        e.preventDefault();
+                        setIsDragOver(true);
+                    }}
+                    onDragLeave={(e) => {
+                        e.preventDefault();
+                        setIsDragOver(false);
+                    }}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={handleDrop}
+                    styles={{
+                        input: {
+                            border: isDragOver ? "2px dashed #69db7c" : undefined,
+                            backgroundColor: isDragOver ? "#ebfbee" : undefined,
+                        },
+                    }}
                 />
-                <Flex gap="8" justify="flex-end">
-                    <Button variant="subtle" color="gray" onClick={onCancel}>
-                        {getLanguageByKey("Anulare")}
-                    </Button>
-                    <Button onClick={() => onSave(text.trim())} disabled={!text.trim() || loading}>
-                        {getLanguageByKey("Save")}
-                    </Button>
+                <AttachmentsPreview />
+
+                <Flex justify="space-between" align="center" gap="8">
+                    <Flex gap="6" align="center">
+                        <FileButton
+                            onChange={handleFileButton}
+                            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                            multiple
+                        >
+                            {(props) => (
+                                <ActionIcon {...props} title={getLanguageByKey("Attach files")}>
+                                    <RiAttachment2 size={18} />
+                                </ActionIcon>
+                            )}
+                        </FileButton>
+                        {(uploading || loading || sending) && <Loader size="xs" />}
+                    </Flex>
+
+                    <Flex gap="8">
+                        <Button
+                            variant="subtle"
+                            color="gray"
+                            onClick={onCancel}
+                            disabled={uploading || loading || sending}
+                        >
+                            {getLanguageByKey("Cancel")}
+                        </Button>
+                        <Button
+                            onClick={handleSend}
+                            disabled={!canSend}
+                            loading={uploading || loading || sending}
+                        >
+                            {getLanguageByKey("Save")}
+                        </Button>
+                    </Flex>
                 </Flex>
             </Flex>
         </Paper>

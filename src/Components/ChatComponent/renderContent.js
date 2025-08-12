@@ -84,7 +84,7 @@ export const renderContent = (msg) => {
       );
 
     case MEDIA_TYPE.SHARE: {
-      const isImage = msg.message.match(/\.(jpeg|jpg|png|webp|gif)$/i);
+      const isImage = msg.message.match(/\.(jpeg|jpg|png|webp|gif|photo)$/i);
 
       return isImage ? (
         <CheckedImage
