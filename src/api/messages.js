@@ -1,36 +1,58 @@
-import { baseAxios } from "./baseAxios"
-import Cookies from "js-cookie"
+import { baseAxios } from "./baseAxios";
+import Cookies from "js-cookie";
 
 export const messages = {
   list: async () => {
-    const { data } = await baseAxios.get("/api/messages")
-
-    return data
+    const { data } = await baseAxios.get("/api/messages");
+    return data;
   },
 
   messagesTicketById: async (id) => {
-    const { data } = await baseAxios.get(`/api/messages/ticket/${id}`)
-
-    return data
+    const { data } = await baseAxios.get(`/api/messages/ticket/${id}`);
+    return data;
   },
 
   upload: async (body) => {
     const { data } = await baseAxios.post("/api/messages/upload", body, {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    })
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data;
+  },
 
-    return data
+  notes: {
+    create: async (body) => {
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/api/ticket/note", body, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data;
+    },
+
+    getByTicketId: async (ticketId) => {
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.get(`/api/ticket/${ticketId}/note`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data; // ожидается массив заметок
+    },
+
+    // батч-создание (по одному, чтобы сохранить порядок)
+    batchCreate: async (items = []) => {
+      const results = [];
+      for (const item of items) {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await messages.notes.create(item);
+        results.push(res);
+      }
+      return results;
+    },
   },
 
   send: {
     create: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return data;
     },
@@ -38,9 +60,7 @@ export const messages = {
     telegram: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/telegram", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return data;
     },
@@ -48,9 +68,7 @@ export const messages = {
     viber: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/viber", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return data;
     },
@@ -58,9 +76,7 @@ export const messages = {
     whatsapp: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/whatsapp", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return data;
     },
@@ -68,11 +84,9 @@ export const messages = {
     email: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/email", body, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       return data;
-    }
+    },
   },
-}
+};

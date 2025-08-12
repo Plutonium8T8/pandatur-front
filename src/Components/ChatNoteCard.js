@@ -6,7 +6,6 @@ import {
     Anchor,
     Badge,
     Group,
-    Tooltip,
     ActionIcon,
 } from "@mantine/core";
 import {
@@ -14,7 +13,6 @@ import {
     FiVideo,
     FiMusic,
     FiFileText,
-    FiDownload,
     FiExternalLink,
 } from "react-icons/fi";
 import { getLanguageByKey } from "@utils";
@@ -145,7 +143,6 @@ export const ChatNoteCard = ({
     const meta = NOTE_STYLE[kind] || NOTE_STYLE.file;
     const Icon = meta.icon;
     const url = note?.value;
-    const fileName = getFileNameFromUrl(url);
 
     return (
         <Paper
@@ -182,33 +179,6 @@ export const ChatNoteCard = ({
                     </Badge>
                 </Group>
 
-                {showActions && url ? (
-                    <Group gap={6}>
-                            <ActionIcon
-                                component="a"
-                                href={url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                variant="subtle"
-                                aria-label="open"
-                            >
-                                <FiExternalLink />
-                            </ActionIcon>
-                        <Tooltip label={getLanguageByKey("Скачать")}>
-                            <ActionIcon
-                                component="a"
-                                href={url}
-                                download={fileName}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                variant="subtle"
-                                aria-label="download"
-                            >
-                                <FiDownload />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Group>
-                ) : null}
             </Flex>
 
             {/* content */}

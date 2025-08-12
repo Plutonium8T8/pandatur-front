@@ -213,9 +213,19 @@ export const ChatMessages = ({
           {noteMode && (
             <div style={{ padding: 16 }}>
               <InlineNoteComposer
+                ticketId={ticketId}
+                technicianId={Number(userId)}
                 loading={noteSaving}
                 onCancel={() => setNoteMode(false)}
-                onSave={handleSaveNote}
+                onSave={async () => {
+                  setNoteSaving(true);
+                  try {
+                    await getUserMessages(Number(ticketId));
+                    setNoteMode(false);
+                  } finally {
+                    setNoteSaving(false);
+                  }
+                }}
               />
             </div>
           )}
