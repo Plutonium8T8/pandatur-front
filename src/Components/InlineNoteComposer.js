@@ -204,6 +204,12 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                     <Badge variant="light" color="yellow">
                         {getLanguageByKey("Notice")}
                     </Badge>
+                    <CloseButton
+                        aria-label={getLanguageByKey("Close")}
+                        title={getLanguageByKey("Close")}
+                        onClick={onCancel}
+                        disabled={uploading || loading || sending}
+                    />
                 </Flex>
 
                 <Textarea
