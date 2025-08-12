@@ -6,18 +6,15 @@ import {
     Anchor,
     Badge,
     Group,
-    ActionIcon,
 } from "@mantine/core";
 import {
     FiImage,
     FiVideo,
     FiMusic,
     FiFileText,
-    FiExternalLink,
 } from "react-icons/fi";
 import { getLanguageByKey } from "@utils";
 
-// ---- helpers ----
 const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "heif", "avif"];
 const VIDEO_EXT = ["mp4", "webm", "ogg", "mov", "m4v"];
 const AUDIO_EXT = ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"];
@@ -131,7 +128,6 @@ const NOTE_STYLE = {
     file: { border: "#d9d9d9", bg: "linear-gradient(180deg,#fafafa 0%,#ffffff 60%)", icon: FiFileText, label: "File" },
 };
 
-// ---- основной экспорт ----
 export const ChatNoteCard = ({
     note,
     techLabel,
@@ -158,7 +154,6 @@ export const ChatNoteCard = ({
                 ...style,
             }}
         >
-            {/* header */}
             <Flex align="center" justify="space-between" px="14" py="10" style={{ borderBottom: `1px solid ${meta.border}` }}>
                 <Group gap={10}>
                     <span
@@ -181,12 +176,10 @@ export const ChatNoteCard = ({
 
             </Flex>
 
-            {/* content */}
             <Flex direction="column" gap="8" px="12" py="10">
                 <NoteContent note={note} />
             </Flex>
 
-            {/* footer */}
             <Flex align="center" justify="space-between" px="12" py="8" style={{ borderTop: "1px solid rgba(0,0,0,.06)" }}>
                 <Text size="xs" c="dimmed">
                     {getLanguageByKey("Заметка")} · {techLabel}
