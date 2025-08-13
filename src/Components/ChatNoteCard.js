@@ -1,49 +1,73 @@
 import React from "react";
-import {
-    Paper,
-    Flex,
-    Text,
-    Anchor,
-    Badge,
-    Group,
-} from "@mantine/core";
-import {
-    FiImage,
-    FiVideo,
-    FiMusic,
-    FiFileText,
-} from "react-icons/fi";
+import { Paper, Flex, Text, Anchor, Badge, Group } from "@mantine/core";
+import { FiImage, FiVideo, FiMusic, FiFileText } from "react-icons/fi";
 import { getLanguageByKey } from "@utils";
 
 const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "heif", "avif"];
 const VIDEO_EXT = ["mp4", "webm", "ogg", "mov", "m4v"];
 const AUDIO_EXT = ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"];
 
-const getExt = (url = "") => {
+// --- безопасные утилиты ---
+const safeDecodeURIComponent = (s = "") => {
     try {
-        const u = new URL(url);
-        const pathname = u.pathname.toLowerCase();
-        const name = pathname.split("/").pop() || "";
-        const clean = name.split("?")[0].split("#")[0];
-        const parts = clean.split(".");
-        return parts.length > 1 ? parts.pop() : "";
+        return decodeURIComponent(s);
     } catch {
-        const lower = String(url).toLowerCase();
-        const clean = lower.split("?")[0].split("#")[0];
-        const parts = clean.split(".");
-        return parts.length > 1 ? parts.pop() : "";
+        try {
+            return decodeURI(s);
+        } catch {
+            return s;
+        }
+    }
+};
+
+// экранируем "одинокие" %
+const escapeBadPercents = (s = "") => s.replace(/%(?![0-9A-Fa-f]{2})/g, "%25");
+
+const extractName = (pathLike = "") => {
+    const raw = (pathLike.split("/").pop() || "").split("?")[0].split("#")[0];
+    return safeDecodeURIComponent(escapeBadPercents(raw));
+};
+
+const getExt = (url = "") => {
+    const str = String(url).trim();
+    const fromPath = (pathname) => {
+        const decoded = extractName(pathname);
+        const parts = decoded.split(".");
+        return parts.length > 1 ? (parts.pop() || "").toLowerCase() : "";
+    };
+
+    try {
+        const u = new URL(str, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+        return fromPath(u.pathname);
+    } catch {
+        const clean = str.split("?")[0].split("#")[0];
+        return fromPath(clean);
     }
 };
 
 const getFileNameFromUrl = (url = "") => {
+    const str = String(url).trim();
+    if (!str) return "file";
+    if (str.startsWith("data:") || str.startsWith("blob:")) return "file";
+
+    const pickName = (pathname, search = "") => {
+        // иногда бэкенд кладёт имя в query
+        const params = new URLSearchParams(search);
+        const qn = params.get("filename") || params.get("file") || params.get("name");
+        if (qn) return safeDecodeURIComponent(escapeBadPercents(qn));
+        const name = extractName(pathname);
+        return name || "file";
+    };
+
     try {
-        const u = new URL(url);
-        return decodeURIComponent(u.pathname.split("/").pop() || "file");
+        const u = new URL(str, typeof window !== "undefined" ? window.location.origin : "http://localhost");
+        return pickName(u.pathname, u.search);
     } catch {
-        const clean = String(url).split("?")[0].split("#")[0];
-        return decodeURIComponent(clean.split("/").pop() || "file");
+        const clean = str.split("?")[0].split("#")[0];
+        return pickName(clean);
     }
 };
+// --- конец утилит ---
 
 const getNoteKind = (note) => {
     const t = (note?.type || "").toLowerCase();
@@ -61,15 +85,16 @@ const getNoteKind = (note) => {
 const NoteContent = ({ note }) => {
     const kind = getNoteKind(note);
     const url = note?.value;
-    const fileName = getFileNameFromUrl(url);
+    const fileName = kind === "text" ? "" : getFileNameFromUrl(url);
 
     if (kind === "text") {
         return (
             <Text size="sm" style={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
-                {note?.value || ""}
+                {url || ""}
             </Text>
         );
     }
+
     if (kind === "image") {
         return (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -90,6 +115,7 @@ const NoteContent = ({ note }) => {
             </div>
         );
     }
+
     if (kind === "video") {
         return (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -100,6 +126,7 @@ const NoteContent = ({ note }) => {
             </div>
         );
     }
+
     if (kind === "audio") {
         return (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
@@ -110,6 +137,7 @@ const NoteContent = ({ note }) => {
             </div>
         );
     }
+
     return (
         <Text size="sm" style={{ whiteSpace: "pre-wrap" }}>
             {getLanguageByKey("Файл заметки")}:{" "}
@@ -128,17 +156,10 @@ const NOTE_STYLE = {
     file: { border: "#d9d9d9", bg: "linear-gradient(180deg,#fafafa 0%,#ffffff 60%)", icon: FiFileText, label: "File" },
 };
 
-export const ChatNoteCard = ({
-    note,
-    techLabel,
-    showActions = true,
-    className,
-    style,
-}) => {
+export const ChatNoteCard = ({ note, techLabel, showActions = true, className, style }) => {
     const kind = getNoteKind(note);
     const meta = NOTE_STYLE[kind] || NOTE_STYLE.file;
     const Icon = meta.icon;
-    const url = note?.value;
 
     return (
         <Paper
@@ -173,7 +194,6 @@ export const ChatNoteCard = ({
                         {getLanguageByKey(meta.label)}
                     </Badge>
                 </Group>
-
             </Flex>
 
             <Flex direction="column" gap="8" px="12" py="10">
