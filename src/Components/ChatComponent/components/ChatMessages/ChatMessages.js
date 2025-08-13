@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Flex, Text } from "@mantine/core";
+import { Flex, Text, Paper, Divider } from "@mantine/core";
 import dayjs from "dayjs";
 import { useUser, useMessagesContext } from "@hooks";
 import { api } from "@api";
@@ -10,6 +10,7 @@ import { ChatInput } from "../ChatInput";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
 import { InlineNoteComposer } from "../../../InlineNoteComposer";
+import { TicketParticipants } from "../../../TicketParticipants";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) =>
@@ -147,6 +148,14 @@ export const ChatMessages = ({
 
   return (
     <Flex w="100%" direction="column" className="chat-area">
+      {/* Панель участников тикета */}
+      {ticketId && (
+        <Paper shadow="xs" p="8" style={{ borderRadius: 12, margin: "8px 16px 0" }}>
+          <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
+        </Paper>
+      )}
+
+      {/* Лента сообщений */}
       <Flex
         h="100vh"
         p="16"
