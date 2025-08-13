@@ -3824,4 +3824,29 @@ export const translations = {
     RO: "Fișier",
     EN: "File",
   },
+  you: {
+    RU: "Вы",
+    RO: "Tu",
+    EN: "You",
+  },
+  inTicket: {
+    RU: "В тикете",
+    RO: "În tichet",
+    EN: "In ticket",
+  },
+  noParticipantsInTicket: {
+    RU: "Никого нет в тикете",
+    RO: "Nu sunt participanți în tichet",
+    EN: "No participants in ticket",
+  },
+  showAllParticipants: {
+    RU: "Показать всех участников",
+    RO: "Afișează toți participanții",
+    EN: "Show all participants",
+  },
+  andMore: {
+    RU: "и ещё",
+    RO: "și încă",
+    EN: "and more",
+  },
 }

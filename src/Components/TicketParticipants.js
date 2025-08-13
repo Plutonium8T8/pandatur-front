@@ -1,71 +1,82 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Avatar, Badge, Group, Stack, Text, Tooltip, Flex } from "@mantine/core";
+import React, { useContext, useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { Badge, Group, Text, Popover, ScrollArea } from "@mantine/core";
 import { SocketContext } from "../contexts/SocketContext";
 import { useGetTechniciansList } from "@hooks";
 import { getLanguageByKey } from "@utils";
 
-// серверные события
 const SERVER = {
-    INIT: "ticket_clients",          // { ticket_id, clients: number[], action: 'initial_list' }
-    JOINED: "ticket_client_joined",  // { ticket_id, client_id, total_clients }
-    LEFT: "ticket_client_left",      // { ticket_id, client_id, total_clients }
+    INIT: "ticket_clients",
+    JOINED: "ticket_client_joined",
+    LEFT: "ticket_client_left",
     ERROR: "error",
 };
 
-// ===== ХУК ПРИСУТСТВИЯ =====
 export const useTicketPresence = (ticketId, clientId) => {
     const { sendedValue, joinTicketRoom, leaveTicketRoom, onOpenSubscribe, socketRef } = useContext(SocketContext);
     const [connected, setConnected] = useState(false);
     const [presence, setPresence] = useState({ ticketId: null, clients: [], total: 0 });
+    const joinedRef = useRef({ ticketId: null, clientId: null });
 
-    // индикатор online/offline
     useEffect(() => {
         const ws = socketRef.current;
-        if (!ws) {
-            setConnected(false);
-            return;
-        }
+        if (!ws) { setConnected(false); return; }
         setConnected(ws.readyState === WebSocket.OPEN);
-
-        const handleOpen = () => setConnected(true);
-        const handleClose = () => setConnected(false);
-
-        ws.addEventListener?.("open", handleOpen);
-        ws.addEventListener?.("close", handleClose);
-
+        const onOpen = () => setConnected(true);
+        const onClose = () => setConnected(false);
+        ws.addEventListener?.("open", onOpen);
+        ws.addEventListener?.("close", onClose);
         return () => {
-            ws?.removeEventListener?.("open", handleOpen);
-            ws?.removeEventListener?.("close", handleClose);
+            ws?.removeEventListener?.("open", onOpen);
+            ws?.removeEventListener?.("close", onClose);
         };
     }, [socketRef]);
 
-    // join/leave комнаты
     useEffect(() => {
         if (!ticketId || !clientId) return;
-        joinTicketRoom(ticketId, clientId);
-        return () => leaveTicketRoom(ticketId, clientId);
+
+        const prev = joinedRef.current;
+        const sameTicket = String(prev.ticketId) === String(ticketId);
+        const sameClient = String(prev.clientId) === String(clientId);
+
+        if (!sameTicket || !sameClient) {
+            if (prev.ticketId && prev.clientId && !sameTicket) {
+                leaveTicketRoom(prev.ticketId, prev.clientId);
+            }
+            joinTicketRoom(ticketId, clientId);
+            joinedRef.current = { ticketId, clientId };
+        }
+
+        return () => {
+            const cur = joinedRef.current;
+            if (cur.ticketId && cur.clientId) {
+                leaveTicketRoom(cur.ticketId, cur.clientId);
+                joinedRef.current = { ticketId: null, clientId: null };
+            }
+        };
     }, [ticketId, clientId, joinTicketRoom, leaveTicketRoom]);
 
-    // re-join после реконнекта
     useEffect(() => {
         if (!ticketId || !clientId) return;
-        const unsub = onOpenSubscribe(() => joinTicketRoom(ticketId, clientId));
+        const unsub = onOpenSubscribe(() => {
+            const cur = joinedRef.current;
+            if (String(cur.ticketId) === String(ticketId) && String(cur.clientId) === String(clientId)) {
+                joinTicketRoom(ticketId, clientId);
+            }
+        });
         return () => unsub && unsub();
     }, [ticketId, clientId, onOpenSubscribe, joinTicketRoom]);
 
-    // входящие события сервера
     useEffect(() => {
         const msg = sendedValue;
         if (!msg || !msg.type) return;
         const { type, data } = msg;
-
         if (!data || String(data.ticket_id) !== String(ticketId)) return;
 
         switch (type) {
             case SERVER.INIT: {
                 const existing = Array.isArray(data.clients) ? data.clients.map(Number) : [];
                 const set = new Set(existing);
-                if (clientId != null) set.add(Number(clientId)); // сервер шлёт список без нас — добавим локально
+                if (clientId != null) set.add(Number(clientId));
                 const clients = Array.from(set);
                 setPresence({ ticketId: data.ticket_id, clients, total: clients.length });
                 break;
@@ -87,27 +98,19 @@ export const useTicketPresence = (ticketId, clientId) => {
                 });
                 break;
             }
-            default:
-                break;
+            default: break;
         }
     }, [sendedValue, ticketId, clientId]);
 
     return { connected, clients: presence.clients, total: presence.total };
 };
 
-// ===== UI =====
-const getInitials = (name, surname) => {
-    const n = (name || "").trim();
-    const s = (surname || "").trim();
-    const a = (n ? n[0] : "") + (s ? s[0] : "");
-    return a || "U";
-};
-
-const SYSTEM_ID = 1; // показываем "System" при id=1
+const SYSTEM_ID = 1;
+const MAX_INLINE_NAMES = 4;
 
 export const TicketParticipants = ({ ticketId, currentUserId }) => {
-    const { technicians, loading: loadingTechs } = useGetTechniciansList(); // [{value,label,name,surname}, ...]
-    const { connected, clients, total } = useTicketPresence(ticketId, currentUserId);
+    const { technicians } = useGetTechniciansList();
+    const { clients, total } = useTicketPresence(ticketId, currentUserId);
 
     const techMap = useMemo(() => {
         const map = new Map();
@@ -115,43 +118,67 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
         return map;
     }, [technicians]);
 
-    const items = useMemo(() => {
+    const fullNames = useMemo(() => {
         return clients.map((id) => {
-            if (Number(id) === SYSTEM_ID) return { id, label: "System", name: "System", surname: "", you: false };
+            if (Number(id) === SYSTEM_ID) return "System";
             const t = techMap.get(Number(id));
-            const you = String(id) === String(currentUserId);
-            return { id, label: t?.label || `User ${id}`, name: t?.name, surname: t?.surname, you };
+            const base = t?.label || [t?.name, t?.surname].filter(Boolean).join(" ") || `User ${id}`;
+            return String(id) === String(currentUserId) ? `${base}` : base;
         });
     }, [clients, techMap, currentUserId]);
 
-    return (
-        <Stack gap={6}>
-            <Group justify="space-between" align="center">
-                <Group gap={8}>
-                    <Text fw={600}>{getLanguageByKey("Участники тикета")}</Text>
-                    <Badge variant="light">{total}</Badge>
-                </Group>
-                <Badge color={connected ? "green" : "red"} variant="light">
-                    {connected ? getLanguageByKey("online") : getLanguageByKey("offline")}
-                </Badge>
-            </Group>
+    const inline = fullNames.slice(0, MAX_INLINE_NAMES);
+    const rest = fullNames.slice(MAX_INLINE_NAMES);
+    const hasMore = rest.length > 0;
 
-            <Flex wrap="wrap" gap={8}>
-                {items.map((u) => {
-                    const initials = getInitials(u.name, u.surname);
-                    const title = u.you ? `${u.label} • ${getLanguageByKey("Вы")}` : u.label;
-                    return (
-                        <Tooltip key={u.id} label={title} withArrow>
-                            <Avatar radius="xl">{initials}</Avatar>
-                        </Tooltip>
-                    );
-                })}
-                {!loadingTechs && items.length === 0 && (
-                    <Text size="sm" c="dimmed">
-                        {getLanguageByKey("Никого нет в тикете")}
-                    </Text>
-                )}
-            </Flex>
-        </Stack>
+    return (
+        <Group align="center" gap="8" wrap="nowrap" style={{ width: "100%" }}>
+            <Badge variant="light">{total}</Badge>
+
+            <Text size="sm" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+                {getLanguageByKey("inTicket")}:
+            </Text>
+
+            {fullNames.length > 0 ? (
+                <Text
+                    size="sm"
+                    style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        flex: 1,
+                        minWidth: 0,
+                    }}
+                    title={inline.join(", ")}
+                >
+                    {inline.join(", ")}
+                    {hasMore && "…"}
+                </Text>
+            ) : (
+                <Text size="sm" c="dimmed">
+                    {getLanguageByKey("noParticipantsInTicket")}
+                </Text>
+            )}
+
+            {hasMore && (
+                <Popover width={320} position="bottom-end" withArrow shadow="md">
+                    <Popover.Target>
+                        <Text
+                            size="sm"
+                            c="blue"
+                            style={{ cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" }}
+                            aria-label={getLanguageByKey("showAllParticipants")}
+                        >
+                            {getLanguageByKey("andMore")} {rest.length}
+                        </Text>
+                    </Popover.Target>
+                    <Popover.Dropdown>
+                        <ScrollArea.Autosize mah={220} type="auto">
+                            <Text size="sm">{rest.join(", ")}</Text>
+                        </ScrollArea.Autosize>
+                    </Popover.Dropdown>
+                </Popover>
+            )}
+        </Group>
     );
 };
