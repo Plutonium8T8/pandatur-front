@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Flex, Text, Paper, Divider } from "@mantine/core";
+import { Flex, Text, Paper } from "@mantine/core";
 import dayjs from "dayjs";
 import { useUser, useMessagesContext } from "@hooks";
 import { api } from "@api";
@@ -149,7 +149,7 @@ export const ChatMessages = ({
   return (
     <Flex w="100%" direction="column" className="chat-area">
       {ticketId && (
-        <Paper  p="8" style={{ borderRadius: 12, margin: "12px 42px" }}>
+        <Paper p="8" style={{ borderRadius: 12, margin: "12px 42px" }}>
           <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
         </Paper>
       )}
