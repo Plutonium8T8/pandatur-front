@@ -8,13 +8,18 @@ import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import { socialMediaIcons } from "../../../utils";
 import { ChatNoteCard } from "../../../ChatNoteCard";
 import { useLiveTicketLogs } from "../../../../hooks/useLiveTicketLogs";
+import { useLiveTicketNotes } from "../../../../hooks/useLiveTicketNotes";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
+const makeNoteKey = (n) =>
+  `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
+
 export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
   const { liveLogs = [] } = useLiveTicketLogs(ticketId);
+  const { liveNotes = [] } = useLiveTicketNotes(ticketId);
 
   const technicianMap = useMemo(() => {
     const map = new Map();
@@ -63,24 +68,47 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     }));
   }, [rawLogs, liveLogs, ticketId]);
 
-  const notes = (apiNotes || [])
-    .filter((n) => Number(n.ticket_id) == Number(ticketId))
-    .map((n) => {
+  const mergedNotes = useMemo(() => {
+    const map = new Map();
+
+    (apiNotes || [])
+      .filter((n) => Number(n.ticket_id) === Number(ticketId))
+      .forEach((n) => {
+        const key = makeNoteKey({
+          ticket_id: n.ticket_id,
+          technician_id: n.technician_id,
+          type: n.type,
+          value: n.value,
+          created_at: n.created_at,
+        });
+        map.set(key, { ...n, __live: false });
+      });
+
+    (liveNotes || []).forEach((n) => {
+      if (Number(n.ticket_id) !== Number(ticketId)) return;
+      const key = makeNoteKey(n);
+      map.set(key, { ...n, __live: true });
+    });
+
+    return Array.from(map.values()).map((n) => {
       let ts = dayjs(n.created_at, DD_MM_YYYY__HH_mm_ss, true);
       if (!ts.isValid()) ts = dayjs(n.created_at);
       if (!ts.isValid()) ts = dayjs();
+
       return {
         ...n,
         itemType: "note",
         sortTime: ts.valueOf(),
         dateDivider: ts.format(DD_MM_YYYY),
         timeCreatedDisplay: ts.format(DD_MM_YYYY__HH_mm_ss),
+        isLive: !!n.__live,
       };
     });
+  }, [apiNotes, liveNotes, ticketId]);
 
   const allItems = useMemo(
-    () => [...messages, ...mergedLogs, ...notes].sort((a, b) => a.sortTime - b.sortTime),
-    [messages, mergedLogs, notes]
+    () => [...messages, ...mergedLogs, ...mergedNotes].sort((a, b) => a.sortTime - b.sortTime),
+    [messages, mergedLogs, mergedNotes]
   );
 
   const itemsByDate = useMemo(() => {
@@ -162,7 +190,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                     return (
                       <ChatNoteCard
-                        key={`note-${n.id}-${i}`}
+                        key={`note-${makeNoteKey(n)}-${i}`}
                         note={n}
                         techLabel={tech.label}
                       />
