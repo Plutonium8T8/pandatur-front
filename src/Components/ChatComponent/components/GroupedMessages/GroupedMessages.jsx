@@ -7,12 +7,14 @@ import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import { socialMediaIcons } from "../../../utils";
 import { ChatNoteCard } from "../../../ChatNoteCard";
+import { useLiveTicketLogs } from "../../../../hooks/useLiveTicketLogs";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
+  const { liveLogs = [] } = useLiveTicketLogs(ticketId);
 
   const technicianMap = useMemo(() => {
     const map = new Map();
@@ -36,14 +38,30 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       platform: msg.platform?.toLowerCase?.() || "",
     }));
 
-  const logs = rawLogs
-    .filter((log) => Number(log.ticket_id) === Number(ticketId))
-    .map((log) => ({
+  const mergedLogs = useMemo(() => {
+    const map = new Map();
+
+    rawLogs
+      .filter((l) => Number(l.ticket_id) === Number(ticketId))
+      .forEach((l) => {
+        const key = l.id ?? `${l.timestamp}-${l.subject}`;
+        map.set(key, { ...l, __live: false });
+      });
+
+    (liveLogs || []).forEach((l) => {
+      if (Number(l.ticket_id) !== Number(ticketId)) return;
+      const key = l.id ?? `${l.timestamp}-${l.subject}`;
+      map.set(key, { ...l, __live: true });
+    });
+
+    return Array.from(map.values()).map((log) => ({
       ...log,
       itemType: "log",
       sortTime: parseServerDate(log.timestamp).valueOf(),
       dateDivider: parseServerDate(log.timestamp).format(DD_MM_YYYY),
+      isLive: !!log.__live,
     }));
+  }, [rawLogs, liveLogs, ticketId]);
 
   const notes = (apiNotes || [])
     .filter((n) => Number(n.ticket_id) == Number(ticketId))
@@ -61,8 +79,8 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     });
 
   const allItems = useMemo(
-    () => [...messages, ...logs, ...notes].sort((a, b) => a.sortTime - b.sortTime),
-    [messages, logs, notes]
+    () => [...messages, ...mergedLogs, ...notes].sort((a, b) => a.sortTime - b.sortTime),
+    [messages, mergedLogs, notes]
   );
 
   const itemsByDate = useMemo(() => {
@@ -125,11 +143,13 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                 {clientBlocks.map((block, i) => {
                   if (block.log) {
+                    const logKey = String(block.log.id ?? `${block.log.timestamp}-${i}`);
                     return (
                       <MessagesLogItem
-                        key={`log-${block.log.id}-${block.log.timestamp}-${i}`}
+                        key={`log-${logKey}`}
                         log={block.log}
                         technicians={technicians}
+                        isLive={block.log.isLive}
                       />
                     );
                   }
@@ -178,9 +198,19 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                         const technician = technicianMap.get(Number(msg.sender_id));
                         return isClientMessage ? (
-                          <ReceivedMessage key={`${msg.id}-${idx}`} msg={msg} personalInfo={personalInfo} technicians={technicians} />
+                          <ReceivedMessage
+                            key={`${msg.id}-${idx}`}
+                            msg={msg}
+                            personalInfo={personalInfo}
+                            technicians={technicians}
+                          />
                         ) : (
-                          <SendedMessage key={`${msg.id}-${idx}`} msg={msg} technician={technician} technicians={technicians} />
+                          <SendedMessage
+                            key={`${msg.id}-${idx}`}
+                            msg={msg}
+                            technician={technician}
+                            technicians={technicians}
+                          />
                         );
                       })}
                     </Flex>

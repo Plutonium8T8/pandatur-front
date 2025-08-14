@@ -41,6 +41,7 @@ export const ChatMessages = ({
   } = useMessagesContext();
 
   const messageContainerRef = useRef(null);
+  const contentRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
 
@@ -86,6 +87,7 @@ export const ChatMessages = ({
     setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
   }, []);
 
+  // автоскролл при изменении messages/notes
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
@@ -93,6 +95,21 @@ export const ChatMessages = ({
       });
     }
   }, [messages, ticketId, apiNotesFromCtx, isUserAtBottom]);
+
+  useEffect(() => {
+    const container = messageContainerRef.current;
+    const contentEl = contentRef.current;
+    if (!container || !contentEl) return;
+
+    const ro = new ResizeObserver(() => {
+      if (isUserAtBottom) {
+        container.scrollTo({ top: container.scrollHeight });
+      }
+    });
+
+    ro.observe(contentEl);
+    return () => ro.disconnect();
+  }, [isUserAtBottom]);
 
   useEffect(() => {
     const el = messageContainerRef.current;
@@ -126,12 +143,14 @@ export const ChatMessages = ({
 
     if (ticketId) {
       return (
-        <GroupedMessages
-          personalInfo={personalInfo}
-          ticketId={ticketId}
-          technicians={technicians}
-          apiNotes={apiNotesFromCtx}
-        />
+        <div ref={contentRef}>
+          <GroupedMessages
+            personalInfo={personalInfo}
+            ticketId={ticketId}
+            technicians={technicians}
+            apiNotes={apiNotesFromCtx}
+          />
+        </div>
       );
     }
 
