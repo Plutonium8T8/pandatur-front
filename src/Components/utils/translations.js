@@ -3858,5 +3858,10 @@ export const translations = {
     RU: "Пауза",
     RO: "Pauză",
     EN: "Pause",
+  },
+  socketMaxReconnectReached: {
+    RU: "Превышено максимальное число попыток переподключения",
+    RO: "Numărul maxim de încercări de reconectare a fost atins",
+    EN: "Maximum reconnect attempts reached",
   }
 }
