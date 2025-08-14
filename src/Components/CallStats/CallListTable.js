@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, Flex, Pagination, Badge, ActionIcon } from "@mantine/core";
+import { Box, Flex, Pagination, Badge, ActionIcon, LoadingOverlay, Loader } from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
 import { format } from "date-fns";
@@ -21,62 +21,66 @@ export const CallListTable = ({
     loading,
     techniciansMap,
 }) => {
-    const columns = useMemo(() => [
-        {
-            title: getLanguageByKey("DateTime"),
-            dataIndex: "timestamp",
-            width: 180,
-            render: (ts) => (
-                <span style={{ fontFamily: "monospace" }}>{formatDate(ts)}</span>
-            ),
-        },
-        {
-            title: getLanguageByKey("Users"),
-            dataIndex: "user_id",
-            width: 200,
-            render: (userId) => techniciansMap.get(String(userId)) || userId,
-        },
-        {
-            title: getLanguageByKey("Client"),
-            dataIndex: "client_fullname",
-            width: 160,
-            render: (val) => val || "-",
-        },
-        {
-            title: getLanguageByKey("Ticket"),
-            dataIndex: "ticket_id",
-            width: 110,
-            render: (id) => id || "-",
-        },
-        {
-            title: getLanguageByKey("WhoCalled"),
-            dataIndex: "who_called",
-            width: 120,
-            render: (v) =>
-                v === "user"
-                    ? <Badge color="blue">{getLanguageByKey("User")}</Badge>
-                    : v === "client"
-                        ? <Badge color="green">{getLanguageByKey("Client")}</Badge>
-                        : v,
-        },
-        {
-            title: getLanguageByKey("Status"),
-            dataIndex: "status",
-            width: 110,
-            render: (v) =>
-                v === "ANSWER"
-                    ? <Badge color="teal">{getLanguageByKey("Answer")}</Badge>
-                    : v === "NOANSWER"
-                        ? <Badge color="red">{getLanguageByKey("NoAnswer")}</Badge>
-                        : v,
-        },
-        {
-            title: getLanguageByKey("Record"),
-            dataIndex: "call_url",
-            width: 110,
-            render: (url) =>
-                url
-                    ? (
+    const columns = useMemo(
+        () => [
+            {
+                title: getLanguageByKey("DateTime"),
+                dataIndex: "timestamp",
+                width: 180,
+                render: (ts) => (
+                    <span style={{ fontFamily: "monospace" }}>{formatDate(ts)}</span>
+                ),
+            },
+            {
+                title: getLanguageByKey("Users"),
+                dataIndex: "user_id",
+                width: 200,
+                render: (userId) => techniciansMap.get(String(userId)) || userId,
+            },
+            {
+                title: getLanguageByKey("Client"),
+                dataIndex: "client_fullname",
+                width: 160,
+                render: (val) => val || "-",
+            },
+            {
+                title: getLanguageByKey("Ticket"),
+                dataIndex: "ticket_id",
+                width: 110,
+                render: (id) => id || "-",
+            },
+            {
+                title: getLanguageByKey("WhoCalled"),
+                dataIndex: "who_called",
+                width: 120,
+                render: (v) =>
+                    v === "user" ? (
+                        <Badge color="blue">{getLanguageByKey("User")}</Badge>
+                    ) : v === "client" ? (
+                        <Badge color="green">{getLanguageByKey("Client")}</Badge>
+                    ) : (
+                        v
+                    ),
+            },
+            {
+                title: getLanguageByKey("Status"),
+                dataIndex: "status",
+                width: 110,
+                render: (v) =>
+                    v === "ANSWER" ? (
+                        <Badge color="teal">{getLanguageByKey("Answer")}</Badge>
+                    ) : v === "NOANSWER" ? (
+                        <Badge color="red">{getLanguageByKey("NoAnswer")}</Badge>
+                    ) : (
+                        v
+                    ),
+            },
+            {
+                title: getLanguageByKey("Record"),
+                dataIndex: "call_url",
+                width: 110,
+                render: (url) =>
+                    url ? (
                         <ActionIcon
                             component="a"
                             href={url}
@@ -87,20 +91,31 @@ export const CallListTable = ({
                         >
                             <FaDownload size={16} />
                         </ActionIcon>
-                    )
-                    : <span style={{ color: "#888" }}>—</span>,
-        },
-    ], [techniciansMap]);
+                    ) : (
+                        <span style={{ color: "#888" }}>—</span>
+                    ),
+            },
+        ],
+        [techniciansMap]
+    );
 
     return (
-        <Box p={"xs"}>
+        <Box p="xs" style={{ position: "relative" }}>
+            <LoadingOverlay
+                visible={loading}
+                zIndex={10}
+                overlayProps={{ blur: 1, backgroundOpacity: 0.6 }}
+                loaderProps={{ children: <Loader size="lg" /> }}
+            />
+
             <RcTable
                 columns={columns}
                 data={data}
                 bordered
-                loading={loading}
+                loading={false}
                 scroll={{ y: "calc(100vh - 330px)" }}
                 rowKey={(_, index) => `row_${index}`}
+                style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s ease" }}
             />
 
             <Flex justify="center" mt="md">
@@ -108,6 +123,7 @@ export const CallListTable = ({
                     total={pagination?.total_pages || 1}
                     value={pagination?.page || 1}
                     onChange={onPageChange}
+                    disabled={loading}
                 />
             </Flex>
         </Box>
