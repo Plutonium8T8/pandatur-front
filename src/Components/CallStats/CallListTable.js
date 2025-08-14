@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Box, Flex, Pagination, Badge, ActionIcon, LoadingOverlay, Loader } from "@mantine/core";
+import { Box, Flex, Pagination, Badge, ActionIcon, LoadingOverlay, Loader, Text } from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
 import { format } from "date-fns";
@@ -12,6 +12,20 @@ const formatDate = (ts) => {
     } catch {
         return "-";
     }
+};
+
+// форматирование duration (секунды → чч:мм:сс)
+const formatDuration = (totalSeconds = 0) => {
+    const h = Math.floor(totalSeconds / 3600);
+    const m = Math.floor((totalSeconds % 3600) / 60);
+    const s = Math.floor(totalSeconds % 60);
+    return [
+        h > 0 ? String(h).padStart(2, "0") : null,
+        String(m).padStart(2, "0"),
+        String(s).padStart(2, "0"),
+    ]
+        .filter(Boolean)
+        .join(":");
 };
 
 export const CallListTable = ({
@@ -77,20 +91,27 @@ export const CallListTable = ({
             },
             {
                 title: getLanguageByKey("Record"),
-                dataIndex: "call_url",
-                width: 110,
-                render: (url) =>
-                    url ? (
-                        <ActionIcon
-                            component="a"
-                            href={url}
-                            target="_blank"
-                            color="blue"
-                            variant="light"
-                            title={getLanguageByKey("DownloadListen")}
-                        >
-                            <FaDownload size={16} />
-                        </ActionIcon>
+                key: "record",
+                width: 140,
+                render: (_, record) =>
+                    record.call_url ? (
+                        <Flex align="center" gap={8}>
+                            <ActionIcon
+                                component="a"
+                                href={record.call_url}
+                                target="_blank"
+                                color="blue"
+                                variant="light"
+                                title={getLanguageByKey("DownloadListen")}
+                            >
+                                <FaDownload size={16} />
+                            </ActionIcon>
+                            {record.duration != null && (
+                                <Text size="sm" c="dimmed">
+                                    {formatDuration(record.duration)}
+                                </Text>
+                            )}
+                        </Flex>
                     ) : (
                         <span style={{ color: "#888" }}>—</span>
                     ),
