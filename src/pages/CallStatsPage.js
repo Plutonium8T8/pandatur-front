@@ -324,7 +324,7 @@ export const CallStatsPage = () => {
             data={filteredCalls}
             pagination={pagination}
             onPageChange={handlePageChange}
-            loading={loading} // спинер только в RcTable
+            loading={loading}
             techniciansMap={techniciansMap}
           />
         )}
@@ -342,7 +342,6 @@ export const CallStatsPage = () => {
         mode={mode}
       />
 
-      {/* Модалка SingleChat — открывается по роуту /analytics/calls/:ticketId */}
       <MantineModal
         fullScreen
         open={!!ticketId}
