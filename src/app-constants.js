@@ -50,6 +50,7 @@ export const TYPE_SOCKET_EVENTS = {
   TICKET_LEAVE: "ticket_leave",
   PING: "ping",
   TICKET_LOGS: "ticket_logs",
+  TICKET_NOTE: "ticket_note",
 };
 
 export const TYPE_TICKET = {
