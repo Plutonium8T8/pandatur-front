@@ -1,12 +1,23 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Flex, ActionIcon, TextInput, SegmentedControl, Text, Paper, Group } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  ActionIcon,
+  TextInput,
+  SegmentedControl,
+  Text,
+  Paper,
+  Group,
+} from "@mantine/core";
+import { useParams, useNavigate } from "react-router-dom";
 import { dashboard } from "../api/dashboard";
 import { useGetTechniciansList } from "../hooks";
 import { PageHeader } from "../Components/PageHeader";
 import { LuFilter } from "react-icons/lu";
 import { CallListTable } from "../Components/CallStats/CallListTable";
 import { CallStatsChartCard } from "../Components/CallStats/CallStatsChartCards";
-import { Spin } from "@components";
+import { MantineModal, Spin } from "@components";
+import SingleChat from "@components/ChatComponent/SingleChat";
 import { getLanguageByKey } from "../Components/utils";
 import { CallStatsFilterModal } from "../Components/CallStats/CallStatsFilterModal";
 
@@ -22,14 +33,17 @@ const formatDuration = (totalSeconds = 0) => {
   const h = Math.floor(totalSeconds / 3600);
   const m = Math.floor((totalSeconds % 3600) / 60);
   const s = Math.floor(totalSeconds % 60);
-  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 const isFilterActive = (filters) => {
   if (!filters) return false;
   return Object.entries(filters).some(([_, value]) => {
     if (Array.isArray(value)) return value.length > 0;
-    if (typeof value === "object" && value !== null) return Object.keys(value).length > 0;
+    if (typeof value === "object" && value !== null)
+      return Object.keys(value).length > 0;
     return value !== undefined && value !== null && value !== "";
   });
 };
@@ -46,7 +60,11 @@ export const CallStatsPage = () => {
     total_duration_to: 0,
   });
   const [callList, setCallList] = useState([]);
-  const [pagination, setPagination] = useState({ page: 1, total_pages: 1, total: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    total_pages: 1,
+    total: 0,
+  });
   const [loading, setLoading] = useState(false);
 
   const { technicians } = useGetTechniciansList();
@@ -54,6 +72,11 @@ export const CallStatsPage = () => {
   const [filterModalOpen, setFilterModalOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
+  // роут-параметры для открытия SingleChat
+  const { ticketId } = useParams();
+  const navigate = useNavigate();
+  const closeChat = () => navigate("/analytics/calls");
 
   useEffect(() => {
     if (mode === "stats") {
@@ -65,7 +88,8 @@ export const CallStatsPage = () => {
   const techniciansMap = useMemo(() => {
     const map = new Map();
     (technicians || []).forEach((tech) => {
-      if (!tech.value || !tech.label || tech.value.startsWith("__group__")) return;
+      if (!tech.value || !tech.label || tech.value.startsWith("__group__"))
+        return;
       map.set(String(tech.value), tech.label);
     });
     return map;
@@ -132,10 +156,10 @@ export const CallStatsPage = () => {
     });
   }, [searchValue, statsData, techniciansMap]);
 
-  // для calls всегда без поиска по строке
   const filteredCalls = useMemo(() => callList || [], [callList]);
 
-  const handlePageChange = (p) => setPagination((prev) => ({ ...prev, page: p }));
+  const handlePageChange = (p) =>
+    setPagination((prev) => ({ ...prev, page: p }));
 
   return (
     <Box
@@ -179,18 +203,20 @@ export const CallStatsPage = () => {
             >
               <LuFilter size={22} />
             </ActionIcon>
+
             {mode === "stats" && (
               <TextInput
                 w={320}
                 placeholder={getLanguageByKey("SearchTechnician")}
                 value={search}
-                onChange={e => setSearch(e.target.value)}
+                onChange={(e) => setSearch(e.target.value)}
                 style={{ minWidth: 220 }}
               />
             )}
+
             <SegmentedControl
               value={mode}
-              onChange={value => {
+              onChange={(value) => {
                 setMode(value);
                 setPagination({ page: 1, total_pages: 1, total: 0 });
               }}
@@ -225,26 +251,48 @@ export const CallStatsPage = () => {
           >
             <Flex align="center" gap={40} wrap="wrap">
               <Group>
-                <Text fw={700} c={COLORS.textMain} size="xl">{getLanguageByKey("TotalCalls")}</Text>
-                <Text fw={700} c={COLORS.total} size="xl">{statsSummary.total_all_users}</Text>
+                <Text fw={700} c={COLORS.textMain} size="xl">
+                  {getLanguageByKey("TotalCalls")}
+                </Text>
+                <Text fw={700} c={COLORS.total} size="xl">
+                  {statsSummary.total_all_users}
+                </Text>
               </Group>
               <Group>
-                <Text c={COLORS.to} fw={600} size="lg">{getLanguageByKey("Incoming")}</Text>
-                <Text fw={700} c={COLORS.to} size="xl">{statsSummary.total_calls_from}</Text>
-                <Text c={COLORS.from} fw={600} ml="xl" size="lg">{getLanguageByKey("Outgoing")}</Text>
-                <Text fw={700} c={COLORS.from} size="xl">{statsSummary.total_calls_to}</Text>
+                <Text c={COLORS.to} fw={600} size="lg">
+                  {getLanguageByKey("Incoming")}
+                </Text>
+                <Text fw={700} c={COLORS.to} size="xl">
+                  {statsSummary.total_calls_from}
+                </Text>
+                <Text c={COLORS.from} fw={600} ml="xl" size="lg">
+                  {getLanguageByKey("Outgoing")}
+                </Text>
+                <Text fw={700} c={COLORS.from} size="xl">
+                  {statsSummary.total_calls_to}
+                </Text>
               </Group>
               <Group>
-                <Text c={COLORS.textMain} fw={600} size="lg">{getLanguageByKey("TotalDuration")}</Text>
+                <Text c={COLORS.textMain} fw={600} size="lg">
+                  {getLanguageByKey("TotalDuration")}
+                </Text>
                 <Text fw={700} c={COLORS.total} size="xl">
                   {formatDuration(statsSummary.total_duration)}
                 </Text>
               </Group>
               <Group>
-                <Text c={COLORS.to} fw={600} size="lg">{getLanguageByKey("IncomingDuration")}</Text>
-                <Text fw={700} c={COLORS.to} size="xl">{formatDuration(statsSummary.total_duration_from)}</Text>
-                <Text c={COLORS.from} fw={600} ml="xl" size="lg">{getLanguageByKey("OutgoingDuration")}</Text>
-                <Text fw={700} c={COLORS.from} size="xl">{formatDuration(statsSummary.total_duration_to)}</Text>
+                <Text c={COLORS.to} fw={600} size="lg">
+                  {getLanguageByKey("IncomingDuration")}
+                </Text>
+                <Text fw={700} c={COLORS.to} size="xl">
+                  {formatDuration(statsSummary.total_duration_from)}
+                </Text>
+                <Text c={COLORS.from} fw={600} ml="xl" size="lg">
+                  {getLanguageByKey("OutgoingDuration")}
+                </Text>
+                <Text fw={700} c={COLORS.from} size="xl">
+                  {formatDuration(statsSummary.total_duration_to)}
+                </Text>
               </Group>
             </Flex>
           </Paper>
@@ -252,34 +300,36 @@ export const CallStatsPage = () => {
       )}
 
       <Box px={32}>
-        {mode === "stats" && (
-          loading ? (
-            <Flex align="center" justify="center" mt={48}><Spin /></Flex>
+        {mode === "stats" &&
+          (loading ? (
+            <Flex align="center" justify="center" mt={48}>
+              <Spin />
+            </Flex>
+          ) : filteredStats.length === 0 ? (
+            <Text c="dimmed" ta="center" mt={48}>
+              {getLanguageByKey("NoData")}
+            </Text>
           ) : (
-            filteredStats.length === 0 ? (
-              <Text c="dimmed" ta="center" mt={48}>{getLanguageByKey("NoData")}</Text>
-            ) : (
-              filteredStats.map((user) => (
-                <CallStatsChartCard
-                  key={user.user_id}
-                  user={user}
-                  fullName={techniciansMap.get(String(user.user_id))}
-                />
-              ))
-            )
-          )
-        )}
+            filteredStats.map((user) => (
+              <CallStatsChartCard
+                key={user.user_id}
+                user={user}
+                fullName={techniciansMap.get(String(user.user_id))}
+              />
+            ))
+          ))}
 
         {mode === "calls" && (
           <CallListTable
             data={filteredCalls}
             pagination={pagination}
             onPageChange={handlePageChange}
-            loading={loading}
+            loading={loading} // спинер только в RcTable
             techniciansMap={techniciansMap}
           />
         )}
       </Box>
+
       <CallStatsFilterModal
         opened={filterModalOpen}
         onClose={() => setFilterModalOpen(false)}
@@ -291,6 +341,25 @@ export const CallStatsPage = () => {
         technicians={technicians}
         mode={mode}
       />
+
+      {/* Модалка SingleChat — открывается по роуту /analytics/calls/:ticketId */}
+      <MantineModal
+        fullScreen
+        open={!!ticketId}
+        onClose={closeChat}
+        title={false}
+        withCloseButton={false}
+        style={{ padding: 0 }}
+        height="100%"
+      >
+        {ticketId && (
+          <SingleChat
+            ticketId={ticketId}
+            onClose={closeChat}
+            technicians={technicians}
+          />
+        )}
+      </MantineModal>
     </Box>
   );
 };
