@@ -1,9 +1,12 @@
-import { useMemo, useRef, useState } from "react";
-import { Box, Flex, Pagination, Badge, ActionIcon, LoadingOverlay, Loader, Text, Tooltip } from "@mantine/core";
+import { useMemo, useRef, useState, useEffect } from "react";
+import {
+    Box, Flex, Pagination, Badge, ActionIcon, Text, Tooltip, Anchor
+} from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
 import { format } from "date-fns";
 import { FaDownload, FaPlay, FaPause } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 const formatDate = (ts) => {
     if (!ts) return "-";
@@ -33,6 +36,12 @@ export const CallListTable = ({
     const audioRef = useRef(null);
     const [playingUrl, setPlayingUrl] = useState(null);
 
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) audioRef.current.pause();
+        };
+    }, []);
+
     const playUrl = async (url) => {
         try {
             if (audioRef.current) {
@@ -44,8 +53,7 @@ export const CallListTable = ({
             audio.onended = () => setPlayingUrl(null);
             await audio.play();
             setPlayingUrl(url);
-        } catch {
-        }
+        } catch { }
     };
 
     const togglePlay = (url) => {
@@ -87,8 +95,24 @@ export const CallListTable = ({
             {
                 title: getLanguageByKey("Ticket"),
                 dataIndex: "ticket_id",
-                width: 110,
-                render: (id) => id || "-",
+                width: 140,
+                render: (id) =>
+                    id ? (
+                        <Tooltip label={getLanguageByKey("OpenChat")}>
+                            <Anchor
+                                component={Link}
+                                to={`/analytics/calls/${id}`}
+                                c="blue"
+                                underline="always"
+                                fw={600}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                {id}
+                            </Anchor>
+                        </Tooltip>
+                    ) : (
+                        "-"
+                    ),
             },
             {
                 title: getLanguageByKey("WhoCalled"),
@@ -119,7 +143,7 @@ export const CallListTable = ({
             {
                 title: getLanguageByKey("Record"),
                 key: "record",
-                width: 90,
+                width: 180,
                 render: (_, record) =>
                     record.call_url ? (
                         <Flex align="center" gap={8}>
@@ -127,7 +151,10 @@ export const CallListTable = ({
                                 <ActionIcon
                                     color={playingUrl === record.call_url ? "teal" : "blue"}
                                     variant="light"
-                                    onClick={() => togglePlay(record.call_url)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        togglePlay(record.call_url);
+                                    }}
                                 >
                                     {playingUrl === record.call_url ? <FaPause size={14} /> : <FaPlay size={14} />}
                                 </ActionIcon>
@@ -140,6 +167,7 @@ export const CallListTable = ({
                                     target="_blank"
                                     color="blue"
                                     variant="light"
+                                    onClick={(e) => e.stopPropagation()}
                                 >
                                     <FaDownload size={16} />
                                 </ActionIcon>
@@ -160,22 +188,14 @@ export const CallListTable = ({
     );
 
     return (
-        <Box p="xs" style={{ position: "relative" }}>
-            <LoadingOverlay
-                visible={loading}
-                zIndex={10}
-                overlayProps={{ blur: 1, backgroundOpacity: 0.6 }}
-                loaderProps={{ children: <Loader size="lg" /> }}
-            />
-
+        <Box p="xs">
             <RcTable
                 columns={columns}
                 data={data}
                 bordered
-                loading={false}
+                loading={loading}
                 scroll={{ y: "calc(100vh - 330px)" }}
                 rowKey={(_, index) => `row_${index}`}
-                style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s ease" }}
             />
 
             <Flex justify="center" mt="md">
