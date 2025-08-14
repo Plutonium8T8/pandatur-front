@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, useEffect } from "react";
 import {
-    Box, Flex, Pagination, Badge, ActionIcon, Text, Tooltip, Anchor
+    Box, Flex, Pagination, Badge, ActionIcon, Text, Tooltip, Anchor, LoadingOverlay
 } from "@mantine/core";
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
@@ -34,7 +34,6 @@ export const CallListTable = ({
     const [localLoading, setLocalLoading] = useState(false);
 
     useEffect(() => {
-        // когда родительская загрузка закончилась — снимаем локальный
         if (!loading) setLocalLoading(false);
     }, [loading, data, pagination?.page]);
 
@@ -87,16 +86,16 @@ export const CallListTable = ({
             width: 140,
             render: (id) =>
                 id ? (
-                        <Anchor
-                            component={Link}
-                            to={`/analytics/calls/${id}`}
-                            c="blue"
-                            underline="always"
-                            fw={600}
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {id}
-                        </Anchor>
+                    <Anchor
+                        component={Link}
+                        to={`/analytics/calls/${id}`}
+                        c="blue"
+                        underline="always"
+                        fw={600}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        {id}
+                    </Anchor>
                 ) : "-",
         },
         {
@@ -156,29 +155,40 @@ export const CallListTable = ({
     ], [techniciansMap, playingUrl]);
 
     const handlePaginate = (p) => {
-        setLocalLoading(true);
+        setLocalLoading(true);      
         onPageChange?.(p);
     };
 
+    const overlayVisible = loading || localLoading;
+
     return (
         <Box p="xs">
-            <RcTable
-                columns={columns}
-                data={data}
-                bordered
-                loading={loading || localLoading}
-                scroll={{ y: "calc(100vh - 330px)" }}
-                rowKey={(_, index) => `row_${index}`}
-            />
-
-            <Flex justify="center" mt="md" style={{ position: "relative", minHeight: 48 }}>
-                <Pagination
-                    total={pagination?.total_pages || 1}
-                    value={pagination?.page || 1}
-                    onChange={handlePaginate}
-                    disabled={loading || localLoading}
+            <Box pos="relative">
+                <LoadingOverlay
+                    visible={overlayVisible}
+                    zIndex={10}
+                    overlayProps={{ blur: 1, backgroundOpacity: 0.35 }}
                 />
-            </Flex>
+
+                <RcTable
+                    columns={columns}
+                    data={data}
+                    bordered
+                    loading={false}
+                    scroll={{ y: "calc(100vh - 330px)" }}
+                    rowKey={(_, index) => `row_${index}`}
+                    style={{ opacity: overlayVisible ? 0.7 : 1, transition: "opacity .15s ease" }}
+                />
+
+                <Flex justify="center" mt="md" style={{ position: "relative", minHeight: 48 }}>
+                    <Pagination
+                        total={pagination?.total_pages || 1}
+                        value={pagination?.page || 1}
+                        onChange={handlePaginate}
+                        disabled={overlayVisible}
+                    />
+                </Flex>
+            </Box>
         </Box>
     );
 };

@@ -73,7 +73,6 @@ export const CallStatsPage = () => {
   const [search, setSearch] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  // роут-параметры для открытия SingleChat
   const { ticketId } = useParams();
   const navigate = useNavigate();
   const closeChat = () => navigate("/analytics/calls");

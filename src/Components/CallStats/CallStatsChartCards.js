@@ -6,7 +6,7 @@ const COLORS = {
     from: "#4fc3f7",
     to: "#81c784",
     total: "#0f824c",
-    bgCard: "#fff", // Белый фон
+    bgCard: "#fff",
     textDark: "#222",
 };
 

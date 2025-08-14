@@ -203,8 +203,6 @@ export const CallStatsChart = () => {
                         ))
                 )}
             </Box>
-            {/* Место для фильтра */}
-            {/* <YourFilterModal opened={filterModalOpen} onClose={() => setFilterModalOpen(false)} onApply={setFilters} filters={filters} /> */}
         </Box>
     );
 };
