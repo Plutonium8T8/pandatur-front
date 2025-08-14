@@ -28,7 +28,7 @@ import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 import "./ChatInput.css";
 
-const SEND_AS_SINGLE_BATCH = false; // <-- поставь true, если API поддерживает attachments[]
+const SEND_AS_SINGLE_BATCH = false;
 
 const pandaNumbersWhatsup = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" },
@@ -63,8 +63,7 @@ export const ChatInput = ({
   const [showEmailForm, setShowEmailForm] = useState(false);
   const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
-  // новые состояния для мульти-вложений
-  const [attachments, setAttachments] = useState([]); // [{ media_url, media_type, name, size }]
+  const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
 
   const actionNeededInit = useRef(undefined);
@@ -119,7 +118,6 @@ export const ChatInput = ({
     setShowEmojiPicker((prev) => !prev);
   };
 
-  // ====== загрузка файлов (кнопка / dnd / paste) ======
   const uploadAndAddFiles = async (files) => {
     if (!files?.length) return;
     handlers.open();
@@ -138,7 +136,6 @@ export const ChatInput = ({
       console.error(e);
     } finally {
       handlers.close();
-      // после вставки/дропа фокус обратно в текст
       requestAnimationFrame(() => textAreaRef.current?.focus());
     }
   };
@@ -157,7 +154,7 @@ export const ChatInput = ({
 
   const handlePaste = async (e) => {
     const files = Array.from(e.clipboardData?.files || []);
-    if (!files.length) return; // текст идёт как обычно
+    if (!files.length) return;
     e.preventDefault();
     await uploadAndAddFiles(files);
   };
@@ -166,7 +163,6 @@ export const ChatInput = ({
     setAttachments((prev) => prev.filter((a) => a.media_url !== url));
   };
 
-  // ====== отправка ======
   const clearState = () => {
     setMessage("");
     setAttachments([]);
@@ -186,10 +182,9 @@ export const ChatInput = ({
     if (!hasText && !hasFiles) return;
 
     if (SEND_AS_SINGLE_BATCH) {
-      // один payload с массивом attachments (если бэкенд поддерживает)
       const payload = {
         ...buildBasePayload(),
-        message: hasText ? trimmedText : attachments[0]?.media_url, // fallback
+        message: hasText ? trimmedText : attachments[0]?.media_url,
         message_text: isPhoneChat && hasText ? trimmedText : undefined,
         last_message_type: hasFiles ? attachments[0].media_type : "text",
         attachments: attachments.map(({ media_url, media_type, name, size }) => ({
@@ -201,7 +196,6 @@ export const ChatInput = ({
       };
       onSendMessage(payload);
     } else {
-      // fallback: шлём последовательно: все файлы отдельными сообщениями + текст (если есть)
       for (const att of attachments) {
         const payloadFile = {
           ...buildBasePayload(),
@@ -210,7 +204,6 @@ export const ChatInput = ({
           media_type: att.media_type,
           last_message_type: att.media_type,
         };
-        // для WA/Viber текст можно дублировать как message_text при необходимости — обычно не нужно
         onSendMessage(payloadFile);
       }
       if (hasText) {
@@ -273,7 +266,6 @@ export const ChatInput = ({
     }
   };
 
-  // предпросмотр вложений (простая сетка)
   const AttachmentsPreview = () => {
     if (!attachments.length) return null;
     return (
@@ -372,7 +364,6 @@ export const ChatInput = ({
               />
             </Flex>
 
-            {/* предпросмотр выбранных вложений */}
             <AttachmentsPreview />
 
             <Textarea
@@ -461,7 +452,7 @@ export const ChatInput = ({
                 <FileButton
                   onChange={handleFileButton}
                   accept="image/*,video/*,audio/*,.pdf"
-                  multiple // <— выбрать сразу несколько
+                  multiple
                 >
                   {(props) => (
                     <ActionIcon {...props} c="black" bg="white" title={getLanguageByKey("attachFiles")}>
