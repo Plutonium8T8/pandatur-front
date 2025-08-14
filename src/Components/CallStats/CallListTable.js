@@ -143,7 +143,7 @@ export const CallListTable = ({
             {
                 title: getLanguageByKey("Record"),
                 key: "record",
-                width: 180,
+                width: 90,
                 render: (_, record) =>
                     record.call_url ? (
                         <Flex align="center" gap={8}>
