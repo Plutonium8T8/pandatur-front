@@ -71,6 +71,7 @@ export const privateRoutes = (userRoles) => {
 
   routes.push({ path: "/terms-and-conditions", component: TermsAndConditions });
   routes.push({ path: "/analytics/calls/:ticketId?", component: Analytics });
+  routes.push({ path: "/analytics/*", component: Analytics });
 
   return routes;
 };
