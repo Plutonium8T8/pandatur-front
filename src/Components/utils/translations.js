@@ -3849,4 +3849,14 @@ export const translations = {
     RO: "și încă",
     EN: "and more",
   },
+  Play: {
+    RU: "Воспроизвести",
+    RO: "Redare",
+    EN: "Play",
+  },
+  Pause: {
+    RU: "Пауза",
+    RO: "Pauză",
+    EN: "Pause",
+  }
 }
