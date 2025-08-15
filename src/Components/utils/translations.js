@@ -3863,5 +3863,15 @@ export const translations = {
     RU: "Превышено максимальное число попыток переподключения",
     RO: "Numărul maxim de încercări de reconectare a fost atins",
     EN: "Maximum reconnect attempts reached",
-  }
+  },
+  Collapse: {
+    RU: "Свернуть",
+    RO: "Ascunde",
+    EN: "Collapse",
+  },
+  ShowMore: {
+    RU: "Показать ещё",
+    RO: "Arată mai mult",
+    EN: "Show more",
+  },
 }
