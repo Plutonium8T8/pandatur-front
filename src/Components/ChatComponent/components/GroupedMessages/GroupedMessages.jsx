@@ -1,5 +1,5 @@
-import { useMemo } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text } from "@mantine/core";
+import { useMemo, useState } from "react";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "@app-constants";
 import { parseServerDate, getFullName, getLanguageByKey, parseDate } from "@utils";
@@ -12,9 +12,46 @@ import { useLiveTicketNotes } from "../../../../hooks/useLiveTicketNotes";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
+const MAX_LOGS_COLLAPSED = 5;
 
 const makeNoteKey = (n) =>
   `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
+
+const LogCluster = ({ logs = [], technicians }) => {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? logs : logs.slice(0, MAX_LOGS_COLLAPSED);
+  const hidden = logs.length - visible.length;
+
+  return (
+    <Flex direction="column" gap="xs">
+      {visible.map((l, i) => {
+        const logKey = String(l.id ?? `${l.timestamp}-${i}`);
+        return (
+          <MessagesLogItem
+            key={`log-${logKey}`}
+            log={l}
+            technicians={technicians}
+            isLive={l.isLive}
+          />
+        );
+      })}
+
+      {logs.length > MAX_LOGS_COLLAPSED && (
+        <Flex justify="center" mt={4}>
+          <Button
+            size="xs"
+            variant="light"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded
+              ? getLanguageByKey("Collapse")
+              : `${getLanguageByKey("ShowMore")} ${hidden}`}
+          </Button>
+        </Flex>
+      )}
+    </Flex>
+  );
+};
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
@@ -132,35 +169,56 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
 
-            const clientBlocks = [];
-            let lastClientId = null;
-            let lastPlatform = null;
-            let currentBlock = null;
+            const blocks = [];
+            let currentMsgBlock = null;
+            let currentLogCluster = null;
+
+            const flushMsgBlock = () => {
+              if (currentMsgBlock) {
+                blocks.push(currentMsgBlock);
+                currentMsgBlock = null;
+              }
+            };
+            const flushLogCluster = () => {
+              if (currentLogCluster) {
+                blocks.push({ logs: currentLogCluster });
+                currentLogCluster = null;
+              }
+            };
 
             dayItems.forEach((item) => {
               if (item.itemType === "message") {
+                flushLogCluster();
                 const currentClientId = item.clientId?.toString();
                 const currentPlatform = item.platform || "";
-                if (!currentBlock || lastClientId !== currentClientId || lastPlatform !== currentPlatform) {
-                  lastClientId = currentClientId;
-                  lastPlatform = currentPlatform;
-                  currentBlock = { clientId: Number(currentClientId), platform: currentPlatform, items: [item] };
-                  clientBlocks.push(currentBlock);
+                const needNew =
+                  !currentMsgBlock ||
+                  String(currentMsgBlock.clientId) !== String(currentClientId) ||
+                  currentMsgBlock.platform !== currentPlatform;
+
+                if (needNew) {
+                  flushMsgBlock();
+                  currentMsgBlock = {
+                    clientId: Number(currentClientId),
+                    platform: currentPlatform,
+                    items: [item],
+                  };
                 } else {
-                  currentBlock.items.push(item);
+                  currentMsgBlock.items.push(item);
                 }
               } else if (item.itemType === "log") {
-                currentBlock = null;
-                lastClientId = null;
-                lastPlatform = null;
-                clientBlocks.push({ log: item });
+                flushMsgBlock();
+                if (!currentLogCluster) currentLogCluster = [];
+                currentLogCluster.push(item);
               } else if (item.itemType === "note") {
-                currentBlock = null;
-                lastClientId = null;
-                lastPlatform = null;
-                clientBlocks.push({ note: item });
+                flushMsgBlock();
+                flushLogCluster();
+                blocks.push({ note: item });
               }
             });
+
+            flushMsgBlock();
+            flushLogCluster();
 
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
@@ -169,15 +227,13 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                   labelPosition="center"
                 />
 
-                {clientBlocks.map((block, i) => {
-                  if (block.log) {
-                    const logKey = String(block.log.id ?? `${block.log.timestamp}-${i}`);
+                {blocks.map((block, i) => {
+                  if (block.logs) {
                     return (
-                      <MessagesLogItem
-                        key={`log-${logKey}`}
-                        log={block.log}
+                      <LogCluster
+                        key={`log-cluster-${date}-${i}`}
+                        logs={block.logs}
                         technicians={technicians}
-                        isLive={block.log.isLive}
                       />
                     );
                   }
@@ -199,7 +255,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                   const clientInfo = personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
                   const clientName = getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
-
                   const platform = block.platform;
                   const platformIcon = socialMediaIcons[platform] || null;
                   const platformLabel = platform ? platform[0].toUpperCase() + platform.slice(1) : "";
