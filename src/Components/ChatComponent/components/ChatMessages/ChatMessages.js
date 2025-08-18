@@ -87,7 +87,6 @@ export const ChatMessages = ({
     setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
   }, []);
 
-  // автоскролл при изменении messages/notes
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
       messageContainerRef.current.scrollTo({
