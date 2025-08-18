@@ -205,8 +205,8 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                         {getLanguageByKey("Notice")}
                     </Badge>
                     <CloseButton
-                        aria-label={getLanguageByKey("Close")}
-                        title={getLanguageByKey("Close")}
+                        aria-label={getLanguageByKey("Închide")}
+                        title={getLanguageByKey("Închide")}
                         onClick={onCancel}
                         disabled={uploading || loading || sending}
                     />
@@ -214,7 +214,7 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
 
                 <Textarea
                     ref={taRef}
-                    placeholder={getLanguageByKey("Write a note…")}
+                    placeholder={getLanguageByKey("WriteNote")}
                     autosize
                     minRows={3}
                     maxRows={8}
@@ -263,7 +263,7 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                             onClick={onCancel}
                             disabled={uploading || loading || sending}
                         >
-                            {getLanguageByKey("Cancel")}
+                            {getLanguageByKey("Anuleaza")}
                         </Button>
                         <Button
                             onClick={handleSend}
