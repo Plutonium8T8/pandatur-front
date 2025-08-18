@@ -3884,4 +3884,21 @@ export const translations = {
     RO: "Încă nu există note",
     EN: "No notes yet",
   },
+  "Are you sure you want to delete this note?": {
+    RU: "Вы уверены, что хотите удалить эту заметку?",
+    RO: "Sigur doriți să ștergeți această notă?",
+    EN: "Are you sure you want to delete this note?",
+  },
+
+  "Deleted successfully": {
+    RU: "Заметка успешно удалена",
+    RO: "Nota a fost ștearsă cu succes",
+    EN: "Deleted successfully",
+  },
+
+  "Deleting": {
+    RU: "Удаление...",
+    RO: "Se șterge...",
+    EN: "Deleting...",
+  }
 }

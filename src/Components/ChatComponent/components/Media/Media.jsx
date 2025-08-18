@@ -1,4 +1,4 @@
-import { Flex, Tabs, Text, ActionIcon, Tooltip } from "@mantine/core";
+import { Flex, Tabs, Text, ActionIcon, Tooltip, Loader } from "@mantine/core";
 import { useState, useMemo } from "react";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
@@ -9,6 +9,7 @@ import { useMessagesContext } from "@hooks";
 import { ChatNoteCard } from "../../../ChatNoteCard";
 import { renderFile, renderMedia, renderCall } from "./utils";
 import { FiTrash2 } from "react-icons/fi";
+import { useConfirmPopup } from "../../../../hooks";
 import "./Media.css";
 
 const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "heif", "avif"];
@@ -32,6 +33,7 @@ export const Media = ({ messages, id }) => {
   const { notes: ctxNotes = [], getUserMessages } = useMessagesContext();
 
   const [uploadTab, setUploadTab] = useState("notes");
+  const [deletingIds, setDeletingIds] = useState(() => new Set());
 
   const safeMessages = Array.isArray(messages) ? messages : [];
 
@@ -47,14 +49,45 @@ export const Media = ({ messages, id }) => {
       : "",
   });
 
-  const deleteNoteById = async (noteId) => {
+  const isDeleting = (noteId) => deletingIds.has(noteId);
+
+  const confirmDelete = useConfirmPopup({
+    subTitle: getLanguageByKey("Are you sure you want to delete this note?") || "Delete this note?",
+    loading: false,
+  });
+
+  const handleDelete = async (noteId) => {
+    setDeletingIds((s) => new Set(s).add(noteId));
     try {
-      await api.messages.notes.deleteById(noteId);
+      await api.messages.notes.delete(noteId);
       await getUserMessages(Number(id));
+      enqueueSnackbar(getLanguageByKey("Deleted successfully") || "Deleted successfully", { variant: "success" });
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
+      setDeletingIds((s) => {
+        const next = new Set(s);
+        next.delete(noteId);
+        return next;
+      });
     }
   };
+
+  const renderDeleteBtn = (n) => (
+    <Tooltip label={isDeleting(n.id) ? (getLanguageByKey("Deleting") || "Deleting") : getLanguageByKey("delete")}>
+      <ActionIcon
+        color="red"
+        variant="subtle"
+        onClick={() => confirmDelete(() => handleDelete(n.id))}
+        aria-label="delete-note"
+        mt={4}
+        disabled={isDeleting(n.id)}
+        aria-busy={isDeleting(n.id)}
+      >
+        {isDeleting(n.id) ? <Loader size="xs" /> : <FiTrash2 />}
+      </ActionIcon>
+    </Tooltip>
+  );
 
   const notesAll = ticketNotes;
   const notesText = ticketNotes.filter((n) => String(n?.type).toLowerCase() === "text");
@@ -125,17 +158,7 @@ export const Media = ({ messages, id }) => {
                       showActions
                       style={{ flex: 1 }}
                     />
-                    <Tooltip label={getLanguageByKey("delete")}>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => deleteNoteById(n.id)}
-                        aria-label="delete-note"
-                        mt={4}
-                      >
-                        <FiTrash2 />
-                      </ActionIcon>
-                    </Tooltip>
+                    {renderDeleteBtn(n)}
                   </Flex>
                 ))
               ) : (
@@ -155,17 +178,7 @@ export const Media = ({ messages, id }) => {
                       showActions
                       style={{ flex: 1 }}
                     />
-                    <Tooltip label={getLanguageByKey("delete")}>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => deleteNoteById(n.id)}
-                        aria-label="delete-note"
-                        mt={4}
-                      >
-                        <FiTrash2 />
-                      </ActionIcon>
-                    </Tooltip>
+                    {renderDeleteBtn(n)}
                   </Flex>
                 ))
               ) : (
@@ -185,17 +198,7 @@ export const Media = ({ messages, id }) => {
                       showActions
                       style={{ flex: 1 }}
                     />
-                    <Tooltip label={getLanguageByKey("delete")}>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => deleteNoteById(n.id)}
-                        aria-label="delete-note"
-                        mt={4}
-                      >
-                        <FiTrash2 />
-                      </ActionIcon>
-                    </Tooltip>
+                    {renderDeleteBtn(n)}
                   </Flex>
                 ))
               ) : (
@@ -215,17 +218,7 @@ export const Media = ({ messages, id }) => {
                       showActions
                       style={{ flex: 1 }}
                     />
-                    <Tooltip label={getLanguageByKey("delete")}>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => deleteNoteById(n.id)}
-                        aria-label="delete-note"
-                        mt={4}
-                      >
-                        <FiTrash2 />
-                      </ActionIcon>
-                    </Tooltip>
+                    {renderDeleteBtn(n)}
                   </Flex>
                 ))
               ) : (
@@ -245,17 +238,7 @@ export const Media = ({ messages, id }) => {
                       showActions
                       style={{ flex: 1 }}
                     />
-                    <Tooltip label={getLanguageByKey("delete")}>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => deleteNoteById(n.id)}
-                        aria-label="delete-note"
-                        mt={4}
-                      >
-                        <FiTrash2 />
-                      </ActionIcon>
-                    </Tooltip>
+                    {renderDeleteBtn(n)}
                   </Flex>
                 ))
               ) : (

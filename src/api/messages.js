@@ -28,15 +28,23 @@ export const messages = {
       return data;
     },
 
+    delete: async (noteId) => {
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.delete(`/api/ticket/note`, {
+        headers: { Authorization: `Bearer ${token}` },
+        data: { note_id: noteId },
+      });
+      return data;
+    },
+
     getByTicketId: async (ticketId) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.get(`/api/ticket/${ticketId}/note`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return data; // ожидается массив заметок
+      return data;
     },
 
-    // батч-создание (по одному, чтобы сохранить порядок)
     batchCreate: async (items = []) => {
       const results = [];
       for (const item of items) {
