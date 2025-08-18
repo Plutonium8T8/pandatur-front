@@ -1,30 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import {
-  Paper,
-  Text,
-  Box,
-  Group,
-  Stack,
-  Card,
-  Divider,
-  Collapse,
-  TextInput,
-  Button,
-  Select,
-  ActionIcon,
+  Paper, Text, Box, Group, Stack, Card, Divider, Collapse,
+  TextInput, Button, Select, ActionIcon,
 } from "@mantine/core";
 import {
-  FaChevronDown,
-  FaChevronUp,
-  FaTrash,
-  FaCheck,
-  FaPencil,
+  FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil,
 } from "react-icons/fa6";
 import {
-  getDeadlineColor,
-  getBadgeColor,
-  formatTasksToEdits,
-  sortTasksByDate
+  getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate
 } from "../utils/taskUtils";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
@@ -37,14 +20,11 @@ import { useSnackbar } from "notistack";
 import { PageHeader } from "../PageHeader";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
+import { SocketContext } from "../../contexts/SocketContext"; // проверь путь
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskListOverlay = ({
-  ticketId,
-  creatingTask,
-  setCreatingTask
-}) => {
+const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [tasks, setTasks] = useState([]);
   const [expandedCard, setExpandedCard] = useState(null);
   const [listCollapsed, setListCollapsed] = useState(true);
@@ -54,19 +34,22 @@ const TaskListOverlay = ({
   const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
   const [originalTaskValues, setOriginalTaskValues] = useState({});
+  const { onEvent } = useContext(SocketContext);
 
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
   });
 
-  const fetchTasks = async () => {
-    if (!ticketId) return setTasks([]);
+  // fetchTasks с опциональным id (по сокету)
+  const fetchTasks = useCallback(async (idOverride) => {
+    const qId = Number(idOverride ?? ticketId);
+    if (!qId) { setTasks([]); return; }
+
     try {
-      const res = await api.task.getTaskByTicket(ticketId);
-      const taskArray = sortTasksByDate(
-        (Array.isArray(res?.data) ? res.data : res)
-          .filter(t => t.ticket_id === ticketId && !t.status)
-      );
+      const res = await api.task.getTaskByTicket(qId);
+      const list = Array.isArray(res?.data) ? res.data : res;
+      const taskArray = sortTasksByDate(list.filter(t => Number(t.ticket_id) === qId && !t.status));
+
       setTasks(taskArray);
 
       const edits = formatTasksToEdits(taskArray);
@@ -75,7 +58,26 @@ const TaskListOverlay = ({
       console.error("Error loading tasks", error);
       setTasks([]);
     }
-  };
+  }, [ticketId]);
+
+  // начальная загрузка и при смене тикета
+  useEffect(() => { fetchTasks(ticketId); }, [fetchTasks, ticketId]);
+
+  // подписка на Сокет: type === "task"
+  useEffect(() => {
+    if (!onEvent) return;
+
+    const handler = (evt) => {
+      const fromSocket = Number(evt?.data?.ticket_id ?? evt?.data?.ticketId);
+      if (!fromSocket) return;
+      // обновляем только текущий тикет
+      if (Number(fromSocket) !== Number(ticketId)) return;
+      fetchTasks(fromSocket);
+    };
+
+    const unsub = onEvent("task", handler);
+    return () => { typeof unsub === "function" && unsub(); };
+  }, [onEvent, ticketId, fetchTasks]);
 
   useEffect(() => {
     if (creatingTask) {
@@ -94,13 +96,8 @@ const TaskListOverlay = ({
   }, [creatingTask, userId]);
 
   useEffect(() => {
-  fetchTasks();
-}, []);
-
-  useEffect(() => {
     setTaskEdits((prev) => {
       const preservedNew = prev.new;
-
       const updated = {};
       tasks.forEach((t) => {
         updated[t.id] = {
@@ -111,41 +108,25 @@ const TaskListOverlay = ({
           description: t.description || "",
         };
       });
-
-      return {
-        ...updated,
-        ...(preservedNew ? { new: preservedNew } : {}),
-      };
+      return { ...updated, ...(preservedNew ? { new: preservedNew } : {}) };
     });
   }, [tasks]);
 
   if (!creatingTask && tasks.length === 0) return null;
 
   const updateTaskField = (id, field, value) => {
-    setTaskEdits((prev) => ({
-      ...prev,
-      [id]: {
-        ...prev[id],
-        [field]: value,
-      },
-    }));
+    setTaskEdits((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
   };
 
   const handleUpdateTask = async (taskId) => {
     const changes = taskEdits[taskId];
     if (!changes) return;
-
     try {
-      await api.task.update({
-        id: taskId,
-        ...changes,
-        scheduled_time: formatDate(changes.scheduled_time),
-      });
-      enqueueSnackbar(translations["taskUpdated"][language],
-        { variant: "success" });
+      await api.task.update({ id: taskId, ...changes, scheduled_time: formatDate(changes.scheduled_time) });
+      enqueueSnackbar(translations["taskUpdated"][language], { variant: "success" });
       setEditMode((prev) => ({ ...prev, [taskId]: false }));
-      fetchTasks();
-    } catch (err) {
+      fetchTasks(ticketId);
+    } catch {
       enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
     }
   };
@@ -156,7 +137,6 @@ const TaskListOverlay = ({
       enqueueSnackbar(translations["completeAllFields"][language], { variant: "warning" });
       return;
     }
-
     try {
       await api.task.create({
         ...newTask,
@@ -165,12 +145,12 @@ const TaskListOverlay = ({
         ticket_id: ticketId,
         priority: "",
         status_task: "",
-        status: "false"
+        status: "false",
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
-      fetchTasks();
-    } catch (err) {
+      fetchTasks(ticketId);
+    } catch {
       enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
     }
   };
@@ -180,7 +160,7 @@ const TaskListOverlay = ({
       api.task.delete({ id })
         .then(() => {
           enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
-          fetchTasks();
+          fetchTasks(ticketId);
         })
         .catch(() => {
           enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
@@ -192,23 +172,17 @@ const TaskListOverlay = ({
     try {
       await api.task.update({ id, status: true });
       enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
-      fetchTasks();
-    } catch (err) {
+      fetchTasks(ticketId);
+    } catch {
       enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
     }
   };
 
-  const getTaskIcon = (type) => {
-    const match = TypeTask.find((t) => t.name === type);
-    return match?.icon || null;
-  };
+  const getTaskIcon = (type) => TypeTask.find((t) => t.name === type)?.icon || null;
 
   const handleCancelEdit = (id) => {
     if (originalTaskValues[id]) {
-      setTaskEdits((prev) => ({
-        ...prev,
-        [id]: { ...originalTaskValues[id] },
-      }));
+      setTaskEdits((prev) => ({ ...prev, [id]: { ...originalTaskValues[id] } }));
     }
     setEditMode((prev) => ({ ...prev, [id]: false }));
   };
@@ -216,7 +190,6 @@ const TaskListOverlay = ({
   const renderTaskForm = (id, isNew = false, currentUserId, userGroups) => {
     const isEditing = isNew || editMode[id];
     const responsibleId = String(taskEdits[id]?.created_for);
-
     const isSameTeam = Array.isArray(userGroups) && userGroups.some(group =>
       Array.isArray(group.users) && group.users.map(String).includes(responsibleId)
     );
@@ -224,33 +197,21 @@ const TaskListOverlay = ({
     return (
       <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
         {!isNew && (
-          <Box
-            onClick={() => setExpandedCard(expandedCard === id ? null : id)}
-            style={{ cursor: "pointer" }}
-          >
+          <Box onClick={() => setExpandedCard(expandedCard === id ? null : id)} style={{ cursor: "pointer" }}>
             <Group justify="space-between" align="center">
               <Group gap="xs">
                 {getTaskIcon(taskEdits[id]?.task_type)}
                 <Text fw={500}>
                   {taskEdits[id]?.task_type}
                   {!isNew && id && (
-                    <Text
-                      span
-                      size="sm"
-                      c="dimmed"
-                      ml={6}
-                      style={{ fontWeight: 400 }}
-                    >
+                    <Text span size="sm" c="dimmed" ml={6} style={{ fontWeight: 400 }}>
                       #{id}
                     </Text>
                   )}
                 </Text>
               </Group>
               <Group gap="xs">
-                <Text
-                  size="sm"
-                  style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}
-                >
+                <Text size="sm" style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}>
                   {formatDate(taskEdits[id]?.scheduled_time)}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
@@ -331,20 +292,10 @@ const TaskListOverlay = ({
               </>
             ) : (
               <>
-                <Can
-                  permission={{ module: "TASK", action: "EDIT" }}
-                  context={{ responsibleId, currentUserId, isSameTeam }}
-                >
-                  <Button
-                    size="xs"
-                    variant="filled"
-                    onClick={() => handleMarkDone(id)}
-                    leftSection={<FaCheck />}
-                  >
+                <Can permission={{ module: "TASK", action: "EDIT" }} context={{ responsibleId, currentUserId: userId, isSameTeam }}>
+                  <Button size="xs" variant="filled" onClick={() => handleMarkDone(id)} leftSection={<FaCheck />}>
                     {translations["Done"][language]}
                   </Button>
-
-
                   <Button
                     size="xs"
                     variant="light"
@@ -370,17 +321,8 @@ const TaskListOverlay = ({
                   </Button>
                 </Can>
 
-                <Can
-                  permission={{ module: "TASK", action: "DELETE" }}
-                  context={{ responsibleId, currentUserId, isSameTeam }}
-                >
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    color="red"
-                    onClick={() => handleDeleteTask(id)}
-                    leftSection={<FaTrash />}
-                  >
+                <Can permission={{ module: "TASK", action: "DELETE" }} context={{ responsibleId, currentUserId: userId, isSameTeam }}>
+                  <Button size="xs" variant="subtle" color="red" onClick={() => handleDeleteTask(id)} leftSection={<FaTrash />}>
                     {translations["Șterge"][language]}
                   </Button>
                 </Can>
@@ -406,7 +348,6 @@ const TaskListOverlay = ({
             </ActionIcon>
           }
         />
-
         <Collapse in={!listCollapsed}>
           <Stack spacing="xs" mt="xs">
             {tasks.map((task) => renderTaskForm(task.id))}

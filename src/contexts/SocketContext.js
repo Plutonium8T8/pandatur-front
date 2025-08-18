@@ -43,7 +43,7 @@ export const SocketProvider = ({ children }) => {
     const set = listenersRef.current[type];
     if (!set || set.size === 0) return;
     set.forEach((cb) => {
-      try { cb(data); } catch { /* игнор */ }
+      try { cb(data); } catch { }
     });
   }, []);
 
@@ -129,7 +129,7 @@ export const SocketProvider = ({ children }) => {
     <SocketContext.Provider
       value={{
         socketRef,
-        sendedValue: val,     
+        sendedValue: val,
         sendJSON,
         joinTicketRoom,
         leaveTicketRoom,
