@@ -3874,4 +3874,9 @@ export const translations = {
     RO: "Arată mai mult",
     EN: "Show more",
   },
+  WriteNote: {
+    RU: "Напишите заметку",
+    RO: "Scrieți o notă",
+    EN: "Write a note",
+  }
 }
