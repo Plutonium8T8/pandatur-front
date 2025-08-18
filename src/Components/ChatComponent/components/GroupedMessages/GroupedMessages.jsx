@@ -19,8 +19,11 @@ const makeNoteKey = (n) =>
 
 const LogCluster = ({ logs = [], technicians }) => {
   const [expanded, setExpanded] = useState(false);
-  const visible = expanded ? logs : logs.slice(0, MAX_LOGS_COLLAPSED);
-  const hidden = logs.length - visible.length;
+
+  const collapsedStart = Math.max(0, logs.length - MAX_LOGS_COLLAPSED);
+  const lastFive = logs.slice(collapsedStart);
+  const visible = expanded ? logs : lastFive;
+  const hidden = expanded ? 0 : collapsedStart;
 
   return (
     <Flex direction="column" gap="xs">
