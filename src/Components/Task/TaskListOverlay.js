@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from "react";
 import {
   Paper, Text, Box, Group, Stack, Card, Divider, Collapse,
-  TextInput, Button, Select, ActionIcon,
+  TextInput, Button, Select, ActionIcon, Loader, Center,
 } from "@mantine/core";
 import {
   FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil,
@@ -20,7 +20,7 @@ import { useSnackbar } from "notistack";
 import { PageHeader } from "../PageHeader";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
-import { SocketContext } from "../../contexts/SocketContext"; // проверь путь
+import { SocketContext } from "../../contexts/SocketContext";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -36,15 +36,18 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [originalTaskValues, setOriginalTaskValues] = useState({});
   const { onEvent } = useContext(SocketContext);
 
+  const [listLoading, setListLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
   });
 
-  // fetchTasks с опциональным id (по сокету)
   const fetchTasks = useCallback(async (idOverride) => {
     const qId = Number(idOverride ?? ticketId);
     if (!qId) { setTasks([]); return; }
 
+    setListLoading(true);
     try {
       const res = await api.task.getTaskByTicket(qId);
       const list = Array.isArray(res?.data) ? res.data : res;
@@ -57,20 +60,19 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     } catch (error) {
       console.error("Error loading tasks", error);
       setTasks([]);
+    } finally {
+      setListLoading(false);
     }
   }, [ticketId]);
 
-  // начальная загрузка и при смене тикета
   useEffect(() => { fetchTasks(ticketId); }, [fetchTasks, ticketId]);
 
-  // подписка на Сокет: type === "task"
   useEffect(() => {
     if (!onEvent) return;
 
     const handler = (evt) => {
       const fromSocket = Number(evt?.data?.ticket_id ?? evt?.data?.ticketId);
       if (!fromSocket) return;
-      // обновляем только текущий тикет
       if (Number(fromSocket) !== Number(ticketId)) return;
       fetchTasks(fromSocket);
     };
@@ -112,7 +114,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     });
   }, [tasks]);
 
-  if (!creatingTask && tasks.length === 0) return null;
+  if (!creatingTask && tasks.length === 0 && !listLoading) return null;
 
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
@@ -121,13 +123,16 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const handleUpdateTask = async (taskId) => {
     const changes = taskEdits[taskId];
     if (!changes) return;
+    setActionLoading(true);
     try {
       await api.task.update({ id: taskId, ...changes, scheduled_time: formatDate(changes.scheduled_time) });
       enqueueSnackbar(translations["taskUpdated"][language], { variant: "success" });
       setEditMode((prev) => ({ ...prev, [taskId]: false }));
-      fetchTasks(ticketId);
+      await fetchTasks(ticketId);
     } catch {
       enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -137,6 +142,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       enqueueSnackbar(translations["completeAllFields"][language], { variant: "warning" });
       return;
     }
+    setActionLoading(true);
     try {
       await api.task.create({
         ...newTask,
@@ -149,32 +155,39 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
-      fetchTasks(ticketId);
+      await fetchTasks(ticketId);
     } catch {
       enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
+    } finally {
+      setActionLoading(false);
     }
   };
 
   const handleDeleteTask = (id) => {
-    confirmDelete(() =>
-      api.task.delete({ id })
-        .then(() => {
-          enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
-          fetchTasks(ticketId);
-        })
-        .catch(() => {
-          enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
-        })
-    );
+    confirmDelete(async () => {
+      setActionLoading(true);
+      try {
+        await api.task.delete({ id });
+        enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
+        await fetchTasks(ticketId);
+      } catch {
+        enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
+      } finally {
+        setActionLoading(false);
+      }
+    });
   };
 
   const handleMarkDone = async (id) => {
+    setActionLoading(true);
     try {
       await api.task.update({ id, status: true });
       enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
-      fetchTasks(ticketId);
+      await fetchTasks(ticketId);
     } catch {
       enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -230,13 +243,13 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               value={taskEdits[id]?.task_type}
               onChange={(value) => updateTaskField(id, "task_type", value)}
               label={translations["Alege tip task"][language]}
-              disabled={!isEditing}
+              disabled={!isEditing || actionLoading}
               required
             />
             <DateQuickInput
               value={taskEdits[id]?.scheduled_time}
               onChange={(value) => updateTaskField(id, "scheduled_time", value)}
-              disabled={!isEditing}
+              disabled={!isEditing || actionLoading}
             />
             <Select
               data={users}
@@ -245,7 +258,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               w={180}
               label={translations["Autor"][language]}
               placeholder={translations["Autor"][language]}
-              disabled={!isEditing}
+              disabled={!isEditing || actionLoading}
               required
               searchable
               clearable
@@ -256,7 +269,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               onChange={(value) => updateTaskField(id, "created_for", value)}
               w={180}
               label={translations["Responsabil"][language]}
-              disabled={!isEditing}
+              disabled={!isEditing || actionLoading}
               placeholder={translations["Responsabil"][language]}
               required
               searchable
@@ -268,32 +281,39 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               value={taskEdits[id]?.description || ""}
               onChange={(e) => updateTaskField(id, "description", e.currentTarget.value)}
               w="100%"
+              disabled={actionLoading}
             />
           </Group>
 
           <Group gap="xs" mt="md">
             {isNew ? (
               <>
-                <Button size="xs" onClick={handleCreateTask}>
+                <Button size="xs" onClick={handleCreateTask} loading={actionLoading}>
                   {translations["Adaugă task"][language]}
                 </Button>
-                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)}>
+                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)} disabled={actionLoading}>
                   {translations["Anulare"][language]}
                 </Button>
               </>
             ) : isEditing ? (
               <>
-                <Button size="xs" onClick={() => handleUpdateTask(id)} variant="filled">
+                <Button size="xs" onClick={() => handleUpdateTask(id)} variant="filled" loading={actionLoading}>
                   {translations["Save"][language]}
                 </Button>
-                <Button size="xs" variant="subtle" onClick={() => handleCancelEdit(id)}>
+                <Button size="xs" variant="subtle" onClick={() => handleCancelEdit(id)} disabled={actionLoading}>
                   {translations["Anulare"][language]}
                 </Button>
               </>
             ) : (
               <>
                 <Can permission={{ module: "TASK", action: "EDIT" }} context={{ responsibleId, currentUserId: userId, isSameTeam }}>
-                  <Button size="xs" variant="filled" onClick={() => handleMarkDone(id)} leftSection={<FaCheck />}>
+                  <Button
+                    size="xs"
+                    variant="filled"
+                    onClick={() => handleMarkDone(id)}
+                    leftSection={<FaCheck />}
+                    loading={actionLoading}
+                  >
                     {translations["Done"][language]}
                   </Button>
                   <Button
@@ -316,13 +336,21 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                       setEditMode((prev) => ({ ...prev, [id]: true }));
                     }}
                     leftSection={<FaPencil />}
+                    disabled={actionLoading}
                   >
                     {translations["Editare Task"][language]}
                   </Button>
                 </Can>
 
                 <Can permission={{ module: "TASK", action: "DELETE" }} context={{ responsibleId, currentUserId: userId, isSameTeam }}>
-                  <Button size="xs" variant="subtle" color="red" onClick={() => handleDeleteTask(id)} leftSection={<FaTrash />}>
+                  <Button
+                    size="xs"
+                    variant="subtle"
+                    color="red"
+                    onClick={() => handleDeleteTask(id)}
+                    leftSection={<FaTrash />}
+                    loading={actionLoading}
+                  >
                     {translations["Șterge"][language]}
                   </Button>
                 </Can>
@@ -343,16 +371,25 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
           badgeColor={getBadgeColor(tasks)}
           withDivider={false}
           extraInfo={
-            <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
-              {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-            </ActionIcon>
+            listLoading
+              ? <Loader size="sm" />
+              : (
+                <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
+                  {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
+                </ActionIcon>
+              )
           }
         />
+
         <Collapse in={!listCollapsed}>
-          <Stack spacing="xs" mt="xs">
-            {tasks.map((task) => renderTaskForm(task.id))}
-            {creatingTask && renderTaskForm("new", true)}
-          </Stack>
+          {listLoading ? (
+            <Center my="md"><Loader /></Center>
+          ) : (
+            <Stack spacing="xs" mt="xs">
+              {tasks.map((task) => renderTaskForm(task.id))}
+              {creatingTask && renderTaskForm("new", true)}
+            </Stack>
+          )}
         </Collapse>
       </Paper>
     </Box>
