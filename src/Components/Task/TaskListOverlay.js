@@ -1,14 +1,10 @@
-import { useState, useEffect, useContext, useCallback } from "react";
+import { useState, useEffect, useContext, useCallback, useRef, startTransition } from "react";
 import {
   Paper, Text, Box, Group, Stack, Card, Divider, Collapse,
-  TextInput, Button, Select, ActionIcon, Loader, Center,
+  TextInput, Button, Select, ActionIcon, Loader, Center
 } from "@mantine/core";
-import {
-  FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil,
-} from "react-icons/fa6";
-import {
-  getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate
-} from "../utils/taskUtils";
+import { FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
+import { getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate } from "../utils/taskUtils";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
@@ -39,44 +35,51 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [listLoading, setListLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
+  const skipNextSocketRef = useRef(false);
+
   const confirmDelete = useConfirmPopup({
     subTitle: translations["Confirmare ștergere"][language],
   });
 
-  const fetchTasks = useCallback(async (idOverride) => {
-    const qId = Number(idOverride ?? ticketId);
-    if (!qId) { setTasks([]); return; }
+  const fetchTasks = useCallback(
+    async ({ idOverride, silent } = {}) => {
+      const qId = Number(idOverride ?? ticketId);
+      if (!qId) { setTasks([]); return; }
 
-    setListLoading(true);
-    try {
-      const res = await api.task.getTaskByTicket(qId);
-      const list = Array.isArray(res?.data) ? res.data : res;
-      const taskArray = sortTasksByDate(list.filter(t => Number(t.ticket_id) === qId && !t.status));
+      if (!silent) setListLoading(true);
+      try {
+        const res = await api.task.getTaskByTicket(qId);
+        const list = Array.isArray(res?.data) ? res.data : res;
+        const taskArray = sortTasksByDate(list.filter(t => Number(t.ticket_id) === qId && !t.status));
 
-      setTasks(taskArray);
+        startTransition(() => {
+          setTasks(taskArray);
+          const edits = formatTasksToEdits(taskArray);
+          setTaskEdits((prev) => ({ ...edits, ...(prev.new ? { new: prev.new } : {}) }));
+        });
+      } catch (error) {
+        console.error("Error loading tasks", error);
+        setTasks([]);
+      } finally {
+        if (!silent) setListLoading(false);
+      }
+    },
+    [ticketId]
+  );
 
-      const edits = formatTasksToEdits(taskArray);
-      setTaskEdits((prev) => ({ ...edits, ...(prev.new ? { new: prev.new } : {}) }));
-    } catch (error) {
-      console.error("Error loading tasks", error);
-      setTasks([]);
-    } finally {
-      setListLoading(false);
-    }
-  }, [ticketId]);
-
-  useEffect(() => { fetchTasks(ticketId); }, [fetchTasks, ticketId]);
+  useEffect(() => { fetchTasks(); }, [fetchTasks]);
 
   useEffect(() => {
     if (!onEvent) return;
-
     const handler = (evt) => {
       const fromSocket = Number(evt?.data?.ticket_id ?? evt?.data?.ticketId);
-      if (!fromSocket) return;
-      if (Number(fromSocket) !== Number(ticketId)) return;
-      fetchTasks(fromSocket);
+      if (!fromSocket || Number(fromSocket) !== Number(ticketId)) return;
+      if (skipNextSocketRef.current) {
+        skipNextSocketRef.current = false;
+        return;
+      }
+      fetchTasks({ idOverride: fromSocket, silent: true });
     };
-
     const unsub = onEvent("task", handler);
     return () => { typeof unsub === "function" && unsub(); };
   }, [onEvent, ticketId, fetchTasks]);
@@ -114,8 +117,6 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     });
   }, [tasks]);
 
-  if (!creatingTask && tasks.length === 0 && !listLoading) return null;
-
   const updateTaskField = (id, field, value) => {
     setTaskEdits((prev) => ({ ...prev, [id]: { ...prev[id], [field]: value } }));
   };
@@ -125,10 +126,11 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     if (!changes) return;
     setActionLoading(true);
     try {
+      skipNextSocketRef.current = true;
       await api.task.update({ id: taskId, ...changes, scheduled_time: formatDate(changes.scheduled_time) });
       enqueueSnackbar(translations["taskUpdated"][language], { variant: "success" });
       setEditMode((prev) => ({ ...prev, [taskId]: false }));
-      await fetchTasks(ticketId);
+      await fetchTasks({ silent: true });
     } catch {
       enqueueSnackbar(translations["errorUpdatingTask"][language], { variant: "error" });
     } finally {
@@ -144,6 +146,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     }
     setActionLoading(true);
     try {
+      skipNextSocketRef.current = true;
       await api.task.create({
         ...newTask,
         description: newTask.description || "",
@@ -155,7 +158,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       });
       enqueueSnackbar(translations["taskAdded"][language], { variant: "success" });
       setCreatingTask(false);
-      await fetchTasks(ticketId);
+      await fetchTasks({ silent: true });
     } catch {
       enqueueSnackbar(translations["errorAddingTask"][language], { variant: "error" });
     } finally {
@@ -167,11 +170,21 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     confirmDelete(async () => {
       setActionLoading(true);
       try {
+        skipNextSocketRef.current = true;
+
+        setTasks((prev) => prev.filter((t) => t.id !== id));
+        setTaskEdits((prev) => {
+          const { [id]: _drop, ...rest } = prev;
+          return rest;
+        });
+
         await api.task.delete({ id });
         enqueueSnackbar(translations["taskDeleted"][language], { variant: "success" });
-        await fetchTasks(ticketId);
+
+        await fetchTasks({ silent: true });
       } catch {
         enqueueSnackbar(translations["errorDeletingTask"][language], { variant: "error" });
+        await fetchTasks({ silent: false });
       } finally {
         setActionLoading(false);
       }
@@ -181,11 +194,16 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const handleMarkDone = async (id) => {
     setActionLoading(true);
     try {
+      skipNextSocketRef.current = true;
+
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+
       await api.task.update({ id, status: true });
       enqueueSnackbar(translations["taskCompleted"][language], { variant: "success" });
-      await fetchTasks(ticketId);
+      await fetchTasks({ silent: true });
     } catch {
       enqueueSnackbar(translations["errorCompletingTask"][language], { variant: "error" });
+      await fetchTasks({ silent: false });
     } finally {
       setActionLoading(false);
     }
@@ -362,6 +380,9 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     );
   };
 
+  const isVisible = creatingTask || tasks.length > 0;
+  if (!isVisible) return null;
+
   return (
     <Box pos="relative" p="xs" w="100%">
       <Paper shadow="xs" radius="md" withBorder p="xs">
@@ -371,23 +392,29 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
           badgeColor={getBadgeColor(tasks)}
           withDivider={false}
           extraInfo={
-            listLoading
-              ? <Loader size="sm" />
-              : (
-                <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
-                  {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-                </ActionIcon>
-              )
+            <Group gap="xs">
+              <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
+                {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
+              </ActionIcon>
+              {listLoading && <Loader size="sm" />}
+            </Group>
           }
         />
 
         <Collapse in={!listCollapsed}>
-          {listLoading ? (
+          {listLoading && tasks.length === 0 && (
             <Center my="md"><Loader /></Center>
-          ) : (
+          )}
+
+          {!listLoading && tasks.length > 0 && (
             <Stack spacing="xs" mt="xs">
               {tasks.map((task) => renderTaskForm(task.id))}
-              {creatingTask && renderTaskForm("new", true)}
+            </Stack>
+          )}
+
+          {creatingTask && (
+            <Stack spacing="xs" mt="xs">
+              {renderTaskForm("new", true)}
             </Stack>
           )}
         </Collapse>
