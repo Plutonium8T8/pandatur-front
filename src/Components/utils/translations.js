@@ -3878,5 +3878,10 @@ export const translations = {
     RU: "Напишите заметку",
     RO: "Scrieți o notă",
     EN: "Write a note",
-  }
+  },
+  noNotesYet: {
+    RU: "Заметок пока нет",
+    RO: "Încă nu există note",
+    EN: "No notes yet",
+  },
 }
