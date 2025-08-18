@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useContext } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { useUser } from "@hooks";
 import { showServerError } from "@utils";
 import { MEDIA_TYPE } from "@app-constants";
+import { SocketContext } from "../contexts/SocketContext";
 
 const FORMAT_MEDIA = [
   MEDIA_TYPE.AUDIO,
@@ -19,10 +20,11 @@ const getMediaFileMessages = (messageList) => {
 
 export const useMessages = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const { onEvent, offEvent } = useContext(SocketContext);
 
   const [messages, setMessages] = useState([]);
   const [logs, setLogs] = useState([]);
-  const [notes, setNotes] = useState([]);           // <-- NEW
+  const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [lastMessage, setLastMessage] = useState();
   const [mediaFiles, setMediaFiles] = useState([]);
@@ -34,14 +36,14 @@ export const useMessages = () => {
       const response = await api.messages.messagesTicketById(id);
       const data = Array.isArray(response?.messages) ? response.messages : [];
       const logsData = Array.isArray(response?.logs) ? response.logs : [];
-      const notesData = Array.isArray(response?.notes) ? response.notes : []; // <-- NEW
+      const notesData = Array.isArray(response?.notes) ? response.notes : [];
 
       setMessages(data);
       setLogs(logsData);
-      setNotes(notesData);                                                      // <-- NEW
+      setNotes(notesData);
 
       const sortedMessages = data.filter(
-        ({ sender_id }) => sender_id !== 1 && sender_id !== userId,
+        ({ sender_id }) => sender_id !== 1 && sender_id !== userId
       );
       setLastMessage(sortedMessages[sortedMessages.length - 1]);
       setMediaFiles(getMediaFileMessages(data));
@@ -63,7 +65,7 @@ export const useMessages = () => {
           };
         }
         return msg;
-      }),
+      })
     );
   };
 
@@ -74,16 +76,32 @@ export const useMessages = () => {
   const markMessageSeen = (id, seenAt) => {
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
-        msg.ticket_id === id ? { ...msg, seen_at: seenAt } : msg,
-      ),
+        msg.ticket_id === id ? { ...msg, seen_at: seenAt } : msg
+      )
     );
   };
+
+  useEffect(() => {
+    if (!onEvent || !offEvent) return;
+
+    const handleNoteDelete = (evt) => {
+      const noteId = Number(evt?.data?.note_id);
+      if (!noteId) return;
+      setNotes((prev) => prev.filter((n) => Number(n.id) !== noteId));
+    };
+
+    const unsub = onEvent("ticket_note_delete", handleNoteDelete);
+    return () => {
+      offEvent("ticket_note_delete", handleNoteDelete);
+      typeof unsub === "function" && unsub();
+    };
+  }, [onEvent, offEvent]);
 
   return useMemo(
     () => ({
       messages,
       logs,
-      notes,                 // <-- NEW (экспортируем)
+      notes,
       lastMessage,
       loading,
       mediaFiles,
@@ -93,8 +111,8 @@ export const useMessages = () => {
       markMessageSeen,
       setMessages,
       setLogs,
-      setNotes,              // <-- опционально, если где-то понадобится править
+      setNotes,
     }),
-    [messages, logs, notes, lastMessage, mediaFiles, loading],
+    [messages, logs, notes, lastMessage, mediaFiles, loading]
   );
 };
