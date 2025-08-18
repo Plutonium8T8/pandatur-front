@@ -14,6 +14,7 @@ import "./Media.css";
 const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "heif", "avif"];
 const VIDEO_EXT = ["mp4", "webm", "ogg", "mov", "m4v"];
 const AUDIO_EXT = ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"];
+
 const guessNoteKind = (n) => {
   const t = String(n?.type || "").toLowerCase();
   if (["text", "image", "video", "audio", "file"].includes(t)) return t;
