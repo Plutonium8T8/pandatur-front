@@ -174,52 +174,6 @@ export const ChatInput = ({
     client_phone: isPhoneChat ? currentClient?.payload?.phone : undefined,
   });
 
-  const sendMessage = async () => {
-    const trimmedText = message.trim();
-    const hasText = !!trimmedText;
-    const hasFiles = attachments.length > 0;
-
-    if (!hasText && !hasFiles) return;
-
-    if (SEND_AS_SINGLE_BATCH) {
-      const payload = {
-        ...buildBasePayload(),
-        message: hasText ? trimmedText : attachments[0]?.media_url,
-        message_text: isPhoneChat && hasText ? trimmedText : undefined,
-        last_message_type: hasFiles ? attachments[0].media_type : "text",
-        attachments: attachments.map(({ media_url, media_type, name, size }) => ({
-          media_url,
-          media_type,
-          name,
-          size,
-        })),
-      };
-      onSendMessage(payload);
-    } else {
-      for (const att of attachments) {
-        const payloadFile = {
-          ...buildBasePayload(),
-          message: att.media_url,
-          media_url: att.media_url,
-          media_type: att.media_type,
-          last_message_type: att.media_type,
-        };
-        onSendMessage(payloadFile);
-      }
-      if (hasText) {
-        const payloadText = {
-          ...buildBasePayload(),
-          message: trimmedText,
-          message_text: isPhoneChat ? trimmedText : undefined,
-          last_message_type: "text",
-        };
-        onSendMessage(payloadText);
-      }
-    }
-
-    clearState();
-  };
-
   const handleMarkAsRead = () => {
     if (!ticketId) return;
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
@@ -234,6 +188,57 @@ export const ChatInput = ({
     }
     seenMessages(ticketId, userId);
     markMessagesAsRead(ticketId, unseenCount);
+  };
+
+  const sendMessage = async () => {
+    const trimmedText = message.trim();
+    const hasText = !!trimmedText;
+    const hasFiles = attachments.length > 0;
+
+    if (!hasText && !hasFiles) return;
+
+    try {
+      if (SEND_AS_SINGLE_BATCH) {
+        const payload = {
+          ...buildBasePayload(),
+          message: hasText ? trimmedText : attachments[0]?.media_url,
+          message_text: isPhoneChat && hasText ? trimmedText : undefined,
+          last_message_type: hasFiles ? attachments[0].media_type : "text",
+          attachments: attachments.map(({ media_url, media_type, name, size }) => ({
+            media_url,
+            media_type,
+            name,
+            size,
+          })),
+        };
+        await Promise.resolve(onSendMessage(payload));
+      } else {
+        for (const att of attachments) {
+          const payloadFile = {
+            ...buildBasePayload(),
+            message: att.media_url,
+            media_url: att.media_url,
+            media_type: att.media_type,
+            last_message_type: att.media_type,
+          };
+          await Promise.resolve(onSendMessage(payloadFile));
+        }
+        if (hasText) {
+          const payloadText = {
+            ...buildBasePayload(),
+            message: trimmedText,
+            message_text: isPhoneChat ? trimmedText : undefined,
+            last_message_type: "text",
+          };
+          await Promise.resolve(onSendMessage(payloadText));
+        }
+      }
+
+      handleMarkAsRead();
+      clearState();
+    } catch (e) {
+      console.error("Failed to send message", e);
+    }
   };
 
   const handleMarkActionResolved = async () => {
@@ -261,6 +266,8 @@ export const ChatInput = ({
       });
       setShowEmailForm(false);
       setEmailFields({ from: "", to: "", subject: "", body: "" });
+      // ✅ email тоже считаем реакцией — помечаем чат прочитанным
+      handleMarkAsRead();
     } catch (e) {
       console.error("Failed to send email", e);
     }
