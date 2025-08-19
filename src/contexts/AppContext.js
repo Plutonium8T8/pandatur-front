@@ -348,53 +348,53 @@ export const AppProvider = ({ children }) => {
         break;
       }
 
-      case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
-        const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
+      // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
+      //   const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
 
-        const idsRaw = Array.isArray(ticket_ids)
-          ? ticket_ids
-          : (ticket_id ? [ticket_id] : []);
+      //   const idsRaw = Array.isArray(ticket_ids)
+      //     ? ticket_ids
+      //     : (ticket_id ? [ticket_id] : []);
 
-        const ids = [...new Set(
-          idsRaw
-            .map((v) => Number(v))
-            .filter((v) => Number.isFinite(v))
-        )];
+      //   const ids = [...new Set(
+      //     idsRaw
+      //       .map((v) => Number(v))
+      //       .filter((v) => Number.isFinite(v))
+      //   )];
 
-        const isMatchingGroup = group_title === groupTitleForApi;
-        const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
+      //   const isMatchingGroup = group_title === groupTitleForApi;
+      //   const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
 
-        if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
-          break;
-        }
+      //   if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
+      //     break;
+      //   }
 
-        ids.forEach((id) => {
-          try {
-            fetchSingleTicket(id);
-          } catch (e) {
-          }
-        });
+      //   ids.forEach((id) => {
+      //     try {
+      //       fetchSingleTicket(id);
+      //     } catch (e) {
+      //     }
+      //   });
 
-        const socketInstance = socketRef.current;
-        if (socketInstance?.readyState === WebSocket.OPEN) {
-          const CHUNK_SIZE = 50;
-          for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
-            const chunk = ids.slice(i, i + CHUNK_SIZE);
-            socketInstance.send(
-              JSON.stringify({
-                type: TYPE_SOCKET_EVENTS.CONNECT,
-                data: { ticket_id: chunk },
-              })
-            );
-          }
-        } else {
-          enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
-            variant: "error",
-          });
-        }
+      //   const socketInstance = socketRef.current;
+      //   if (socketInstance?.readyState === WebSocket.OPEN) {
+      //     const CHUNK_SIZE = 50;
+      //     for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
+      //       const chunk = ids.slice(i, i + CHUNK_SIZE);
+      //       socketInstance.send(
+      //         JSON.stringify({
+      //           type: TYPE_SOCKET_EVENTS.CONNECT,
+      //           data: { ticket_id: chunk },
+      //         })
+      //       );
+      //     }
+      //   } else {
+      //     enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
+      //       variant: "error",
+      //     });
+      //   }
 
-        break;
-      }
+      //   break;
+      // }
 
       default:
         console.warn("Invalid socket message type:", message.type);

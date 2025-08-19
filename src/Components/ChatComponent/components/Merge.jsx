@@ -12,8 +12,8 @@ export const Merge = ({
   const field = useField({
     initialValue: "",
     clearErrorOnChange: false,
-    validate: (value) => {
-      if (typeof value === "string" && value === "") {
+    validate: (v) => {
+      if (typeof v === "string" && v === "") {
         return getLanguageByKey("ID-ul leadului este necesar");
       }
       return null;
@@ -22,7 +22,6 @@ export const Merge = ({
 
   const triggerSubmit = async () => {
     const validateField = await field.validate();
-
     if (validateField === null) {
       onSubmit(field.getValue(), field.reset);
     }
@@ -32,8 +31,20 @@ export const Merge = ({
     <>
       <TextInput
         disabled
-        value={value}
+        value={value ?? ""}
         placeholder={getLanguageByKey("Introduceți ID vechi")}
+        variant="filled"
+        styles={(theme) => ({
+          root: { opacity: 1 },
+          input: {
+            color: theme.black,
+            WebkitTextFillColor: theme.black,
+            opacity: 1,
+            backgroundColor: theme.colors.gray[1],
+            fontWeight: 600,
+            "::placeholder": { color: theme.colors.gray[7], opacity: 1 },
+          },
+        })}
       />
 
       <NumberInput
