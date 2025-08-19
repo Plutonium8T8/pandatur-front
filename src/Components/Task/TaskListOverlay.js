@@ -218,6 +218,8 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     setEditMode((prev) => ({ ...prev, [id]: false }));
   };
 
+  const toggleList = useCallback(() => setListCollapsed((p) => !p), []);
+
   const renderTaskForm = (id, isNew = false, currentUserId, userGroups) => {
     const isEditing = isNew || editMode[id];
     const responsibleId = String(taskEdits[id]?.created_for);
@@ -386,20 +388,34 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   return (
     <Box pos="relative" p="xs" w="100%">
       <Paper shadow="xs" radius="md" withBorder p="xs">
-        <PageHeader
-          title={translations["Tasks"][language]}
-          count={tasks.length}
-          badgeColor={getBadgeColor(tasks)}
-          withDivider={false}
-          extraInfo={
-            <Group gap="xs">
-              <ActionIcon variant="light" onClick={() => setListCollapsed((p) => !p)}>
-                {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-              </ActionIcon>
-              {listLoading && <Loader size="sm" />}
-            </Group>
-          }
-        />
+        <Box
+          onClick={toggleList}
+          role="button"
+          aria-expanded={!listCollapsed}
+          tabIndex={0}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleList(); }
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <PageHeader
+            title={translations["Tasks"][language]}
+            count={tasks.length}
+            badgeColor={getBadgeColor(tasks)}
+            withDivider={false}
+            extraInfo={
+              <Group gap="xs" onClick={(e) => e.stopPropagation()}>
+                <ActionIcon
+                  variant="light"
+                  onClick={(e) => { e.stopPropagation(); toggleList(); }}
+                >
+                  {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
+                </ActionIcon>
+                {listLoading && <Loader size="sm" />}
+              </Group>
+            }
+          />
+        </Box>
 
         <Collapse in={!listCollapsed}>
           {listLoading && tasks.length === 0 && (
