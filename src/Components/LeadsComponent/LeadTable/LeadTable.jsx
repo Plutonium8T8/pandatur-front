@@ -162,7 +162,7 @@ export const LeadTable = ({
       title: getLanguageByKey("Workflow"),
       dataIndex: "workflow",
       align: "center",
-      width: 150,
+      width: 170,
       render: (workflow) => <WorkflowTag type={workflow} />,
     },
     {
