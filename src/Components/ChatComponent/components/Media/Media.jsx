@@ -9,7 +9,7 @@ import { useMessagesContext } from "@hooks";
 import { ChatNoteCard } from "../../../ChatNoteCard";
 import { renderFile, renderMedia, renderCall } from "./utils";
 import { FiTrash2 } from "react-icons/fi";
-import { useConfirmPopup } from "../../../../hooks";
+import { useConfirmPopup, useGetTechniciansList } from "../../../../hooks";
 import "./Media.css";
 
 const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "heif", "avif"];
@@ -31,6 +31,7 @@ const guessNoteKind = (n) => {
 export const Media = ({ messages, id }) => {
   const { enqueueSnackbar } = useSnackbar();
   const { notes: ctxNotes = [], getUserMessages } = useMessagesContext();
+  const { technicians: techOptions = [] } = useGetTechniciansList();
 
   const [uploadTab, setUploadTab] = useState("notes");
   const [deletingIds, setDeletingIds] = useState(() => new Set());
@@ -41,6 +42,30 @@ export const Media = ({ messages, id }) => {
     () => (ctxNotes || []).filter((n) => Number(n.ticket_id) === Number(id)),
     [ctxNotes, id]
   );
+
+  const techLabelById = useMemo(() => {
+    const m = new Map();
+    (techOptions || []).forEach((t) => {
+      const key = String(t?.value ?? t?.id ?? "");
+      const label =
+        t?.label ||
+        t?.name ||
+        [t?.first_name, t?.last_name].filter(Boolean).join(" ") ||
+        (key ? `#${key}` : (getLanguageByKey("Unknown") || "Unknown"));
+      if (key) m.set(key, label);
+    });
+    return m;
+  }, [techOptions]);
+
+  const resolveTechLabel = (n) => {
+    const direct =
+      n?.technician_full_name ||
+      n?.technician_name ||
+      n?.created_by_full_name;
+    if (direct && String(direct).trim()) return direct;
+    const idStr = String(n?.technician_id ?? "");
+    return techLabelById.get(idStr) || (idStr ? `#${idStr}` : (getLanguageByKey("Unknown") || "Unknown"));
+  };
 
   const normalizeNote = (n) => ({
     ...n,
@@ -154,7 +179,7 @@ export const Media = ({ messages, id }) => {
                   <Flex key={n.id} align="stretch" gap={8}>
                     <ChatNoteCard
                       note={normalizeNote(n)}
-                      techLabel={`#${n.technician_id || ""}`}
+                      techLabel={resolveTechLabel(n)}
                       showActions
                       style={{ flex: 1 }}
                     />
@@ -174,7 +199,7 @@ export const Media = ({ messages, id }) => {
                   <Flex key={n.id} align="stretch" gap={8}>
                     <ChatNoteCard
                       note={normalizeNote(n)}
-                      techLabel={`#${n.technician_id || ""}`}
+                      techLabel={resolveTechLabel(n)}
                       showActions
                       style={{ flex: 1 }}
                     />
@@ -194,7 +219,7 @@ export const Media = ({ messages, id }) => {
                   <Flex key={n.id} align="stretch" gap={8}>
                     <ChatNoteCard
                       note={normalizeNote(n)}
-                      techLabel={`#${n.technician_id || ""}`}
+                      techLabel={resolveTechLabel(n)}
                       showActions
                       style={{ flex: 1 }}
                     />
@@ -214,7 +239,7 @@ export const Media = ({ messages, id }) => {
                   <Flex key={n.id} align="stretch" gap={8}>
                     <ChatNoteCard
                       note={normalizeNote(n)}
-                      techLabel={`#${n.technician_id || ""}`}
+                      techLabel={resolveTechLabel(n)}
                       showActions
                       style={{ flex: 1 }}
                     />
@@ -234,7 +259,7 @@ export const Media = ({ messages, id }) => {
                   <Flex key={n.id} align="stretch" gap={8}>
                     <ChatNoteCard
                       note={normalizeNote(n)}
-                      techLabel={`#${n.technician_id || ""}`}
+                      techLabel={resolveTechLabel(n)}
                       showActions
                       style={{ flex: 1 }}
                     />
