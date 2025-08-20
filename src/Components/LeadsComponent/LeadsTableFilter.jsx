@@ -50,7 +50,6 @@ export const LeadsTableFilter = ({
     });
 
     setSearchParams(urlParams, { replace: true });
-    onSubmitTicket(combinedFilters, "hard");
     onClose?.();
   };
 
