@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider, Modal, Button, ActionIcon, Input, SegmentedControl, Flex, Select } from "@mantine/core";
-import { useDOMElementHeight, useApp, useDebounce, useConfirmPopup, useGetTechniciansList } from "@hooks";
+import { useDOMElementHeight, useApp, useConfirmPopup, useGetTechniciansList } from "@hooks";
 import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
 import { SpinnerRightBottom, MantineModal, AddLeadModal, PageHeader, Spin } from "@components";
@@ -13,26 +13,31 @@ import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilte
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
 import Can from "../Components/CanComponent/Can";
-import { showServerError, getTotalPages, getLanguageByKey } from "../Components/utils";
+import { getTotalPages, getLanguageByKey } from "../Components/utils";
 import { api } from "../api";
-import { VIEW_MODE, filteredWorkflows } from "@components/LeadsComponent/utils";
+import { VIEW_MODE } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
 import { IoMdAdd, IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
-import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
 import { LuFilter } from "react-icons/lu";
 import "../css/SnackBarComponent.css";
 import "../Components/LeadsComponent/LeadsHeader/LeadsFilter.css";
+
+// новые хуки
+import { useLeadsKanban } from "../hooks/useLeadsKanban";
+import { useLeadsTable } from "../hooks/useLeadsTable";
+import { useLeadsUrlSync } from "../hooks/useLeadsUrlSync";
+import { useLeadsSelection } from "../hooks/useLeadsSelection";
 
 export const Leads = () => {
   const refLeadsHeader = useRef();
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const leadsFilterHeight = useDOMElementHeight(refLeadsHeader);
+
   const {
     tickets,
     spinnerTickets,
-    setLightTicketFilters,
     fetchTickets,
     groupTitleForApi,
     workflowOptions,
@@ -41,220 +46,109 @@ export const Leads = () => {
     customGroupTitle,
     setCustomGroupTitle,
   } = useApp();
+
   const { ticketId } = useParams();
   const { technicians } = useGetTechniciansList();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [params] = useSearchParams();
   const didLoadGlobalTicketsRef = useRef(false);
-  const [filtersReady, setFiltersReady] = useState(false);
 
-  const [hardTickets, setHardTickets] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTicket, setCurrentTicket] = useState(null);
-  const [selectedTickets, setSelectedTickets] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [totalLeads, setTotalLeads] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isChatOpen, setIsChatOpen] = useState(!!ticketId);
-  const [selectedWorkflow, setSelectedWorkflow] = useState(filteredWorkflows);
   const [isOpenAddLeadModal, setIsOpenAddLeadModal] = useState(false);
-  const [hardTicketFilters, setHardTicketFilters] = useState({});
   const [isOpenKanbanFilterModal, setIsOpenKanbanFilterModal] = useState(false);
   const [isOpenListFilterModal, setIsOpenListFilterModal] = useState(false);
-  const [kanbanTickets, setKanbanTickets] = useState([]);
-  const [kanbanFilters, setKanbanFilters] = useState({});
-  const [kanbanSearchTerm, setKanbanSearchTerm] = useState("");
-  const [kanbanSpinner, setKanbanSpinner] = useState(false);
-  const [kanbanFilterActive, setKanbanFilterActive] = useState(false);
-  const [choiceWorkflow, setChoiceWorkflow] = useState([]);
-  const isGroupTitleSyncedRef = useRef(false);
+  const [isChatOpen, setIsChatOpen] = useState(!!ticketId);
 
   const [viewMode, setViewMode] = useState(VIEW_MODE.KANBAN);
-  const isSearching = !!kanbanSearchTerm?.trim();
 
-  const currentSearch = viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm;
-  const debouncedSearch = useDebounce(currentSearch, 2000);
-  const deleteBulkLeads = useConfirmPopup({
-    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
+  // --- КАНБАН (light) ---
+  const {
+    visibleTickets,
+    kanbanFilters,
+    kanbanSpinner,
+    kanbanFilterActive,
+    selectedWorkflow,
+    choiceWorkflow,
+
+    kanbanSearchTerm,
+    setKanbanSearchTerm,
+    debouncedSearch,
+
+    fetchKanbanTickets,
+    currentFetchTickets,
+    applyKanbanFilters,
+    resetKanban,
+    setKanbanFilters,
+    setKanbanTickets,
+    setKanbanFilterActive,
+    setSelectedWorkflow,
+    setChoiceWorkflow,
+  } = useLeadsKanban();
+
+  // --- ТАБЛИЦА (hard) ---
+  const {
+    hardTickets,
+    hardTicketFilters,
+    loading,
+    totalLeads,
+    currentPage,
+    perPage,
+    hasHardFilters,
+    searchTerm,
+    fetchHardTickets,
+    setHardTicketFilters,
+    setCurrentPage,
+    setSearchTerm,
+    handleApplyFiltersHardTicket,
+    handlePerPageChange,
+  } = useLeadsTable();
+
+  // --- Выделение ---
+  const {
+    selectedTickets,
+    setSelectedTickets,
+    toggleSelectTicket,
+    toggleSelectAll,
+    responsibleId,
+    selectedTicket,
+  } = useLeadsSelection({
+    listForSelection: viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets,
   });
-  const [perPage, setPerPage] = useState(50);
 
-  // маркер последнего hard-запроса (вместо AbortController -> не слать signal в API)
-  const hardReqIdRef = useRef(0);
+  // --- URL-синк (view/type/group_title/фильтры) ---
+  const { filtersReady } = useLeadsUrlSync({
+    viewMode,
+    setViewMode,
 
-  const fetchKanbanTickets = async (filters = {}) => {
-    setKanbanSpinner(true);
-    setKanbanFilters(filters);
-    setKanbanTickets([]);
+    // kanban
+    setKanbanFilters,
+    setKanbanFilterActive,
+    fetchKanbanTickets,
+    setChoiceWorkflow,
 
-    let page = 1;
-    let totalPages = 1;
+    // table
+    handleApplyFiltersHardTicket,
 
-    try {
-      const { group_title, search, ...attributes } = filters;
+    // groupTitle sync
+    accessibleGroupTitles,
+    customGroupTitle,
+    setCustomGroupTitle,
+  });
 
-      while (page <= totalPages) {
-        const res = await api.tickets.filters({
-          page,
-          type: "light",
-          group_title: group_title || groupTitleForApi,
-          attributes: {
-            ...attributes,
-            ...(search?.trim() ? { search: search.trim() } : {}),
-          },
-        });
-
-        const normalized = res.tickets.map((t) => ({
-          ...t,
-          last_message: t.last_message || getLanguageByKey("no_messages"),
-          time_sent: t.time_sent || null,
-          unseen_count: t.unseen_count || 0,
-        }));
-
-        setKanbanTickets((prev) => [...prev, ...normalized]);
-
-        totalPages = res.pagination?.total_pages || 1;
-        page += 1;
-      }
-    } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    } finally {
-      setKanbanSpinner(false);
-    }
-  };
-
-  const visibleTickets = isSearching || kanbanSpinner || kanbanFilterActive ? kanbanTickets : tickets;
-
-  const currentFetchTickets = kanbanSearchTerm?.trim() ? fetchKanbanTickets : fetchTickets;
-
+  // открытие чата при переходе на /leads/:ticketId
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
   }, [ticketId]);
 
+  // загрузка таблицы (hard) при готовности фильтров/смене зависимостей
   useEffect(() => {
     if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage]);
 
-  useEffect(() => {
-    if (!filtersReady || !groupTitleForApi) return;
-
-    if (viewMode === VIEW_MODE.KANBAN && debouncedSearch.trim()) {
-      setKanbanFilterActive(true);
-      fetchKanbanTickets({
-        ...kanbanFilters,
-        search: debouncedSearch.trim(),
-      });
-      return;
-    }
-
-    if (viewMode === VIEW_MODE.KANBAN && !debouncedSearch.trim()) {
-      setKanbanTickets([]);
-      setKanbanFilterActive(false);
-      return;
-    }
-
-    if (viewMode === VIEW_MODE.LIST) {
-      setHardTicketFilters((prev) => ({
-        ...prev,
-        search: debouncedSearch.trim(),
-      }));
-      setCurrentPage(1);
-    }
-  }, [debouncedSearch, viewMode, groupTitleForApi, filtersReady]);
-
-  const fetchHardTickets = async (page = 1) => {
-    if (!groupTitleForApi || !workflowOptions.length) return;
-
-    const reqId = ++hardReqIdRef.current;
-    try {
-      setLoading(true);
-
-      const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
-      const isSearchingInList = !!searchTerm?.trim();
-
-      const effectiveWorkflow =
-        hardTicketFilters.workflow?.length > 0
-          ? hardTicketFilters.workflow
-          : isSearchingInList
-            ? workflowOptions
-            : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
-
-      const { search, group_title, workflow, type, view, ...restFilters } = hardTicketFilters;
-
-      const response = await api.tickets.filters({
-        page,
-        type: "hard",
-        group_title: groupTitleForApi,
-        sort_by: "creation_date",
-        order: "DESC",
-        limit: perPage, // <-- сервер ожидает limit
-        attributes: {
-          ...restFilters,
-          workflow: effectiveWorkflow,
-          ...(search?.trim() ? { search: search.trim() } : {}),
-        },
-      });
-
-      // если прилетел не последний ответ — игнор
-      if (reqId !== hardReqIdRef.current) return;
-
-      setHardTickets(response.data);
-      setTotalLeads(response.pagination?.total || 0);
-    } catch (error) {
-      if (reqId === hardReqIdRef.current) {
-        enqueueSnackbar(showServerError(error), { variant: "error" });
-      }
-    } finally {
-      if (reqId === hardReqIdRef.current) {
-        setLoading(false);
-      }
-    }
-  };
-
-  const closeChatModal = () => {
-    setIsChatOpen(false);
-    navigate("/leads");
-  };
-
-  const toggleSelectTicket = (ticketId) => {
-    setSelectedTickets((prev) =>
-      prev.includes(ticketId) ? prev.filter((id) => id !== ticketId) : [...prev, ticketId]
-    );
-  };
-
-  const deleteTicket = async () => {
-    deleteBulkLeads(async () => {
-      try {
-        setLoading(true);
-        await api.tickets.deleteById(selectedTickets);
-        setSelectedTickets([]);
-        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), { variant: "success" });
-        fetchHardTickets(currentPage);
-      } catch (error) {
-        enqueueSnackbar(showServerError(error), { variant: "error" });
-      } finally {
-        setLoading(false);
-      }
-    });
-  };
-
-  const openCreateTicketModal = () => {
-    setCurrentTicket({
-      contact: "",
-      transport: "",
-      country: "",
-      priority: priorityOptions[0],
-      workflow: defaultWorkflowOptions[0],
-      service_reference: "",
-      technician_id: 0,
-    });
-    setIsOpenAddLeadModal(true);
-  };
-
+  // смена режима (kanban/list)
   const handleChangeViewMode = (mode) => {
     const upperMode = mode.toUpperCase();
     setViewMode(upperMode);
@@ -269,6 +163,7 @@ export const Leads = () => {
       setHardTicketFilters({});
       setSearchTerm("");
     } else {
+      // kanban reset до дефолтной глобальной ленты
       setKanbanFilters({});
       setKanbanSearchTerm("");
       setKanbanFilterActive(false);
@@ -281,10 +176,12 @@ export const Leads = () => {
     }
   };
 
+  // при смене groupTitle — сбрасываем локальные списки (как раньше)
   useEffect(() => {
     didLoadGlobalTicketsRef.current = false;
   }, [groupTitleForApi]);
 
+  // держим view из URL (на случай внешней навигации)
   useEffect(() => {
     const urlView = searchParams.get("view");
     const urlViewUpper = urlView ? urlView.toUpperCase() : undefined;
@@ -293,29 +190,9 @@ export const Leads = () => {
     }
   }, [searchParams, viewMode]);
 
-  const handleApplyFiltersHardTicket = (selectedFilters) => {
-    const hasWorkflow = selectedFilters.workflow && selectedFilters.workflow.length > 0;
-
-    const workflow =
-      typeof selectedFilters.workflow === "string"
-        ? [selectedFilters.workflow]
-        : selectedFilters.workflow;
-
-    const merged = {
-      ...hardTicketFilters,
-      ...selectedFilters,
-      workflow: hasWorkflow ? workflow : workflowOptions,
-    };
-
-    setHardTicketFilters(merged);
-    setCurrentPage(1);
-    setIsOpenListFilterModal(false);
-  };
-
+  // применить фильтры для light (канбан) + обновить URL (как было)
   const handleApplyFilterLightTicket = (selectedFilters) => {
-    setLightTicketFilters(selectedFilters);
-    setKanbanFilters(selectedFilters);
-    setKanbanFilterActive(true);
+    applyKanbanFilters(selectedFilters);
     setIsOpenKanbanFilterModal(false);
     didLoadGlobalTicketsRef.current = false;
 
@@ -323,9 +200,7 @@ export const Leads = () => {
       const newParams = new URLSearchParams(prev);
 
       for (const key of Array.from(newParams.keys())) {
-        if (key !== "view") {
-          newParams.delete(key);
-        }
+        if (key !== "view") newParams.delete(key);
       }
 
       Object.entries(selectedFilters).forEach(([key, value]) => {
@@ -344,94 +219,50 @@ export const Leads = () => {
     });
   };
 
-  const handlePaginationWorkflow = (page) => {
-    setCurrentPage(page);
+  // удаление лидов (table bulk delete)
+  const deleteBulkLeads = useConfirmPopup({
+    subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
+  });
+
+  const deleteTicket = async () => {
+    deleteBulkLeads(async () => {
+      try {
+        // loading: это спиннер таблицы
+        // (оставляю, как и было — логика таблицы)
+        await api.tickets.deleteById(selectedTickets);
+        setSelectedTickets([]);
+        enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), { variant: "success" });
+        fetchHardTickets(currentPage);
+      } catch (error) {
+        enqueueSnackbar(getLanguageByKey("A aparut o eroare la ștergere"), { variant: "error" });
+      }
+    });
   };
 
-  const toggleSelectAll = (ids) => {
-    setSelectedTickets((prev) => (prev.length === ids.length ? [] : ids));
+  // открыть создание
+  const openCreateTicketModal = () => {
+    setCurrentTicket({
+      contact: "",
+      transport: "",
+      country: "",
+      priority: priorityOptions[0],
+      workflow: defaultWorkflowOptions[0],
+      service_reference: "",
+      technician_id: 0,
+    });
+    setIsOpenAddLeadModal(true);
   };
 
-  const groupTitleSelectData = groupTitleOptions.filter((option) => accessibleGroupTitles.includes(option.value));
+  // пагинация таблицы
+  const handlePaginationWorkflow = (page) => setCurrentPage(page);
 
-  const selectedTicket = (viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets).find(
-    (t) => t.id === selectedTickets?.[0]
-  );
-  const responsibleId = selectedTicket?.technician_id ? String(selectedTicket.technician_id) : undefined;
+  // доступные groupTitle в Select
+  const groupTitleSelectData = groupTitleOptions.filter((o) => accessibleGroupTitles.includes(o.value));
 
-  const hasHardFilters = Object.values(hardTicketFilters).some(
-    (v) =>
-      v !== undefined &&
-      v !== null &&
-      v !== "" &&
-      (!Array.isArray(v) || v.length > 0) &&
-      (typeof v !== "object" || Object.keys(v).length > 0)
-  );
-
-  useEffect(() => {
-    const isReady = groupTitleForApi && workflowOptions.length;
-    if (!isReady) return;
-
-    const parsedFilters = parseFiltersFromUrl(searchParams);
-    const urlGroupTitle = parsedFilters.group_title;
-    const type = searchParams.get("type");
-    const hasUrlFilters = Object.keys(parsedFilters).length > 0;
-
-    if (urlGroupTitle && accessibleGroupTitles.includes(urlGroupTitle) && customGroupTitle !== urlGroupTitle) {
-      setCustomGroupTitle(urlGroupTitle);
-      isGroupTitleSyncedRef.current = true;
-      return;
-    }
-
-    if (isGroupTitleSyncedRef.current && urlGroupTitle && customGroupTitle === urlGroupTitle) {
-      if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-        setKanbanFilters(parsedFilters);
-        setKanbanFilterActive(true);
-        fetchKanbanTickets(parsedFilters);
-        setChoiceWorkflow(parsedFilters.workflow || []);
-      } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-        setHardTicketFilters(parsedFilters);
-      }
-
-      isGroupTitleSyncedRef.current = false;
-      return;
-    }
-
-    if (!isGroupTitleSyncedRef.current && customGroupTitle === urlGroupTitle && hasUrlFilters) {
-      if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
-        setKanbanFilters(parsedFilters);
-        setKanbanFilterActive(true);
-        fetchKanbanTickets(parsedFilters);
-        setChoiceWorkflow(parsedFilters.workflow || []);
-      } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
-        setHardTicketFilters(parsedFilters);
-      }
-    }
-
-    if (type === "light" && !hasUrlFilters) {
-      setKanbanTickets([]);
-      setKanbanFilterActive(false);
-    }
-  }, [searchParams.toString(), groupTitleForApi, workflowOptions, customGroupTitle, viewMode, accessibleGroupTitles]);
-
-  useEffect(() => {
-    const type = params.get("type");
-    if (type === "hard") {
-      const parsedFilters = parseFiltersFromUrl(params);
-      handleApplyFiltersHardTicket(parsedFilters);
-      setFiltersReady(true);
-    } else {
-      setFiltersReady(true);
-    }
-  }, [params]);
-
-  // единый обработчик смены лимита
-  const handlePerPageChange = (next) => {
-    const n = Number(next);
-    if (!n || n === perPage) return;
-    setCurrentPage(1);
-    setPerPage(n);
-    // запрос уйдет из эффекта один раз
+  // закрытие чата
+  const closeChatModal = () => {
+    setIsChatOpen(false);
+    navigate("/leads");
   };
 
   return (
@@ -460,6 +291,7 @@ export const Leads = () => {
                   </Button>
                 </Can>
               )}
+
               <ActionIcon
                 variant={
                   viewMode === VIEW_MODE.KANBAN
@@ -481,6 +313,7 @@ export const Leads = () => {
               >
                 <LuFilter size={16} />
               </ActionIcon>
+
               <Input
                 value={viewMode === VIEW_MODE.KANBAN ? kanbanSearchTerm : searchTerm}
                 onChange={(e) => {
@@ -505,17 +338,18 @@ export const Leads = () => {
                   )
                 }
               />
+
               <Select
                 placeholder={getLanguageByKey("filter_by_group")}
                 value={customGroupTitle ?? groupTitleForApi}
                 data={groupTitleSelectData}
                 onChange={(val) => {
                   setCustomGroupTitle(val);
-
                   if (viewMode === VIEW_MODE.LIST) {
                     setCurrentPage(1);
                     setHardTicketFilters({});
                   } else {
+                    // сброс канбана
                     setKanbanFilters({});
                     setKanbanSearchTerm("");
                     setKanbanFilterActive(false);
@@ -524,6 +358,7 @@ export const Leads = () => {
                   }
                 }}
               />
+
               <SegmentedControl
                 onChange={handleChangeViewMode}
                 value={viewMode}
@@ -532,6 +367,7 @@ export const Leads = () => {
                   { value: VIEW_MODE.LIST, label: <FaList /> },
                 ]}
               />
+
               <Can permission={{ module: "leads", action: "create" }}>
                 <Button onClick={openCreateTicketModal} leftSection={<IoMdAdd size={16} />}>
                   {getLanguageByKey("Adaugă lead")}
