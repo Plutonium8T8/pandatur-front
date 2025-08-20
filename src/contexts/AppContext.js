@@ -348,6 +348,7 @@ export const AppProvider = ({ children }) => {
         break;
       }
 
+      
       // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
       //   const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
 
