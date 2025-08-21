@@ -4,11 +4,6 @@ import { useApp } from "@hooks";
 import { parseFiltersFromUrl } from "../Components/utils/parseFiltersFromUrl";
 import { VIEW_MODE } from "@components/LeadsComponent/utils";
 
-/**
- * Синхронизирует URL <-> состояние канбана/таблицы.
- * filtersReady переключается в true ТОЛЬКО после применения URL-фильтров (если есть),
- * чтобы не было стартового запроса с дефолтными фильтрами.
- */
 export const useLeadsUrlSync = ({
     viewMode,
     setViewMode,
@@ -36,7 +31,6 @@ export const useLeadsUrlSync = ({
     const hardApplyRef = useRef(handleApplyFiltersHardTicket);
     const lastHardAppliedRef = useRef(null);
 
-    // держим актуальную ссылку на коллбек (без дерганья зависимостей)
     useEffect(() => {
         hardApplyRef.current = handleApplyFiltersHardTicket;
     }, [handleApplyFiltersHardTicket]);
@@ -44,11 +38,7 @@ export const useLeadsUrlSync = ({
     const areEqual = (a, b) => {
         if (a === b) return true;
         if (!a || !b) return false;
-        try {
-            return JSON.stringify(a) === JSON.stringify(b);
-        } catch {
-            return false;
-        }
+        try { return JSON.stringify(a) === JSON.stringify(b); } catch { return false; }
     };
 
     // синк view из URL
@@ -61,51 +51,50 @@ export const useLeadsUrlSync = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchParams, viewMode, setViewMode]);
 
-    // главный эффект: применяем фильтры из URL и только потом ставим filtersReady=true
+    // главный эффект: применяем фильтры из URL, но В ЛЮБОМ СЛУЧАЕ выставляем filtersReady(true)
     useEffect(() => {
-        const ctxReady = !!groupTitleForApi && workflowOptions.length > 0;
+        const ctxReady = !!groupTitleForApi && Array.isArray(workflowOptions) && workflowOptions.length > 0;
         if (!ctxReady) return;
 
         const parsed = parseFiltersFromUrl(searchParams);
-        const urlGroupTitle = parsed.group_title;
+        const urlGroupTitle = parsed.group_title ?? null;
         const type = searchParams.get("type");
         const hasUrlFilters = Object.keys(parsed).length > 0;
 
-        // 1) сначала синхронизируем group_title из URL
+        // 1) сначала пробуем синхронизировать group_title из URL
         if (
             urlGroupTitle &&
+            Array.isArray(accessibleGroupTitles) &&
             accessibleGroupTitles.includes(urlGroupTitle) &&
             customGroupTitle !== urlGroupTitle
         ) {
             setCustomGroupTitle(urlGroupTitle);
             isGroupTitleSyncedRef.current = true;
-            return; // ждём следующий прогон
+            return; // подождём следующий прогон
         }
 
-        // 2) после синка group_title применяем фильтры и выставляем готовность
+        // 2) после синка group_title применяем фильтры из URL
         if (isGroupTitleSyncedRef.current && urlGroupTitle && customGroupTitle === urlGroupTitle) {
             if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
                 setKanbanFilters(parsed);
                 setKanbanFilterActive(true);
                 fetchKanbanTickets(parsed);
                 setChoiceWorkflow(parsed.workflow || []);
-                setFiltersReady(true);
             } else if (type === "hard" && viewMode === VIEW_MODE.LIST) {
                 if (!areEqual(lastHardAppliedRef.current, parsed)) {
                     lastHardAppliedRef.current = parsed;
                     hardApplyRef.current(parsed);
                 }
-                setFiltersReady(true); // готово для первого fetchHardTickets
-            } else {
-                setFiltersReady(true);
             }
-
             isGroupTitleSyncedRef.current = false;
+            setFiltersReady(true); // ВСЕГДА поднимаем
             return;
         }
 
-        // 3) обычный путь: group_title уже совпадает или отсутствует
-        if (!isGroupTitleSyncedRef.current && customGroupTitle === urlGroupTitle) {
+        // 3) обычный путь: либо group_title уже совпал, либо его НЕТ в URL (тоже считаем «синхронизированным»)
+        const groupTitleAligned = !urlGroupTitle || customGroupTitle === urlGroupTitle;
+
+        if (!isGroupTitleSyncedRef.current && groupTitleAligned) {
             if (type === "light" && viewMode === VIEW_MODE.KANBAN) {
                 if (hasUrlFilters) {
                     setKanbanFilters(parsed);
@@ -116,7 +105,7 @@ export const useLeadsUrlSync = ({
                     setKanbanFilterActive(false);
                     setKanbanFilters({});
                 }
-                setFiltersReady(true);
+                setFiltersReady(true); // ВСЕГДА поднимаем
                 return;
             }
 
@@ -127,15 +116,20 @@ export const useLeadsUrlSync = ({
                         hardApplyRef.current(parsed);
                     }
                 } else {
-                    lastHardAppliedRef.current = null; // дефолтная загрузка
+                    // не трогаем API здесь: дефолтный fetch уйдёт из компонента по filtersReady && LIST
+                    lastHardAppliedRef.current = null;
                 }
-                setFiltersReady(true);
+                setFiltersReady(true); // ВСЕГДА поднимаем
                 return;
             }
 
+            // тип не задан/не совпал — но как договаривались, всё равно поднимаем
             setFiltersReady(true);
             return;
         }
+
+        // если дошли сюда (редко) — всё равно освобождаем внешний эффект
+        setFiltersReady(true);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         searchParams.toString(),
