@@ -3900,5 +3900,35 @@ export const translations = {
     RU: "Удаление...",
     RO: "Se șterge...",
     EN: "Deleting...",
-  }
+  },
+  "Selected": {
+    RU: "Выбрано",
+    RO: "Selectate",
+    EN: "Selected",
+  },
+  "Select all": {
+    RU: "Выбрать все",
+    RO: "Selectează toate",
+    EN: "Select all",
+  },
+  "results": {
+    RU: "результатов",
+    RO: "rezultate",
+    EN: "results",
+  },
+  "All": {
+    RU: "Все",
+    RO: "Toate",
+    EN: "All",
+  },
+  "results selected": {
+    RU: "результатов выбрано",
+    RO: "rezultate selectate",
+    EN: "results selected",
+  },
+  "Clear selection": {
+    RU: "Снять выделение",
+    RO: "Anulează selecția",
+    EN: "Clear selection",
+  },
 }
