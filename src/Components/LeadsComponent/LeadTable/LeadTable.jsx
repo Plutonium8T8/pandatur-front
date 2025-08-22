@@ -52,6 +52,11 @@ export const LeadTable = ({
   onToggleAll = () => { },
   perPage = 25,
   setPerPage = () => { },
+
+  allResultIds = [],
+  isAllResultsSelected = false,
+  onSelectAllResults = () => { },
+  onClearAllResults = () => { },
 }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [id, setId] = useState();
@@ -60,7 +65,6 @@ export const LeadTable = ({
 
   const technicianMap = useMemo(() => {
     if (!technicians || technicians.length === 0) return new Map();
-
     return new Map(
       technicians
         .filter((t) => t?.id && t.id.id)
@@ -79,9 +83,7 @@ export const LeadTable = ({
   }, [user]);
 
   const visibleLeads = useMemo(() => {
-    return filteredLeads.filter((ticket) =>
-      allowedGroupTitles.includes(ticket.group_title)
-    );
+    return filteredLeads.filter((ticket) => allowedGroupTitles.includes(ticket.group_title));
   }, [filteredLeads, allowedGroupTitles]);
 
   const deleteLead = useConfirmPopup({
@@ -92,14 +94,10 @@ export const LeadTable = ({
     deleteLead(async () => {
       try {
         await api.tickets.deleteById([id]);
-        enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
-          variant: "success",
-        });
+        enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), { variant: "success" });
         fetchTickets();
       } catch (error) {
-        enqueueSnackbar(showServerError(error), {
-          variant: "error",
-        });
+        enqueueSnackbar(showServerError(error), { variant: "error" });
       }
     });
   };
@@ -127,10 +125,7 @@ export const LeadTable = ({
       ),
       render: (id) => (
         <Flex justify="center">
-          <Checkbox
-            checked={selectTicket.includes(id)}
-            onChange={() => onSelectRow(id)}
-          />
+          <Checkbox checked={selectTicket.includes(id)} onChange={() => onSelectRow(id)} />
         </Flex>
       ),
     },
@@ -155,8 +150,7 @@ export const LeadTable = ({
       key: "technician_id",
       align: "center",
       width: 200,
-      render: (technicianId) =>
-        technicianMap.get(Number(technicianId)) || cleanValue(),
+      render: (technicianId) => technicianMap.get(Number(technicianId)) || cleanValue(),
     },
     {
       title: getLanguageByKey("Workflow"),
@@ -170,27 +164,21 @@ export const LeadTable = ({
       dataIndex: "priority",
       align: "center",
       width: 100,
-      render: (priority) => (
-        <Tag type={priorityTagColors[priority]}>{priority}</Tag>
-      ),
+      render: (priority) => <Tag type={priorityTagColors[priority]}>{priority}</Tag>,
     },
     {
       title: getLanguageByKey("Data de creare"),
       dataIndex: "creation_date",
       align: "center",
       width: 200,
-      render: (date) => (
-        <DateCell gap={4} direction="row" justify="center" date={date} />
-      ),
+      render: (date) => <DateCell gap={4} direction="row" justify="center" date={date} />,
     },
     {
       title: getLanguageByKey("Ultima interacțiune"),
       dataIndex: "last_interaction_date",
       align: "center",
       width: 200,
-      render: (date) => (
-        <DateCell gap={4} direction="row" justify="center" date={date} />
-      ),
+      render: (date) => <DateCell gap={4} direction="row" justify="center" date={date} />,
     },
     {
       title: getLanguageByKey("Telefon"),
@@ -205,8 +193,7 @@ export const LeadTable = ({
       dataIndex: "email",
       align: "center",
       width: 200,
-      render: (email) =>
-        email ? <div className="break-word">{email}</div> : cleanValue(),
+      render: (email) => (email ? <div className="break-word">{email}</div> : cleanValue()),
     },
     {
       title: getLanguageByKey("Prenume"),
@@ -236,11 +223,7 @@ export const LeadTable = ({
       align: "center",
       width: 250,
       render: (description) =>
-        description ? (
-          <TextEllipsis rows={3}>{description}</TextEllipsis>
-        ) : (
-          cleanValue()
-        ),
+        description ? <TextEllipsis rows={3}>{description}</TextEllipsis> : cleanValue(),
     },
     {
       title: getLanguageByKey("Tag-uri"),
@@ -287,12 +270,7 @@ export const LeadTable = ({
       align: "center",
       width: 150,
       render: (data_avansului) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_avansului}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_avansului} />
       ),
     },
     {
@@ -301,12 +279,7 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_cererii_de_retur) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_cererii_de_retur}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_cererii_de_retur} />
       ),
     },
     {
@@ -315,12 +288,7 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_contractului) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_contractului}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_contractului} />
       ),
     },
     {
@@ -329,12 +297,7 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_de_plata_integrala) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_de_plata_integrala}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_de_plata_integrala} />
       ),
     },
     {
@@ -343,12 +306,7 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_plecarii) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_plecarii}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_plecarii} />
       ),
     },
     {
@@ -357,12 +315,7 @@ export const LeadTable = ({
       align: "center",
       width: 200,
       render: (data_intoarcerii) => (
-        <DateCell
-          gap={4}
-          direction="row"
-          justify="center"
-          date={data_intoarcerii}
-        />
+        <DateCell gap={4} direction="row" justify="center" date={data_intoarcerii} />
       ),
     },
     {
@@ -393,34 +346,15 @@ export const LeadTable = ({
       render: (_, ticket) => {
         const responsibleId = ticket.technician_id?.toString();
         return (
-          <Paper
-            pos="absolute"
-            top="0"
-            right="0"
-            bottom="0"
-            shadow="xs"
-            w="100%"
-          >
+          <Paper pos="absolute" top="0" right="0" bottom="0" shadow="xs" w="100%">
             <Flex align="center" justify="center" gap="8" h="100%" p="xs">
-              <Can
-                permission={{ module: "leads", action: "delete" }}
-                context={{ responsibleId }}
-              >
-                <ActionIcon
-                  variant="danger"
-                  onClick={() => handleDeleteLead(ticket.id)}
-                >
+              <Can permission={{ module: "leads", action: "delete" }} context={{ responsibleId }}>
+                <ActionIcon variant="danger" onClick={() => handleDeleteLead(ticket.id)}>
                   <MdDelete />
                 </ActionIcon>
               </Can>
-              <Can
-                permission={{ module: "leads", action: "edit" }}
-                context={{ responsibleId }}
-              >
-                <ActionIcon
-                  variant="outline"
-                  onClick={() => setId(ticket.id)}
-                >
+              <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
+                <ActionIcon variant="outline" onClick={() => setId(ticket.id)}>
                   <MdEdit />
                 </ActionIcon>
               </Can>
@@ -434,13 +368,36 @@ export const LeadTable = ({
   return (
     <>
       <Box px="20px">
-        <div
-          style={{
-            overflowX: "auto",
-            overflowY: "hidden",
-            width: "100%",
-          }}
-        >
+        {selectTicket.length > 0 && allResultIds.length > 0 && !isAllResultsSelected && (
+          <Paper p="xs" mb="xs" withBorder>
+            <Text size="sm">
+              {getLanguageByKey("Selected")} {selectTicket.length}.{" "}
+              <Text
+                span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={onSelectAllResults}
+              >
+                {getLanguageByKey("Select all")} {allResultIds.length} {getLanguageByKey("results")}
+              </Text>
+            </Text>
+          </Paper>
+        )}
+        {isAllResultsSelected && (
+          <Paper p="xs" mb="xs" withBorder>
+            <Text size="sm">
+              {getLanguageByKey("All")} {allResultIds.length} {getLanguageByKey("results selected")}.{" "}
+              <Text
+                span
+                style={{ textDecoration: "underline", cursor: "pointer" }}
+                onClick={onClearAllResults}
+              >
+                {getLanguageByKey("Clear selection")}
+              </Text>
+            </Text>
+          </Paper>
+        )}
+
+        <div style={{ overflowX: "auto", overflowY: "hidden", width: "100%" }}>
           <RcTable
             rowKey="id"
             columns={rcColumn}
@@ -450,6 +407,7 @@ export const LeadTable = ({
             scroll={{ y: "calc(100vh - 230px)" }}
           />
         </div>
+
         {!!totalLeadsPages && (
           <Flex
             justify="center"
@@ -458,16 +416,12 @@ export const LeadTable = ({
             pt="10"
             style={{ position: "relative", minHeight: 48 }}
           >
-            <Pagination
-              total={totalLeadsPages}
-              value={currentPage}
-              onChange={onChangePagination}
-            />
+            <Pagination total={totalLeadsPages} value={currentPage} onChange={onChangePagination} />
             <Select
               size="xs"
               w={70}
               value={String(perPage)}
-              onChange={val => setPerPage(Number(val))}
+              onChange={(val) => setPerPage(Number(val))}
               data={[
                 { value: "25", label: "25" },
                 { value: "50", label: "50" },
@@ -487,22 +441,15 @@ export const LeadTable = ({
           </Flex>
         )}
       </Box>
+
       <Modal
         centered
         opened={!!id}
         onClose={() => setId()}
         size="lg"
         styles={{
-          content: {
-            height: "850px",
-            display: "flex",
-            flexDirection: "column",
-          },
-          body: {
-            flex: 1,
-            overflowY: "auto",
-            padding: "1rem",
-          },
+          content: { height: "850px", display: "flex", flexDirection: "column" },
+          body: { flex: 1, overflowY: "auto", padding: "1rem" },
         }}
         title={
           <Text size="xl" fw="bold">
@@ -510,11 +457,7 @@ export const LeadTable = ({
           </Text>
         }
       >
-        <ManageLeadInfoTabs
-          onClose={() => setId()}
-          fetchLeads={fetchTickets}
-          id={id}
-        />
+        <ManageLeadInfoTabs onClose={() => setId()} fetchLeads={fetchTickets} id={id} />
       </Modal>
     </>
   );

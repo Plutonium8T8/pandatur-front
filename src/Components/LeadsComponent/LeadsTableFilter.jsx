@@ -54,7 +54,7 @@ export const LeadsTableFilter = ({
   };
 
   const handleReset = () => {
-    setSearchParams({ view: "list", type: "hard" }, { replace: true });
+    setSearchParams({ view: "list" }, { replace: true });
     onResetFilters?.();
     onClose?.();
   };

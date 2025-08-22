@@ -13,7 +13,7 @@ import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilte
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { LeadTable } from "../Components/LeadsComponent/LeadTable/LeadTable";
 import Can from "../Components/CanComponent/Can";
-import { getTotalPages, getLanguageByKey } from "../Components/utils";
+import { getTotalPages, getLanguageByKey, showServerError } from "../Components/utils";
 import { api } from "../api";
 import { VIEW_MODE } from "@components/LeadsComponent/utils";
 import { FaTrash, FaEdit, FaList } from "react-icons/fa";
@@ -103,7 +103,7 @@ export const Leads = () => {
     handlePerPageChange,
   } = useLeadsTable();
 
-  // --- Выделение ---
+  // --- Выделение текущего списка ---
   const {
     selectedTickets,
     setSelectedTickets,
@@ -115,7 +115,13 @@ export const Leads = () => {
     listForSelection: viewMode === VIEW_MODE.LIST ? hardTickets : visibleTickets,
   });
 
-  // --- URL-синк (view/type/group_title/фильтры) ---
+  // --- Хранение ВСЕХ id результатов hard-поиска ---
+  const [allHardIds, setAllHardIds] = useState([]);
+  const allIdsReqIdRef = useRef(0);
+  const isAllResultsSelected =
+    allHardIds.length > 0 && selectedTickets.length === allHardIds.length;
+
+  // --- URL-синк ---
   const { filtersReady } = useLeadsUrlSync({
     viewMode,
     setViewMode,
@@ -135,6 +141,28 @@ export const Leads = () => {
     setCustomGroupTitle,
   });
 
+  // helper: построить атрибуты для hard/id запросов (как в hard-странице)
+  const buildHardAttributes = (filters) => {
+    const { search, group_title, workflow, type, view, ...restFilters } = filters || {};
+    const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+    const isSearchingInList = !!(search && search.trim());
+
+    const effectiveWorkflow =
+      Array.isArray(workflow) && workflow.length > 0
+        ? workflow
+        : isSearchingInList
+          ? workflowOptions
+          : workflowOptions.filter((w) => !excludedWorkflows.includes(w));
+
+    return {
+      attributes: {
+        ...restFilters,
+        workflow: effectiveWorkflow,
+        ...(search && search.trim() ? { search: search.trim() } : {}),
+      },
+    };
+  };
+
   // открытие чата при переходе на /leads/:ticketId
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
@@ -145,8 +173,39 @@ export const Leads = () => {
     if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
-
   }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage]);
+
+  // ПАРАЛЛЕЛЬНО: ids-only запрос под те же фильтры (без пагинации)
+  useEffect(() => {
+    if (!(viewMode === VIEW_MODE.LIST && filtersReady)) return;
+    if (!groupTitleForApi || !workflowOptions.length) return;
+
+    const reqId = ++allIdsReqIdRef.current;
+    const { attributes } = buildHardAttributes(hardTicketFilters);
+
+    (async () => {
+      try {
+        const res = await api.tickets.filters({
+          type: "id",                  // сервер вернёт только ID
+          group_title: groupTitleForApi,
+          attributes,
+        });
+        if (reqId !== allIdsReqIdRef.current) return; // гонкозащита
+        const ids = Array.isArray(res?.data) ? res.data : [];
+        setAllHardIds(ids);
+      } catch (err) {
+        if (reqId === allIdsReqIdRef.current) {
+          enqueueSnackbar(showServerError(err), { variant: "error" });
+        }
+      }
+    })();
+  }, [viewMode, filtersReady, groupTitleForApi, workflowOptions, hardTicketFilters]); // страница/лимит не влияют на ids
+
+  // при смене фильтров/группы — сбрасываем выделение и кеш ID всех результатов
+  useEffect(() => {
+    setSelectedTickets([]);
+    setAllHardIds([]);
+  }, [groupTitleForApi, JSON.stringify(hardTicketFilters)]);
 
   // смена режима (kanban/list)
   const handleChangeViewMode = (mode) => {
@@ -190,7 +249,7 @@ export const Leads = () => {
     }
   }, [searchParams, viewMode]);
 
-  // применить фильтры для light (канбан) + обновить URL (как было)
+  // применить фильтры для light (канбан) + обновить URL
   const handleApplyFilterLightTicket = (selectedFilters) => {
     applyKanbanFilters(selectedFilters);
     setIsOpenKanbanFilterModal(false);
@@ -219,7 +278,7 @@ export const Leads = () => {
     });
   };
 
-  // удаление лидов (table bulk delete)
+  // массовое удаление (table)
   const deleteBulkLeads = useConfirmPopup({
     subTitle: getLanguageByKey("Sigur doriți să ștergeți aceste leaduri"),
   });
@@ -227,8 +286,6 @@ export const Leads = () => {
   const deleteTicket = async () => {
     deleteBulkLeads(async () => {
       try {
-        // loading: это спиннер таблицы
-        // (оставляю, как и было — логика таблицы)
         await api.tickets.deleteById(selectedTickets);
         setSelectedTickets([]);
         enqueueSnackbar(getLanguageByKey("Leadurile au fost șterse cu succes"), { variant: "success" });
@@ -263,6 +320,16 @@ export const Leads = () => {
   const closeChatModal = () => {
     setIsChatOpen(false);
     navigate("/leads");
+  };
+
+  // обработчики «выбрать все результаты» / «снять выбор»
+  const handleSelectAllResults = () => {
+    if (allHardIds.length > 0) {
+      setSelectedTickets(allHardIds);
+    }
+  };
+  const handleClearAllResults = () => {
+    setSelectedTickets([]);
   };
 
   return (
@@ -395,6 +462,12 @@ export const Leads = () => {
             onChangePagination={handlePaginationWorkflow}
             perPage={perPage}
             setPerPage={handlePerPageChange}
+
+            // НОВОЕ: поддержка выбора всех результатов
+            allResultIds={allHardIds}
+            isAllResultsSelected={isAllResultsSelected}
+            onSelectAllResults={handleSelectAllResults}
+            onClearAllResults={handleClearAllResults}
           />
         ) : (
           <WorkflowColumns
