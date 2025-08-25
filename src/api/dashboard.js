@@ -11,18 +11,21 @@ export const dashboard = {
       { skipNull: true, skipEmptyString: true }
     );
     const { data } = await baseAxios.post(url, { user_id: id });
-
     return data;
   },
 
   updateGraphById: async (id, body) => {
     const { data } = await baseAxios.patch(`/api/graph/${id}`, body);
-
     return data;
   },
 
   getCallStats: async (body) => {
     const { data } = await baseAxios.post("/api/filter/call-stats", body);
+    return data;
+  },
+
+  getAnalytics: async (body) => {
+    const { data } = await baseAxios.post("/api/analytics/filter", body);
     return data;
   },
 };
