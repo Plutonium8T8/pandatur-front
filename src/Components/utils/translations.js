@@ -3774,11 +3774,6 @@ export const translations = {
     RO: "Notiță",
     EN: "Notice",
   },
-  Notice: {
-    RU: "Заметка",
-    RO: "Notiță",
-    EN: "Notice",
-  },
   OpenDownload: {
     RU: "Открыть/скачать",
     RO: "Deschide/descărcă",
@@ -3931,4 +3926,29 @@ export const translations = {
     RO: "Anulează selecția",
     EN: "Clear selection",
   },
+  "Total calls for the period": {
+    RU: "Всего звонков за период",
+    RO: "Total apeluri pentru perioada",
+    EN: "Total calls for the period"
+  },
+  "By Group Title": {
+    RU: "По Group Title",
+    RO: "După titlul grupului",
+    EN: "By Group Title"
+  },
+  "Top users": {
+    RU: "Топ пользователей",
+    RO: "Top utilizatori",
+    EN: "Top users"
+  },
+  "Users: incoming vs outgoing": {
+    RU: "Пользователи: входящие vs исходящие",
+    RO: "Utilizatori: apeluri primite vs efectuate",
+    EN: "Users: incoming vs outgoing"
+  },
+  "No data": {
+    RU: "Нет данных",
+    RO: "Nu există date",
+    EN: "No data"
+  }
 }
