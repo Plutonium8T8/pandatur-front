@@ -1,120 +1,135 @@
+// Dashboard.jsx
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { format } from "date-fns";
 import { useSnackbar } from "notistack";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Flex } from "@mantine/core";
-import { useUser } from "@hooks";
-import { api } from "@api";
+import { Flex, Card, Group, Badge, Text } from "@mantine/core";
+import { api } from "../api";
 import { Filter } from "@components/DashboardComponent/Filter";
-import {
-  chartsMetadata,
-  metricsDashboardCharts,
-  normalizeUserGraphs,
-  renderChart,
-  chartComponents,
-  getLastItemId,
-} from "@components/DashboardComponent/utils";
 import { showServerError, getLanguageByKey } from "@utils";
-import { ISO_DATE } from "@app-constants";
 import { Spin, PageHeader } from "@components";
 import { TotalCard } from "../Components/DashboardComponent/TotalCard";
 import { StatBarList } from "../Components/DashboardComponent/StatBarList";
-import { UsersBarChart } from "../Components/DashboardComponent/UsersBarChart";
 import { ScrollContainer } from "../Components/DashboardComponent/ScrollContainer";
 
 const THRESHOLD = 47;
 
-/** helpers */
-const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
+const TYPES = [
+  "calls",
+  "messages",
+  "system_usage",
+  "tickets_count",
+  "distributor",
+  "workflow_change",
+  "ticket_create_count",
+  "contract_closed",
+  "ticket_lifetime",
+  "contract_departure",
+  "workflow_percentage",
+  "workflow_duration",
+  "country_count",
+];
+
 const safeArray = (a) => (Array.isArray(a) ? a : []);
 const sum = (arr, key) => safeArray(arr).reduce((acc, x) => acc + (Number(x?.[key]) || 0), 0);
 const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
 export const Dashboard = () => {
-  const [statistics, setStatistics] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
   const [scrollHeight, setScrollHeight] = useState(400);
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
-  const [layout, setLayout] = useState([]);
   const [dateRange, setDateRange] = useState([]);
-  const { userId } = useUser();
   const { enqueueSnackbar } = useSnackbar();
 
   const headerRef = useRef(null);
   const filterRef = useRef(null);
   const scrollRef = useRef(null);
+  const requestIdRef = useRef(0);
 
-  const [analytics, setAnalytics] = useState({
-    by_users: [],
-    by_groups: [],
-    by_group_titles: [],
-    total: { incoming_calls: 0, outgoing_calls: 0 },
-  });
+  const [responses, setResponses] = useState(
+    () => Object.fromEntries(TYPES.map((t) => [t, { data: null, error: null }]))
+  );
 
-  const fetchStatistics = useCallback(async ({ dateRange, technicianId }) => {
-    setIsLoading(true);
+  // данные для calls
+  const calls = responses["calls"]?.data || {};
+  const totalIncoming = Number(calls?.total?.incoming_calls) || 0;
+  const totalOutgoing = Number(calls?.total?.outgoing_calls) || 0;
+  const totalAll = totalIncoming + totalOutgoing;
+
+  const topGroupTitles = useMemo(
+    () =>
+      [...safeArray(calls?.by_group_titles)]
+        .sort((a, b) => (b.incoming_calls + b.outgoing_calls) - (a.incoming_calls + a.outgoing_calls))
+        .slice(0, 6)
+        .map((x) => ({ ...x, _sum: (x.incoming_calls || 0) + (x.outgoing_calls || 0) })),
+    [calls?.by_group_titles]
+  );
+
+  const topUsers = useMemo(
+    () =>
+      [...safeArray(calls?.by_users)]
+        .sort((a, b) => (b.incoming_calls + b.outgoing_calls) - (a.incoming_calls + a.outgoing_calls))
+        .slice(0, 8)
+        .map((x) => ({ ...x, _sum: (x.incoming_calls || 0) + (x.outgoing_calls || 0) })),
+    [calls?.by_users]
+  );
+
+  const fetchAllTypes = useCallback(async ({ dateRange }) => {
     const [start, end] = dateRange;
-    try {
-      // старый дашборд
-      const statsData = await api.dashboard.statistics(
-        {
-          start_date: start ? format(start, ISO_DATE) : null,
-          end_date: end ? format(end, ISO_DATE) : null,
-          technician_id: technicianId,
-        },
-        userId
-      );
-      const { user_graphs, ...charts } = statsData;
-      setLayout(normalizeUserGraphs(user_graphs));
-      setStatistics(charts);
+    const user_ids = pickIds(selectedTechnicians);
 
-      // новый Analytics
-      const user_ids = pickIds(selectedTechnicians);
-      const body = {
-        type: "calls",
-        attributes: {
-          user_ids,
-          ...(start || end ? {
-            timestamp: {
-              from: start ? format(start, "yyyy-MM-dd") : undefined,
-              until: end ? format(end, "yyyy-MM-dd") : undefined,
-            }
-          } : {}),
-        },
-      };
-      const res = await api.dashboard.getAnalytics(body);
-      setAnalytics({
-        by_users: safeArray(res?.by_users),
-        by_groups: safeArray(res?.by_groups),
-        by_group_titles: safeArray(res?.by_group_titles),
-        total: res?.total ?? { incoming_calls: 0, outgoing_calls: 0 },
-      });
+    const attributes = {
+      user_ids,
+      ...(start || end
+        ? {
+          timestamp: {
+            from: start ? format(start, "yyyy-MM-dd") : undefined,
+            until: end ? format(end, "yyyy-MM-dd") : undefined,
+          },
+        }
+        : {}),
+    };
+
+    const thisReqId = ++requestIdRef.current;
+    setIsLoading(true);
+
+    try {
+      const results = await Promise.all(
+        TYPES.map(async (type) => {
+          try {
+            const res = await api.dashboard.getAnalytics({ type, attributes });
+            return { type, ok: true, res };
+          } catch (e) {
+            return { type, ok: false, err: e };
+          }
+        })
+      );
+
+      if (requestIdRef.current !== thisReqId) return;
+
+      const next = Object.fromEntries(
+        results.map((r) =>
+          r.ok
+            ? [r.type, { data: r.res || null, error: null }]
+            : [r.type, { data: null, error: r.err?.message || String(r.err) }]
+        )
+      );
+
+      setResponses(next);
+
+      const errorsCount = results.filter((r) => !r.ok).length;
+      if (errorsCount > 0) {
+        enqueueSnackbar(`Часть запросов завершилась с ошибкой: ${errorsCount}/${TYPES.length}`, { variant: "warning" });
+      }
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     } finally {
-      setIsLoading(false);
+      if (requestIdRef.current === thisReqId) setIsLoading(false);
     }
-  }, [selectedTechnicians, userId]);
-
-  const changeGraphPosition = async (id, graphPositions) => {
-    try {
-      await api.dashboard.updateGraphById(id, { user_id: userId, ...graphPositions });
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    }
-  };
-
-  const updateGraph = (movedGraph) => {
-    const chartId = layout.find(({ i }) => i === movedGraph.i)?.i;
-    if (chartId) {
-      changeGraphPosition(chartId, {
-        x: movedGraph.x, y: movedGraph.y, w: movedGraph.w, h: movedGraph.h,
-      });
-    }
-  };
+  }, [selectedTechnicians, enqueueSnackbar]);
 
   const recalcSizes = useCallback(() => {
     const headerH = headerRef.current?.offsetHeight || 0;
@@ -139,8 +154,8 @@ export const Dashboard = () => {
   useEffect(() => {
     const [start, end] = dateRange;
     if (!!start !== !!end) return;
-    fetchStatistics({ dateRange, technicianId: getLastItemId(selectedTechnicians) });
-  }, [fetchStatistics, dateRange, selectedTechnicians]);
+    fetchAllTypes({ dateRange });
+  }, [fetchAllTypes, dateRange, selectedTechnicians]);
 
   const { cols, rowHeight } = useMemo(() => {
     const cols = containerWidth > 1400 ? 6 : 4;
@@ -148,43 +163,66 @@ export const Dashboard = () => {
     return { cols, rowHeight };
   }, [containerWidth]);
 
-  // подготовка данных
-  const totalIncoming = Number(analytics?.total?.incoming_calls) || 0;
-  const totalOutgoing = Number(analytics?.total?.outgoing_calls) || 0;
-  const totalAll = totalIncoming + totalOutgoing;
-
-  const topGroupTitles = useMemo(
-    () => [...safeArray(analytics.by_group_titles)]
-      .sort((a, b) => (b.incoming_calls + b.outgoing_calls) - (a.incoming_calls + a.outgoing_calls))
-      .slice(0, 6)
-      .map((x) => ({ ...x, _sum: (x.incoming_calls || 0) + (x.outgoing_calls || 0) })),
-    [analytics.by_group_titles]
+  const baseLayout = useMemo(
+    () => [
+      { i: "a-total", x: 0, y: 0, w: 2, h: 1 },
+      { i: "a-groups", x: 2, y: 0, w: 2, h: 2 },
+      { i: "a-users", x: 4, y: 0, w: 2, h: 2 },
+    ],
+    []
   );
 
-  const topUsers = useMemo(
-    () => [...safeArray(analytics.by_users)]
-      .sort((a, b) => (b.incoming_calls + b.outgoing_calls) - (a.incoming_calls + a.outgoing_calls))
-      .slice(0, 8)
-      .map((x) => ({ ...x, _sum: (x.incoming_calls || 0) + (x.outgoing_calls || 0) })),
-    [analytics.by_users]
-  );
+  const typesLayout = useMemo(() => {
+    const w = 2;
+    const h = 2;
+    const perRow = Math.max(1, Math.floor(cols / w));
+    const startY = 4;
+    const arr = [];
 
-  // layout
-  const analyticsLayout = useMemo(() => ([
-    { i: "a-total", x: 0, y: 0, w: 2, h: 1, static: false },
-    { i: "a-groups", x: 2, y: 0, w: 2, h: 2, static: false },
-    { i: "a-users", x: 4, y: 0, w: 2, h: 2, static: false },
-    { i: "a-chart", x: 0, y: 2, w: 6, h: 2, static: false },
-  ]), []);
+    TYPES.forEach((t, idx) => {
+      const col = idx % perRow;
+      const row = Math.floor(idx / perRow);
+      arr.push({ i: `t-${t}`, x: col * w, y: startY + row * h, w, h });
+    });
 
-  const combinedLayout = useMemo(() => {
-    const ids = new Set(layout.map((l) => l.i));
-    const extras = analyticsLayout.filter((l) => !ids.has(l.i));
-    return [...layout, ...extras];
-  }, [layout, analyticsLayout]);
+    return arr;
+  }, [cols]);
+
+  const analyticsLayout = useMemo(() => [...baseLayout, ...typesLayout], [baseLayout, typesLayout]);
+
+  const TypeCard = ({ type, data, error }) => {
+    const hasError = !!error;
+    return (
+      <Card withBorder radius="lg" p="lg" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+        <Group justify="space-between" style={{ marginBottom: 8 }}>
+          <Text fw={700} style={{ textTransform: "uppercase" }}>{type}</Text>
+          <Badge color={hasError ? "red" : "green"} variant="light">
+            {hasError ? "error" : "ok"}
+          </Badge>
+        </Group>
+        <div style={{ overflow: "auto", flex: 1 }}>
+          <pre
+            style={{
+              margin: 0,
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              fontSize: 12,
+              maxHeight: "100%",
+              overflow: "auto",
+              background: "rgba(0,0,0,0.03)",
+              padding: 8,
+              borderRadius: 8,
+            }}
+          >
+            {hasError ? String(error) : JSON.stringify(data ?? null, null, 2)}
+          </pre>
+        </div>
+      </Card>
+    );
+  };
 
   return (
-    <div className="dashboard-container-wrapper" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div ref={headerRef}>
         <PageHeader title={getLanguageByKey("Dashboard")} />
       </div>
@@ -205,8 +243,7 @@ export const Dashboard = () => {
       ) : (
         <ScrollContainer ref={scrollRef} height={scrollHeight}>
           <GridLayout
-            className="dashboard-layout"
-            layout={combinedLayout}
+            layout={analyticsLayout}
             cols={cols}
             rowHeight={rowHeight}
             width={containerWidth}
@@ -214,27 +251,7 @@ export const Dashboard = () => {
             isDraggable
             compactType={null}
             preventCollision
-            onResizeStop={(_, __, resizeGraph) => updateGraph(resizeGraph)}
-            onDragStop={(_, __, movedGraph) => updateGraph(movedGraph)}
           >
-            {/* старые пользовательские графики */}
-            {layout.map((graph) => {
-              const { label } = metricsDashboardCharts[graph.graphName];
-              const ChartComponent = chartComponents[graph.type];
-              const graphValue = statistics[graph.graphName]?.data;
-              if (graphValue?.length) {
-                const chartDataOld = chartsMetadata(graphValue, label, graph.type);
-                return renderChart({
-                  Component: ChartComponent,
-                  chartData: chartDataOld,
-                  chartLabel: label,
-                  index: graph.i,
-                });
-              }
-              return null;
-            })}
-
-            {/* новый блок: Итого */}
             <div key="a-total">
               <TotalCard
                 totalAll={totalAll}
@@ -244,10 +261,9 @@ export const Dashboard = () => {
               />
             </div>
 
-            {/* новый блок: Group Titles */}
             <div key="a-groups">
               <StatBarList
-                title="По Group Title"
+                title={getLanguageByKey("By Group Title")}
                 items={topGroupTitles}
                 total={sum(topGroupTitles, "_sum")}
                 nameKey="group_title"
@@ -255,10 +271,9 @@ export const Dashboard = () => {
               />
             </div>
 
-            {/* новый блок: Users */}
             <div key="a-users">
               <StatBarList
-                title="Топ пользователей"
+                title={getLanguageByKey("Top users")}
                 items={topUsers}
                 total={sum(topUsers, "_sum")}
                 nameKey="username"
@@ -266,10 +281,14 @@ export const Dashboard = () => {
               />
             </div>
 
-            {/* новый блок: Chart.js барчарт по пользователям */}
-            <div key="a-chart">
-              <UsersBarChart users={topUsers} />
-            </div>
+            {TYPES.map((t) => {
+              const item = responses[t] || { data: null, error: null };
+              return (
+                <div key={`t-${t}`}>
+                  <TypeCard type={t} data={item.data} error={item.error} />
+                </div>
+              );
+            })}
           </GridLayout>
         </ScrollContainer>
       )}

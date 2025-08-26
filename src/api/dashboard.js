@@ -25,7 +25,7 @@ export const dashboard = {
   },
 
   getAnalytics: async (body) => {
-    const { data } = await baseAxios.post("/api/analytics/filter", body);
+    const { data } = await baseAxios.post("/api/analytics", body);
     return data;
   },
 };
