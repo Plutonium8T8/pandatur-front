@@ -4,9 +4,9 @@ import { useSnackbar } from "notistack";
 import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Flex, Card, Group, Badge, Text } from "@mantine/core";
+import { Flex, Card, Group, Badge, Text, Box, Stack } from "@mantine/core";
 import { api } from "../api";
-import { Filter } from "@components/DashboardComponent/Filter";
+import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin, PageHeader } from "@components";
 import { TotalCard } from "../Components/DashboardComponent/TotalCard";
@@ -16,19 +16,9 @@ import { ScrollContainer } from "../Components/DashboardComponent/ScrollContaine
 const THRESHOLD = 47;
 
 const TYPES = [
-  "calls",
-  "messages",
-  "system_usage",
-  "tickets_count",
-  "distributor",
-  "workflow_change",
-  "ticket_create_count",
-  "contract_closed",
-  "ticket_lifetime",
-  "contract_departure",
-  "workflow_percentage",
-  "workflow_duration",
-  "country_count",
+  "calls", "messages", "system_usage", "tickets_count", "distributor", "workflow_change",
+  "ticket_create_count", "contract_closed", "ticket_lifetime", "contract_departure",
+  "workflow_percentage", "workflow_duration", "country_count",
 ];
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
@@ -43,8 +33,10 @@ export const Dashboard = () => {
   const [dateRange, setDateRange] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
 
-  const headerRef = useRef(null);
-  const filterRef = useRef(null);
+  const [selectedUserGroups, setSelectedUserGroups] = useState([]);
+  const [selectedGroupTitles, setSelectedGroupTitles] = useState([]);
+
+  const headerRowRef = useRef(null);
   const scrollRef = useRef(null);
   const requestIdRef = useRef(0);
 
@@ -52,7 +44,6 @@ export const Dashboard = () => {
     () => Object.fromEntries(TYPES.map((t) => [t, { data: null, error: null }]))
   );
 
-  // данные для calls
   const calls = responses["calls"]?.data || {};
   const totalIncoming = Number(calls?.total?.incoming_calls) || 0;
   const totalOutgoing = Number(calls?.total?.outgoing_calls) || 0;
@@ -131,11 +122,10 @@ export const Dashboard = () => {
   }, [selectedTechnicians, enqueueSnackbar]);
 
   const recalcSizes = useCallback(() => {
-    const headerH = headerRef.current?.offsetHeight || 0;
-    const filterH = filterRef.current?.offsetHeight || 0;
+    const headerH = headerRowRef.current?.offsetHeight || 0;
     const margins = 24;
     const viewportH = window.innerHeight || 800;
-    setScrollHeight(Math.max(240, viewportH - headerH - filterH - margins));
+    setScrollHeight(Math.max(240, viewportH - headerH - margins));
     if (scrollRef.current) setContainerWidth(Math.max(0, scrollRef.current.clientWidth - THRESHOLD));
   }, []);
 
@@ -177,13 +167,11 @@ export const Dashboard = () => {
     const perRow = Math.max(1, Math.floor(cols / w));
     const startY = 4;
     const arr = [];
-
     TYPES.forEach((t, idx) => {
       const col = idx % perRow;
       const row = Math.floor(idx / perRow);
       arr.push({ i: `t-${t}`, x: col * w, y: startY + row * h, w, h });
     });
-
     return arr;
   }, [cols]);
 
@@ -192,15 +180,16 @@ export const Dashboard = () => {
   const TypeCard = ({ type, data, error }) => {
     const hasError = !!error;
     return (
-      <Card withBorder radius="lg" p="lg" style={{ height: "100%", display: "flex", flexDirection: "column" }}>
-        <Group justify="space-between" style={{ marginBottom: 8 }}>
-          <Text fw={700} style={{ textTransform: "uppercase" }}>{type}</Text>
+      <Card withBorder radius="lg" p="lg" h="100%" style={{ display: "flex", flexDirection: "column" }}>
+        <Group justify="space-between" mb={8}>
+          <Text fw={700} tt="uppercase">{type}</Text>
           <Badge color={hasError ? "red" : "green"} variant="light">
             {hasError ? "error" : "ok"}
           </Badge>
         </Group>
-        <div style={{ overflow: "auto", flex: 1 }}>
-          <pre
+        <Box style={{ overflow: "auto", flex: 1 }}>
+          <Text
+            component="pre"
             style={{
               margin: 0,
               whiteSpace: "pre-wrap",
@@ -214,26 +203,36 @@ export const Dashboard = () => {
             }}
           >
             {hasError ? String(error) : JSON.stringify(data ?? null, null, 2)}
-          </pre>
-        </div>
+          </Text>
+        </Box>
       </Card>
     );
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      <div ref={headerRef}>
-        <PageHeader title={getLanguageByKey("Dashboard")} />
-      </div>
-
-      <div ref={filterRef}>
-        <Filter
-          onSelectedTechnicians={setSelectedTechnicians}
-          onSelectDataRange={setDateRange}
-          selectedTechnicians={selectedTechnicians}
-          dateRange={dateRange}
+    <Stack gap={12}>
+      <Flex
+        ref={headerRowRef}
+        className="dashboard-header-container"
+        p={"md"}
+      >
+        <PageHeader
+          title={getLanguageByKey("Dashboard")}
+          // count={totalAll}
+          extraInfo={
+            <Filter
+              onSelectedTechnicians={setSelectedTechnicians}
+              onSelectedUserGroups={setSelectedUserGroups}     // НОВОЕ
+              onSelectedGroupTitles={setSelectedGroupTitles}   // НОВОЕ
+              onSelectDataRange={setDateRange}
+              selectedTechnicians={selectedTechnicians}
+              selectedUserGroups={selectedUserGroups}          // НОВОЕ
+              selectedGroupTitles={selectedGroupTitles}        // НОВОЕ
+              dateRange={dateRange}
+            />
+          }
         />
-      </div>
+      </Flex>
 
       {isLoading ? (
         <Flex align="center" justify="center" style={{ flex: 1, minHeight: 240 }}>
@@ -251,16 +250,16 @@ export const Dashboard = () => {
             compactType={null}
             preventCollision
           >
-            <div key="a-total">
+            <Box key="a-total">
               <TotalCard
                 totalAll={totalAll}
                 totalIncoming={totalIncoming}
                 totalOutgoing={totalOutgoing}
                 dateRange={dateRange}
               />
-            </div>
+            </Box>
 
-            <div key="a-groups">
+            <Box key="a-groups">
               <StatBarList
                 title={getLanguageByKey("By Group Title")}
                 items={topGroupTitles}
@@ -268,9 +267,9 @@ export const Dashboard = () => {
                 nameKey="group_title"
                 valueKey="_sum"
               />
-            </div>
+            </Box>
 
-            <div key="a-users">
+            <Box key="a-users">
               <StatBarList
                 title={getLanguageByKey("Top users")}
                 items={topUsers}
@@ -278,19 +277,19 @@ export const Dashboard = () => {
                 nameKey="username"
                 valueKey="_sum"
               />
-            </div>
+            </Box>
 
             {TYPES.map((t) => {
               const item = responses[t] || { data: null, error: null };
               return (
-                <div key={`t-${t}`}>
+                <Box key={`t-${t}`}>
                   <TypeCard type={t} data={item.data} error={item.error} />
-                </div>
+                </Box>
               );
             })}
           </GridLayout>
         </ScrollContainer>
       )}
-    </div>
+    </Stack>
   );
 };
