@@ -7,8 +7,7 @@ import { DD_MM_YYYY } from "../../../app-constants";
 import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
 
-// импорт твоих workflow utils с мапой userGroupsToGroupTitle
-import { userGroupsToGroupTitle } from "../../utils/workflowUtils"; // поправь путь под свой проект
+import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
 
 const getStartEndDateRange = (date) => {
   const startOfDay = new Date(date);
@@ -25,22 +24,9 @@ const getYesterdayDate = () => {
   return getStartEndDateRange(yesterday);
 };
 
-// служебка — префикс групп из formatMultiSelectData (поддерживаем "__group__")
 const GROUP_PREFIX = "__group__";
-const toGroupKey = (label) => `${GROUP_PREFIX}${label}`;
 const fromGroupKey = (key) => key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key;
 
-/**
- * props:
- * - onSelectedTechnicians(val: string[])
- * - onSelectedUserGroups(val: string[])       // НОВОЕ (массив ЛЕЙБЛОВ групп, без "__group__")
- * - onSelectedGroupTitles(val: string[])      // НОВОЕ (массив value для group title)
- * - onSelectDataRange(val: [Date|nil, Date|nil])
- * - selectedTechnicians: string[]
- * - selectedUserGroups: string[]              // НОВОЕ
- * - selectedGroupTitles: string[]             // НОВОЕ
- * - dateRange: [Date|nil, Date|nil]
- */
 export const Filter = ({
   onSelectedTechnicians,
   onSelectedUserGroups,
@@ -53,34 +39,28 @@ export const Filter = ({
 }) => {
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
 
-  // данные для мультиселекта пользователей (включая группы c "__group__")
   const formattedTechnicians = useMemo(
     () => formatMultiSelectData(technicians),
     [technicians]
   );
 
-  // карта: "__group__{groupLabel}" -> string[] userIds
   const groupUserMap = useMemo(
     () => getGroupUserMap(technicians),
     [technicians]
   );
 
-  // все возможные названия групп (человекочитаемые лейблы)
   const allUserGroupLabels = useMemo(() => {
     const labels = Array.from(groupUserMap.keys())
       .map(fromGroupKey)
       .filter(Boolean);
-    // уникальность
     return Array.from(new Set(labels));
   }, [groupUserMap]);
 
-  // данные для мультиселекта "Группы пользователей"
   const userGroupsSelectData = useMemo(
     () => allUserGroupLabels.map((g) => ({ value: g, label: g })),
     [allUserGroupLabels]
   );
 
-  // все возможные group titles (по мапе прав)
   const allGroupTitles = useMemo(() => {
     const all = new Set();
     Object.values(userGroupsToGroupTitle || {}).forEach((arr) => (arr || []).forEach((v) => all.add(v)));
@@ -91,9 +71,7 @@ export const Filter = ({
     [allGroupTitles]
   );
 
-  // ---- Автозаполнение по выбору пользователей ----
   const handleUsersChange = (val) => {
-    // 1) обработка выбора групп "__group__"
     const last = val[val.length - 1];
     const isGroupChip = typeof last === "string" && last.startsWith(GROUP_PREFIX);
     let nextUsers = val || [];
@@ -105,8 +83,6 @@ export const Filter = ({
 
     onSelectedTechnicians(nextUsers);
 
-    // 2) найти группы, к которым относятся выбранные пользователи
-    //    (по всем записям groupUserMap)
     const groupsForUsers = new Set();
     for (const [groupKey, users] of groupUserMap.entries()) {
       const hasAny = (nextUsers || []).some((u) => users.includes(u));
@@ -116,7 +92,6 @@ export const Filter = ({
     const nextUserGroups = Array.from(groupsForUsers);
     onSelectedUserGroups?.(nextUserGroups);
 
-    // 3) из выбранных групп получить доступные group titles
     const titlesSet = new Set();
     nextUserGroups.forEach((g) => {
       (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t));
@@ -125,7 +100,6 @@ export const Filter = ({
     onSelectedGroupTitles?.(nextGroupTitles);
   };
 
-  // ---- Ручной выбор групп пользователей -> пересчитать group titles ----
   const handleUserGroupsChange = (groups) => {
     onSelectedUserGroups?.(groups || []);
 
@@ -136,7 +110,6 @@ export const Filter = ({
     onSelectedGroupTitles?.(Array.from(titlesSet));
   };
 
-  // ---- Ручной выбор group titles (без побочных эффектов) ----
   const handleGroupTitlesChange = (titles) => {
     onSelectedGroupTitles?.(titles || []);
   };
@@ -167,7 +140,6 @@ export const Filter = ({
         aria-label="Users"
       />
 
-      {/* НОВОЕ: Группы пользователей */}
       <MultiSelect
         w={260}
         data={userGroupsSelectData}
@@ -181,7 +153,6 @@ export const Filter = ({
         aria-label="User groups"
       />
 
-      {/* НОВОЕ: Group Title */}
       <MultiSelect
         w={280}
         data={groupTitleSelectData}
