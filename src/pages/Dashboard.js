@@ -222,12 +222,12 @@ export const Dashboard = () => {
           extraInfo={
             <Filter
               onSelectedTechnicians={setSelectedTechnicians}
-              onSelectedUserGroups={setSelectedUserGroups}     // НОВОЕ
-              onSelectedGroupTitles={setSelectedGroupTitles}   // НОВОЕ
+              onSelectedUserGroups={setSelectedUserGroups}
+              onSelectedGroupTitles={setSelectedGroupTitles}   
               onSelectDataRange={setDateRange}
               selectedTechnicians={selectedTechnicians}
-              selectedUserGroups={selectedUserGroups}          // НОВОЕ
-              selectedGroupTitles={selectedGroupTitles}        // НОВОЕ
+              selectedUserGroups={selectedUserGroups}          
+              selectedGroupTitles={selectedGroupTitles}        
               dateRange={dateRange}
             />
           }
