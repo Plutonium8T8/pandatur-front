@@ -236,44 +236,53 @@ export const workflowOptionsLimitedByGroupTitle = {
 };
 
 export const userGroupsToGroupTitle = {
-    "Admin": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
-    "IT dep.": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
-    "Quality Department": ["MD", "RO", "GreenCard", "Filiale", "FranchiseCantemir", "FranchiseOrhei", "BusinessGroups", "IndividualGroups", "GreenCard", "Agency", "SalesUA"],
+    // 10
+    "Admin": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
+    "IT dep.": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
+    "Quality Department": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
+    "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
     "Front Office": ["MD"],
-    "Back MD": ["MD", "RO", "GreenCard"],
-    "Back Flagman": ["MD", "RO", "GreenCard"],
-    "Back Headline": ["MD", "RO", "GreenCard"],
-    "Back EliteSales": ["MD", "RO", "GreenCard"],
-    "Corporate clients": ["BusinessGroups", "IndividualGroups"],
+    "Distribution": [""],
+    "Back Flagman": ["MD"],
+    "Back Headline": ["MD"],
+    "Back EliteSales": ["MD"],
+    "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
 
-    // RO
+    // RO 5
     "Call Centre RO": ["RO"],
     "Bucharest RO": ["RO"],
     "Brasov RO": ["RO"],
     "Iasi RO": ["RO"],
+    "Back RO": ["RO"],
 
-    // other
+    // other 10
     "Company branches": ["Filiale"],
-    "Franchise Cantemir": ["FranchiseCantemir"],
-    "Franchise Orhei": ["FranchiseOrhei"],
     "Corporate sales": ["BusinessGroups", "IndividualGroups"],
+    "Corporate clients": ["BusinessGroups", "IndividualGroups"],
     "Private sales": ["IndividualGroups"],
     "Green Card": ["GreenCard"],
-    "Agency": ["Agency", "MD"],
+    "Agency": ["Agency"],
     "Sales UA dep.": ["SalesUA"],
-};
+    "Organic traffic": ["MD", "RO", "Filiale"],
+    "Sorting": ["MD", "RO", "Filiale"],
+    "Trainees": ["MD"],
 
-// export const groupTitleOptions = [
-//     { value: "MD", label: "MD-Sales" },
-//     { value: "RO", label: "RO-Sales" },
-//     { value: "Filiale", label: "Filiale" },
-//     { value: "Franchise", label: "Francize" },
-//     { value: "FranchiseOrhei", label: "Franchise Orhei" },
-//     { value: "FranchiseCantemir", label: "Franchise Cantemir" },
-//     { value: "Marketing", label: "Marketing" },
-//     { value: "IndividualGroups", label: "Individual groups" },
-//     { value: "BusinessGroups", label: "Business groups" },
-//     { value: "Agency", label: "Agency" },
-//     { value: "GreenCard", label: "Green Card" },
-//     { value: "SalesUA", label: "SALES UA" },
-// ];
+    //franchize 17
+    "Franchise PandaTur": ["FranchiseOrhei", "FranchiseCantemir", "FranchiseEdinet", "FranchiseDrochia", "FranchiseIaloveni", "FranchiseChisinauBuiucani", "FranchiseCauseni", "FranchiseSoldanesti", "FranchiseRezina", "FranchiseChisinauRiscani", "FranchiseTimisoara", "FranchiseNisporeni", "FranchiseCluj", "FranchiseStauceni", "FranchiseHincesti", "FranchiseCimislia",],
+    "Edinet Franchise": ["FranchiseEdinet"],
+    "Drochia Franchise": ["FranchiseDrochia"],
+    "Ialoveni Franchise": ["FranchiseIaloveni"],
+    "Chisinau, Buiucani Franchise": ["FranchiseChisinauBuiucani"],
+    "Causeni Franchise": ["FranchiseCauseni"],
+    "Soldanesti Franchise": ["FranchiseSoldanesti"],
+    "Rezina Franchise": ["FranchiseRezina"],
+    "Orhei Franchise": ["FranchiseRezina"],
+    "Cantemir Franchise": ["FranchiseCantemir"],
+    "Chisinau, Riscani Franchise": ["FranchiseChisinauRiscani"],
+    "Timisoara Franchise": ["FranchiseTimisoara"],
+    "Nisporeni Franchise": ["FranchiseNisporeni"],
+    "Cluj Franchise": ["FranchiseCluj"],
+    "Stauceni Franchise": ["FranchiseStauceni"],
+    "Hincesti Franchise": ["FranchiseHincesti"],
+    "Cimislia Franchise": ["FranchiseCimislia"],
+};
