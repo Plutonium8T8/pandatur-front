@@ -1,7 +1,16 @@
-import React from "react";
-import { Card, Group, Stack, Text, Progress, Divider, Badge } from "@mantine/core";
+import {
+    Card,
+    Group,
+    Stack,
+    Text,
+    Progress,
+    Divider,
+    Badge,
+    ThemeIcon,
+} from "@mantine/core";
 import { format } from "date-fns";
 import { getLanguageByKey } from "@utils";
+import { MdCall, MdCallReceived, MdCallMade } from "react-icons/md";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
 const percent = (part, total) => {
@@ -9,51 +18,121 @@ const percent = (part, total) => {
     return Math.max(0, Math.min(100, Number.isFinite(p) ? p : 0));
 };
 
-export const TotalCard = ({ totalAll, totalIncoming, totalOutgoing, dateRange }) => {
+/**
+ * Виджет звонков без круговой диаграммы, с бейджами внутри.
+ * Доп. пропсы:
+ * - title?: string
+ * - subtitle?: string
+ * - colors?: { in?: MantineColor; out?: MantineColor; totalAccent?: MantineColor }
+ * - icons?: { total?, incoming?, outgoing? } — ReactNode
+ */
+export const TotalCard = ({
+    totalAll,
+    totalIncoming,
+    totalOutgoing,
+    dateRange,
+    title,
+    subtitle,
+    colors = { in: "teal", out: "blue", totalAccent: "indigo" },
+    icons = {},
+}) => {
+    const inPct = percent(totalIncoming, totalAll);
+    const outPct = percent(totalOutgoing, totalAll);
+
+    const TotalIconNode = icons.total ?? <MdCall size={18} />;
+    const IncomingIconNode = icons.incoming ?? <MdCallReceived size={14} />;
+    const OutgoingIconNode = icons.outgoing ?? <MdCallMade size={14} />;
+
     return (
         <Card
             withBorder
-            radius="lg"
+            radius="xl"
             p="lg"
-            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+            style={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                background:
+                    "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(45,212,191,0.06))",
+                borderColor: "rgba(0,0,0,0.06)",
+            }}
         >
-            <Group justify="space-between">
-                <Group gap="xs">
-                    <Text
-                        size="xs"
-                        c="dimmed"
-                        fw={600}
-                        tt="uppercase"
-                        style={{ letterSpacing: 0.6 }}
-                    >
-                        {getLanguageByKey("Total calls for the period")}
-                    </Text>
-                    <Badge variant="light" ml="xs">
-                        {dateRange?.[0]
-                            ? format(dateRange[0], "dd.MM.yyyy")
-                            : "—"} →{" "}
-                        {dateRange?.[1]
-                            ? format(dateRange[1], "dd.MM.yyyy")
-                            : "—"}
-                    </Badge>
+            {/* Header */}
+            <Group justify="space-between" align="center">
+                <Group gap="sm" align="center">
+                    <ThemeIcon size="lg" radius="xl" variant="light" color={colors.totalAccent}>
+                        {TotalIconNode}
+                    </ThemeIcon>
+                    <div>
+                        <Text
+                            size="xs"
+                            c="dimmed"
+                            fw={700}
+                            tt="uppercase"
+                            style={{ letterSpacing: 0.6 }}
+                        >
+                            {title || getLanguageByKey("Total calls for the period")}
+                        </Text>
+                        <Group gap={6} wrap="wrap">
+                            {subtitle ? <Badge variant="light">{subtitle}</Badge> : null}
+                            <Badge variant="light">
+                                {dateRange?.[0] ? format(dateRange[0], "dd.MM.yyyy") : "—"} →{" "}
+                                {dateRange?.[1] ? format(dateRange[1], "dd.MM.yyyy") : "—"}
+                            </Badge>
+                        </Group>
+                    </div>
                 </Group>
-                <Text fz={36} fw={800}>{fmt(totalAll)}</Text>
+
+                <Text fz={38} fw={900} style={{ lineHeight: 1 }}>
+                    {fmt(totalAll)}
+                </Text>
             </Group>
 
-            <Divider style={{ margin: "8px 0" }} />
+            <Divider my="sm" />
 
-            <Stack gap={8} style={{ overflow: "auto" }}>
-                <Group justify="space-between">
-                    <Text size="sm" c="green">{getLanguageByKey("Incoming")}</Text>
-                    <Text size="sm" fw={600}>{fmt(totalIncoming)}</Text>
+            {/* Body */}
+            <Stack gap={12} style={{ flex: 1, minWidth: 200 }}>
+                {/* Incoming */}
+                <Group justify="space-between" align="center">
+                    <Group gap={8} align="center">
+                        <ThemeIcon size="sm" radius="xl" variant="light" color={colors.in}>
+                            {IncomingIconNode}
+                        </ThemeIcon>
+                        <Text size="sm" c={colors.in}>
+                            {getLanguageByKey("Incoming")}
+                        </Text>
+                    </Group>
+                    <Text size="sm" fw={700}>
+                        {fmt(totalIncoming)}
+                    </Text>
                 </Group>
-                <Progress value={percent(totalIncoming, totalAll)} size="md" radius="xl" />
+                <Progress value={inPct} size="md" radius="xl" color={colors.in} />
 
-                <Group justify="space-between" style={{ marginTop: 6 }}>
-                    <Text size="sm" c="blue">{getLanguageByKey("Outgoing")}</Text>
-                    <Text size="sm" fw={600}>{fmt(totalOutgoing)}</Text>
+                {/* Outgoing */}
+                <Group justify="space-between" align="center">
+                    <Group gap={8} align="center">
+                        <ThemeIcon size="sm" radius="xl" variant="light" color={colors.out}>
+                            {OutgoingIconNode}
+                        </ThemeIcon>
+                        <Text size="sm" c={colors.out}>
+                            {getLanguageByKey("Outgoing")}
+                        </Text>
+                    </Group>
+                    <Text size="sm" fw={700}>
+                        {fmt(totalOutgoing)}
+                    </Text>
                 </Group>
-                <Progress value={percent(totalOutgoing, totalAll)} size="md" radius="xl" />
+                <Progress value={outPct} size="md" radius="xl" color={colors.out} />
+
+                {/* Сводка процентов */}
+                <Group gap="xs" justify="flex-end">
+                    <Badge radius="sm" variant="light" color={colors.in}>
+                        {Math.round(inPct)}% {getLanguageByKey("Incoming")}
+                    </Badge>
+                    <Badge radius="sm" variant="light" color={colors.out}>
+                        {Math.round(outPct)}% {getLanguageByKey("Outgoing")}
+                    </Badge>
+                </Group>
             </Stack>
         </Card>
     );

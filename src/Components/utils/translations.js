@@ -3950,5 +3950,20 @@ export const translations = {
     RU: "Нет данных",
     RO: "Nu există date",
     EN: "No data"
+  },
+  "User group": {
+    RU: "Группа пользователей",
+    RO: "Grup utilizatori",
+    EN: "User group"
+  },
+  "Group title": {
+    RU: "Заголовок группы",
+    RO: "Group title",
+    EN: "Group title"
+  },
+  "Source": {
+    RU: "Источник",
+    RO: "Sursă",
+    EN: "Source"
   }
 }
