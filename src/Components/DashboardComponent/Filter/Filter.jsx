@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
 import { Button, Group, MultiSelect } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
@@ -6,8 +6,14 @@ import { getLanguageByKey } from "../../utils";
 import { DD_MM_YYYY } from "../../../app-constants";
 import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
-import { user as userApi } from  "../../../api/user";
+import { user as userApi } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
+
+const GROUP_PREFIX = "__group__";
+const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
+
+// → YYYY-MM-DD
+const toYMD = (d) => (d ? dayjs(d).format("YYYY-MM-DD") : undefined);
 
 const getStartEndDateRange = (date) => {
   const startOfDay = new Date(date);
@@ -24,14 +30,24 @@ const getYesterdayDate = () => {
   return getStartEndDateRange(yesterday);
 };
 
-const GROUP_PREFIX = "__group__";
-const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
+// убираем пустые поля из payload
+const compactPayload = (p) => {
+  const copy = { ...p };
+  if (Array.isArray(copy.user_ids) && !copy.user_ids.length) delete copy.user_ids;
+  if (Array.isArray(copy.user_groups) && !copy.user_groups.length) delete copy.user_groups;
+  if (Array.isArray(copy.group_titles) && !copy.group_titles.length) delete copy.group_titles;
+  const ts = copy.attributes?.timestamp || {};
+  if (!ts.from && !ts.to) delete copy.attributes;
+  return copy;
+};
 
 export const Filter = ({
   onSelectedTechnicians,
   onSelectedUserGroups,
   onSelectedGroupTitles,
   onSelectDataRange,
+  onChangePayload, // готовый payload для POST /api/dashboard/widget/calls-static
+  onApply,         // вызвать ручной apply(payload)
   selectedTechnicians = [],
   selectedUserGroups = [],
   selectedGroupTitles = [],
@@ -39,15 +55,8 @@ export const Filter = ({
 }) => {
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
 
-  const formattedTechnicians = useMemo(
-    () => formatMultiSelectData(technicians),
-    [technicians]
-  );
-
-  const groupUserMap = useMemo(
-    () => getGroupUserMap(technicians),
-    [technicians]
-  );
+  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
   const [userGroupsOptions, setUserGroupsOptions] = useState([]);
   const [loadingUserGroups, setLoadingUserGroups] = useState(false);
@@ -58,9 +67,9 @@ export const Filter = ({
       try {
         setLoadingUserGroups(true);
         const data = await userApi.getGroupsList();
-        const opts = Array.from(
-          new Set((data || []).map((g) => g?.name).filter(Boolean))
-        ).map((name) => ({ value: name, label: name }));
+        const opts = Array.from(new Set((data || []).map((g) => g?.name).filter(Boolean))).map(
+          (name) => ({ value: name, label: name })
+        );
         if (mounted) setUserGroupsOptions(opts);
       } catch (e) {
         console.error("Не удалось загрузить группы пользователей:", e);
@@ -72,6 +81,7 @@ export const Filter = ({
     return () => { mounted = false; };
   }, []);
 
+  // все возможные group_title
   const allGroupTitles = useMemo(() => {
     const all = new Set();
     Object.values(userGroupsToGroupTitle || {}).forEach((arr) =>
@@ -84,6 +94,7 @@ export const Filter = ({
     [allGroupTitles]
   );
 
+  // === handlers ===
   const handleUsersChange = (val) => {
     const last = val[val.length - 1];
     const isGroupChip = typeof last === "string" && last.startsWith(GROUP_PREFIX);
@@ -94,8 +105,9 @@ export const Filter = ({
       nextUsers = Array.from(new Set([...(selectedTechnicians || []), ...groupUsers]));
     }
 
-    onSelectedTechnicians(nextUsers);
+    onSelectedTechnicians?.(nextUsers);
 
+    // авто-вывод user_groups по выбранным пользователям
     const groupsForUsers = new Set();
     for (const [groupKey, users] of groupUserMap.entries()) {
       const hasAny = (nextUsers || []).some((u) => users.includes(u));
@@ -104,20 +116,16 @@ export const Filter = ({
     const nextUserGroups = Array.from(groupsForUsers);
     onSelectedUserGroups?.(nextUserGroups);
 
+    // авто-вывод group_titles по группам
     const titlesSet = new Set();
-    nextUserGroups.forEach((g) => {
-      (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t));
-    });
+    nextUserGroups.forEach((g) => (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t)));
     onSelectedGroupTitles?.(Array.from(titlesSet));
   };
 
   const handleUserGroupsChange = (groups) => {
     onSelectedUserGroups?.(groups || []);
-
     const titlesSet = new Set();
-    (groups || []).forEach((g) => {
-      (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t));
-    });
+    (groups || []).forEach((g) => (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t)));
     onSelectedGroupTitles?.(Array.from(titlesSet));
   };
 
@@ -126,14 +134,35 @@ export const Filter = ({
   };
 
   const isToday =
-    dateRange?.[0] && dateRange?.[1] &&
+    dateRange?.[0] &&
+    dateRange?.[1] &&
     dayjs(dateRange[0]).isSame(dayjs(), "day") &&
     dayjs(dateRange[1]).isSame(dayjs(), "day");
 
   const isYesterday =
-    dateRange?.[0] && dateRange?.[1] &&
+    dateRange?.[0] &&
+    dateRange?.[1] &&
     dayjs(dateRange[0]).isSame(dayjs().subtract(1, "day"), "day") &&
     dayjs(dateRange[1]).isSame(dayjs().subtract(1, "day"), "day");
+
+  const buildPayload = useCallback(() => {
+    const [fromDate, toDate] = dateRange || [];
+    const payload = {
+      user_ids: selectedTechnicians,
+      user_groups: selectedUserGroups,
+      group_titles: selectedGroupTitles,
+      attributes:
+        fromDate || toDate
+          ? { timestamp: { from: toYMD(fromDate || undefined), to: toYMD(toDate || undefined) } }
+          : undefined,
+    };
+    return compactPayload(payload);
+  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
+
+  // сообщаем наверх при каждом изменении
+  useEffect(() => {
+    onChangePayload?.(buildPayload());
+  }, [buildPayload, onChangePayload]);
 
   return (
     <Group wrap="wrap" gap="sm" align="center">
@@ -181,14 +210,14 @@ export const Filter = ({
       <Group gap="xs" align="center">
         <Button
           variant={isToday ? "filled" : "default"}
-          onClick={() => onSelectDataRange(getStartEndDateRange(new Date()))}
+          onClick={() => onSelectDataRange?.(getStartEndDateRange(new Date()))}
         >
           {getLanguageByKey("azi")}
         </Button>
 
         <Button
           variant={isYesterday ? "filled" : "default"}
-          onClick={() => onSelectDataRange(getYesterdayDate())}
+          onClick={() => onSelectDataRange?.(getYesterdayDate())}
         >
           {getLanguageByKey("ieri")}
         </Button>
@@ -199,8 +228,12 @@ export const Filter = ({
           type="range"
           placeholder={getLanguageByKey("Selectează o dată")}
           value={dateRange}
-          onChange={(date) => onSelectDataRange(date || [])}
+          onChange={(date) => onSelectDataRange?.(date || [])}
         />
+
+        <Button variant="filled" onClick={() => onApply?.(buildPayload())}>
+          {getLanguageByKey("Aplică")}
+        </Button>
       </Group>
     </Group>
   );
