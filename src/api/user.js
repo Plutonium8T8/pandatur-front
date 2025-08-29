@@ -2,7 +2,7 @@ import { baseAxios } from "./baseAxios";
 
 export const user = {
   getGroupsList: async () => {
-    const { data } = await baseAxios.get("/api/user-groups");
+    const { data } = await baseAxios.get("/api/user-groups"); // вот этот
     return data;
   },
 

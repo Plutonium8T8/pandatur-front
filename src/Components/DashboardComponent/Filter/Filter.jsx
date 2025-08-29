@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Button, Group, MultiSelect } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
@@ -6,7 +6,7 @@ import { getLanguageByKey } from "../../utils";
 import { DD_MM_YYYY } from "../../../app-constants";
 import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
-
+import { user as userApi } from  "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
 
 const getStartEndDateRange = (date) => {
@@ -25,7 +25,7 @@ const getYesterdayDate = () => {
 };
 
 const GROUP_PREFIX = "__group__";
-const fromGroupKey = (key) => key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key;
+const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
 
 export const Filter = ({
   onSelectedTechnicians,
@@ -49,21 +49,34 @@ export const Filter = ({
     [technicians]
   );
 
-  const allUserGroupLabels = useMemo(() => {
-    const labels = Array.from(groupUserMap.keys())
-      .map(fromGroupKey)
-      .filter(Boolean);
-    return Array.from(new Set(labels));
-  }, [groupUserMap]);
+  const [userGroupsOptions, setUserGroupsOptions] = useState([]);
+  const [loadingUserGroups, setLoadingUserGroups] = useState(false);
 
-  const userGroupsSelectData = useMemo(
-    () => allUserGroupLabels.map((g) => ({ value: g, label: g })),
-    [allUserGroupLabels]
-  );
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        setLoadingUserGroups(true);
+        const data = await userApi.getGroupsList();
+        const opts = Array.from(
+          new Set((data || []).map((g) => g?.name).filter(Boolean))
+        ).map((name) => ({ value: name, label: name }));
+        if (mounted) setUserGroupsOptions(opts);
+      } catch (e) {
+        console.error("Не удалось загрузить группы пользователей:", e);
+        if (mounted) setUserGroupsOptions([]);
+      } finally {
+        if (mounted) setLoadingUserGroups(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   const allGroupTitles = useMemo(() => {
     const all = new Set();
-    Object.values(userGroupsToGroupTitle || {}).forEach((arr) => (arr || []).forEach((v) => all.add(v)));
+    Object.values(userGroupsToGroupTitle || {}).forEach((arr) =>
+      (arr || []).forEach((v) => all.add(v))
+    );
     return Array.from(all);
   }, []);
   const groupTitleSelectData = useMemo(
@@ -88,7 +101,6 @@ export const Filter = ({
       const hasAny = (nextUsers || []).some((u) => users.includes(u));
       if (hasAny) groupsForUsers.add(fromGroupKey(groupKey));
     }
-
     const nextUserGroups = Array.from(groupsForUsers);
     onSelectedUserGroups?.(nextUserGroups);
 
@@ -96,8 +108,7 @@ export const Filter = ({
     nextUserGroups.forEach((g) => {
       (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t));
     });
-    const nextGroupTitles = Array.from(titlesSet);
-    onSelectedGroupTitles?.(nextGroupTitles);
+    onSelectedGroupTitles?.(Array.from(titlesSet));
   };
 
   const handleUserGroupsChange = (groups) => {
@@ -142,7 +153,7 @@ export const Filter = ({
 
       <MultiSelect
         w={260}
-        data={userGroupsSelectData}
+        data={userGroupsOptions}
         value={selectedUserGroups}
         onChange={handleUserGroupsChange}
         searchable
@@ -151,6 +162,7 @@ export const Filter = ({
         nothingFoundMessage={getLanguageByKey("Nimic găsit")}
         maxDropdownHeight={260}
         aria-label="User groups"
+        disabled={loadingUserGroups}
       />
 
       <MultiSelect
