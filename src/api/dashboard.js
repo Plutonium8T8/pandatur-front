@@ -25,7 +25,7 @@ export const dashboard = {
   },
 
   getAnalytics: async (body) => {
-    const { data } = await baseAxios.post("/api/dashboard/widget/calls-static", body);
+    const { data } = await baseAxios.post("/api/dashboard/widget/calls", body);
     return data;
   },
 };
