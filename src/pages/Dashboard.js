@@ -175,7 +175,7 @@ export const Dashboard = () => {
 
   const layout = useMemo(() => {
     const w = 2;
-    const h = 0.7;
+    const h = 1;
     const perRow = Math.max(1, Math.floor(cols / w));
     return widgets.map((wgt, idx) => {
       const isGeneral = wgt.id === "general";
