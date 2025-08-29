@@ -15,11 +15,13 @@ import { ScrollContainer } from "../Components/DashboardComponent/ScrollContaine
 
 const THRESHOLD = 47;
 
-const TYPES = [
-  "calls", "messages", "system_usage", "tickets_count", "distributor", "workflow_change",
-  "ticket_create_count", "contract_closed", "ticket_lifetime", "contract_departure",
-  "workflow_percentage", "workflow_duration", "country_count",
-];
+// const TYPES = [
+//   "calls", "messages", "system_usage", "tickets_count", "distributor", "workflow_change",
+//   "ticket_create_count", "contract_closed", "ticket_lifetime", "contract_departure",
+//   "workflow_percentage", "workflow_duration", "country_count",
+// ];
+
+const TYPES = ["calls"];
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
 const sum = (arr, key) => safeArray(arr).reduce((acc, x) => acc + (Number(x?.[key]) || 0), 0);
@@ -223,11 +225,11 @@ export const Dashboard = () => {
             <Filter
               onSelectedTechnicians={setSelectedTechnicians}
               onSelectedUserGroups={setSelectedUserGroups}
-              onSelectedGroupTitles={setSelectedGroupTitles}   
+              onSelectedGroupTitles={setSelectedGroupTitles}
               onSelectDataRange={setDateRange}
               selectedTechnicians={selectedTechnicians}
-              selectedUserGroups={selectedUserGroups}          
-              selectedGroupTitles={selectedGroupTitles}        
+              selectedUserGroups={selectedUserGroups}
+              selectedGroupTitles={selectedGroupTitles}
               dateRange={dateRange}
             />
           }
@@ -250,7 +252,7 @@ export const Dashboard = () => {
             compactType={null}
             preventCollision
           >
-            <Box key="a-total">
+            {/* <Box key="a-total">
               <TotalCard
                 totalAll={totalAll}
                 totalIncoming={totalIncoming}
@@ -277,7 +279,7 @@ export const Dashboard = () => {
                 nameKey="username"
                 valueKey="_sum"
               />
-            </Box>
+            </Box> */}
 
             {TYPES.map((t) => {
               const item = responses[t] || { data: null, error: null };
