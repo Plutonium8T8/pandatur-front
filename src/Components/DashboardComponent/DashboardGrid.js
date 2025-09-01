@@ -23,7 +23,6 @@ const WIDGET_SIZES = {
 
 const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
 
-// раскладка максимум по 5 виджетов в ряд (стартовая)
 const buildRowLayout = (widgets = []) => {
     const perRow = 5;
     return widgets.map((w, idx) => {
@@ -40,7 +39,7 @@ const buildRowLayout = (widgets = []) => {
             maxW: t.maxW,
             minH: t.minH,
             static: false,
-            resizeHandles: ["e", "se"], // ← удобные ручки для изменения ширины/диагонали
+            resizeHandles: ["e", "se"],
         };
     });
 };
@@ -54,7 +53,6 @@ const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
 
 const DashboardGrid = ({ widgets = [], dateRange }) => {
-    // ширина ряда: 5 * 21 = 105 колонок (держим правило «не больше 5 стартом»)
     const colsMax = 105;
     const COLS = useMemo(
         () => ({ lg: colsMax, md: colsMax, sm: colsMax, xs: colsMax, xxs: colsMax }),
@@ -85,8 +83,8 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 rowHeight={ROW_HEIGHT}
                 margin={MARGIN}
                 containerPadding={PADDING}
-                compactType={null}         // без авто-упаковки
-                preventCollision={false}   // разрешаем растягивать даже если ниже есть элементы
+                compactType={null}
+                preventCollision
                 isResizable
                 isDraggable
                 onLayoutChange={handleLayoutChange}
