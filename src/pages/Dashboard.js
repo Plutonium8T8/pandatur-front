@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { format } from "date-fns";
 import { useSnackbar } from "notistack";
-import GridLayout from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Flex, Text, Box, Stack } from "@mantine/core";
@@ -9,16 +8,16 @@ import { api } from "../api";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin, PageHeader } from "@components";
+// важно: это твой новый компонент с тонкой сеткой (ResponsiveGridLayout внутри)
+import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
+// если ты рендеришь TotalCard прямо в Grid — импортируй его там
 import { TotalCard } from "../Components/DashboardComponent/TotalCard";
-
-const THRESHOLD = 47;
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
 const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [containerWidth, setContainerWidth] = useState(0);
   const [scrollHeight, setScrollHeight] = useState(400);
 
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
@@ -81,7 +80,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     const [start, end] = dateRange || [];
-    if (!!start !== !!end) return;
+    if (!!start !== !!end) return; // ждём полноценный диапазон
     fetchCallsStatic(buildCallsPayload());
   }, [buildCallsPayload, fetchCallsStatic]);
 
@@ -90,9 +89,6 @@ export const Dashboard = () => {
     const margins = 24;
     const viewportH = window.innerHeight || 800;
     setScrollHeight(Math.max(240, viewportH - headerH - margins));
-    if (scrollRef.current) {
-      setContainerWidth(Math.max(0, (scrollRef.current.clientWidth || 0) - THRESHOLD));
-    }
   }, []);
 
   useEffect(() => {
@@ -106,18 +102,14 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  const { cols, rowHeight } = useMemo(() => {
-    const cols = containerWidth > 1400 ? 6 : 4;
-    const rowHeight = containerWidth > 0 ? containerWidth / cols + 50 : 300;
-    return { cols, rowHeight };
-  }, [containerWidth]);
-
+  // собираем виджеты с типами для грид-компонента (general/group/user/source/gt)
   const widgets = useMemo(() => {
     const W = [];
 
     if (callsData?.general) {
       W.push({
         id: "general",
+        type: "general",
         title: getLanguageByKey("Total calls for the period"),
         subtitle: getLanguageByKey("All company"),
         incoming: Number(callsData.general.incoming_calls_count) || 0,
@@ -129,6 +121,7 @@ export const Dashboard = () => {
     safeArray(callsData?.by_user_group).forEach((r, idx) => {
       W.push({
         id: `ug-${idx}`,
+        type: "group",
         title: getLanguageByKey("User group"),
         subtitle: r.user_group_name || "-",
         incoming: Number(r.incoming_calls_count) || 0,
@@ -140,6 +133,7 @@ export const Dashboard = () => {
     safeArray(callsData?.by_user).forEach((r, idx) => {
       W.push({
         id: `user-${r.user_id ?? idx}`,
+        type: "user",
         title: getLanguageByKey("User"),
         subtitle: String(r.user_id ?? "-") + (r.sipuni_id ? ` • ${r.sipuni_id}` : ""),
         incoming: Number(r.incoming_calls_count) || 0,
@@ -151,6 +145,7 @@ export const Dashboard = () => {
     safeArray(callsData?.by_group_title).forEach((r, idx) => {
       W.push({
         id: `gt-${r.group_title_name ?? idx}`,
+        type: "group", // или свой тип "gt", если в DashboardGrid есть размеры под него
         title: getLanguageByKey("Group title"),
         subtitle: r.group_title_name || "-",
         incoming: Number(r.incoming_calls_count) || 0,
@@ -162,6 +157,7 @@ export const Dashboard = () => {
     safeArray(callsData?.by_source).forEach((r, idx) => {
       W.push({
         id: `src-${r.source ?? idx}`,
+        type: "source",
         title: getLanguageByKey("Source"),
         subtitle: r.source || "-",
         incoming: Number(r.incoming_calls_count) || 0,
@@ -172,19 +168,6 @@ export const Dashboard = () => {
 
     return W;
   }, [callsData]);
-
-  const layout = useMemo(() => {
-    const w = 2;
-    const h = 1;
-    const perRow = Math.max(1, Math.floor(cols / w));
-    return widgets.map((wgt, idx) => {
-      const isGeneral = wgt.id === "general";
-      const width = isGeneral ? Math.min(cols, 2) : w;
-      const col = idx % perRow;
-      const row = Math.floor(idx / perRow);
-      return { i: wgt.id, x: col * w, y: row * h, w: width, h };
-    });
-  }, [widgets, cols]);
 
   return (
     <Stack gap={12}>
@@ -226,29 +209,8 @@ export const Dashboard = () => {
             scrollbarGutter: "stable",
           }}
         >
-          <GridLayout
-            layout={layout}
-            cols={cols}
-            rowHeight={rowHeight}
-            width={containerWidth}
-            isResizable
-            isDraggable
-            compactType={null}
-            preventCollision
-          >
-            {widgets.map((wgt) => (
-              <Box key={wgt.id}>
-                <TotalCard
-                  title={wgt.title}
-                  subtitle={wgt.subtitle}
-                  totalAll={wgt.total}
-                  totalIncoming={wgt.incoming}
-                  totalOutgoing={wgt.outgoing}
-                  dateRange={dateRange}
-                />
-              </Box>
-            ))}
-          </GridLayout>
+          {/* твой компонент с тонкой сеткой */}
+          <DashboardGrid widgets={widgets} />
         </Box>
       )}
     </Stack>
