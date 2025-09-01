@@ -18,14 +18,6 @@ const percent = (part, total) => {
     return Math.max(0, Math.min(100, Number.isFinite(p) ? p : 0));
 };
 
-/**
- * Виджет звонков без круговой диаграммы, с бейджами внутри.
- * Доп. пропсы:
- * - title?: string
- * - subtitle?: string
- * - colors?: { in?: MantineColor; out?: MantineColor; totalAccent?: MantineColor }
- * - icons?: { total?, incoming?, outgoing? } — ReactNode
- */
 export const TotalCard = ({
     totalAll,
     totalIncoming,
@@ -123,16 +115,6 @@ export const TotalCard = ({
                     </Text>
                 </Group>
                 <Progress value={outPct} size="md" radius="xl" color={colors.out} />
-
-                {/* Сводка процентов */}
-                <Group gap="xs" justify="flex-end">
-                    <Badge radius="sm" variant="light" color={colors.in}>
-                        {Math.round(inPct)}% {getLanguageByKey("Incoming")}
-                    </Badge>
-                    <Badge radius="sm" variant="light" color={colors.out}>
-                        {Math.round(outPct)}% {getLanguageByKey("Outgoing")}
-                    </Badge>
-                </Group>
             </Stack>
         </Card>
     );
