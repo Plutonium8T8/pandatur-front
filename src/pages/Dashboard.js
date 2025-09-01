@@ -20,7 +20,7 @@ const BG = {
   general: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.15))",
   by_user_group: "linear-gradient(135deg, rgba(147,51,234,0.14), rgba(59,130,246,0.14))",
   by_user: "linear-gradient(135deg, rgba(59,130,246,0.14), rgba(34,197,94,0.14))",
-  by_group_title: "linear-gradient(135deg, rgba(245,158,11,0.16), rgba(244,63,94,0.12))",
+  by_group_title: "linear-gradient(135deg, rgba(245,158,11,0.16), rgba(48, 23, 27, 0.12))",
   by_source: "linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,211,238,0.14))",
 };
 
@@ -42,7 +42,8 @@ export const Dashboard = () => {
   const [callsData, setCallsData] = useState(null);
   const [callsError, setCallsError] = useState(null);
 
-  const { technicians } = useGetTechniciansList();
+  // имена по user_id
+  const { technicians } = useGetTechniciansList(); // [{ value, label }, ...]
   const userNameById = useMemo(() => {
     const map = new Map();
     safeArray(technicians).forEach((t) => {
@@ -100,7 +101,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     const [start, end] = dateRange || [];
-    if (!!start !== !!end) return;
+    if (!!start !== !!end) return; // ждём полноценный диапазон
     fetchCallsStatic(buildCallsPayload());
   }, [buildCallsPayload, fetchCallsStatic]);
 
@@ -122,12 +123,12 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  // собираем виджеты + разделители
+  // собираем виджеты + заголовки секций
   const widgets = useMemo(() => {
     const W = [];
 
     if (callsData?.general) {
-      // блок general
+      W.push({ id: "sep-general", type: "separator", label: getLanguageByKey("General") });
       W.push({
         id: "general",
         type: "general",
@@ -164,7 +165,6 @@ export const Dashboard = () => {
         const subtitle =
           (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) +
           (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
-
         W.push({
           id: `user-${uid || idx}`,
           type: "user",

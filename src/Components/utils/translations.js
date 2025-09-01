@@ -3965,5 +3965,30 @@ export const translations = {
     RU: "Источник",
     RO: "Sursă",
     EN: "Source"
-  }
+  },
+  "All company": {
+    RU: "Вся компания",
+    RO: "Întreaga companie",
+    EN: "All company",
+  },
+  "By user group": {
+    RU: "По группам пользователей",
+    RO: "După grup utilizatori",
+    EN: "By user group",
+  },
+  "By user": {
+    RU: "По пользователям",
+    RO: "După utilizator",
+    EN: "By user",
+  },
+  "By group title": {
+    RU: "По названиям групп",
+    RO: "După titlu grup",
+    EN: "By group title",
+  },
+  "By source": {
+    RU: "По источнику",
+    RO: "După sursă",
+    EN: "By source",
+  },
 }
