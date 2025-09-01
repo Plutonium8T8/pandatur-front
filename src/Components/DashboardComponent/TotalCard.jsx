@@ -1,4 +1,7 @@
-import { Card, Group, Stack, Text, Progress, Divider, Badge, ThemeIcon, Tooltip} from "@mantine/core";
+import React from "react";
+import {
+    Card, Group, Stack, Text, Progress, Divider, Badge, ThemeIcon, Tooltip
+} from "@mantine/core";
 import { format } from "date-fns";
 import { getLanguageByKey } from "@utils";
 import { MdCall, MdCallReceived, MdCallMade } from "react-icons/md";
@@ -20,6 +23,7 @@ export const TotalCard = ({
     icons = {},
     sizeInfo,
     sizePx,
+    bg, // ⬅️ НОВОЕ: фон карточки
 }) => {
     const inPct = percent(totalIncoming, totalAll);
     const outPct = percent(totalOutgoing, totalAll);
@@ -43,6 +47,7 @@ export const TotalCard = ({
                 display: "flex",
                 flexDirection: "column",
                 background:
+                    bg ||
                     "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(45,212,191,0.06))",
                 borderColor: "rgba(0,0,0,0.06)",
             }}
@@ -54,13 +59,7 @@ export const TotalCard = ({
                         {TotalIconNode}
                     </ThemeIcon>
                     <div>
-                        <Text
-                            size="xs"
-                            c="dimmed"
-                            fw={700}
-                            tt="uppercase"
-                            style={{ letterSpacing: 0.6 }}
-                        >
+                        <Text size="xs" c="dimmed" fw={700} tt="uppercase" style={{ letterSpacing: 0.6 }}>
                             {title || getLanguageByKey("Total calls for the period")}
                         </Text>
 
@@ -71,17 +70,12 @@ export const TotalCard = ({
                                 {dateRange?.[1] ? format(dateRange[1], "dd.MM.yyyy") : "—"}
                             </Badge>
 
-                            {/* бейджи размера */}
                             {sizeInfo ? (
-                                <Badge variant="outline" color="gray">
-                                    {sizeInfo}
-                                </Badge>
+                                <Badge variant="outline" color="gray">{sizeInfo}</Badge>
                             ) : null}
                             {pxLabel ? (
                                 <Tooltip label="Текущий размер в пикселях">
-                                    <Badge variant="outline" color="gray">
-                                        {pxLabel}
-                                    </Badge>
+                                    <Badge variant="outline" color="gray">{pxLabel}</Badge>
                                 </Tooltip>
                             ) : null}
                         </Group>
@@ -97,35 +91,25 @@ export const TotalCard = ({
 
             {/* Body */}
             <Stack gap={12} style={{ flex: 1, minWidth: 200 }}>
-                {/* Incoming */}
                 <Group justify="space-between" align="center">
                     <Group gap={8} align="center">
                         <ThemeIcon size="sm" radius="xl" variant="light" color={colors.in}>
                             {IncomingIconNode}
                         </ThemeIcon>
-                        <Text size="sm" c={colors.in}>
-                            {getLanguageByKey("Incoming")}
-                        </Text>
+                        <Text size="sm" c={colors.in}>{getLanguageByKey("Incoming")}</Text>
                     </Group>
-                    <Text size="sm" fw={700}>
-                        {fmt(totalIncoming)}
-                    </Text>
+                    <Text size="sm" fw={700}>{fmt(totalIncoming)}</Text>
                 </Group>
                 <Progress value={inPct} size="md" radius="xl" color={colors.in} />
 
-                {/* Outgoing */}
                 <Group justify="space-between" align="center">
                     <Group gap={8} align="center">
                         <ThemeIcon size="sm" radius="xl" variant="light" color={colors.out}>
                             {OutgoingIconNode}
                         </ThemeIcon>
-                        <Text size="sm" c={colors.out}>
-                            {getLanguageByKey("Outgoing")}
-                        </Text>
+                        <Text size="sm" c={colors.out}>{getLanguageByKey("Outgoing")}</Text>
                     </Group>
-                    <Text size="sm" fw={700}>
-                        {fmt(totalOutgoing)}
-                    </Text>
+                    <Text size="sm" fw={700}>{fmt(totalOutgoing)}</Text>
                 </Group>
                 <Progress value={outPct} size="md" radius="xl" color={colors.out} />
             </Stack>
