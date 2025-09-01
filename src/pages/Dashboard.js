@@ -8,13 +8,16 @@ import { api } from "../api";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin, PageHeader } from "@components";
-// важно: это твой новый компонент с тонкой сеткой (ResponsiveGridLayout внутри)
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
-// если ты рендеришь TotalCard прямо в Grid — импортируй его там
-import { TotalCard } from "../Components/DashboardComponent/TotalCard";
+
+// ⬇️ важный хук — путь поправь при необходимости
+import { useGetTechniciansList } from "../hooks";
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
-const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
+const pickIds = (arr) =>
+  safeArray(arr)
+    .map((x) => Number(x?.value ?? x))
+    .filter((n) => Number.isFinite(n));
 
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +36,18 @@ export const Dashboard = () => {
 
   const [callsData, setCallsData] = useState(null);
   const [callsError, setCallsError] = useState(null);
+
+  // ⬇️ тянем список техников и строим мапу id → имя
+  const { technicians } = useGetTechniciansList(); // [{ value, label }, ...]
+  const userNameById = useMemo(() => {
+    const map = new Map();
+    safeArray(technicians).forEach((t) => {
+      const id = Number(t?.value);
+      const name = String(t?.label ?? "").trim();
+      if (Number.isFinite(id) && name) map.set(id, name);
+    });
+    return map;
+  }, [technicians]);
 
   const buildCallsPayload = useCallback(() => {
     const [start, end] = dateRange || [];
@@ -53,7 +68,8 @@ export const Dashboard = () => {
     if (!payload.user_ids?.length) delete payload.user_ids;
     if (!payload.user_groups?.length) delete payload.user_groups;
     if (!payload.group_titles?.length) delete payload.group_titles;
-    if (!payload.attributes?.timestamp?.from && !payload.attributes?.timestamp?.to) delete payload.attributes;
+    if (!payload.attributes?.timestamp?.from && !payload.attributes?.timestamp?.to)
+      delete payload.attributes;
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
@@ -102,7 +118,7 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  // собираем виджеты с типами для грид-компонента (general/group/user/source/gt)
+  // собираем виджеты (general/group/user/source/gt)
   const widgets = useMemo(() => {
     const W = [];
 
@@ -130,12 +146,19 @@ export const Dashboard = () => {
       });
     });
 
+    // ⬇️ здесь подставляем имя по user_id (фолбэк на "ID 123")
     safeArray(callsData?.by_user).forEach((r, idx) => {
+      const uid = Number(r.user_id);
+      const name = userNameById.get(uid);
+      const subtitle =
+        (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) +
+        (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
+
       W.push({
-        id: `user-${r.user_id ?? idx}`,
+        id: `user-${uid || idx}`,
         type: "user",
         title: getLanguageByKey("User"),
-        subtitle: String(r.user_id ?? "-") + (r.sipuni_id ? ` • ${r.sipuni_id}` : ""),
+        subtitle,
         incoming: Number(r.incoming_calls_count) || 0,
         outgoing: Number(r.outgoing_calls_count) || 0,
         total: Number(r.total_calls_count) || 0,
@@ -145,7 +168,7 @@ export const Dashboard = () => {
     safeArray(callsData?.by_group_title).forEach((r, idx) => {
       W.push({
         id: `gt-${r.group_title_name ?? idx}`,
-        type: "group", // или свой тип "gt", если в DashboardGrid есть размеры под него
+        type: "group", // или свой тип "gt"
         title: getLanguageByKey("Group title"),
         subtitle: r.group_title_name || "-",
         incoming: Number(r.incoming_calls_count) || 0,
@@ -167,7 +190,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [callsData]);
+  }, [callsData, userNameById]);
 
   return (
     <Stack gap={12}>
@@ -209,8 +232,7 @@ export const Dashboard = () => {
             scrollbarGutter: "stable",
           }}
         >
-          {/* твой компонент с тонкой сеткой */}
-          <DashboardGrid widgets={widgets} />
+          <DashboardGrid widgets={widgets} dateRange={dateRange} />
         </Box>
       )}
     </Stack>
