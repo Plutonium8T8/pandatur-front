@@ -1,14 +1,4 @@
-import {
-    Card,
-    Group,
-    Stack,
-    Text,
-    Progress,
-    Divider,
-    Badge,
-    ThemeIcon,
-    Tooltip,
-} from "@mantine/core";
+import { Card, Group, Stack, Text, Progress, Divider, Badge, ThemeIcon, Tooltip} from "@mantine/core";
 import { format } from "date-fns";
 import { getLanguageByKey } from "@utils";
 import { MdCall, MdCallReceived, MdCallMade } from "react-icons/md";
@@ -28,9 +18,8 @@ export const TotalCard = ({
     subtitle,
     colors = { in: "teal", out: "blue", totalAccent: "indigo" },
     icons = {},
-    // новое:
-    sizeInfo,                 // строка вида "8 × 12" из layout (w × h)
-    sizePx,                   // опционально { width, height } в пикселях
+    sizeInfo,
+    sizePx,
 }) => {
     const inPct = percent(totalIncoming, totalAll);
     const outPct = percent(totalOutgoing, totalAll);
