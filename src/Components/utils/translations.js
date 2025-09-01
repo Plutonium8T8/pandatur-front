@@ -3957,9 +3957,9 @@ export const translations = {
     EN: "User group"
   },
   "Group title": {
-    RU: "Заголовок группы",
-    RO: "Group title",
-    EN: "Group title"
+    RU: "Воронка",
+    RO: "Pâlnie",
+    EN: "By pipeline"
   },
   "Source": {
     RU: "Источник",
@@ -3982,9 +3982,9 @@ export const translations = {
     EN: "By user",
   },
   "By group title": {
-    RU: "По названиям групп",
-    RO: "După titlu grup",
-    EN: "By group title",
+    RU: "По вороноке",
+    RO: "După pâlnie",
+    EN: "By pipeline",
   },
   "By source": {
     RU: "По источнику",
