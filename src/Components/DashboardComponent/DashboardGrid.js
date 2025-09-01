@@ -11,12 +11,11 @@ const ROW_HEIGHT = 8;
 const MARGIN = [8, 8];
 const PADDING = [8, 8];
 
-// 5 карточек в ряд: 5 * 21 = 105 колонок
-const COLS_MAX = 105;
+const COLS_MAX = 105;      // 5 карточек * 21
 const PER_ROW = 5;
+const SEP_H = 3;        // высота разделителя в грид-юнитах
 
-const DEFAULT_SIZE = { w: 21, h: 18, minW: 6, maxW: 105, minH: 6 };
-const SEP_H = 2; // высота divider'а в грид-юнитах
+const DEFAULT_SIZE = { w: 21, h: 21, minW: 6, maxW: 105, minH: 6 };
 
 const WIDGET_SIZES = {
     general: DEFAULT_SIZE,
@@ -24,55 +23,42 @@ const WIDGET_SIZES = {
     user: DEFAULT_SIZE,
     source: DEFAULT_SIZE,
     gt: DEFAULT_SIZE,
-    separator: { w: COLS_MAX, h: SEP_H, minW: COLS_MAX, minH: SEP_H },
+    separator: { w: COLS_MAX, h: SEP_H, minW: COLS_MAX, minH: SEP_H, static: true },
 };
 
 const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
 
-/** новая раскладка: используем y-курсор вместо row*DEFAULT_SIZE.h */
+/** раскладка с y-курcором + полноширинные separator’ы */
 const buildRowLayout = (widgets = []) => {
     const items = [];
-    let y = 0;     // текущая «высота» в грид-юнитах
-    let col = 0;   // 0..PER_ROW-1
-
-    const nextRow = () => {
-        y += DEFAULT_SIZE.h;
-        col = 0;
-    };
+    let y = 0;
+    let col = 0;
+    const nextRow = () => { y += DEFAULT_SIZE.h; col = 0; };
 
     for (const w of widgets) {
-        // separator занимает всю ширину и всегда с новой строки
         if (w.type === "separator") {
-            if (col !== 0) nextRow(); // перенести на новую строку, если были карточки
+            if (col !== 0) nextRow();
             items.push({
                 i: String(w.id),
-                x: 0,
-                y,
-                w: COLS_MAX,
-                h: SEP_H,
-                minW: COLS_MAX,
-                minH: SEP_H,
+                x: 0, y,
+                w: COLS_MAX, h: SEP_H,
+                minW: COLS_MAX, minH: SEP_H,
                 static: true,
                 isDraggable: false,
                 isResizable: false,
             });
-            y += SEP_H; // сразу под ним начнётся следующая группа
+            y += SEP_H; // след. карточки пойдут сразу под заголовком
             col = 0;
             continue;
         }
 
         const t = getSize(w.type);
         const x = col * DEFAULT_SIZE.w;
-
         items.push({
             i: String(w.id),
-            x,
-            y,
-            w: t.w,
-            h: t.h,
-            minW: t.minW,
-            maxW: t.maxW,
-            minH: t.minH,
+            x, y,
+            w: t.w, h: t.h,
+            minW: t.minW, maxW: t.maxW, minH: t.minH,
             static: false,
             resizeHandles: ["e", "se"],
         });
@@ -80,7 +66,6 @@ const buildRowLayout = (widgets = []) => {
         col += 1;
         if (col >= PER_ROW) nextRow();
     }
-
     return items;
 };
 
@@ -88,7 +73,6 @@ const buildLayoutsAllBps = (widgets = []) => {
     const single = buildRowLayout(widgets);
     return { lg: single, md: single, sm: single, xs: single, xxs: single };
 };
-
 const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
 
@@ -116,8 +100,8 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 rowHeight={ROW_HEIGHT}
                 margin={MARGIN}
                 containerPadding={PADDING}
-                compactType={null}      // без автопака
-                preventCollision        // без «отталкивания»
+                compactType={null}     // без автопака
+                preventCollision       // без «отталкивания» и наложений
                 isResizable
                 isDraggable
                 onLayoutChange={handleLayoutChange}
@@ -126,11 +110,31 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 {widgets.map((w) => {
                     if (w.type === "separator") {
                         return (
-                            <div key={w.id} style={{ height: "100%", padding: 4 }}>
-                                <Divider label={w.label} labelPosition="left" style={{ opacity: 0.9 }} />
+                            <div key={w.id} style={{ height: "100%", display: "flex", alignItems: "center" }}>
+                                <Divider
+                                    label={
+                                        <Box
+                                            px="xs" py={4}
+                                            style={{
+                                                borderRadius: 8,
+                                                fontWeight: 700,
+                                                fontSize: 12,
+                                                textTransform: "uppercase",
+                                                letterSpacing: 0.6,
+                                                background: "rgba(0,0,0,0.04)",
+                                            }}
+                                        >
+                                            {w.label}
+                                        </Box>
+                                    }
+                                    labelPosition="left"
+                                    variant="solid"
+                                    color="gray"
+                                />
                             </div>
                         );
                     }
+
                     const li = currentLayout.find((l) => l.i === String(w.id));
                     const sizeInfo = li ? `${li.w} × ${li.h}` : null;
 
