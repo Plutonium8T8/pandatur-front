@@ -7,20 +7,18 @@ import { TotalCard } from "./TotalCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-// тонкая сетка
 const BREAKPOINTS = { lg: 1400, md: 1100, sm: 900, xs: 600, xxs: 0 };
 const COLS = { lg: 36, md: 30, sm: 24, xs: 16, xxs: 12 };
 const ROW_HEIGHT = 8;
 const MARGIN = [8, 8];
 const PADDING = [8, 8];
 
-// базовые размеры виджетов
 const WIDGET_SIZES = {
     general: { w: 12, h: 14, minW: 8, minH: 10, maxW: 36 },
     group: { w: 8, h: 12, minW: 6, minH: 8 },
     user: { w: 8, h: 12, minW: 6, minH: 8 },
     source: { w: 6, h: 10, minW: 4, minH: 6 },
-    gt: { w: 8, h: 12, minW: 6, minH: 8 }, // если нужен отдельный тип
+    gt: { w: 8, h: 12, minW: 6, minH: 8 },
 };
 
 const buildLayouts = (widgets) => {
@@ -43,7 +41,6 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
         catch { return buildLayouts(widgets); }
     });
 
-    // добавляем в layout новые виджеты при их появлении
     useEffect(() => {
         const anyBp = Object.values(layouts)[0] || [];
         const known = new Set(anyBp.map(l => l.i));
