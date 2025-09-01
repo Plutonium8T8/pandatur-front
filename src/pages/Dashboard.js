@@ -64,7 +64,7 @@ export const Dashboard = () => {
       setIsLoading(true);
       setCallsError(null);
       try {
-        const res = await api.dashboard.getAnalytics(payload);
+        const res = await api.dashboard.getWidgetCalls(payload);
         if (requestIdRef.current !== thisReqId) return;
         setCallsData(res || null);
       } catch (e) {

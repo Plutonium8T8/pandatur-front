@@ -24,8 +24,13 @@ export const dashboard = {
     return data;
   },
 
-  getAnalytics: async (body) => {
+  getWidgetCalls: async (body) => {
     const { data } = await baseAxios.post("/api/dashboard/widget/calls", body);
+    return data;
+  },
+
+  getWidgetMessages: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/messages", body);
     return data;
   },
 };
