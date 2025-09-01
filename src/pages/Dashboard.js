@@ -3,19 +3,18 @@ import { format } from "date-fns";
 import { useSnackbar } from "notistack";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Flex, Text, Box, Stack } from "@mantine/core";
+import { Flex, Text, Box, Stack, ActionIcon, Tooltip } from "@mantine/core";
+import { LuFilter } from "react-icons/lu";
 import { api } from "../api";
-import { Filter } from "../Components/DashboardComponent/Filter/Filter";
+import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin, PageHeader } from "@components";
-import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { useGetTechniciansList } from "../hooks";
+import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
-const pickIds = (arr) =>
-  safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
+const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
-/** цвета фона по типам группировок */
 const BG = {
   general: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.15))",
   by_user_group: "linear-gradient(135deg, rgba(147,51,234,0.14), rgba(59,130,246,0.14))",
@@ -28,13 +27,15 @@ export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [scrollHeight, setScrollHeight] = useState(400);
 
+  // состояние фильтра
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
   const [selectedUserGroups, setSelectedUserGroups] = useState([]);
   const [selectedGroupTitles, setSelectedGroupTitles] = useState([]);
   const [dateRange, setDateRange] = useState([]);
 
-  const { enqueueSnackbar } = useSnackbar();
+  const [filterOpened, setFilterOpened] = useState(false);
 
+  const { enqueueSnackbar } = useSnackbar();
   const headerRowRef = useRef(null);
   const scrollRef = useRef(null);
   const requestIdRef = useRef(0);
@@ -42,8 +43,7 @@ export const Dashboard = () => {
   const [callsData, setCallsData] = useState(null);
   const [callsError, setCallsError] = useState(null);
 
-  // имена по user_id
-  const { technicians } = useGetTechniciansList(); // [{ value, label }, ...]
+  const { technicians } = useGetTechniciansList();
   const userNameById = useMemo(() => {
     const map = new Map();
     safeArray(technicians).forEach((t) => {
@@ -62,46 +62,37 @@ export const Dashboard = () => {
       group_titles: selectedGroupTitles?.length ? selectedGroupTitles : undefined,
       attributes:
         start || end
-          ? {
-            timestamp: {
-              from: start ? format(start, "yyyy-MM-dd") : undefined,
-              to: end ? format(end, "yyyy-MM-dd") : undefined,
-            },
-          }
+          ? { timestamp: { from: start ? format(start, "yyyy-MM-dd") : undefined, to: end ? format(end, "yyyy-MM-dd") : undefined } }
           : undefined,
     };
     if (!payload.user_ids?.length) delete payload.user_ids;
     if (!payload.user_groups?.length) delete payload.user_groups;
     if (!payload.group_titles?.length) delete payload.group_titles;
-    if (!payload.attributes?.timestamp?.from && !payload.attributes?.timestamp?.to)
-      delete payload.attributes;
+    if (!payload.attributes?.timestamp?.from && !payload.attributes?.timestamp?.to) delete payload.attributes;
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
-  const fetchCallsStatic = useCallback(
-    async (payload) => {
-      const thisReqId = ++requestIdRef.current;
-      setIsLoading(true);
-      setCallsError(null);
-      try {
-        const res = await api.dashboard.getWidgetCalls(payload);
-        if (requestIdRef.current !== thisReqId) return;
-        setCallsData(res || null);
-      } catch (e) {
-        if (requestIdRef.current !== thisReqId) return;
-        setCallsData(null);
-        setCallsError(e?.message || String(e));
-        enqueueSnackbar(showServerError(e), { variant: "error" });
-      } finally {
-        if (requestIdRef.current === thisReqId) setIsLoading(false);
-      }
-    },
-    [enqueueSnackbar]
-  );
+  const fetchCallsStatic = useCallback(async (payload) => {
+    const thisReqId = ++requestIdRef.current;
+    setIsLoading(true);
+    setCallsError(null);
+    try {
+      const res = await api.dashboard.getWidgetCalls(payload);
+      if (requestIdRef.current !== thisReqId) return;
+      setCallsData(res || null);
+    } catch (e) {
+      if (requestIdRef.current !== thisReqId) return;
+      setCallsData(null);
+      setCallsError(e?.message || String(e));
+      enqueueSnackbar(showServerError(e), { variant: "error" });
+    } finally {
+      if (requestIdRef.current === thisReqId) setIsLoading(false);
+    }
+  }, [enqueueSnackbar]);
 
   useEffect(() => {
     const [start, end] = dateRange || [];
-    if (!!start !== !!end) return; // ждём полноценный диапазон
+    if (!!start !== !!end) return; // ждём оба конца диапазона
     fetchCallsStatic(buildCallsPayload());
   }, [buildCallsPayload, fetchCallsStatic]);
 
@@ -111,7 +102,6 @@ export const Dashboard = () => {
     const viewportH = window.innerHeight || 800;
     setScrollHeight(Math.max(240, viewportH - headerH - margins));
   }, []);
-
   useEffect(() => {
     recalcSizes();
     window.addEventListener("resize", recalcSizes);
@@ -123,15 +113,12 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  // собираем виджеты + заголовки секций
   const widgets = useMemo(() => {
     const W = [];
-
     if (callsData?.general) {
       W.push({ id: "sep-general", type: "separator", label: getLanguageByKey("General") });
       W.push({
-        id: "general",
-        type: "general",
+        id: "general", type: "general",
         title: getLanguageByKey("Total calls for the period"),
         subtitle: getLanguageByKey("All company"),
         incoming: Number(callsData.general.incoming_calls_count) || 0,
@@ -140,78 +127,61 @@ export const Dashboard = () => {
         bg: BG.general,
       });
     }
-
     if (safeArray(callsData?.by_user_group).length) {
       W.push({ id: "sep-ug", type: "separator", label: getLanguageByKey("By user group") });
       safeArray(callsData.by_user_group).forEach((r, idx) => {
         W.push({
-          id: `ug-${idx}`,
-          type: "group",
-          title: getLanguageByKey("User group"),
-          subtitle: r.user_group_name || "-",
-          incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0,
-          bg: BG.by_user_group,
+          id: `ug-${idx}`, type: "group", title: getLanguageByKey("User group"),
+          subtitle: r.user_group_name || "-", incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_user_group,
         });
       });
     }
-
     if (safeArray(callsData?.by_user).length) {
       W.push({ id: "sep-user", type: "separator", label: getLanguageByKey("By user") });
       safeArray(callsData.by_user).forEach((r, idx) => {
         const uid = Number(r.user_id);
         const name = userNameById.get(uid);
-        const subtitle =
-          (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) +
-          (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
+        const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
         W.push({
-          id: `user-${uid || idx}`,
-          type: "user",
-          title: getLanguageByKey("User"),
-          subtitle,
-          incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0,
-          bg: BG.by_user,
+          id: `user-${uid || idx}`, type: "user", title: getLanguageByKey("User"),
+          subtitle, incoming: Number(r.incoming_calls_count) || 0, outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0, bg: BG.by_user,
         });
       });
     }
-
     if (safeArray(callsData?.by_group_title).length) {
       W.push({ id: "sep-gt", type: "separator", label: getLanguageByKey("By group title") });
       safeArray(callsData.by_group_title).forEach((r, idx) => {
         W.push({
-          id: `gt-${r.group_title_name ?? idx}`,
-          type: "group",
-          title: getLanguageByKey("Group title"),
-          subtitle: r.group_title_name || "-",
-          incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0,
-          bg: BG.by_group_title,
+          id: `gt-${r.group_title_name ?? idx}`, type: "group", title: getLanguageByKey("Group title"),
+          subtitle: r.group_title_name || "-", incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_group_title,
         });
       });
     }
-
     if (safeArray(callsData?.by_source).length) {
       W.push({ id: "sep-src", type: "separator", label: getLanguageByKey("By source") });
       safeArray(callsData.by_source).forEach((r, idx) => {
         W.push({
-          id: `src-${r.source ?? idx}`,
-          type: "source",
-          title: getLanguageByKey("Source"),
-          subtitle: r.source || "-",
-          incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0,
-          bg: BG.by_source,
+          id: `src-${r.source ?? idx}`, type: "source", title: getLanguageByKey("Source"),
+          subtitle: r.source || "-", incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_source,
         });
       });
     }
-
     return W;
   }, [callsData, userNameById]);
+
+  const handleApplyFilter = useCallback((payload, meta) => {
+    // синхроним локальный стейт, чтобы useEffect сам дёрнул fetchCallsStatic
+    setSelectedTechnicians(meta?.selectedTechnicians || []);
+    setSelectedUserGroups(meta?.selectedUserGroups || []);
+    setSelectedGroupTitles(meta?.selectedGroupTitles || []);
+    setDateRange(meta?.dateRange || []);
+    // если нужно моментально — можно раскомментить прямой вызов:
+    // fetchCallsStatic(payload);
+  }, [/* fetchCallsStatic */]);
 
   return (
     <Stack gap={12}>
@@ -219,16 +189,11 @@ export const Dashboard = () => {
         <PageHeader
           title={getLanguageByKey("Dashboard")}
           extraInfo={
-            <Filter
-              onSelectedTechnicians={setSelectedTechnicians}
-              onSelectedUserGroups={setSelectedUserGroups}
-              onSelectedGroupTitles={setSelectedGroupTitles}
-              onSelectDataRange={setDateRange}
-              selectedTechnicians={selectedTechnicians}
-              selectedUserGroups={selectedUserGroups}
-              selectedGroupTitles={selectedGroupTitles}
-              dateRange={dateRange}
-            />
+            <Tooltip label={getLanguageByKey("Filtru")}>
+              <ActionIcon variant="light" size="lg" onClick={() => setFilterOpened(true)} aria-label="open-filter">
+                <LuFilter size={18} />
+              </ActionIcon>
+            </Tooltip>
           }
         />
       </Flex>
@@ -244,18 +209,21 @@ export const Dashboard = () => {
       ) : (
         <Box
           ref={scrollRef}
-          style={{
-            width: "100%",
-            height: scrollHeight,
-            overflowY: "auto",
-            overflowX: "hidden",
-            paddingRight: 8,
-            scrollbarGutter: "stable",
-          }}
+          style={{ width: "100%", height: scrollHeight, overflowY: "auto", overflowX: "hidden", paddingRight: 8, scrollbarGutter: "stable" }}
         >
           <DashboardGrid widgets={widgets} dateRange={dateRange} />
         </Box>
       )}
+
+      <Filter
+        opened={filterOpened}
+        onClose={() => setFilterOpened(false)}
+        onApply={handleApplyFilter}
+        initialTechnicians={selectedTechnicians}
+        initialUserGroups={selectedUserGroups}
+        initialGroupTitles={selectedGroupTitles}
+        initialDateRange={dateRange}
+      />
     </Stack>
   );
 };
