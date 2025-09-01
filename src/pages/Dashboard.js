@@ -9,15 +9,20 @@ import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin, PageHeader } from "@components";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
-
-// ⬇️ важный хук — путь поправь при необходимости
 import { useGetTechniciansList } from "../hooks";
 
 const safeArray = (a) => (Array.isArray(a) ? a : []);
 const pickIds = (arr) =>
-  safeArray(arr)
-    .map((x) => Number(x?.value ?? x))
-    .filter((n) => Number.isFinite(n));
+  safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
+
+/** цвета фона по типам группировок */
+const BG = {
+  general: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.15))",
+  by_user_group: "linear-gradient(135deg, rgba(147,51,234,0.14), rgba(59,130,246,0.14))",
+  by_user: "linear-gradient(135deg, rgba(59,130,246,0.14), rgba(34,197,94,0.14))",
+  by_group_title: "linear-gradient(135deg, rgba(245,158,11,0.16), rgba(244,63,94,0.12))",
+  by_source: "linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,211,238,0.14))",
+};
 
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -37,8 +42,7 @@ export const Dashboard = () => {
   const [callsData, setCallsData] = useState(null);
   const [callsError, setCallsError] = useState(null);
 
-  // ⬇️ тянем список техников и строим мапу id → имя
-  const { technicians } = useGetTechniciansList(); // [{ value, label }, ...]
+  const { technicians } = useGetTechniciansList();
   const userNameById = useMemo(() => {
     const map = new Map();
     safeArray(technicians).forEach((t) => {
@@ -96,7 +100,7 @@ export const Dashboard = () => {
 
   useEffect(() => {
     const [start, end] = dateRange || [];
-    if (!!start !== !!end) return; // ждём полноценный диапазон
+    if (!!start !== !!end) return;
     fetchCallsStatic(buildCallsPayload());
   }, [buildCallsPayload, fetchCallsStatic]);
 
@@ -118,11 +122,12 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  // собираем виджеты (general/group/user/source/gt)
+  // собираем виджеты + разделители
   const widgets = useMemo(() => {
     const W = [];
 
     if (callsData?.general) {
+      // блок general
       W.push({
         id: "general",
         type: "general",
@@ -131,63 +136,79 @@ export const Dashboard = () => {
         incoming: Number(callsData.general.incoming_calls_count) || 0,
         outgoing: Number(callsData.general.outgoing_calls_count) || 0,
         total: Number(callsData.general.total_calls_count) || 0,
+        bg: BG.general,
       });
     }
 
-    safeArray(callsData?.by_user_group).forEach((r, idx) => {
-      W.push({
-        id: `ug-${idx}`,
-        type: "group",
-        title: getLanguageByKey("User group"),
-        subtitle: r.user_group_name || "-",
-        incoming: Number(r.incoming_calls_count) || 0,
-        outgoing: Number(r.outgoing_calls_count) || 0,
-        total: Number(r.total_calls_count) || 0,
+    if (safeArray(callsData?.by_user_group).length) {
+      W.push({ id: "sep-ug", type: "separator", label: getLanguageByKey("By user group") });
+      safeArray(callsData.by_user_group).forEach((r, idx) => {
+        W.push({
+          id: `ug-${idx}`,
+          type: "group",
+          title: getLanguageByKey("User group"),
+          subtitle: r.user_group_name || "-",
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+          bg: BG.by_user_group,
+        });
       });
-    });
+    }
 
-    // ⬇️ здесь подставляем имя по user_id (фолбэк на "ID 123")
-    safeArray(callsData?.by_user).forEach((r, idx) => {
-      const uid = Number(r.user_id);
-      const name = userNameById.get(uid);
-      const subtitle =
-        (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) +
-        (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
+    if (safeArray(callsData?.by_user).length) {
+      W.push({ id: "sep-user", type: "separator", label: getLanguageByKey("By user") });
+      safeArray(callsData.by_user).forEach((r, idx) => {
+        const uid = Number(r.user_id);
+        const name = userNameById.get(uid);
+        const subtitle =
+          (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) +
+          (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
 
-      W.push({
-        id: `user-${uid || idx}`,
-        type: "user",
-        title: getLanguageByKey("User"),
-        subtitle,
-        incoming: Number(r.incoming_calls_count) || 0,
-        outgoing: Number(r.outgoing_calls_count) || 0,
-        total: Number(r.total_calls_count) || 0,
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "user",
+          title: getLanguageByKey("User"),
+          subtitle,
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+          bg: BG.by_user,
+        });
       });
-    });
+    }
 
-    safeArray(callsData?.by_group_title).forEach((r, idx) => {
-      W.push({
-        id: `gt-${r.group_title_name ?? idx}`,
-        type: "group", // или свой тип "gt"
-        title: getLanguageByKey("Group title"),
-        subtitle: r.group_title_name || "-",
-        incoming: Number(r.incoming_calls_count) || 0,
-        outgoing: Number(r.outgoing_calls_count) || 0,
-        total: Number(r.total_calls_count) || 0,
+    if (safeArray(callsData?.by_group_title).length) {
+      W.push({ id: "sep-gt", type: "separator", label: getLanguageByKey("By group title") });
+      safeArray(callsData.by_group_title).forEach((r, idx) => {
+        W.push({
+          id: `gt-${r.group_title_name ?? idx}`,
+          type: "group",
+          title: getLanguageByKey("Group title"),
+          subtitle: r.group_title_name || "-",
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+          bg: BG.by_group_title,
+        });
       });
-    });
+    }
 
-    safeArray(callsData?.by_source).forEach((r, idx) => {
-      W.push({
-        id: `src-${r.source ?? idx}`,
-        type: "source",
-        title: getLanguageByKey("Source"),
-        subtitle: r.source || "-",
-        incoming: Number(r.incoming_calls_count) || 0,
-        outgoing: Number(r.outgoing_calls_count) || 0,
-        total: Number(r.total_calls_count) || 0,
+    if (safeArray(callsData?.by_source).length) {
+      W.push({ id: "sep-src", type: "separator", label: getLanguageByKey("By source") });
+      safeArray(callsData.by_source).forEach((r, idx) => {
+        W.push({
+          id: `src-${r.source ?? idx}`,
+          type: "source",
+          title: getLanguageByKey("Source"),
+          subtitle: r.source || "-",
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+          bg: BG.by_source,
+        });
       });
-    });
+    }
 
     return W;
   }, [callsData, userNameById]);
