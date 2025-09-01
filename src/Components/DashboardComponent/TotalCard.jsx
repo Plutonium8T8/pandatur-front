@@ -7,6 +7,7 @@ import {
     Divider,
     Badge,
     ThemeIcon,
+    Tooltip,
 } from "@mantine/core";
 import { format } from "date-fns";
 import { getLanguageByKey } from "@utils";
@@ -27,6 +28,9 @@ export const TotalCard = ({
     subtitle,
     colors = { in: "teal", out: "blue", totalAccent: "indigo" },
     icons = {},
+    // новое:
+    sizeInfo,                 // строка вида "8 × 12" из layout (w × h)
+    sizePx,                   // опционально { width, height } в пикселях
 }) => {
     const inPct = percent(totalIncoming, totalAll);
     const outPct = percent(totalOutgoing, totalAll);
@@ -34,6 +38,11 @@ export const TotalCard = ({
     const TotalIconNode = icons.total ?? <MdCall size={18} />;
     const IncomingIconNode = icons.incoming ?? <MdCallReceived size={14} />;
     const OutgoingIconNode = icons.outgoing ?? <MdCallMade size={14} />;
+
+    const pxLabel =
+        sizePx && Number.isFinite(sizePx.width) && Number.isFinite(sizePx.height)
+            ? `${Math.round(sizePx.width)}×${Math.round(sizePx.height)}px`
+            : null;
 
     return (
         <Card
@@ -65,12 +74,27 @@ export const TotalCard = ({
                         >
                             {title || getLanguageByKey("Total calls for the period")}
                         </Text>
+
                         <Group gap={6} wrap="wrap">
                             {subtitle ? <Badge variant="light">{subtitle}</Badge> : null}
                             <Badge variant="light">
                                 {dateRange?.[0] ? format(dateRange[0], "dd.MM.yyyy") : "—"} →{" "}
                                 {dateRange?.[1] ? format(dateRange[1], "dd.MM.yyyy") : "—"}
                             </Badge>
+
+                            {/* бейджи размера */}
+                            {sizeInfo ? (
+                                <Badge variant="outline" color="gray">
+                                    {sizeInfo}
+                                </Badge>
+                            ) : null}
+                            {pxLabel ? (
+                                <Tooltip label="Текущий размер в пикселях">
+                                    <Badge variant="outline" color="gray">
+                                        {pxLabel}
+                                    </Badge>
+                                </Tooltip>
+                            ) : null}
                         </Group>
                     </div>
                 </Group>

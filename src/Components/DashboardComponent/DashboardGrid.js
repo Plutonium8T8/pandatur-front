@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
@@ -7,89 +7,110 @@ import { TotalCard } from "./TotalCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
-const BREAKPOINTS = { lg: 1400, md: 1100, sm: 900, xs: 600, xxs: 0 };
-const COLS = { lg: 36, md: 30, sm: 24, xs: 16, xxs: 12 };
 const ROW_HEIGHT = 8;
 const MARGIN = [8, 8];
 const PADDING = [8, 8];
 
+const DEFAULT_SIZE = { w: 21, h: 18, minW: 6, maxW: 105, minH: 6 };
+
 const WIDGET_SIZES = {
-    general: { w: 12, h: 14, minW: 8, minH: 10, maxW: 36 },
-    group: { w: 8, h: 12, minW: 6, minH: 8 },
-    user: { w: 8, h: 12, minW: 6, minH: 8 },
-    source: { w: 6, h: 10, minW: 4, minH: 6 },
-    gt: { w: 8, h: 12, minW: 6, minH: 8 },
+    general: DEFAULT_SIZE,
+    group: DEFAULT_SIZE,
+    user: DEFAULT_SIZE,
+    source: DEFAULT_SIZE,
+    gt: DEFAULT_SIZE,
 };
 
-const buildLayouts = (widgets) => {
-    const single = widgets.map((wgt) => {
-        const t = WIDGET_SIZES[wgt.type] || { w: 8, h: 10 };
+const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
+
+// раскладка максимум по 5 виджетов в ряд (стартовая)
+const buildRowLayout = (widgets = []) => {
+    const perRow = 5;
+    return widgets.map((w, idx) => {
+        const t = getSize(w.type);
+        const row = Math.floor(idx / perRow);
+        const col = idx % perRow;
         return {
-            i: wgt.id,
-            x: 0, y: 0,
-            w: t.w, h: t.h,
-            minW: t.minW, minH: t.minH, maxW: t.maxW,
+            i: String(w.id),
+            x: col * t.w,
+            y: row * t.h,
+            w: t.w,
+            h: t.h,
+            minW: t.minW,
+            maxW: t.maxW,
+            minH: t.minH,
             static: false,
+            resizeHandles: ["e", "se"], // ← удобные ручки для изменения ширины/диагонали
         };
     });
+};
+
+const buildLayoutsAllBps = (widgets = []) => {
+    const single = buildRowLayout(widgets);
     return { lg: single, md: single, sm: single, xs: single, xxs: single };
 };
 
+const pickAnyBpLayout = (layouts) =>
+    layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
+
 const DashboardGrid = ({ widgets = [], dateRange }) => {
-    const [layouts, setLayouts] = useState(() => {
-        try { return JSON.parse(localStorage.getItem("dash_layouts")) || buildLayouts(widgets); }
-        catch { return buildLayouts(widgets); }
-    });
+    // ширина ряда: 5 * 21 = 105 колонок (держим правило «не больше 5 стартом»)
+    const colsMax = 105;
+    const COLS = useMemo(
+        () => ({ lg: colsMax, md: colsMax, sm: colsMax, xs: colsMax, xxs: colsMax }),
+        []
+    );
+
+    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(widgets));
 
     useEffect(() => {
-        const anyBp = Object.values(layouts)[0] || [];
-        const known = new Set(anyBp.map(l => l.i));
-        const needAdd = widgets.filter(w => !known.has(w.id));
-        if (!needAdd.length) return;
-
-        const base = buildLayouts(needAdd);
-        const merged = Object.keys({ ...layouts, ...base }).reduce((acc, bp) => {
-            acc[bp] = [...(layouts[bp] || []), ...(base[bp] || [])];
-            return acc;
-        }, {});
-        setLayouts(merged);
-    }, [widgets]); // eslint-disable-line
+        setLayouts(buildLayoutsAllBps(widgets));
+    }, [widgets]);
 
     const handleLayoutChange = useCallback((_curr, all) => {
         setLayouts(all);
-        localStorage.setItem("dash_layouts", JSON.stringify(all));
     }, []);
+
+    const gridKey = useMemo(() => widgets.map((w) => w.id).join("|"), [widgets]);
+    const currentLayout = pickAnyBpLayout(layouts);
 
     return (
         <Box style={{ width: "100%", height: "100%" }}>
             <ResponsiveGridLayout
+                key={gridKey}
                 className="layout"
-                breakpoints={BREAKPOINTS}
+                breakpoints={{ lg: 1400, md: 1100, sm: 900, xs: 600, xxs: 0 }}
                 cols={COLS}
                 layouts={layouts}
                 rowHeight={ROW_HEIGHT}
                 margin={MARGIN}
                 containerPadding={PADDING}
+                compactType={null}         // без авто-упаковки
+                preventCollision={false}   // разрешаем растягивать даже если ниже есть элементы
                 isResizable
                 isDraggable
-                compactType={null}
-                preventCollision
                 onLayoutChange={handleLayoutChange}
             >
-                {widgets.map(w => (
-                    <div key={w.id} style={{ height: "100%" }}>
-                        <Box style={{ height: "100%" }}>
-                            <TotalCard
-                                title={w.title}
-                                subtitle={w.subtitle}
-                                totalAll={Number.isFinite(w.total) ? w.total : 0}
-                                totalIncoming={Number.isFinite(w.incoming) ? w.incoming : 0}
-                                totalOutgoing={Number.isFinite(w.outgoing) ? w.outgoing : 0}
-                                dateRange={dateRange}
-                            />
-                        </Box>
-                    </div>
-                ))}
+                {widgets.map((w) => {
+                    const li = currentLayout.find((l) => l.i === String(w.id));
+                    const sizeInfo = li ? `${li.w} × ${li.h}` : null;
+
+                    return (
+                        <div key={w.id} style={{ height: "100%" }}>
+                            <Box style={{ height: "100%" }}>
+                                <TotalCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    totalAll={Number.isFinite(w.total) ? w.total : 0}
+                                    totalIncoming={Number.isFinite(w.incoming) ? w.incoming : 0}
+                                    totalOutgoing={Number.isFinite(w.outgoing) ? w.outgoing : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                />
+                            </Box>
+                        </div>
+                    );
+                })}
             </ResponsiveGridLayout>
         </Box>
     );
