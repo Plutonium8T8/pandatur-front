@@ -165,7 +165,7 @@ export const Filter = ({
   }, [buildPayload, onChangePayload]);
 
   return (
-    <Group wrap="wrap" gap="sm" align="center">
+    <Group wrap="wrap" gap="sm" align="center" pr="lg">
       <MultiSelect
         w={360}
         data={formattedTechnicians}
@@ -231,9 +231,6 @@ export const Filter = ({
           onChange={(date) => onSelectDataRange?.(date || [])}
         />
 
-        <Button variant="filled" onClick={() => onApply?.(buildPayload())}>
-          {getLanguageByKey("Aplică")}
-        </Button>
       </Group>
     </Group>
   );
