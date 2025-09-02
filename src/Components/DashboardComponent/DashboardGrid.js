@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Box, Divider } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { TotalCard } from "./TotalCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
@@ -11,11 +11,9 @@ const ROW_HEIGHT = 8;
 const MARGIN = [8, 8];
 const PADDING = [8, 8];
 
-const COLS_MAX = 150;      // 5 карточек * 21
-const PER_ROW = 6;
-const SEP_H = 3;        // высота разделителя в грид-юнитах
+const COLS_MAX = 150;
 
-const DEFAULT_SIZE = { w: 25, h: 21, minW: 6, maxW: 105, minH: 6 };
+const DEFAULT_SIZE = { w: 30, h: 20, minW: 6, maxW: 150, minH: 6 };
 
 const WIDGET_SIZES = {
     general: DEFAULT_SIZE,
@@ -23,48 +21,41 @@ const WIDGET_SIZES = {
     user: DEFAULT_SIZE,
     source: DEFAULT_SIZE,
     gt: DEFAULT_SIZE,
-    separator: { w: COLS_MAX, h: SEP_H, minW: COLS_MAX, minH: SEP_H, static: true },
 };
 
 const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
 
-/** раскладка с y-курcором + полноширинные separator’ы */
+/** раскладка слева-направо с переносом по ширине COLS_MAX */
 const buildRowLayout = (widgets = []) => {
     const items = [];
-    let y = 0;
-    let col = 0;
-    const nextRow = () => { y += DEFAULT_SIZE.h; col = 0; };
+    let x = 0;                // текущая «колоночная» X-позиция
+    let y = 0;                // текущая «строка» (в грид-юнитах)
+    const rowH = DEFAULT_SIZE.h; // высота ряда (по умолчанию h карточки)
 
     for (const w of widgets) {
-        if (w.type === "separator") {
-            if (col !== 0) nextRow();
-            items.push({
-                i: String(w.id),
-                x: 0, y,
-                w: COLS_MAX, h: SEP_H,
-                minW: COLS_MAX, minH: SEP_H,
-                static: true,
-                isDraggable: false,
-                isResizable: false,
-            });
-            y += SEP_H; // след. карточки пойдут сразу под заголовком
-            col = 0;
-            continue;
-        }
+        if (w.type === "separator") continue;
 
         const t = getSize(w.type);
-        const x = col * DEFAULT_SIZE.w;
+        // если карточка не влезает в остаток ряда — перенос на новую строку
+        if (x + t.w > COLS_MAX) {
+            y += rowH;
+            x = 0;
+        }
+
         items.push({
             i: String(w.id),
-            x, y,
-            w: t.w, h: t.h,
-            minW: t.minW, maxW: t.maxW, minH: t.minH,
+            x,
+            y,
+            w: t.w,
+            h: t.h,
+            minW: t.minW,
+            maxW: t.maxW,
+            minH: t.minH,
             static: false,
             resizeHandles: ["e", "se"],
         });
 
-        col += 1;
-        if (col >= PER_ROW) nextRow();
+        x += t.w; // сдвиг вправо для следующей карточки
     }
     return items;
 };
@@ -82,11 +73,18 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
         []
     );
 
-    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(widgets));
-    useEffect(() => { setLayouts(buildLayoutsAllBps(widgets)); }, [widgets]);
+    const visibleWidgets = useMemo(
+        () => (widgets || []).filter((w) => w.type !== "separator"),
+        [widgets]
+    );
+
+    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(visibleWidgets));
+    useEffect(() => {
+        setLayouts(buildLayoutsAllBps(visibleWidgets));
+    }, [visibleWidgets]);
 
     const handleLayoutChange = useCallback((_curr, all) => setLayouts(all), []);
-    const gridKey = useMemo(() => widgets.map((w) => w.id).join("|"), [widgets]);
+    const gridKey = useMemo(() => visibleWidgets.map((w) => w.id).join("|"), [visibleWidgets]);
     const currentLayout = pickAnyBpLayout(layouts);
 
     return (
@@ -100,41 +98,14 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 rowHeight={ROW_HEIGHT}
                 margin={MARGIN}
                 containerPadding={PADDING}
-                compactType={null}     // без автопака
-                preventCollision       // без «отталкивания» и наложений
+                compactType={null}
+                preventCollision
                 isResizable
                 isDraggable
                 onLayoutChange={handleLayoutChange}
                 draggableCancel=".mantine-Badge,.mantine-Progress,.mantine-Button,.mantine-Input"
             >
-                {widgets.map((w) => {
-                    if (w.type === "separator") {
-                        return (
-                            <div key={w.id} style={{ height: "100%", display: "flex", alignItems: "center" }}>
-                                <Divider
-                                    label={
-                                        <Box
-                                            px="xs" py={4}
-                                            style={{
-                                                borderRadius: 8,
-                                                fontWeight: 700,
-                                                fontSize: 12,
-                                                textTransform: "uppercase",
-                                                letterSpacing: 0.6,
-                                                background: "rgba(0,0,0,0.04)",
-                                            }}
-                                        >
-                                            {w.label}
-                                        </Box>
-                                    }
-                                    labelPosition="left"
-                                    variant="solid"
-                                    color="gray"
-                                />
-                            </div>
-                        );
-                    }
-
+                {visibleWidgets.map((w) => {
                     const li = currentLayout.find((l) => l.i === String(w.id));
                     const sizeInfo = li ? `${li.w} × ${li.h}` : null;
 

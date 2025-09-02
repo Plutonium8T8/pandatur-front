@@ -16,11 +16,11 @@ const safeArray = (a) => (Array.isArray(a) ? a : []);
 const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
 const BG = {
-  general: "rgba(99, 102, 241, 0.28)",  // indigo
-  by_user_group: "rgba(168, 85, 247, 0.28)",  // purple
-  by_user: "rgba(59, 130, 246, 0.28)",  // blue
-  by_group_title: "rgba(245, 158, 11, 0.30)",  // amber
-  by_source: "rgba(6, 182, 212, 0.28)",   // cyan
+  general: "#FFFFFF",  // белый
+  by_user_group: "#BFDBFE",  // синий — темнее (blue-200)
+  by_user: "#DBEAFE",  // светло-синий — темнее (blue-100)
+  by_group_title: "#FFF5CC",  // жёлтый (бледный)
+  by_source: "#FFE8E8",  // красный (бледный)
 };
 
 const t = (key) => String(getLanguageByKey?.(key) ?? key);
