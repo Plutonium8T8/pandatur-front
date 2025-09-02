@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { useSnackbar } from "notistack";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Flex, Text, Box, Stack, ActionIcon, Tooltip } from "@mantine/core";
+import { Flex, Text, Box, Stack, ActionIcon, Tooltip, Select, Group } from "@mantine/core";
 import { LuFilter } from "react-icons/lu";
 import { api } from "../api";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
@@ -16,16 +16,38 @@ const safeArray = (a) => (Array.isArray(a) ? a : []);
 const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
 const BG = {
-  general: "linear-gradient(135deg, rgba(99,102,241,0.15), rgba(16,185,129,0.15))",
-  by_user_group: "linear-gradient(135deg, rgba(147,51,234,0.14), rgba(59,130,246,0.14))",
-  by_user: "linear-gradient(135deg, rgba(59,130,246,0.14), rgba(34,197,94,0.14))",
-  by_group_title: "linear-gradient(135deg, rgba(245,158,11,0.16), rgba(48, 23, 27, 0.12))",
-  by_source: "linear-gradient(135deg, rgba(34,197,94,0.14), rgba(34,211,238,0.14))",
+  general: "rgba(99, 102, 241, 0.28)",  // indigo
+  by_user_group: "rgba(168, 85, 247, 0.28)",  // purple
+  by_user: "rgba(59, 130, 246, 0.28)",  // blue
+  by_group_title: "rgba(245, 158, 11, 0.30)",  // amber
+  by_source: "rgba(6, 182, 212, 0.28)",   // cyan
 };
+
+const t = (key) => String(getLanguageByKey?.(key) ?? key);
+
+// опции для Select с фолбэками
+const WIDGET_TYPE_OPTIONS = [
+  { value: "calls", label: t("Calls") },
+  { value: "messages", label: t("Messages") },
+  { value: "system_usage", label: t("System usage"), disabled: true },
+  { value: "tickets_count", label: t("Tickets count"), disabled: true },
+  { value: "distributor", label: t("Distributor"), disabled: true },
+  { value: "workflow_change", label: t("Workflow change"), disabled: true },
+  { value: "ticket_create_count", label: t("Tickets created"), disabled: true },
+  { value: "contract_closed", label: t("Contracts closed"), disabled: true },
+  { value: "ticket_lifetime", label: t("Ticket lifetime"), disabled: true },
+  { value: "contract_departure", label: t("Contract departures"), disabled: true },
+  { value: "workflow_percentage", label: t("Workflow percentage"), disabled: true },
+  { value: "workflow_duration", label: t("Workflow duration"), disabled: true },
+  { value: "country_count", label: t("Countries"), disabled: true },
+];
 
 export const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [scrollHeight, setScrollHeight] = useState(400);
+
+  // тип виджетов
+  const [widgetType, setWidgetType] = useState("calls");
 
   // состояние фильтра
   const [selectedTechnicians, setSelectedTechnicians] = useState([]);
@@ -40,8 +62,8 @@ export const Dashboard = () => {
   const scrollRef = useRef(null);
   const requestIdRef = useRef(0);
 
-  const [callsData, setCallsData] = useState(null);
-  const [callsError, setCallsError] = useState(null);
+  const [rawData, setRawData] = useState(null);
+  const [dataError, setDataError] = useState(null);
 
   const { technicians } = useGetTechniciansList();
   const userNameById = useMemo(() => {
@@ -54,7 +76,8 @@ export const Dashboard = () => {
     return map;
   }, [technicians]);
 
-  const buildCallsPayload = useCallback(() => {
+  // общий payload
+  const buildPayloadCommon = useCallback(() => {
     const [start, end] = dateRange || [];
     const payload = {
       user_ids: pickIds(selectedTechnicians),
@@ -72,30 +95,58 @@ export const Dashboard = () => {
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
-  const fetchCallsStatic = useCallback(async (payload) => {
-    const thisReqId = ++requestIdRef.current;
-    setIsLoading(true);
-    setCallsError(null);
-    try {
-      const res = await api.dashboard.getWidgetCalls(payload);
-      if (requestIdRef.current !== thisReqId) return;
-      setCallsData(res || null);
-    } catch (e) {
-      if (requestIdRef.current !== thisReqId) return;
-      setCallsData(null);
-      setCallsError(e?.message || String(e));
-      enqueueSnackbar(showServerError(e), { variant: "error" });
-    } finally {
-      if (requestIdRef.current === thisReqId) setIsLoading(false);
-    }
-  }, [enqueueSnackbar]);
+  // payload под конкретный тип (messages требует timestamp_after/before)
+  const buildPayloadForType = useCallback(() => {
+    const common = buildPayloadCommon();
+    if (widgetType !== "messages") return common;
 
+    const after = common?.attributes?.timestamp?.from;
+    const before = common?.attributes?.timestamp?.to;
+
+    const msgAttrs =
+      after || before
+        ? { timestamp_after: after, timestamp_before: before }
+        : undefined;
+
+    const { attributes, ...rest } = common;
+    return { ...rest, attributes: msgAttrs };
+  }, [buildPayloadCommon, widgetType]);
+
+  // запрос по типу
+  const fetchByType = useCallback(
+    async (payload) => {
+      const thisReqId = ++requestIdRef.current;
+      setIsLoading(true);
+      setDataError(null);
+      try {
+        let res = null;
+        if (widgetType === "calls") {
+          res = await api.dashboard.getWidgetCalls(payload);
+        } else if (widgetType === "messages") {
+          res = await api.dashboard.getWidgetMessages(payload);
+        }
+        if (requestIdRef.current !== thisReqId) return;
+        setRawData(res || null);
+      } catch (e) {
+        if (requestIdRef.current !== thisReqId) return;
+        setRawData(null);
+        setDataError(e?.message || String(e));
+        enqueueSnackbar(showServerError(e), { variant: "error" });
+      } finally {
+        if (requestIdRef.current === thisReqId) setIsLoading(false);
+      }
+    },
+    [enqueueSnackbar, widgetType]
+  );
+
+  // автозагрузка при изменении диапазона/типа
   useEffect(() => {
     const [start, end] = dateRange || [];
-    if (!!start !== !!end) return; // ждём оба конца диапазона
-    fetchCallsStatic(buildCallsPayload());
-  }, [buildCallsPayload, fetchCallsStatic]);
+    if (!!start !== !!end) return; // нужен полноценный диапазон
+    fetchByType(buildPayloadForType());
+  }, [buildPayloadForType, fetchByType, widgetType]);
 
+  // размеры
   const recalcSizes = useCallback(() => {
     const headerH = headerRowRef.current?.offsetHeight || 0;
     const margins = 24;
@@ -113,75 +164,167 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
+  // утилиты для чтения разных схем
+  const pickNum = (obj, keys) => {
+    for (const k of keys) {
+      const v = obj?.[k];
+      if (v !== undefined && v !== null && !Number.isNaN(Number(v))) return Number(v);
+    }
+    return 0;
+  };
+  const countsFrom = (obj) => ({
+    incoming: pickNum(obj, ["incoming_calls_count", "incoming_messages_count", "incoming_count", "incoming", "in"]),
+    outgoing: pickNum(obj, ["outgoing_calls_count", "outgoing_messages_count", "outgoing_count", "outgoing", "out"]),
+    total: pickNum(obj, ["total_calls_count", "total_messages_count", "total_count", "total", "count", "all"]),
+  });
+
+  // нормализация by_platform (массив/объект → массив)
+  const mapPlatforms = (bp) => {
+    if (!bp) return [];
+    if (Array.isArray(bp)) return bp;
+    if (typeof bp === "object") {
+      return Object.entries(bp).map(([platform, stats]) => ({ platform, ...(stats || {}) }));
+    }
+    return [];
+  };
+
+  // построение списка виджетов
   const widgets = useMemo(() => {
+    const D = rawData || {};
     const W = [];
-    if (callsData?.general) {
+
+    // General
+    if (D.general) {
+      const c = countsFrom(D.general);
       W.push({ id: "sep-general", type: "separator", label: getLanguageByKey("General") });
       W.push({
-        id: "general", type: "general",
-        title: getLanguageByKey("Total calls for the period"),
+        id: "general",
+        type: "general",
+        title:
+          widgetType === "messages"
+            ? getLanguageByKey("Total messages for the period")
+            : getLanguageByKey("Total calls for the period"),
         subtitle: getLanguageByKey("All company"),
-        incoming: Number(callsData.general.incoming_calls_count) || 0,
-        outgoing: Number(callsData.general.outgoing_calls_count) || 0,
-        total: Number(callsData.general.total_calls_count) || 0,
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
         bg: BG.general,
       });
     }
-    if (safeArray(callsData?.by_user_group).length) {
+
+    // By platform (для messages)
+    if (widgetType === "messages") {
+      const platforms = mapPlatforms(D.by_platform);
+      if (platforms.length) {
+        W.push({ id: "sep-platform", type: "separator", label: getLanguageByKey("By platform") });
+        platforms.forEach((row, idx) => {
+          const c = countsFrom(row || {});
+          const name = row?.platform || "-";
+          W.push({
+            id: `plat-${name ?? idx}`,
+            type: "source",
+            title: getLanguageByKey("Platform"),
+            subtitle: name,
+            incoming: c.incoming,
+            outgoing: c.outgoing,
+            total: c.total,
+            bg: BG.by_source,
+          });
+        });
+      }
+    }
+
+    // By user group
+    const byUserGroup = safeArray(D.by_user_group);
+    if (byUserGroup.length) {
       W.push({ id: "sep-ug", type: "separator", label: getLanguageByKey("By user group") });
-      safeArray(callsData.by_user_group).forEach((r, idx) => {
+      byUserGroup.forEach((r, idx) => {
+        const c = countsFrom(r);
+        const name = r.user_group_name ?? r.user_group ?? r.group ?? "-";
         W.push({
-          id: `ug-${idx}`, type: "group", title: getLanguageByKey("User group"),
-          subtitle: r.user_group_name || "-", incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_user_group,
+          id: `ug-${idx}`,
+          type: "group",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_user_group,
         });
       });
     }
-    if (safeArray(callsData?.by_user).length) {
+
+    // By user
+    const byUser = safeArray(D.by_user);
+    if (byUser.length) {
       W.push({ id: "sep-user", type: "separator", label: getLanguageByKey("By user") });
-      safeArray(callsData.by_user).forEach((r, idx) => {
+      byUser.forEach((r, idx) => {
+        const c = countsFrom(r);
         const uid = Number(r.user_id);
         const name = userNameById.get(uid);
         const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
         W.push({
-          id: `user-${uid || idx}`, type: "user", title: getLanguageByKey("User"),
-          subtitle, incoming: Number(r.incoming_calls_count) || 0, outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0, bg: BG.by_user,
+          id: `user-${uid || idx}`,
+          type: "user",
+          title: getLanguageByKey("User"),
+          subtitle,
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_user,
         });
       });
     }
-    if (safeArray(callsData?.by_group_title).length) {
+
+    // By group title
+    const byGt = safeArray(D.by_group_title);
+    if (byGt.length) {
       W.push({ id: "sep-gt", type: "separator", label: getLanguageByKey("By group title") });
-      safeArray(callsData.by_group_title).forEach((r, idx) => {
+      byGt.forEach((r, idx) => {
+        const c = countsFrom(r);
+        const name = r.group_title_name ?? r.group_title ?? r.group ?? "-";
         W.push({
-          id: `gt-${r.group_title_name ?? idx}`, type: "group", title: getLanguageByKey("Group title"),
-          subtitle: r.group_title_name || "-", incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_group_title,
+          id: `gt-${name ?? idx}`,
+          type: "group",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_group_title,
         });
       });
     }
-    if (safeArray(callsData?.by_source).length) {
+
+    // By source (для calls — если бэк вернёт)
+    const bySrc = safeArray(D.by_source);
+    if (bySrc.length) {
       W.push({ id: "sep-src", type: "separator", label: getLanguageByKey("By source") });
-      safeArray(callsData.by_source).forEach((r, idx) => {
+      bySrc.forEach((r, idx) => {
+        const c = countsFrom(r);
+        const name = r.source ?? r.channel ?? r.platform ?? "-";
         W.push({
-          id: `src-${r.source ?? idx}`, type: "source", title: getLanguageByKey("Source"),
-          subtitle: r.source || "-", incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0, total: Number(r.total_calls_count) || 0, bg: BG.by_source,
+          id: `src-${name ?? idx}`,
+          type: "source",
+          title: getLanguageByKey("Source"),
+          subtitle: name || "-",
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_source,
         });
       });
     }
+
     return W;
-  }, [callsData, userNameById]);
+  }, [rawData, userNameById, widgetType]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
-    // синхроним локальный стейт, чтобы useEffect сам дёрнул fetchCallsStatic
     setSelectedTechnicians(meta?.selectedTechnicians || []);
     setSelectedUserGroups(meta?.selectedUserGroups || []);
     setSelectedGroupTitles(meta?.selectedGroupTitles || []);
     setDateRange(meta?.dateRange || []);
-    // если нужно моментально — можно раскомментить прямой вызов:
-    // fetchCallsStatic(payload);
-  }, [/* fetchCallsStatic */]);
+  }, []);
 
   return (
     <Stack gap={12}>
@@ -189,11 +332,24 @@ export const Dashboard = () => {
         <PageHeader
           title={getLanguageByKey("Dashboard")}
           extraInfo={
-            <Tooltip label={getLanguageByKey("Filtru")}>
-              <ActionIcon variant="light" size="lg" onClick={() => setFilterOpened(true)} aria-label="open-filter">
-                <LuFilter size={18} />
-              </ActionIcon>
-            </Tooltip>
+            <Group gap="sm">
+              <Tooltip label={getLanguageByKey("Filtru")}>
+                <ActionIcon variant="light" size="lg" onClick={() => setFilterOpened(true)} aria-label="open-filter">
+                  <LuFilter size={18} />
+                </ActionIcon>
+              </Tooltip>
+
+              <Select
+                size="sm"
+                w={220}
+                value={widgetType}
+                onChange={(v) => v && setWidgetType(v)}
+                data={WIDGET_TYPE_OPTIONS}
+                allowDeselect={false}
+                placeholder={getLanguageByKey("Widget type")}
+                aria-label="widget-type"
+              />
+            </Group>
           }
         />
       </Flex>
@@ -202,9 +358,9 @@ export const Dashboard = () => {
         <Flex align="center" justify="center" style={{ flex: 1, minHeight: 240 }}>
           <Spin />
         </Flex>
-      ) : callsError ? (
+      ) : dataError ? (
         <Flex align="center" justify="center" style={{ flex: 1, minHeight: 240 }}>
-          <Text c="red">{String(callsError)}</Text>
+          <Text c="red">{String(dataError)}</Text>
         </Flex>
       ) : (
         <Box

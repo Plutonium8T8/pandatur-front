@@ -3991,4 +3991,74 @@ export const translations = {
     RO: "După sursă",
     EN: "By source",
   },
-}
+  "By platform": {
+    RU: "По платформе",
+    RO: "După platformă",
+    EN: "By platform",
+  },
+  calls: {
+    RU: "Звонки",
+    RO: "Apeluri",
+    EN: "Calls",
+  },
+  messages: {
+    RU: "Сообщения",
+    RO: "Mesaje",
+    EN: "Messages",
+  },
+  system_usage: {
+    RU: "Системная нагрузка",
+    RO: "Încărcarea sistemului",
+    EN: "System usage",
+  },
+  tickets_count: {
+    RU: "Количество тикетов",
+    RO: "Număr de tichete",
+    EN: "Tickets count",
+  },
+  distributor: {
+    RU: "Дистрибьютор",
+    RO: "Distribuitor",
+    EN: "Distributor",
+  },
+  workflow_change: {
+    RU: "Смена воронки",
+    RO: "Schimbare flux de lucru",
+    EN: "Workflow change",
+  },
+  ticket_create_count: {
+    RU: "Создано тикетов",
+    RO: "Tichete create",
+    EN: "Tickets created",
+  },
+  contract_closed: {
+    RU: "Закрытые контракты",
+    RO: "Contracte închise",
+    EN: "Contracts closed",
+  },
+  ticket_lifetime: {
+    RU: "Время жизни тикетов",
+    RO: "Durata de viață a tichetelor",
+    EN: "Ticket lifetime",
+  },
+  contract_departure: {
+    RU: "Вылеты по контрактам",
+    RO: "Ieșiri din contracte",
+    EN: "Contract departures",
+  },
+  workflow_percentage: {
+    RU: "Доли по воронке",
+    RO: "Procente pe flux",
+    EN: "Workflow percentage",
+  },
+  workflow_duration: {
+    RU: "Длительность по воронке",
+    RO: "Durată pe flux",
+    EN: "Workflow duration",
+  },
+  country_count: {
+    RU: "Страны",
+    RO: "Țări",
+    EN: "Countries",
+  },
+};
