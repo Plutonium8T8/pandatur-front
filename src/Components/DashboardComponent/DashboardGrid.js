@@ -4,6 +4,7 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Box } from "@mantine/core";
 import { TotalCard } from "./TotalCard";
+import { TopUsersCard } from "./TopUsersCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -21,22 +22,32 @@ const WIDGET_SIZES = {
     user: DEFAULT_SIZE,
     source: DEFAULT_SIZE,
     gt: DEFAULT_SIZE,
+    top_users: { ...DEFAULT_SIZE, w: 60, h: 28 }, // выше/шире под список
 };
 
 const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
 
+// приоритеты: general → gt-* → ug-* → user-* → остальные
+const priorityOf = (w) => {
+    const id = String(w?.id ?? "");
+    if (id === "general") return 0;
+    if (id.startsWith("gt-")) return 1;    // group title
+    if (id.startsWith("ug-")) return 2;    // user group
+    if (id.startsWith("user-")) return 3;  // users
+    return 4;                               // всё остальное (source, platform и т.п.)
+};
+
 /** раскладка слева-направо с переносом по ширине COLS_MAX */
 const buildRowLayout = (widgets = []) => {
     const items = [];
-    let x = 0;                // текущая «колоночная» X-позиция
-    let y = 0;                // текущая «строка» (в грид-юнитах)
-    const rowH = DEFAULT_SIZE.h; // высота ряда (по умолчанию h карточки)
+    let x = 0;
+    let y = 0;
+    const rowH = DEFAULT_SIZE.h;
 
     for (const w of widgets) {
         if (w.type === "separator") continue;
 
         const t = getSize(w.type);
-        // если карточка не влезает в остаток ряда — перенос на новую строку
         if (x + t.w > COLS_MAX) {
             y += rowH;
             x = 0;
@@ -55,7 +66,7 @@ const buildRowLayout = (widgets = []) => {
             resizeHandles: ["e", "se"],
         });
 
-        x += t.w; // сдвиг вправо для следующей карточки
+        x += t.w;
     }
     return items;
 };
@@ -67,24 +78,40 @@ const buildLayoutsAllBps = (widgets = []) => {
 const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
 
+
+
 const DashboardGrid = ({ widgets = [], dateRange }) => {
     const COLS = useMemo(
         () => ({ lg: COLS_MAX, md: COLS_MAX, sm: COLS_MAX, xs: COLS_MAX, xxs: COLS_MAX }),
         []
     );
 
+    // убираем сепараторы
     const visibleWidgets = useMemo(
         () => (widgets || []).filter((w) => w.type !== "separator"),
         [widgets]
     );
 
-    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(visibleWidgets));
-    useEffect(() => {
-        setLayouts(buildLayoutsAllBps(visibleWidgets));
+    // сортируем по приоритету, сохраняем порядок внутри группы
+    const orderedWidgets = useMemo(() => {
+        return visibleWidgets
+            .map((w, idx) => ({ w, idx }))
+            .sort((a, b) => {
+                const pa = priorityOf(a.w);
+                const pb = priorityOf(b.w);
+                if (pa !== pb) return pa - pb;
+                return a.idx - b.idx;
+            })
+            .map((x) => x.w);
     }, [visibleWidgets]);
 
+    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(orderedWidgets));
+    useEffect(() => {
+        setLayouts(buildLayoutsAllBps(orderedWidgets));
+    }, [orderedWidgets]);
+
     const handleLayoutChange = useCallback((_curr, all) => setLayouts(all), []);
-    const gridKey = useMemo(() => visibleWidgets.map((w) => w.id).join("|"), [visibleWidgets]);
+    const gridKey = useMemo(() => orderedWidgets.map((w) => w.id).join("|"), [orderedWidgets]);
     const currentLayout = pickAnyBpLayout(layouts);
 
     return (
@@ -105,9 +132,22 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 onLayoutChange={handleLayoutChange}
                 draggableCancel=".mantine-Badge,.mantine-Progress,.mantine-Button,.mantine-Input"
             >
-                {visibleWidgets.map((w) => {
+                {orderedWidgets.map((w) => {
                     const li = currentLayout.find((l) => l.i === String(w.id));
                     const sizeInfo = li ? `${li.w} × ${li.h}` : null;
+
+                    if (w.type === "top_users") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <TopUsersCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    rows={w.rows}
+                                    bg={w.bg}
+                                />
+                            </div>
+                        );
+                    }
 
                     return (
                         <div key={w.id} style={{ height: "100%" }}>

@@ -16,16 +16,15 @@ const safeArray = (a) => (Array.isArray(a) ? a : []);
 const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
 
 const BG = {
-  general: "#FFFFFF",  // белый
-  by_user_group: "#BFDBFE",  // синий — темнее (blue-200)
-  by_user: "#DBEAFE",  // светло-синий — темнее (blue-100)
-  by_group_title: "#FFF5CC",  // жёлтый (бледный)
-  by_source: "#FFE8E8",  // красный (бледный)
+  general: "#FFFFFF",     // белый
+  by_user_group: "#93C5FD", // синий темнее (blue-300)
+  by_user: "#DBEAFE",       // светло-синий темнее (blue-100)
+  by_group_title: "#FFF5CC",// жёлтый (бледный)
+  by_source: "#FFE8E8",     // красный (бледный)
 };
 
 const t = (key) => String(getLanguageByKey?.(key) ?? key);
 
-// опции для Select с фолбэками
 const WIDGET_TYPE_OPTIONS = [
   { value: "calls", label: t("Calls") },
   { value: "messages", label: t("Messages") },
@@ -65,6 +64,7 @@ export const Dashboard = () => {
   const [rawData, setRawData] = useState(null);
   const [dataError, setDataError] = useState(null);
 
+  // имена по user_id
   const { technicians } = useGetTechniciansList();
   const userNameById = useMemo(() => {
     const map = new Map();
@@ -95,7 +95,7 @@ export const Dashboard = () => {
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
-  // payload под конкретный тип (messages требует timestamp_after/before)
+  // payload под messages (timestamp_after/before)
   const buildPayloadForType = useCallback(() => {
     const common = buildPayloadCommon();
     if (widgetType !== "messages") return common;
@@ -196,14 +196,10 @@ export const Dashboard = () => {
     // General
     if (D.general) {
       const c = countsFrom(D.general);
-      W.push({ id: "sep-general", type: "separator", label: getLanguageByKey("General") });
       W.push({
         id: "general",
         type: "general",
-        title:
-          widgetType === "messages"
-            ? getLanguageByKey("Total messages for the period")
-            : getLanguageByKey("Total calls for the period"),
+        title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
         subtitle: getLanguageByKey("All company"),
         incoming: c.incoming,
         outgoing: c.outgoing,
@@ -212,102 +208,93 @@ export const Dashboard = () => {
       });
     }
 
-    // By platform (для messages)
-    if (widgetType === "messages") {
-      const platforms = mapPlatforms(D.by_platform);
-      if (platforms.length) {
-        W.push({ id: "sep-platform", type: "separator", label: getLanguageByKey("By platform") });
-        platforms.forEach((row, idx) => {
-          const c = countsFrom(row || {});
-          const name = row?.platform || "-";
-          W.push({
-            id: `plat-${name ?? idx}`,
-            type: "source",
-            title: getLanguageByKey("Platform"),
-            subtitle: name,
-            incoming: c.incoming,
-            outgoing: c.outgoing,
-            total: c.total,
-            bg: BG.by_source,
-          });
-        });
-      }
-    }
+    // By group title
+    const byGt = safeArray(D.by_group_title);
+    byGt.forEach((r, idx) => {
+      const c = countsFrom(r);
+      const name = r.group_title_name ?? r.group_title ?? r.group ?? "-";
+      W.push({
+        id: `gt-${name ?? idx}`,
+        type: "group",
+        title: getLanguageByKey("Group title"),
+        subtitle: name || "-",
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_group_title,
+      });
+    });
 
     // By user group
     const byUserGroup = safeArray(D.by_user_group);
-    if (byUserGroup.length) {
-      W.push({ id: "sep-ug", type: "separator", label: getLanguageByKey("By user group") });
-      byUserGroup.forEach((r, idx) => {
-        const c = countsFrom(r);
-        const name = r.user_group_name ?? r.user_group ?? r.group ?? "-";
-        W.push({
-          id: `ug-${idx}`,
-          type: "group",
-          title: getLanguageByKey("User group"),
-          subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_user_group,
-        });
+    byUserGroup.forEach((r, idx) => {
+      const c = countsFrom(r);
+      const name = r.user_group_name ?? r.user_group ?? r.group ?? "-";
+      W.push({
+        id: `ug-${idx}`,
+        type: "group",
+        title: getLanguageByKey("User group"),
+        subtitle: name || "-",
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_user_group,
       });
-    }
+    });
 
     // By user
     const byUser = safeArray(D.by_user);
+    byUser.forEach((r, idx) => {
+      const c = countsFrom(r);
+      const uid = Number(r.user_id);
+      const name = userNameById.get(uid);
+      const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
+      W.push({
+        id: `user-${uid || idx}`,
+        type: "user",
+        title: getLanguageByKey("User"),
+        subtitle,
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_user,
+      });
+    });
+
+    // Топ пользователей (по total по убыванию)
     if (byUser.length) {
-      W.push({ id: "sep-user", type: "separator", label: getLanguageByKey("By user") });
-      byUser.forEach((r, idx) => {
-        const c = countsFrom(r);
+      const rows = byUser.map((r) => {
         const uid = Number(r.user_id);
-        const name = userNameById.get(uid);
-        const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
-        W.push({
-          id: `user-${uid || idx}`,
-          type: "user",
-          title: getLanguageByKey("User"),
-          subtitle,
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_user,
-        });
+        return {
+          user_id: uid,
+          name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+          sipuni_id: r.sipuni_id,
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+        };
+      });
+      W.push({
+        id: "top-users",
+        type: "top_users",
+        title: getLanguageByKey("Top users"),
+        subtitle: getLanguageByKey("By total (desc)"),
+        rows,
+        bg: BG.by_user,
       });
     }
 
-    // By group title
-    const byGt = safeArray(D.by_group_title);
-    if (byGt.length) {
-      W.push({ id: "sep-gt", type: "separator", label: getLanguageByKey("By group title") });
-      byGt.forEach((r, idx) => {
-        const c = countsFrom(r);
-        const name = r.group_title_name ?? r.group_title ?? r.group ?? "-";
+    // By platform (для messages)
+    if (widgetType === "messages") {
+      const platforms = mapPlatforms(D.by_platform);
+      platforms.forEach((row, idx) => {
+        const c = countsFrom(row || {});
+        const name = row?.platform || "-";
         W.push({
-          id: `gt-${name ?? idx}`,
-          type: "group",
-          title: getLanguageByKey("Group title"),
-          subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_group_title,
-        });
-      });
-    }
-
-    // By source (для calls — если бэк вернёт)
-    const bySrc = safeArray(D.by_source);
-    if (bySrc.length) {
-      W.push({ id: "sep-src", type: "separator", label: getLanguageByKey("By source") });
-      bySrc.forEach((r, idx) => {
-        const c = countsFrom(r);
-        const name = r.source ?? r.channel ?? r.platform ?? "-";
-        W.push({
-          id: `src-${name ?? idx}`,
+          id: `plat-${name ?? idx}`,
           type: "source",
-          title: getLanguageByKey("Source"),
-          subtitle: name || "-",
+          title: getLanguageByKey("Platform"),
+          subtitle: name,
           incoming: c.incoming,
           outgoing: c.outgoing,
           total: c.total,
@@ -315,6 +302,23 @@ export const Dashboard = () => {
         });
       });
     }
+
+    // By source (для calls — если бэк вернёт)
+    const bySrc = safeArray(D.by_source);
+    bySrc.forEach((r, idx) => {
+      const c = countsFrom(r);
+      const name = r.source ?? r.channel ?? r.platform ?? "-";
+      W.push({
+        id: `src-${name ?? idx}`,
+        type: "source",
+        title: getLanguageByKey("Source"),
+        subtitle: name || "-",
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_source,
+      });
+    });
 
     return W;
   }, [rawData, userNameById, widgetType]);
@@ -366,7 +370,7 @@ export const Dashboard = () => {
         <Box
           ref={scrollRef}
           style={{ width: "100%", height: scrollHeight, overflowY: "auto", overflowX: "hidden", scrollbarGutter: "stable" }}
-          p="lg"
+          p="200px"
         >
           <DashboardGrid widgets={widgets} dateRange={dateRange} />
         </Box>
