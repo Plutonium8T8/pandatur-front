@@ -209,7 +209,8 @@ export const Dashboard = () => {
       ) : (
         <Box
           ref={scrollRef}
-          style={{ width: "100%", height: scrollHeight, overflowY: "auto", overflowX: "hidden", paddingRight: 8, scrollbarGutter: "stable" }}
+          style={{ width: "100%", height: scrollHeight, overflowY: "auto", overflowX: "hidden", scrollbarGutter: "stable" }}
+          p="lg"
         >
           <DashboardGrid widgets={widgets} dateRange={dateRange} />
         </Box>

@@ -11,8 +11,8 @@ const ROW_HEIGHT = 8;
 const MARGIN = [8, 8];
 const PADDING = [8, 8];
 
-const COLS_MAX = 105;      // 5 карточек * 21
-const PER_ROW = 5;
+const COLS_MAX = 150;      // 5 карточек * 21
+const PER_ROW = 6;
 const SEP_H = 3;        // высота разделителя в грид-юнитах
 
 const DEFAULT_SIZE = { w: 25, h: 21, minW: 6, maxW: 105, minH: 6 };
