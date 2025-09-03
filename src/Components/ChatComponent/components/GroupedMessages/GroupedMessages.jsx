@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD, YYYY_MM_DD_HH_mm_ss } from "@app-constants";
-import { parseServerDate, getFullName, getLanguageByKey, parseDate } from "@utils";
+import { getFullName, getLanguageByKey } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
 import { socialMediaIcons } from "../../../utils";
@@ -13,6 +13,18 @@ import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
 const MAX_LOGS_COLLAPSED = 5;
+
+const toDate = (val) => {
+  if (!val) return null;
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  if (typeof val === "number") {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const s = String(val).trim().replace(" ", "T").replace(/Z$/, "");
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+};
 
 const makeNoteKey = (n) =>
   `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
@@ -41,14 +53,8 @@ const LogCluster = ({ logs = [], technicians }) => {
 
       {logs.length > MAX_LOGS_COLLAPSED && (
         <Flex justify="center" mt={4}>
-          <Button
-            size="xs"
-            variant="light"
-            onClick={() => setExpanded((v) => !v)}
-          >
-            {expanded
-              ? getLanguageByKey("Collapse")
-              : `${getLanguageByKey("ShowMore")} ${hidden}`}
+          <Button size="xs" variant="light" onClick={() => setExpanded((v) => !v)}>
+            {expanded ? getLanguageByKey("Collapse") : `${getLanguageByKey("ShowMore")} ${hidden}`}
           </Button>
         </Flex>
       )}
@@ -72,17 +78,23 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     [personalInfo]
   );
 
+  // сообщения
   const messages = rawMessages
     .filter((msg) => Number(msg.ticket_id) === Number(ticketId))
-    .map((msg) => ({
-      ...msg,
-      itemType: "message",
-      sortTime: parseDate(msg.time_sent).valueOf(),
-      dateDivider: parseServerDate(msg.time_sent).format(YYYY_MM_DD),
-      clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
-      platform: msg.platform?.toLowerCase?.() || "",
-    }));
+    .map((msg) => {
+      const d = toDate(msg.time_sent) || new Date(0);
+      const dj = dayjs(d);
+      return {
+        ...msg,
+        itemType: "message",
+        sortTime: dj.valueOf(),
+        dateDivider: dj.format(YYYY_MM_DD),
+        clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
+        platform: msg.platform?.toLowerCase?.() || "",
+      };
+    });
 
+  // логи (мердж статики и live)
   const mergedLogs = useMemo(() => {
     const map = new Map();
 
@@ -99,15 +111,20 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       map.set(key, { ...l, __live: true });
     });
 
-    return Array.from(map.values()).map((log) => ({
-      ...log,
-      itemType: "log",
-      sortTime: parseServerDate(log.timestamp).valueOf(),
-      dateDivider: parseServerDate(log.timestamp).format(YYYY_MM_DD),
-      isLive: !!log.__live,
-    }));
+    return Array.from(map.values()).map((log) => {
+      const d = toDate(log.timestamp) || new Date();
+      const dj = dayjs(d);
+      return {
+        ...log,
+        itemType: "log",
+        sortTime: dj.valueOf(),
+        dateDivider: dj.format(YYYY_MM_DD),
+        isLive: !!log.__live,
+      };
+    });
   }, [rawLogs, liveLogs, ticketId]);
 
+  // заметки (мердж статики и live)
   const mergedNotes = useMemo(() => {
     const map = new Map();
 
@@ -131,26 +148,26 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     });
 
     return Array.from(map.values()).map((n) => {
-      let ts = dayjs(n.created_at, YYYY_MM_DD_HH_mm_ss, true);
-      if (!ts.isValid()) ts = dayjs(n.created_at);
-      if (!ts.isValid()) ts = dayjs();
-
+      const d = toDate(n.created_at) || new Date();
+      const dj = dayjs(d);
       return {
         ...n,
         itemType: "note",
-        sortTime: ts.valueOf(),
-        dateDivider: ts.format(YYYY_MM_DD),
-        timeCreatedDisplay: ts.format(YYYY_MM_DD_HH_mm_ss),
+        sortTime: dj.valueOf(),
+        dateDivider: dj.format(YYYY_MM_DD),
+        timeCreatedDisplay: dj.format(YYYY_MM_DD_HH_mm_ss),
         isLive: !!n.__live,
       };
     });
   }, [apiNotes, liveNotes, ticketId]);
 
+  // общий список и сортировка
   const allItems = useMemo(
     () => [...messages, ...mergedLogs, ...mergedNotes].sort((a, b) => a.sortTime - b.sortTime),
     [messages, mergedLogs, mergedNotes]
   );
 
+  // группировка по dateDivider
   const itemsByDate = useMemo(() => {
     const map = {};
     allItems.forEach((item) => {
@@ -160,10 +177,12 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     return map;
   }, [allItems]);
 
-  const allDates = useMemo(
-    () => Object.keys(itemsByDate).sort((a, b) => parseDate(a) - parseDate(b)),
-    [itemsByDate]
-  );
+  // отсортированный список дат
+  const allDates = useMemo(() => {
+    return Object.keys(itemsByDate).sort(
+      (a, b) => dayjs(a, YYYY_MM_DD, true).valueOf() - dayjs(b, YYYY_MM_DD, true).valueOf()
+    );
+  }, [itemsByDate]);
 
   return (
     <Flex direction="column" gap="xl" h="100%">
@@ -256,21 +275,31 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                     );
                   }
 
-                  const clientInfo = personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
-                  const clientName = getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
+                  const clientInfo =
+                    personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
+                  const clientName =
+                    getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
                   const platform = block.platform;
                   const platformIcon = socialMediaIcons[platform] || null;
                   const platformLabel = platform ? platform[0].toUpperCase() + platform.slice(1) : "";
 
                   return (
-                    <Flex direction="column" gap="xs" key={`msgs-${date}-${block.clientId}-${platform}-${i}`}>
+                    <Flex
+                      direction="column"
+                      gap="xs"
+                      key={`msgs-${date}-${block.clientId}-${platform}-${i}`}
+                    >
                       <Flex justify="center" align="center" gap={6}>
                         <Badge c="black" size="lg" bg={colors.gray[2]} px={12}>
                           {getLanguageByKey("Mesajele clientului")}: {clientName}
                           {platformIcon ? (
-                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>{platformIcon}</span>
+                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>
+                              {platformIcon}
+                            </span>
                           ) : platformLabel ? (
-                            <span style={{ marginLeft: 8, color: "#777" }}>{platformLabel}</span>
+                            <span style={{ marginLeft: 8, color: "#777" }}>
+                              {platformLabel}
+                            </span>
                           ) : null}
                         </Badge>
                       </Flex>
@@ -280,7 +309,8 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         const msgClientIds = Array.isArray(msg.client_id)
                           ? msg.client_id.map(String)
                           : [String(msg.client_id)];
-                        const isClientMessage = msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
+                        const isClientMessage =
+                          msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
 
                         const technician = technicianMap.get(Number(msg.sender_id));
                         return isClientMessage ? (
