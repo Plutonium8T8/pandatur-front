@@ -1,8 +1,8 @@
 export const ISO_DATE = "yyyy-MM-dd";
-export const DD_MM_YYYY = "DD.MM.YYYY";
-export const DD_MM_YYYY_DASH = "DD-MM-YYYY";
-export const DD_MM_YYYY__HH_mm_ss = "DD-MM-YYYY HH:mm:ss";
+export const DD_MM_YYYY = "YYYY.MM.DD";
+export const DD_MM_YYYY_DASH = "YYYY-MM-DD";
 export const HH_mm = "HH:mm";
+export const YYYY_MM_DD_HH_mm_ss = "YYYY-DD-MM HH:mm:ss";
 
 export const DEFAULT_PHOTO =
   "https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp";

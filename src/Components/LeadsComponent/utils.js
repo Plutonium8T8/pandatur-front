@@ -1,6 +1,6 @@
 import { workflowOptionsSalesMD } from "../../Components/utils/workflowUtils";
 import dayjs from "dayjs";
-import { DD_MM_YYYY__HH_mm_ss, DD_MM_YYYY } from "../../app-constants";
+import { YYYY_MM_DD_HH_mm_ss, DD_MM_YYYY } from "../../app-constants";
 import { DD_MM_YYYY_DASH } from "../../app-constants";
 
 export const VIEW_MODE = {
