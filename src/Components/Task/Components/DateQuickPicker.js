@@ -7,7 +7,6 @@ import { YYYY_MM_DD, HH_mm } from "../../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
 
-// безопасно приводим любое значение к Date
 const coerceToDate = (val) => {
     if (!val) return null;
     if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
@@ -16,7 +15,6 @@ const coerceToDate = (val) => {
         return isNaN(d.getTime()) ? null : d;
     }
     if (typeof val === "string") {
-        // сервер даёт "YYYY-MM-DD HH:mm:ss" — превратим в ISO-подобное
         const s = val.trim().replace(" ", "T").replace(/Z$/, "");
         const d = new Date(s);
         return isNaN(d.getTime()) ? null : d;
@@ -24,10 +22,9 @@ const coerceToDate = (val) => {
     return null;
 };
 
-// собираем дату без внешних парсеров
 const buildDate = (dateStr, timeStr) => {
     if (!dateStr) return null;
-    const ds = dateStr.replace(/\./g, "-"); // поддержим ввод "dd.mm.yyyy"
+    const ds = dateStr.replace(/\./g, "-");
     const [y, m, d] = ds.split("-").map((x) => Number(x));
     const [hh, mm] = (timeStr || "00:00").split(":").map((x) => Number(x));
     if (!y || !m || !d) return null;
@@ -37,10 +34,9 @@ const buildDate = (dateStr, timeStr) => {
 
 const DateQuickInput = ({ value, onChange, disabled = false }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [date, setDate] = useState(""); // YYYY-MM-DD или dd.mm.yyyy
-    const [time, setTime] = useState(""); // HH:mm
+    const [date, setDate] = useState("");
+    const [time, setTime] = useState("");
 
-    // инициализация из props.value
     useEffect(() => {
         const d = coerceToDate(value);
         if (d) {
@@ -56,7 +52,6 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
     const composed = useMemo(() => buildDate(date, time), [date, time]);
     const display = composed ? dayjs(composed).format("YYYY-MM-DD HH:mm:ss") : "";
 
-    // отдаём наверх только валидную Date
     useEffect(() => {
         if (!disabled && composed && onChange) onChange(composed);
     }, [composed, disabled, onChange]);
