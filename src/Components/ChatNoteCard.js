@@ -1,4 +1,3 @@
-import React from "react";
 import { Paper, Flex, Text, Anchor, Badge, Group } from "@mantine/core";
 import { FiImage, FiVideo, FiMusic, FiFileText } from "react-icons/fi";
 import { getLanguageByKey } from "@utils";
@@ -7,7 +6,6 @@ const IMAGE_EXT = ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "heic", "h
 const VIDEO_EXT = ["mp4", "webm", "ogg", "mov", "m4v"];
 const AUDIO_EXT = ["mp3", "wav", "ogg", "m4a", "aac", "flac", "wma"];
 
-// --- безопасные утилиты ---
 const safeDecodeURIComponent = (s = "") => {
     try {
         return decodeURIComponent(s);
@@ -20,7 +18,6 @@ const safeDecodeURIComponent = (s = "") => {
     }
 };
 
-// экранируем "одинокие" %
 const escapeBadPercents = (s = "") => s.replace(/%(?![0-9A-Fa-f]{2})/g, "%25");
 
 const extractName = (pathLike = "") => {
@@ -51,7 +48,6 @@ const getFileNameFromUrl = (url = "") => {
     if (str.startsWith("data:") || str.startsWith("blob:")) return "file";
 
     const pickName = (pathname, search = "") => {
-        // иногда бэкенд кладёт имя в query
         const params = new URLSearchParams(search);
         const qn = params.get("filename") || params.get("file") || params.get("name");
         if (qn) return safeDecodeURIComponent(escapeBadPercents(qn));
@@ -67,7 +63,6 @@ const getFileNameFromUrl = (url = "") => {
         return pickName(clean);
     }
 };
-// --- конец утилит ---
 
 const getNoteKind = (note) => {
     const t = (note?.type || "").toLowerCase();
