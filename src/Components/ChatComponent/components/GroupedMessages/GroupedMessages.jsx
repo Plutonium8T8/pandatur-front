@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
-import { DD_MM_YYYY, YYYY_MM_DD_HH_mm_ss } from "@app-constants";
+import { YYYY_MM_DD, YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { parseServerDate, getFullName, getLanguageByKey, parseDate } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
@@ -78,7 +78,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       ...msg,
       itemType: "message",
       sortTime: parseDate(msg.time_sent).valueOf(),
-      dateDivider: parseServerDate(msg.time_sent).format(DD_MM_YYYY),
+      dateDivider: parseServerDate(msg.time_sent).format(YYYY_MM_DD),
       clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
       platform: msg.platform?.toLowerCase?.() || "",
     }));
@@ -103,7 +103,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       ...log,
       itemType: "log",
       sortTime: parseServerDate(log.timestamp).valueOf(),
-      dateDivider: parseServerDate(log.timestamp).format(DD_MM_YYYY),
+      dateDivider: parseServerDate(log.timestamp).format(YYYY_MM_DD),
       isLive: !!log.__live,
     }));
   }, [rawLogs, liveLogs, ticketId]);
@@ -139,7 +139,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         ...n,
         itemType: "note",
         sortTime: ts.valueOf(),
-        dateDivider: ts.format(DD_MM_YYYY),
+        dateDivider: ts.format(YYYY_MM_DD),
         timeCreatedDisplay: ts.format(YYYY_MM_DD_HH_mm_ss),
         isLive: !!n.__live,
       };

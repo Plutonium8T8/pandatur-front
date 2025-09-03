@@ -5,7 +5,7 @@ import { MdOutlineEuroSymbol } from "react-icons/md";
 import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
 import { paymentStatusOptions } from "../../FormOptions";
-import { DD_MM_YYYY } from "../../app-constants";
+import { YYYY_MM_DD } from "../../app-constants";
 import { UserContext } from "../../contexts/UserContext";
 import { useWorkflowOptions } from "../../hooks/useWorkflowOptions";
 
@@ -60,7 +60,7 @@ export const ContractForm = ({
 
       <DateInput
         minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         clearable
         allowDeselect
         mt="md"
@@ -72,7 +72,7 @@ export const ContractForm = ({
 
       <DateInput
         minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         clearable
         allowDeselect
         mt="md"
@@ -84,7 +84,7 @@ export const ContractForm = ({
 
       <DateInput
         minDate={setMinDate}
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         clearable
         allowDeselect
         mt="md"

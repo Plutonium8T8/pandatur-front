@@ -1,5 +1,5 @@
 import { Flex, Text } from "@mantine/core";
-import { parseServerDate, getFullName } from "@utils";
+import { parseServerDate, getFullName } from "../../../utils";
 import { translations } from "../../../utils";
 
 const language = localStorage.getItem("language") || "RO";

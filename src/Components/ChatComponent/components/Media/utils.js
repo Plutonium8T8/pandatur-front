@@ -16,7 +16,7 @@ import {
 import {
   FALLBACK_IMAGE,
   MEDIA_TYPE,
-  DD_MM_YYYY,
+  YYYY_MM_DD,
   HH_mm,
 } from "@app-constants";
 import { getLanguageByKey, parseServerDate } from "@utils";
@@ -138,7 +138,7 @@ export const renderMediaContent = ({
           <Audio src={message} />
           <TimeClient
             id={payload?.client_id}
-            date={parseServerDate(msjTime)?.format(`${DD_MM_YYYY} ${HH_mm}`)}
+            date={parseServerDate(msjTime)?.format(`${YYYY_MM_DD} ${HH_mm}`)}
           />
         </Flex>
 
@@ -169,7 +169,7 @@ export const renderMediaContent = ({
                 <TimeClient
                   id={payload?.client_id}
                   date={parseServerDate(msjTime)?.format(
-                    `${DD_MM_YYYY} ${HH_mm}`,
+                    `${YYYY_MM_DD} ${HH_mm}`,
                   )}
                 />
               </Flex>
@@ -201,7 +201,7 @@ export const renderMediaContent = ({
         {!shouldDelete && (
           <TimeClient
             id={payload?.client_id}
-            date={parseServerDate(msjTime)?.format(`${DD_MM_YYYY} ${HH_mm}`)}
+            date={parseServerDate(msjTime)?.format(`${YYYY_MM_DD} ${HH_mm}`)}
           />
         )}
       </Flex>

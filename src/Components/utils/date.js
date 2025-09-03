@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { YYYY_MM_DD_HH_mm_ss, DD_MM_YYYY, HH_mm } from "../../app-constants";
+import { YYYY_MM_DD_HH_mm_ss, YYYY_MM_DD, HH_mm } from "../../app-constants";
 import { translations } from "./translations";
 
 const language = localStorage.getItem("language") || "RO";
@@ -60,7 +60,7 @@ export const formattedDate = (date) => {
   const parsedDate = dayjs(date, YYYY_MM_DD_HH_mm_ss);
 
   return {
-    formateDate: parsedDate.format(DD_MM_YYYY),
+    formateDate: parsedDate.format(YYYY_MM_DD),
     formateTime: parsedDate.format(HH_mm),
   };
 };

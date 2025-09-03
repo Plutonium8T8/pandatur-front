@@ -16,7 +16,7 @@ import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
-import { MESSAGES_TYPE_OPTIONS, DD_MM_YYYY_DASH } from "../../app-constants";
+import { MESSAGES_TYPE_OPTIONS, YYYY_MM_DD_DASH } from "../../app-constants";
 import {
     getGroupUserMap,
     formatMultiSelectData,
@@ -84,10 +84,10 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
         if (initialData.time_sent?.from || initialData.time_sent?.to) {
             setTimeSent([
                 initialData.time_sent?.from
-                    ? dayjs(initialData.time_sent.from, DD_MM_YYYY_DASH).toDate()
+                    ? dayjs(initialData.time_sent.from, YYYY_MM_DD_DASH).toDate()
                     : null,
                 initialData.time_sent?.to
-                    ? dayjs(initialData.time_sent.to, DD_MM_YYYY_DASH).toDate()
+                    ? dayjs(initialData.time_sent.to, YYYY_MM_DD_DASH).toDate()
                     : null,
             ]);
         } else {
@@ -117,8 +117,8 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
             if (senderIds?.length) filters.sender_id = senderIds.map(Number);
             if (timeSent?.[0] || timeSent?.[1]) {
                 filters.time_sent = {
-                    ...(timeSent[0] && { from: dayjs(timeSent[0]).format(DD_MM_YYYY_DASH) }),
-                    ...(timeSent[1] && { to: dayjs(timeSent[1]).format(DD_MM_YYYY_DASH) }),
+                    ...(timeSent[0] && { from: dayjs(timeSent[0]).format(YYYY_MM_DD_DASH) }),
+                    ...(timeSent[1] && { to: dayjs(timeSent[1]).format(YYYY_MM_DD_DASH) }),
                 };
             }
             if (lastMessageAuthor?.length) filters.last_message_author = lastMessageAuthor.map(Number);

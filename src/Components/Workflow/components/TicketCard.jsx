@@ -21,7 +21,7 @@ import {
 import { parseTags } from "../../../stringUtils";
 import { parseServerDate, getLanguageByKey } from "../../utils";
 import { Tag } from "../../Tag";
-import { DEFAULT_PHOTO, DD_MM_YYYY, HH_mm } from "../../../app-constants";
+import { DEFAULT_PHOTO, YYYY_MM_DD, HH_mm } from "../../../app-constants";
 import Can from "../../CanComponent/Can";
 
 const { colors } = DEFAULT_THEME;
@@ -140,11 +140,11 @@ export const TicketCard = ({
                 <MdAccessTime />
                 <Flex direction="column">
                   <Text size="xs">
-                    {parseServerDate(ticket.creation_date)?.format(DD_MM_YYYY)}:{" "}
+                    {parseServerDate(ticket.creation_date)?.format(YYYY_MM_DD)}:{" "}
                     {parseServerDate(ticket.creation_date)?.format(HH_mm)}
                   </Text>
                   <Text size="xs">
-                    {parseServerDate(ticket.last_interaction_date)?.format(DD_MM_YYYY)}
+                    {parseServerDate(ticket.last_interaction_date)?.format(YYYY_MM_DD)}
                     {ticket.last_interaction_date
                       ? `: ${parseServerDate(ticket.last_interaction_date)?.format(HH_mm)}`
                       : null}

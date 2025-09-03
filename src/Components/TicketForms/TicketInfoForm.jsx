@@ -14,7 +14,7 @@ import {
   nameExcursionOptions,
   purchaseProcessingOptions,
 } from "../../FormOptions";
-import { DD_MM_YYYY } from "../../app-constants";
+import { YYYY_MM_DD } from "../../app-constants";
 
 export const TicketInfoForm = ({
   data,
@@ -43,7 +43,7 @@ export const TicketInfoForm = ({
   }, [data]);
 
   const parseDate = (input) => {
-    const parsed = dayjs(input, DD_MM_YYYY);
+    const parsed = dayjs(input, YYYY_MM_DD);
     return parsed.isValid() ? parsed.toDate() : new Date(NaN);
   };
 
@@ -67,7 +67,7 @@ export const TicketInfoForm = ({
         placeholder={getLanguageByKey("Selectează data venirii în oficiu")}
         allowDeselect
         clearable
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_venit_in_oficiu")}
         dateParser={parseDate}
@@ -80,7 +80,7 @@ export const TicketInfoForm = ({
         placeholder={getLanguageByKey("Data și ora plecării")}
         allowDeselect
         clearable
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_plecarii")}
         dateParser={parseDate}
@@ -93,7 +93,7 @@ export const TicketInfoForm = ({
         placeholder={getLanguageByKey("Data și ora întoarcerii")}
         allowDeselect
         clearable
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_intoarcerii")}
         dateParser={parseDate}
@@ -106,7 +106,7 @@ export const TicketInfoForm = ({
         placeholder={getLanguageByKey("Data cererii de retur")}
         allowDeselect
         clearable
-        valueFormat={DD_MM_YYYY}
+        valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_cererii_de_retur")}
         dateParser={parseDate}
