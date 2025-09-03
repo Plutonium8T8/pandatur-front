@@ -9,7 +9,7 @@ import {
     quickOptions,
     translations,
 } from "../../utils";
-import { DD_MM_YYYY, HH_mm } from "../../../app-constants";
+import { YYYY_MM_DD, HH_mm } from "../../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -26,7 +26,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
     useEffect(() => {
         if (value) {
             const initial = dayjs(value);
-            setDate(initial.format(DD_MM_YYYY));
+            setDate(initial.format(YYYY_MM_DD));
             setTime(initial.format(HH_mm));
         } else {
             setDate("");
@@ -52,7 +52,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
         const result = option.custom
             ? option.custom()
             : applyOffset(base, option.offset);
-        setDate(result.format(DD_MM_YYYY));
+        setDate(result.format(YYYY_MM_DD));
         setTime(result.format(HH_mm));
     };
 
@@ -110,7 +110,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
                         <DatePicker
                             value={parsedDate || new Date()}
                             onChange={(d) => {
-                                if (d) setDate(dayjs(d).format(DD_MM_YYYY));
+                                if (d) setDate(dayjs(d).format(YYYY_MM_DD));
                             }}
                             size="md"
                             minDate={new Date()}

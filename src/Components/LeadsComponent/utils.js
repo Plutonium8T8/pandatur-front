@@ -1,7 +1,7 @@
 import { workflowOptionsSalesMD } from "../../Components/utils/workflowUtils";
 import dayjs from "dayjs";
-import { YYYY_MM_DD_HH_mm_ss, DD_MM_YYYY } from "../../app-constants";
-import { DD_MM_YYYY_DASH } from "../../app-constants";
+import { YYYY_MM_DD_HH_mm_ss, YYYY_MM_DD } from "../../app-constants";
+import { YYYY_MM_DD_DASH } from "../../app-constants";
 
 export const VIEW_MODE = {
   KANBAN: "KANBAN",
@@ -32,8 +32,8 @@ export const formatDateOrUndefined = (date) => {
 
   return minDate && maxDate
     ? {
-      from: dayjs(minDate).format(DD_MM_YYYY_DASH),
-      to: dayjs(maxDate).format(DD_MM_YYYY_DASH),
+      from: dayjs(minDate).format(YYYY_MM_DD_DASH),
+      to: dayjs(maxDate).format(YYYY_MM_DD_DASH),
     }
     : undefined;
 };
@@ -44,8 +44,8 @@ export const formatDateOrUndefinedFilter = (date) => {
 
   return minDate && maxDate
     ? {
-      from: dayjs(minDate).format(DD_MM_YYYY_DASH),
-      to: dayjs(maxDate).format(DD_MM_YYYY_DASH),
+      from: dayjs(minDate).format(YYYY_MM_DD_DASH),
+      to: dayjs(maxDate).format(YYYY_MM_DD_DASH),
     }
     : undefined;
 };
@@ -59,8 +59,8 @@ export const convertDateToArray = (rangeDate = {}) => {
   const { from, to } = rangeDate;
 
   return [
-    from ? dayjs(from, DD_MM_YYYY_DASH) : undefined,
-    to ? dayjs(to, DD_MM_YYYY_DASH) : undefined,
+    from ? dayjs(from, YYYY_MM_DD_DASH) : undefined,
+    to ? dayjs(to, YYYY_MM_DD_DASH) : undefined,
   ];
 };
 
@@ -68,8 +68,8 @@ export const convertDateToArrayFilter = (rangeDate = {}) => {
   const { from, to } = rangeDate;
 
   return [
-    from ? dayjs(from, DD_MM_YYYY) : undefined,
-    to ? dayjs(to, DD_MM_YYYY) : undefined,
+    from ? dayjs(from, YYYY_MM_DD) : undefined,
+    to ? dayjs(to, YYYY_MM_DD) : undefined,
   ];
 };
 

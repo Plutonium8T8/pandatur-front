@@ -15,7 +15,7 @@ import { MdOutlineEuroSymbol } from "react-icons/md";
 import { getLanguageByKey } from "../../utils";
 import { LabelSwitch } from "../../LabelSwitch";
 import { paymentStatusOptions } from "../../../FormOptions";
-import { DD_MM_YYYY } from "../../../app-constants";
+import { YYYY_MM_DD } from "../../../app-constants";
 import {
   formatDateOrUndefinedFilter,
   formatNumericValue,
@@ -130,7 +130,7 @@ export const ContractFormFilter = forwardRef(
           <DatePickerInput
             type="range"
             minDate={setMinDate}
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             clearable
             mt="md"
             label={getLanguageByKey("Data contractului")}
@@ -142,7 +142,7 @@ export const ContractFormFilter = forwardRef(
           <DatePickerInput
             type="range"
             minDate={setMinDate}
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             clearable
             mt="md"
             label={getLanguageByKey("Data avansului")}
@@ -154,7 +154,7 @@ export const ContractFormFilter = forwardRef(
           <DatePickerInput
             type="range"
             minDate={setMinDate}
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             clearable
             mt="md"
             label={getLanguageByKey("Data de plată integrală")}

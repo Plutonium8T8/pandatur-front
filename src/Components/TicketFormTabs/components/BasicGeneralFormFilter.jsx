@@ -24,7 +24,7 @@ import {
   formatDateOrUndefinedFilter,
   convertDateToArrayFilter,
 } from "../../LeadsComponent/utils";
-import { DD_MM_YYYY_DASH } from "../../../app-constants";
+import { YYYY_MM_DD_DASH } from "../../../app-constants";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
@@ -171,7 +171,7 @@ export const BasicGeneralFormFilter = forwardRef(({ loading, data, formId }, ref
 
       <DatePickerInput
         type="range"
-        valueFormat={DD_MM_YYYY_DASH}
+        valueFormat={YYYY_MM_DD_DASH}
         clearable
         mt="md"
         label={getLanguageByKey("Data creării")}
@@ -181,7 +181,7 @@ export const BasicGeneralFormFilter = forwardRef(({ loading, data, formId }, ref
 
       <DatePickerInput
         type="range"
-        valueFormat={DD_MM_YYYY_DASH}
+        valueFormat={YYYY_MM_DD_DASH}
         clearable
         mt="md"
         label={getLanguageByKey("Ultima modificare")}

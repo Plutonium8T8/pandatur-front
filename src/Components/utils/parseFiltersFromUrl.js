@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { DD_MM_YYYY_DASH, DD_MM_YYYY } from "../../app-constants";
+import { YYYY_MM_DD_DASH, YYYY_MM_DD } from "../../app-constants";
 
 const parseBoolean = (val) => {
     if (val === "true") return true;
@@ -7,7 +7,7 @@ const parseBoolean = (val) => {
     return undefined;
 };
 
-const parseDateRange = (from, to, format = DD_MM_YYYY) => {
+const parseDateRange = (from, to, format = YYYY_MM_DD) => {
     const result = {};
     if (from && dayjs(from, format, true).isValid()) result.from = from;
     if (to && dayjs(to, format, true).isValid()) result.to = to;
@@ -46,7 +46,7 @@ export const parseFiltersFromUrl = (params) => ({
     message: params.get("message") || undefined,
     mtype: params.get("mtype") || undefined,
     sender_id: parseNumberMulti(params, "sender_id"),
-    time_sent: getFromTo(params, "time_sent", DD_MM_YYYY_DASH),
+    time_sent: getFromTo(params, "time_sent", YYYY_MM_DD_DASH),
     last_message_author: parseNumberMulti(params, "last_message_author"),
     action_needed: parseBoolean(params.get("action_needed")),
     unseen: params.get("unseen") || undefined,
@@ -57,8 +57,8 @@ export const parseFiltersFromUrl = (params) => ({
     contact: params.get("contact") || undefined,
     tags: parseMulti(params, "tags"),
     technician_id: parseNumberMulti(params, "technician_id"),
-    creation_date: getFromTo(params, "creation_date", DD_MM_YYYY_DASH),
-    last_interaction_date: getFromTo(params, "last_interaction_date", DD_MM_YYYY_DASH),
+    creation_date: getFromTo(params, "creation_date", YYYY_MM_DD_DASH),
+    last_interaction_date: getFromTo(params, "last_interaction_date", YYYY_MM_DD_DASH),
 
     // TicketInfoFormFilter
     buget: getFromTo(params, "buget"), // число
@@ -70,16 +70,16 @@ export const parseFiltersFromUrl = (params) => ({
     tip_de_transport: parseMulti(params, "tip_de_transport"),
     denumirea_excursiei_turului: parseMulti(params, "denumirea_excursiei_turului"),
     procesarea_achizitionarii: parseMulti(params, "procesarea_achizitionarii"),
-    data_plecarii: getFromTo(params, "data_plecarii", DD_MM_YYYY_DASH),
-    data_venit_in_oficiu: getFromTo(params, "data_venit_in_oficiu", DD_MM_YYYY_DASH),
-    data_intoarcerii: getFromTo(params, "data_intoarcerii", DD_MM_YYYY_DASH),
-    data_cererii_de_retur: getFromTo(params, "data_cererii_de_retur", DD_MM_YYYY_DASH),
+    data_plecarii: getFromTo(params, "data_plecarii", YYYY_MM_DD_DASH),
+    data_venit_in_oficiu: getFromTo(params, "data_venit_in_oficiu", YYYY_MM_DD_DASH),
+    data_intoarcerii: getFromTo(params, "data_intoarcerii", YYYY_MM_DD_DASH),
+    data_cererii_de_retur: getFromTo(params, "data_cererii_de_retur", YYYY_MM_DD_DASH),
 
     // ContractFormFilter
     numar_de_contract: params.get("numar_de_contract") || undefined,
-    data_contractului: getFromTo(params, "data_contractului", DD_MM_YYYY_DASH),
-    data_avansului: getFromTo(params, "data_avansului", DD_MM_YYYY_DASH),
-    data_de_plata_integrala: getFromTo(params, "data_de_plata_integrala", DD_MM_YYYY_DASH),
+    data_contractului: getFromTo(params, "data_contractului", YYYY_MM_DD_DASH),
+    data_avansului: getFromTo(params, "data_avansului", YYYY_MM_DD_DASH),
+    data_de_plata_integrala: getFromTo(params, "data_de_plata_integrala", YYYY_MM_DD_DASH),
     contract_trimis: parseBoolean(params.get("contract_trimis")),
     contract_semnat: parseBoolean(params.get("contract_semnat")),
     tour_operator: params.get("tour_operator") || undefined,

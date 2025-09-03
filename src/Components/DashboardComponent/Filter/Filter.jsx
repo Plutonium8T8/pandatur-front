@@ -3,7 +3,7 @@ import dayjs from "dayjs";
 import { Button, Group, MultiSelect, Modal, Stack, Divider, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { getLanguageByKey } from "../../utils";
-import { DD_MM_YYYY } from "../../../app-constants";
+import { YYYY_MM_DD } from "../../../app-constants";
 import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
 import { user as userApi } from "../../../api/user";
@@ -239,7 +239,7 @@ export const Filter = ({
                 type="range"
                 value={dateRange}
                 onChange={(val) => setDateRange(val || [])}
-                valueFormat={DD_MM_YYYY}
+                valueFormat={YYYY_MM_DD}
                 placeholder={getLanguageByKey("Selectează o dată")}
               />
             </Group>

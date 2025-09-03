@@ -29,7 +29,7 @@ import {
   nameExcursionOptions,
   purchaseProcessingOptions,
 } from "../../../FormOptions";
-import { DD_MM_YYYY } from "../../../app-constants";
+import { YYYY_MM_DD } from "../../../app-constants";
 
 const TICKET_FORM_FILTER_ID = "TICKET_FORM_FILTER_ID";
 
@@ -112,7 +112,7 @@ export const TicketInfoFormFilter = forwardRef(
           <DatePickerInput
             type="range"
             minDate={setMinDate}
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             clearable
             mt="md"
             label={getLanguageByKey("Data venit in oficiu")}
@@ -125,7 +125,7 @@ export const TicketInfoFormFilter = forwardRef(
             type="range"
             minDate={setMinDate}
             clearable
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             mt="md"
             label={getLanguageByKey("Data și ora plecării")}
             placeholder={getLanguageByKey("Data și ora plecării")}
@@ -137,7 +137,7 @@ export const TicketInfoFormFilter = forwardRef(
             type="range"
             minDate={setMinDate}
             clearable
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             mt="md"
             label={getLanguageByKey("Data și ora întoarcerii")}
             placeholder={getLanguageByKey("Data și ora întoarcerii")}
@@ -149,7 +149,7 @@ export const TicketInfoFormFilter = forwardRef(
             type="range"
             minDate={setMinDate}
             clearable
-            valueFormat={DD_MM_YYYY}
+            valueFormat={YYYY_MM_DD}
             mt="md"
             label={getLanguageByKey("Data cererii de retur")}
             placeholder={getLanguageByKey("Data cererii de retur")}
