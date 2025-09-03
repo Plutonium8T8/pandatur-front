@@ -8,7 +8,7 @@ import { getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate } 
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
-import { formatDate, parseDate } from "../utils/date";
+import { formatDate } from "../utils/date";
 import DateQuickInput from "./Components/DateQuickPicker";
 import { useGetTechniciansList, useUser, useConfirmPopup } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
@@ -19,6 +19,19 @@ import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
 
 const language = localStorage.getItem("language") || "RO";
+
+// безопасный парсер значения в Date
+const toDate = (val) => {
+  if (!val) return null;
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  if (typeof val === "number") {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const s = String(val).trim().replace(" ", "T").replace(/Z$/, "");
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+};
 
 const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   const [tasks, setTasks] = useState([]);
@@ -107,7 +120,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
       tasks.forEach((t) => {
         updated[t.id] = {
           task_type: t.task_type,
-          scheduled_time: parseDate(t.scheduled_time),
+          scheduled_time: toDate(t.scheduled_time),
           created_for: String(t.created_for),
           created_by: String(t.created_by),
           description: t.description || "",
@@ -245,7 +258,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               </Group>
               <Group gap="xs">
                 <Text size="sm" style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}>
-                  {formatDate(taskEdits[id]?.scheduled_time)}{" "}
+                  {taskEdits[id]?.scheduled_time ? formatDate(taskEdits[id].scheduled_time) : ""}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </Text>
                 {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
@@ -346,7 +359,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                           ...prev,
                           [id]: {
                             task_type: original.task_type,
-                            scheduled_time: parseDate(original.scheduled_time),
+                            scheduled_time: toDate(original.scheduled_time),
                             created_for: String(original.created_for),
                             created_by: String(original.created_by),
                             description: original.description || "",
