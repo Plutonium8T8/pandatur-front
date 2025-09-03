@@ -14,71 +14,169 @@ const PADDING = [8, 8];
 
 const COLS_MAX = 150;
 
-const DEFAULT_SIZE = { w: 30, h: 20, minW: 6, maxW: 150, minH: 6 };
+const ROW_GAP = 4;          // вертикальный зазор между «рядами-группами»
+const FIRST_ROW_HGAP = 3;   // минимальный горизонтальный зазор между карточками в 1-й группе
+
+// размеры
+const DEFAULT_SIZE_ROW0 = { w: 45, h: 20, minW: 6, maxW: 150, minH: 6 }; // 1-я группа
+const DEFAULT_SIZE_ROWX = { w: 30, h: 20, minW: 6, maxW: 150, minH: 6 }; // 2-я+ группы
 
 const WIDGET_SIZES = {
-    general: DEFAULT_SIZE,
-    group: DEFAULT_SIZE,
-    user: DEFAULT_SIZE,
-    source: DEFAULT_SIZE,
-    gt: DEFAULT_SIZE,
-    top_users: { ...DEFAULT_SIZE, w: 60, h: 28 }, // выше/шире под список
+    top_users: { ...DEFAULT_SIZE_ROWX, w: 60, h: 28 },
 };
 
-const getSize = (type) => WIDGET_SIZES[type] || DEFAULT_SIZE;
-
-// приоритеты: general → gt-* → ug-* → user-* → остальные
-const priorityOf = (w) => {
+const rowOf = (w) => {
     const id = String(w?.id ?? "");
-    if (id === "general") return 0;
-    if (id.startsWith("gt-")) return 1;    // group title
-    if (id.startsWith("ug-")) return 2;    // user group
-    if (id.startsWith("user-")) return 3;  // users
-    return 4;                               // всё остальное (source, platform и т.п.)
+    if (id === "general" || id.startsWith("gt-") || id.startsWith("ug-")) return 0; // 1-я группа
+    if (w.type === "top_users" || id.startsWith("user-")) return 1;                // 2-я группа
+    return 2;                                                                       // 3-я группа
 };
 
-/** раскладка слева-направо с переносом по ширине COLS_MAX */
-const buildRowLayout = (widgets = []) => {
-    const items = [];
-    let x = 0;
-    let y = 0;
-    const rowH = DEFAULT_SIZE.h;
+const getSizeByRow = (w, row) => {
+    const explicit = WIDGET_SIZES[w.type];
+    if (explicit) return explicit;
+    return row === 0 ? DEFAULT_SIZE_ROW0 : DEFAULT_SIZE_ROWX;
+};
+
+// ——— helpers для 1-й группы ———
+
+// бьём список виджетов первой группы на строки так, чтобы хотя бы минимальный FIRST_ROW_HGAP помещался
+const splitFirstGroupIntoLines = (widgets) => {
+    const lines = [];
+    let line = [];
+    let sumW = 0;
 
     for (const w of widgets) {
-        if (w.type === "separator") continue;
+        const t = getSizeByRow(w, 0);
+        const nextCount = line.length + 1;
+        const minNeeded = sumW + t.w + FIRST_ROW_HGAP * Math.max(0, nextCount - 1);
+        if (nextCount > 1 && minNeeded > COLS_MAX) {
+            // закрываем текущую строку
+            if (line.length) lines.push(line);
+            // начинаем новую
+            line = [w];
+            sumW = t.w;
+        } else {
+            line.push(w);
+            sumW += t.w;
+        }
+    }
+    if (line.length) lines.push(line);
+    return lines;
+};
 
-        const t = getSize(w.type);
-        if (x + t.w > COLS_MAX) {
-            y += rowH;
-            x = 0;
+// равномерная раскладка одной строки первой группы: первый слева, последний справа, между ними равные интервалы
+const layoutFirstGroupLine = (lineWidgets, yStart, items) => {
+    // суммарная ширина карточек
+    const sumW = lineWidgets.reduce((acc, w) => acc + getSizeByRow(w, 0).w, 0);
+    const n = lineWidgets.length;
+
+    if (n === 1) {
+        // один виджет — прижимаем к левому краю
+        const w0 = lineWidgets[0];
+        const t0 = getSizeByRow(w0, 0);
+        items.push({
+            i: String(w0.id), x: 0, y: yStart, w: t0.w, h: t0.h,
+            minW: t0.minW, maxW: t0.maxW, minH: t0.minH, static: false, resizeHandles: ["e", "se"],
+        });
+        return yStart + t0.h;
+    }
+
+    // вычисляем равный gap так, чтобы последний заканчивался строго на COLS_MAX
+    // гарантировано не отрицательный, т.к. splitFirstGroupIntoLines обеспечивает минимум
+    const gapsCount = n - 1;
+    const totalGap = COLS_MAX - sumW;
+    const baseGap = Math.floor(totalGap / gapsCount);
+    const remainder = totalGap % gapsCount; // «хвост» раскидываем по первым gap’ам
+
+    let x = 0;
+    for (let i = 0; i < n; i++) {
+        const w = lineWidgets[i];
+        const t = getSizeByRow(w, 0);
+        items.push({
+            i: String(w.id), x, y: yStart, w: t.w, h: t.h,
+            minW: t.minW, maxW: t.maxW, minH: t.minH, static: false,
+            resizeHandles: i === n - 1 ? ["w", "sw"] : ["e", "se"], // правому — логичнее тянуть слева
+        });
+        // добавляем равномерный gap после карточки, кроме последней
+        if (i < n - 1) {
+            const extra = i < remainder ? 1 : 0;
+            x += t.w + baseGap + extra;
+        }
+    }
+    // высота строки = максимальная высота карточек (в сеточных единицах)
+    const lineH = Math.max(...lineWidgets.map((w) => getSizeByRow(w, 0).h));
+    return yStart + lineH;
+};
+
+// ——— основная раскладка ———
+const buildLayoutByRows = (widgets = []) => {
+    const rows = [[], [], []];
+    widgets.forEach((w) => {
+        if (w.type !== "separator") rows[rowOf(w)].push(w);
+    });
+
+    const items = [];
+    const rowBaseH = DEFAULT_SIZE_ROWX.h;
+    let yCursor = 0;
+
+    for (let r = 0; r < rows.length; r++) {
+        const rowWidgets = rows[r];
+        if (!rowWidgets.length) continue;
+
+        let y = yCursor;
+        let localMaxY = yCursor;
+
+        if (r === 0) {
+            // ПЕРВАЯ ГРУППА: равные промежутки и крайние по краям в КАЖДОЙ строке
+            const lines = splitFirstGroupIntoLines(rowWidgets);
+            for (const line of lines) {
+                y = layoutFirstGroupLine(line, y, items);
+                localMaxY = Math.max(localMaxY, y);
+            }
+        } else {
+            // ПРОЧИЕ ГРУППЫ: обычный поток, без выравнивания по краям
+            let x = 0;
+            for (let i = 0; i < rowWidgets.length; i++) {
+                const w = rowWidgets[i];
+                const t = getSizeByRow(w, r);
+
+                if (x + t.w > COLS_MAX) {
+                    x = 0;
+                    y += rowBaseH;
+                }
+
+                items.push({
+                    i: String(w.id),
+                    x,
+                    y,
+                    w: t.w,
+                    h: t.h,
+                    minW: t.minW,
+                    maxW: t.maxW,
+                    minH: t.minH,
+                    static: false,
+                    resizeHandles: ["e", "se"],
+                });
+
+                x += t.w;
+                localMaxY = Math.max(localMaxY, y + t.h);
+            }
         }
 
-        items.push({
-            i: String(w.id),
-            x,
-            y,
-            w: t.w,
-            h: t.h,
-            minW: t.minW,
-            maxW: t.maxW,
-            minH: t.minH,
-            static: false,
-            resizeHandles: ["e", "se"],
-        });
-
-        x += t.w;
+        yCursor = localMaxY + ROW_GAP;
     }
+
     return items;
 };
 
 const buildLayoutsAllBps = (widgets = []) => {
-    const single = buildRowLayout(widgets);
+    const single = buildLayoutByRows(widgets);
     return { lg: single, md: single, sm: single, xs: single, xxs: single };
 };
+
 const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
-
-
 
 const DashboardGrid = ({ widgets = [], dateRange }) => {
     const COLS = useMemo(
@@ -86,32 +184,31 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
         []
     );
 
-    // убираем сепараторы
     const visibleWidgets = useMemo(
         () => (widgets || []).filter((w) => w.type !== "separator"),
         [widgets]
     );
 
-    // сортируем по приоритету, сохраняем порядок внутри группы
-    const orderedWidgets = useMemo(() => {
-        return visibleWidgets
-            .map((w, idx) => ({ w, idx }))
-            .sort((a, b) => {
-                const pa = priorityOf(a.w);
-                const pb = priorityOf(b.w);
-                if (pa !== pb) return pa - pb;
-                return a.idx - b.idx;
-            })
-            .map((x) => x.w);
+    // сохраняем порядок, но раскладываем по группам
+    const orderedByRows = useMemo(() => {
+        const r0 = [], r1 = [], r2 = [];
+        for (const w of visibleWidgets) {
+            const r = rowOf(w);
+            if (r === 0) r0.push(w);
+            else if (r === 1) r1.push(w);
+            else r2.push(w);
+        }
+        return [...r0, ...r1, ...r2];
     }, [visibleWidgets]);
 
-    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(orderedWidgets));
+    const [layouts, setLayouts] = useState(() => buildLayoutsAllBps(orderedByRows));
+
     useEffect(() => {
-        setLayouts(buildLayoutsAllBps(orderedWidgets));
-    }, [orderedWidgets]);
+        setLayouts(buildLayoutsAllBps(orderedByRows));
+    }, [orderedByRows]);
 
     const handleLayoutChange = useCallback((_curr, all) => setLayouts(all), []);
-    const gridKey = useMemo(() => orderedWidgets.map((w) => w.id).join("|"), [orderedWidgets]);
+    const gridKey = useMemo(() => orderedByRows.map((w) => w.id).join("|"), [orderedByRows]);
     const currentLayout = pickAnyBpLayout(layouts);
 
     return (
@@ -132,19 +229,14 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                 onLayoutChange={handleLayoutChange}
                 draggableCancel=".mantine-Badge,.mantine-Progress,.mantine-Button,.mantine-Input"
             >
-                {orderedWidgets.map((w) => {
+                {orderedByRows.map((w) => {
                     const li = currentLayout.find((l) => l.i === String(w.id));
                     const sizeInfo = li ? `${li.w} × ${li.h}` : null;
 
                     if (w.type === "top_users") {
                         return (
                             <div key={w.id} style={{ height: "100%" }}>
-                                <TopUsersCard
-                                    title={w.title}
-                                    subtitle={w.subtitle}
-                                    rows={w.rows}
-                                    bg={w.bg}
-                                />
+                                <TopUsersCard title={w.title} subtitle={w.subtitle} rows={w.rows} bg={w.bg} />
                             </div>
                         );
                     }
