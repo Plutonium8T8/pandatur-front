@@ -1,57 +1,70 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button, Popover, Flex, Stack, TextInput } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
-import {
-    parseDate,
-    formatDate,
-    applyOffset,
-    quickOptions,
-    translations,
-} from "../../utils";
+import { applyOffset, quickOptions, translations } from "../../utils";
 import { YYYY_MM_DD, HH_mm } from "../../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
 
+// безопасно приводим любое значение к Date
+const coerceToDate = (val) => {
+    if (!val) return null;
+    if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+    if (typeof val === "number") {
+        const d = new Date(val);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    if (typeof val === "string") {
+        // сервер даёт "YYYY-MM-DD HH:mm:ss" — превратим в ISO-подобное
+        const s = val.trim().replace(" ", "T").replace(/Z$/, "");
+        const d = new Date(s);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    return null;
+};
+
+// собираем дату без внешних парсеров
+const buildDate = (dateStr, timeStr) => {
+    if (!dateStr) return null;
+    const ds = dateStr.replace(/\./g, "-"); // поддержим ввод "dd.mm.yyyy"
+    const [y, m, d] = ds.split("-").map((x) => Number(x));
+    const [hh, mm] = (timeStr || "00:00").split(":").map((x) => Number(x));
+    if (!y || !m || !d) return null;
+    const dt = new Date(y, m - 1, d, hh || 0, mm || 0, 0);
+    return isNaN(dt.getTime()) ? null : dt;
+};
+
 const DateQuickInput = ({ value, onChange, disabled = false }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
+    const [date, setDate] = useState(""); // YYYY-MM-DD или dd.mm.yyyy
+    const [time, setTime] = useState(""); // HH:mm
 
-    const safeTime = time || "00:00";
-    const combined = `${date.replace(/\./g, "-")} ${safeTime}:00`;
-    const parsedDate = parseDate(combined);
-    const display = parsedDate ? formatDate(parsedDate) : "";
-
+    // инициализация из props.value
     useEffect(() => {
-        if (value) {
-            const initial = dayjs(value);
-            setDate(initial.format(YYYY_MM_DD));
-            setTime(initial.format(HH_mm));
+        const d = coerceToDate(value);
+        if (d) {
+            const dj = dayjs(d);
+            setDate(dj.format(YYYY_MM_DD));
+            setTime(dj.format(HH_mm));
         } else {
             setDate("");
             setTime("");
         }
     }, [value]);
 
+    const composed = useMemo(() => buildDate(date, time), [date, time]);
+    const display = composed ? dayjs(composed).format("YYYY-MM-DD HH:mm:ss") : "";
 
+    // отдаём наверх только валидную Date
     useEffect(() => {
-        if (!date || disabled) return;
-        const parsed = parseDate(`${date.replace(/\./g, "-")} ${safeTime}:00`);
-        if (parsed && onChange) {
-            onChange(parsed);
-        }
-    }, [date, time]);
+        if (!disabled && composed && onChange) onChange(composed);
+    }, [composed, disabled, onChange]);
 
     const handleQuickSelect = (option) => {
         if (disabled) return;
-        const now = dayjs();
-        const isFuture = parsedDate && dayjs(parsedDate).isAfter(now);
-        const base = isFuture ? dayjs(parsedDate) : now;
-
-        const result = option.custom
-            ? option.custom()
-            : applyOffset(base, option.offset);
+        const base = composed && dayjs(composed).isAfter(dayjs()) ? dayjs(composed) : dayjs();
+        const result = option.custom ? option.custom() : applyOffset(base, option.offset);
         setDate(result.format(YYYY_MM_DD));
         setTime(result.format(HH_mm));
     };
@@ -83,7 +96,6 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
                                 key={option.label}
                                 fullWidth
                                 variant="subtle"
-                                color="gray"
                                 onClick={() => handleQuickSelect(option)}
                                 style={{ justifyContent: "flex-start" }}
                                 disabled={disabled}
@@ -98,7 +110,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
                             label={translations["Date"][language]}
                             value={date}
                             onChange={(e) => setDate(e.currentTarget.value)}
-                            placeholder="dd.mm.yyyy"
+                            placeholder="yyyy-mm-dd / dd.mm.yyyy"
                             disabled={disabled}
                         />
                         <TimeInput
@@ -108,10 +120,8 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
                             disabled={disabled}
                         />
                         <DatePicker
-                            value={parsedDate || new Date()}
-                            onChange={(d) => {
-                                if (d) setDate(dayjs(d).format(YYYY_MM_DD));
-                            }}
+                            value={composed ?? null}
+                            onChange={(d) => d && setDate(dayjs(d).format(YYYY_MM_DD))}
                             size="md"
                             minDate={new Date()}
                             disabled={disabled}
