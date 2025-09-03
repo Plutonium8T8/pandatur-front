@@ -5,7 +5,7 @@ import { useUser, useMessagesContext } from "@hooks";
 import { api } from "@api";
 import { getLanguageByKey, MESSAGES_STATUS } from "@utils";
 import { Spin } from "@components";
-import { DD_MM_YYYY__HH_mm_ss } from "@app-constants";
+import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { ChatInput } from "../ChatInput";
 import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
@@ -227,7 +227,7 @@ export const ChatMessages = ({
                 client_id: selectedClient.payload.id,
                 platform: selectedClient.payload.platform,
                 ticket_id: ticketId,
-                time_sent: dayjs().format(DD_MM_YYYY__HH_mm_ss),
+                time_sent: dayjs().format(YYYY_MM_DD_HH_mm_ss),
                 messageStatus: MESSAGES_STATUS.PENDING,
                 ...value,
               });

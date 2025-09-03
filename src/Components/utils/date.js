@@ -1,23 +1,23 @@
 import dayjs from "dayjs";
-import { DD_MM_YYYY__HH_mm_ss, DD_MM_YYYY, HH_mm } from "../../app-constants";
+import { YYYY_MM_DD_HH_mm_ss, DD_MM_YYYY, HH_mm } from "../../app-constants";
 import { translations } from "./translations";
 
 const language = localStorage.getItem("language") || "RO";
 
 export const formatDate = (date) => {
-  return date ? dayjs(date).format(DD_MM_YYYY__HH_mm_ss) : null;
+  return date ? dayjs(date).format(YYYY_MM_DD_HH_mm_ss) : null;
 };
 
 export const parseServerDate = (date) => {
   if (date === "Invalid Date") {
     return null;
   }
-  return date ? dayjs(date, DD_MM_YYYY__HH_mm_ss) : null;
+  return date ? dayjs(date, YYYY_MM_DD_HH_mm_ss) : null;
 };
 
 export const parseServerDatePicker = (date) => {
   if (date === "Invalid Date" || !date) return null;
-  const parsed = dayjs(date, DD_MM_YYYY__HH_mm_ss);
+  const parsed = dayjs(date, YYYY_MM_DD_HH_mm_ss);
   return parsed.isValid() ? parsed.toDate() : null;
 };
 
@@ -57,7 +57,7 @@ export const quickOptions = [
 ];
 
 export const formattedDate = (date) => {
-  const parsedDate = dayjs(date, DD_MM_YYYY__HH_mm_ss);
+  const parsedDate = dayjs(date, YYYY_MM_DD_HH_mm_ss);
 
   return {
     formateDate: parsedDate.format(DD_MM_YYYY),

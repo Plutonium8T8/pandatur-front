@@ -3,7 +3,7 @@ import { useState, useMemo } from "react";
 import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import { getLanguageByKey, showServerError } from "@utils";
-import { DD_MM_YYYY__HH_mm_ss } from "@app-constants";
+import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { api } from "../../../../api";
 import { useMessagesContext } from "@hooks";
 import { ChatNoteCard } from "../../../ChatNoteCard";
@@ -70,7 +70,7 @@ export const Media = ({ messages, id }) => {
   const normalizeNote = (n) => ({
     ...n,
     timeCreatedDisplay: dayjs(n.created_at || n.time_created).isValid()
-      ? dayjs(n.created_at || n.time_created).format(DD_MM_YYYY__HH_mm_ss)
+      ? dayjs(n.created_at || n.time_created).format(YYYY_MM_DD_HH_mm_ss)
       : "",
   });
 

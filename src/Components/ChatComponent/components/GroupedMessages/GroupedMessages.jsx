@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
-import { DD_MM_YYYY, DD_MM_YYYY__HH_mm_ss } from "@app-constants";
+import { DD_MM_YYYY, YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { parseServerDate, getFullName, getLanguageByKey, parseDate } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
@@ -131,7 +131,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     });
 
     return Array.from(map.values()).map((n) => {
-      let ts = dayjs(n.created_at, DD_MM_YYYY__HH_mm_ss, true);
+      let ts = dayjs(n.created_at, YYYY_MM_DD_HH_mm_ss, true);
       if (!ts.isValid()) ts = dayjs(n.created_at);
       if (!ts.isValid()) ts = dayjs();
 
@@ -140,7 +140,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         itemType: "note",
         sortTime: ts.valueOf(),
         dateDivider: ts.format(DD_MM_YYYY),
-        timeCreatedDisplay: ts.format(DD_MM_YYYY__HH_mm_ss),
+        timeCreatedDisplay: ts.format(YYYY_MM_DD_HH_mm_ss),
         isLive: !!n.__live,
       };
     });
