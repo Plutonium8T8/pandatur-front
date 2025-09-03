@@ -20,7 +20,6 @@ import { SocketContext } from "../../contexts/SocketContext";
 
 const language = localStorage.getItem("language") || "RO";
 
-// безопасный парсер значения в Date
 const toDate = (val) => {
   if (!val) return null;
   if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
