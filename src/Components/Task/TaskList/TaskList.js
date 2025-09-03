@@ -24,6 +24,19 @@ import Can from "../../CanComponent/Can";
 
 const language = localStorage.getItem("language") || "RO";
 
+// безопасно приводим любое значение к Date
+const toDate = (val) => {
+  if (!val) return null;
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  if (typeof val === "number") {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  const s = String(val).trim().replace(" ", "T").replace(/Z$/, "");
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
+};
+
 const TaskList = ({
   tasks = [],
   userList = [],
@@ -74,7 +87,6 @@ const TaskList = ({
 
   const ActionMenu = ({ row }) => {
     const isSameTeam = useSameTeamChecker(String(row.created_for));
-
     return (
       <Menu shadow="md" width={200} position="bottom-end">
         <Menu.Target>
@@ -85,11 +97,7 @@ const TaskList = ({
         <Menu.Dropdown>
           <Can
             permission={{ module: "TASK", action: "EDIT" }}
-            context={{
-              responsibleId: String(row.created_for),
-              currentUserId,
-              isSameTeam,
-            }}
+            context={{ responsibleId: String(row.created_for), currentUserId, isSameTeam }}
           >
             <Menu.Item
               leftSection={<IoCheckmarkCircle size={16} />}
@@ -110,11 +118,7 @@ const TaskList = ({
 
           <Can
             permission={{ module: "TASK", action: "DELETE" }}
-            context={{
-              responsibleId: String(row.created_for),
-              currentUserId,
-              isSameTeam,
-            }}
+            context={{ responsibleId: String(row.created_for), currentUserId, isSameTeam }}
           >
             <Menu.Item
               leftSection={<IoTrash size={16} />}
@@ -140,14 +144,8 @@ const TaskList = ({
         title: (
           <Checkbox
             checked={allSelected}
-            indeterminate={
-              selectedRow.length > 0 && selectedRow.length < tasks.length
-                ? true
-                : undefined
-            }
-            onChange={() => {
-              setSelectedRow(allSelected ? [] : tasks.map((t) => t.id));
-            }}
+            indeterminate={selectedRow.length > 0 && selectedRow.length < tasks.length ? true : undefined}
+            onChange={() => { setSelectedRow(allSelected ? [] : tasks.map((t) => t.id)); }}
           />
         ),
         render: (row) => (
@@ -169,14 +167,14 @@ const TaskList = ({
         key: "scheduled_time",
         width: 180,
         align: "center",
-        render: (date) => {
-          const parsed = dayjs(date, "DD-MM-YYYY HH:mm:ss");
-          if (!parsed.isValid()) return "Invalid Date";
+        render: (value) => {
+          const d = toDate(value);
+          if (!d) return "—";
 
+          const parsed = dayjs(d);
           const today = dayjs().startOf("day");
           const isToday = parsed.isSame(today, "day");
-          const isPast = parsed.isBefore(today);
-
+          const isPast = parsed.isBefore(today, "day");
           const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
 
           return (
@@ -192,8 +190,7 @@ const TaskList = ({
         key: "creator_by_full_name",
         width: 150,
         align: "center",
-        render: (_, row) =>
-          row.creator_by_full_name || `ID: ${row.created_by}`,
+        render: (_, row) => row.creator_by_full_name || `ID: ${row.created_by}`,
       },
       {
         title: translations["Responsabil"][language],
@@ -201,8 +198,7 @@ const TaskList = ({
         key: "created_for_full_name",
         width: 150,
         align: "center",
-        render: (_, row) =>
-          row.created_for_full_name || `ID: ${row.created_for}`,
+        render: (_, row) => row.created_for_full_name || `ID: ${row.created_for}`,
       },
       {
         title: translations["Lead ID"][language],
@@ -265,9 +261,7 @@ const TaskList = ({
         align: "center",
         render: (status) => (
           <Tag type={status ? "success" : "danger"}>
-            {status
-              ? translations["done"][language]
-              : translations["toDo"][language]}
+            {status ? translations["done"][language] : translations["toDo"][language]}
           </Tag>
         ),
       },
@@ -278,7 +272,7 @@ const TaskList = ({
         width: 100,
         align: "center",
         render: (_, row) => <ActionMenu row={row} />,
-      }
+      },
     ],
     [language, selectedRow, currentUserId, allSelected, tasks]
   );
