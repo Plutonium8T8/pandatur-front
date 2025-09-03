@@ -2,7 +2,7 @@ export const ISO_DATE = "yyyy-MM-dd";
 export const YYYY_MM_DD = "YYYY.MM.DD";
 export const YYYY_MM_DD_DASH = "YYYY-MM-DD";
 export const HH_mm = "HH:mm";
-export const YYYY_MM_DD_HH_mm_ss = "YYYY-DD-MM HH:mm:ss";
+export const YYYY_MM_DD_HH_mm_ss = "YYYY-MM-DD HH:mm:ss";
 
 export const DEFAULT_PHOTO =
   "https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp";
