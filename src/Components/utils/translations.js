@@ -4101,4 +4101,14 @@ export const translations = {
     RO: "tichete",
     EN: "tickets",
   },
+  "Total": {
+    RU: "Всего",
+    RO: "Total",
+    EN: "Total",
+  },
+  "Total calls": {
+    RU: "Всего звонков",
+    RO: "Total apeluri",
+    EN: "Total calls",
+  },
 };

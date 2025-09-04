@@ -82,9 +82,14 @@ export const TotalCard = ({
                     </div>
                 </Group>
 
-                <Text fz={38} fw={900} style={{ lineHeight: 1 }}>
-                    {fmt(totalAll)}
-                </Text>
+                <div style={{ textAlign: "right" }}>
+                    <Text fz={38} fw={900} style={{ lineHeight: 1 }}>
+                        {fmt(totalAll)}
+                    </Text>
+                    <Text size="xs" c="dimmed" fw={500}>
+                        {getLanguageByKey("Total")}
+                    </Text>
+                </div>
             </Group>
 
             <Divider my="sm" />
@@ -98,7 +103,10 @@ export const TotalCard = ({
                         </ThemeIcon>
                         <Text size="sm" c={colors.in}>{getLanguageByKey("Incoming")}</Text>
                     </Group>
-                    <Text size="sm" fw={700}>{fmt(totalIncoming)}</Text>
+                    <div style={{ textAlign: "right" }}>
+                        <Text size="sm" fw={700}>{fmt(totalIncoming)}</Text>
+                        <Text size="xs" c="dimmed">{getLanguageByKey("calls")}</Text>
+                    </div>
                 </Group>
                 <Progress value={inPct} size="md" radius="xl" color={colors.in} />
 
@@ -109,7 +117,10 @@ export const TotalCard = ({
                         </ThemeIcon>
                         <Text size="sm" c={colors.out}>{getLanguageByKey("Outgoing")}</Text>
                     </Group>
-                    <Text size="sm" fw={700}>{fmt(totalOutgoing)}</Text>
+                    <div style={{ textAlign: "right" }}>
+                        <Text size="sm" fw={700}>{fmt(totalOutgoing)}</Text>
+                        <Text size="xs" c="dimmed">{getLanguageByKey("calls")}</Text>
+                    </div>
                 </Group>
                 <Progress value={outPct} size="md" radius="xl" color={colors.out} />
             </Stack>
