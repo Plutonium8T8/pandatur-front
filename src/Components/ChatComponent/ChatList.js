@@ -25,16 +25,30 @@ import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 
 const CHAT_ITEM_HEIGHT = 94;
 
-const parseCustomDate = (dateStr) => {
-  if (!dateStr) return 0;
-  const [datePart, timePart] = dateStr.split(" ");
-  if (!datePart || !timePart) return 0;
-  const [day, month, year] = datePart.split("-").map(Number);
-  const [hours, minutes, seconds] = timePart.split(":").map(Number);
-  return new Date(year, month - 1, day, hours, minutes, seconds).getTime();
+// безопасно приводим любую дату к timestamp
+const toDate = (val) => {
+  if (!val) return null;
+  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
+  if (typeof val === "number") {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  // поддержим "YYYY-MM-DD HH:mm:ss", ISO, и пр.
+  const s = String(val).trim().replace(" ", "T").replace(/Z$/, "");
+  const d = new Date(s);
+  return isNaN(d.getTime()) ? null : d;
 };
 
-const getLastMessageTime = (ticket) => parseCustomDate(ticket.time_sent);
+const getLastMessageTime = (ticket) => {
+  // приоритет: time_sent -> last_message_time -> updated_at -> created_at
+  const cand =
+    ticket?.time_sent ??
+    ticket?.last_message_time ??
+    ticket?.updated_at ??
+    ticket?.created_at;
+  const d = toDate(cand);
+  return d ? d.getTime() : 0;
+};
 
 const ChatList = ({ ticketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner } = useApp();
@@ -84,9 +98,8 @@ const ChatList = ({ ticketId }) => {
   }, [baseTickets, showMyTickets, searchQuery, userId]);
 
   const sortedTickets = useMemo(() => {
-    return [...filteredTickets].sort(
-      (a, b) => getLastMessageTime(b) - getLastMessageTime(a)
-    );
+    // по убыванию последнего сообщения
+    return [...filteredTickets].sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
   }, [filteredTickets]);
 
   useEffect(() => {
