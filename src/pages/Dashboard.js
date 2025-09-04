@@ -28,6 +28,7 @@ const t = (key) => String(getLanguageByKey?.(key) ?? key);
 const WIDGET_TYPE_OPTIONS = [
   { value: "calls", label: t("Calls") },
   { value: "messages", label: t("Messages") },
+  { value: "ticket_state", label: t("Ticket State") },
   { value: "system_usage", label: t("System usage"), disabled: true },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
@@ -124,6 +125,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getWidgetCalls(payload);
         } else if (widgetType === "messages") {
           res = await api.dashboard.getWidgetMessages(payload);
+        } else if (widgetType === "ticket_state") {
+          res = await api.dashboard.getTicketStateWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -178,6 +181,13 @@ export const Dashboard = () => {
     total: pickNum(obj, ["total_calls_count", "total_messages_count", "total_count", "total", "count", "all"]),
   });
 
+  // утилиты для ticket state данных
+  const ticketStateFrom = (obj) => ({
+    oldClientTickets: pickNum(obj, ["old_client_tickets_count", "old_client", "old"]),
+    newClientTickets: pickNum(obj, ["new_client_tickets_count", "new_client", "new"]),
+    totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]),
+  });
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -195,70 +205,126 @@ export const Dashboard = () => {
 
     // General
     if (D.general) {
-      const c = countsFrom(D.general);
-      W.push({
-        id: "general",
-        type: "general",
-        title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
-        subtitle: getLanguageByKey("All company"),
-        incoming: c.incoming,
-        outgoing: c.outgoing,
-        total: c.total,
-        bg: BG.general,
-      });
+      if (widgetType === "ticket_state") {
+        const ts = ticketStateFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_state",
+          title: getLanguageByKey("Total tickets for the period"),
+          subtitle: getLanguageByKey("All company"),
+          oldClientTickets: ts.oldClientTickets,
+          newClientTickets: ts.newClientTickets,
+          totalTickets: ts.totalTickets,
+          bg: BG.general,
+        });
+      } else {
+        const c = countsFrom(D.general);
+        W.push({
+          id: "general",
+          type: "general",
+          title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
+          subtitle: getLanguageByKey("All company"),
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.general,
+        });
+      }
     }
 
     // By group title
     const byGt = safeArray(D.by_group_title);
     byGt.forEach((r, idx) => {
-      const c = countsFrom(r);
       const name = r.group_title_name ?? r.group_title ?? r.group ?? "-";
-      W.push({
-        id: `gt-${name ?? idx}`,
-        type: "group",
-        title: getLanguageByKey("Group title"),
-        subtitle: name || "-",
-        incoming: c.incoming,
-        outgoing: c.outgoing,
-        total: c.total,
-        bg: BG.by_group_title,
-      });
+      if (widgetType === "ticket_state") {
+        const ts = ticketStateFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "ticket_state",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          oldClientTickets: ts.oldClientTickets,
+          newClientTickets: ts.newClientTickets,
+          totalTickets: ts.totalTickets,
+          bg: BG.by_group_title,
+        });
+      } else {
+        const c = countsFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "group",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_group_title,
+        });
+      }
     });
 
     // By user group
     const byUserGroup = safeArray(D.by_user_group);
     byUserGroup.forEach((r, idx) => {
-      const c = countsFrom(r);
       const name = r.user_group_name ?? r.user_group ?? r.group ?? "-";
-      W.push({
-        id: `ug-${idx}`,
-        type: "group",
-        title: getLanguageByKey("User group"),
-        subtitle: name || "-",
-        incoming: c.incoming,
-        outgoing: c.outgoing,
-        total: c.total,
-        bg: BG.by_user_group,
-      });
+      if (widgetType === "ticket_state") {
+        const ts = ticketStateFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "ticket_state",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          oldClientTickets: ts.oldClientTickets,
+          newClientTickets: ts.newClientTickets,
+          totalTickets: ts.totalTickets,
+          bg: BG.by_user_group,
+        });
+      } else {
+        const c = countsFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "group",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_user_group,
+        });
+      }
     });
 
     // By user
     const byUser = safeArray(D.by_user);
     byUser.forEach((r, idx) => {
-      const c = countsFrom(r);
       const uid = Number(r.user_id);
       const name = userNameById.get(uid);
       const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
-      W.push({
-        id: `user-${uid || idx}`,
-        type: "user",
-        title: getLanguageByKey("User"),
-        subtitle,
-        incoming: c.incoming,
-        outgoing: c.outgoing,
-        total: c.total,
-        bg: BG.by_user,
-      });
+      if (widgetType === "ticket_state") {
+        const ts = ticketStateFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "ticket_state",
+          title: getLanguageByKey("User"),
+          subtitle,
+          oldClientTickets: ts.oldClientTickets,
+          newClientTickets: ts.newClientTickets,
+          totalTickets: ts.totalTickets,
+          bg: BG.by_user,
+        });
+      } else {
+        const c = countsFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "user",
+          title: getLanguageByKey("User"),
+          subtitle,
+          incoming: c.incoming,
+          outgoing: c.outgoing,
+          total: c.total,
+          bg: BG.by_user,
+        });
+      }
     });
 
     // Топ пользователей (по total по убыванию)

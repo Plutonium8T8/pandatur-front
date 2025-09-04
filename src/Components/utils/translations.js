@@ -4061,4 +4061,44 @@ export const translations = {
     RO: "Țări",
     EN: "Countries",
   },
+  "Ticket State": {
+    RU: "Состояние тикетов",
+    RO: "Starea tichetelor",
+    EN: "Ticket State",
+  },
+  "Total tickets for the period": {
+    RU: "Всего тикетов за период",
+    RO: "Total tichete pentru perioada",
+    EN: "Total tickets for the period",
+  },
+  "Old Clients": {
+    RU: "Старые клиенты",
+    RO: "Clienți vechi",
+    EN: "Old Clients",
+  },
+  "New Clients": {
+    RU: "Новые клиенты",
+    RO: "Clienți noi",
+    EN: "New Clients",
+  },
+  "Multiple tickets": {
+    RU: "Несколько тикетов",
+    RO: "Mai multe tichete",
+    EN: "Multiple tickets",
+  },
+  "Single ticket": {
+    RU: "Один тикет",
+    RO: "Un singur tichet",
+    EN: "Single ticket",
+  },
+  "Total tickets": {
+    RU: "Всего тикетов",
+    RO: "Total tichete",
+    EN: "Total tickets",
+  },
+  "tickets": {
+    RU: "тикетов",
+    RO: "tichete",
+    EN: "tickets",
+  },
 };
