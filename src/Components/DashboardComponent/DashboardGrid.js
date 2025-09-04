@@ -5,6 +5,7 @@ import "react-resizable/css/styles.css";
 import { Box } from "@mantine/core";
 import { TotalCard } from "./TotalCard";
 import { TopUsersCard } from "./TopUsersCard";
+import { TicketStateCard } from "./TicketStateCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -237,6 +238,25 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                         return (
                             <div key={w.id} style={{ height: "100%" }}>
                                 <TopUsersCard title={w.title} subtitle={w.subtitle} rows={w.rows} bg={w.bg} />
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_state") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketStateCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        oldClientTickets={Number.isFinite(w.oldClientTickets) ? w.oldClientTickets : 0}
+                                        newClientTickets={Number.isFinite(w.newClientTickets) ? w.newClientTickets : 0}
+                                        totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                    />
+                                </Box>
                             </div>
                         );
                     }

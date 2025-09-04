@@ -33,4 +33,9 @@ export const dashboard = {
     const { data } = await baseAxios.post("/api/dashboard/widget/messages", body);
     return data;
   },
+
+  getTicketStateWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-state", body);
+    return data;
+  },
 };
