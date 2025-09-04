@@ -237,7 +237,7 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                     if (w.type === "top_users") {
                         return (
                             <div key={w.id} style={{ height: "100%" }}>
-                                <TopUsersCard title={w.title} subtitle={w.subtitle} rows={w.rows} bg={w.bg} />
+                                <TopUsersCard title={w.title} subtitle={w.subtitle} rows={w.rows} bg={w.bg} widgetType={w.widgetType} />
                             </div>
                         );
                     }

@@ -331,14 +331,26 @@ export const Dashboard = () => {
     if (byUser.length) {
       const rows = byUser.map((r) => {
         const uid = Number(r.user_id);
-        return {
-          user_id: uid,
-          name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
-          sipuni_id: r.sipuni_id,
-          incoming: Number(r.incoming_calls_count) || 0,
-          outgoing: Number(r.outgoing_calls_count) || 0,
-          total: Number(r.total_calls_count) || 0,
-        };
+        if (widgetType === "ticket_state") {
+          const ts = ticketStateFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            oldClientTickets: ts.oldClientTickets,
+            newClientTickets: ts.newClientTickets,
+            total: ts.totalTickets,
+          };
+        } else {
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            incoming: Number(r.incoming_calls_count) || 0,
+            outgoing: Number(r.outgoing_calls_count) || 0,
+            total: Number(r.total_calls_count) || 0,
+          };
+        }
       });
       W.push({
         id: "top-users",
@@ -347,6 +359,7 @@ export const Dashboard = () => {
         subtitle: getLanguageByKey("By total (desc)"),
         rows,
         bg: BG.by_user,
+        widgetType, // Передаем тип виджета
       });
     }
 

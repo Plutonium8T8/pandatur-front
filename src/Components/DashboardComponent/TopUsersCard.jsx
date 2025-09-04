@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, Box, Group, Stack, Text, Badge, Progress, ThemeIcon } from "@mantine/core";
 import { MdCall } from "react-icons/md";
+import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
 
@@ -11,15 +12,25 @@ export const TopUsersCard = ({
     limit = 10,
     bg,
     colors = { totalAccent: "indigo" },
+    widgetType = "calls", // Тип виджета для определения отображаемых данных
 }) => {
     const data = useMemo(() => {
-        const normal = (rows || []).map((r) => ({
-            ...r,
-            total: Number(r.total ?? r.total_calls_count ?? 0),
-        }));
+        const normal = (rows || []).map((r) => {
+            if (widgetType === "ticket_state") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.totalTickets ?? 0),
+                };
+            } else {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.total_calls_count ?? 0),
+                };
+            }
+        });
         const sorted = normal.sort((a, b) => b.total - a.total);
         return sorted.slice(0, limit);
-    }, [rows, limit]);
+    }, [rows, limit, widgetType]);
 
     const maxTotal = useMemo(
         () => Math.max(1, ...data.map((r) => r.total || 0)),
@@ -52,6 +63,20 @@ export const TopUsersCard = ({
                         {subtitle ? <Badge variant="light">{subtitle}</Badge> : null}
                     </div>
                 </Group>
+                
+                {data.length > 0 && (
+                    <div style={{ textAlign: "right" }}>
+                        <Text fz={24} fw={700} style={{ lineHeight: 1 }}>
+                            {fmt(data.reduce((sum, u) => sum + (u.total || 0), 0))}
+                        </Text>
+                        <Text size="xs" c="dimmed" fw={500}>
+                            {widgetType === "ticket_state" 
+                                ? getLanguageByKey("Total tickets") 
+                                : getLanguageByKey("Total calls")
+                            }
+                        </Text>
+                    </div>
+                )}
             </Group>
 
             <Stack gap="sm" style={{ overflowY: "auto" }}>
@@ -66,7 +91,15 @@ export const TopUsersCard = ({
                                         {u.name || (Number.isFinite(Number(u.user_id)) ? `ID ${u.user_id}` : "-")}
                                     </Text>
                                 </Group>
-                                <Text size="sm"><b>{fmt(u.total)}</b></Text>
+                                <div style={{ textAlign: "right" }}>
+                                    <Text size="sm" fw={700}>{fmt(u.total)}</Text>
+                                    <Text size="xs" c="dimmed">
+                                        {widgetType === "ticket_state" 
+                                            ? getLanguageByKey("tickets") 
+                                            : getLanguageByKey("calls")
+                                        }
+                                    </Text>
+                                </div>
                             </Group>
 
                             {/* зелёная линия */}
