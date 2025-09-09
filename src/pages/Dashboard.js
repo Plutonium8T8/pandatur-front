@@ -29,6 +29,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "calls", label: t("Calls") },
   { value: "messages", label: t("Messages") },
   { value: "ticket_state", label: t("Ticket State") },
+  { value: "tickets_into_work", label: t("Tickets Into Work") },
   { value: "system_usage", label: t("System usage"), disabled: true },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
@@ -127,6 +128,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getWidgetMessages(payload);
         } else if (widgetType === "ticket_state") {
           res = await api.dashboard.getTicketStateWidget(payload);
+        } else if (widgetType === "tickets_into_work") {
+          res = await api.dashboard.getTicketsIntoWorkWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -188,6 +191,11 @@ export const Dashboard = () => {
     totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]),
   });
 
+  // утилиты для tickets into work данных
+  const ticketsIntoWorkFrom = (obj) => ({
+    takenIntoWorkTickets: pickNum(obj, ["taken_into_work_tickets_count", "taken_into_work", "taken"]),
+  });
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -215,6 +223,16 @@ export const Dashboard = () => {
           oldClientTickets: ts.oldClientTickets,
           newClientTickets: ts.newClientTickets,
           totalTickets: ts.totalTickets,
+          bg: BG.general,
+        });
+      } else if (widgetType === "tickets_into_work") {
+        const tiw = ticketsIntoWorkFrom(D.general);
+        W.push({
+          id: "general",
+          type: "tickets_into_work",
+          title: getLanguageByKey("Tickets taken into work"),
+          subtitle: getLanguageByKey("All company"),
+          takenIntoWorkTickets: tiw.takenIntoWorkTickets,
           bg: BG.general,
         });
       } else {
@@ -248,6 +266,16 @@ export const Dashboard = () => {
           totalTickets: ts.totalTickets,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "tickets_into_work") {
+        const tiw = ticketsIntoWorkFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "tickets_into_work",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          takenIntoWorkTickets: tiw.takenIntoWorkTickets,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -277,6 +305,16 @@ export const Dashboard = () => {
           oldClientTickets: ts.oldClientTickets,
           newClientTickets: ts.newClientTickets,
           totalTickets: ts.totalTickets,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "tickets_into_work") {
+        const tiw = ticketsIntoWorkFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "tickets_into_work",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          takenIntoWorkTickets: tiw.takenIntoWorkTickets,
           bg: BG.by_user_group,
         });
       } else {
@@ -312,6 +350,16 @@ export const Dashboard = () => {
           totalTickets: ts.totalTickets,
           bg: BG.by_user,
         });
+      } else if (widgetType === "tickets_into_work") {
+        const tiw = ticketsIntoWorkFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "tickets_into_work",
+          title: getLanguageByKey("User"),
+          subtitle,
+          takenIntoWorkTickets: tiw.takenIntoWorkTickets,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -340,6 +388,15 @@ export const Dashboard = () => {
             oldClientTickets: ts.oldClientTickets,
             newClientTickets: ts.newClientTickets,
             total: ts.totalTickets,
+          };
+        } else if (widgetType === "tickets_into_work") {
+          const tiw = ticketsIntoWorkFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            takenIntoWorkTickets: tiw.takenIntoWorkTickets,
+            total: tiw.takenIntoWorkTickets,
           };
         } else {
           return {

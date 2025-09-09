@@ -6,6 +6,7 @@ import { Box } from "@mantine/core";
 import { TotalCard } from "./TotalCard";
 import { TopUsersCard } from "./TopUsersCard";
 import { TicketStateCard } from "./TicketStateCard";
+import { TicketsIntoWorkCard } from "./TicketsIntoWorkCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -252,6 +253,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         oldClientTickets={Number.isFinite(w.oldClientTickets) ? w.oldClientTickets : 0}
                                         newClientTickets={Number.isFinite(w.newClientTickets) ? w.newClientTickets : 0}
                                         totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "tickets_into_work") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketsIntoWorkCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        takenIntoWorkTickets={Number.isFinite(w.takenIntoWorkTickets) ? w.takenIntoWorkTickets : 0}
                                         dateRange={dateRange}
                                         sizeInfo={sizeInfo}
                                         bg={w.bg}

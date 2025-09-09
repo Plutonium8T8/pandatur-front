@@ -21,6 +21,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.totalTickets ?? 0),
                 };
+            } else if (widgetType === "tickets_into_work") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.takenIntoWorkTickets ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -72,6 +77,8 @@ export const TopUsersCard = ({
                         <Text size="xs" c="dimmed" fw={500}>
                             {widgetType === "ticket_state" 
                                 ? getLanguageByKey("Total tickets") 
+                                : widgetType === "tickets_into_work"
+                                ? getLanguageByKey("Tickets taken")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -96,6 +103,8 @@ export const TopUsersCard = ({
                                     <Text size="xs" c="dimmed">
                                         {widgetType === "ticket_state" 
                                             ? getLanguageByKey("tickets") 
+                                            : widgetType === "tickets_into_work"
+                                            ? getLanguageByKey("tickets")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>

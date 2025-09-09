@@ -4111,4 +4111,24 @@ export const translations = {
     RO: "Total apeluri",
     EN: "Total calls",
   },
+  "Tickets Into Work": {
+    RU: "Тикеты в работу",
+    RO: "Tichete în lucru",
+    EN: "Tickets Into Work",
+  },
+  "Tickets taken into work": {
+    RU: "Тикеты взятые в работу",
+    RO: "Tichete luate în lucru",
+    EN: "Tickets taken into work",
+  },
+  "Taken into work": {
+    RU: "Взято в работу",
+    RO: "Luate în lucru",
+    EN: "Taken into work",
+  },
+  "Tickets taken": {
+    RU: "Тикетов взято",
+    RO: "Tichete luate",
+    EN: "Tickets taken",
+  },
 };
