@@ -50,8 +50,7 @@
     "eject": "craco eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "prettier": "npx prettier . --write",
-    "prepare": "husky"
+    "prettier": "npx prettier . --write"
   },
   "eslintConfig": {
     "extends": [
@@ -74,12 +73,7 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "gh-pages": "^6.3.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^15.5.0",
     "prettier": "^3.5.3"
   },
-  "homepage": "/",
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
-  }
+  "homepage": "/"
 }
