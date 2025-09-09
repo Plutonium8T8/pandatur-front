@@ -4131,4 +4131,9 @@ export const translations = {
     RO: "Tichete luate",
     EN: "Tickets taken",
   },
+  "GPT": {
+    RU: "GPT",
+    RO: "GPT",
+    EN: "GPT",
+  },
 };
