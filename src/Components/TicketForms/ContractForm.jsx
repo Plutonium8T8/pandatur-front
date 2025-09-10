@@ -23,6 +23,9 @@ export const ContractForm = ({
     groupTitle: data?.group_title || "RO",
   });
 
+  // Проверяем есть ли группа "IT dep." у пользователя
+  const isITDep = userGroups.some((g) => g.name === "IT dep.");
+
   useEffect(() => {
     if (data) {
       formInstance.setValues({
@@ -235,7 +238,7 @@ export const ContractForm = ({
         />
       )}
 
-      {isAdmin && (
+      {(isAdmin || isITDep) && (
         <LabelSwitch
           mt="md"
           label={getLanguageByKey("Control Admin")}
