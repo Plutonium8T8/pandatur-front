@@ -4136,4 +4136,34 @@ export const translations = {
     RO: "GPT",
     EN: "GPT",
   },
+  "System usage": {
+    RU: "Использование системы",
+    RO: "Utilizarea sistemului",
+    EN: "System usage",
+  },
+  "Activity hours": {
+    RU: "Часы активности",
+    RO: "Ore de activitate",
+    EN: "Activity hours",
+  },
+  "Minutes": {
+    RU: "Минуты",
+    RO: "Minute",
+    EN: "Minutes",
+  },
+  "Hours": {
+    RU: "Часы",
+    RO: "Ore",
+    EN: "Hours",
+  },
+  "activity": {
+    RU: "активность",
+    RO: "activitate",
+    EN: "activity",
+  },
+  "min": {
+    RU: "мин",
+    RO: "min",
+    EN: "min",
+  },
 };

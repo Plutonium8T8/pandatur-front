@@ -30,7 +30,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "messages", label: t("Messages") },
   { value: "ticket_state", label: t("Ticket State") },
   { value: "tickets_into_work", label: t("Tickets Into Work") },
-  { value: "system_usage", label: t("System usage"), disabled: true },
+  { value: "system_usage", label: t("System usage") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -130,6 +130,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketStateWidget(payload);
         } else if (widgetType === "tickets_into_work") {
           res = await api.dashboard.getTicketsIntoWorkWidget(payload);
+        } else if (widgetType === "system_usage") {
+          res = await api.dashboard.getSystemUsageWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -196,6 +198,12 @@ export const Dashboard = () => {
     takenIntoWorkTickets: pickNum(obj, ["taken_into_work_tickets_count", "taken_into_work", "taken"]),
   });
 
+  // утилиты для system usage данных
+  const systemUsageFrom = (obj) => ({
+    activityMinutes: pickNum(obj, ["activity_minutes", "minutes", "min"]),
+    activityHours: pickNum(obj, ["activity_hours", "hours", "hrs"]),
+  });
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -233,6 +241,17 @@ export const Dashboard = () => {
           title: getLanguageByKey("Tickets taken into work"),
           subtitle: getLanguageByKey("All company"),
           takenIntoWorkTickets: tiw.takenIntoWorkTickets,
+          bg: BG.general,
+        });
+      } else if (widgetType === "system_usage") {
+        const su = systemUsageFrom(D.general);
+        W.push({
+          id: "general",
+          type: "system_usage",
+          title: getLanguageByKey("System usage"),
+          subtitle: getLanguageByKey("All company"),
+          activityMinutes: su.activityMinutes,
+          activityHours: su.activityHours,
           bg: BG.general,
         });
       } else {
@@ -317,6 +336,17 @@ export const Dashboard = () => {
           takenIntoWorkTickets: tiw.takenIntoWorkTickets,
           bg: BG.by_user_group,
         });
+      } else if (widgetType === "system_usage") {
+        const su = systemUsageFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "system_usage",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          activityMinutes: su.activityMinutes,
+          activityHours: su.activityHours,
+          bg: BG.by_user_group,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -360,6 +390,17 @@ export const Dashboard = () => {
           takenIntoWorkTickets: tiw.takenIntoWorkTickets,
           bg: BG.by_user,
         });
+      } else if (widgetType === "system_usage") {
+        const su = systemUsageFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "system_usage",
+          title: getLanguageByKey("User"),
+          subtitle,
+          activityMinutes: su.activityMinutes,
+          activityHours: su.activityHours,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -397,6 +438,16 @@ export const Dashboard = () => {
             sipuni_id: r.sipuni_id,
             takenIntoWorkTickets: tiw.takenIntoWorkTickets,
             total: tiw.takenIntoWorkTickets,
+          };
+        } else if (widgetType === "system_usage") {
+          const su = systemUsageFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            activityMinutes: su.activityMinutes,
+            activityHours: su.activityHours,
+            total: su.activityHours,
           };
         } else {
           return {

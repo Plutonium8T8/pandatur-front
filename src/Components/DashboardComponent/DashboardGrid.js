@@ -7,6 +7,7 @@ import { TotalCard } from "./TotalCard";
 import { TopUsersCard } from "./TopUsersCard";
 import { TicketStateCard } from "./TicketStateCard";
 import { TicketsIntoWorkCard } from "./TicketsIntoWorkCard";
+import { SystemUsageCard } from "./SystemUsageCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -270,6 +271,24 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         title={w.title}
                                         subtitle={w.subtitle}
                                         takenIntoWorkTickets={Number.isFinite(w.takenIntoWorkTickets) ? w.takenIntoWorkTickets : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "system_usage") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <SystemUsageCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        activityMinutes={Number.isFinite(w.activityMinutes) ? w.activityMinutes : 0}
+                                        activityHours={Number.isFinite(w.activityHours) ? w.activityHours : 0}
                                         dateRange={dateRange}
                                         sizeInfo={sizeInfo}
                                         bg={w.bg}
