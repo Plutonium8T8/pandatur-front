@@ -199,10 +199,18 @@ export const Dashboard = () => {
   });
 
   // утилиты для system usage данных
-  const systemUsageFrom = (obj) => ({
-    activityMinutes: pickNum(obj, ["activity_minutes", "minutes", "min"]),
-    activityHours: pickNum(obj, ["activity_hours", "hours", "hrs"]),
-  });
+  const systemUsageFrom = (obj) => {
+    const minutes = pickNum(obj, ["activity_minutes", "minutes", "min"]);
+    const hours = pickNum(obj, ["activity_hours", "hours", "hrs"]);
+    
+    // Если есть минуты, конвертируем их в часы (с округлением до 2 знаков)
+    const convertedHours = minutes ? Math.round((minutes / 60) * 100) / 100 : 0;
+    
+    return {
+      activityMinutes: minutes,
+      activityHours: hours || convertedHours, // Используем переданные часы или конвертированные из минут
+    };
+  };
 
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {

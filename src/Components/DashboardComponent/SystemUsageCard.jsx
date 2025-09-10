@@ -5,6 +5,20 @@ import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (Number(n) || 0).toLocaleString();
 
+// Форматирование времени для system_usage
+const fmtTime = (hours) => {
+  if (typeof hours !== "number" || hours === 0) return "0ч";
+  
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.round((hours - wholeHours) * 60);
+  
+  if (minutes === 0) {
+    return `${wholeHours}ч`;
+  } else {
+    return `${wholeHours}ч ${minutes}м`;
+  }
+};
+
 export const SystemUsageCard = ({ 
   title, 
   subtitle, 
@@ -49,7 +63,7 @@ export const SystemUsageCard = ({
         <Group justify="space-between" align="center" style={{ flex: 1 }}>
           <Box>
             <Text fz={38} fw={900} style={{ lineHeight: 1 }}>
-              {fmt(activityHours)}
+              {fmtTime(activityHours)}
             </Text>
             <Text size="xs" c="dimmed" fw={500}>
               {getLanguageByKey("Activity hours")}

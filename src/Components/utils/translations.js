@@ -4166,4 +4166,9 @@ export const translations = {
     RO: "min",
     EN: "min",
   },
+  "hours": {
+    RU: "часов",
+    RO: "ore",
+    EN: "hours",
+  },
 };

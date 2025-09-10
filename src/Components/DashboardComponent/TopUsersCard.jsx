@@ -5,6 +5,20 @@ import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
 
+// Форматирование времени для system_usage
+const fmtTime = (hours) => {
+  if (typeof hours !== "number" || hours === 0) return "0ч";
+  
+  const wholeHours = Math.floor(hours);
+  const minutes = Math.round((hours - wholeHours) * 60);
+  
+  if (minutes === 0) {
+    return `${wholeHours}ч`;
+  } else {
+    return `${wholeHours}ч ${minutes}м`;
+  }
+};
+
 export const TopUsersCard = ({
     title = "Top users",
     subtitle,
@@ -25,6 +39,11 @@ export const TopUsersCard = ({
                 return {
                     ...r,
                     total: Number(r.total ?? r.takenIntoWorkTickets ?? 0),
+                };
+            } else if (widgetType === "system_usage") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.activityHours ?? 0),
                 };
             } else {
                 return {
@@ -72,13 +91,18 @@ export const TopUsersCard = ({
                 {data.length > 0 && (
                     <div style={{ textAlign: "right" }}>
                         <Text fz={24} fw={700} style={{ lineHeight: 1 }}>
-                            {fmt(data.reduce((sum, u) => sum + (u.total || 0), 0))}
+                            {widgetType === "system_usage" 
+                                ? fmtTime(data.reduce((sum, u) => sum + (u.total || 0), 0))
+                                : fmt(data.reduce((sum, u) => sum + (u.total || 0), 0))
+                            }
                         </Text>
                         <Text size="xs" c="dimmed" fw={500}>
                             {widgetType === "ticket_state" 
                                 ? getLanguageByKey("Total tickets") 
                                 : widgetType === "tickets_into_work"
                                 ? getLanguageByKey("Tickets taken")
+                                : widgetType === "system_usage"
+                                ? getLanguageByKey("Activity hours")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -99,12 +123,19 @@ export const TopUsersCard = ({
                                     </Text>
                                 </Group>
                                 <div style={{ textAlign: "right" }}>
-                                    <Text size="sm" fw={700}>{fmt(u.total)}</Text>
+                                    <Text size="sm" fw={700}>
+                                        {widgetType === "system_usage" 
+                                            ? fmtTime(u.total)
+                                            : fmt(u.total)
+                                        }
+                                    </Text>
                                     <Text size="xs" c="dimmed">
                                         {widgetType === "ticket_state" 
                                             ? getLanguageByKey("tickets") 
                                             : widgetType === "tickets_into_work"
                                             ? getLanguageByKey("tickets")
+                                            : widgetType === "system_usage"
+                                            ? getLanguageByKey("hours")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>
