@@ -3287,6 +3287,11 @@ export const translations = {
     RU: "Создана задача",
     EN: "Task created"
   },
+  "Ticket creat": {
+    RO: "Ticket creat",
+    RU: "Создан тикет",
+    EN: "Ticket created"
+  },
   "Câmp actualizat": {
     RO: "Câmp actualizat",
     RU: "Обновлено поле",

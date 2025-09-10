@@ -59,8 +59,13 @@ export const MessagesLogItem = ({ log, technicians }) => {
             description = `${log.action} ${log.subject ?? ""}`.trim();
         }
     } else {
-        const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
-        description = `${translations["Câmp modificat"][language]} "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
+        // Специальная обработка для создания тикета
+        if (log.action === "created" && log.subject === "ticket") {
+            description = translations["Ticket creat"][language];
+        } else {
+            const subjectLabel = SUBJECT_LABELS[log.subject] || log.subject;
+            description = `${translations["Câmp modificat"][language]} "${subjectLabel}": ${getTechLabel(from)} → ${getTechLabel(to)}`;
+        }
     }
 
     const logType =
