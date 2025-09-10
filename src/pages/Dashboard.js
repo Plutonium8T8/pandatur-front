@@ -32,6 +32,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "tickets_into_work", label: t("Tickets Into Work") },
   { value: "system_usage", label: t("System usage") },
   { value: "ticket_distribution", label: t("Ticket Distribution") },
+  { value: "closed_tickets_count", label: t("Closed Tickets Count") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -135,6 +136,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getSystemUsageWidget(payload);
         } else if (widgetType === "ticket_distribution") {
           res = await api.dashboard.getTicketDistributionWidget(payload);
+        } else if (widgetType === "closed_tickets_count") {
+          res = await api.dashboard.getClosedTicketsCountWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -220,6 +223,13 @@ export const Dashboard = () => {
     distributedTickets: pickNum(obj, ["distributed_tickets_count", "distributed_tickets", "distributed"]),
   }), []);
 
+  // утилиты для closed tickets count данных
+  const closedTicketsCountFrom = useCallback((obj) => ({
+    olderThan11Days: pickNum(obj, ["older_than_11_days_count", "older_than_11_days", "older"]),
+    newerThan11Days: pickNum(obj, ["newer_than_11_days_count", "newer_than_11_days", "newer"]),
+    totalClosedTickets: pickNum(obj, ["total_closed_tickets_count", "total_closed_tickets", "total"]),
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -278,6 +288,18 @@ export const Dashboard = () => {
           title: getLanguageByKey("Ticket Distribution"),
           subtitle: getLanguageByKey("All company"),
           distributedTickets: td.distributedTickets,
+          bg: BG.general,
+        });
+      } else if (widgetType === "closed_tickets_count") {
+        const ctc = closedTicketsCountFrom(D.general);
+        W.push({
+          id: "general",
+          type: "closed_tickets_count",
+          title: getLanguageByKey("Closed Tickets Count"),
+          subtitle: getLanguageByKey("All company"),
+          olderThan11Days: ctc.olderThan11Days,
+          newerThan11Days: ctc.newerThan11Days,
+          totalClosedTickets: ctc.totalClosedTickets,
           bg: BG.general,
         });
       } else {
@@ -342,6 +364,18 @@ export const Dashboard = () => {
           distributedTickets: td.distributedTickets,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "closed_tickets_count") {
+        const ctc = closedTicketsCountFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "closed_tickets_count",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          olderThan11Days: ctc.olderThan11Days,
+          newerThan11Days: ctc.newerThan11Days,
+          totalClosedTickets: ctc.totalClosedTickets,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -402,6 +436,18 @@ export const Dashboard = () => {
           title: getLanguageByKey("User group"),
           subtitle: name || "-",
           distributedTickets: td.distributedTickets,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "closed_tickets_count") {
+        const ctc = closedTicketsCountFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "closed_tickets_count",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          olderThan11Days: ctc.olderThan11Days,
+          newerThan11Days: ctc.newerThan11Days,
+          totalClosedTickets: ctc.totalClosedTickets,
           bg: BG.by_user_group,
         });
       } else {
@@ -468,6 +514,18 @@ export const Dashboard = () => {
           distributedTickets: td.distributedTickets,
           bg: BG.by_user,
         });
+      } else if (widgetType === "closed_tickets_count") {
+        const ctc = closedTicketsCountFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "closed_tickets_count",
+          title: getLanguageByKey("User"),
+          subtitle,
+          olderThan11Days: ctc.olderThan11Days,
+          newerThan11Days: ctc.newerThan11Days,
+          totalClosedTickets: ctc.totalClosedTickets,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -524,6 +582,17 @@ export const Dashboard = () => {
             sipuni_id: r.sipuni_id,
             distributedTickets: td.distributedTickets,
             total: td.distributedTickets,
+          };
+        } else if (widgetType === "closed_tickets_count") {
+          const ctc = closedTicketsCountFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            olderThan11Days: ctc.olderThan11Days,
+            newerThan11Days: ctc.newerThan11Days,
+            totalClosedTickets: ctc.totalClosedTickets,
+            total: ctc.totalClosedTickets,
           };
         } else {
           return {
@@ -584,7 +653,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

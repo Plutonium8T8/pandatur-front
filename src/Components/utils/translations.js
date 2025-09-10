@@ -4191,4 +4191,24 @@ export const translations = {
     RO: "sistem",
     EN: "system",
   },
+  "Closed Tickets Count": {
+    RU: "Количество закрытых тикетов",
+    RO: "Numărul de tichete închise",
+    EN: "Closed Tickets Count",
+  },
+  "Total closed tickets": {
+    RU: "Всего закрытых тикетов",
+    RO: "Total tichete închise",
+    EN: "Total closed tickets",
+  },
+  "Older than 11 days": {
+    RU: "Старше 11 дней",
+    RO: "Mai vechi de 11 zile",
+    EN: "Older than 11 days",
+  },
+  "Newer than 11 days": {
+    RU: "Новее 11 дней",
+    RO: "Mai noi de 11 zile",
+    EN: "Newer than 11 days",
+  },
 };

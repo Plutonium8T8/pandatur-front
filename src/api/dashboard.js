@@ -53,4 +53,9 @@ export const dashboard = {
     const { data } = await baseAxios.post("/api/dashboard/widget/ticket-distribution", body);
     return data;
   },
+
+  getClosedTicketsCountWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/closed-tickets-count", body);
+    return data;
+  },
 };

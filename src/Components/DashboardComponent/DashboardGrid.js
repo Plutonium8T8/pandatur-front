@@ -9,6 +9,7 @@ import { TicketStateCard } from "./TicketStateCard";
 import { TicketsIntoWorkCard } from "./TicketsIntoWorkCard";
 import { SystemUsageCard } from "./SystemUsageCard";
 import { TicketDistributionCard } from "./TicketDistributionCard";
+import { ClosedTicketsCountCard } from "./ClosedTicketsCountCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -307,6 +308,25 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         title={w.title}
                                         subtitle={w.subtitle}
                                         distributedTickets={Number.isFinite(w.distributedTickets) ? w.distributedTickets : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "closed_tickets_count") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <ClosedTicketsCountCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        olderThan11Days={Number.isFinite(w.olderThan11Days) ? w.olderThan11Days : 0}
+                                        newerThan11Days={Number.isFinite(w.newerThan11Days) ? w.newerThan11Days : 0}
+                                        totalClosedTickets={Number.isFinite(w.totalClosedTickets) ? w.totalClosedTickets : 0}
                                         dateRange={dateRange}
                                         sizeInfo={sizeInfo}
                                         bg={w.bg}
