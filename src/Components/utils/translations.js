@@ -4171,4 +4171,24 @@ export const translations = {
     RO: "ore",
     EN: "hours",
   },
+  "Ticket Distribution": {
+    RU: "Распределение тикетов",
+    RO: "Distribuția tichetelor",
+    EN: "Ticket Distribution",
+  },
+  "Distributed tickets": {
+    RU: "Распределенные тикеты",
+    RO: "Tichete distribuite",
+    EN: "Distributed tickets",
+  },
+  "Distributed": {
+    RU: "Распределено",
+    RO: "Distribuit",
+    EN: "Distributed",
+  },
+  "system": {
+    RU: "система",
+    RO: "sistem",
+    EN: "system",
+  },
 };

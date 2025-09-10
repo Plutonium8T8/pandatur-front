@@ -8,6 +8,7 @@ import { TopUsersCard } from "./TopUsersCard";
 import { TicketStateCard } from "./TicketStateCard";
 import { TicketsIntoWorkCard } from "./TicketsIntoWorkCard";
 import { SystemUsageCard } from "./SystemUsageCard";
+import { TicketDistributionCard } from "./TicketDistributionCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -289,6 +290,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         subtitle={w.subtitle}
                                         activityMinutes={Number.isFinite(w.activityMinutes) ? w.activityMinutes : 0}
                                         activityHours={Number.isFinite(w.activityHours) ? w.activityHours : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_distribution") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketDistributionCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        distributedTickets={Number.isFinite(w.distributedTickets) ? w.distributedTickets : 0}
                                         dateRange={dateRange}
                                         sizeInfo={sizeInfo}
                                         bg={w.bg}

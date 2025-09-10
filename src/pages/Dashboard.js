@@ -31,6 +31,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_state", label: t("Ticket State") },
   { value: "tickets_into_work", label: t("Tickets Into Work") },
   { value: "system_usage", label: t("System usage") },
+  { value: "ticket_distribution", label: t("Ticket Distribution") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -132,6 +133,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketsIntoWorkWidget(payload);
         } else if (widgetType === "system_usage") {
           res = await api.dashboard.getSystemUsageWidget(payload);
+        } else if (widgetType === "ticket_distribution") {
+          res = await api.dashboard.getTicketDistributionWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -180,26 +183,26 @@ export const Dashboard = () => {
     }
     return 0;
   };
-  const countsFrom = (obj) => ({
+  const countsFrom = useCallback((obj) => ({
     incoming: pickNum(obj, ["incoming_calls_count", "incoming_messages_count", "incoming_count", "incoming", "in"]),
     outgoing: pickNum(obj, ["outgoing_calls_count", "outgoing_messages_count", "outgoing_count", "outgoing", "out"]),
     total: pickNum(obj, ["total_calls_count", "total_messages_count", "total_count", "total", "count", "all"]),
-  });
+  }), []);
 
   // утилиты для ticket state данных
-  const ticketStateFrom = (obj) => ({
+  const ticketStateFrom = useCallback((obj) => ({
     oldClientTickets: pickNum(obj, ["old_client_tickets_count", "old_client", "old"]),
     newClientTickets: pickNum(obj, ["new_client_tickets_count", "new_client", "new"]),
     totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]),
-  });
+  }), []);
 
   // утилиты для tickets into work данных
-  const ticketsIntoWorkFrom = (obj) => ({
+  const ticketsIntoWorkFrom = useCallback((obj) => ({
     takenIntoWorkTickets: pickNum(obj, ["taken_into_work_tickets_count", "taken_into_work", "taken"]),
-  });
+  }), []);
 
   // утилиты для system usage данных
-  const systemUsageFrom = (obj) => {
+  const systemUsageFrom = useCallback((obj) => {
     const minutes = pickNum(obj, ["activity_minutes", "minutes", "min"]);
     const hours = pickNum(obj, ["activity_hours", "hours", "hrs"]);
     
@@ -210,7 +213,12 @@ export const Dashboard = () => {
       activityMinutes: minutes,
       activityHours: hours || convertedHours, // Используем переданные часы или конвертированные из минут
     };
-  };
+  }, []);
+
+  // утилиты для ticket distribution данных
+  const ticketDistributionFrom = useCallback((obj) => ({
+    distributedTickets: pickNum(obj, ["distributed_tickets_count", "distributed_tickets", "distributed"]),
+  }), []);
 
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
@@ -262,6 +270,16 @@ export const Dashboard = () => {
           activityHours: su.activityHours,
           bg: BG.general,
         });
+      } else if (widgetType === "ticket_distribution") {
+        const td = ticketDistributionFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_distribution",
+          title: getLanguageByKey("Ticket Distribution"),
+          subtitle: getLanguageByKey("All company"),
+          distributedTickets: td.distributedTickets,
+          bg: BG.general,
+        });
       } else {
         const c = countsFrom(D.general);
         W.push({
@@ -301,6 +319,27 @@ export const Dashboard = () => {
           title: getLanguageByKey("Group title"),
           subtitle: name || "-",
           takenIntoWorkTickets: tiw.takenIntoWorkTickets,
+          bg: BG.by_group_title,
+        });
+      } else if (widgetType === "system_usage") {
+        const su = systemUsageFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "system_usage",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          activityMinutes: su.activityMinutes,
+          activityHours: su.activityHours,
+          bg: BG.by_group_title,
+        });
+      } else if (widgetType === "ticket_distribution") {
+        const td = ticketDistributionFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "ticket_distribution",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          distributedTickets: td.distributedTickets,
           bg: BG.by_group_title,
         });
       } else {
@@ -353,6 +392,16 @@ export const Dashboard = () => {
           subtitle: name || "-",
           activityMinutes: su.activityMinutes,
           activityHours: su.activityHours,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "ticket_distribution") {
+        const td = ticketDistributionFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "ticket_distribution",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          distributedTickets: td.distributedTickets,
           bg: BG.by_user_group,
         });
       } else {
@@ -409,6 +458,16 @@ export const Dashboard = () => {
           activityHours: su.activityHours,
           bg: BG.by_user,
         });
+      } else if (widgetType === "ticket_distribution") {
+        const td = ticketDistributionFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "ticket_distribution",
+          title: getLanguageByKey("User"),
+          subtitle,
+          distributedTickets: td.distributedTickets,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -456,6 +515,15 @@ export const Dashboard = () => {
             activityMinutes: su.activityMinutes,
             activityHours: su.activityHours,
             total: su.activityHours,
+          };
+        } else if (widgetType === "ticket_distribution") {
+          const td = ticketDistributionFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            distributedTickets: td.distributedTickets,
+            total: td.distributedTickets,
           };
         } else {
           return {
@@ -516,7 +584,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
