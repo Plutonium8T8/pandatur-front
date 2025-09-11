@@ -97,7 +97,22 @@ const NoteContent = ({ note }) => {
                     src={url}
                     alt={fileName}
                     loading="lazy"
-                    style={{ maxWidth: "100%", maxHeight: 460, objectFit: "contain", borderRadius: 10, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }}
+                    style={{ 
+                        maxWidth: "100%", 
+                        maxHeight: 460, 
+                        objectFit: "contain", 
+                        borderRadius: 10, 
+                        boxShadow: "0 2px 10px rgba(0,0,0,.06)",
+                        cursor: "pointer",
+                        transition: "transform 0.2s ease"
+                    }}
+                    onClick={() => window.open(url, '_blank')}
+                    onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = "scale(1.02)";
+                    }}
+                    onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = "scale(1)";
+                    }}
                     onError={(e) => {
                         e.currentTarget.style.display = "none";
                         const link = e.currentTarget.nextSibling;
