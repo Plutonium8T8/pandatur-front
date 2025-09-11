@@ -81,18 +81,6 @@ export const AppProvider = ({ children }) => {
         return t;
       })
     );
-
-    setTimeout(() => {
-      // if (updatedGlobal && updatedFiltered) {
-      //   console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
-      // } else if (updatedGlobal) {
-      //   console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
-      // } else if (updatedFiltered) {
-      //   console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
-      // } else {
-      //   console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
-      // }
-    }, 0);
   };
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
@@ -223,13 +211,64 @@ export const AppProvider = ({ children }) => {
 
   const fetchSingleTicket = async (ticketId) => {
     try {
+      console.log(`📡 Fetching ticket ${ticketId} from server...`);
+      
       const ticket = await api.tickets.ticket.getLightById(ticketId);
+      
+      console.log(`📦 Received ticket ${ticketId} from server:`, {
+        workflow: ticket.workflow,
+        technician_id: ticket.technician_id,
+        priority: ticket.priority,
+        contact: ticket.contact,
+        group_title: ticket.group_title,
+        unseen_count: ticket.unseen_count
+      });
+
       setTickets((prev) => {
         const exists = prev.find((t) => t.id === ticketId);
-        return exists ? prev.map((t) => (t.id === ticketId ? ticket : t)) : [...prev, ticket];
+        
+        if (exists) {
+          console.log(`🔄 Updating existing ticket ${ticketId} in main tickets list:`, {
+            old_workflow: exists.workflow,
+            new_workflow: ticket.workflow,
+            old_technician_id: exists.technician_id,
+            new_technician_id: ticket.technician_id,
+            old_priority: exists.priority,
+            new_priority: ticket.priority,
+            workflow_changed: exists.workflow !== ticket.workflow,
+            technician_changed: exists.technician_id !== ticket.technician_id,
+            priority_changed: exists.priority !== ticket.priority
+          });
+          
+          return prev.map((t) => (t.id === ticketId ? ticket : t));
+        } else {
+          console.log(`➕ Adding new ticket ${ticketId} to main tickets list`);
+          return [...prev, ticket];
+        }
       });
+
+      setChatFilteredTickets((prev) => {
+        const exists = prev.find((t) => t.id === ticketId);
+        
+        if (exists) {
+          console.log(`🔄 Updating existing ticket ${ticketId} in chat filtered tickets list:`, {
+            old_workflow: exists.workflow,
+            new_workflow: ticket.workflow,
+            workflow_changed: exists.workflow !== ticket.workflow
+          });
+          
+          return prev.map((t) => (t.id === ticketId ? ticket : t));
+        } else {
+          console.log(`➕ Adding new ticket ${ticketId} to chat filtered tickets list`);
+          return [...prev, ticket];
+        }
+      });
+
       setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
+      
+      console.log(`✅ Successfully updated ticket ${ticketId}`);
     } catch (error) {
+      console.error(`❌ Failed to fetch ticket ${ticketId}:`, error);
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
@@ -349,53 +388,54 @@ export const AppProvider = ({ children }) => {
       }
 
 
-      // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
-      //   const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
+      case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
+        const { ticket_id, ticket_ids } = message.data || {};
 
-      //   const idsRaw = Array.isArray(ticket_ids)
-      //     ? ticket_ids
-      //     : (ticket_id ? [ticket_id] : []);
+        const idsRaw = Array.isArray(ticket_ids)
+          ? ticket_ids
+          : (ticket_id ? [ticket_id] : []);
 
-      //   const ids = [...new Set(
-      //     idsRaw
-      //       .map((v) => Number(v))
-      //       .filter((v) => Number.isFinite(v))
-      //   )];
+        const ids = [...new Set(
+          idsRaw
+            .map((v) => Number(v))
+            .filter((v) => Number.isFinite(v))
+        )];
 
-      //   const isMatchingGroup = group_title === groupTitleForApi;
-      //   const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
+        if (!ids.length) {
+          console.log("📭 TICKET_UPDATE: No valid ticket IDs found");
+          break;
+        }
 
-      //   if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
-      //     break;
-      //   }
+        console.log("🔄 TICKET_UPDATE received:", {
+          ids,
+          timestamp: new Date().toISOString()
+        });
 
-      //   ids.forEach((id) => {
-      //     try {
-      //       fetchSingleTicket(id);
-      //     } catch (e) {
-      //     }
-      //   });
+        // Проверяем, есть ли тикеты в нашем списке и обновляем их
+        ids.forEach((id) => {
+          const existsInTickets = tickets.some(t => t.id === id);
+          const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
+          
+          console.log(`🔍 Checking ticket ${id}:`, {
+            existsInTickets,
+            existsInChatFiltered,
+            shouldUpdate: existsInTickets || existsInChatFiltered
+          });
 
-      //   const socketInstance = socketRef.current;
-      //   if (socketInstance?.readyState === WebSocket.OPEN) {
-      //     const CHUNK_SIZE = 50;
-      //     for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
-      //       const chunk = ids.slice(i, i + CHUNK_SIZE);
-      //       socketInstance.send(
-      //         JSON.stringify({
-      //           type: TYPE_SOCKET_EVENTS.CONNECT,
-      //           data: { ticket_id: chunk },
-      //         })
-      //       );
-      //     }
-      //   } else {
-      //     enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
-      //       variant: "error",
-      //     });
-      //   }
+          if (existsInTickets || existsInChatFiltered) {
+            console.log(`✅ Fetching updated ticket ${id} from server`);
+            try {
+              fetchSingleTicket(id);
+            } catch (e) {
+              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+            }
+          } else {
+            console.log(`⚠️ Ticket ${id} not found in current tickets list, skipping update`);
+          }
+        });
 
-      //   break;
-      // }
+        break;
+      }
 
       default:
         console.warn("Invalid socket message type:", message.type);
@@ -486,7 +526,8 @@ export const AppProvider = ({ children }) => {
 
       return () => clearInterval(interval);
     }
-  }, [socketRef?.current, groupTitleForApi, workflowOptions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupTitleForApi, workflowOptions]);
 
   return (
     <AppContext.Provider

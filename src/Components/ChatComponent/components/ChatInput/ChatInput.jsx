@@ -92,14 +92,14 @@ export const ChatInput = ({
 
   // Устанавливаем actionNeeded = true если есть непрочитанные сообщения
   useEffect(() => {
-    console.log("👀 unseenCount changed:", { 
-      unseenCount, 
-      currentActionNeeded: actionNeeded,
-      ticketActionNeeded: ticket?.action_needed
-    });
+    // console.log("👀 unseenCount changed:", { 
+    //   unseenCount, 
+    //   currentActionNeeded: actionNeeded,
+    //   ticketActionNeeded: ticket?.action_needed
+    // });
     
     if (unseenCount > 0) {
-      console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
+      // console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
       setActionNeeded(true);
     }
   }, [unseenCount, actionNeeded, ticket?.action_needed]);
