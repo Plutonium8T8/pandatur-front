@@ -1,6 +1,16 @@
-import { Flex, Text } from "@mantine/core";
+import { Flex, Text, Box, Badge, Group, Stack } from "@mantine/core";
 import { parseServerDate, getFullName } from "../../../utils";
 import { translations } from "../../../utils";
+import { 
+    FaTicketAlt, 
+    FaTasks, 
+    FaUser, 
+    FaClock, 
+    FaCheckCircle,
+    FaEdit,
+    FaTrash,
+    FaPlus
+} from "react-icons/fa";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -9,6 +19,29 @@ const SUBJECT_LABELS = {
     technician_id: translations["Responsabil"][language],
     created_by: translations["Autor"][language],
     workflow: translations["Etapă"][language],
+};
+
+// Функция для получения иконки и цвета действия
+const getActionIcon = (action, subject, isTask) => {
+    if (isTask) {
+        if (["create", "created"].includes(action)) return { icon: FaPlus, color: "green" };
+        if (["update", "updated"].includes(action)) return { icon: FaEdit, color: "blue" };
+        if (["delete", "deleted"].includes(action)) return { icon: FaTrash, color: "red" };
+    } else {
+        if (action === "created" && subject === "ticket") return { icon: FaTicketAlt, color: "green" };
+        if (["update", "updated"].includes(action)) return { icon: FaEdit, color: "blue" };
+        if (["delete", "deleted"].includes(action)) return { icon: FaTrash, color: "red" };
+    }
+    return { icon: FaEdit, color: "gray" };
+};
+
+// Функция для получения цвета типа лога
+const getLogTypeColor = (type) => {
+    switch (type) {
+        case "ticket": return "blue";
+        case "task": return "orange";
+        default: return "gray";
+    }
 };
 
 export const MessagesLogItem = ({ log, technicians }) => {
@@ -75,19 +108,65 @@ export const MessagesLogItem = ({ log, technicians }) => {
                 ? "TICKET"
                 : log.type || "";
 
+    const { icon: ActionIcon, color: actionColor } = getActionIcon(log.action, log.subject, isTask);
+    const logTypeColor = getLogTypeColor(log.type);
+
     return (
-        <Flex pl="md" pr="md" pt={4} pb={4} direction="row" justify="space-between">
-            <Flex direction="column">
-                <Text size="xs">
-                    <Text span c="dimmed" mr={6}>
-                        [{logType}]
+        <Box
+            p="md"
+            mb="xs"
+            style={{
+                backgroundColor: "var(--mantine-color-gray-0)",
+                borderRadius: "8px",
+                border: "1px solid var(--mantine-color-gray-2)",
+                transition: "all 0.2s ease",
+            }}
+            sx={{
+                "&:hover": {
+                    backgroundColor: "var(--mantine-color-gray-1)",
+                    borderColor: "var(--mantine-color-gray-3)",
+                }
+            }}
+        >
+            <Group justify="space-between" align="flex-start" mb="xs">
+                <Group gap="sm" align="center">
+                    <Badge
+                        size="sm"
+                        color={logTypeColor}
+                        variant="light"
+                        leftSection={
+                            log.type === "task" ? <FaTasks size={10} /> : 
+                            log.type === "ticket" ? <FaTicketAlt size={10} /> : 
+                            null
+                        }
+                    >
+                        {logType}
+                    </Badge>
+                    
+                    <Group gap="xs" align="center">
+                        <ActionIcon size={14} color={actionColor} />
+                        <Text size="sm" fw={500}>
+                            {description}
+                        </Text>
+                    </Group>
+                </Group>
+            </Group>
+
+            <Group justify="space-between" align="center">
+                <Group gap="xs" align="center">
+                    <FaUser size={12} color="var(--mantine-color-gray-6)" />
+                    <Text size="xs" c="dimmed">
+                        {author}
                     </Text>
-                    {description}
-                </Text>
-                <Text size="xs" c="dimmed">
-                    {author} • {date}
-                </Text>
-            </Flex>
-        </Flex>
+                </Group>
+                
+                <Group gap="xs" align="center">
+                    <FaClock size={12} color="var(--mantine-color-gray-6)" />
+                    <Text size="xs" c="dimmed">
+                        {date}
+                    </Text>
+                </Group>
+            </Group>
+        </Box>
     );
 };
