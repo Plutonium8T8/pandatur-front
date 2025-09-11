@@ -59,13 +59,9 @@ export const AppProvider = ({ children }) => {
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
 
-    let updatedGlobal = false;
-    let updatedFiltered = false;
-
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id === ticketId) {
-          updatedGlobal = true;
           return { ...t, unseen_count: 0 };
         }
         return t;
@@ -75,7 +71,6 @@ export const AppProvider = ({ children }) => {
     setChatFilteredTickets((prev) =>
       prev.map((t) => {
         if (t.id === ticketId) {
-          updatedFiltered = true;
           return { ...t, unseen_count: 0 };
         }
         return t;
@@ -242,7 +237,7 @@ export const AppProvider = ({ children }) => {
           
           return prev.map((t) => (t.id === ticketId ? ticket : t));
         } else {
-          console.log(`➕ Adding new ticket ${ticketId} to main tickets list`);
+          console.log(`➕ Adding new ticket ${ticketId} to main tickets list (prev length: ${prev.length})`);
           return [...prev, ticket];
         }
       });
@@ -259,12 +254,17 @@ export const AppProvider = ({ children }) => {
           
           return prev.map((t) => (t.id === ticketId ? ticket : t));
         } else {
-          console.log(`➕ Adding new ticket ${ticketId} to chat filtered tickets list`);
+          console.log(`➕ Adding new ticket ${ticketId} to chat filtered tickets list (prev length: ${prev.length})`);
           return [...prev, ticket];
         }
       });
 
       setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
+      
+      // Отправляем событие для обновления personalInfo в useFetchTicketChat
+      window.dispatchEvent(new CustomEvent('ticketUpdated', { 
+        detail: { ticketId } 
+      }));
       
       console.log(`✅ Successfully updated ticket ${ticketId}`);
     } catch (error) {
@@ -406,21 +406,23 @@ export const AppProvider = ({ children }) => {
           break;
         }
 
-        console.log("🔄 TICKET_UPDATE received:", {
-          ids,
-          timestamp: new Date().toISOString()
-        });
+        // console.log("🔄 TICKET_UPDATE received:", {
+        //   ids,
+        //   timestamp: new Date().toISOString()
+        // });
 
         // Проверяем, есть ли тикеты в нашем списке и обновляем их
         ids.forEach((id) => {
           const existsInTickets = tickets.some(t => t.id === id);
           const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
           
-          console.log(`🔍 Checking ticket ${id}:`, {
-            existsInTickets,
-            existsInChatFiltered,
-            shouldUpdate: existsInTickets || existsInChatFiltered
-          });
+        // console.log(`🔍 Checking ticket ${id}:`, {
+        //   existsInTickets,
+        //   existsInChatFiltered,
+        //   shouldUpdate: existsInTickets || existsInChatFiltered,
+        //   totalTickets: tickets.length,
+        //   totalChatFiltered: chatFilteredTickets.length
+        // });
 
           if (existsInTickets || existsInChatFiltered) {
             console.log(`✅ Fetching updated ticket ${id} from server`);
@@ -430,7 +432,12 @@ export const AppProvider = ({ children }) => {
               console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
             }
           } else {
-            console.log(`⚠️ Ticket ${id} not found in current tickets list, skipping update`);
+            // console.log(`⚠️ Ticket ${id} not found in current tickets list, but trying to fetch anyway...`);
+            try {
+              fetchSingleTicket(id);
+            } catch (e) {
+              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+            }
           }
         });
 

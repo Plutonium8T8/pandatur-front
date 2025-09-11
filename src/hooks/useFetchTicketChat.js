@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
 import { useMessagesContext } from "./useMessagesContext";
+import { useApp } from "./useApp";
 
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
@@ -29,6 +30,7 @@ const normalizeClients = (clientList) => {
 };
 export const useFetchTicketChat = (id) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { tickets, chatFilteredTickets } = useApp();
 
   const [personalInfo, setPersonalInfo] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
@@ -45,7 +47,7 @@ export const useFetchTicketChat = (id) => {
     setSelectedUser(user);
   };
 
-  const getLightTicketInfo = async () => {
+  const getLightTicketInfo = useCallback(async () => {
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
@@ -80,13 +82,50 @@ export const useFetchTicketChat = (id) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, enqueueSnackbar, lastMessage]);
 
   useEffect(() => {
     if (id) {
       getLightTicketInfo();
     }
-  }, [id]);
+  }, [id, getLightTicketInfo]);
+
+  // Простая проверка существования тикета в AppContext (для отладки)
+  // useEffect(() => {
+  //   if (id && (tickets.length > 0 || chatFilteredTickets.length > 0)) {
+  //     const foundInMainTickets = tickets.some(t => t.id === id);
+  //     const foundInChatFiltered = chatFilteredTickets.some(t => t.id === id);
+  //     
+  //     console.log(`🔍 Ticket ${id} status:`, {
+  //       foundInMainTickets,
+  //       foundInChatFiltered,
+  //       totalTickets: tickets.length,
+  //       totalChatFiltered: chatFilteredTickets.length
+  //     });
+  //   }
+  // }, [tickets, chatFilteredTickets, id]);
+
+  // Слушаем кастомное событие ticketUpdated
+  useEffect(() => {
+    const handleTicketUpdate = (event) => {
+      const { ticketId } = event.detail;
+      
+      // console.log(`📨 Received ticketUpdated event for ticket ${ticketId}`);
+      
+      if (Number(ticketId) === Number(id)) {
+        console.log(`🔄 Syncing ticket ${id} data from server...`);
+        
+        // Делаем запрос на получение актуальных данных тикета
+        getLightTicketInfo();
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdate);
+    
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdate);
+    };
+  }, [id, getLightTicketInfo]);
 
   return {
     personalInfo,
