@@ -66,7 +66,6 @@ export const ChatInput = ({
   const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
 
-  const actionNeededInit = useRef(undefined);
   const [actionNeeded, setActionNeeded] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
@@ -78,35 +77,32 @@ export const ChatInput = ({
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
   const isPhoneChat = isWhatsApp || isViber;
 
+  // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
-    if (!ticketId) return;
-    let mounted = true;
-    const fetchTicket = async () => {
-      try {
-        const data = await api.tickets.getById(ticketId);
-        if (mounted) {
-          setTicket(data);
-          setActionNeeded(Boolean(data.action_needed));
-          actionNeededInit.current = Boolean(data.action_needed);
-        }
-      } catch (e) {
-        console.error("Failed to fetch ticket", e);
-      }
-    };
-    fetchTicket();
-    return () => { mounted = false; };
-  }, [ticketId]);
-
-  useEffect(() => {
-    if (actionNeededInit.current === undefined && ticket) {
+    if (ticket) {
+      console.log("🎫 Setting actionNeeded from ticket:", { 
+        ticketId, 
+        action_needed: ticket.action_needed, 
+        action_needed_type: typeof ticket.action_needed 
+      });
       setActionNeeded(Boolean(ticket.action_needed));
-      actionNeededInit.current = Boolean(ticket.action_needed);
+      console.log("✅ Set actionNeeded from ticket:", Boolean(ticket.action_needed));
     }
   }, [ticket, ticketId]);
 
+  // Устанавливаем actionNeeded = true если есть непрочитанные сообщения
   useEffect(() => {
-    if (unseenCount > 0) setActionNeeded(true);
-  }, [unseenCount]);
+    console.log("👀 unseenCount changed:", { 
+      unseenCount, 
+      currentActionNeeded: actionNeeded,
+      ticketActionNeeded: ticket?.action_needed
+    });
+    
+    if (unseenCount > 0) {
+      console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
+      setActionNeeded(true);
+    }
+  }, [unseenCount, actionNeeded, ticket?.action_needed]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -244,6 +240,12 @@ export const ChatInput = ({
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
+    console.log("🔄 Toggling action_needed:", { 
+      current: actionNeeded, 
+      new: newValue, 
+      ticketId 
+    });
+    
     try {
       await api.tickets.updateById({
         id: ticketId,
@@ -251,7 +253,7 @@ export const ChatInput = ({
       });
       setActionNeeded(newValue);
       setTicket((prev) => ({ ...prev, action_needed: newValue }));
-      actionNeededInit.current = newValue;
+      console.log("✅ Successfully updated action_needed to:", newValue);
     } catch (e) {
       console.error("Failed to update action_needed", e);
     }
