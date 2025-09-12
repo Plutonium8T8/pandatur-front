@@ -33,6 +33,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "system_usage", label: t("System usage") },
   { value: "ticket_distribution", label: t("Ticket Distribution") },
   { value: "closed_tickets_count", label: t("Closed Tickets Count") },
+  { value: "tickets_by_depart_count", label: t("Tickets By Depart Count") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -138,6 +139,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketDistributionWidget(payload);
         } else if (widgetType === "closed_tickets_count") {
           res = await api.dashboard.getClosedTicketsCountWidget(payload);
+        } else if (widgetType === "tickets_by_depart_count") {
+          res = await api.dashboard.getTicketsByDepartCountWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -230,6 +233,14 @@ export const Dashboard = () => {
     totalClosedTickets: pickNum(obj, ["total_closed_tickets_count", "total_closed_tickets", "total"]),
   }), []);
 
+  const ticketsByDepartCountFrom = useCallback((obj) => ({
+    lessThan14Days: pickNum(obj, ["less_than_14_days_count", "less_than_14_days", "less_14"]),
+    between14And30Days: pickNum(obj, ["between_14_30_days_count", "between_14_30_days", "between_14_30"]),
+    moreThan30Days: pickNum(obj, ["more_than_30_days_count", "more_than_30_days", "more_30"]),
+    totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]) || 
+      (pickNum(obj, ["less_than_14_days_count"]) + pickNum(obj, ["between_14_30_days_count"]) + pickNum(obj, ["more_than_30_days_count"])),
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -300,6 +311,19 @@ export const Dashboard = () => {
           olderThan11Days: ctc.olderThan11Days,
           newerThan11Days: ctc.newerThan11Days,
           totalClosedTickets: ctc.totalClosedTickets,
+          bg: BG.general,
+        });
+      } else if (widgetType === "tickets_by_depart_count") {
+        const tbdc = ticketsByDepartCountFrom(D.general);
+        W.push({
+          id: "general",
+          type: "tickets_by_depart_count",
+          title: getLanguageByKey("Tickets By Depart Count"),
+          subtitle: getLanguageByKey("All company"),
+          lessThan14Days: tbdc.lessThan14Days,
+          between14And30Days: tbdc.between14And30Days,
+          moreThan30Days: tbdc.moreThan30Days,
+          totalTickets: tbdc.totalTickets,
           bg: BG.general,
         });
       } else {
@@ -376,6 +400,19 @@ export const Dashboard = () => {
           totalClosedTickets: ctc.totalClosedTickets,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "tickets_by_depart_count") {
+        const tbdc = ticketsByDepartCountFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "tickets_by_depart_count",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          lessThan14Days: tbdc.lessThan14Days,
+          between14And30Days: tbdc.between14And30Days,
+          moreThan30Days: tbdc.moreThan30Days,
+          totalTickets: tbdc.totalTickets,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -448,6 +485,19 @@ export const Dashboard = () => {
           olderThan11Days: ctc.olderThan11Days,
           newerThan11Days: ctc.newerThan11Days,
           totalClosedTickets: ctc.totalClosedTickets,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "tickets_by_depart_count") {
+        const tbdc = ticketsByDepartCountFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "tickets_by_depart_count",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          lessThan14Days: tbdc.lessThan14Days,
+          between14And30Days: tbdc.between14And30Days,
+          moreThan30Days: tbdc.moreThan30Days,
+          totalTickets: tbdc.totalTickets,
           bg: BG.by_user_group,
         });
       } else {
@@ -526,6 +576,19 @@ export const Dashboard = () => {
           totalClosedTickets: ctc.totalClosedTickets,
           bg: BG.by_user,
         });
+      } else if (widgetType === "tickets_by_depart_count") {
+        const tbdc = ticketsByDepartCountFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "tickets_by_depart_count",
+          title: getLanguageByKey("User"),
+          subtitle,
+          lessThan14Days: tbdc.lessThan14Days,
+          between14And30Days: tbdc.between14And30Days,
+          moreThan30Days: tbdc.moreThan30Days,
+          totalTickets: tbdc.totalTickets,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -594,6 +657,18 @@ export const Dashboard = () => {
             totalClosedTickets: ctc.totalClosedTickets,
             total: ctc.totalClosedTickets,
           };
+        } else if (widgetType === "tickets_by_depart_count") {
+          const tbdc = ticketsByDepartCountFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            lessThan14Days: tbdc.lessThan14Days,
+            between14And30Days: tbdc.between14And30Days,
+            moreThan30Days: tbdc.moreThan30Days,
+            totalTickets: tbdc.totalTickets,
+            total: tbdc.totalTickets,
+          };
         } else {
           return {
             user_id: uid,
@@ -653,7 +728,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

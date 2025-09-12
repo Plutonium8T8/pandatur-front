@@ -55,6 +55,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.totalClosedTickets ?? 0),
                 };
+            } else if (widgetType === "tickets_by_depart_count") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.totalTickets ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -117,6 +122,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Distributed tickets")
                                 : widgetType === "closed_tickets_count"
                                 ? getLanguageByKey("Total closed tickets")
+                                : widgetType === "tickets_by_depart_count"
+                                ? getLanguageByKey("Total tickets")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -153,6 +160,8 @@ export const TopUsersCard = ({
                                             : widgetType === "ticket_distribution"
                                             ? getLanguageByKey("tickets")
                                             : widgetType === "closed_tickets_count"
+                                            ? getLanguageByKey("tickets")
+                                            : widgetType === "tickets_by_depart_count"
                                             ? getLanguageByKey("tickets")
                                             : getLanguageByKey("calls")
                                         }

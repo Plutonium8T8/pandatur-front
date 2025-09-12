@@ -4216,4 +4216,24 @@ export const translations = {
     RO: "Mai noi de 11 zile",
     EN: "Newer than 11 days",
   },
+  "Tickets By Depart Count": {
+    RU: "Тикеты по дате отъезда",
+    RO: "Tichete după data plecării",
+    EN: "Tickets By Depart Count",
+  },
+  "Less than 14 days": {
+    RU: "Менее 14 дней",
+    RO: "Mai puțin de 14 zile",
+    EN: "Less than 14 days",
+  },
+  "Between 14-30 days": {
+    RU: "Между 14-30 днями",
+    RO: "Între 14-30 zile",
+    EN: "Between 14-30 days",
+  },
+  "More than 30 days": {
+    RU: "Более 30 дней",
+    RO: "Mai mult de 30 zile",
+    EN: "More than 30 days",
+  },
 };

@@ -206,38 +206,14 @@ export const AppProvider = ({ children }) => {
 
   const fetchSingleTicket = async (ticketId) => {
     try {
-      console.log(`📡 Fetching ticket ${ticketId} from server...`);
-      
       const ticket = await api.tickets.ticket.getLightById(ticketId);
-      
-      console.log(`📦 Received ticket ${ticketId} from server:`, {
-        workflow: ticket.workflow,
-        technician_id: ticket.technician_id,
-        priority: ticket.priority,
-        contact: ticket.contact,
-        group_title: ticket.group_title,
-        unseen_count: ticket.unseen_count
-      });
 
       setTickets((prev) => {
         const exists = prev.find((t) => t.id === ticketId);
         
         if (exists) {
-          console.log(`🔄 Updating existing ticket ${ticketId} in main tickets list:`, {
-            old_workflow: exists.workflow,
-            new_workflow: ticket.workflow,
-            old_technician_id: exists.technician_id,
-            new_technician_id: ticket.technician_id,
-            old_priority: exists.priority,
-            new_priority: ticket.priority,
-            workflow_changed: exists.workflow !== ticket.workflow,
-            technician_changed: exists.technician_id !== ticket.technician_id,
-            priority_changed: exists.priority !== ticket.priority
-          });
-          
           return prev.map((t) => (t.id === ticketId ? ticket : t));
         } else {
-          console.log(`➕ Adding new ticket ${ticketId} to main tickets list (prev length: ${prev.length})`);
           return [...prev, ticket];
         }
       });
@@ -246,15 +222,8 @@ export const AppProvider = ({ children }) => {
         const exists = prev.find((t) => t.id === ticketId);
         
         if (exists) {
-          console.log(`🔄 Updating existing ticket ${ticketId} in chat filtered tickets list:`, {
-            old_workflow: exists.workflow,
-            new_workflow: ticket.workflow,
-            workflow_changed: exists.workflow !== ticket.workflow
-          });
-          
           return prev.map((t) => (t.id === ticketId ? ticket : t));
         } else {
-          console.log(`➕ Adding new ticket ${ticketId} to chat filtered tickets list (prev length: ${prev.length})`);
           return [...prev, ticket];
         }
       });
@@ -265,10 +234,7 @@ export const AppProvider = ({ children }) => {
       window.dispatchEvent(new CustomEvent('ticketUpdated', { 
         detail: { ticketId } 
       }));
-      
-      console.log(`✅ Successfully updated ticket ${ticketId}`);
     } catch (error) {
-      console.error(`❌ Failed to fetch ticket ${ticketId}:`, error);
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
   };
@@ -402,7 +368,6 @@ export const AppProvider = ({ children }) => {
         )];
 
         if (!ids.length) {
-          console.log("📭 TICKET_UPDATE: No valid ticket IDs found");
           break;
         }
 
@@ -425,14 +390,12 @@ export const AppProvider = ({ children }) => {
         // });
 
           if (existsInTickets || existsInChatFiltered) {
-            console.log(`✅ Fetching updated ticket ${id} from server`);
             try {
               fetchSingleTicket(id);
             } catch (e) {
               console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
             }
           } else {
-            // console.log(`⚠️ Ticket ${id} not found in current tickets list, but trying to fetch anyway...`);
             try {
               fetchSingleTicket(id);
             } catch (e) {
@@ -445,7 +408,7 @@ export const AppProvider = ({ children }) => {
       }
 
       default:
-        console.warn("Invalid socket message type:", message.type);
+        // console.warn("Invalid socket message type:", message.type);
     }
   };
 
@@ -485,7 +448,7 @@ export const AppProvider = ({ children }) => {
 
         trySend();
       } catch (e) {
-        console.error("error get id for connect chat room", e);
+        // console.error("error get id for connect chat room", e);
       }
     };
 
@@ -515,9 +478,9 @@ export const AppProvider = ({ children }) => {
         });
 
         socket.send(socketMessage);
-        console.log("[Socket] Reconnected and rejoined chat rooms");
+        // console.log("[Socket] Reconnected and rejoined chat rooms");
       } catch (e) {
-        console.error("[Socket] Failed to reconnect to chat rooms", e);
+        // console.error("[Socket] Failed to reconnect to chat rooms", e);
       }
     };
 
