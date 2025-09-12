@@ -43,6 +43,7 @@ export const Filter = ({
   initialUserGroups = [],
   initialGroupTitles = [],
   initialDateRange = [],
+  widgetType = "calls", // Тип виджета для определения доступных фильтров
 }) => {
   const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
   const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
@@ -95,6 +96,35 @@ export const Filter = ({
     [allGroupTitles]
   );
 
+  // Определяем доступные фильтры в зависимости от типа виджета
+  const availableFilters = useMemo(() => {
+    const filterMap = {
+      'calls': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'messages': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_state': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'system_usage': ['user_ids', 'user_groups', 'attributes'],
+      'ticket_distribution': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'tickets_into_work': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'closed_tickets_count': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'tickets_by_depart_count': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_lifetime_stats': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_rate': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_from_change': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_to_change': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_creation': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_from_de_prelucrat': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_duration': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_destination': ['attributes'],
+    };
+
+    return filterMap[widgetType] || ['user_ids', 'group_titles', 'user_groups', 'attributes'];
+  }, [widgetType]);
+
+  const showUserFilter = availableFilters.includes('user_ids');
+  const showGroupTitlesFilter = availableFilters.includes('group_titles');
+  const showUserGroupsFilter = availableFilters.includes('user_groups');
+  const showDateFilter = availableFilters.includes('attributes');
+
   const handleUsersChange = (val) => {
     const last = val[val.length - 1];
     const isGroupChip = typeof last === "string" && last.startsWith(GROUP_PREFIX);
@@ -127,17 +157,29 @@ export const Filter = ({
 
   const buildPayload = useCallback(() => {
     const [fromDate, toDate] = dateRange || [];
-    const payload = {
-      user_ids: selectedTechnicians,
-      user_groups: selectedUserGroups,
-      group_titles: selectedGroupTitles,
-      attributes:
-        fromDate || toDate
-          ? { timestamp: { from: toYMD(fromDate || undefined), to: toYMD(toDate || undefined) } }
-          : undefined,
-    };
-    return compactPayload(payload);
-  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
+    const payload = {};
+    
+    // Добавляем только доступные фильтры
+    if (showUserFilter && selectedTechnicians.length > 0) {
+      payload.user_ids = selectedTechnicians;
+    }
+    if (showUserGroupsFilter && selectedUserGroups.length > 0) {
+      payload.user_groups = selectedUserGroups;
+    }
+    if (showGroupTitlesFilter && selectedGroupTitles.length > 0) {
+      payload.group_titles = selectedGroupTitles;
+    }
+    if (showDateFilter && (fromDate || toDate)) {
+      payload.attributes = { 
+        timestamp: { 
+          from: toYMD(fromDate || undefined), 
+          to: toYMD(toDate || undefined) 
+        } 
+      };
+    }
+    
+    return payload;
+  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange, showUserFilter, showUserGroupsFilter, showGroupTitlesFilter, showDateFilter]);
 
   const isToday =
     dateRange?.[0] && dateRange?.[1] &&
@@ -150,10 +192,10 @@ export const Filter = ({
     dayjs(dateRange[1]).isSame(dayjs().subtract(1, "day"), "day");
 
   const handleReset = () => {
-    setSelectedTechnicians([]);
-    setSelectedUserGroups([]);
-    setSelectedGroupTitles([]);
-    setDateRange([]);
+    if (showUserFilter) setSelectedTechnicians([]);
+    if (showUserGroupsFilter) setSelectedUserGroups([]);
+    if (showGroupTitlesFilter) setSelectedGroupTitles([]);
+    if (showDateFilter) setDateRange([]);
   };
 
   const handleApply = () => {
@@ -185,64 +227,75 @@ export const Filter = ({
         {/* Прокручиваемая часть с полями — ВЕРТИКАЛЬНО */}
         <Box style={{ flex: 1, overflowY: "auto" }}>
           <Stack gap="md">
-            <MultiSelect
-              data={formattedTechnicians}
-              value={selectedTechnicians}
-              onChange={handleUsersChange}
-              searchable
-              clearable
-              maxDropdownHeight={300}
-              placeholder={getLanguageByKey("User")}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              disabled={loadingTechnicians}
-            />
-
-            <MultiSelect
-              data={userGroupsOptions}
-              value={selectedUserGroups}
-              onChange={handleUserGroupsChange}
-              searchable
-              clearable
-              maxDropdownHeight={260}
-              placeholder={getLanguageByKey("User group")}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              disabled={loadingUserGroups}
-            />
-
-            <MultiSelect
-              data={groupTitleSelectData}
-              value={selectedGroupTitles}
-              onChange={(v) => setSelectedGroupTitles(v || [])}
-              searchable
-              clearable
-              maxDropdownHeight={260}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              placeholder={getLanguageByKey("Group title")}
-            />
-
-            {/* Быстрые даты + диапазон */}
-            <Group gap="xs" align="center">
-              <Button
-                variant={isToday ? "filled" : "default"}
-                onClick={() => setDateRange(getStartEndDateRange(new Date()))}
-              >
-                {getLanguageByKey("azi")}
-              </Button>
-              <Button
-                variant={isYesterday ? "filled" : "default"}
-                onClick={() => setDateRange(getYesterdayDate())}
-              >
-                {getLanguageByKey("ieri")}
-              </Button>
-              <DatePickerInput
+            {/* Фильтр по пользователям */}
+            {showUserFilter && (
+              <MultiSelect
+                data={formattedTechnicians}
+                value={selectedTechnicians}
+                onChange={handleUsersChange}
+                searchable
                 clearable
-                type="range"
-                value={dateRange}
-                onChange={(val) => setDateRange(val || [])}
-                valueFormat={YYYY_MM_DD}
-                placeholder={getLanguageByKey("Selectează o dată")}
+                maxDropdownHeight={300}
+                placeholder={getLanguageByKey("User")}
+                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
+                disabled={loadingTechnicians}
               />
-            </Group>
+            )}
+
+            {/* Фильтр по группам пользователей */}
+            {showUserGroupsFilter && (
+              <MultiSelect
+                data={userGroupsOptions}
+                value={selectedUserGroups}
+                onChange={handleUserGroupsChange}
+                searchable
+                clearable
+                maxDropdownHeight={260}
+                placeholder={getLanguageByKey("User group")}
+                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
+                disabled={loadingUserGroups}
+              />
+            )}
+
+            {/* Фильтр по названиям групп */}
+            {showGroupTitlesFilter && (
+              <MultiSelect
+                data={groupTitleSelectData}
+                value={selectedGroupTitles}
+                onChange={(v) => setSelectedGroupTitles(v || [])}
+                searchable
+                clearable
+                maxDropdownHeight={260}
+                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
+                placeholder={getLanguageByKey("Group title")}
+              />
+            )}
+
+            {/* Фильтр по датам */}
+            {showDateFilter && (
+              <Group gap="xs" align="center">
+                <Button
+                  variant={isToday ? "filled" : "default"}
+                  onClick={() => setDateRange(getStartEndDateRange(new Date()))}
+                >
+                  {getLanguageByKey("azi")}
+                </Button>
+                <Button
+                  variant={isYesterday ? "filled" : "default"}
+                  onClick={() => setDateRange(getYesterdayDate())}
+                >
+                  {getLanguageByKey("ieri")}
+                </Button>
+                <DatePickerInput
+                  clearable
+                  type="range"
+                  value={dateRange}
+                  onChange={(val) => setDateRange(val || [])}
+                  valueFormat={YYYY_MM_DD}
+                  placeholder={getLanguageByKey("Selectează o dată")}
+                />
+              </Group>
+            )}
           </Stack>
         </Box>
 

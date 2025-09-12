@@ -1330,6 +1330,7 @@ export const Dashboard = () => {
         initialUserGroups={selectedUserGroups}
         initialGroupTitles={selectedGroupTitles}
         initialDateRange={dateRange}
+        widgetType={widgetType}
       />
     </Stack>
   );
