@@ -4384,5 +4384,5 @@ export const translations = {
     RU: "Всего созданных тикетов",
     RO: "Total tichete create",
     EN: "Total tickets created",
-  },
+  }
 };
