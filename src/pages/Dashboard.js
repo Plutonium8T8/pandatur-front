@@ -41,6 +41,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_creation", label: t("Ticket Creation") },
   { value: "workflow_from_de_prelucrat", label: t("Workflow From De Prelucrat") },
   { value: "workflow_duration", label: t("Workflow Duration") },
+  { value: "ticket_destination", label: t("Ticket Destination") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -162,6 +163,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getWorkflowFromDePrelucratWidget(payload);
         } else if (widgetType === "workflow_duration") {
           res = await api.dashboard.getWorkflowDurationWidget(payload);
+        } else if (widgetType === "ticket_destination") {
+          res = await api.dashboard.getTicketDestinationWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -333,6 +336,12 @@ export const Dashboard = () => {
     ticketsProcessed: pickNum(obj, ["tickets_processed", "tickets", "processed"]) || 0,
   }), []);
 
+  // утилиты для ticket destination данных
+  const ticketDestinationFrom = useCallback((obj) => {
+    // Данные уже в нужном формате: { "Ofertă trimisă": { "Romania": 45, ... }, "Aprobat cu client": { ... } }
+    return obj || {};
+  }, []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -499,6 +508,16 @@ export const Dashboard = () => {
           totalDurationMinutes: wd.totalDurationMinutes,
           averageDurationMinutes: wd.averageDurationMinutes,
           ticketsProcessed: wd.ticketsProcessed,
+          bg: BG.general,
+        });
+      } else if (widgetType === "ticket_destination") {
+        const td = ticketDestinationFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_destination",
+          title: getLanguageByKey("Ticket Destination"),
+          subtitle: getLanguageByKey("All company"),
+          destinationData: td,
           bg: BG.general,
         });
       } else {
@@ -1225,7 +1244,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom, workflowFromDePrelucratFrom, workflowDurationFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom, workflowFromDePrelucratFrom, workflowDurationFrom, ticketDestinationFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

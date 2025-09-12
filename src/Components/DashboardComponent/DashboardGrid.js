@@ -18,6 +18,7 @@ import { WorkflowToChangeCard } from "./WorkflowToChangeCard";
 import { TicketCreationCard } from "./TicketCreationCard";
 import { WorkflowFromDePrelucratCard } from "./WorkflowFromDePrelucratCard";
 import { WorkflowDurationCard } from "./WorkflowDurationCard";
+import { TicketDestinationCard } from "./TicketDestinationCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -495,6 +496,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         totalDurationMinutes={Number.isFinite(w.totalDurationMinutes) ? w.totalDurationMinutes : 0}
                                         averageDurationMinutes={Number.isFinite(w.averageDurationMinutes) ? w.averageDurationMinutes : 0}
                                         ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
+                                        bg={w.bg}
+                                        width={w.w}
+                                        height={w.h}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_destination") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketDestinationCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        destinationData={w.destinationData || {}}
                                         bg={w.bg}
                                         width={w.w}
                                         height={w.h}

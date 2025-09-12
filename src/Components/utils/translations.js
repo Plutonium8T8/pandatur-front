@@ -4441,5 +4441,31 @@ export const translations = {
     RU: "в состоянии обработки",
     RO: "în starea de procesare",
     EN: "in processing state",
+  },
+  // Ticket Destination Widget
+  "Ticket Destination": {
+    RU: "Назначение тикетов",
+    RO: "Destinația tichetelor",
+    EN: "Ticket Destination",
+  },
+  "By country": {
+    RU: "По странам",
+    RO: "Pe țări",
+    EN: "By country",
+  },
+  "tickets by country": {
+    RU: "тикетов по странам",
+    RO: "tichete pe țări",
+    EN: "tickets by country",
+  },
+  "Ofertă trimisă": {
+    RU: "Предложение отправлено",
+    RO: "Ofertă trimisă",
+    EN: "Offer sent",
+  },
+  "Aprobat cu client": {
+    RU: "Одобрено клиентом",
+    RO: "Aprobat cu client",
+    EN: "Approved by client",
   }
 };

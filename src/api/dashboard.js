@@ -85,12 +85,16 @@ export const dashboard = {
     const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
     return data;
   },
-    getWorkflowFromDePrelucratWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
-      return data;
-    },
-    getWorkflowDurationWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-duration", body);
-      return data;
-    },
+  getWorkflowFromDePrelucratWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
+    return data;
+  },
+  getWorkflowDurationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-duration", body);
+    return data;
+  },
+  getTicketDestinationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-destination", body);
+    return data;
+  },
 };

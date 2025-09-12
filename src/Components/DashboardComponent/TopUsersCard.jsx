@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, Box, Group, Stack, Text, Badge, Progress, ThemeIcon } from "@mantine/core";
 import { MdCall } from "react-icons/md";
-import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs, FaPlus, FaPlay } from "react-icons/fa";
+import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs, FaPlus, FaPlay, FaMapMarkerAlt } from "react-icons/fa";
 import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
@@ -66,6 +66,8 @@ const getWidgetIconAndColor = (widgetType) => {
       return { icon: FaPlay, color: "orange" };
     case "workflow_duration":
       return { icon: FaClock, color: "teal" };
+    case "ticket_destination":
+      return { icon: FaMapMarkerAlt, color: "purple" };
     default:
       return { icon: MdCall, color: "blue" };
   }
@@ -160,6 +162,9 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.averageDurationMinutes ?? 0),
                 };
+            } else if (widgetType === "ticket_destination") {
+                // Для ticket_destination нет пользовательских данных, возвращаем пустой массив
+                return null;
             } else {
                 return {
                     ...r,
@@ -167,7 +172,8 @@ export const TopUsersCard = ({
                 };
             }
         });
-        const sorted = normal.sort((a, b) => b.total - a.total);
+        const filtered = normal.filter(r => r !== null);
+        const sorted = filtered.sort((a, b) => b.total - a.total);
         return sorted.slice(0, Math.min(limit, limitCount));
     }, [rows, limit, widgetType, limitCount]);
 
@@ -243,6 +249,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Total workflow transitions")
                                 : widgetType === "workflow_duration"
                                 ? getLanguageByKey("Average processing time")
+                                : widgetType === "ticket_destination"
+                                ? getLanguageByKey("By country")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -298,6 +306,8 @@ export const TopUsersCard = ({
                                             ? getLanguageByKey("workflow transitions")
                                             : widgetType === "workflow_duration"
                                             ? ""
+                                            : widgetType === "ticket_destination"
+                                            ? getLanguageByKey("tickets by country")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>
