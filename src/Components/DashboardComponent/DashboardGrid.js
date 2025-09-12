@@ -198,7 +198,7 @@ const buildLayoutsAllBps = (widgets = []) => {
 const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
 
-const DashboardGrid = ({ widgets = [], dateRange }) => {
+const DashboardGrid = ({ widgets = [], dateRange, widgetType = "calls" }) => {
     const COLS = useMemo(
         () => ({ lg: COLS_MAX, md: COLS_MAX, sm: COLS_MAX, xs: COLS_MAX, xxs: COLS_MAX }),
         []
@@ -534,6 +534,7 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                     dateRange={dateRange}
                                     sizeInfo={sizeInfo}
                                     bg={w.bg}
+                                    widgetType={widgetType}
                                 />
                             </Box>
                         </div>

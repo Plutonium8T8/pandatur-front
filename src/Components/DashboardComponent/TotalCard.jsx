@@ -4,7 +4,7 @@ import {
 } from "@mantine/core";
 import { format } from "date-fns";
 import { getLanguageByKey } from "@utils";
-import { MdCall, MdCallReceived, MdCallMade } from "react-icons/md";
+import { MdCall, MdCallReceived, MdCallMade, MdMessage, MdSend } from "react-icons/md";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
 const percent = (part, total) => {
@@ -24,13 +24,32 @@ export const TotalCard = ({
     sizeInfo,
     sizePx,
     bg, // ⬅️ НОВОЕ: фон карточки
+    widgetType = "calls", // ⬅️ НОВОЕ: тип виджета для определения иконок
 }) => {
     const inPct = percent(totalIncoming, totalAll);
     const outPct = percent(totalOutgoing, totalAll);
 
-    const TotalIconNode = icons.total ?? <MdCall size={18} />;
-    const IncomingIconNode = icons.incoming ?? <MdCallReceived size={14} />;
-    const OutgoingIconNode = icons.outgoing ?? <MdCallMade size={14} />;
+    // Выбираем иконки в зависимости от типа виджета
+    const getDefaultIcons = (type) => {
+        if (type === "messages") {
+            return {
+                total: <MdMessage size={18} />,
+                incoming: <MdMessage size={14} />,
+                outgoing: <MdSend size={14} />
+            };
+        }
+        // По умолчанию для calls
+        return {
+            total: <MdCall size={18} />,
+            incoming: <MdCallReceived size={14} />,
+            outgoing: <MdCallMade size={14} />
+        };
+    };
+
+    const defaultIcons = getDefaultIcons(widgetType);
+    const TotalIconNode = icons.total ?? defaultIcons.total;
+    const IncomingIconNode = icons.incoming ?? defaultIcons.incoming;
+    const OutgoingIconNode = icons.outgoing ?? defaultIcons.outgoing;
 
     const pxLabel =
         sizePx && Number.isFinite(sizePx.width) && Number.isFinite(sizePx.height)
@@ -105,7 +124,9 @@ export const TotalCard = ({
                     </Group>
                     <div style={{ textAlign: "right" }}>
                         <Text size="sm" fw={700}>{fmt(totalIncoming)}</Text>
-                        <Text size="xs" c="dimmed">{getLanguageByKey("calls")}</Text>
+                        <Text size="xs" c="dimmed">
+                            {widgetType === "messages" ? getLanguageByKey("messages") : getLanguageByKey("calls")}
+                        </Text>
                     </div>
                 </Group>
                 <Progress value={inPct} size="md" radius="xl" color={colors.in} />
@@ -119,7 +140,9 @@ export const TotalCard = ({
                     </Group>
                     <div style={{ textAlign: "right" }}>
                         <Text size="sm" fw={700}>{fmt(totalOutgoing)}</Text>
-                        <Text size="xs" c="dimmed">{getLanguageByKey("calls")}</Text>
+                        <Text size="xs" c="dimmed">
+                            {widgetType === "messages" ? getLanguageByKey("messages") : getLanguageByKey("calls")}
+                        </Text>
                     </div>
                 </Group>
                 <Progress value={outPct} size="md" radius="xl" color={colors.out} />

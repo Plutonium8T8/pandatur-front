@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, Box, Group, Stack, Text, Badge, Progress, ThemeIcon } from "@mantine/core";
-import { MdCall } from "react-icons/md";
+import { MdCall, MdMessage } from "react-icons/md";
 import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs, FaPlus, FaPlay, FaMapMarkerAlt } from "react-icons/fa";
 import { getLanguageByKey } from "@utils";
 
@@ -39,7 +39,7 @@ const getWidgetIconAndColor = (widgetType) => {
     case "calls":
       return { icon: MdCall, color: "blue" };
     case "messages":
-      return { icon: MdCall, color: "green" };
+      return { icon: MdMessage, color: "green" };
     case "ticket_state":
       return { icon: FaTicketAlt, color: "purple" };
     case "tickets_into_work":
