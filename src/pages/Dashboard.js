@@ -1266,7 +1266,7 @@ export const Dashboard = () => {
   return (
     <Stack gap={12}>
       {/* Центрированный заголовок */}
-      <Flex ref={headerRowRef} className="dashboard-header-container" p="md" justify="center">
+      <Flex ref={headerRowRef} className="dashboard-header-container" p="md" justify="center" style={{ borderBottom: "1px solid #e9ecef" }}>
         <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "600px" }}>
           <Text fw={700} size="2rem" style={{ fontSize: "2.5rem", paddingTop: "2rem" }}>
             {getLanguageByKey("Dashboard")}
