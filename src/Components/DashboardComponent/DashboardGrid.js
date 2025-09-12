@@ -37,8 +37,9 @@ const WIDGET_SIZES = {
 const rowOf = (w) => {
     const id = String(w?.id ?? "");
     if (id === "general" || id.startsWith("gt-") || id.startsWith("ug-")) return 0; // 1-я группа
-    if (w.type === "top_users" || id.startsWith("user-")) return 1;                // 2-я группа
-    return 2;                                                                       // 3-я группа
+    if (w.type === "top_users") return 1;                                          // 2-я группа - Top Users первым среди пользователей
+    if (id.startsWith("user-")) return 2;                                          // 3-я группа
+    return 3;                                                                      // 4-я группа
 };
 
 const getSizeByRow = (w, row) => {
