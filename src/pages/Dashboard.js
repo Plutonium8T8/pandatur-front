@@ -40,6 +40,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "workflow_to_change", label: t("Workflow Change To") },
   { value: "ticket_creation", label: t("Ticket Creation") },
   { value: "workflow_from_de_prelucrat", label: t("Workflow From De Prelucrat") },
+  { value: "workflow_duration", label: t("Workflow Duration") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -48,7 +49,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_lifetime", label: t("Ticket lifetime"), disabled: true },
   { value: "contract_departure", label: t("Contract departures"), disabled: true },
   { value: "workflow_percentage", label: t("Workflow percentage"), disabled: true },
-  { value: "workflow_duration", label: t("Workflow duration"), disabled: true },
+  { value: "workflow_duration_old", label: t("Workflow duration"), disabled: true },
   { value: "country_count", label: t("Countries"), disabled: true },
 ];
 
@@ -159,6 +160,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketCreationWidget(payload);
         } else if (widgetType === "workflow_from_de_prelucrat") {
           res = await api.dashboard.getWorkflowFromDePrelucratWidget(payload);
+        } else if (widgetType === "workflow_duration") {
+          res = await api.dashboard.getWorkflowDurationWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -323,6 +326,13 @@ export const Dashboard = () => {
     }
   }, []);
 
+  // утилиты для workflow duration данных
+  const workflowDurationFrom = useCallback((obj) => ({
+    totalDurationMinutes: pickNum(obj, ["total_duration_minutes", "total_duration", "duration"]) || 0,
+    averageDurationMinutes: pickNum(obj, ["average_duration_minutes", "average_duration", "avg_duration"]) || 0,
+    ticketsProcessed: pickNum(obj, ["tickets_processed", "tickets", "processed"]) || 0,
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -479,18 +489,30 @@ export const Dashboard = () => {
           totalChanges: wfdp.totalChanges,
           bg: BG.general,
         });
-      } else {
-        const c = countsFrom(D.general);
+      } else if (widgetType === "workflow_duration") {
+        const wd = workflowDurationFrom(D.general);
         W.push({
           id: "general",
-          type: "general",
-          title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
+          type: "workflow_duration",
+          title: getLanguageByKey("Workflow Duration"),
           subtitle: getLanguageByKey("All company"),
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
+          totalDurationMinutes: wd.totalDurationMinutes,
+          averageDurationMinutes: wd.averageDurationMinutes,
+          ticketsProcessed: wd.ticketsProcessed,
           bg: BG.general,
         });
+      } else {
+      const c = countsFrom(D.general);
+      W.push({
+        id: "general",
+        type: "general",
+        title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
+        subtitle: getLanguageByKey("All company"),
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.general,
+      });
       }
     }
 
@@ -637,18 +659,30 @@ export const Dashboard = () => {
           totalChanges: wfdp.totalChanges,
           bg: BG.by_group_title,
         });
-      } else {
-        const c = countsFrom(r);
+      } else if (widgetType === "workflow_duration") {
+        const wd = workflowDurationFrom(r);
         W.push({
           id: `gt-${name ?? idx}`,
-          type: "group",
+          type: "workflow_duration",
           title: getLanguageByKey("Group title"),
           subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
+          totalDurationMinutes: wd.totalDurationMinutes,
+          averageDurationMinutes: wd.averageDurationMinutes,
+          ticketsProcessed: wd.ticketsProcessed,
           bg: BG.by_group_title,
         });
+      } else {
+        const c = countsFrom(r);
+      W.push({
+        id: `gt-${name ?? idx}`,
+        type: "group",
+        title: getLanguageByKey("Group title"),
+        subtitle: name || "-",
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_group_title,
+      });
       }
     });
 
@@ -795,18 +829,30 @@ export const Dashboard = () => {
           totalChanges: wfdp.totalChanges,
           bg: BG.by_user_group,
         });
-      } else {
-        const c = countsFrom(r);
+      } else if (widgetType === "workflow_duration") {
+        const wd = workflowDurationFrom(r);
         W.push({
           id: `ug-${idx}`,
-          type: "group",
+          type: "workflow_duration",
           title: getLanguageByKey("User group"),
           subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
+          totalDurationMinutes: wd.totalDurationMinutes,
+          averageDurationMinutes: wd.averageDurationMinutes,
+          ticketsProcessed: wd.ticketsProcessed,
           bg: BG.by_user_group,
         });
+      } else {
+        const c = countsFrom(r);
+      W.push({
+        id: `ug-${idx}`,
+        type: "group",
+        title: getLanguageByKey("User group"),
+        subtitle: name || "-",
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_user_group,
+      });
       }
     });
 
@@ -955,18 +1001,30 @@ export const Dashboard = () => {
           totalChanges: wfdp.totalChanges,
           bg: BG.by_user,
         });
-      } else {
-        const c = countsFrom(r);
+      } else if (widgetType === "workflow_duration") {
+        const wd = workflowDurationFrom(r);
         W.push({
           id: `user-${uid || idx}`,
-          type: "user",
+          type: "workflow_duration",
           title: getLanguageByKey("User"),
           subtitle,
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
+          totalDurationMinutes: wd.totalDurationMinutes,
+          averageDurationMinutes: wd.averageDurationMinutes,
+          ticketsProcessed: wd.ticketsProcessed,
           bg: BG.by_user,
         });
+      } else {
+        const c = countsFrom(r);
+      W.push({
+        id: `user-${uid || idx}`,
+        type: "user",
+        title: getLanguageByKey("User"),
+        subtitle,
+        incoming: c.incoming,
+        outgoing: c.outgoing,
+        total: c.total,
+        bg: BG.by_user,
+      });
       }
     });
 
@@ -1099,15 +1157,24 @@ export const Dashboard = () => {
             totalChanges: wfdp.totalChanges,
             total: wfdp.totalChanges,
           };
-        } else {
+        } else if (widgetType === "workflow_duration") {
+          const wd = workflowDurationFrom(r);
           return {
             user_id: uid,
             name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
             sipuni_id: r.sipuni_id,
-            incoming: Number(r.incoming_calls_count) || 0,
-            outgoing: Number(r.outgoing_calls_count) || 0,
-            total: Number(r.total_calls_count) || 0,
+            averageDurationMinutes: wd.averageDurationMinutes,
+            total: wd.averageDurationMinutes,
           };
+        } else {
+        return {
+          user_id: uid,
+          name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+          sipuni_id: r.sipuni_id,
+          incoming: Number(r.incoming_calls_count) || 0,
+          outgoing: Number(r.outgoing_calls_count) || 0,
+          total: Number(r.total_calls_count) || 0,
+        };
         }
       });
       W.push({
@@ -1158,7 +1225,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom, workflowFromDePrelucratFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom, workflowFromDePrelucratFrom, workflowDurationFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
@@ -1187,16 +1254,16 @@ export const Dashboard = () => {
           </Text>
           
           <Group gap="sm" justify="center">
-            <Select
-              size="sm"
-              w={220}
-              value={widgetType}
-              onChange={(v) => v && setWidgetType(v)}
-              data={WIDGET_TYPE_OPTIONS}
-              allowDeselect={false}
-              placeholder={getLanguageByKey("Widget type")}
-              aria-label="widget-type"
-            />
+              <Select
+                size="sm"
+                w={220}
+                value={widgetType}
+                onChange={(v) => v && setWidgetType(v)}
+                data={WIDGET_TYPE_OPTIONS}
+                allowDeselect={false}
+                placeholder={getLanguageByKey("Widget type")}
+                aria-label="widget-type"
+              />
             
             <Tooltip label={getLanguageByKey("Filtru")}>
               <ActionIcon
@@ -1214,7 +1281,7 @@ export const Dashboard = () => {
                 <LuFilter size={18} />
               </ActionIcon>
             </Tooltip>
-          </Group>
+            </Group>
         </Stack>
       </Flex>
 

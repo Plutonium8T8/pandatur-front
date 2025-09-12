@@ -6,6 +6,19 @@ import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
 
+// Функция для форматирования времени в минутах
+const formatDuration = (minutes) => {
+  if (!minutes || minutes === 0) return "0m";
+  
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  
+  if (hours > 0) {
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  }
+  return `${mins}m`;
+};
+
 // Форматирование времени для system_usage
 const fmtTime = (hours) => {
   if (typeof hours !== "number" || hours === 0) return "0ч";
@@ -51,6 +64,8 @@ const getWidgetIconAndColor = (widgetType) => {
       return { icon: FaPlus, color: "blue" };
     case "workflow_from_de_prelucrat":
       return { icon: FaPlay, color: "orange" };
+    case "workflow_duration":
+      return { icon: FaClock, color: "teal" };
     default:
       return { icon: MdCall, color: "blue" };
   }
@@ -140,6 +155,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.totalChanges ?? 0),
                 };
+            } else if (widgetType === "workflow_duration") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.averageDurationMinutes ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -191,6 +211,8 @@ export const TopUsersCard = ({
                         <Text fz={24} fw={700} style={{ lineHeight: 1 }}>
                             {widgetType === "system_usage" 
                                 ? fmtTime(data.reduce((sum, u) => sum + (u.total || 0), 0))
+                                : widgetType === "workflow_duration"
+                                ? formatDuration(data.reduce((sum, u) => sum + (u.total || 0), 0))
                                 : fmt(data.reduce((sum, u) => sum + (u.total || 0), 0))
                             }
                         </Text>
@@ -219,6 +241,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Total tickets created")
                                 : widgetType === "workflow_from_de_prelucrat"
                                 ? getLanguageByKey("Total workflow transitions")
+                                : widgetType === "workflow_duration"
+                                ? getLanguageByKey("Average processing time")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -242,6 +266,8 @@ export const TopUsersCard = ({
                                     <Text size="sm" fw={700}>
                                         {widgetType === "system_usage" 
                                             ? fmtTime(u.total)
+                                            : widgetType === "workflow_duration"
+                                            ? formatDuration(u.total)
                                             : fmt(u.total)
                                         }
                                     </Text>
@@ -270,6 +296,8 @@ export const TopUsersCard = ({
                                             ? getLanguageByKey("tickets created")
                                             : widgetType === "workflow_from_de_prelucrat"
                                             ? getLanguageByKey("workflow transitions")
+                                            : widgetType === "workflow_duration"
+                                            ? ""
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>

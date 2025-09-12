@@ -4410,5 +4410,36 @@ export const translations = {
     RU: "Всего переходов рабочего процесса",
     RO: "Total tranziții workflow",
     EN: "Total workflow transitions",
+  },
+  // Workflow Duration Widget
+  "Workflow Duration": {
+    RU: "Длительность рабочего процесса",
+    RO: "Durata workflow",
+    EN: "Workflow Duration",
+  },
+  "Processing time": {
+    RU: "Время обработки",
+    RO: "Timp procesare",
+    EN: "Processing time",
+  },
+  "Average processing time": {
+    RU: "Среднее время обработки",
+    RO: "Timp mediu procesare",
+    EN: "Average processing time",
+  },
+  "Tickets processed": {
+    RU: "Обработано тикетов",
+    RO: "Tichete procesate",
+    EN: "Tickets processed",
+  },
+  "Total processing time": {
+    RU: "Общее время обработки",
+    RO: "Timp total procesare",
+    EN: "Total processing time",
+  },
+  "in processing state": {
+    RU: "в состоянии обработки",
+    RO: "în starea de procesare",
+    EN: "in processing state",
   }
 };

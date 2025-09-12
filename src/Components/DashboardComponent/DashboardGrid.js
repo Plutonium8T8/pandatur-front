@@ -17,6 +17,7 @@ import { WorkflowFromChangeCard } from "./WorkflowFromChangeCard";
 import { WorkflowToChangeCard } from "./WorkflowToChangeCard";
 import { TicketCreationCard } from "./TicketCreationCard";
 import { WorkflowFromDePrelucratCard } from "./WorkflowFromDePrelucratCard";
+import { WorkflowDurationCard } from "./WorkflowDurationCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -475,6 +476,25 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         subtitle={w.subtitle}
                                         workflowChanges={w.workflowChanges || []}
                                         totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
+                                        bg={w.bg}
+                                        width={w.w}
+                                        height={w.h}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "workflow_duration") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <WorkflowDurationCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        totalDurationMinutes={Number.isFinite(w.totalDurationMinutes) ? w.totalDurationMinutes : 0}
+                                        averageDurationMinutes={Number.isFinite(w.averageDurationMinutes) ? w.averageDurationMinutes : 0}
+                                        ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
                                         bg={w.bg}
                                         width={w.w}
                                         height={w.h}
