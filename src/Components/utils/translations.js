@@ -4458,14 +4458,4 @@ export const translations = {
     RO: "tichete pe țări",
     EN: "tickets by country",
   },
-  "Ofertă trimisă": {
-    RU: "Предложение отправлено",
-    RO: "Ofertă trimisă",
-    EN: "Offer sent",
-  },
-  "Aprobat cu client": {
-    RU: "Одобрено клиентом",
-    RO: "Aprobat cu client",
-    EN: "Approved by client",
-  }
 };

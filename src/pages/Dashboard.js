@@ -27,7 +27,7 @@ const t = (key) => String(getLanguageByKey?.(key) ?? key);
 
 const WIDGET_TYPE_OPTIONS = [
   { value: "calls", label: t("Calls") },
-  { value: "messages", label: t("Messages") },
+  { value: "messages", label: t("messages") },
   { value: "ticket_state", label: t("Ticket State") },
   { value: "tickets_into_work", label: t("Tickets Into Work") },
   { value: "system_usage", label: t("System usage") },
