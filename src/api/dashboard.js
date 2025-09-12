@@ -85,4 +85,8 @@ export const dashboard = {
       const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
       return data;
     },
+    getWorkflowFromDePrelucratWidget: async (body) => {
+      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
+      return data;
+    },
 };

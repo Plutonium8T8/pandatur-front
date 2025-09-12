@@ -4384,5 +4384,31 @@ export const translations = {
     RU: "Всего созданных тикетов",
     RO: "Total tichete create",
     EN: "Total tickets created",
+  },
+  // Workflow From De Prelucrat Widget
+  "Workflow From De Prelucrat": {
+    RU: "Рабочий процесс из 'В обработке'",
+    RO: "Workflow din 'De prelucrat'",
+    EN: "Workflow From De Prelucrat",
+  },
+  "De prelucrat": {
+    RU: "В обработке",
+    RO: "De prelucrat",
+    EN: "In processing",
+  },
+  "destination workflow": {
+    RU: "целевой рабочий процесс",
+    RO: "workflow destinație",
+    EN: "destination workflow",
+  },
+  "workflow transitions": {
+    RU: "переходы рабочего процесса",
+    RO: "tranziții workflow",
+    EN: "workflow transitions",
+  },
+  "Total workflow transitions": {
+    RU: "Всего переходов рабочего процесса",
+    RO: "Total tranziții workflow",
+    EN: "Total workflow transitions",
   }
 };

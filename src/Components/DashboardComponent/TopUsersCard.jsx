@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, Box, Group, Stack, Text, Badge, Progress, ThemeIcon } from "@mantine/core";
 import { MdCall } from "react-icons/md";
-import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs,FaPlus } from "react-icons/fa";
+import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs, FaPlus, FaPlay } from "react-icons/fa";
 import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
@@ -49,6 +49,8 @@ const getWidgetIconAndColor = (widgetType) => {
       return { icon: FaFileContract, color: "green" };
     case "ticket_creation":
       return { icon: FaPlus, color: "blue" };
+    case "workflow_from_de_prelucrat":
+      return { icon: FaPlay, color: "orange" };
     default:
       return { icon: MdCall, color: "blue" };
   }
@@ -133,6 +135,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.ticketsCreatedCount ?? 0),
                 };
+            } else if (widgetType === "workflow_from_de_prelucrat") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.totalChanges ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -210,6 +217,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Total completed contracts")
                                 : widgetType === "ticket_creation"
                                 ? getLanguageByKey("Total tickets created")
+                                : widgetType === "workflow_from_de_prelucrat"
+                                ? getLanguageByKey("Total workflow transitions")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -259,6 +268,8 @@ export const TopUsersCard = ({
                                             ? getLanguageByKey("completed contracts")
                                             : widgetType === "ticket_creation"
                                             ? getLanguageByKey("tickets created")
+                                            : widgetType === "workflow_from_de_prelucrat"
+                                            ? getLanguageByKey("workflow transitions")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>

@@ -39,6 +39,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "workflow_from_change", label: t("Workflow From Change") },
   { value: "workflow_to_change", label: t("Workflow Change To") },
   { value: "ticket_creation", label: t("Ticket Creation") },
+  { value: "workflow_from_de_prelucrat", label: t("Workflow From De Prelucrat") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -156,6 +157,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getWorkflowToChangeWidget(payload);
         } else if (widgetType === "ticket_creation") {
           res = await api.dashboard.getTicketCreationWidget(payload);
+        } else if (widgetType === "workflow_from_de_prelucrat") {
+          res = await api.dashboard.getWorkflowFromDePrelucratWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -291,6 +294,34 @@ export const Dashboard = () => {
   const ticketCreationFrom = useCallback((obj) => ({
     ticketsCreatedCount: pickNum(obj, ["tickets_created_count", "tickets_created", "created"]),
   }), []);
+
+  // утилиты для workflow from de prelucrat данных
+  const workflowFromDePrelucratFrom = useCallback((obj) => {
+    if (Array.isArray(obj)) {
+      // Для general секции - это массив объектов
+      const totalChanges = obj.reduce((sum, item) => sum + (pickNum(item, ["change_count", "count"]) || 0), 0);
+      return {
+        workflowChanges: obj.map(item => ({
+          destination_workflow: item.destination_workflow || item.destination || "-",
+          change_count: pickNum(item, ["change_count", "count"]) || 0,
+        })),
+        totalChanges,
+      };
+    } else {
+      // Для других секций - это объект с workflow_changes массивом
+      const workflowChanges = safeArray(obj.workflow_changes || obj.changes || []);
+      const totalChanges = pickNum(obj, ["total_changes", "total"]) || 
+        workflowChanges.reduce((sum, item) => sum + (pickNum(item, ["change_count", "count"]) || 0), 0);
+      
+      return {
+        workflowChanges: workflowChanges.map(item => ({
+          destination_workflow: item.destination_workflow || item.destination || "-",
+          change_count: pickNum(item, ["change_count", "count"]) || 0,
+        })),
+        totalChanges,
+      };
+    }
+  }, []);
 
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
@@ -435,6 +466,17 @@ export const Dashboard = () => {
           title: getLanguageByKey("Ticket Creation"),
           subtitle: getLanguageByKey("All company"),
           ticketsCreatedCount: tc.ticketsCreatedCount,
+          bg: BG.general,
+        });
+      } else if (widgetType === "workflow_from_de_prelucrat") {
+        const wfdp = workflowFromDePrelucratFrom(D.general);
+        W.push({
+          id: "general",
+          type: "workflow_from_de_prelucrat",
+          title: getLanguageByKey("Workflow From De Prelucrat"),
+          subtitle: getLanguageByKey("All company"),
+          workflowChanges: wfdp.workflowChanges,
+          totalChanges: wfdp.totalChanges,
           bg: BG.general,
         });
       } else {
@@ -584,6 +626,17 @@ export const Dashboard = () => {
           ticketsCreatedCount: tc.ticketsCreatedCount,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "workflow_from_de_prelucrat") {
+        const wfdp = workflowFromDePrelucratFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "workflow_from_de_prelucrat",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          workflowChanges: wfdp.workflowChanges,
+          totalChanges: wfdp.totalChanges,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -729,6 +782,17 @@ export const Dashboard = () => {
           title: getLanguageByKey("User group"),
           subtitle: name || "-",
           ticketsCreatedCount: tc.ticketsCreatedCount,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "workflow_from_de_prelucrat") {
+        const wfdp = workflowFromDePrelucratFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "workflow_from_de_prelucrat",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          workflowChanges: wfdp.workflowChanges,
+          totalChanges: wfdp.totalChanges,
           bg: BG.by_user_group,
         });
       } else {
@@ -880,6 +944,17 @@ export const Dashboard = () => {
           ticketsCreatedCount: tc.ticketsCreatedCount,
           bg: BG.by_user,
         });
+      } else if (widgetType === "workflow_from_de_prelucrat") {
+        const wfdp = workflowFromDePrelucratFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "workflow_from_de_prelucrat",
+          title: getLanguageByKey("User"),
+          subtitle,
+          workflowChanges: wfdp.workflowChanges,
+          totalChanges: wfdp.totalChanges,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -1015,6 +1090,15 @@ export const Dashboard = () => {
             ticketsCreatedCount: tc.ticketsCreatedCount,
             total: tc.ticketsCreatedCount,
           };
+        } else if (widgetType === "workflow_from_de_prelucrat") {
+          const wfdp = workflowFromDePrelucratFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            totalChanges: wfdp.totalChanges,
+            total: wfdp.totalChanges,
+          };
         } else {
           return {
             user_id: uid,
@@ -1074,7 +1158,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom, workflowFromDePrelucratFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
