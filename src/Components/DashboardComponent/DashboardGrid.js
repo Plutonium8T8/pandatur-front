@@ -14,6 +14,7 @@ import { TicketsByDepartCountCard } from "./TicketsByDepartCountCard";
 import { TicketLifetimeStatsCard } from "./TicketLifetimeStatsCard";
 import { TicketRateCard } from "./TicketRateCard";
 import { WorkflowFromChangeCard } from "./WorkflowFromChangeCard";
+import { WorkflowToChangeCard } from "./WorkflowToChangeCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -121,9 +122,14 @@ const layoutFirstGroupLine = (lineWidgets, yStart, items) => {
 
 // ——— основная раскладка ———
 const buildLayoutByRows = (widgets = []) => {
-    const rows = [[], [], []];
+    const rows = [[], [], [], []]; // Добавили 4-ю группу
     widgets.forEach((w) => {
-        if (w.type !== "separator") rows[rowOf(w)].push(w);
+        if (w.type !== "separator") {
+            const rowIndex = rowOf(w);
+            if (rows[rowIndex]) {
+                rows[rowIndex].push(w);
+            }
+        }
     });
 
     const items = [];
@@ -415,6 +421,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         luatInLucruChangedCount={Number.isFinite(w.luatInLucruChangedCount) ? w.luatInLucruChangedCount : 0}
                                         ofertaTrimisaChangedCount={Number.isFinite(w.ofertaTrimisaChangedCount) ? w.ofertaTrimisaChangedCount : 0}
                                         totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
+                                        bg={w.bg}
+                                        width={w.w}
+                                        height={w.h}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "workflow_to_change") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <WorkflowToChangeCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        contractIncheiatChangedCount={Number.isFinite(w.contractIncheiatChangedCount) ? w.contractIncheiatChangedCount : 0}
                                         bg={w.bg}
                                         width={w.w}
                                         height={w.h}

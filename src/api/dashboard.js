@@ -77,4 +77,8 @@ export const dashboard = {
       const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-change", body);
       return data;
     },
+    getWorkflowToChangeWidget: async (body) => {
+      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-to-change", body);
+      return data;
+    },
 };

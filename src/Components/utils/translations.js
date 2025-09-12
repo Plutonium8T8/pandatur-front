@@ -4343,16 +4343,6 @@ export const translations = {
     RO: "Modificări flux de lucru",
     EN: "Workflow From Change",
   },
-  "Luat în lucru": {
-    RU: "Взят в работу",
-    RO: "Luat în lucru",
-    EN: "Taken into work",
-  },
-  "Ofertă trimisă": {
-    RU: "Предложение отправлено",
-    RO: "Ofertă trimisă",
-    EN: "Offer sent",
-  },
   "changes": {
     RU: "изменений",
     RO: "modificări",
@@ -4362,5 +4352,21 @@ export const translations = {
     RU: "Всего изменений рабочего процесса",
     RO: "Total modificări flux de lucru",
     EN: "Total workflow changes",
+  },
+  // Workflow Change To Widget
+  "Workflow Change To": {
+    RU: "Изменения в рабочий процесс",
+    RO: "Modificări în flux de lucru",
+    EN: "Workflow Change To",
+  },
+  "completed contracts": {
+    RU: "завершенных договоров",
+    RO: "contracte încheiate",
+    EN: "completed contracts",
+  },
+  "Total completed contracts": {
+    RU: "Всего завершенных договоров",
+    RO: "Total contracte încheiate",
+    EN: "Total completed contracts",
   },
 };

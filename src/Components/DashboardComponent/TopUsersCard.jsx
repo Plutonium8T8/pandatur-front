@@ -45,6 +45,8 @@ const getWidgetIconAndColor = (widgetType) => {
       return { icon: FaExchangeAlt, color: "pink" };
     case "workflow_from_change":
       return { icon: FaCogs, color: "indigo" };
+    case "workflow_to_change":
+      return { icon: FaFileContract, color: "green" };
     default:
       return { icon: MdCall, color: "blue" };
   }
@@ -119,6 +121,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.totalChanges ?? 0),
                 };
+            } else if (widgetType === "workflow_to_change") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.contractIncheiatChangedCount ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -192,6 +199,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Total transitions")
                                 : widgetType === "workflow_from_change"
                                 ? getLanguageByKey("Total changes")
+                                : widgetType === "workflow_to_change"
+                                ? getLanguageByKey("Total completed contracts")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -237,6 +246,8 @@ export const TopUsersCard = ({
                                             ? getLanguageByKey("transitions")
                                             : widgetType === "workflow_from_change"
                                             ? getLanguageByKey("changes")
+                                            : widgetType === "workflow_to_change"
+                                            ? getLanguageByKey("completed contracts")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>

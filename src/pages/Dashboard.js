@@ -37,6 +37,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_lifetime_stats", label: t("Ticket Lifetime Stats") },
   { value: "ticket_rate", label: t("Ticket Rate") },
   { value: "workflow_from_change", label: t("Workflow From Change") },
+  { value: "workflow_to_change", label: t("Workflow Change To") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -150,6 +151,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketRateWidget(payload);
         } else if (widgetType === "workflow_from_change") {
           res = await api.dashboard.getWorkflowFromChangeWidget(payload);
+        } else if (widgetType === "workflow_to_change") {
+          res = await api.dashboard.getWorkflowToChangeWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -276,6 +279,11 @@ export const Dashboard = () => {
       (pickNum(obj, ["luat_in_lucru_changed_count"]) + pickNum(obj, ["oferta_trimisa_changed_count"])),
   }), []);
 
+  // утилиты для workflow to change данных
+  const workflowToChangeFrom = useCallback((obj) => ({
+    contractIncheiatChangedCount: pickNum(obj, ["contract_incheiat_changed_count", "contract_incheiat", "contract"]),
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -399,6 +407,16 @@ export const Dashboard = () => {
           luatInLucruChangedCount: wfc.luatInLucruChangedCount,
           ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
           totalChanges: wfc.totalChanges,
+          bg: BG.general,
+        });
+      } else if (widgetType === "workflow_to_change") {
+        const wtc = workflowToChangeFrom(D.general);
+        W.push({
+          id: "general",
+          type: "workflow_to_change",
+          title: getLanguageByKey("Workflow Change To"),
+          subtitle: getLanguageByKey("All company"),
+          contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
           bg: BG.general,
         });
       } else {
@@ -528,6 +546,16 @@ export const Dashboard = () => {
           totalChanges: wfc.totalChanges,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "workflow_to_change") {
+        const wtc = workflowToChangeFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "workflow_to_change",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -653,6 +681,16 @@ export const Dashboard = () => {
           luatInLucruChangedCount: wfc.luatInLucruChangedCount,
           ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
           totalChanges: wfc.totalChanges,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "workflow_to_change") {
+        const wtc = workflowToChangeFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "workflow_to_change",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
           bg: BG.by_user_group,
         });
       } else {
@@ -784,6 +822,16 @@ export const Dashboard = () => {
           totalChanges: wfc.totalChanges,
           bg: BG.by_user,
         });
+      } else if (widgetType === "workflow_to_change") {
+        const wtc = workflowToChangeFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "workflow_to_change",
+          title: getLanguageByKey("User"),
+          subtitle,
+          contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -901,6 +949,15 @@ export const Dashboard = () => {
             totalChanges: wfc.totalChanges,
             total: wfc.totalChanges,
           };
+        } else if (widgetType === "workflow_to_change") {
+          const wtc = workflowToChangeFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
+            total: wtc.contractIncheiatChangedCount,
+          };
         } else {
           return {
             user_id: uid,
@@ -960,7 +1017,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
