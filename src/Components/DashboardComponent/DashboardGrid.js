@@ -13,6 +13,7 @@ import { ClosedTicketsCountCard } from "./ClosedTicketsCountCard";
 import { TicketsByDepartCountCard } from "./TicketsByDepartCountCard";
 import { TicketLifetimeStatsCard } from "./TicketLifetimeStatsCard";
 import { TicketRateCard } from "./TicketRateCard";
+import { WorkflowFromChangeCard } from "./WorkflowFromChangeCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -388,6 +389,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         directlyClosedPercentage={Number.isFinite(w.directlyClosedPercentage) ? w.directlyClosedPercentage : 0}
                                         workedOnCount={Number.isFinite(w.workedOnCount) ? w.workedOnCount : 0}
                                         workedOnPercentage={Number.isFinite(w.workedOnPercentage) ? w.workedOnPercentage : 0}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "workflow_from_change") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <WorkflowFromChangeCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        luatInLucruChangedCount={Number.isFinite(w.luatInLucruChangedCount) ? w.luatInLucruChangedCount : 0}
+                                        ofertaTrimisaChangedCount={Number.isFinite(w.ofertaTrimisaChangedCount) ? w.ofertaTrimisaChangedCount : 0}
+                                        totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
                                         bg={w.bg}
                                     />
                                 </Box>

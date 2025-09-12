@@ -69,8 +69,12 @@ export const dashboard = {
     return data;
   },
 
-  getTicketRateWidget: async (body) => {
-    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
-    return data;
-  },
+    getTicketRateWidget: async (body) => {
+      const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
+      return data;
+    },
+    getWorkflowFromChangeWidget: async (body) => {
+      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-change", body);
+      return data;
+    },
 };

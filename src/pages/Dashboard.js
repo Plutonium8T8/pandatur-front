@@ -36,6 +36,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "tickets_by_depart_count", label: t("Tickets By Depart Count") },
   { value: "ticket_lifetime_stats", label: t("Ticket Lifetime Stats") },
   { value: "ticket_rate", label: t("Ticket Rate") },
+  { value: "workflow_from_change", label: t("Workflow From Change") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -147,6 +148,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketLifetimeStatsWidget(payload);
         } else if (widgetType === "ticket_rate") {
           res = await api.dashboard.getTicketRateWidget(payload);
+        } else if (widgetType === "workflow_from_change") {
+          res = await api.dashboard.getWorkflowFromChangeWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -265,6 +268,14 @@ export const Dashboard = () => {
     workedOnPercentage: pickNum(obj, ["worked_on_percentage", "worked_percentage", "worked_pct"]),
   }), []);
 
+  // утилиты для workflow from change данных
+  const workflowFromChangeFrom = useCallback((obj) => ({
+    luatInLucruChangedCount: pickNum(obj, ["luat_in_lucru_changed_count", "luat_in_lucru", "luat"]),
+    ofertaTrimisaChangedCount: pickNum(obj, ["oferta_trimisa_changed_count", "oferta_trimisa", "oferta"]),
+    totalChanges: pickNum(obj, ["total_changes", "total"]) ||
+      (pickNum(obj, ["luat_in_lucru_changed_count"]) + pickNum(obj, ["oferta_trimisa_changed_count"])),
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -376,6 +387,18 @@ export const Dashboard = () => {
           directlyClosedPercentage: tr.directlyClosedPercentage,
           workedOnCount: tr.workedOnCount,
           workedOnPercentage: tr.workedOnPercentage,
+          bg: BG.general,
+        });
+      } else if (widgetType === "workflow_from_change") {
+        const wfc = workflowFromChangeFrom(D.general);
+        W.push({
+          id: "general",
+          type: "workflow_from_change",
+          title: getLanguageByKey("Workflow From Change"),
+          subtitle: getLanguageByKey("All company"),
+          luatInLucruChangedCount: wfc.luatInLucruChangedCount,
+          ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
+          totalChanges: wfc.totalChanges,
           bg: BG.general,
         });
       } else {
@@ -493,6 +516,18 @@ export const Dashboard = () => {
           workedOnPercentage: tr.workedOnPercentage,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "workflow_from_change") {
+        const wfc = workflowFromChangeFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "workflow_from_change",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          luatInLucruChangedCount: wfc.luatInLucruChangedCount,
+          ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
+          totalChanges: wfc.totalChanges,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -606,6 +641,18 @@ export const Dashboard = () => {
           directlyClosedPercentage: tr.directlyClosedPercentage,
           workedOnCount: tr.workedOnCount,
           workedOnPercentage: tr.workedOnPercentage,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "workflow_from_change") {
+        const wfc = workflowFromChangeFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "workflow_from_change",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          luatInLucruChangedCount: wfc.luatInLucruChangedCount,
+          ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
+          totalChanges: wfc.totalChanges,
           bg: BG.by_user_group,
         });
       } else {
@@ -725,6 +772,18 @@ export const Dashboard = () => {
           workedOnPercentage: tr.workedOnPercentage,
           bg: BG.by_user,
         });
+      } else if (widgetType === "workflow_from_change") {
+        const wfc = workflowFromChangeFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "workflow_from_change",
+          title: getLanguageByKey("User"),
+          subtitle,
+          luatInLucruChangedCount: wfc.luatInLucruChangedCount,
+          ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
+          totalChanges: wfc.totalChanges,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -831,6 +890,17 @@ export const Dashboard = () => {
             workedOnPercentage: tr.workedOnPercentage,
             total: tr.totalTransitions,
           };
+        } else if (widgetType === "workflow_from_change") {
+          const wfc = workflowFromChangeFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            luatInLucruChangedCount: wfc.luatInLucruChangedCount,
+            ofertaTrimisaChangedCount: wfc.ofertaTrimisaChangedCount,
+            totalChanges: wfc.totalChanges,
+            total: wfc.totalChanges,
+          };
         } else {
           return {
             user_id: uid,
@@ -890,7 +960,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
