@@ -42,16 +42,6 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "workflow_from_de_prelucrat", label: t("Workflow From De Prelucrat") },
   { value: "workflow_duration", label: t("Workflow Duration") },
   { value: "ticket_destination", label: t("Ticket Destination") },
-  // { value: "tickets_count", label: t("Tickets count"), disabled: true },
-  // { value: "distributor", label: t("Distributor"), disabled: true },
-  // { value: "workflow_change", label: t("Workflow change"), disabled: true },
-  // { value: "ticket_create_count", label: t("Tickets created"), disabled: true },
-  // { value: "contract_closed", label: t("Contracts closed"), disabled: true },
-  // { value: "ticket_lifetime", label: t("Ticket lifetime"), disabled: true },
-  // { value: "contract_departure", label: t("Contract departures"), disabled: true },
-  // { value: "workflow_percentage", label: t("Workflow percentage"), disabled: true },
-  // { value: "workflow_duration_old", label: t("Workflow duration"), disabled: true },
-  // { value: "country_count", label: t("Countries"), disabled: true },
 ];
 
 export const Dashboard = () => {
