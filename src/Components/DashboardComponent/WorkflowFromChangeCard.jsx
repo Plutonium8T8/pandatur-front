@@ -10,6 +10,8 @@ export const WorkflowFromChangeCard = ({
   title,
   subtitle,
   bg,
+  width,
+  height,
 }) => {
   const luatPercentage = totalChanges > 0 ? Math.round((luatInLucruChangedCount / totalChanges) * 100) : 0;
   const ofertaPercentage = totalChanges > 0 ? Math.round((ofertaTrimisaChangedCount / totalChanges) * 100) : 0;
@@ -24,94 +26,81 @@ export const WorkflowFromChangeCard = ({
   const luatRating = getEfficiencyRating(luatPercentage);
   const ofertaRating = getEfficiencyRating(ofertaPercentage);
 
+  // Адаптивные размеры в зависимости от размера виджета
+  const isCompact = width < 40 || height < 15;
+  const isVeryCompact = width < 30 || height < 12;
+  
+  const cardPadding = isVeryCompact ? "xs" : isCompact ? "sm" : "lg";
+  const titleSize = isVeryCompact ? "xs" : isCompact ? "sm" : "sm";
+  const subtitleSize = isVeryCompact ? "xs" : isCompact ? "sm" : "lg";
+  const badgeSize = isVeryCompact ? "xs" : isCompact ? "sm" : "lg";
+  const statGap = isVeryCompact ? "xs" : isCompact ? "sm" : "sm";
+
   return (
     <Card
       shadow="sm"
-      padding="lg"
+      padding={cardPadding}
       radius="md"
       withBorder
       style={{
         backgroundColor: bg || "#fff",
-        minHeight: "200px",
+        height: "100%",
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden",
       }}
     >
-      <Stack gap="sm" style={{ flex: 1 }}>
+      <Stack gap={statGap} style={{ flex: 1, height: "100%" }}>
         {/* Заголовок */}
         <Group justify="space-between" align="flex-start">
           <Box>
-            <Text fw={600} size="sm" c="dimmed">
+            <Text fw={600} size={titleSize} c="dimmed">
               {title}
             </Text>
-            <Text fw={700} size="lg" c="dark">
+            <Text fw={700} size={subtitleSize} c="dark">
               {subtitle}
             </Text>
           </Box>
-          <Badge size="lg" variant="light" color="blue">
+          <Badge size={badgeSize} variant="light" color="blue">
             {totalChanges} {getLanguageByKey("changes")}
           </Badge>
         </Group>
 
         {/* Статистика по "Luat în lucru" */}
-        <Box
-          style={{
-            padding: "12px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <Group justify="space-between" align="center" mb="xs">
-            <Group gap="xs">
-              <FaHandPaper size={16} color="#28a745" />
-              <Text fw={600} size="sm" c="dark">
-                {getLanguageByKey("Luat în lucru")}
-              </Text>
-            </Group>
-            <Badge color={luatRating.color} variant="light">
-              {luatRating.label}
-            </Badge>
+        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+          <Group gap="xs">
+            <FaHandPaper size={isVeryCompact ? 12 : 14} color="#28a745" />
+            <Text fw={500} size={isVeryCompact ? "xs" : "xs"} c="dark">
+              {getLanguageByKey("Luat în lucru")}
+            </Text>
           </Group>
-          <Group justify="space-between" align="center">
-            <Text fw={700} size="xl" c="#28a745">
+          <Group gap="xs" align="center">
+            <Text fw={700} size={isVeryCompact ? "xs" : "sm"} c="#28a745">
               {luatInLucruChangedCount}
             </Text>
-            <Text fw={600} size="sm" c="dimmed">
+            <Badge size={isVeryCompact ? "xs" : "xs"} color={luatRating.color} variant="light">
               {luatPercentage}%
-            </Text>
-          </Group>
-        </Box>
-
-        {/* Статистика по "Ofertă trimisă" */}
-        <Box
-          style={{
-            padding: "12px",
-            backgroundColor: "#f8f9fa",
-            borderRadius: "8px",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <Group justify="space-between" align="center" mb="xs">
-            <Group gap="xs">
-              <FaFileContract size={16} color="#007bff" />
-              <Text fw={600} size="sm" c="dark">
-                {getLanguageByKey("Ofertă trimisă")}
-              </Text>
-            </Group>
-            <Badge color={ofertaRating.color} variant="light">
-              {ofertaRating.label}
             </Badge>
           </Group>
-          <Group justify="space-between" align="center">
-            <Text fw={700} size="xl" c="#007bff">
-              {ofertaTrimisaChangedCount}
-            </Text>
-            <Text fw={600} size="sm" c="dimmed">
-              {ofertaPercentage}%
+        </Group>
+
+        {/* Статистика по "Ofertă trimisă" */}
+        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+          <Group gap="xs">
+            <FaFileContract size={isVeryCompact ? 12 : 14} color="#007bff" />
+            <Text fw={500} size={isVeryCompact ? "xs" : "xs"} c="dark">
+              {getLanguageByKey("Ofertă trimisă")}
             </Text>
           </Group>
-        </Box>
+          <Group gap="xs" align="center">
+            <Text fw={700} size={isVeryCompact ? "xs" : "sm"} c="#007bff">
+              {ofertaTrimisaChangedCount}
+            </Text>
+            <Badge size={isVeryCompact ? "xs" : "xs"} color={ofertaRating.color} variant="light">
+              {ofertaPercentage}%
+            </Badge>
+          </Group>
+        </Group>
 
         {/* Общая статистика */}
         <Group justify="center" mt="auto">

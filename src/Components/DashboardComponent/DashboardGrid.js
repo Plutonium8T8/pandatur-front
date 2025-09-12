@@ -245,7 +245,15 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                     if (w.type === "top_users") {
                         return (
                             <div key={w.id} style={{ height: "100%" }}>
-                                <TopUsersCard title={w.title} subtitle={w.subtitle} rows={w.rows} bg={w.bg} widgetType={w.widgetType} />
+                                <TopUsersCard 
+                                    title={w.title} 
+                                    subtitle={w.subtitle} 
+                                    rows={w.rows} 
+                                    bg={w.bg} 
+                                    widgetType={w.widgetType}
+                                    width={w.w}
+                                    height={w.h}
+                                />
                             </div>
                         );
                     }
@@ -407,6 +415,8 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         ofertaTrimisaChangedCount={Number.isFinite(w.ofertaTrimisaChangedCount) ? w.ofertaTrimisaChangedCount : 0}
                                         totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
                                         bg={w.bg}
+                                        width={w.w}
+                                        height={w.h}
                                     />
                                 </Box>
                             </div>
