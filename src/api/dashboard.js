@@ -69,24 +69,24 @@ export const dashboard = {
     return data;
   },
 
-    getTicketRateWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
-      return data;
-    },
-    getWorkflowFromChangeWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-change", body);
-      return data;
-    },
-    getWorkflowToChangeWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-to-change", body);
-      return data;
-    },
-    getTicketCreationWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
-      return data;
-    },
-    getWorkflowFromDePrelucratWidget: async (body) => {
-      const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
-      return data;
-    },
+  getTicketRateWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
+    return data;
+  },
+  getWorkflowFromChangeWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-change", body);
+    return data;
+  },
+  getWorkflowToChangeWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-to-change", body);
+    return data;
+  },
+  getTicketCreationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
+    return data;
+  },
+  getWorkflowFromDePrelucratWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
+    return data;
+  },
 };
