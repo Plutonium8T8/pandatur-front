@@ -81,4 +81,8 @@ export const dashboard = {
       const { data } = await baseAxios.post("/api/dashboard/widget/workflow-to-change", body);
       return data;
     },
+    getTicketCreationWidget: async (body) => {
+      const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
+      return data;
+    },
 };

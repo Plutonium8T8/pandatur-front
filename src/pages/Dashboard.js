@@ -38,6 +38,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_rate", label: t("Ticket Rate") },
   { value: "workflow_from_change", label: t("Workflow From Change") },
   { value: "workflow_to_change", label: t("Workflow Change To") },
+  { value: "ticket_creation", label: t("Ticket Creation") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -153,6 +154,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getWorkflowFromChangeWidget(payload);
         } else if (widgetType === "workflow_to_change") {
           res = await api.dashboard.getWorkflowToChangeWidget(payload);
+        } else if (widgetType === "ticket_creation") {
+          res = await api.dashboard.getTicketCreationWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -282,6 +285,11 @@ export const Dashboard = () => {
   // утилиты для workflow to change данных
   const workflowToChangeFrom = useCallback((obj) => ({
     contractIncheiatChangedCount: pickNum(obj, ["contract_incheiat_changed_count", "contract_incheiat", "contract"]),
+  }), []);
+
+  // утилиты для ticket creation данных
+  const ticketCreationFrom = useCallback((obj) => ({
+    ticketsCreatedCount: pickNum(obj, ["tickets_created_count", "tickets_created", "created"]),
   }), []);
 
   // нормализация by_platform (массив/объект → массив)
@@ -417,6 +425,16 @@ export const Dashboard = () => {
           title: getLanguageByKey("Workflow Change To"),
           subtitle: getLanguageByKey("All company"),
           contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
+          bg: BG.general,
+        });
+      } else if (widgetType === "ticket_creation") {
+        const tc = ticketCreationFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_creation",
+          title: getLanguageByKey("Ticket Creation"),
+          subtitle: getLanguageByKey("All company"),
+          ticketsCreatedCount: tc.ticketsCreatedCount,
           bg: BG.general,
         });
       } else {
@@ -556,6 +574,16 @@ export const Dashboard = () => {
           contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "ticket_creation") {
+        const tc = ticketCreationFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "ticket_creation",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          ticketsCreatedCount: tc.ticketsCreatedCount,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -691,6 +719,16 @@ export const Dashboard = () => {
           title: getLanguageByKey("User group"),
           subtitle: name || "-",
           contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "ticket_creation") {
+        const tc = ticketCreationFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "ticket_creation",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          ticketsCreatedCount: tc.ticketsCreatedCount,
           bg: BG.by_user_group,
         });
       } else {
@@ -832,6 +870,16 @@ export const Dashboard = () => {
           contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
           bg: BG.by_user,
         });
+      } else if (widgetType === "ticket_creation") {
+        const tc = ticketCreationFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "ticket_creation",
+          title: getLanguageByKey("User"),
+          subtitle,
+          ticketsCreatedCount: tc.ticketsCreatedCount,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -958,6 +1006,15 @@ export const Dashboard = () => {
             contractIncheiatChangedCount: wtc.contractIncheiatChangedCount,
             total: wtc.contractIncheiatChangedCount,
           };
+        } else if (widgetType === "ticket_creation") {
+          const tc = ticketCreationFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            ticketsCreatedCount: tc.ticketsCreatedCount,
+            total: tc.ticketsCreatedCount,
+          };
         } else {
           return {
             user_id: uid,
@@ -1017,7 +1074,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom, workflowFromChangeFrom, workflowToChangeFrom, ticketCreationFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

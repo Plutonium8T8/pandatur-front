@@ -4369,4 +4369,20 @@ export const translations = {
     RO: "Total contracte încheiate",
     EN: "Total completed contracts",
   },
+  // Ticket Creation Widget
+  "Ticket Creation": {
+    RU: "Создание тикетов",
+    RO: "Crearea tichetelor",
+    EN: "Ticket Creation",
+  },
+  "tickets created": {
+    RU: "созданных тикетов",
+    RO: "tichete create",
+    EN: "tickets created",
+  },
+  "Total tickets created": {
+    RU: "Всего созданных тикетов",
+    RO: "Total tichete create",
+    EN: "Total tickets created",
+  },
 };

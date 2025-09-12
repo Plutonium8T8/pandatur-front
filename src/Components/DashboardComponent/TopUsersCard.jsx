@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Card, Box, Group, Stack, Text, Badge, Progress, ThemeIcon } from "@mantine/core";
 import { MdCall } from "react-icons/md";
-import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs } from "react-icons/fa";
+import { FaTicketAlt, FaHandPaper, FaFileContract, FaClock, FaChartPie, FaCheckCircle, FaPlane, FaHourglassHalf, FaExchangeAlt, FaCogs,FaPlus } from "react-icons/fa";
 import { getLanguageByKey } from "@utils";
 
 const fmt = (n) => (typeof n === "number" ? n.toLocaleString() : "-");
@@ -47,6 +47,8 @@ const getWidgetIconAndColor = (widgetType) => {
       return { icon: FaCogs, color: "indigo" };
     case "workflow_to_change":
       return { icon: FaFileContract, color: "green" };
+    case "ticket_creation":
+      return { icon: FaPlus, color: "blue" };
     default:
       return { icon: MdCall, color: "blue" };
   }
@@ -126,6 +128,11 @@ export const TopUsersCard = ({
                     ...r,
                     total: Number(r.total ?? r.contractIncheiatChangedCount ?? 0),
                 };
+            } else if (widgetType === "ticket_creation") {
+                return {
+                    ...r,
+                    total: Number(r.total ?? r.ticketsCreatedCount ?? 0),
+                };
             } else {
                 return {
                     ...r,
@@ -201,6 +208,8 @@ export const TopUsersCard = ({
                                 ? getLanguageByKey("Total changes")
                                 : widgetType === "workflow_to_change"
                                 ? getLanguageByKey("Total completed contracts")
+                                : widgetType === "ticket_creation"
+                                ? getLanguageByKey("Total tickets created")
                                 : getLanguageByKey("Total calls")
                             }
                         </Text>
@@ -248,6 +257,8 @@ export const TopUsersCard = ({
                                             ? getLanguageByKey("changes")
                                             : widgetType === "workflow_to_change"
                                             ? getLanguageByKey("completed contracts")
+                                            : widgetType === "ticket_creation"
+                                            ? getLanguageByKey("tickets created")
                                             : getLanguageByKey("calls")
                                         }
                                     </Text>

@@ -15,6 +15,7 @@ import { TicketLifetimeStatsCard } from "./TicketLifetimeStatsCard";
 import { TicketRateCard } from "./TicketRateCard";
 import { WorkflowFromChangeCard } from "./WorkflowFromChangeCard";
 import { WorkflowToChangeCard } from "./WorkflowToChangeCard";
+import { TicketCreationCard } from "./TicketCreationCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -438,6 +439,23 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         title={w.title}
                                         subtitle={w.subtitle}
                                         contractIncheiatChangedCount={Number.isFinite(w.contractIncheiatChangedCount) ? w.contractIncheiatChangedCount : 0}
+                                        bg={w.bg}
+                                        width={w.w}
+                                        height={w.h}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_creation") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketCreationCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        ticketsCreatedCount={Number.isFinite(w.ticketsCreatedCount) ? w.ticketsCreatedCount : 0}
                                         bg={w.bg}
                                         width={w.w}
                                         height={w.h}
