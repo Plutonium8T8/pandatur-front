@@ -899,6 +899,16 @@ export const Dashboard = () => {
     setDateRange(meta?.dateRange || []);
   }, []);
 
+  // Проверяем, активен ли фильтр
+  const isFilterActive = useMemo(() => {
+    const hasTechnicians = selectedTechnicians?.length > 0;
+    const hasUserGroups = selectedUserGroups?.length > 0;
+    const hasGroupTitles = selectedGroupTitles?.length > 0;
+    const hasDateRange = dateRange?.length === 2 && dateRange[0] && dateRange[1];
+    
+    return hasTechnicians || hasUserGroups || hasGroupTitles || hasDateRange;
+  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
+
   return (
     <Stack gap={12}>
       <Flex ref={headerRowRef} className="dashboard-header-container" p="md">
@@ -907,7 +917,18 @@ export const Dashboard = () => {
           extraInfo={
             <Group gap="sm">
               <Tooltip label={getLanguageByKey("Filtru")}>
-                <ActionIcon variant="light" size="lg" onClick={() => setFilterOpened(true)} aria-label="open-filter">
+                <ActionIcon
+                  variant="light" 
+                  size="lg" 
+                  onClick={() => setFilterOpened(true)} 
+                  aria-label="open-filter"
+                  color={isFilterActive ? "green" : "gray"}
+                  style={{ 
+                    backgroundColor: isFilterActive ? "#51cf66" : "white",
+                    border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
+                    color: isFilterActive ? "white" : "#868e96"
+                  }}
+                >
                   <LuFilter size={18} />
                 </ActionIcon>
               </Tooltip>
