@@ -4236,4 +4236,54 @@ export const translations = {
     RO: "Mai mult de 30 zile",
     EN: "More than 30 days",
   },
+  "Ticket Lifetime Stats": {
+    RU: "Статистика времени обработки тикетов",
+    RO: "Statistici timp procesare tichete",
+    EN: "Ticket Lifetime Stats",
+  },
+  "Total processing time": {
+    RU: "Общее время обработки",
+    RO: "Timp total procesare",
+    EN: "Total processing time",
+  },
+  "Average processing time": {
+    RU: "Среднее время обработки",
+    RO: "Timp mediu procesare",
+    EN: "Average processing time",
+  },
+  "Efficiency": {
+    RU: "Эффективность",
+    RO: "Eficiență",
+    EN: "Efficiency",
+  },
+  "Very fast": {
+    RU: "Очень быстро",
+    RO: "Foarte rapid",
+    EN: "Very fast",
+  },
+  "Normal": {
+    RU: "Нормально",
+    RO: "Normal",
+    EN: "Normal",
+  },
+  "Slow": {
+    RU: "Медленно",
+    RO: "Lent",
+    EN: "Slow",
+  },
+  "Very slow": {
+    RU: "Очень медленно",
+    RO: "Foarte lent",
+    EN: "Very slow",
+  },
+  "Tickets processed": {
+    RU: "Обработано тикетов",
+    RO: "Tichete procesate",
+    EN: "Tickets processed",
+  },
+  "Total time (minutes)": {
+    RU: "Общее время (минуты)",
+    RO: "Timp total (minute)",
+    EN: "Total time (minutes)",
+  },
 };

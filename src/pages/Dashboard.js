@@ -34,6 +34,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "ticket_distribution", label: t("Ticket Distribution") },
   { value: "closed_tickets_count", label: t("Closed Tickets Count") },
   { value: "tickets_by_depart_count", label: t("Tickets By Depart Count") },
+  { value: "ticket_lifetime_stats", label: t("Ticket Lifetime Stats") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -141,6 +142,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getClosedTicketsCountWidget(payload);
         } else if (widgetType === "tickets_by_depart_count") {
           res = await api.dashboard.getTicketsByDepartCountWidget(payload);
+        } else if (widgetType === "ticket_lifetime_stats") {
+          res = await api.dashboard.getTicketLifetimeStatsWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -241,6 +244,15 @@ export const Dashboard = () => {
       (pickNum(obj, ["less_than_14_days_count"]) + pickNum(obj, ["between_14_30_days_count"]) + pickNum(obj, ["more_than_30_days_count"])),
   }), []);
 
+  // утилиты для ticket lifetime stats данных
+  const ticketLifetimeStatsFrom = useCallback((obj) => ({
+    totalLifetimeMinutes: pickNum(obj, ["total_lifetime_minutes", "total_lifetime", "total"]),
+    averageLifetimeMinutes: pickNum(obj, ["average_lifetime_minutes", "average_lifetime", "average"]),
+    ticketsProcessed: pickNum(obj, ["tickets_processed", "processed", "count"]),
+    totalLifetimeHours: Math.round((pickNum(obj, ["total_lifetime_minutes", "total_lifetime", "total"]) || 0) / 60 * 10) / 10,
+    averageLifetimeHours: Math.round((pickNum(obj, ["average_lifetime_minutes", "average_lifetime", "average"]) || 0) / 60 * 10) / 10,
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -324,6 +336,20 @@ export const Dashboard = () => {
           between14And30Days: tbdc.between14And30Days,
           moreThan30Days: tbdc.moreThan30Days,
           totalTickets: tbdc.totalTickets,
+          bg: BG.general,
+        });
+      } else if (widgetType === "ticket_lifetime_stats") {
+        const tls = ticketLifetimeStatsFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_lifetime_stats",
+          title: getLanguageByKey("Ticket Lifetime Stats"),
+          subtitle: getLanguageByKey("All company"),
+          totalLifetimeMinutes: tls.totalLifetimeMinutes,
+          averageLifetimeMinutes: tls.averageLifetimeMinutes,
+          ticketsProcessed: tls.ticketsProcessed,
+          totalLifetimeHours: tls.totalLifetimeHours,
+          averageLifetimeHours: tls.averageLifetimeHours,
           bg: BG.general,
         });
       } else {
@@ -413,6 +439,20 @@ export const Dashboard = () => {
           totalTickets: tbdc.totalTickets,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "ticket_lifetime_stats") {
+        const tls = ticketLifetimeStatsFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "ticket_lifetime_stats",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          totalLifetimeMinutes: tls.totalLifetimeMinutes,
+          averageLifetimeMinutes: tls.averageLifetimeMinutes,
+          ticketsProcessed: tls.ticketsProcessed,
+          totalLifetimeHours: tls.totalLifetimeHours,
+          averageLifetimeHours: tls.averageLifetimeHours,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -498,6 +538,20 @@ export const Dashboard = () => {
           between14And30Days: tbdc.between14And30Days,
           moreThan30Days: tbdc.moreThan30Days,
           totalTickets: tbdc.totalTickets,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "ticket_lifetime_stats") {
+        const tls = ticketLifetimeStatsFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "ticket_lifetime_stats",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          totalLifetimeMinutes: tls.totalLifetimeMinutes,
+          averageLifetimeMinutes: tls.averageLifetimeMinutes,
+          ticketsProcessed: tls.ticketsProcessed,
+          totalLifetimeHours: tls.totalLifetimeHours,
+          averageLifetimeHours: tls.averageLifetimeHours,
           bg: BG.by_user_group,
         });
       } else {
@@ -589,6 +643,20 @@ export const Dashboard = () => {
           totalTickets: tbdc.totalTickets,
           bg: BG.by_user,
         });
+      } else if (widgetType === "ticket_lifetime_stats") {
+        const tls = ticketLifetimeStatsFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "ticket_lifetime_stats",
+          title: getLanguageByKey("User"),
+          subtitle,
+          totalLifetimeMinutes: tls.totalLifetimeMinutes,
+          averageLifetimeMinutes: tls.averageLifetimeMinutes,
+          ticketsProcessed: tls.ticketsProcessed,
+          totalLifetimeHours: tls.totalLifetimeHours,
+          averageLifetimeHours: tls.averageLifetimeHours,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -669,6 +737,19 @@ export const Dashboard = () => {
             totalTickets: tbdc.totalTickets,
             total: tbdc.totalTickets,
           };
+        } else if (widgetType === "ticket_lifetime_stats") {
+          const tls = ticketLifetimeStatsFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            totalLifetimeMinutes: tls.totalLifetimeMinutes,
+            averageLifetimeMinutes: tls.averageLifetimeMinutes,
+            ticketsProcessed: tls.ticketsProcessed,
+            totalLifetimeHours: tls.totalLifetimeHours,
+            averageLifetimeHours: tls.averageLifetimeHours,
+            total: tls.ticketsProcessed,
+          };
         } else {
           return {
             user_id: uid,
@@ -728,7 +809,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

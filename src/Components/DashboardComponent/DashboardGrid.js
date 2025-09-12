@@ -11,6 +11,7 @@ import { SystemUsageCard } from "./SystemUsageCard";
 import { TicketDistributionCard } from "./TicketDistributionCard";
 import { ClosedTicketsCountCard } from "./ClosedTicketsCountCard";
 import { TicketsByDepartCountCard } from "./TicketsByDepartCountCard";
+import { TicketLifetimeStatsCard } from "./TicketLifetimeStatsCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -348,6 +349,25 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         between14And30Days={Number.isFinite(w.between14And30Days) ? w.between14And30Days : 0}
                                         moreThan30Days={Number.isFinite(w.moreThan30Days) ? w.moreThan30Days : 0}
                                         totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_lifetime_stats") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketLifetimeStatsCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        totalLifetimeMinutes={Number.isFinite(w.totalLifetimeMinutes) ? w.totalLifetimeMinutes : 0}
+                                        averageLifetimeMinutes={Number.isFinite(w.averageLifetimeMinutes) ? w.averageLifetimeMinutes : 0}
+                                        ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
+                                        totalLifetimeHours={Number.isFinite(w.totalLifetimeHours) ? w.totalLifetimeHours : 0}
+                                        averageLifetimeHours={Number.isFinite(w.averageLifetimeHours) ? w.averageLifetimeHours : 0}
                                         bg={w.bg}
                                     />
                                 </Box>
