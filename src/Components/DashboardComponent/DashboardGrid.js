@@ -12,6 +12,7 @@ import { TicketDistributionCard } from "./TicketDistributionCard";
 import { ClosedTicketsCountCard } from "./ClosedTicketsCountCard";
 import { TicketsByDepartCountCard } from "./TicketsByDepartCountCard";
 import { TicketLifetimeStatsCard } from "./TicketLifetimeStatsCard";
+import { TicketRateCard } from "./TicketRateCard";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -368,6 +369,25 @@ const DashboardGrid = ({ widgets = [], dateRange }) => {
                                         ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
                                         totalLifetimeHours={Number.isFinite(w.totalLifetimeHours) ? w.totalLifetimeHours : 0}
                                         averageLifetimeHours={Number.isFinite(w.averageLifetimeHours) ? w.averageLifetimeHours : 0}
+                                        bg={w.bg}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
+                    if (w.type === "ticket_rate") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TicketRateCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        totalTransitions={Number.isFinite(w.totalTransitions) ? w.totalTransitions : 0}
+                                        directlyClosedCount={Number.isFinite(w.directlyClosedCount) ? w.directlyClosedCount : 0}
+                                        directlyClosedPercentage={Number.isFinite(w.directlyClosedPercentage) ? w.directlyClosedPercentage : 0}
+                                        workedOnCount={Number.isFinite(w.workedOnCount) ? w.workedOnCount : 0}
+                                        workedOnPercentage={Number.isFinite(w.workedOnPercentage) ? w.workedOnPercentage : 0}
                                         bg={w.bg}
                                     />
                                 </Box>

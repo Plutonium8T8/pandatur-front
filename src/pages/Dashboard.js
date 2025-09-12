@@ -35,6 +35,7 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "closed_tickets_count", label: t("Closed Tickets Count") },
   { value: "tickets_by_depart_count", label: t("Tickets By Depart Count") },
   { value: "ticket_lifetime_stats", label: t("Ticket Lifetime Stats") },
+  { value: "ticket_rate", label: t("Ticket Rate") },
   { value: "tickets_count", label: t("Tickets count"), disabled: true },
   { value: "distributor", label: t("Distributor"), disabled: true },
   { value: "workflow_change", label: t("Workflow change"), disabled: true },
@@ -144,6 +145,8 @@ export const Dashboard = () => {
           res = await api.dashboard.getTicketsByDepartCountWidget(payload);
         } else if (widgetType === "ticket_lifetime_stats") {
           res = await api.dashboard.getTicketLifetimeStatsWidget(payload);
+        } else if (widgetType === "ticket_rate") {
+          res = await api.dashboard.getTicketRateWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -253,6 +256,15 @@ export const Dashboard = () => {
     averageLifetimeHours: Math.round((pickNum(obj, ["average_lifetime_minutes", "average_lifetime", "average"]) || 0) / 60 * 10) / 10,
   }), []);
 
+  // утилиты для ticket rate данных
+  const ticketRateFrom = useCallback((obj) => ({
+    totalTransitions: pickNum(obj, ["total_transitions", "total", "count"]),
+    directlyClosedCount: pickNum(obj, ["directly_closed_count", "directly_closed", "closed"]),
+    directlyClosedPercentage: pickNum(obj, ["directly_closed_percentage", "closed_percentage", "closed_pct"]),
+    workedOnCount: pickNum(obj, ["worked_on_count", "worked_on", "worked"]),
+    workedOnPercentage: pickNum(obj, ["worked_on_percentage", "worked_percentage", "worked_pct"]),
+  }), []);
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
@@ -350,6 +362,20 @@ export const Dashboard = () => {
           ticketsProcessed: tls.ticketsProcessed,
           totalLifetimeHours: tls.totalLifetimeHours,
           averageLifetimeHours: tls.averageLifetimeHours,
+          bg: BG.general,
+        });
+      } else if (widgetType === "ticket_rate") {
+        const tr = ticketRateFrom(D.general);
+        W.push({
+          id: "general",
+          type: "ticket_rate",
+          title: getLanguageByKey("Ticket Rate"),
+          subtitle: getLanguageByKey("All company"),
+          totalTransitions: tr.totalTransitions,
+          directlyClosedCount: tr.directlyClosedCount,
+          directlyClosedPercentage: tr.directlyClosedPercentage,
+          workedOnCount: tr.workedOnCount,
+          workedOnPercentage: tr.workedOnPercentage,
           bg: BG.general,
         });
       } else {
@@ -453,6 +479,20 @@ export const Dashboard = () => {
           averageLifetimeHours: tls.averageLifetimeHours,
           bg: BG.by_group_title,
         });
+      } else if (widgetType === "ticket_rate") {
+        const tr = ticketRateFrom(r);
+        W.push({
+          id: `gt-${name ?? idx}`,
+          type: "ticket_rate",
+          title: getLanguageByKey("Group title"),
+          subtitle: name || "-",
+          totalTransitions: tr.totalTransitions,
+          directlyClosedCount: tr.directlyClosedCount,
+          directlyClosedPercentage: tr.directlyClosedPercentage,
+          workedOnCount: tr.workedOnCount,
+          workedOnPercentage: tr.workedOnPercentage,
+          bg: BG.by_group_title,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -552,6 +592,20 @@ export const Dashboard = () => {
           ticketsProcessed: tls.ticketsProcessed,
           totalLifetimeHours: tls.totalLifetimeHours,
           averageLifetimeHours: tls.averageLifetimeHours,
+          bg: BG.by_user_group,
+        });
+      } else if (widgetType === "ticket_rate") {
+        const tr = ticketRateFrom(r);
+        W.push({
+          id: `ug-${idx}`,
+          type: "ticket_rate",
+          title: getLanguageByKey("User group"),
+          subtitle: name || "-",
+          totalTransitions: tr.totalTransitions,
+          directlyClosedCount: tr.directlyClosedCount,
+          directlyClosedPercentage: tr.directlyClosedPercentage,
+          workedOnCount: tr.workedOnCount,
+          workedOnPercentage: tr.workedOnPercentage,
           bg: BG.by_user_group,
         });
       } else {
@@ -657,6 +711,20 @@ export const Dashboard = () => {
           averageLifetimeHours: tls.averageLifetimeHours,
           bg: BG.by_user,
         });
+      } else if (widgetType === "ticket_rate") {
+        const tr = ticketRateFrom(r);
+        W.push({
+          id: `user-${uid || idx}`,
+          type: "ticket_rate",
+          title: getLanguageByKey("User"),
+          subtitle,
+          totalTransitions: tr.totalTransitions,
+          directlyClosedCount: tr.directlyClosedCount,
+          directlyClosedPercentage: tr.directlyClosedPercentage,
+          workedOnCount: tr.workedOnCount,
+          workedOnPercentage: tr.workedOnPercentage,
+          bg: BG.by_user,
+        });
       } else {
         const c = countsFrom(r);
         W.push({
@@ -750,6 +818,19 @@ export const Dashboard = () => {
             averageLifetimeHours: tls.averageLifetimeHours,
             total: tls.ticketsProcessed,
           };
+        } else if (widgetType === "ticket_rate") {
+          const tr = ticketRateFrom(r);
+          return {
+            user_id: uid,
+            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
+            sipuni_id: r.sipuni_id,
+            totalTransitions: tr.totalTransitions,
+            directlyClosedCount: tr.directlyClosedCount,
+            directlyClosedPercentage: tr.directlyClosedPercentage,
+            workedOnCount: tr.workedOnCount,
+            workedOnPercentage: tr.workedOnPercentage,
+            total: tr.totalTransitions,
+          };
         } else {
           return {
             user_id: uid,
@@ -809,7 +890,7 @@ export const Dashboard = () => {
     });
 
     return W;
-  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom]);
+  }, [rawData, userNameById, widgetType, countsFrom, systemUsageFrom, ticketDistributionFrom, ticketStateFrom, ticketsIntoWorkFrom, closedTicketsCountFrom, ticketsByDepartCountFrom, ticketLifetimeStatsFrom, ticketRateFrom]);
 
   const handleApplyFilter = useCallback((payload, meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);

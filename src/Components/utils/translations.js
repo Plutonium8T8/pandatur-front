@@ -4286,4 +4286,54 @@ export const translations = {
     RO: "Timp total (minute)",
     EN: "Total time (minutes)",
   },
+  "Ticket Rate": {
+    RU: "Коэффициент обработки тикетов",
+    RO: "Rata de procesare tichete",
+    EN: "Ticket Rate",
+  },
+  "Worked on tickets": {
+    RU: "Обработано тикетов",
+    RO: "Tichete procesate",
+    EN: "Worked on tickets",
+  },
+  "Directly closed tickets": {
+    RU: "Прямо закрытые тикеты",
+    RO: "Tichete închise direct",
+    EN: "Directly closed tickets",
+  },
+  "Processing quality": {
+    RU: "Качество обработки",
+    RO: "Calitatea procesării",
+    EN: "Processing quality",
+  },
+  "Excellent": {
+    RU: "Отлично",
+    RO: "Excelent",
+    EN: "Excellent",
+  },
+  "Good": {
+    RU: "Хорошо",
+    RO: "Bun",
+    EN: "Good",
+  },
+  "Fair": {
+    RU: "Удовлетворительно",
+    RO: "Acceptabil",
+    EN: "Fair",
+  },
+  "Poor": {
+    RU: "Плохо",
+    RO: "Slab",
+    EN: "Poor",
+  },
+  "Total transitions": {
+    RU: "Всего переходов",
+    RO: "Total tranziții",
+    EN: "Total transitions",
+  },
+  "transitions": {
+    RU: "переходов",
+    RO: "tranziții",
+    EN: "transitions",
+  },
 };

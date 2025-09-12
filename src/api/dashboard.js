@@ -68,4 +68,9 @@ export const dashboard = {
     const { data } = await baseAxios.post("/api/dashboard/widget/tickets-lifetime-stats", body);
     return data;
   },
+
+  getTicketRateWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
+    return data;
+  },
 };
