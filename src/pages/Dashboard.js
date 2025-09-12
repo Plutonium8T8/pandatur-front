@@ -1038,41 +1038,43 @@ export const Dashboard = () => {
 
   return (
     <Stack gap={12}>
-      <Flex ref={headerRowRef} className="dashboard-header-container" p="md">
-        <PageHeader
-          title={getLanguageByKey("Dashboard")}
-          extraInfo={
-            <Group gap="sm">
-              <Tooltip label={getLanguageByKey("Filtru")}>
-                <ActionIcon
-                  variant="light" 
-                  size="lg" 
-                  onClick={() => setFilterOpened(true)} 
-                  aria-label="open-filter"
-                  color={isFilterActive ? "green" : "gray"}
-                  style={{ 
-                    backgroundColor: isFilterActive ? "#51cf66" : "white",
-                    border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
-                    color: isFilterActive ? "white" : "#868e96"
-                  }}
-                >
-                  <LuFilter size={18} />
-                </ActionIcon>
-              </Tooltip>
-
-              <Select
-                size="sm"
-                w={220}
-                value={widgetType}
-                onChange={(v) => v && setWidgetType(v)}
-                data={WIDGET_TYPE_OPTIONS}
-                allowDeselect={false}
-                placeholder={getLanguageByKey("Widget type")}
-                aria-label="widget-type"
-              />
-            </Group>
-          }
-        />
+      {/* Центрированный заголовок */}
+      <Flex ref={headerRowRef} className="dashboard-header-container" p="md" justify="center">
+        <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "600px" }}>
+          <Text fw={700} size="2rem" style={{ fontSize: "2.5rem", paddingTop: "2rem" }}>
+            {getLanguageByKey("Dashboard")}
+          </Text>
+          
+          <Group gap="sm" justify="center">
+            <Select
+              size="sm"
+              w={220}
+              value={widgetType}
+              onChange={(v) => v && setWidgetType(v)}
+              data={WIDGET_TYPE_OPTIONS}
+              allowDeselect={false}
+              placeholder={getLanguageByKey("Widget type")}
+              aria-label="widget-type"
+            />
+            
+            <Tooltip label={getLanguageByKey("Filtru")}>
+              <ActionIcon
+                variant="light"
+                size="lg"
+                onClick={() => setFilterOpened(true)} 
+                aria-label="open-filter"
+                color={isFilterActive ? "green" : "gray"}
+                style={{ 
+                  backgroundColor: isFilterActive ? "#51cf66" : "white",
+                  border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
+                  color: isFilterActive ? "white" : "#868e96"
+                }}
+              >
+                <LuFilter size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+        </Stack>
       </Flex>
 
       {isLoading ? (
