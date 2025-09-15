@@ -7,15 +7,15 @@ const fmt = (n) => (Number(n) || 0).toLocaleString();
 
 // Форматирование времени для system_usage
 const fmtTime = (hours) => {
-  if (typeof hours !== "number" || hours === 0) return "0ч";
+  if (typeof hours !== "number" || hours === 0) return `0${getLanguageByKey("hours")}`;
   
   const wholeHours = Math.floor(hours);
   const minutes = Math.round((hours - wholeHours) * 60);
   
   if (minutes === 0) {
-    return `${wholeHours}ч`;
+    return `${wholeHours}${getLanguageByKey("hours")}`;
   } else {
-    return `${wholeHours}ч ${minutes}м`;
+    return `${wholeHours}${getLanguageByKey("hours")} ${minutes}${getLanguageByKey("minutes")}`;
   }
 };
 

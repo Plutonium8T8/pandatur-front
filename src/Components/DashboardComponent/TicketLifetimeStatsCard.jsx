@@ -7,31 +7,31 @@ const t = (key) => String(getLanguageByKey?.(key) ?? key);
 
 // Форматирование времени
 const fmtTime = (hours) => {
-  if (typeof hours !== "number" || hours === 0) return "0ч";
+  if (typeof hours !== "number" || hours === 0) return `0${getLanguageByKey("hours")}`;
   
   const wholeHours = Math.floor(hours);
   const minutes = Math.round((hours - wholeHours) * 60);
   
   if (minutes === 0) {
-    return `${wholeHours}ч`;
+    return `${wholeHours}${getLanguageByKey("hours")}`;
   } else {
-    return `${wholeHours}ч ${minutes}м`;
+    return `${wholeHours}${getLanguageByKey("hours")} ${minutes}${getLanguageByKey("minutes")}`;
   }
 };
 
 // Форматирование минут в часы и минуты
 const fmtMinutes = (minutes) => {
-  if (typeof minutes !== "number" || minutes === 0) return "0м";
+  if (typeof minutes !== "number" || minutes === 0) return `0${getLanguageByKey("minutes")}`;
   
   const hours = Math.floor(minutes / 60);
   const remainingMinutes = minutes % 60;
   
   if (hours === 0) {
-    return `${remainingMinutes}м`;
+    return `${remainingMinutes}${getLanguageByKey("minutes")}`;
   } else if (remainingMinutes === 0) {
-    return `${hours}ч`;
+    return `${hours}${getLanguageByKey("hours")}`;
   } else {
-    return `${hours}ч ${remainingMinutes}м`;
+    return `${hours}${getLanguageByKey("hours")} ${remainingMinutes}${getLanguageByKey("minutes")}`;
   }
 };
 

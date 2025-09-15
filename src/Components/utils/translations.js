@@ -4171,11 +4171,6 @@ export const translations = {
     RO: "min",
     EN: "min",
   },
-  "hours": {
-    RU: "часов",
-    RO: "ore",
-    EN: "hours",
-  },
   "Ticket Distribution": {
     RU: "Распределение тикетов",
     RO: "Distribuția tichetelor",
@@ -4391,11 +4386,6 @@ export const translations = {
     RO: "Workflow din 'De prelucrat'",
     EN: "Workflow From De Prelucrat",
   },
-  "De prelucrat": {
-    RU: "В обработке",
-    RO: "De prelucrat",
-    EN: "In processing",
-  },
   "destination workflow": {
     RU: "целевой рабочий процесс",
     RO: "workflow destinație",
@@ -4422,21 +4412,6 @@ export const translations = {
     RO: "Timp procesare",
     EN: "Processing time",
   },
-  "Average processing time": {
-    RU: "Среднее время обработки",
-    RO: "Timp mediu procesare",
-    EN: "Average processing time",
-  },
-  "Tickets processed": {
-    RU: "Обработано тикетов",
-    RO: "Tichete procesate",
-    EN: "Tickets processed",
-  },
-  "Total processing time": {
-    RU: "Общее время обработки",
-    RO: "Timp total procesare",
-    EN: "Total processing time",
-  },
   "in processing state": {
     RU: "в состоянии обработки",
     RO: "în starea de procesare",
@@ -4457,5 +4432,15 @@ export const translations = {
     RU: "тикетов по странам",
     RO: "tichete pe țări",
     EN: "tickets by country",
+  },
+  "hours": {
+    RO: "ore",
+    RU: "ч",
+    EN: "h",
+  },
+  "minutes": {
+    RO: "min",
+    RU: "м",
+    EN: "m",
   },
 };
