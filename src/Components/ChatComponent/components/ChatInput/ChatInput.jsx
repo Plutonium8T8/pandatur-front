@@ -7,7 +7,6 @@ import {
   Select,
   Loader,
   FileButton,
-  TextInput,
   Badge,
   CloseButton,
 } from "@mantine/core";
@@ -26,6 +25,7 @@ import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
+import { EmailForm } from "../EmailForm/EmailForm";
 import "./ChatInput.css";
 
 const SEND_AS_SINGLE_BATCH = false;
@@ -61,7 +61,6 @@ export const ChatInput = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
   const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
@@ -260,14 +259,10 @@ export const ChatInput = ({
     handleMarkAsRead();
   };
 
-  const sendEmail = async () => {
+  const handleEmailSend = async (emailData) => {
     try {
-      await api.messages.send.email({
-        ticket_id: ticketId,
-        ...emailFields,
-      });
+      await api.messages.send.email(emailData);
       setShowEmailForm(false);
-      setEmailFields({ from: "", to: "", subject: "", body: "" });
       // ✅ email тоже считаем реакцией — помечаем чат прочитанным
       handleMarkAsRead();
     } catch (e) {
@@ -497,49 +492,11 @@ export const ChatInput = ({
             </Flex>
           </>
         ) : (
-          <>
-            <Flex justify="space-between" mb="xs">
-              <Button variant="default" onClick={() => setShowEmailForm(false)}>
-                ← {getLanguageByKey("Înapoi la chat")}
-              </Button>
-            </Flex>
-            <Flex direction="column" gap="xs">
-              <TextInput
-                label={getLanguageByKey("emailFrom")}
-                placeholder={getLanguageByKey("emailFrom")}
-                value={emailFields.from}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, from: e.target.value }))
-                }
-              />
-              <TextInput
-                label={getLanguageByKey("emailTo")}
-                placeholder={getLanguageByKey("emailTo")}
-                value={emailFields.to}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, to: e.target.value }))
-                }
-              />
-              <TextInput
-                label={getLanguageByKey("emailSubject")}
-                placeholder={getLanguageByKey("emailSubject")}
-                value={emailFields.subject}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, subject: e.target.value }))
-                }
-              />
-              <Textarea
-                label={getLanguageByKey("emailBody")}
-                placeholder={getLanguageByKey("emailBody")}
-                minRows={4}
-                value={emailFields.body}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, body: e.target.value }))
-                }
-              />
-              <Button onClick={sendEmail}>{getLanguageByKey("Trimite Email")}</Button>
-            </Flex>
-          </>
+          <EmailForm
+            onSend={handleEmailSend}
+            onCancel={() => setShowEmailForm(false)}
+            ticketId={ticketId}
+          />
         )}
       </Box>
 

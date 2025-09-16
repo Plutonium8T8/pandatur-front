@@ -3137,6 +3137,11 @@ export const translations = {
     RU: "Кому",
     EN: "To",
   },
+  emailCc: {
+    RO: "CC",
+    RU: "Копия",
+    EN: "CC",
+  },
   emailSubject: {
     RO: "Subiect",
     RU: "Тема",
@@ -3151,6 +3156,31 @@ export const translations = {
     RO: "Trimite Email",
     RU: "Отправить Email",
     EN: "Send Email",
+  },
+  Attachments: {
+    RO: "Atașamente",
+    RU: "Вложения",
+    EN: "Attachments",
+  },
+  "Attach Files": {
+    RO: "Atașează fișiere",
+    RU: "Прикрепить файлы",
+    EN: "Attach Files",
+  },
+  Cancel: {
+    RO: "Anulează",
+    RU: "Отмена",
+    EN: "Cancel",
+  },
+  Send: {
+    RO: "Trimite",
+    RU: "Отправить",
+    EN: "Send",
+  },
+  "Add email": {
+    RO: "Adaugă email",
+    RU: "Добавить email",
+    EN: "Add email",
   },
   Plătitor: {
     RO: "Plătitor",
