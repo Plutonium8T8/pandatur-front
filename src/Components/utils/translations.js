@@ -3127,6 +3127,31 @@ export const translations = {
     RU: "Выбери номер Viber",
     EN: "Select Viber Number",
   },
+  emailFrom: {
+    RO: "De la",
+    RU: "От",
+    EN: "From",
+  },
+  emailTo: {
+    RO: "Către",
+    RU: "Кому",
+    EN: "To",
+  },
+  emailSubject: {
+    RO: "Subiect",
+    RU: "Тема",
+    EN: "Subject",
+  },
+  emailBody: {
+    RO: "Mesaj",
+    RU: "Сообщение",
+    EN: "Message",
+  },
+  "Trimite Email": {
+    RO: "Trimite Email",
+    RU: "Отправить Email",
+    EN: "Send Email",
+  },
   Plătitor: {
     RO: "Plătitor",
     RU: "Плательщик",

@@ -505,28 +505,32 @@ export const ChatInput = ({
             </Flex>
             <Flex direction="column" gap="xs">
               <TextInput
-                placeholder="From"
+                label={getLanguageByKey("emailFrom")}
+                placeholder={getLanguageByKey("emailFrom")}
                 value={emailFields.from}
                 onChange={(e) =>
                   setEmailFields((prev) => ({ ...prev, from: e.target.value }))
                 }
               />
               <TextInput
-                placeholder="To"
+                label={getLanguageByKey("emailTo")}
+                placeholder={getLanguageByKey("emailTo")}
                 value={emailFields.to}
                 onChange={(e) =>
                   setEmailFields((prev) => ({ ...prev, to: e.target.value }))
                 }
               />
               <TextInput
-                placeholder="Subject"
+                label={getLanguageByKey("emailSubject")}
+                placeholder={getLanguageByKey("emailSubject")}
                 value={emailFields.subject}
                 onChange={(e) =>
                   setEmailFields((prev) => ({ ...prev, subject: e.target.value }))
                 }
               />
               <Textarea
-                placeholder="Text"
+                label={getLanguageByKey("emailBody")}
+                placeholder={getLanguageByKey("emailBody")}
                 minRows={4}
                 value={emailFields.body}
                 onChange={(e) =>
