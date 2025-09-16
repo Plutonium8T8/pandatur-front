@@ -84,13 +84,7 @@ const ChatList = ({ ticketId }) => {
       result = result.filter((ticket) => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        const tags = ticket.tags
-          ? ticket.tags.replace(/[{}]/g, "").split(",").map((tag) => tag.trim().toLowerCase())
-          : [];
-        const tagMatch = tags.some((tag) => tag.includes(query));
-        const phones = ticket.clients?.map((c) => String(c.phone || "").toLowerCase()) || [];
-        const phoneMatch = phones.some((phone) => phone.includes(query));
-        return idMatch || contactMatch || tagMatch || phoneMatch;
+        return idMatch || contactMatch;
       });
     }
 
@@ -147,7 +141,7 @@ const ChatList = ({ ticketId }) => {
           />
 
           <TextInput
-            placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+            placeholder={getLanguageByKey("Cauta dupa Lead sau Client")}
             onInput={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>

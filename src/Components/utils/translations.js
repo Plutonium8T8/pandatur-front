@@ -3182,6 +3182,11 @@ export const translations = {
     RU: "Добавить email",
     EN: "Add email",
   },
+  "Cauta dupa Lead sau Client": {
+    RO: "Caută după Lead sau Client",
+    RU: "Поиск по Lead или Клиенту",
+    EN: "Search by Lead or Client",
+  },
   Plătitor: {
     RO: "Plătitor",
     RU: "Плательщик",
