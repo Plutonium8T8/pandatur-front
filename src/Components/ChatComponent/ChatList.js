@@ -84,7 +84,17 @@ const ChatList = ({ ticketId }) => {
       result = result.filter((ticket) => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        return idMatch || contactMatch;
+        
+        // Поиск по клиентам
+        const clientMatches = ticket.clients?.some((client) => {
+          const phoneMatch = client.phone?.toString().toLowerCase().includes(query);
+          const clientIdMatch = client.id?.toString().includes(query);
+          const nameMatch = client.name?.toLowerCase().includes(query);
+          const surnameMatch = client.surname?.toLowerCase().includes(query);
+          return phoneMatch || clientIdMatch || nameMatch || surnameMatch;
+        }) || false;
+        
+        return idMatch || contactMatch || clientMatches;
       });
     }
 
@@ -141,7 +151,7 @@ const ChatList = ({ ticketId }) => {
           />
 
           <TextInput
-            placeholder={getLanguageByKey("Cauta dupa Lead sau Client")}
+            placeholder={getLanguageByKey("Cauta dupa Lead, Client, Telefon sau ID")}
             onInput={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>

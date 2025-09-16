@@ -3187,6 +3187,11 @@ export const translations = {
     RU: "Поиск по Lead или Клиенту",
     EN: "Search by Lead or Client",
   },
+  "Cauta dupa Lead, Client, Telefon sau ID": {
+    RO: "Caută după Lead, Client, Telefon sau ID",
+    RU: "Поиск по Lead, Клиенту, Телефону или ID",
+    EN: "Search by Lead, Client, Phone or ID",
+  },
   Plătitor: {
     RO: "Plătitor",
     RU: "Плательщик",
