@@ -8,7 +8,6 @@ import {
   Stack,
   Button,
   Modal,
-  ScrollArea,
 } from "@mantine/core";
 import { FaEnvelope, FaCode, FaPaperclip } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
@@ -149,16 +148,15 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
             </Box>
 
             {/* HTML Content */}
-            <ScrollArea h="calc(100vh - 200px)" style={{ border: "1px solid #e9ecef", borderRadius: "4px" }}>
-              <Box
-                p="md"
-                style={{
-                  backgroundColor: "#f8f9fa",
-                  minHeight: "100%",
-                }}
-                dangerouslySetInnerHTML={{ __html: html || "" }}
-              />
-            </ScrollArea>
+            <Box
+              p="md"
+              style={{
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #e9ecef",
+                borderRadius: "4px",
+              }}
+              dangerouslySetInnerHTML={{ __html: html || "" }}
+            />
           </Stack>
         </Modal>
       </>
