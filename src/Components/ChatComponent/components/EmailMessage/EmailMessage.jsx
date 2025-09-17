@@ -145,8 +145,7 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
                 <Group gap="xs">
                   <FaPaperclip size={12} color="#6c757d" />
                   <Text size="xs" c="dimmed">
-                    {attachments.length} {getLanguageByKey("attachment")}
-                    {attachments.length !== 1 ? "s" : ""}
+                    {attachments.length} {attachments.length === 1 ? getLanguageByKey("attachment") : getLanguageByKey("Attachments").toLowerCase()}
                   </Text>
                 </Group>
               )}
