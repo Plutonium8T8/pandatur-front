@@ -17,7 +17,7 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
 
   try {
     const emailData = JSON.parse(message);
-    
+
     const {
       from,
       to,
@@ -32,7 +32,6 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
       if (Array.isArray(emailList)) return emailList.join(", ");
       return String(emailList);
     };
-
 
     return (
       <>
