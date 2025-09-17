@@ -18,6 +18,8 @@ import { getLanguageByKey } from "../../../utils";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
 import { useUser } from "@hooks";
+import { api } from "../../../../api";
+import { useSnackbar } from "notistack";
 
 export const EmailForm = ({
   onSend,
@@ -36,7 +38,9 @@ export const EmailForm = ({
   });
   const [attachments, setAttachments] = useState([]);
   const [isToFieldTouched, setIsToFieldTouched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { uploadFile } = useUploadMediaFile();
+  const { enqueueSnackbar } = useSnackbar();
 
   // Обновляем поле "from" когда загружается email пользователя
   useEffect(() => {
@@ -103,19 +107,66 @@ export const EmailForm = ({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
-  const handleSend = () => {
-    const payload = {
-      ticket_id: ticketId,
-      ...emailFields,
-      attachments: attachments.map(({ media_url, media_type, name, size }) => ({
-        media_url,
-        media_type,
-        name,
-        size,
-      })),
-    };
+  const handleSend = async () => {
+    if (!user?.id) {
+      enqueueSnackbar(getLanguageByKey("User ID not found"), { variant: "error" });
+      return;
+    }
 
-    onSend(payload);
+    setIsLoading(true);
+    
+    try {
+      // Форматируем email адреса
+      const toEmails = emailFields.to
+        .split(',')
+        .map(email => email.trim())
+        .filter(email => email);
+
+      const ccEmails = emailFields.cc
+        .split(',')
+        .map(email => email.trim())
+        .filter(email => email);
+
+      // Форматируем attachments для API
+      const attachmentUrls = attachments.map(({ media_url }) => media_url);
+
+      const payload = {
+        sender_id: user.id,
+        from_email: emailFields.from,
+        to_emails: toEmails,
+        text: emailFields.body,
+        cc_emails: ccEmails,
+        subject: emailFields.subject,
+        attachments: attachmentUrls,
+      };
+
+      console.log("Sending email with payload:", payload);
+      
+      const response = await api.messages.send.email(payload);
+      console.log("Email sent successfully:", response);
+
+      // Показываем успешное уведомление
+      enqueueSnackbar(getLanguageByKey("Email sent successfully"), { variant: "success" });
+
+      // Вызываем onSend для обновления UI
+      onSend({
+        ...payload,
+        ticket_id: ticketId,
+        response
+      });
+
+    } catch (error) {
+      console.error("Failed to send email:", error);
+      
+      // Показываем ошибку пользователю
+      const errorMessage = error?.response?.data?.message || 
+                          error?.message || 
+                          getLanguageByKey("Failed to send email");
+      
+      enqueueSnackbar(errorMessage, { variant: "error" });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const AttachmentPreview = ({ attachment }) => {
@@ -432,7 +483,8 @@ export const EmailForm = ({
               <Button
                 onClick={handleSend}
                 size="sm"
-                disabled={!emailFields.to.trim() || !emailFields.subject.trim()}
+                loading={isLoading}
+                disabled={!emailFields.to.trim() || !emailFields.subject.trim() || isLoading}
                 styles={{
                   root: {
                     backgroundColor: "#1a73e8",
@@ -446,7 +498,7 @@ export const EmailForm = ({
                   }
                 }}
               >
-                {getLanguageByKey("Send")}
+                {isLoading ? getLanguageByKey("Sending...") : getLanguageByKey("Send")}
               </Button>
             </Group>
           </Flex>

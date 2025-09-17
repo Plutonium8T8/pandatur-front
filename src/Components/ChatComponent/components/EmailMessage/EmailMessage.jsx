@@ -8,12 +8,84 @@ import {
   Stack,
   Button,
   Modal,
+  Image,
+  Anchor,
+  Divider,
 } from "@mantine/core";
-import { FaEnvelope, FaCode, FaPaperclip } from "react-icons/fa";
+import { FaEnvelope, FaCode, FaPaperclip, FaDownload } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
 
 export const EmailMessage = ({ message, platform_id, page_id }) => {
   const [modalOpened, setModalOpened] = useState(false);
+
+  // Функция для определения типа файла
+  const getFileType = (extension) => {
+    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg'];
+    const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
+    
+    if (imageExtensions.includes(extension?.toLowerCase())) return 'image';
+    if (documentExtensions.includes(extension?.toLowerCase())) return 'document';
+    return 'file';
+  };
+
+  // Компонент для отображения attachment
+  const AttachmentItem = ({ attachment }) => {
+    const fileType = getFileType(attachment.extension);
+    const isImage = fileType === 'image';
+    
+    return (
+      <Card shadow="xs" padding="sm" radius="md" withBorder>
+        <Group gap="md" align="flex-start">
+          {isImage ? (
+            <Image
+              src={attachment.url}
+              alt={attachment.filename}
+              width={60}
+              height={60}
+              fit="cover"
+              radius="md"
+              fallbackSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+"
+            />
+          ) : (
+            <Box
+              w={60}
+              h={60}
+              style={{
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #e9ecef",
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <FaPaperclip size={20} color="#6c757d" />
+            </Box>
+          )}
+          
+          <Stack gap="xs" style={{ flex: 1 }}>
+            <Text size="sm" fw={500} c="dark">
+              {attachment.filename}
+            </Text>
+            <Text size="xs" c="dimmed">
+              {attachment.extension?.toUpperCase()}
+            </Text>
+            <Anchor
+              href={attachment.url}
+              target="_blank"
+              size="sm"
+              style={{ alignSelf: "flex-start" }}
+            >
+              <Group gap="xs">
+                <FaDownload size={12} />
+                {getLanguageByKey("Download")}
+              </Group>
+            </Anchor>
+          </Stack>
+        </Group>
+      </Card>
+    );
+  };
 
   try {
     const emailData = JSON.parse(message);
@@ -146,16 +218,41 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
               </Text>
             </Box>
 
+            {/* Attachments */}
+            {attachments && attachments.length > 0 && (
+              <>
+                <Divider />
+                <Box>
+                  <Text size="sm" fw={600} c="dark" mb="md">
+                    {getLanguageByKey("Attachments")} ({attachments.length})
+                  </Text>
+                  <Stack gap="sm">
+                    {attachments.map((attachment, index) => (
+                      <AttachmentItem key={index} attachment={attachment} />
+                    ))}
+                  </Stack>
+                </Box>
+                <Divider />
+              </>
+            )}
+
             {/* HTML Content */}
-            <Box
-              p="md"
-              style={{
-                backgroundColor: "#f8f9fa",
-                border: "1px solid #e9ecef",
-                borderRadius: "4px",
-              }}
-              dangerouslySetInnerHTML={{ __html: html || "" }}
-            />
+            {html && (
+              <Box>
+                <Text size="sm" fw={600} c="dark" mb="md">
+                  {getLanguageByKey("Email content")}
+                </Text>
+                <Box
+                  p="md"
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    border: "1px solid #e9ecef",
+                    borderRadius: "4px",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: html }}
+                />
+              </Box>
+            )}
           </Stack>
         </Modal>
       </>

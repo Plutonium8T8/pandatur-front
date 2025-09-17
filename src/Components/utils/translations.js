@@ -3247,6 +3247,26 @@ export const translations = {
     RU: "Номер плательщика",
     EN: "Payer No.",
   },
+  "User ID not found": {
+    RO: "ID utilizator nu a fost găsit",
+    RU: "ID пользователя не найден",
+    EN: "User ID not found",
+  },
+  "Email sent successfully": {
+    RO: "Email trimis cu succes",
+    RU: "Email отправлен успешно",
+    EN: "Email sent successfully",
+  },
+  "Failed to send email": {
+    RO: "Eroare la trimiterea email-ului",
+    RU: "Ошибка отправки email",
+    EN: "Failed to send email",
+  },
+  "Sending...": {
+    RO: "Se trimite...",
+    RU: "Отправляется...",
+    EN: "Sending...",
+  },
   Cantitate: {
     RO: "Cantitate",
     RU: "Количество",
