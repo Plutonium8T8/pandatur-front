@@ -192,24 +192,6 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
               </Text>
             </Box>
 
-            {/* Attachments */}
-            {attachments && attachments.length > 0 && (
-              <>
-                <Divider />
-                <Box>
-                  <Text size="sm" fw={600} c="dark" mb="md">
-                    {getLanguageByKey("Attachments")} ({attachments.length})
-                  </Text>
-                  <Stack gap="sm">
-                    {attachments.map((attachment, index) => (
-                      <AttachmentItem key={index} attachment={attachment} />
-                    ))}
-                  </Stack>
-                </Box>
-                <Divider />
-              </>
-            )}
-
             {/* HTML Content */}
             {html && (
               <Box>
@@ -226,6 +208,23 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
                   dangerouslySetInnerHTML={{ __html: html }}
                 />
               </Box>
+            )}
+
+            {/* Attachments */}
+            {attachments && attachments.length > 0 && (
+              <>
+                <Divider />
+                <Box>
+                  <Text size="sm" fw={600} c="dark" mb="md">
+                    {getLanguageByKey("Attachments")} ({attachments.length})
+                  </Text>
+                  <Stack gap="sm">
+                    {attachments.map((attachment, index) => (
+                      <AttachmentItem key={index} attachment={attachment} />
+                    ))}
+                  </Stack>
+                </Box>
+              </>
             )}
           </Stack>
         </Modal>
