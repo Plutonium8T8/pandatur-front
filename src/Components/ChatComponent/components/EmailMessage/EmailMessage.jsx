@@ -8,7 +8,6 @@ import {
   Stack,
   Button,
   Modal,
-  Image,
   Anchor,
   Divider,
 } from "@mantine/core";
@@ -18,50 +17,25 @@ import { getLanguageByKey } from "../../../utils";
 export const EmailMessage = ({ message, platform_id, page_id }) => {
   const [modalOpened, setModalOpened] = useState(false);
 
-  // Функция для определения типа файла
-  const getFileType = (extension) => {
-    const imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'webp', 'svg'];
-    const documentExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt'];
-    
-    if (imageExtensions.includes(extension?.toLowerCase())) return 'image';
-    if (documentExtensions.includes(extension?.toLowerCase())) return 'document';
-    return 'file';
-  };
-
   // Компонент для отображения attachment
   const AttachmentItem = ({ attachment }) => {
-    const fileType = getFileType(attachment.extension);
-    const isImage = fileType === 'image';
-    
     return (
       <Card shadow="xs" padding="sm" radius="md" withBorder>
         <Group gap="md" align="flex-start">
-          {isImage ? (
-            <Image
-              src={attachment.url}
-              alt={attachment.filename}
-              width={60}
-              height={60}
-              fit="cover"
-              radius="md"
-              fallbackSrc="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjRjVGNUY1Ii8+CjxwYXRoIGQ9Ik0yMCAyMEg0MFY0MEgyMFYyMFoiIGZpbGw9IiNEOUQ5RDkiLz4KPC9zdmc+"
-            />
-          ) : (
-            <Box
-              w={60}
-              h={60}
-              style={{
-                backgroundColor: "#f8f9fa",
-                border: "1px solid #e9ecef",
-                borderRadius: "8px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <FaPaperclip size={20} color="#6c757d" />
-            </Box>
-          )}
+          <Box
+            w={40}
+            h={40}
+            style={{
+              backgroundColor: "#f8f9fa",
+              border: "1px solid #e9ecef",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FaPaperclip size={16} color="#6c757d" />
+          </Box>
           
           <Stack gap="xs" style={{ flex: 1 }}>
             <Text size="sm" fw={500} c="dark">
