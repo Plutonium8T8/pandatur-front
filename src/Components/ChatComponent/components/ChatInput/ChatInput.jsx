@@ -261,12 +261,12 @@ export const ChatInput = ({
 
   const handleEmailSend = async (emailData) => {
     try {
-      await api.messages.send.email(emailData);
+      console.log("Email sent successfully:", emailData);
       setShowEmailForm(false);
       // ✅ email тоже считаем реакцией — помечаем чат прочитанным
       handleMarkAsRead();
     } catch (e) {
-      console.error("Failed to send email", e);
+      console.error("Failed to process email response", e);
     }
   };
 
@@ -332,6 +332,14 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("selectUser")}
                   value={currentClient?.value}
                   data={clientList}
+                  searchable
+                  clearable
+                  styles={{
+                    input: {
+                      fontSize: '14px',
+                      minHeight: '36px'
+                    }
+                  }}
                 />
               )}
               {isWhatsApp && (

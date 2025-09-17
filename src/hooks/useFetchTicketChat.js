@@ -3,14 +3,23 @@ import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
 import { useMessagesContext } from "./useMessagesContext";
-import { useApp } from "./useApp";
 
 const normalizeClients = (clientList) => {
   const platformsByClient = clientList.map(({ id, ...platforms }) => {
-    return Object.entries(platforms)
-      .filter(([, platformValue]) => Boolean(platformValue))
+    const email = id.user?.email || "";
+    
+    // Эмулируем поведение бэкенда - добавляем поле "mail" в корень объекта
+    const clientWithMail = {
+      ...platforms,
+      mail: email, // Добавляем email как отдельное поле "mail"
+      id
+    };
+    
+    return Object.entries(clientWithMail)
+      .filter(([key, platformValue]) => Boolean(platformValue) && key !== 'id')
       .map(([platform, platformValue]) => {
         const identifier = getFullName(id.name, id.surname) || `#${id.id}`;
+        
         return {
           label: `${identifier} - ${platform}`,
           value: `${id.id}-${platform}`,
@@ -20,7 +29,7 @@ const normalizeClients = (clientList) => {
             name: id.name,
             surname: id.surname,
             phone: id.phone,
-            email: id.user?.email || "",
+            email,
           },
         };
       });
@@ -30,7 +39,6 @@ const normalizeClients = (clientList) => {
 };
 export const useFetchTicketChat = (id) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { tickets, chatFilteredTickets } = useApp();
 
   const [personalInfo, setPersonalInfo] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
