@@ -3202,6 +3202,16 @@ export const translations = {
     RU: "Нет данных для этого клиента",
     EN: "No data for this client",
   },
+  "Download": {
+    RO: "Descarcă",
+    RU: "Скачать",
+    EN: "Download",
+  },
+  "Email content": {
+    RO: "Conținut email",
+    RU: "Содержимое email",
+    EN: "Email content",
+  },
   "Trimite Email": {
     RO: "Trimite Email",
     RU: "Отправить Email",

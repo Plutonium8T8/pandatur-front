@@ -8,7 +8,7 @@ import {
   Group,
   Text,
 } from "@mantine/core";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { getLanguageByKey, showServerError } from "../../utils";
 import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
@@ -17,13 +17,16 @@ import { enqueueSnackbar } from "notistack";
 export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   const [showSave, setShowSave] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
+  const [emailValue, setEmailValue] = useState("");
 
   // Диагностика данных (только при изменении data)
   useEffect(() => {
-    console.log("🔍 PersonalData4ClientForm data changed:", { data, ticketId });
-  }, [data, ticketId]);
+    if (data) {
+      console.log("🔍 PersonalData4ClientForm data changed:", { data, ticketId });
+    }
+  }, [data?.id, ticketId, data]); // Добавили data для линтера
 
-  const updateFormValues = useCallback(() => {
+  useEffect(() => {
     if (data && !showSave) {
       const values = {
         name: data.name || "",
@@ -32,19 +35,16 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         email: data.email || "",
         ticket_id: ticketId
       };
-      console.log("🔍 Setting form values:", values);
       formInstance.setValues(values);
       setPhoneValue(values.phone);
+      setEmailValue(values.email);
     }
-  }, [data, showSave, ticketId, formInstance]);
-
-  useEffect(() => {
-    updateFormValues();
-  }, [updateFormValues]);
+  }, [data?.id, showSave, ticketId, data, formInstance]); // Добавили недостающие зависимости
 
   const handleAddClient = () => {
     formInstance.setValues({ name: "", surname: "", phone: "", email: "" });
     setPhoneValue("");
+    setEmailValue("");
     setShowSave(true);
   };
 
@@ -77,6 +77,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
       };
       formInstance.setValues(values);
       setPhoneValue(values.phone);
+      setEmailValue(values.email);
     }
   };
 
@@ -84,6 +85,12 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
     const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
     setPhoneValue(onlyDigits);
     formInstance.setFieldValue("phone", onlyDigits);
+  };
+
+  const handleEmailChange = (e) => {
+    const value = e.currentTarget.value;
+    setEmailValue(value);
+    formInstance.setFieldValue("email", value);
   };
 
   // Показываем заглушку если нет данных
@@ -132,8 +139,9 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         mt="md"
         label={getLanguageByKey("Email")}
         placeholder={getLanguageByKey("Email")}
-        key={formInstance.key("email")}
-        {...formInstance.getInputProps("email")}
+        value={emailValue}
+        onChange={handleEmailChange}
+        type="email"
       />
 
       <TextInput

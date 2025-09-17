@@ -3,16 +3,9 @@ import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { extractNumbers, showServerError, getFullName } from "@utils";
 import { useMessagesContext } from "./useMessagesContext";
-import { useApp } from "./useApp";
 
 const normalizeClients = (clientList) => {
-  console.log("🔍 normalizeClients input:", clientList);
-  
   const platformsByClient = clientList.map((client) => {
-    console.log("🔍 Processing client:", client);
-    console.log("🔍 Client keys:", Object.keys(client));
-    console.log("🔍 Client.id structure:", client.id);
-    
     // Проверяем структуру данных клиента
     let clientData, platforms;
     
@@ -24,22 +17,17 @@ const normalizeClients = (clientList) => {
       
       // Если все платформы null, но есть email в имени клиента или отдельное поле email, создаем email платформу
       const hasActivePlatforms = Object.values(platforms).some(Boolean);
-      console.log("🔍 Checking for email platform creation:", { hasActivePlatforms, clientDataName: clientData.name, clientDataEmail: clientData.email, clientEmail: client.email });
       
       if (!hasActivePlatforms) {
         if (clientData.name && clientData.name.includes('@')) {
           platforms.email = clientData.name;
-          console.log("🔍 Created email platform from client name:", clientData.name);
         } else if (clientData.email) {
           platforms.email = clientData.email;
-          console.log("🔍 Created email platform from client email:", clientData.email);
         } else if (client.email) {
           platforms.email = client.email;
-          console.log("🔍 Created email platform from client.email:", client.email);
         } else if (clientData.name && clientData.surname) {
           // Если есть имя и фамилия, но нет email, создаем платформу "client" для отображения
           platforms.client = `${clientData.name} ${clientData.surname}`;
-          console.log("🔍 Created client platform from name and surname:", `${clientData.name} ${clientData.surname}`);
         }
       }
     } else {
@@ -65,12 +53,6 @@ const normalizeClients = (clientList) => {
       }
     }
     
-    console.log("🔍 Client data:", clientData);
-    console.log("🔍 Client data keys:", Object.keys(clientData));
-    console.log("🔍 Client data email:", clientData.email);
-    console.log("🔍 Platforms:", platforms);
-    console.log("🔍 Has active platforms:", Object.values(platforms).some(Boolean));
-    
     return Object.entries(platforms)
       .filter(([, platformValue]) => Boolean(platformValue))
       .map(([platform, platformValue]) => {
@@ -78,7 +60,7 @@ const normalizeClients = (clientList) => {
                           clientData.email || 
                           `#${clientData.id}`;
         
-        const result = {
+        return {
           label: `${identifier} - ${platform}`,
           value: `${clientData.id}-${platform}`,
           payload: {
@@ -90,19 +72,13 @@ const normalizeClients = (clientList) => {
             email: clientData.email || clientData.user?.email || "",
           },
         };
-        
-        console.log("🔍 Created option:", result);
-        return result;
       });
   });
 
-  const result = platformsByClient.flat();
-  console.log("🔍 normalizeClients result:", result);
-  return result;
+  return platformsByClient.flat();
 };
 export const useFetchTicketChat = (id) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { tickets, chatFilteredTickets } = useApp();
 
   const [personalInfo, setPersonalInfo] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
@@ -123,34 +99,27 @@ export const useFetchTicketChat = (id) => {
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
-      console.log("🎫 Ticket data:", ticket);
       setPersonalInfo(ticket);
       
       const clientList = extractNumbers(ticket.client_id);
-      console.log("🎫 Extracted client IDs:", clientList);
       
       const clients = await Promise.all(
         clientList.map(async (clientId) => {
           try {
             const clientData = await api.users.getUsersClientById(clientId);
-            console.log(`🎫 API client ${clientId} response:`, clientData);
             return clientData;
           } catch (error) {
-            console.error(`🎫 Error fetching client ${clientId}:`, error);
             // Если API не работает, используем данные из тикета
             const ticketClient = ticket.clients?.find(c => c.id === clientId);
             if (ticketClient) {
-              console.log(`🎫 Using ticket client data for ${clientId}:`, ticketClient);
               return ticketClient;
             }
             return null;
           }
         }),
       );
-      console.log("🎫 All clients data:", clients);
 
       const clientsPlatform = normalizeClients(clients.filter(Boolean)) || [];
-      console.log("🎫 Final clients platform:", clientsPlatform);
 
       if (lastMessage) {
         const { client_id, platform } = lastMessage;
@@ -203,11 +172,7 @@ export const useFetchTicketChat = (id) => {
     const handleTicketUpdate = (event) => {
       const { ticketId } = event.detail;
       
-      // console.log(`📨 Received ticketUpdated event for ticket ${ticketId}`);
-      
       if (Number(ticketId) === Number(id)) {
-        console.log(`🔄 Syncing ticket ${id} data from server...`);
-        
         // Делаем запрос на получение актуальных данных тикета
         getLightTicketInfo();
       }

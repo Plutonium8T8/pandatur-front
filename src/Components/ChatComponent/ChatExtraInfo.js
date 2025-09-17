@@ -52,11 +52,13 @@ const ChatExtraInfo = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
-  // Диагностика selectedUser (только при изменении)
+  // Диагностика selectedUser (только при изменении ID)
   useEffect(() => {
-    console.log("🔍 ChatExtraInfo selectedUser changed:", selectedUser);
-    console.log("🔍 ChatExtraInfo selectedUser.payload:", selectedUser.payload);
-  }, [selectedUser]);
+    if (selectedUser?.payload?.id) {
+      console.log("🔍 ChatExtraInfo selectedUser changed:", selectedUser);
+      console.log("🔍 ChatExtraInfo selectedUser.payload:", selectedUser.payload);
+    }
+  }, [selectedUser?.payload?.id]);
 
   /**
    *
