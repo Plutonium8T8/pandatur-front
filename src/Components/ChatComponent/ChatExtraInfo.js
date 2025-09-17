@@ -52,12 +52,6 @@ const ChatExtraInfo = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
-  // Диагностика selectedUser (только при изменении)
-  useEffect(() => {
-    console.log("🔍 ChatExtraInfo selectedUser changed:", selectedUser);
-    console.log("🔍 ChatExtraInfo selectedUser.payload:", selectedUser.payload);
-  }, [selectedUser]);
-
   /**
    *
    * @param {number} mergedTicketId

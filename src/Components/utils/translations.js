@@ -3197,11 +3197,6 @@ export const translations = {
     RU: "вложение",
     EN: "attachment",
   },
-  "Nu sunt date pentru acest client": {
-    RO: "Nu sunt date pentru acest client",
-    RU: "Нет данных для этого клиента",
-    EN: "No data for this client",
-  },
   "Trimite Email": {
     RO: "Trimite Email",
     RU: "Отправить Email",

@@ -6,9 +6,8 @@ import {
   Flex,
   Button,
   Group,
-  Text,
 } from "@mantine/core";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { getLanguageByKey, showServerError } from "../../utils";
 import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
@@ -18,12 +17,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   const [showSave, setShowSave] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
 
-  // Диагностика данных (только при изменении data)
   useEffect(() => {
-    console.log("🔍 PersonalData4ClientForm data changed:", { data, ticketId });
-  }, [data, ticketId]);
-
-  const updateFormValues = useCallback(() => {
     if (data && !showSave) {
       const values = {
         name: data.name || "",
@@ -32,15 +26,10 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         email: data.email || "",
         ticket_id: ticketId
       };
-      console.log("🔍 Setting form values:", values);
       formInstance.setValues(values);
       setPhoneValue(values.phone);
     }
-  }, [data, showSave, ticketId, formInstance]);
-
-  useEffect(() => {
-    updateFormValues();
-  }, [updateFormValues]);
+  }, [data, showSave]);
 
   const handleAddClient = () => {
     formInstance.setValues({ name: "", surname: "", phone: "", email: "" });
@@ -85,23 +74,6 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
     setPhoneValue(onlyDigits);
     formInstance.setFieldValue("phone", onlyDigits);
   };
-
-  // Показываем заглушку если нет данных
-  if (!data) {
-    return (
-      <Box bg="#f1f3f5" p="md" style={{ borderRadius: 8 }}>
-        <Flex justify="space-between" align="center">
-          <Title order={3}>{getLanguageByKey("Date personale")}</Title>
-          <ActionIcon onClick={handleAddClient} variant="filled">
-            <LuPlus size={18} />
-          </ActionIcon>
-        </Flex>
-        <Text mt="md" c="dimmed">
-          {getLanguageByKey("Nu sunt date pentru acest client")}
-        </Text>
-      </Box>
-    );
-  }
 
   return (
     <Box bg="#f1f3f5" p="md" style={{ borderRadius: 8 }}>
