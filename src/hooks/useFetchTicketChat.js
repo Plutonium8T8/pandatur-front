@@ -14,13 +14,13 @@ const normalizeClients = (clientList) => {
         return {
           label: `${identifier} - ${platform}`,
           value: `${id.id}-${platform}`,
-
           payload: {
             id: id.id,
             platform,
             name: id.name,
             surname: id.surname,
             phone: id.phone,
+            email: id.user?.email || "",
           },
         };
       });

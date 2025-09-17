@@ -7,6 +7,7 @@ import { IoCall } from "react-icons/io5";
 import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
+import { FaEnvelope } from "react-icons/fa";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "@app-constants";
 import { Tag } from "@components";
 import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
@@ -58,6 +59,14 @@ const MESSAGE_INDICATOR = {
       <IoCall />
       <Text h="20px" size="sm">
         {getLanguageByKey("call")}
+      </Text>
+    </Flex>
+  ),
+  [MEDIA_TYPE.EMAIL]: (
+    <Flex c="dimmed" align="center" gap="8">
+      <FaEnvelope />
+      <Text h="20px" size="sm">
+        {getLanguageByKey("email")}
       </Text>
     </Flex>
   ),

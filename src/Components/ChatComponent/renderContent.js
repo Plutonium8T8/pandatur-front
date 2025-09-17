@@ -4,6 +4,7 @@ import { Audio } from "../Audio";
 import { File } from "../File";
 import { MEDIA_TYPE } from "../../app-constants";
 import { Image as CheckedImage } from "../Image";
+import { EmailMessage } from "./components/EmailMessage/EmailMessage";
 
 const { colors } = DEFAULT_THEME;
 
@@ -100,6 +101,13 @@ export const renderContent = (msg) => {
         <Text>{msg.message}</Text>
       );
     }
+
+    case MEDIA_TYPE.EMAIL:
+      return <EmailMessage 
+        message={msg.message} 
+        platform_id={msg.platform_id} 
+        page_id={msg.page_id} 
+      />;
 
     default:
       const { message } = msg;

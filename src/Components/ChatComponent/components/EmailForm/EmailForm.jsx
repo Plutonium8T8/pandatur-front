@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   TextInput,
@@ -11,35 +11,64 @@ import {
   FileButton,
   Group,
   Text,
-  MultiSelect,
+  Select,
 } from "@mantine/core";
 import { FaEnvelope, FaPaperclip, FaTimes } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
+import { useUser } from "@hooks";
 
-export const EmailForm = ({ 
-  onSend, 
-  onCancel, 
-  ticketId 
+export const EmailForm = ({
+  onSend,
+  onCancel,
+  ticketId,
+  clientEmail = "", // Email клиента для автоматического заполнения
+  ticketClients = [] // Все клиенты тикета для селекта
 }) => {
-  const [emailFields, setEmailFields] = useState({ 
-    from: "", 
-    to: [], 
-    cc: [],
-    subject: "", 
-    body: "" 
+  const { user } = useUser();
+  const [emailFields, setEmailFields] = useState({
+    from: user?.email || "",
+    to: clientEmail || "",
+    cc: "",
+    subject: "",
+    body: ""
   });
   const [attachments, setAttachments] = useState([]);
+  const [isToFieldTouched, setIsToFieldTouched] = useState(false);
   const { uploadFile } = useUploadMediaFile();
 
+  // Обновляем поле "from" когда загружается email пользователя
+  useEffect(() => {
+    if (user?.email && !emailFields.from) {
+      setEmailFields(prev => ({ ...prev, from: user.email }));
+    }
+  }, [user?.email, emailFields.from]);
+
+  // Обновляем поле "to" только при первой загрузке email клиента
+  useEffect(() => {
+    if (clientEmail && !emailFields.to && !isToFieldTouched) {
+      setEmailFields(prev => ({ ...prev, to: clientEmail }));
+    }
+  }, [clientEmail, emailFields.to, isToFieldTouched]);
+
   const handleFieldChange = (field, value) => {
+    if (field === "to") {
+      setIsToFieldTouched(true);
+    }
     setEmailFields(prev => ({ ...prev, [field]: value }));
   };
 
+  // Создаем список email'ов всех клиентов тикета (убираем дубликаты)
+  const clientEmails = ticketClients
+    .map(client => client.payload?.email)
+    .filter(email => email && email.trim() !== "")
+    .filter((email, index, array) => array.indexOf(email) === index) // Убираем дубликаты
+    .map(email => ({ value: email, label: email }));
+
   const handleAttachmentUpload = async (files) => {
     if (!files?.length) return;
-    
+
     try {
       for (const file of files) {
         const url = await uploadFile(file);
@@ -47,10 +76,10 @@ export const EmailForm = ({
           const media_type = getMediaType(file.type);
           setAttachments(prev => [
             ...prev,
-            { 
-              media_url: url, 
-              media_type, 
-              name: file.name, 
+            {
+              media_url: url,
+              media_type,
+              name: file.name,
               size: file.size,
               file: file
             },
@@ -85,15 +114,15 @@ export const EmailForm = ({
         size,
       })),
     };
-    
+
     onSend(payload);
   };
 
   const AttachmentPreview = ({ attachment }) => {
-    const isImage = attachment.media_type === "image" || 
-                   attachment.media_type === "photo" || 
-                   attachment.media_type === "image_url";
-    
+    const isImage = attachment.media_type === "image" ||
+      attachment.media_type === "photo" ||
+      attachment.media_type === "image_url";
+
     return (
       <Box
         style={{
@@ -111,17 +140,17 @@ export const EmailForm = ({
           <img
             src={attachment.media_url}
             alt={attachment.name || "attachment"}
-            style={{ 
-              width: "100%", 
-              height: "100%", 
-              objectFit: "cover" 
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover"
             }}
           />
         ) : (
-          <Flex 
-            w="100%" 
-            h="100%" 
-            align="center" 
+          <Flex
+            w="100%"
+            h="100%"
+            align="center"
             justify="center"
             direction="column"
             gap={4}
@@ -135,10 +164,10 @@ export const EmailForm = ({
         <CloseButton
           size="xs"
           onClick={() => removeAttachment(attachment.media_url)}
-          style={{ 
-            position: "absolute", 
-            top: 2, 
-            right: 2, 
+          style={{
+            position: "absolute",
+            top: 2,
+            right: 2,
             background: "rgba(255,255,255,0.9)",
             borderRadius: "50%"
           }}
@@ -163,7 +192,7 @@ export const EmailForm = ({
   };
 
   return (
-    <Box 
+    <Box
       style={{
         background: "white",
         border: "1px solid #dadce0",
@@ -210,7 +239,7 @@ export const EmailForm = ({
             onChange={(e) => handleFieldChange("from", e.target.value)}
             styles={{
               label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: { 
+              input: {
                 border: "1px solid #dadce0",
                 borderRadius: 4,
                 fontSize: 14,
@@ -223,49 +252,66 @@ export const EmailForm = ({
           />
 
           {/* To Field */}
-          <MultiSelect
-            label={getLanguageByKey("emailTo")}
-            placeholder={getLanguageByKey("emailTo")}
-            value={emailFields.to}
-            onChange={(value) => handleFieldChange("to", value)}
-            searchable
-            creatable
-            getCreateLabel={(query) => `+ ${getLanguageByKey("Add email")} ${query}`}
-            onCreate={(query) => query}
-            data={[]}
-            styles={{
-              label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: { 
-                border: "1px solid #dadce0",
-                borderRadius: 4,
-                fontSize: 14,
-                minHeight: "36px",
-                "&:focus": {
-                  borderColor: "#1a73e8",
-                  boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
-                }
-              }
-            }}
-          />
+          <Box>
+            <Text size="sm" fw={500} mb="xs" c="dark">
+              {getLanguageByKey("emailTo")}
+            </Text>
+            <Flex gap="xs" align="flex-end">
+              <TextInput
+                placeholder={getLanguageByKey("emailTo")}
+                value={emailFields.to}
+                onChange={(e) => handleFieldChange("to", e.target.value)}
+                style={{ flex: 1 }}
+                styles={{
+                  input: {
+                    border: "1px solid #dadce0",
+                    borderRadius: 4,
+                    fontSize: 14,
+                    "&:focus": {
+                      borderColor: "#1a73e8",
+                      boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
+                    }
+                  }
+                }}
+              />
+              {clientEmails.length > 0 && (
+                <Select
+                  placeholder={getLanguageByKey("Select email")}
+                  data={clientEmails}
+                  onChange={(value) => {
+                    if (value) {
+                      handleFieldChange("to", value);
+                    }
+                  }}
+                  styles={{
+                    input: { 
+                      border: "1px solid #dadce0",
+                      borderRadius: 4,
+                      fontSize: 14,
+                      width: "200px",
+                      "&:focus": {
+                        borderColor: "#1a73e8",
+                        boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
+                      }
+                    }
+                  }}
+                />
+              )}
+            </Flex>
+          </Box>
 
           {/* CC Field */}
-          <MultiSelect
+          <TextInput
             label={getLanguageByKey("emailCc")}
             placeholder={getLanguageByKey("emailCc")}
             value={emailFields.cc}
-            onChange={(value) => handleFieldChange("cc", value)}
-            searchable
-            creatable
-            getCreateLabel={(query) => `+ ${getLanguageByKey("Add email")} ${query}`}
-            onCreate={(query) => query}
-            data={[]}
+            onChange={(e) => handleFieldChange("cc", e.target.value)}
             styles={{
               label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: { 
+              input: {
                 border: "1px solid #dadce0",
                 borderRadius: 4,
                 fontSize: 14,
-                minHeight: "36px",
                 "&:focus": {
                   borderColor: "#1a73e8",
                   boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
@@ -283,7 +329,7 @@ export const EmailForm = ({
             onChange={(e) => handleFieldChange("subject", e.target.value)}
             styles={{
               label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: { 
+              input: {
                 border: "1px solid #dadce0",
                 borderRadius: 4,
                 fontSize: 14,
@@ -303,9 +349,9 @@ export const EmailForm = ({
               </Text>
               <Flex wrap="wrap" gap="xs">
                 {attachments.map((attachment) => (
-                  <AttachmentPreview 
-                    key={attachment.media_url} 
-                    attachment={attachment} 
+                  <AttachmentPreview
+                    key={attachment.media_url}
+                    attachment={attachment}
                   />
                 ))}
               </Flex>
@@ -322,7 +368,7 @@ export const EmailForm = ({
             maxRows={20}
             styles={{
               label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: { 
+              input: {
                 border: "1px solid #dadce0",
                 borderRadius: 4,
                 fontSize: 14,
@@ -386,7 +432,7 @@ export const EmailForm = ({
               <Button
                 onClick={handleSend}
                 size="sm"
-                disabled={!emailFields.to.length || !emailFields.subject}
+                disabled={!emailFields.to.trim() || !emailFields.subject.trim()}
                 styles={{
                   root: {
                     backgroundColor: "#1a73e8",

@@ -496,6 +496,8 @@ export const ChatInput = ({
             onSend={handleEmailSend}
             onCancel={() => setShowEmailForm(false)}
             ticketId={ticketId}
+            clientEmail={currentClient?.payload?.email}
+            ticketClients={clientList}
           />
         )}
       </Box>

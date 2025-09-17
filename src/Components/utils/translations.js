@@ -3152,6 +3152,51 @@ export const translations = {
     RU: "Сообщение",
     EN: "Message",
   },
+  "Select email": {
+    RO: "Selectează email",
+    RU: "Выбрать email",
+    EN: "Select email",
+  },
+  "Email": {
+    RO: "Email",
+    RU: "Email",
+    EN: "Email",
+  },
+  "No subject": {
+    RO: "Fără subiect",
+    RU: "Без темы",
+    EN: "No subject",
+  },
+  "No content": {
+    RO: "Fără conținut",
+    RU: "Нет содержимого",
+    EN: "No content",
+  },
+  "Show HTML": {
+    RO: "Afișează HTML",
+    RU: "Показать HTML",
+    EN: "Show HTML",
+  },
+  "Invalid format": {
+    RO: "Format invalid",
+    RU: "Неверный формат",
+    EN: "Invalid format",
+  },
+  "more": {
+    RO: "mai multe",
+    RU: "ещё",
+    EN: "more",
+  },
+  "View HTML": {
+    RO: "Vezi HTML",
+    RU: "Показать HTML",
+    EN: "View HTML",
+  },
+  "attachment": {
+    RO: "atașament",
+    RU: "вложение",
+    EN: "attachment",
+  },
   "Trimite Email": {
     RO: "Trimite Email",
     RU: "Отправить Email",
