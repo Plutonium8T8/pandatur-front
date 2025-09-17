@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Box,
   TextInput,
@@ -6,13 +6,11 @@ import {
   Button,
   Flex,
   Stack,
-  Badge,
   CloseButton,
   ActionIcon,
   FileButton,
   Group,
   Text,
-  Divider,
   MultiSelect,
 } from "@mantine/core";
 import { FaEnvelope, FaPaperclip, FaTimes } from "react-icons/fa";
@@ -33,10 +31,7 @@ export const EmailForm = ({
     body: "" 
   });
   const [attachments, setAttachments] = useState([]);
-  const [isExpanded, setIsExpanded] = useState(false);
-  
   const { uploadFile } = useUploadMediaFile();
-  const fileInputRef = useRef(null);
 
   const handleFieldChange = (field, value) => {
     setEmailFields(prev => ({ ...prev, [field]: value }));
@@ -279,6 +274,7 @@ export const EmailForm = ({
             }}
           />
 
+
           {/* Subject Field */}
           <TextInput
             label={getLanguageByKey("emailSubject")}
@@ -331,7 +327,7 @@ export const EmailForm = ({
                 borderRadius: 4,
                 fontSize: 14,
                 resize: "vertical",
-                minHeight: "300px",
+                minHeight: "200px",
                 "&:focus": {
                   borderColor: "#1a73e8",
                   boxShadow: "0 0 0 2px rgba(26,115,232,.2)"

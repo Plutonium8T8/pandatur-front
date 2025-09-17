@@ -6,6 +6,7 @@ import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
 import { UserContext } from "./UserContext";
+import { useGetTechniciansList } from "../hooks";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
@@ -42,6 +43,9 @@ export const AppProvider = ({ children }) => {
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
+  
+  // Получаем данные всех пользователей
+  const { technicians } = useGetTechniciansList();
 
   const {
     userId,
@@ -525,6 +529,9 @@ export const AppProvider = ({ children }) => {
         fetchChatFilteredTickets,
         setChatFilteredTickets,
         chatSpinner,
+        
+        // technicians
+        technicians,
       }}
     >
       {children}
