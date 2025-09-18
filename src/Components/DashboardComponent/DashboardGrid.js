@@ -32,8 +32,8 @@ const ROW_GAP = 4;          // вертикальный зазор между «
 const FIRST_ROW_HGAP = 3;   // минимальный горизонтальный зазор между карточками в 1-й группе
 
 // размеры
-const DEFAULT_SIZE_ROW0 = { w: 45, h: 20, minW: 6, maxW: 150, minH: 6 }; // 1-я группа
-const DEFAULT_SIZE_ROWX = { w: 30, h: 20, minW: 6, maxW: 150, minH: 6 }; // 2-я+ группы
+const DEFAULT_SIZE_ROW0 = { w: 45, h: 22, minW: 6, maxW: 150, minH: 6 }; // 1-я группа
+const DEFAULT_SIZE_ROWX = { w: 37, h: 22, minW: 6, maxW: 150, minH: 6 }; // 2-я+ группы
 
 const WIDGET_SIZES = {
     top_users: { ...DEFAULT_SIZE_ROWX, w: 60, h: 28 },
