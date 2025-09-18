@@ -12,17 +12,17 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { getUserMessages } = useMessagesContext();
 
   const {
-    personalInfo,
+    ticketData,
     messageSendersByPlatform,
     loading,
     selectedUser,
     changeUser,
-    setPersonalInfo,
+    setTicketData,
     setMessageSendersByPlatform,
     setSelectedUser,
   } = useFetchTicketChat(ticketId);
 
-  const responsibleId = personalInfo?.technician_id?.toString() ?? null;
+  const responsibleId = ticketData?.technician_id?.toString() ?? null;
 
   useEffect(() => {
     if (ticketId) {
@@ -44,7 +44,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
           <ChatMessages
             selectedClient={selectedUser}
             ticketId={ticketId ? Number(ticketId) : undefined}
-            personalInfo={personalInfo}
+            personalInfo={ticketData}
             messageSendersByPlatform={messageSendersByPlatform || []}
             onChangeSelectedUser={changeUser}
             loading={loading}
@@ -58,11 +58,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
           technicians={technicians}
           selectedUser={selectedUser}
           ticketId={ticketId}
-          updatedTicket={personalInfo}
+          updatedTicket={ticketData}
           onUpdatePersonalInfo={(payload, values) => {
             const identifier =
               getFullName(values.name, values.surname) || `#${payload.id}`;
-            const clientTicketList = personalInfo.clients.map((client) =>
+            const clientTicketList = ticketData.clients.map((client) =>
               client.id === payload.id
                 ? { ...client, ...values }
                 : client,
@@ -86,12 +86,12 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             );
             setTickets((prev) =>
               prev.map((ticket) =>
-                ticket.id === personalInfo.id
-                  ? { ...ticket, ...personalInfo, clients: clientTicketList }
+                ticket.id === ticketData.id
+                  ? { ...ticket, ...ticketData, clients: clientTicketList }
                   : ticket,
               ),
             );
-            setPersonalInfo((prev) => ({
+            setTicketData((prev) => ({
               ...prev,
               clients: clientTicketList,
             }));

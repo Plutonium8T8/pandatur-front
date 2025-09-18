@@ -26,11 +26,11 @@ export const SendedMessage = ({
   msg,
   technician,
   technicians = [],
-  personalInfo = {},
+  ticketData = {},
 }) => {
 
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
-  const clients = personalInfo.clients || [];
+  const clients = ticketData.clients || [];
 
   const findClientByPhone = (phone) =>
     clients.find((c) => String(c?.id?.phone) === String(phone));

@@ -40,7 +40,7 @@ const normalizeClients = (clientList) => {
 export const useFetchTicketChat = (id) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [personalInfo, setPersonalInfo] = useState({});
+  const [ticketData, setTicketData] = useState({});
   const [messageSendersByPlatform, setMessageSendersByPlatform] = useState();
   const [loading, setLoading] = useState(false);
   const [selectedUser, setSelectedUser] = useState({});
@@ -59,7 +59,7 @@ export const useFetchTicketChat = (id) => {
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
-      setPersonalInfo(ticket);
+      setTicketData(ticket);
       const clientList = extractNumbers(ticket.client_id);
       const clients = await Promise.all(
         clientList.map((clientId) => api.users.getUsersClientById(clientId)),
@@ -136,12 +136,12 @@ export const useFetchTicketChat = (id) => {
   }, [id, getLightTicketInfo]);
 
   return {
-    personalInfo,
+    ticketData,
     messageSendersByPlatform,
     loading,
     selectedUser,
     changeUser,
-    setPersonalInfo,
+    setTicketData,
     setMessageSendersByPlatform,
     setSelectedUser,
     getTicket: getLightTicketInfo,
