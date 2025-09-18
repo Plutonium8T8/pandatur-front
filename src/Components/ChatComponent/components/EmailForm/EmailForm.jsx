@@ -15,6 +15,7 @@ import {
 } from "@mantine/core";
 import { FaEnvelope, FaPaperclip, FaTimes } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
+import { getFirstEmailForGroup } from "../../../utils/emailUtils";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
 import { useUser } from "@hooks";
@@ -26,7 +27,9 @@ export const EmailForm = ({
   onCancel,
   ticketId,
   clientEmail = "", // Email клиента для автоматического заполнения
-  ticketClients = [] // Все клиенты тикета для селекта
+  ticketClients = [], // Все клиенты тикета для селекта
+  groupTitle = "", // Текущая воронка (group_title)
+  fromEmails = [] // Email адреса для поля "From" по воронке
 }) => {
   const { user } = useUser();
   const [emailFields, setEmailFields] = useState({
@@ -38,16 +41,32 @@ export const EmailForm = ({
   });
   const [attachments, setAttachments] = useState([]);
   const [isToFieldTouched, setIsToFieldTouched] = useState(false);
+  const [isFromFieldTouched, setIsFromFieldTouched] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { uploadFile } = useUploadMediaFile();
   const { enqueueSnackbar } = useSnackbar();
 
-  // Обновляем поле "from" когда загружается email пользователя
+
+  // Обновляем поле "from" когда загружается email пользователя или fromEmails
   useEffect(() => {
-    if (user?.email && !emailFields.from) {
+    if (fromEmails.length > 0 && !isFromFieldTouched) {
+      // Если есть email адреса для воронки, выбираем первый
+      setEmailFields(prev => ({ ...prev, from: fromEmails[0] }));
+    } else if (user?.email && !emailFields.from && !isFromFieldTouched) {
+      // Fallback на email пользователя
       setEmailFields(prev => ({ ...prev, from: user.email }));
     }
-  }, [user?.email, emailFields.from]);
+  }, [user?.email, fromEmails, isFromFieldTouched, emailFields.from]);
+
+  // Дополнительная логика для автозаполнения на основе groupTitle
+  useEffect(() => {
+    if (groupTitle && !isFromFieldTouched && !emailFields.from) {
+      const firstEmail = getFirstEmailForGroup(groupTitle);
+      if (firstEmail) {
+        setEmailFields(prev => ({ ...prev, from: firstEmail }));
+      }
+    }
+  }, [groupTitle, isFromFieldTouched, emailFields.from]);
 
   // Обновляем поле "to" только при первой загрузке email клиента
   useEffect(() => {
@@ -283,24 +302,57 @@ export const EmailForm = ({
       <Box p="16px">
         <Stack gap="md">
           {/* From Field */}
-          <TextInput
-            label={getLanguageByKey("emailFrom")}
-            placeholder={getLanguageByKey("emailFrom")}
-            value={emailFields.from}
-            onChange={(e) => handleFieldChange("from", e.target.value)}
-            styles={{
-              label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
-              input: {
-                border: "1px solid #dadce0",
-                borderRadius: 4,
-                fontSize: 14,
-                "&:focus": {
-                  borderColor: "#1a73e8",
-                  boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
-                }
-              }
-            }}
-          />
+          <Box>
+            <Text size="sm" fw={500} mb="xs" c="dark">
+              {getLanguageByKey("emailFrom")}
+            </Text>
+            <Flex gap="xs" align="flex-end">
+              <TextInput
+                placeholder={getLanguageByKey("emailFrom")}
+                value={emailFields.from}
+                onChange={(e) => {
+                  handleFieldChange("from", e.target.value);
+                  setIsFromFieldTouched(true);
+                }}
+                style={{ flex: 1 }}
+                styles={{
+                  input: {
+                    border: "1px solid #dadce0",
+                    borderRadius: 4,
+                    fontSize: 14,
+                    "&:focus": {
+                      borderColor: "#1a73e8",
+                      boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
+                    }
+                  }
+                }}
+              />
+              {fromEmails.length > 0 && (
+                <Select
+                  placeholder={getLanguageByKey("Select email")}
+                  data={fromEmails.map(email => ({ value: email, label: email }))}
+                  onChange={(value) => {
+                    if (value) {
+                      handleFieldChange("from", value);
+                      setIsFromFieldTouched(true);
+                    }
+                  }}
+                  styles={{
+                    input: { 
+                      border: "1px solid #dadce0",
+                      borderRadius: 4,
+                      fontSize: 14,
+                      width: "200px",
+                      "&:focus": {
+                        borderColor: "#1a73e8",
+                        boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
+                      }
+                    }
+                  }}
+                />
+              )}
+            </Flex>
+          </Box>
 
           {/* To Field */}
           <Box>

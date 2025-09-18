@@ -18,6 +18,7 @@ import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
+import { getEmailsByGroupTitle } from "../../../utils/emailUtils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
@@ -51,6 +52,7 @@ export const ChatInput = ({
   ticketId,
   unseenCount,
   onToggleNoteComposer,
+  personalInfo,
 }) => {
   const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
@@ -71,6 +73,11 @@ export const ChatInput = ({
   const { userId } = useUser();
   const { seenMessages, socketRef } = useSocket();
   const { markMessagesAsRead } = useApp();
+
+  // Получаем данные о воронке и email адресах
+  const groupTitle = personalInfo?.group_title || "";
+  const fromEmails = getEmailsByGroupTitle(groupTitle);
+  
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
@@ -506,6 +513,8 @@ export const ChatInput = ({
             ticketId={ticketId}
             clientEmail={currentClient?.payload?.email}
             ticketClients={clientList}
+            groupTitle={groupTitle}
+            fromEmails={fromEmails}
           />
         )}
       </Box>
