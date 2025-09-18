@@ -79,7 +79,7 @@ export const TotalCard = ({
                     </ThemeIcon>
                     <div>
                         <Text size="xs" c="dimmed" fw={700} tt="uppercase" style={{ letterSpacing: 0.6 }}>
-                            {title || getLanguageByKey("Total calls for the period")}
+                            {title || (widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"))}
                         </Text>
 
                         <Group gap={6} wrap="wrap">

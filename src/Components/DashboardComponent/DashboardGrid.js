@@ -522,6 +522,27 @@ const DashboardGrid = ({ widgets = [], dateRange, widgetType = "calls" }) => {
                         );
                     }
 
+                    // Source widgets (Platform, Source) - используют TotalCard
+                    if (w.type === "source") {
+                        return (
+                            <div key={w.id} style={{ height: "100%" }}>
+                                <Box style={{ height: "100%" }}>
+                                    <TotalCard
+                                        title={w.title}
+                                        subtitle={w.subtitle}
+                                        totalAll={Number.isFinite(w.total) ? w.total : 0}
+                                        totalIncoming={Number.isFinite(w.incoming) ? w.incoming : 0}
+                                        totalOutgoing={Number.isFinite(w.outgoing) ? w.outgoing : 0}
+                                        dateRange={dateRange}
+                                        sizeInfo={sizeInfo}
+                                        bg={w.bg}
+                                        widgetType={widgetType}
+                                    />
+                                </Box>
+                            </div>
+                        );
+                    }
+
                     return (
                         <div key={w.id} style={{ height: "100%" }}>
                             <Box style={{ height: "100%" }}>

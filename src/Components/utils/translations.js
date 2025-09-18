@@ -4066,6 +4066,11 @@ export const translations = {
     RO: "Total apeluri pentru perioada",
     EN: "Total calls for the period"
   },
+  "Total messages for the period": {
+    RU: "Всего сообщений за период",
+    RO: "Total mesaje pentru perioada",
+    EN: "Total messages for the period"
+  },
   "By Group Title": {
     RU: "По Group Title",
     RO: "După titlul grupului",
@@ -4136,7 +4141,7 @@ export const translations = {
     RO: "Apeluri",
     EN: "Calls",
   },
-  messages: {
+  Messages: {
     RU: "Сообщения",
     RO: "Mesaje",
     EN: "Messages",
