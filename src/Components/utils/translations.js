@@ -4573,4 +4573,9 @@ export const translations = {
     RU: "м",
     EN: "m",
   },
+  "Drop files here to attach": {
+    RO: "Trage fișierele aici pentru a le atașa",
+    RU: "Перетащите файлы сюда для прикрепления",
+    EN: "Drop files here to attach",
+  },
 };
