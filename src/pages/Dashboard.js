@@ -332,6 +332,13 @@ export const Dashboard = () => {
     return obj || {};
   }, []);
 
+  // утилиты для ticket state данных
+  const ticketStateFrom = (obj) => ({
+    oldClientTickets: pickNum(obj, ["old_client_tickets_count", "old_client", "old"]),
+    newClientTickets: pickNum(obj, ["new_client_tickets_count", "new_client", "new"]),
+    totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]),
+  });
+
   // нормализация by_platform (массив/объект → массив)
   const mapPlatforms = (bp) => {
     if (!bp) return [];
