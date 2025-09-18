@@ -14,3 +14,4 @@ export * from "./useUploadMediaFile";
 export * from "./useSocket";
 export * from "./useMessagesContext";
 export * from "./useDashboardData";
+export * from "./useUserPermissions";

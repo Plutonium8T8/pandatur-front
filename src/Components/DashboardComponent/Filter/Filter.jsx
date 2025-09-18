@@ -1,6 +1,6 @@
 import { useMemo, useEffect, useState, useCallback } from "react";
 import dayjs from "dayjs";
-import { Button, Group, MultiSelect, Modal, Stack, Divider, Box } from "@mantine/core";
+import { Button, Group, MultiSelect, Modal, Stack, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { getLanguageByKey } from "../../utils";
 import { YYYY_MM_DD } from "../../../app-constants";
@@ -8,6 +8,7 @@ import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
 import { user as userApi } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
+import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const GROUP_PREFIX = "__group__";
 const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
@@ -25,15 +26,6 @@ const getYesterdayDate = () => {
   d.setDate(d.getDate() - 1);
   return getStartEndDateRange(d);
 };
-const compactPayload = (p) => {
-  const copy = { ...p };
-  if (Array.isArray(copy.user_ids) && !copy.user_ids.length) delete copy.user_ids;
-  if (Array.isArray(copy.user_groups) && !copy.user_groups.length) delete copy.user_groups;
-  if (Array.isArray(copy.group_titles) && !copy.group_titles.length) delete copy.group_titles;
-  const ts = copy.attributes?.timestamp || {};
-  if (!ts.from && !ts.to) delete copy.attributes;
-  return copy;
-};
 
 export const Filter = ({
   opened,
@@ -45,7 +37,7 @@ export const Filter = ({
   initialDateRange = [],
   widgetType = "calls", // Тип виджета для определения доступных фильтров
 }) => {
-  const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
+  const { technicians } = useGetTechniciansList();
   const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
   const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
@@ -126,23 +118,20 @@ export const Filter = ({
   const showDateFilter = availableFilters.includes('attributes');
 
   const handleUsersChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroupChip = typeof last === "string" && last.startsWith(GROUP_PREFIX);
-    let nextUsers = val || [];
-    if (isGroupChip) {
-      const groupUsers = groupUserMap.get(last) || [];
-      nextUsers = Array.from(new Set([...(selectedTechnicians || []), ...groupUsers]));
-    }
-    setSelectedTechnicians(nextUsers);
+    // UserGroupMultiSelect уже обрабатывает группы внутри себя
+    // и возвращает только ID пользователей в массиве val
+    setSelectedTechnicians(val || []);
 
+    // Определяем группы на основе выбранных пользователей
     const groupsForUsers = new Set();
     for (const [groupKey, users] of groupUserMap.entries()) {
-      const hasAny = (nextUsers || []).some((u) => users.includes(u));
+      const hasAny = (val || []).some((u) => users.includes(u));
       if (hasAny) groupsForUsers.add(fromGroupKey(groupKey));
     }
     const nextUserGroups = Array.from(groupsForUsers);
     setSelectedUserGroups(nextUserGroups);
 
+    // Обновляем group titles на основе групп
     const titlesSet = new Set();
     nextUserGroups.forEach((g) => (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t)));
     setSelectedGroupTitles(Array.from(titlesSet));
@@ -229,16 +218,13 @@ export const Filter = ({
           <Stack gap="md">
             {/* Фильтр по пользователям */}
             {showUserFilter && (
-              <MultiSelect
-                data={formattedTechnicians}
+              <UserGroupMultiSelect
                 value={selectedTechnicians}
                 onChange={handleUsersChange}
-                searchable
-                clearable
-                maxDropdownHeight={300}
                 placeholder={getLanguageByKey("User")}
-                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-                disabled={loadingTechnicians}
+                label={getLanguageByKey("User")}
+                techniciansData={formattedTechnicians}
+                mode="multi"
               />
             )}
 

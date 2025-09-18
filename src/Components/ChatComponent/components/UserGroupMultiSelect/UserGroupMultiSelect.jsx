@@ -9,19 +9,25 @@ export const UserGroupMultiSelect = ({
   placeholder = "Select users and groups",
   label = "Users & Groups",
   usersData = [], // Данные пользователей из API (raw data)
-  techniciansData = [] // Данные из useGetTechniciansList (formatted)
+  techniciansData = [], // Данные из useGetTechniciansList (formatted)
+  mode = "multi" // "multi" или "single"
 }) => {
   const [selectedValues, setSelectedValues] = useState(value);
   const { userGroups } = useUser();
+
+  // Определяем placeholder в зависимости от режима
+  const actualPlaceholder = mode === "single" 
+    ? (placeholder === "Select users and groups" ? "Select user" : placeholder)
+    : placeholder;
 
   // Создаем опции для мультиселекта из реальных данных
   const options = useMemo(() => {
     // Если есть отформатированные данные из useGetTechniciansList, используем их
     if (techniciansData && techniciansData.length > 0) {
-      // Делаем группы выбираемыми (убираем disabled)
+      // В режиме single отключаем группы, в режиме multi делаем их выбираемыми
       return techniciansData.map(item => 
         item.value.startsWith("__group__") 
-          ? { ...item, disabled: false }
+          ? { ...item, disabled: mode === "single" }
           : item
       );
     }
@@ -54,7 +60,7 @@ export const UserGroupMultiSelect = ({
         options.push({
           value: `__group__${group.id}`,
           label: group.name,
-          disabled: false
+          disabled: mode === "single"
         });
         
         // Добавляем пользователей этой группы
@@ -80,7 +86,8 @@ export const UserGroupMultiSelect = ({
         label: group.name,
         isGroup: true,
         groupId: group.id,
-        userCount: group.users?.length || 0
+        userCount: group.users?.length || 0,
+        disabled: mode === "single"
       }));
 
       // Собираем всех пользователей из всех групп
@@ -107,10 +114,24 @@ export const UserGroupMultiSelect = ({
 
     // Если нет данных - возвращаем пустой массив
     return [];
-  }, [userGroups, usersData, techniciansData]);
+  }, [userGroups, usersData, techniciansData, mode]);
 
   const handleChange = (newValues) => {
-    // Используем логику как в существующей системе
+    // В режиме single ограничиваем выбор одним пользователем
+    if (mode === "single") {
+      const lastValue = newValues[newValues.length - 1];
+      // Проверяем, что выбранный элемент не является группой
+      if (lastValue?.startsWith("__group__")) {
+        return; // Игнорируем выбор групп в режиме single
+      }
+      // Оставляем только последний выбранный пользователь
+      const singleValue = [lastValue].filter(Boolean);
+      setSelectedValues(singleValue);
+      onChange(singleValue);
+      return;
+    }
+
+    // Режим multi - используем существующую логику
     const last = newValues[newValues.length - 1];
     const isGroup = last?.startsWith("__group__");
 
@@ -154,9 +175,30 @@ export const UserGroupMultiSelect = ({
   // Рендер элемента в выпадающем списке
   const renderOption = ({ option, checked }) => {
     const isGroup = option.value.startsWith("__group__");
+    const isDisabled = option.disabled;
     
     return (
-      <Group gap="xs" style={{ padding: '8px 12px' }}>
+      <Group 
+        gap="xs" 
+        style={{ 
+          padding: '8px 12px', 
+          opacity: isDisabled ? 0.7 : 1,
+          backgroundColor: checked ? "#e3f2fd" : "transparent",
+          color: checked ? "#1976d2" : "inherit",
+          cursor: isDisabled ? "not-allowed" : "pointer",
+          transition: "background-color 0.2s ease"
+        }}
+        onMouseEnter={(e) => {
+          if (!isDisabled && !checked) {
+            e.currentTarget.style.backgroundColor = "#f5f5f5";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!checked) {
+            e.currentTarget.style.backgroundColor = "transparent";
+          }
+        }}
+      >
         {isGroup ? (
           <FaUsers size={14} color="#228be6" />
         ) : (
@@ -185,49 +227,12 @@ export const UserGroupMultiSelect = ({
     );
   };
 
-  // Рендер выбранного значения
-  const renderValue = ({ value: selectedValue }) => {
-    const option = options.find(opt => opt.value === selectedValue);
-    if (!option) return selectedValue;
-
-    const isGroup = option.value.startsWith("__group__");
-    
-    return (
-      <Group gap="xs" style={{ maxWidth: '200px' }}>
-        {isGroup ? (
-          <FaUsers size={12} color="#228be6" />
-        ) : (
-          <FaUser size={10} color="#868e96" />
-        )}
-        <Text 
-          size="xs" 
-          fw={isGroup ? 600 : 400}
-          c={isGroup ? "blue" : "dark"}
-          truncate
-          style={{
-            color: isGroup ? "#228be6" : "#333",
-            fontWeight: isGroup ? 600 : 400
-          }}
-        >
-          {option.label}
-        </Text>
-        {isGroup && (
-          <Badge size="xs" variant="light" color="blue">
-            {techniciansData?.filter(item => {
-              if (item.value.startsWith("__group__")) return false;
-              return item.groupName === option.value.replace("__group__", "");
-            })?.length || 0}
-          </Badge>
-        )}
-      </Group>
-    );
-  };
 
   return (
     <Box>
       <MultiSelect
         label={label}
-        placeholder={placeholder}
+        placeholder={actualPlaceholder}
         value={selectedValues}
         onChange={handleChange}
         data={options}
@@ -235,7 +240,6 @@ export const UserGroupMultiSelect = ({
         clearable
         hidePickedOptions={false}
         renderOption={renderOption}
-        valueComponent={renderValue}
         styles={{
           label: { fontSize: 13, fontWeight: 500, color: "#5f6368", marginBottom: 8 },
           input: { 
@@ -254,14 +258,7 @@ export const UserGroupMultiSelect = ({
             boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
           },
           option: {
-            padding: 0,
-            "&[data-selected]": {
-              backgroundColor: "#e3f2fd",
-              color: "#1976d2"
-            },
-            "&[data-hovered]": {
-              backgroundColor: "#f5f5f5"
-            }
+            padding: 0
           }
         }}
       />

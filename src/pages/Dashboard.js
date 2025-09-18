@@ -9,7 +9,7 @@ import { api } from "../api";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin } from "@components";
-import { useGetTechniciansList, useDashboardData } from "../hooks";
+import { useGetTechniciansList, useDashboardData, useUserPermissions } from "../hooks";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { safeArray, pickIds } from "../utils/dashboardHelpers";
 
@@ -56,6 +56,9 @@ export const Dashboard = () => {
 
   const [rawData, setRawData] = useState(null);
   const [dataError, setDataError] = useState(null);
+
+  // данные пользователя и разрешения (для показа в консоли)
+  const userPermissions = useUserPermissions();
 
   // имена по user_id
   const { technicians } = useGetTechniciansList();
