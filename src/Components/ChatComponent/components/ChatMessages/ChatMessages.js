@@ -23,7 +23,7 @@ const getSendedMessage = (msj, currentMsj, statusMessage) =>
 export const ChatMessages = ({
   ticketId,
   selectedClient,
-  ticketData,
+  personalInfo,
   messageSendersByPlatform,
   onChangeSelectedUser,
   loading,
@@ -144,7 +144,7 @@ export const ChatMessages = ({
       return (
         <div ref={contentRef}>
           <GroupedMessages
-            personalInfo={ticketData}
+            personalInfo={personalInfo}
             ticketId={ticketId}
             technicians={technicians}
             apiNotes={apiNotesFromCtx}
@@ -218,7 +218,7 @@ export const ChatMessages = ({
             ticketId={ticketId}
             unseenCount={unseenCount}
             currentClient={selectedClient}
-            personalInfo={ticketData}
+            personalInfo={personalInfo}
             onCreateTask={() => setCreatingTask(true)}
             onToggleNoteComposer={handleToggleNoteComposer}
             onSendMessage={(value) => {

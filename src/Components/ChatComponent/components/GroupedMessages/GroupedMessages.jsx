@@ -62,7 +62,7 @@ const LogCluster = ({ logs = [], technicians }) => {
   );
 };
 
-export const GroupedMessages = ({ ticketData, ticketId, technicians, apiNotes = [] }) => {
+export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
   const { liveLogs = [] } = useLiveTicketLogs(ticketId);
   const { liveNotes = [] } = useLiveTicketNotes(ticketId);
@@ -74,8 +74,8 @@ export const GroupedMessages = ({ ticketData, ticketId, technicians, apiNotes = 
   }, [technicians]);
 
   const clientIds = useMemo(
-    () => (ticketData?.clients || []).map((c) => String(c.id)),
-    [ticketData]
+    () => (personalInfo?.clients || []).map((c) => String(c.id)),
+    [personalInfo]
   );
 
   // сообщения
@@ -276,7 +276,7 @@ export const GroupedMessages = ({ ticketData, ticketId, technicians, apiNotes = 
                   }
 
                   const clientInfo =
-                    ticketData?.clients?.find((c) => c.id === block.clientId) || {};
+                    personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
                   const clientName =
                     getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
                   const platform = block.platform;
@@ -317,7 +317,7 @@ export const GroupedMessages = ({ ticketData, ticketId, technicians, apiNotes = 
                           <ReceivedMessage
                             key={`${msg.id}-${idx}`}
                             msg={msg}
-                            ticketData={ticketData}
+                            personalInfo={personalInfo}
                             technicians={technicians}
                           />
                         ) : (
@@ -326,7 +326,6 @@ export const GroupedMessages = ({ ticketData, ticketId, technicians, apiNotes = 
                             msg={msg}
                             technician={technician}
                             technicians={technicians}
-                            ticketData={ticketData}
                           />
                         );
                       })}

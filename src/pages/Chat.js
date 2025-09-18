@@ -22,12 +22,12 @@ export const Chat = () => {
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const {
-    ticketData,
+    personalInfo,
     messageSendersByPlatform,
     loading,
     selectedUser,
     changeUser,
-    setTicketData,
+    setPersonalInfo,
     setMessageSendersByPlatform,
     setSelectedUser,
   } = useFetchTicketChat(ticketId);
@@ -37,7 +37,7 @@ export const Chat = () => {
     [tickets, ticketId]
   );
 
-  const responsibleId = ticketData?.technician_id?.toString() ?? null;
+  const responsibleId = personalInfo?.technician_id?.toString() ?? null;
 
   return (
     <Flex h="100%" className="chat-wrapper">
@@ -65,7 +65,7 @@ export const Chat = () => {
             <ChatMessages
               ticketId={ticketId}
               selectedClient={selectedUser}
-              personalInfo={ticketData}
+              personalInfo={personalInfo}
               messageSendersByPlatform={messageSendersByPlatform || []}
               onChangeSelectedUser={changeUser}
               loading={loading}
@@ -83,11 +83,11 @@ export const Chat = () => {
             <ChatExtraInfo
               selectedUser={selectedUser}
               ticketId={ticketId}
-              updatedTicket={ticketData}
+              updatedTicket={personalInfo}
               onUpdatePersonalInfo={(payload, values) => {
                 const identifier =
                   getFullName(values.name, values.surname) || `#${payload.id}`;
-                const clientTicketList = ticketData.clients.map((client) =>
+                const clientTicketList = personalInfo.clients.map((client) =>
                   client.id === payload.id
                     ? { ...client, ...values }
                     : client
@@ -114,17 +114,17 @@ export const Chat = () => {
 
                 setTickets((prev) =>
                   prev.map((ticket) =>
-                    ticket.id === ticketData.id
+                    ticket.id === personalInfo.id
                       ? {
-                          ...ticket,
-                          ...ticketData,
+                        ...ticket,
+                        ...personalInfo,
                         clients: clientTicketList,
                       }
                       : ticket
                   )
                 );
 
-                setTicketData((prev) => ({
+                setPersonalInfo((prev) => ({
                   ...prev,
                   clients: clientTicketList,
                 }));

@@ -10,8 +10,8 @@ import { Call } from "./Call";
 
 const { colors } = DEFAULT_THEME;
 
-export const ReceivedMessage = ({ ticketData, msg, technicians = [] }) => {
-  const clients = ticketData?.clients || [];
+export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
+  const clients = personalInfo?.clients || [];
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
 
   const findClientByPhone = (phone) =>

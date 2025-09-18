@@ -52,7 +52,7 @@ export const ChatInput = ({
   ticketId,
   unseenCount,
   onToggleNoteComposer,
-  ticketData,
+  personalInfo,
 }) => {
   const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
@@ -75,7 +75,7 @@ export const ChatInput = ({
   const { markMessagesAsRead } = useApp();
 
   // Получаем данные о воронке и email адресах
-  const groupTitle = ticketData?.group_title || "";
+  const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
   
 

@@ -234,7 +234,7 @@ export const AppProvider = ({ children }) => {
 
       setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
       
-      // Отправляем событие для обновления ticketData в useFetchTicketChat
+      // Отправляем событие для обновления personalInfo в useFetchTicketChat
       window.dispatchEvent(new CustomEvent('ticketUpdated', { 
         detail: { ticketId } 
       }));
