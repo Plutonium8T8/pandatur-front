@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState } from "react";
 import dayjs from "dayjs";
 import { Button, Group, MultiSelect, Modal, Stack, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
@@ -12,7 +12,6 @@ import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMu
 
 const GROUP_PREFIX = "__group__";
 const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
-const toYMD = (d) => (d ? dayjs(d).format("YYYY-MM-DD") : undefined);
 
 const getStartEndDateRange = (date) => {
   const startOfDay = new Date(date);
@@ -144,31 +143,6 @@ export const Filter = ({
     setSelectedGroupTitles(Array.from(titlesSet));
   };
 
-  const buildPayload = useCallback(() => {
-    const [fromDate, toDate] = dateRange || [];
-    const payload = {};
-
-    // Добавляем только доступные фильтры
-    if (showUserFilter && selectedTechnicians.length > 0) {
-      payload.user_ids = selectedTechnicians;
-    }
-    if (showUserGroupsFilter && selectedUserGroups.length > 0) {
-      payload.user_groups = selectedUserGroups;
-    }
-    if (showGroupTitlesFilter && selectedGroupTitles.length > 0) {
-      payload.group_titles = selectedGroupTitles;
-    }
-    if (showDateFilter && (fromDate || toDate)) {
-      payload.attributes = {
-        timestamp: {
-          from: toYMD(fromDate || undefined),
-          to: toYMD(toDate || undefined)
-        }
-      };
-    }
-
-    return payload;
-  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange, showUserFilter, showUserGroupsFilter, showGroupTitlesFilter, showDateFilter]);
 
   const isToday =
     dateRange?.[0] && dateRange?.[1] &&
@@ -188,8 +162,7 @@ export const Filter = ({
   };
 
   const handleApply = () => {
-    const payload = buildPayload();
-    onApply?.(payload, {
+    onApply?.({
       selectedTechnicians,
       selectedUserGroups,
       selectedGroupTitles,

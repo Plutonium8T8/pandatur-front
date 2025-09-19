@@ -9,7 +9,7 @@ import { api } from "../api";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin } from "@components";
-import { useGetTechniciansList, useDashboardData, useUserPermissions } from "../hooks";
+import { useGetTechniciansList, useDashboardData } from "../hooks";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { safeArray, pickIds } from "../utils/dashboardHelpers";
 
@@ -57,9 +57,6 @@ export const Dashboard = () => {
   const [rawData, setRawData] = useState(null);
   const [dataError, setDataError] = useState(null);
 
-  // данные пользователя и разрешения (для показа в консоли)
-  const userPermissions = useUserPermissions();
-
   // имена по user_id
   const { technicians } = useGetTechniciansList();
   const userNameById = useMemo(() => {
@@ -91,22 +88,6 @@ export const Dashboard = () => {
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
-  // payload под messages (timestamp_after/before)
-  const buildPayloadForType = useCallback(() => {
-    const common = buildPayloadCommon();
-    if (widgetType !== "messages") return common;
-
-    const after = common?.attributes?.timestamp?.from;
-    const before = common?.attributes?.timestamp?.to;
-
-    const msgAttrs =
-      after || before
-        ? { timestamp_after: after, timestamp_before: before }
-        : undefined;
-
-    const { attributes, ...rest } = common;
-    return { ...rest, attributes: msgAttrs };
-  }, [buildPayloadCommon, widgetType]);
 
   // запрос по типу
   const fetchByType = useCallback(
@@ -167,8 +148,8 @@ export const Dashboard = () => {
   useEffect(() => {
     const [start, end] = dateRange || [];
     if (!!start !== !!end) return; // нужен полноценный диапазон
-    fetchByType(buildPayloadForType());
-  }, [buildPayloadForType, fetchByType, widgetType]);
+    fetchByType(buildPayloadCommon());
+  }, [buildPayloadCommon, fetchByType, widgetType, dateRange]);
 
   // размеры
   const recalcSizes = useCallback(() => {
@@ -192,7 +173,7 @@ export const Dashboard = () => {
   // построение списка виджетов
   const widgets = useDashboardData(rawData, userNameById, widgetType, getLanguageByKey);
 
-  const handleApplyFilter = useCallback((payload, meta) => {
+  const handleApplyFilter = useCallback((meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
     setSelectedUserGroups(meta?.selectedUserGroups || []);
     setSelectedGroupTitles(meta?.selectedGroupTitles || []);
@@ -205,7 +186,7 @@ export const Dashboard = () => {
     const hasUserGroups = selectedUserGroups?.length > 0;
     const hasGroupTitles = selectedGroupTitles?.length > 0;
     const hasDateRange = dateRange?.length === 2 && dateRange[0] && dateRange[1];
-    
+
     return hasTechnicians || hasUserGroups || hasGroupTitles || hasDateRange;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
@@ -217,27 +198,27 @@ export const Dashboard = () => {
           <Text fw={700} size="2rem" style={{ fontSize: "2.5rem", paddingTop: "2rem" }}>
             {getLanguageByKey("Dashboard")}
           </Text>
-          
+
           <Group gap="sm" justify="center">
-              <Select
-                size="sm"
-                w={220}
-                value={widgetType}
-                onChange={(v) => v && setWidgetType(v)}
-                data={WIDGET_TYPE_OPTIONS}
-                allowDeselect={false}
-                placeholder={getLanguageByKey("Widget type")}
-                aria-label="widget-type"
-              />
-            
+            <Select
+              size="sm"
+              w={220}
+              value={widgetType}
+              onChange={(v) => v && setWidgetType(v)}
+              data={WIDGET_TYPE_OPTIONS}
+              allowDeselect={false}
+              placeholder={getLanguageByKey("Widget type")}
+              aria-label="widget-type"
+            />
+
             <Tooltip label={getLanguageByKey("Filtru")}>
               <ActionIcon
                 variant="light"
                 size="lg"
-                onClick={() => setFilterOpened(true)} 
+                onClick={() => setFilterOpened(true)}
                 aria-label="open-filter"
                 color={isFilterActive ? "green" : "gray"}
-                style={{ 
+                style={{
                   backgroundColor: isFilterActive ? "#51cf66" : "white",
                   border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
                   color: isFilterActive ? "white" : "#868e96"
@@ -246,7 +227,7 @@ export const Dashboard = () => {
                 <LuFilter size={18} />
               </ActionIcon>
             </Tooltip>
-            </Group>
+          </Group>
         </Stack>
       </Flex>
 
