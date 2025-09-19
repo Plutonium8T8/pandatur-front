@@ -3397,11 +3397,6 @@ export const translations = {
     RU: "Выберите автора сообщения",
     EN: "Select message author"
   },
-  "Auxiliar": {
-    "RO": "Auxiliar",
-    "RU": "Auxiliar",
-    "EN": "Auxiliar"
-  },
   "socketConnectionEstablished": {
     RO: "Conectare la socket reușită",
     RU: "Успешное подключение к socket",

@@ -84,7 +84,7 @@ export const AppProvider = ({ children }) => {
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
     try {
-      const excluded = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+      const excluded = ["Realizat cu succes", "Închis și nerealizat"];
       const baseWorkflow = lightTicketFilters.workflow ?? workflowOptions;
       const filteredWorkflow = baseWorkflow.filter((w) => !excluded.includes(w));
 

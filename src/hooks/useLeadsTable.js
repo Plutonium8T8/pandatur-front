@@ -9,7 +9,7 @@ import { showServerError } from "../Components/utils";
  * Сохраняет текущее поведение:
  * - если есть явные workflow в фильтрах -> используем их
  * - иначе, если поиск включён -> используем полный workflowOptions
- * - иначе -> workflowOptions без [Realizat..., Închis..., Auxiliar]
+ * - иначе -> workflowOptions без [Realizat..., Închis...]
  */
 export const useLeadsTable = () => {
     const { enqueueSnackbar } = useSnackbar();
@@ -43,7 +43,7 @@ export const useLeadsTable = () => {
         try {
             setLoading(true);
 
-            const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+            const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat"];
             const isSearchingInList = !!searchTerm?.trim();
 
             const effectiveWorkflow =
