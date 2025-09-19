@@ -29,7 +29,6 @@ import { api } from "../../../../api";
 import { EmailForm } from "../EmailForm/EmailForm";
 import "./ChatInput.css";
 
-const SEND_AS_SINGLE_BATCH = false;
 
 const pandaNumbersWhatsup = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" },
@@ -77,7 +76,7 @@ export const ChatInput = ({
   // Получаем данные о воронке и email адресах
   const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
-  
+
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
@@ -86,10 +85,10 @@ export const ChatInput = ({
   // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
     if (ticket) {
-      console.log("🎫 Setting actionNeeded from ticket:", { 
-        ticketId, 
-        action_needed: ticket.action_needed, 
-        action_needed_type: typeof ticket.action_needed 
+      console.log("🎫 Setting actionNeeded from ticket:", {
+        ticketId,
+        action_needed: ticket.action_needed,
+        action_needed_type: typeof ticket.action_needed
       });
       setActionNeeded(Boolean(ticket.action_needed));
       console.log("✅ Set actionNeeded from ticket:", Boolean(ticket.action_needed));
@@ -103,7 +102,7 @@ export const ChatInput = ({
     //   currentActionNeeded: actionNeeded,
     //   ticketActionNeeded: ticket?.action_needed
     // });
-    
+
     if (unseenCount > 0) {
       // console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
       setActionNeeded(true);
@@ -200,40 +199,26 @@ export const ChatInput = ({
     if (!hasText && !hasFiles) return;
 
     try {
-      if (SEND_AS_SINGLE_BATCH) {
-        const payload = {
+      // Отправляем каждый медиа файл отдельным сообщением
+      for (const att of attachments) {
+        const payloadFile = {
           ...buildBasePayload(),
-          message: hasText ? trimmedText : attachments[0]?.media_url,
-          message_text: isPhoneChat && hasText ? trimmedText : undefined,
-          last_message_type: hasFiles ? attachments[0].media_type : "text",
-          attachments: attachments.map(({ media_url, media_type, name, size }) => ({
-            media_url,
-            media_type,
-            name,
-            size,
-          })),
+          media_url: att.media_url,
+          message_text: null,
+          last_message_type: att.media_type,
         };
-        await Promise.resolve(onSendMessage(payload));
-      } else {
-        for (const att of attachments) {
-          const payloadFile = {
-            ...buildBasePayload(),
-            message: att.media_url,
-            media_url: att.media_url,
-            media_type: att.media_type,
-            last_message_type: att.media_type,
-          };
-          await Promise.resolve(onSendMessage(payloadFile));
-        }
-        if (hasText) {
-          const payloadText = {
-            ...buildBasePayload(),
-            message: trimmedText,
-            message_text: isPhoneChat ? trimmedText : undefined,
-            last_message_type: "text",
-          };
-          await Promise.resolve(onSendMessage(payloadText));
-        }
+        await Promise.resolve(onSendMessage(payloadFile));
+      }
+
+      // Отправляем текст отдельным сообщением (если есть)
+      if (hasText) {
+        const payloadText = {
+          ...buildBasePayload(),
+          media_url: null,
+          message_text: trimmedText,
+          last_message_type: "text",
+        };
+        await Promise.resolve(onSendMessage(payloadText));
       }
 
       handleMarkAsRead();
@@ -246,12 +231,12 @@ export const ChatInput = ({
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
-    console.log("🔄 Toggling action_needed:", { 
-      current: actionNeeded, 
-      new: newValue, 
-      ticketId 
+    console.log("🔄 Toggling action_needed:", {
+      current: actionNeeded,
+      new: newValue,
+      ticketId
     });
-    
+
     try {
       await api.tickets.updateById({
         id: ticketId,
