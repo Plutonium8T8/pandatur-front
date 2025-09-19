@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
@@ -30,15 +30,34 @@ import { EmailForm } from "../EmailForm/EmailForm";
 import "./ChatInput.css";
 
 
-const pandaNumbersWhatsup = [
+const allPandaNumbers = [
   { value: "37360991919", label: "37360991919 - MD / PT_MD" },
   { value: "40720949119", label: "40720949119 - RO / PT_IASI" },
   { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
   { value: "40721205105", label: "40721205105 - RO / PT_BR" },
 ];
-const pandaNumbersViber = [
-  { value: "37360991919", label: "37360991919 - MD / PT_MD" }
-];
+
+// Функция для фильтрации номеров панды по воронке
+const getPandaNumbersByGroupTitle = (groupTitle, platform = 'whatsapp') => {
+  if (!groupTitle) {
+    return allPandaNumbers; // Для всех остальных случаев - показать все номера
+  }
+
+  const groupTitleUpper = groupTitle.toUpperCase();
+
+  if (groupTitleUpper.includes('MD')) {
+    // Для MD воронки - показать только MD номер
+    return allPandaNumbers.filter(num => num.value === "37360991919");
+  }
+
+  if (groupTitleUpper.includes('RO')) {
+    // Для RO воронки - показать только RO номера
+    return allPandaNumbers.filter(num => num.value !== "37360991919");
+  }
+
+  // Для всех остальных случаев - показать все номера
+  return allPandaNumbers;
+};
 
 export const ChatInput = ({
   onSendMessage,
@@ -77,10 +96,35 @@ export const ChatInput = ({
   const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
 
+  // Мемоизированные списки номеров панды по воронке
+  const whatsappNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'whatsapp'),
+    [groupTitle]
+  );
+
+  const viberNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'viber'),
+    [groupTitle]
+  );
+
+  const telegramNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'telegram'),
+    [groupTitle]
+  );
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
   const isTelegram = currentClient?.payload?.platform?.toUpperCase() === "TELEGRAM";
+
+  // Автоматически выбираем первый подходящий номер при изменении воронки
+  useEffect(() => {
+    if (!pandaNumber && (isWhatsApp || isViber || isTelegram)) {
+      const currentNumbers = isViber ? viberNumbers : (isTelegram ? telegramNumbers : whatsappNumbers);
+      if (currentNumbers.length > 0) {
+        setPandaNumber(currentNumbers[0].value);
+      }
+    }
+  }, [groupTitle, isWhatsApp, isViber, isTelegram, whatsappNumbers, viberNumbers, telegramNumbers, pandaNumber]);
   const isPhoneChat = isWhatsApp || isViber;
   const needsPandaNumber = isWhatsApp || isViber || isTelegram;
 
@@ -342,7 +386,7 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("select_sender_number")}
                   value={pandaNumber}
                   onChange={setPandaNumber}
-                  data={pandaNumbersWhatsup}
+                  data={whatsappNumbers}
                 />
               )}
               {isViber && (
@@ -351,7 +395,7 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("select_sender_number_viber")}
                   value={pandaNumber}
                   onChange={setPandaNumber}
-                  data={pandaNumbersViber}
+                  data={viberNumbers}
                 />
               )}
               {isTelegram && (
@@ -360,7 +404,7 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("select_sender_number_telegram")}
                   value={pandaNumber}
                   onChange={setPandaNumber}
-                  data={pandaNumbersWhatsup}
+                  data={telegramNumbers}
                 />
               )}
               <Select
