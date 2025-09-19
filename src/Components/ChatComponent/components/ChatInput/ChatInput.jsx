@@ -19,6 +19,7 @@ import { LuSmile, LuStickyNote } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
 import { getEmailsByGroupTitle } from "../../../utils/emailUtils";
+import { getPandaNumbersByGroupTitle } from "../../../utils/pandaNumbersUtils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
@@ -28,36 +29,6 @@ import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 import { EmailForm } from "../EmailForm/EmailForm";
 import "./ChatInput.css";
-
-
-const allPandaNumbers = [
-  { value: "37360991919", label: "37360991919 - MD / PT_MD" },
-  { value: "40720949119", label: "40720949119 - RO / PT_IASI" },
-  { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
-  { value: "40721205105", label: "40721205105 - RO / PT_BR" },
-];
-
-// Функция для фильтрации номеров панды по воронке
-const getPandaNumbersByGroupTitle = (groupTitle, platform = 'whatsapp') => {
-  if (!groupTitle) {
-    return allPandaNumbers; // Для всех остальных случаев - показать все номера
-  }
-
-  const groupTitleUpper = groupTitle.toUpperCase();
-
-  if (groupTitleUpper.includes('MD')) {
-    // Для MD воронки - показать только MD номер
-    return allPandaNumbers.filter(num => num.value === "37360991919");
-  }
-
-  if (groupTitleUpper.includes('RO')) {
-    // Для RO воронки - показать только RO номера
-    return allPandaNumbers.filter(num => num.value !== "37360991919");
-  }
-
-  // Для всех остальных случаев - показать все номера
-  return allPandaNumbers;
-};
 
 export const ChatInput = ({
   onSendMessage,
