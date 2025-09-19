@@ -61,22 +61,8 @@ export const Filter = ({
   }, [technicians, userRole, userId, teamUserIds]);
 
   const formattedTechnicians = useMemo(() => {
-    const formatted = formatMultiSelectData(filteredTechnicians);
-
-    // Логируем для отладки
-    console.log("🔍 User Filtering:", {
-      userRole,
-      userId,
-      isTeamLeader,
-      teamUserIds: Array.from(teamUserIds),
-      allTechnicians: technicians?.length || 0,
-      filteredTechnicians: filteredTechnicians?.length || 0,
-      formattedTechnicians: formatted?.length || 0,
-      filteredUserNames: filteredTechnicians?.map(t => t.label) || []
-    });
-
-    return formatted;
-  }, [filteredTechnicians, userRole, userId, technicians, isTeamLeader, teamUserIds]);
+    return formatMultiSelectData(filteredTechnicians);
+  }, [filteredTechnicians]);
 
   const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
@@ -129,18 +115,6 @@ export const Filter = ({
         const opts = Array.from(new Set(filteredGroups.map((g) => g?.name).filter(Boolean))).map(
           (name) => ({ value: name, label: name })
         );
-
-        // Логируем для отладки
-        console.log("🔍 User Groups Filtering:", {
-          userRole,
-          isAdmin,
-          isTeamLeader,
-          myGroups: myGroups.map(g => g.name),
-          supervisedGroups: supervisedGroups.map(g => g.name),
-          allGroups: (data || []).map(g => g.name),
-          filteredGroups: filteredGroups.map(g => g.name),
-          finalOptions: opts.map(o => o.label)
-        });
 
         if (mounted) setUserGroupsOptions(opts);
       } catch {

@@ -35,7 +35,6 @@ export const useUserPermissions = () => {
         
         // Загружаем данные текущего пользователя
         const userData = await api.users.getById(currentUserId);
-        console.log("🔍 Raw user data from API:", userData);
         setCurrentUser(userData);
 
         // Загружаем все группы пользователей
@@ -49,7 +48,6 @@ export const useUserPermissions = () => {
         setUserGroups(myGroups);
 
       } catch (err) {
-        console.error("Error fetching user data:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -88,8 +86,6 @@ export const useUserPermissions = () => {
       tech.value === String(currentUserId)
     );
     
-    console.log("🔍 Current user from technicians:", currentUserFromTechnicians);
-
     // Проверяем, является ли пользователь Admin
     const isAdmin = userGroups.some(group => 
       ["Admin", "IT dep.", "Quality Department"].includes(group.name)
@@ -164,37 +160,6 @@ export const useUserPermissions = () => {
     technicians
   ]);
 
-  // Логируем данные для отладки
-  useEffect(() => {
-    if (!loading && currentUserId && userGroups.length > 0) {
-      console.log("🔍 User Permissions Analysis:", {
-        userId: userPermissions.userId,
-        userName: userPermissions.userName,
-        userSurname: userPermissions.userSurname,
-        fullName: userPermissions.fullName,
-        userRole: userPermissions.userRole,
-        isAdmin: userPermissions.isAdmin,
-        isITDep: userPermissions.isITDep,
-        isTeamLeader: userPermissions.isTeamLeader,
-        myGroups: userPermissions.myGroups.map(g => ({
-          id: g.id,
-          name: g.name,
-          supervisor_id: g.supervisor_id,
-          usersCount: g.users?.length || 0
-        })),
-        supervisedGroups: userPermissions.supervisedGroups.map(g => ({
-          id: g.id,
-          name: g.name,
-          usersCount: g.users?.length || 0
-        })),
-        accessibleGroupTitles: userPermissions.accessibleGroupTitles,
-        accessibleWorkflows: userPermissions.accessibleWorkflows,
-        teamUserIds: Array.from(userPermissions.teamUserIds),
-        totalGroupsInSystem: userPermissions.allGroups.length,
-        techniciansCount: technicians?.length || 0
-      });
-    }
-  }, [userPermissions, loading, technicians, currentUserId, userGroups.length]);
 
   return userPermissions;
 };
