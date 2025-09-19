@@ -25,18 +25,18 @@ import { useSnackbar } from "notistack";
 // Функция для проверки и добавления email без дублирования
 const addEmailIfNotExists = (currentEmails, newEmail) => {
   if (!newEmail || !newEmail.trim()) return currentEmails;
-  
+
   const trimmedNewEmail = newEmail.trim().toLowerCase();
   const currentEmailsList = currentEmails
     .split(',')
     .map(email => email.trim().toLowerCase())
     .filter(email => email);
-  
+
   // Проверяем, есть ли уже такой email
   if (currentEmailsList.includes(trimmedNewEmail)) {
     return currentEmails; // Возвращаем без изменений, если email уже есть
   }
-  
+
   // Добавляем новый email
   return currentEmails ? `${currentEmails}, ${newEmail}` : newEmail;
 };
@@ -187,7 +187,7 @@ export const EmailForm = ({
     }
 
     setIsLoading(true);
-    
+
     try {
       // Форматируем email адреса
       const toEmails = emailFields.to
@@ -214,7 +214,7 @@ export const EmailForm = ({
       };
 
       console.log("Sending email with payload:", payload);
-      
+
       const response = await api.messages.send.email(payload);
       console.log("Email sent successfully:", response);
 
@@ -230,12 +230,12 @@ export const EmailForm = ({
 
     } catch (error) {
       console.error("Failed to send email:", error);
-      
+
       // Показываем ошибку пользователю
-      const errorMessage = error?.response?.data?.message || 
-                          error?.message || 
-                          getLanguageByKey("Failed to send email");
-      
+      const errorMessage = error?.response?.data?.message ||
+        error?.message ||
+        getLanguageByKey("Failed to send email");
+
       enqueueSnackbar(errorMessage, { variant: "error" });
     } finally {
       setIsLoading(false);
@@ -393,7 +393,7 @@ export const EmailForm = ({
                     }
                   }}
                   styles={{
-                    input: { 
+                    input: {
                       border: "1px solid #dadce0",
                       borderRadius: 4,
                       fontSize: 14,
@@ -443,7 +443,7 @@ export const EmailForm = ({
                     }
                   }}
                   styles={{
-                    input: { 
+                    input: {
                       border: "1px solid #dadce0",
                       borderRadius: 4,
                       fontSize: 14,
@@ -493,7 +493,7 @@ export const EmailForm = ({
                     }
                   }}
                   styles={{
-                    input: { 
+                    input: {
                       border: "1px solid #dadce0",
                       borderRadius: 4,
                       fontSize: 14,
