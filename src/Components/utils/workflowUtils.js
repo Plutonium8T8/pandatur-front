@@ -1,5 +1,5 @@
 export const workflowOptionsSalesMD = [
-    "Auxiliar",
+    "GPT",
     "Interesat",
     "Apel de intrare",
     "De prelucrat",
@@ -14,6 +14,7 @@ export const workflowOptionsSalesMD = [
 ];
 
 export const workflowOptionsSalesRO = [
+    "GPT",
     "Interesat",
     "De prelucrat",
     "Luat în lucru",
@@ -114,7 +115,6 @@ export const workflowOptionsSalesUA = [
 // limited
 
 export const workflowOptionsLimitedSalesMD = [
-    "Auxiliar",
     "Apel de intrare",
     "De prelucrat",
     "Luat în lucru",

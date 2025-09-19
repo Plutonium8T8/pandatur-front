@@ -144,7 +144,7 @@ export const Leads = () => {
   // helper: построить атрибуты для hard/id запросов (как в hard-странице)
   const buildHardAttributes = (filters) => {
     const { search, group_title, workflow, type, view, ...restFilters } = filters || {};
-    const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+    const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat"];
     const isSearchingInList = !!(search && search.trim());
 
     const effectiveWorkflow =

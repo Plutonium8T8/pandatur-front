@@ -24,6 +24,7 @@ import { Audio } from "../../../Audio";
 import { TimeClient } from "./TimeClient";
 import { Empty } from "../../../Empty";
 import { Image } from "@components";
+import { EmailMessage } from "../EmailMessage/EmailMessage";
 import "./Media.css";
 
 /**
@@ -206,6 +207,22 @@ export const renderMediaContent = ({
         )}
       </Flex>
     ),
+    [MEDIA_TYPE.EMAIL]: (
+      <Flex gap="4" direction="column">
+        <EmailMessage 
+          message={message} 
+          platform_id={payload?.platform_id} 
+          page_id={payload?.page_id} 
+        />
+        
+        {!shouldDelete && (
+          <TimeClient
+            id={payload?.client_id}
+            date={parseServerDate(msjTime)?.format(`${YYYY_MM_DD} ${HH_mm}`)}
+          />
+        )}
+      </Flex>
+    ),
   };
 
   return MEDIA_CONTENT[type];
@@ -218,7 +235,7 @@ export const renderFile = ({
   renderAddAttachments,
 }) => {
   const filterMediaByImageAndVideo = media?.filter((i) =>
-    [MEDIA_TYPE.FILE].includes(i.mtype),
+    [MEDIA_TYPE.FILE, MEDIA_TYPE.EMAIL].includes(i.mtype),
   );
 
   return (

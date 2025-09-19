@@ -3127,6 +3127,121 @@ export const translations = {
     RU: "Выбери номер Viber",
     EN: "Select Viber Number",
   },
+  select_sender_number_telegram: {
+    RO: "Alege nr Telegram",
+    RU: "Выбери номер Telegram",
+    EN: "Select Telegram Number",
+  },
+  emailFrom: {
+    RO: "De la",
+    RU: "От",
+    EN: "From",
+  },
+  emailTo: {
+    RO: "Către",
+    RU: "Кому",
+    EN: "To",
+  },
+  emailCc: {
+    RO: "CC",
+    RU: "Копия",
+    EN: "CC",
+  },
+  emailSubject: {
+    RO: "Subiect",
+    RU: "Тема",
+    EN: "Subject",
+  },
+  emailBody: {
+    RO: "Mesaj",
+    RU: "Сообщение",
+    EN: "Message",
+  },
+  "Select email": {
+    RO: "Selectează email",
+    RU: "Выбрать email",
+    EN: "Select email",
+  },
+  "Email": {
+    RO: "Email",
+    RU: "Email",
+    EN: "Email",
+  },
+  "No subject": {
+    RO: "Fără subiect",
+    RU: "Без темы",
+    EN: "No subject",
+  },
+  "No content": {
+    RO: "Fără conținut",
+    RU: "Нет содержимого",
+    EN: "No content",
+  },
+  "Show HTML": {
+    RO: "Afișează HTML",
+    RU: "Показать HTML",
+    EN: "Show HTML",
+  },
+  "Invalid format": {
+    RO: "Format invalid",
+    RU: "Неверный формат",
+    EN: "Invalid format",
+  },
+  "more": {
+    RO: "mai multe",
+    RU: "ещё",
+    EN: "more",
+  },
+  "View HTML": {
+    RO: "Vezi HTML",
+    RU: "Показать HTML",
+    EN: "View HTML",
+  },
+  "attachment": {
+    RO: "atașament",
+    RU: "вложение",
+    EN: "attachment",
+  },
+  "Trimite Email": {
+    RO: "Trimite Email",
+    RU: "Отправить Email",
+    EN: "Send Email",
+  },
+  Attachments: {
+    RO: "Atașamente",
+    RU: "Вложения",
+    EN: "Attachments",
+  },
+  "Attach Files": {
+    RO: "Atașează fișiere",
+    RU: "Прикрепить файлы",
+    EN: "Attach Files",
+  },
+  Cancel: {
+    RO: "Anulează",
+    RU: "Отмена",
+    EN: "Cancel",
+  },
+  Send: {
+    RO: "Trimite",
+    RU: "Отправить",
+    EN: "Send",
+  },
+  "Add email": {
+    RO: "Adaugă email",
+    RU: "Добавить email",
+    EN: "Add email",
+  },
+  "Cauta dupa Lead sau Client": {
+    RO: "Caută după Lead sau Client",
+    RU: "Поиск по Lead или Клиенту",
+    EN: "Search by Lead or Client",
+  },
+  "Cauta dupa Lead, Client, Telefon sau ID": {
+    RO: "Caută după Lead, Client, Telefon sau ID",
+    RU: "Поиск по Lead, Клиенту, Телефону или ID",
+    EN: "Search by Lead, Client, Phone or ID",
+  },
   Plătitor: {
     RO: "Plătitor",
     RU: "Плательщик",
@@ -3136,6 +3251,26 @@ export const translations = {
     RO: "Nr. Plătitor",
     RU: "Номер плательщика",
     EN: "Payer No.",
+  },
+  "User ID not found": {
+    RO: "ID utilizator nu a fost găsit",
+    RU: "ID пользователя не найден",
+    EN: "User ID not found",
+  },
+  "Email sent successfully": {
+    RO: "Email trimis cu succes",
+    RU: "Email отправлен успешно",
+    EN: "Email sent successfully",
+  },
+  "Failed to send email": {
+    RO: "Eroare la trimiterea email-ului",
+    RU: "Ошибка отправки email",
+    EN: "Failed to send email",
+  },
+  "Sending...": {
+    RO: "Se trimite...",
+    RU: "Отправляется...",
+    EN: "Sending...",
   },
   Cantitate: {
     RO: "Cantitate",
@@ -3262,11 +3397,6 @@ export const translations = {
     RU: "Выберите автора сообщения",
     EN: "Select message author"
   },
-  "Auxiliar": {
-    "RO": "Auxiliar",
-    "RU": "Auxiliar",
-    "EN": "Auxiliar"
-  },
   "socketConnectionEstablished": {
     RO: "Conectare la socket reușită",
     RU: "Успешное подключение к socket",
@@ -3286,6 +3416,11 @@ export const translations = {
     RO: "Task creat",
     RU: "Создана задача",
     EN: "Task created"
+  },
+  "Ticket creat": {
+    RO: "Ticket creat",
+    RU: "Создан тикет",
+    EN: "Ticket created"
   },
   "Câmp actualizat": {
     RO: "Câmp actualizat",
@@ -3931,6 +4066,11 @@ export const translations = {
     RO: "Total apeluri pentru perioada",
     EN: "Total calls for the period"
   },
+  "Total messages for the period": {
+    RU: "Всего сообщений за период",
+    RO: "Total mesaje pentru perioada",
+    EN: "Total messages for the period"
+  },
   "By Group Title": {
     RU: "По Group Title",
     RO: "După titlul grupului",
@@ -4001,7 +4141,7 @@ export const translations = {
     RO: "Apeluri",
     EN: "Calls",
   },
-  messages: {
+  Messages: {
     RU: "Сообщения",
     RO: "Mesaje",
     EN: "Messages",
@@ -4110,5 +4250,337 @@ export const translations = {
     RU: "Всего звонков",
     RO: "Total apeluri",
     EN: "Total calls",
+  },
+  "Tickets Into Work": {
+    RU: "Тикеты в работу",
+    RO: "Tichete în lucru",
+    EN: "Tickets Into Work",
+  },
+  "Tickets taken into work": {
+    RU: "Тикеты взятые в работу",
+    RO: "Tichete luate în lucru",
+    EN: "Tickets taken into work",
+  },
+  "Taken into work": {
+    RU: "Взято в работу",
+    RO: "Luate în lucru",
+    EN: "Taken into work",
+  },
+  "Tickets taken": {
+    RU: "Тикетов взято",
+    RO: "Tichete luate",
+    EN: "Tickets taken",
+  },
+  "GPT": {
+    RU: "GPT",
+    RO: "GPT",
+    EN: "GPT",
+  },
+  "System usage": {
+    RU: "Использование системы",
+    RO: "Utilizarea sistemului",
+    EN: "System usage",
+  },
+  "Activity hours": {
+    RU: "Часы активности",
+    RO: "Ore de activitate",
+    EN: "Activity hours",
+  },
+  "Minutes": {
+    RU: "Минуты",
+    RO: "Minute",
+    EN: "Minutes",
+  },
+  "Hours": {
+    RU: "Часы",
+    RO: "Ore",
+    EN: "Hours",
+  },
+  "activity": {
+    RU: "активность",
+    RO: "activitate",
+    EN: "activity",
+  },
+  "min": {
+    RU: "мин",
+    RO: "min",
+    EN: "min",
+  },
+  "Ticket Distribution": {
+    RU: "Распределение тикетов",
+    RO: "Distribuția tichetelor",
+    EN: "Ticket Distribution",
+  },
+  "Distributed tickets": {
+    RU: "Распределенные тикеты",
+    RO: "Tichete distribuite",
+    EN: "Distributed tickets",
+  },
+  "Distributed": {
+    RU: "Распределено",
+    RO: "Distribuit",
+    EN: "Distributed",
+  },
+  "system": {
+    RU: "система",
+    RO: "sistem",
+    EN: "system",
+  },
+  "Closed Tickets Count": {
+    RU: "Количество закрытых тикетов",
+    RO: "Numărul de tichete închise",
+    EN: "Closed Tickets Count",
+  },
+  "Total closed tickets": {
+    RU: "Всего закрытых тикетов",
+    RO: "Total tichete închise",
+    EN: "Total closed tickets",
+  },
+  "Older than 11 days": {
+    RU: "Старше 11 дней",
+    RO: "Mai vechi de 11 zile",
+    EN: "Older than 11 days",
+  },
+  "Newer than 11 days": {
+    RU: "Новее 11 дней",
+    RO: "Mai noi de 11 zile",
+    EN: "Newer than 11 days",
+  },
+  "Tickets By Depart Count": {
+    RU: "Тикеты по дате отъезда",
+    RO: "Tichete după data plecării",
+    EN: "Tickets By Depart Count",
+  },
+  "Less than 14 days": {
+    RU: "Менее 14 дней",
+    RO: "Mai puțin de 14 zile",
+    EN: "Less than 14 days",
+  },
+  "Between 14-30 days": {
+    RU: "Между 14-30 днями",
+    RO: "Între 14-30 zile",
+    EN: "Between 14-30 days",
+  },
+  "More than 30 days": {
+    RU: "Более 30 дней",
+    RO: "Mai mult de 30 zile",
+    EN: "More than 30 days",
+  },
+  "Ticket Lifetime Stats": {
+    RU: "Статистика времени обработки тикетов",
+    RO: "Statistici timp procesare tichete",
+    EN: "Ticket Lifetime Stats",
+  },
+  "Total processing time": {
+    RU: "Общее время обработки",
+    RO: "Timp total procesare",
+    EN: "Total processing time",
+  },
+  "Average processing time": {
+    RU: "Среднее время обработки",
+    RO: "Timp mediu procesare",
+    EN: "Average processing time",
+  },
+  "Efficiency": {
+    RU: "Эффективность",
+    RO: "Eficiență",
+    EN: "Efficiency",
+  },
+  "Very fast": {
+    RU: "Очень быстро",
+    RO: "Foarte rapid",
+    EN: "Very fast",
+  },
+  "Normal": {
+    RU: "Нормально",
+    RO: "Normal",
+    EN: "Normal",
+  },
+  "Slow": {
+    RU: "Медленно",
+    RO: "Lent",
+    EN: "Slow",
+  },
+  "Very slow": {
+    RU: "Очень медленно",
+    RO: "Foarte lent",
+    EN: "Very slow",
+  },
+  "Tickets processed": {
+    RU: "Обработано тикетов",
+    RO: "Tichete procesate",
+    EN: "Tickets processed",
+  },
+  "Total time (minutes)": {
+    RU: "Общее время (минуты)",
+    RO: "Timp total (minute)",
+    EN: "Total time (minutes)",
+  },
+  "Ticket Rate": {
+    RU: "Коэффициент обработки тикетов",
+    RO: "Rata de procesare tichete",
+    EN: "Ticket Rate",
+  },
+  "Worked on tickets": {
+    RU: "Обработано тикетов",
+    RO: "Tichete procesate",
+    EN: "Worked on tickets",
+  },
+  "Directly closed tickets": {
+    RU: "Прямо закрытые тикеты",
+    RO: "Tichete închise direct",
+    EN: "Directly closed tickets",
+  },
+  "Processing quality": {
+    RU: "Качество обработки",
+    RO: "Calitatea procesării",
+    EN: "Processing quality",
+  },
+  "Excellent": {
+    RU: "Отлично",
+    RO: "Excelent",
+    EN: "Excellent",
+  },
+  "Good": {
+    RU: "Хорошо",
+    RO: "Bun",
+    EN: "Good",
+  },
+  "Fair": {
+    RU: "Удовлетворительно",
+    RO: "Acceptabil",
+    EN: "Fair",
+  },
+  "Poor": {
+    RU: "Плохо",
+    RO: "Slab",
+    EN: "Poor",
+  },
+  "Total transitions": {
+    RU: "Всего переходов",
+    RO: "Total tranziții",
+    EN: "Total transitions",
+  },
+  "transitions": {
+    RU: "переходов",
+    RO: "tranziții",
+    EN: "transitions",
+  },
+
+  // Workflow From Change Widget
+  "Workflow From Change": {
+    RU: "Изменения рабочего процесса",
+    RO: "Modificări flux de lucru",
+    EN: "Workflow From Change",
+  },
+  "changes": {
+    RU: "изменений",
+    RO: "modificări",
+    EN: "changes",
+  },
+  "Total workflow changes": {
+    RU: "Всего изменений рабочего процесса",
+    RO: "Total modificări flux de lucru",
+    EN: "Total workflow changes",
+  },
+  // Workflow Change To Widget
+  "Workflow Change To": {
+    RU: "Изменения в рабочий процесс",
+    RO: "Modificări în flux de lucru",
+    EN: "Workflow Change To",
+  },
+  "completed contracts": {
+    RU: "завершенных договоров",
+    RO: "contracte încheiate",
+    EN: "completed contracts",
+  },
+  "Total completed contracts": {
+    RU: "Всего завершенных договоров",
+    RO: "Total contracte încheiate",
+    EN: "Total completed contracts",
+  },
+  // Ticket Creation Widget
+  "Ticket Creation": {
+    RU: "Создание тикетов",
+    RO: "Crearea tichetelor",
+    EN: "Ticket Creation",
+  },
+  "tickets created": {
+    RU: "созданных тикетов",
+    RO: "tichete create",
+    EN: "tickets created",
+  },
+  "Total tickets created": {
+    RU: "Всего созданных тикетов",
+    RO: "Total tichete create",
+    EN: "Total tickets created",
+  },
+  // Workflow From De Prelucrat Widget
+  "Workflow From De Prelucrat": {
+    RU: "Рабочий процесс из 'В обработке'",
+    RO: "Workflow din 'De prelucrat'",
+    EN: "Workflow From De Prelucrat",
+  },
+  "destination workflow": {
+    RU: "целевой рабочий процесс",
+    RO: "workflow destinație",
+    EN: "destination workflow",
+  },
+  "workflow transitions": {
+    RU: "переходы рабочего процесса",
+    RO: "tranziții workflow",
+    EN: "workflow transitions",
+  },
+  "Total workflow transitions": {
+    RU: "Всего переходов рабочего процесса",
+    RO: "Total tranziții workflow",
+    EN: "Total workflow transitions",
+  },
+  // Workflow Duration Widget
+  "Workflow Duration": {
+    RU: "Длительность рабочего процесса",
+    RO: "Durata workflow",
+    EN: "Workflow Duration",
+  },
+  "Processing time": {
+    RU: "Время обработки",
+    RO: "Timp procesare",
+    EN: "Processing time",
+  },
+  "in processing state": {
+    RU: "в состоянии обработки",
+    RO: "în starea de procesare",
+    EN: "in processing state",
+  },
+  // Ticket Destination Widget
+  "Ticket Destination": {
+    RU: "Назначение тикетов",
+    RO: "Destinația tichetelor",
+    EN: "Ticket Destination",
+  },
+  "By country": {
+    RU: "По странам",
+    RO: "Pe țări",
+    EN: "By country",
+  },
+  "tickets by country": {
+    RU: "тикетов по странам",
+    RO: "tichete pe țări",
+    EN: "tickets by country",
+  },
+  "hours": {
+    RO: "ore",
+    RU: "ч",
+    EN: "h",
+  },
+  "minutes": {
+    RO: "min",
+    RU: "м",
+    EN: "m",
+  },
+  "Drop files here to attach": {
+    RO: "Trage fișierele aici pentru a le atașa",
+    RU: "Перетащите файлы сюда для прикрепления",
+    EN: "Drop files here to attach",
   },
 };

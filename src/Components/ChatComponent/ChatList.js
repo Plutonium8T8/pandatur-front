@@ -84,13 +84,17 @@ const ChatList = ({ ticketId }) => {
       result = result.filter((ticket) => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        const tags = ticket.tags
-          ? ticket.tags.replace(/[{}]/g, "").split(",").map((tag) => tag.trim().toLowerCase())
-          : [];
-        const tagMatch = tags.some((tag) => tag.includes(query));
-        const phones = ticket.clients?.map((c) => String(c.phone || "").toLowerCase()) || [];
-        const phoneMatch = phones.some((phone) => phone.includes(query));
-        return idMatch || contactMatch || tagMatch || phoneMatch;
+        
+        // Поиск по клиентам
+        const clientMatches = ticket.clients?.some((client) => {
+          const phoneMatch = client.phone?.toString().toLowerCase().includes(query);
+          const clientIdMatch = client.id?.toString().includes(query);
+          const nameMatch = client.name?.toLowerCase().includes(query);
+          const surnameMatch = client.surname?.toLowerCase().includes(query);
+          return phoneMatch || clientIdMatch || nameMatch || surnameMatch;
+        }) || false;
+        
+        return idMatch || contactMatch || clientMatches;
       });
     }
 
@@ -147,7 +151,7 @@ const ChatList = ({ ticketId }) => {
           />
 
           <TextInput
-            placeholder={getLanguageByKey("Cauta dupa Lead, Client sau Tag")}
+            placeholder={getLanguageByKey("Cauta dupa Lead, Client, Telefon sau ID")}
             onInput={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>

@@ -218,6 +218,7 @@ export const ChatMessages = ({
             ticketId={ticketId}
             unseenCount={unseenCount}
             currentClient={selectedClient}
+            personalInfo={personalInfo}
             onCreateTask={() => setCreatingTask(true)}
             onToggleNoteComposer={handleToggleNoteComposer}
             onSendMessage={(value) => {

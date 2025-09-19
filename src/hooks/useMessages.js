@@ -12,6 +12,7 @@ const FORMAT_MEDIA = [
   MEDIA_TYPE.IMAGE,
   MEDIA_TYPE.FILE,
   MEDIA_TYPE.CALL,
+  MEDIA_TYPE.EMAIL,
 ];
 
 const getMediaFileMessages = (messageList) => {

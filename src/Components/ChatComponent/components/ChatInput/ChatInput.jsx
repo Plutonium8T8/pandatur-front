@@ -7,18 +7,19 @@ import {
   Select,
   Loader,
   FileButton,
-  TextInput,
   Badge,
   CloseButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
 import { getLanguageByKey, socialMediaIcons } from "../../../utils";
+import { getEmailsByGroupTitle } from "../../../utils/emailUtils";
+import { getPandaNumbersByGroupTitle } from "../../../utils/pandaNumbersUtils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
@@ -26,19 +27,8 @@ import { useApp, useSocket, useUser } from "@hooks";
 import Can from "../../../CanComponent/Can";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
+import { EmailForm } from "../EmailForm/EmailForm";
 import "./ChatInput.css";
-
-const SEND_AS_SINGLE_BATCH = false;
-
-const pandaNumbersWhatsup = [
-  { value: "37360991919", label: "37360991919 - MD / PT_MD" },
-  { value: "40720949119", label: "40720949119 - RO / PT_IASI" },
-  { value: "40728932931", label: "40728932931 - RO / PT_BUC" },
-  { value: "40721205105", label: "40721205105 - RO / PT_BR" },
-];
-const pandaNumbersViber = [
-  { value: "37360991919", label: "37360991919 - MD / PT_MD" }
-];
 
 export const ChatInput = ({
   onSendMessage,
@@ -51,6 +41,7 @@ export const ChatInput = ({
   ticketId,
   unseenCount,
   onToggleNoteComposer,
+  personalInfo,
 }) => {
   const [opened, handlers] = useDisclosure(false);
   const [message, setMessage] = useState("");
@@ -61,12 +52,10 @@ export const ChatInput = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [emailFields, setEmailFields] = useState({ from: "", to: "", subject: "", body: "" });
 
   const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
 
-  const actionNeededInit = useRef(undefined);
   const [actionNeeded, setActionNeeded] = useState(false);
 
   const { uploadFile } = useUploadMediaFile();
@@ -74,39 +63,68 @@ export const ChatInput = ({
   const { seenMessages, socketRef } = useSocket();
   const { markMessagesAsRead } = useApp();
 
+  // Получаем данные о воронке и email адресах
+  const groupTitle = personalInfo?.group_title || "";
+  const fromEmails = getEmailsByGroupTitle(groupTitle);
+
+  // Мемоизированные списки номеров панды по воронке
+  const whatsappNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'whatsapp'),
+    [groupTitle]
+  );
+
+  const viberNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'viber'),
+    [groupTitle]
+  );
+
+  const telegramNumbers = useMemo(() =>
+    getPandaNumbersByGroupTitle(groupTitle, 'telegram'),
+    [groupTitle]
+  );
+
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
-  const isPhoneChat = isWhatsApp || isViber;
+  const isTelegram = currentClient?.payload?.platform?.toUpperCase() === "TELEGRAM";
 
+  // Автоматически выбираем первый подходящий номер при изменении воронки
   useEffect(() => {
-    if (!ticketId) return;
-    let mounted = true;
-    const fetchTicket = async () => {
-      try {
-        const data = await api.tickets.getById(ticketId);
-        if (mounted) {
-          setTicket(data);
-          setActionNeeded(Boolean(data.action_needed));
-          actionNeededInit.current = Boolean(data.action_needed);
-        }
-      } catch (e) {
-        console.error("Failed to fetch ticket", e);
+    if (!pandaNumber && (isWhatsApp || isViber || isTelegram)) {
+      const currentNumbers = isViber ? viberNumbers : (isTelegram ? telegramNumbers : whatsappNumbers);
+      if (currentNumbers.length > 0) {
+        setPandaNumber(currentNumbers[0].value);
       }
-    };
-    fetchTicket();
-    return () => { mounted = false; };
-  }, [ticketId]);
+    }
+  }, [groupTitle, isWhatsApp, isViber, isTelegram, whatsappNumbers, viberNumbers, telegramNumbers, pandaNumber]);
+  const isPhoneChat = isWhatsApp || isViber;
+  const needsPandaNumber = isWhatsApp || isViber || isTelegram;
 
+  // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
-    if (actionNeededInit.current === undefined && ticket) {
+    if (ticket) {
+      console.log("🎫 Setting actionNeeded from ticket:", {
+        ticketId,
+        action_needed: ticket.action_needed,
+        action_needed_type: typeof ticket.action_needed
+      });
       setActionNeeded(Boolean(ticket.action_needed));
-      actionNeededInit.current = Boolean(ticket.action_needed);
+      console.log("✅ Set actionNeeded from ticket:", Boolean(ticket.action_needed));
     }
   }, [ticket, ticketId]);
 
+  // Устанавливаем actionNeeded = true если есть непрочитанные сообщения
   useEffect(() => {
-    if (unseenCount > 0) setActionNeeded(true);
-  }, [unseenCount]);
+    // console.log("👀 unseenCount changed:", { 
+    //   unseenCount, 
+    //   currentActionNeeded: actionNeeded,
+    //   ticketActionNeeded: ticket?.action_needed
+    // });
+
+    if (unseenCount > 0) {
+      // console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
+      setActionNeeded(true);
+    }
+  }, [unseenCount, actionNeeded, ticket?.action_needed]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -170,7 +188,7 @@ export const ChatInput = ({
   };
 
   const buildBasePayload = () => ({
-    panda_number: isPhoneChat ? pandaNumber : undefined,
+    panda_number: needsPandaNumber ? pandaNumber : undefined,
     client_phone: isPhoneChat ? currentClient?.payload?.phone : undefined,
   });
 
@@ -198,40 +216,26 @@ export const ChatInput = ({
     if (!hasText && !hasFiles) return;
 
     try {
-      if (SEND_AS_SINGLE_BATCH) {
-        const payload = {
+      // Отправляем каждый медиа файл отдельным сообщением
+      for (const att of attachments) {
+        const payloadFile = {
           ...buildBasePayload(),
-          message: hasText ? trimmedText : attachments[0]?.media_url,
-          message_text: isPhoneChat && hasText ? trimmedText : undefined,
-          last_message_type: hasFiles ? attachments[0].media_type : "text",
-          attachments: attachments.map(({ media_url, media_type, name, size }) => ({
-            media_url,
-            media_type,
-            name,
-            size,
-          })),
+          media_url: att.media_url,
+          message_text: null,
+          last_message_type: att.media_type,
         };
-        await Promise.resolve(onSendMessage(payload));
-      } else {
-        for (const att of attachments) {
-          const payloadFile = {
-            ...buildBasePayload(),
-            message: att.media_url,
-            media_url: att.media_url,
-            media_type: att.media_type,
-            last_message_type: att.media_type,
-          };
-          await Promise.resolve(onSendMessage(payloadFile));
-        }
-        if (hasText) {
-          const payloadText = {
-            ...buildBasePayload(),
-            message: trimmedText,
-            message_text: isPhoneChat ? trimmedText : undefined,
-            last_message_type: "text",
-          };
-          await Promise.resolve(onSendMessage(payloadText));
-        }
+        await Promise.resolve(onSendMessage(payloadFile));
+      }
+
+      // Отправляем текст отдельным сообщением (если есть)
+      if (hasText) {
+        const payloadText = {
+          ...buildBasePayload(),
+          media_url: null,
+          message_text: trimmedText,
+          last_message_type: "text",
+        };
+        await Promise.resolve(onSendMessage(payloadText));
       }
 
       handleMarkAsRead();
@@ -244,6 +248,12 @@ export const ChatInput = ({
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
+    console.log("🔄 Toggling action_needed:", {
+      current: actionNeeded,
+      new: newValue,
+      ticketId
+    });
+
     try {
       await api.tickets.updateById({
         id: ticketId,
@@ -251,25 +261,21 @@ export const ChatInput = ({
       });
       setActionNeeded(newValue);
       setTicket((prev) => ({ ...prev, action_needed: newValue }));
-      actionNeededInit.current = newValue;
+      console.log("✅ Successfully updated action_needed to:", newValue);
     } catch (e) {
       console.error("Failed to update action_needed", e);
     }
     handleMarkAsRead();
   };
 
-  const sendEmail = async () => {
+  const handleEmailSend = async (emailData) => {
     try {
-      await api.messages.send.email({
-        ticket_id: ticketId,
-        ...emailFields,
-      });
+      console.log("Email sent successfully:", emailData);
       setShowEmailForm(false);
-      setEmailFields({ from: "", to: "", subject: "", body: "" });
       // ✅ email тоже считаем реакцией — помечаем чат прочитанным
       handleMarkAsRead();
     } catch (e) {
-      console.error("Failed to send email", e);
+      console.error("Failed to process email response", e);
     }
   };
 
@@ -335,6 +341,14 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("selectUser")}
                   value={currentClient?.value}
                   data={clientList}
+                  searchable
+                  clearable
+                  styles={{
+                    input: {
+                      fontSize: '14px',
+                      minHeight: '36px'
+                    }
+                  }}
                 />
               )}
               {isWhatsApp && (
@@ -343,7 +357,7 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("select_sender_number")}
                   value={pandaNumber}
                   onChange={setPandaNumber}
-                  data={pandaNumbersWhatsup}
+                  data={whatsappNumbers}
                 />
               )}
               {isViber && (
@@ -352,7 +366,16 @@ export const ChatInput = ({
                   placeholder={getLanguageByKey("select_sender_number_viber")}
                   value={pandaNumber}
                   onChange={setPandaNumber}
-                  data={pandaNumbersViber}
+                  data={viberNumbers}
+                />
+              )}
+              {isTelegram && (
+                <Select
+                  className="w-full"
+                  placeholder={getLanguageByKey("select_sender_number_telegram")}
+                  value={pandaNumber}
+                  onChange={setPandaNumber}
+                  data={telegramNumbers}
                 />
               )}
               <Select
@@ -410,7 +433,8 @@ export const ChatInput = ({
                     !currentClient?.payload ||
                     currentClient.payload.platform === "sipuni" ||
                     (isWhatsApp && !pandaNumber) ||
-                    (isViber && !pandaNumber)
+                    (isViber && !pandaNumber) ||
+                    (isTelegram && !pandaNumber)
                   }
                   variant="filled"
                   onClick={sendMessage}
@@ -495,45 +519,15 @@ export const ChatInput = ({
             </Flex>
           </>
         ) : (
-          <>
-            <Flex justify="space-between" mb="xs">
-              <Button variant="default" onClick={() => setShowEmailForm(false)}>
-                ← {getLanguageByKey("Înapoi la chat")}
-              </Button>
-            </Flex>
-            <Flex direction="column" gap="xs">
-              <TextInput
-                placeholder="From"
-                value={emailFields.from}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, from: e.target.value }))
-                }
-              />
-              <TextInput
-                placeholder="To"
-                value={emailFields.to}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, to: e.target.value }))
-                }
-              />
-              <TextInput
-                placeholder="Subject"
-                value={emailFields.subject}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, subject: e.target.value }))
-                }
-              />
-              <Textarea
-                placeholder="Text"
-                minRows={4}
-                value={emailFields.body}
-                onChange={(e) =>
-                  setEmailFields((prev) => ({ ...prev, body: e.target.value }))
-                }
-              />
-              <Button onClick={sendEmail}>{getLanguageByKey("Trimite Email")}</Button>
-            </Flex>
-          </>
+          <EmailForm
+            onSend={handleEmailSend}
+            onCancel={() => setShowEmailForm(false)}
+            ticketId={ticketId}
+            clientEmail={currentClient?.payload?.email}
+            ticketClients={clientList}
+            groupTitle={groupTitle}
+            fromEmails={fromEmails}
+          />
         )}
       </Box>
 

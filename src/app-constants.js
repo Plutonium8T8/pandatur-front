@@ -20,6 +20,7 @@ export const MEDIA_TYPE = {
   CALL: "call",
   IG_REEL: "ig_reel",
   SHARE: "share",
+  EMAIL: "email",
 };
 
 export const MESSAGES_TYPE_OPTIONS = [

@@ -6,6 +6,7 @@ import { showServerError, getLanguageByKey } from "@utils";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
 import { UserContext } from "./UserContext";
+import { useGetTechniciansList } from "../hooks";
 
 const SIDEBAR_COLLAPSE = "SIDEBAR_COLLAPSE";
 
@@ -42,6 +43,9 @@ export const AppProvider = ({ children }) => {
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
+  
+  // Получаем данные всех пользователей
+  const { technicians } = useGetTechniciansList();
 
   const {
     userId,
@@ -59,13 +63,9 @@ export const AppProvider = ({ children }) => {
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
 
-    let updatedGlobal = false;
-    let updatedFiltered = false;
-
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id === ticketId) {
-          updatedGlobal = true;
           return { ...t, unseen_count: 0 };
         }
         return t;
@@ -75,29 +75,16 @@ export const AppProvider = ({ children }) => {
     setChatFilteredTickets((prev) =>
       prev.map((t) => {
         if (t.id === ticketId) {
-          updatedFiltered = true;
           return { ...t, unseen_count: 0 };
         }
         return t;
       })
     );
-
-    setTimeout(() => {
-      // if (updatedGlobal && updatedFiltered) {
-      //   console.log(`✅ unseen_count обновлён для глобального и отфильтрованного тикета: ${ticketId}`);
-      // } else if (updatedGlobal) {
-      //   console.log(`✅ unseen_count обновлён только для глобального тикета: ${ticketId}`);
-      // } else if (updatedFiltered) {
-      //   console.log(`✅ unseen_count обновлён только для отфильтрованного тикета: ${ticketId}`);
-      // } else {
-      //   console.log(`⚠️ Тикет с id ${ticketId} не найден ни в глобальных, ни в отфильтрованных`);
-      // }
-    }, 0);
   };
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
     try {
-      const excluded = ["Realizat cu succes", "Închis și nerealizat", "Auxiliar"];
+      const excluded = ["Realizat cu succes", "Închis și nerealizat"];
       const baseWorkflow = lightTicketFilters.workflow ?? workflowOptions;
       const filteredWorkflow = baseWorkflow.filter((w) => !excluded.includes(w));
 
@@ -224,11 +211,33 @@ export const AppProvider = ({ children }) => {
   const fetchSingleTicket = async (ticketId) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
+
       setTickets((prev) => {
         const exists = prev.find((t) => t.id === ticketId);
-        return exists ? prev.map((t) => (t.id === ticketId ? ticket : t)) : [...prev, ticket];
+        
+        if (exists) {
+          return prev.map((t) => (t.id === ticketId ? ticket : t));
+        } else {
+          return [...prev, ticket];
+        }
       });
+
+      setChatFilteredTickets((prev) => {
+        const exists = prev.find((t) => t.id === ticketId);
+        
+        if (exists) {
+          return prev.map((t) => (t.id === ticketId ? ticket : t));
+        } else {
+          return [...prev, ticket];
+        }
+      });
+
       setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
+      
+      // Отправляем событие для обновления personalInfo в useFetchTicketChat
+      window.dispatchEvent(new CustomEvent('ticketUpdated', { 
+        detail: { ticketId } 
+      }));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
@@ -349,56 +358,61 @@ export const AppProvider = ({ children }) => {
       }
 
 
-      // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
-      //   const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
+      case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
+        const { ticket_id, ticket_ids } = message.data || {};
 
-      //   const idsRaw = Array.isArray(ticket_ids)
-      //     ? ticket_ids
-      //     : (ticket_id ? [ticket_id] : []);
+        const idsRaw = Array.isArray(ticket_ids)
+          ? ticket_ids
+          : (ticket_id ? [ticket_id] : []);
 
-      //   const ids = [...new Set(
-      //     idsRaw
-      //       .map((v) => Number(v))
-      //       .filter((v) => Number.isFinite(v))
-      //   )];
+        const ids = [...new Set(
+          idsRaw
+            .map((v) => Number(v))
+            .filter((v) => Number.isFinite(v))
+        )];
 
-      //   const isMatchingGroup = group_title === groupTitleForApi;
-      //   const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
+        if (!ids.length) {
+          break;
+        }
 
-      //   if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
-      //     break;
-      //   }
+        // console.log("🔄 TICKET_UPDATE received:", {
+        //   ids,
+        //   timestamp: new Date().toISOString()
+        // });
 
-      //   ids.forEach((id) => {
-      //     try {
-      //       fetchSingleTicket(id);
-      //     } catch (e) {
-      //     }
-      //   });
+        // Проверяем, есть ли тикеты в нашем списке и обновляем их
+        ids.forEach((id) => {
+          const existsInTickets = tickets.some(t => t.id === id);
+          const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
+          
+        // console.log(`🔍 Checking ticket ${id}:`, {
+        //   existsInTickets,
+        //   existsInChatFiltered,
+        //   shouldUpdate: existsInTickets || existsInChatFiltered,
+        //   totalTickets: tickets.length,
+        //   totalChatFiltered: chatFilteredTickets.length
+        // });
 
-      //   const socketInstance = socketRef.current;
-      //   if (socketInstance?.readyState === WebSocket.OPEN) {
-      //     const CHUNK_SIZE = 50;
-      //     for (let i = 0; i < ids.length; i += CHUNK_SIZE) {
-      //       const chunk = ids.slice(i, i + CHUNK_SIZE);
-      //       socketInstance.send(
-      //         JSON.stringify({
-      //           type: TYPE_SOCKET_EVENTS.CONNECT,
-      //           data: { ticket_id: chunk },
-      //         })
-      //       );
-      //     }
-      //   } else {
-      //     enqueueSnackbar(getLanguageByKey("errorConnectingToChatRoomWebSocket"), {
-      //       variant: "error",
-      //     });
-      //   }
+          if (existsInTickets || existsInChatFiltered) {
+            try {
+              fetchSingleTicket(id);
+            } catch (e) {
+              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+            }
+          } else {
+            try {
+              fetchSingleTicket(id);
+            } catch (e) {
+              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+            }
+          }
+        });
 
-      //   break;
-      // }
+        break;
+      }
 
       default:
-        console.warn("Invalid socket message type:", message.type);
+        // console.warn("Invalid socket message type:", message.type);
     }
   };
 
@@ -438,7 +452,7 @@ export const AppProvider = ({ children }) => {
 
         trySend();
       } catch (e) {
-        console.error("error get id for connect chat room", e);
+        // console.error("error get id for connect chat room", e);
       }
     };
 
@@ -468,9 +482,9 @@ export const AppProvider = ({ children }) => {
         });
 
         socket.send(socketMessage);
-        console.log("[Socket] Reconnected and rejoined chat rooms");
+        // console.log("[Socket] Reconnected and rejoined chat rooms");
       } catch (e) {
-        console.error("[Socket] Failed to reconnect to chat rooms", e);
+        // console.error("[Socket] Failed to reconnect to chat rooms", e);
       }
     };
 
@@ -486,7 +500,8 @@ export const AppProvider = ({ children }) => {
 
       return () => clearInterval(interval);
     }
-  }, [socketRef?.current, groupTitleForApi, workflowOptions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupTitleForApi, workflowOptions]);
 
   return (
     <AppContext.Provider
@@ -514,6 +529,9 @@ export const AppProvider = ({ children }) => {
         fetchChatFilteredTickets,
         setChatFilteredTickets,
         chatSpinner,
+        
+        // technicians
+        technicians,
       }}
     >
       {children}

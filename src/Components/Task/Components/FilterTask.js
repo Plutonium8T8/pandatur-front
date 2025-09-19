@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect, useMemo, useRef } from "react";
 import { Group, Button, Flex, MultiSelect, Select, Modal } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { translations, showServerError } from "../../utils";
@@ -11,10 +11,8 @@ import { SelectWorkflow } from "../../SelectWorkflow";
 import { groupTitleOptions } from "../../../FormOptions";
 import { convertRolesToMatrix, safeParseJson } from "../../UsersComponent/rolesUtils";
 import { AppContext } from "../../../contexts/AppContext";
-import {
-  getGroupUserMap,
-  formatMultiSelectData,
-} from "../../utils/multiSelectUtils";
+import { formatMultiSelectData } from "../../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -37,7 +35,9 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
   const teamTechnicians = technicians.filter((tech) =>
     teamUserIds.has(String(tech.value)) || tech.value === String(userId)
   );
-  const [manuallyChangedCreatedFor, setManuallyChangedCreatedFor] = useState(false);
+
+  // Ref для отслеживания предыдущих значений, чтобы избежать бесконечных циклов
+  const prevCreatedForRef = useRef(null);
 
   const { workflowOptions, accessibleGroupTitles } = useContext(AppContext);
 
@@ -57,10 +57,9 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
         group_titles: filters.group_titles || [],
       };
       setLocalFilters(defaultFilters);
-      setManuallyChangedCreatedFor(false);
-      onApply(defaultFilters);
+      // Убираем onApply отсюда - он будет вызываться только при Apply/Clear
     }
-  }, [opened]);
+  }, [opened, filters, isAllowed, userId]);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -76,7 +75,7 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       }
     };
     fetchGroups();
-  }, []);
+  }, [enqueueSnackbar]);
 
   const handleChange = (field, value) => {
     setLocalFilters((prev) => ({ ...prev, [field]: value }));
@@ -134,30 +133,41 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
     if (isTeam) {
       const validIds = new Set(teamTechnicians.map(t => t.value));
       const selected = localFilters.created_for || [];
+      const currentCreatedFor = JSON.stringify(selected);
+
+      // Проверяем, изменились ли значения с последнего раза
+      if (prevCreatedForRef.current === currentCreatedFor) {
+        return; // Ничего не изменилось, выходим
+      }
 
       const filtered = selected.filter((id) => validIds.has(id));
 
-      if (filtered.length === 0) {
-        handleChange("created_for", [String(userId)]);
-      } else if (filtered.length !== selected.length) {
-        handleChange("created_for", filtered);
+      // Предотвращаем бесконечный цикл: проверяем, нужно ли обновление
+      if (filtered.length === 0 && selected.length > 0) {
+        // Если нет валидных ID, но есть выбранные - сбрасываем на userId
+        const newValue = [String(userId)];
+        setLocalFilters(prev => ({ ...prev, created_for: newValue }));
+        prevCreatedForRef.current = JSON.stringify(newValue);
+      } else if (filtered.length !== selected.length && filtered.length > 0) {
+        // Если количество изменилось - обновляем на отфильтрованные
+        setLocalFilters(prev => ({ ...prev, created_for: filtered }));
+        prevCreatedForRef.current = JSON.stringify(filtered);
+      } else {
+        // Обновляем ref даже если не меняем значение
+        prevCreatedForRef.current = currentCreatedFor;
       }
     }
   }, [isTeam, localFilters.created_for, teamTechnicians, userId]);
 
   const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
   const handleCreatedForChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroup = last?.startsWith("__group__");
+    // UserGroupMultiSelect уже обрабатывает логику групп внутри себя
+    // Просто передаем выбранные значения, но проверяем изменения для оптимизации
+    const current = localFilters.created_for || [];
 
-    if (isGroup) {
-      const groupUsers = groupUserMap.get(last) || [];
-      const current = localFilters.created_for || [];
-      const unique = Array.from(new Set([...current, ...groupUsers]));
-      handleChange("created_for", unique);
-    } else {
+    // Обновляем только если значения действительно изменились
+    if (val.length !== current.length || !val.every(id => current.includes(id))) {
       handleChange("created_for", val);
     }
   };
@@ -207,17 +217,9 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           disabled={loadingTechnicians}
         />
 
-        <MultiSelect
+        <UserGroupMultiSelect
           label={translations["Responsabil"][language]}
-          data={
-            isTeam
-              ? formattedTechnicians.filter((t) =>
-                teamUserIds.has(String(t.value)) || t.value === String(userId),
-              )
-              : isIfResponsible
-                ? formattedTechnicians.filter((tech) => tech.value === String(userId))
-                : formattedTechnicians
-          }
+          techniciansData={formattedTechnicians}
           value={
             isIfResponsible
               ? [String(userId)]
@@ -225,9 +227,15 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
           }
           onChange={handleCreatedForChange}
           placeholder={translations["Responsabil"][language]}
-          clearable={!isIfResponsible}
-          searchable
-          nothingFoundMessage={translations["noResult"][language]}
+          mode="multi"
+          // Добавляем фильтрацию по ролям
+          allowedUserIds={
+            isTeam
+              ? new Set([...teamUserIds, String(userId)])
+              : isIfResponsible
+                ? new Set([String(userId)])
+                : null
+          }
           disabled={loadingTechnicians || isIfResponsible}
         />
 

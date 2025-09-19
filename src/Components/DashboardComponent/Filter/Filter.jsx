@@ -1,17 +1,18 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
+import { useMemo, useEffect, useState } from "react";
 import dayjs from "dayjs";
-import { Button, Group, MultiSelect, Modal, Stack, Divider, Box } from "@mantine/core";
+import { Button, Group, MultiSelect, Modal, Stack, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { getLanguageByKey } from "../../utils";
 import { YYYY_MM_DD } from "../../../app-constants";
-import { useGetTechniciansList } from "../../../hooks";
+import { useGetTechniciansList, useUserPermissions } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
-import { user as userApi } from "../../../api/user";
+import { user } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
+import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
+import { groupTitleOptions } from "../../../FormOptions";
 
 const GROUP_PREFIX = "__group__";
 const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
-const toYMD = (d) => (d ? dayjs(d).format("YYYY-MM-DD") : undefined);
 
 const getStartEndDateRange = (date) => {
   const startOfDay = new Date(date);
@@ -25,15 +26,6 @@ const getYesterdayDate = () => {
   d.setDate(d.getDate() - 1);
   return getStartEndDateRange(d);
 };
-const compactPayload = (p) => {
-  const copy = { ...p };
-  if (Array.isArray(copy.user_ids) && !copy.user_ids.length) delete copy.user_ids;
-  if (Array.isArray(copy.user_groups) && !copy.user_groups.length) delete copy.user_groups;
-  if (Array.isArray(copy.group_titles) && !copy.group_titles.length) delete copy.group_titles;
-  const ts = copy.attributes?.timestamp || {};
-  if (!ts.from && !ts.to) delete copy.attributes;
-  return copy;
-};
 
 export const Filter = ({
   opened,
@@ -43,9 +35,35 @@ export const Filter = ({
   initialUserGroups = [],
   initialGroupTitles = [],
   initialDateRange = [],
+  widgetType = "calls", // Тип виджета для определения доступных фильтров
+  accessibleGroupTitles = [], // Доступные воронки для текущего пользователя
 }) => {
-  const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
-  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+  const { technicians } = useGetTechniciansList();
+  const { isAdmin, myGroups, userRole, userId, isTeamLeader, supervisedGroups, teamUserIds } = useUserPermissions();
+
+  // Фильтруем пользователей в зависимости от роли
+  const filteredTechnicians = useMemo(() => {
+    if (!technicians || technicians.length === 0) return [];
+
+    // Если Regular User - показываем только себя
+    // Это обеспечивает безопасность: обычные пользователи не видят других пользователей
+    if (userRole === 'Regular User') {
+      return technicians.filter(tech => tech.value === String(userId));
+    }
+
+    // Если Team Leader - показываем только свою команду (подчиненных)
+    if (userRole === 'Team Leader') {
+      return technicians.filter(tech => teamUserIds.has(tech.value));
+    }
+
+    // Для Admin и IT dep. - показываем всех пользователей
+    return technicians;
+  }, [technicians, userRole, userId, teamUserIds]);
+
+  const formattedTechnicians = useMemo(() => {
+    return formatMultiSelectData(filteredTechnicians);
+  }, [filteredTechnicians]);
+
   const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
   const [userGroupsOptions, setUserGroupsOptions] = useState([]);
@@ -71,10 +89,33 @@ export const Filter = ({
     (async () => {
       try {
         setLoadingUserGroups(true);
-        const data = await userApi.getGroupsList();
-        const opts = Array.from(new Set((data || []).map((g) => g?.name).filter(Boolean))).map(
+        const data = await user.getGroupsList();
+
+        // Фильтруем группы в зависимости от прав пользователя
+        let filteredGroups = data || [];
+
+        if (isAdmin) {
+          // Если Admin - показываем все группы (без фильтрации)
+          filteredGroups = data || [];
+        } else if (isTeamLeader) {
+          // Если Team Leader - показываем только группы, которыми он руководит
+          const supervisedGroupNames = supervisedGroups.map(group => group.name);
+          filteredGroups = (data || []).filter(group =>
+            supervisedGroupNames.includes(group.name)
+          );
+        } else {
+          // Если Regular User - показываем только группы, в которых состоит пользователь
+          // Это обеспечивает безопасность: обычные пользователи не видят чужие группы
+          const myGroupNames = myGroups.map(group => group.name);
+          filteredGroups = (data || []).filter(group =>
+            myGroupNames.includes(group.name)
+          );
+        }
+
+        const opts = Array.from(new Set(filteredGroups.map((g) => g?.name).filter(Boolean))).map(
           (name) => ({ value: name, label: name })
         );
+
         if (mounted) setUserGroupsOptions(opts);
       } catch {
         if (mounted) setUserGroupsOptions([]);
@@ -83,36 +124,65 @@ export const Filter = ({
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [isAdmin, isTeamLeader, myGroups, supervisedGroups, userRole]);
 
-  const allGroupTitles = useMemo(() => {
-    const all = new Set();
-    Object.values(userGroupsToGroupTitle || {}).forEach((arr) => (arr || []).forEach((v) => all.add(v)));
-    return Array.from(all);
-  }, []);
-  const groupTitleSelectData = useMemo(
-    () => allGroupTitles.map((v) => ({ value: v, label: v })),
-    [allGroupTitles]
-  );
+  // Фильтруем доступные group titles на основе прав пользователя
+  const groupTitleSelectData = useMemo(() => {
+    if (accessibleGroupTitles.length === 0) {
+      // Если нет доступных воронок, показываем все из статического списка
+      return groupTitleOptions;
+    }
+
+    // Фильтруем статический список по доступным воронкам
+    return groupTitleOptions.filter((option) =>
+      accessibleGroupTitles.includes(option.value)
+    );
+  }, [accessibleGroupTitles]);
+
+  // Определяем доступные фильтры в зависимости от типа виджета
+  const availableFilters = useMemo(() => {
+    const filterMap = {
+      'calls': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'messages': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_state': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'system_usage': ['user_ids', 'user_groups', 'attributes'],
+      'ticket_distribution': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'tickets_into_work': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'closed_tickets_count': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'tickets_by_depart_count': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_lifetime_stats': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_rate': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_from_change': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_to_change': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_creation': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_from_de_prelucrat': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'workflow_duration': ['user_ids', 'group_titles', 'user_groups', 'attributes'],
+      'ticket_destination': ['attributes'],
+    };
+
+    return filterMap[widgetType] || ['user_ids', 'group_titles', 'user_groups', 'attributes'];
+  }, [widgetType]);
+
+  const showUserFilter = availableFilters.includes('user_ids');
+  const showGroupTitlesFilter = availableFilters.includes('group_titles');
+  const showUserGroupsFilter = availableFilters.includes('user_groups');
+  const showDateFilter = availableFilters.includes('attributes');
 
   const handleUsersChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroupChip = typeof last === "string" && last.startsWith(GROUP_PREFIX);
-    let nextUsers = val || [];
-    if (isGroupChip) {
-      const groupUsers = groupUserMap.get(last) || [];
-      nextUsers = Array.from(new Set([...(selectedTechnicians || []), ...groupUsers]));
-    }
-    setSelectedTechnicians(nextUsers);
+    // UserGroupMultiSelect уже обрабатывает группы внутри себя
+    // и возвращает только ID пользователей в массиве val
+    setSelectedTechnicians(val || []);
 
+    // Определяем группы на основе выбранных пользователей
     const groupsForUsers = new Set();
     for (const [groupKey, users] of groupUserMap.entries()) {
-      const hasAny = (nextUsers || []).some((u) => users.includes(u));
+      const hasAny = (val || []).some((u) => users.includes(u));
       if (hasAny) groupsForUsers.add(fromGroupKey(groupKey));
     }
     const nextUserGroups = Array.from(groupsForUsers);
     setSelectedUserGroups(nextUserGroups);
 
+    // Обновляем group titles на основе групп
     const titlesSet = new Set();
     nextUserGroups.forEach((g) => (userGroupsToGroupTitle?.[g] || []).forEach((t) => titlesSet.add(t)));
     setSelectedGroupTitles(Array.from(titlesSet));
@@ -125,19 +195,6 @@ export const Filter = ({
     setSelectedGroupTitles(Array.from(titlesSet));
   };
 
-  const buildPayload = useCallback(() => {
-    const [fromDate, toDate] = dateRange || [];
-    const payload = {
-      user_ids: selectedTechnicians,
-      user_groups: selectedUserGroups,
-      group_titles: selectedGroupTitles,
-      attributes:
-        fromDate || toDate
-          ? { timestamp: { from: toYMD(fromDate || undefined), to: toYMD(toDate || undefined) } }
-          : undefined,
-    };
-    return compactPayload(payload);
-  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
   const isToday =
     dateRange?.[0] && dateRange?.[1] &&
@@ -150,15 +207,14 @@ export const Filter = ({
     dayjs(dateRange[1]).isSame(dayjs().subtract(1, "day"), "day");
 
   const handleReset = () => {
-    setSelectedTechnicians([]);
-    setSelectedUserGroups([]);
-    setSelectedGroupTitles([]);
-    setDateRange([]);
+    if (showUserFilter) setSelectedTechnicians([]);
+    if (showUserGroupsFilter) setSelectedUserGroups([]);
+    if (showGroupTitlesFilter) setSelectedGroupTitles([]);
+    if (showDateFilter) setDateRange([]);
   };
 
   const handleApply = () => {
-    const payload = buildPayload();
-    onApply?.(payload, {
+    onApply?.({
       selectedTechnicians,
       selectedUserGroups,
       selectedGroupTitles,
@@ -185,64 +241,72 @@ export const Filter = ({
         {/* Прокручиваемая часть с полями — ВЕРТИКАЛЬНО */}
         <Box style={{ flex: 1, overflowY: "auto" }}>
           <Stack gap="md">
-            <MultiSelect
-              data={formattedTechnicians}
-              value={selectedTechnicians}
-              onChange={handleUsersChange}
-              searchable
-              clearable
-              maxDropdownHeight={300}
-              placeholder={getLanguageByKey("User")}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              disabled={loadingTechnicians}
-            />
-
-            <MultiSelect
-              data={userGroupsOptions}
-              value={selectedUserGroups}
-              onChange={handleUserGroupsChange}
-              searchable
-              clearable
-              maxDropdownHeight={260}
-              placeholder={getLanguageByKey("User group")}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              disabled={loadingUserGroups}
-            />
-
-            <MultiSelect
-              data={groupTitleSelectData}
-              value={selectedGroupTitles}
-              onChange={(v) => setSelectedGroupTitles(v || [])}
-              searchable
-              clearable
-              maxDropdownHeight={260}
-              nothingFoundMessage={getLanguageByKey("Nimic găsit")}
-              placeholder={getLanguageByKey("Group title")}
-            />
-
-            {/* Быстрые даты + диапазон */}
-            <Group gap="xs" align="center">
-              <Button
-                variant={isToday ? "filled" : "default"}
-                onClick={() => setDateRange(getStartEndDateRange(new Date()))}
-              >
-                {getLanguageByKey("azi")}
-              </Button>
-              <Button
-                variant={isYesterday ? "filled" : "default"}
-                onClick={() => setDateRange(getYesterdayDate())}
-              >
-                {getLanguageByKey("ieri")}
-              </Button>
-              <DatePickerInput
-                clearable
-                type="range"
-                value={dateRange}
-                onChange={(val) => setDateRange(val || [])}
-                valueFormat={YYYY_MM_DD}
-                placeholder={getLanguageByKey("Selectează o dată")}
+            {/* Фильтр по пользователям */}
+            {showUserFilter && (
+              <UserGroupMultiSelect
+                value={selectedTechnicians}
+                onChange={handleUsersChange}
+                placeholder={getLanguageByKey("User")}
+                label={getLanguageByKey("User")}
+                techniciansData={formattedTechnicians}
+                mode="multi"
               />
-            </Group>
+            )}
+
+            {/* Фильтр по группам пользователей */}
+            {showUserGroupsFilter && (
+              <MultiSelect
+                data={userGroupsOptions}
+                value={selectedUserGroups}
+                onChange={handleUserGroupsChange}
+                searchable
+                clearable
+                maxDropdownHeight={260}
+                placeholder={getLanguageByKey("User group")}
+                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
+                disabled={loadingUserGroups}
+              />
+            )}
+
+            {/* Фильтр по названиям групп */}
+            {showGroupTitlesFilter && (
+              <MultiSelect
+                data={groupTitleSelectData}
+                value={selectedGroupTitles}
+                onChange={(v) => setSelectedGroupTitles(v || [])}
+                searchable
+                clearable
+                maxDropdownHeight={260}
+                nothingFoundMessage={getLanguageByKey("Nimic găsit")}
+                placeholder={getLanguageByKey("Group title")}
+              />
+            )}
+
+            {/* Фильтр по датам */}
+            {showDateFilter && (
+              <Group gap="xs" align="center">
+                <Button
+                  variant={isToday ? "filled" : "default"}
+                  onClick={() => setDateRange(getStartEndDateRange(new Date()))}
+                >
+                  {getLanguageByKey("azi")}
+                </Button>
+                <Button
+                  variant={isYesterday ? "filled" : "default"}
+                  onClick={() => setDateRange(getYesterdayDate())}
+                >
+                  {getLanguageByKey("ieri")}
+                </Button>
+                <DatePickerInput
+                  clearable
+                  type="range"
+                  value={dateRange}
+                  onChange={(val) => setDateRange(val || [])}
+                  valueFormat={YYYY_MM_DD}
+                  placeholder={getLanguageByKey("Selectează o dată")}
+                />
+              </Group>
+            )}
           </Stack>
         </Box>
 

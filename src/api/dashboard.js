@@ -38,4 +38,63 @@ export const dashboard = {
     const { data } = await baseAxios.post("/api/dashboard/widget/ticket-state", body);
     return data;
   },
+
+  getTicketsIntoWorkWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-into-work", body);
+    return data;
+  },
+
+  getSystemUsageWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/system-usage", body);
+    return data;
+  },
+
+  getTicketDistributionWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-distribution", body);
+    return data;
+  },
+
+  getClosedTicketsCountWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/closed-tickets-count", body);
+    return data;
+  },
+
+  getTicketsByDepartCountWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-by-depart-count", body);
+    return data;
+  },
+
+  getTicketLifetimeStatsWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-lifetime-stats", body);
+    return data;
+  },
+
+  getTicketRateWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/tickets-rate", body);
+    return data;
+  },
+  getWorkflowFromChangeWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-change", body);
+    return data;
+  },
+  getWorkflowToChangeWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-to-change", body);
+    return data;
+  },
+  getTicketCreationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-creation", body);
+    return data;
+  },
+  getWorkflowFromDePrelucratWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-from-de-prelucrat", body);
+    return data;
+  },
+  getWorkflowDurationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/workflow-duration", body);
+    return data;
+  },
+  getTicketDestinationWidget: async (body) => {
+    const { data } = await baseAxios.post("/api/dashboard/widget/ticket-destination", body);
+    return data;
+  },
 };

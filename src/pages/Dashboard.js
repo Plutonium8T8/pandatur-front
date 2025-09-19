@@ -8,20 +8,10 @@ import { LuFilter } from "react-icons/lu";
 import { api } from "../api";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { showServerError, getLanguageByKey } from "@utils";
-import { Spin, PageHeader } from "@components";
-import { useGetTechniciansList } from "../hooks";
+import { Spin } from "@components";
+import { useGetTechniciansList, useDashboardData, useUserPermissions } from "../hooks";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
-
-const safeArray = (a) => (Array.isArray(a) ? a : []);
-const pickIds = (arr) => safeArray(arr).map((x) => Number(x?.value ?? x)).filter((n) => Number.isFinite(n));
-
-const BG = {
-  general: "#FFFFFF",     // белый
-  by_user_group: "#93C5FD", // синий темнее (blue-300)
-  by_user: "#DBEAFE",       // светло-синий темнее (blue-100)
-  by_group_title: "#FFF5CC",// жёлтый (бледный)
-  by_source: "#FFE8E8",     // красный (бледный)
-};
+import { safeArray, pickIds } from "../utils/dashboardHelpers";
 
 const t = (key) => String(getLanguageByKey?.(key) ?? key);
 
@@ -29,17 +19,19 @@ const WIDGET_TYPE_OPTIONS = [
   { value: "calls", label: t("Calls") },
   { value: "messages", label: t("Messages") },
   { value: "ticket_state", label: t("Ticket State") },
-  { value: "system_usage", label: t("System usage"), disabled: true },
-  { value: "tickets_count", label: t("Tickets count"), disabled: true },
-  { value: "distributor", label: t("Distributor"), disabled: true },
-  { value: "workflow_change", label: t("Workflow change"), disabled: true },
-  { value: "ticket_create_count", label: t("Tickets created"), disabled: true },
-  { value: "contract_closed", label: t("Contracts closed"), disabled: true },
-  { value: "ticket_lifetime", label: t("Ticket lifetime"), disabled: true },
-  { value: "contract_departure", label: t("Contract departures"), disabled: true },
-  { value: "workflow_percentage", label: t("Workflow percentage"), disabled: true },
-  { value: "workflow_duration", label: t("Workflow duration"), disabled: true },
-  { value: "country_count", label: t("Countries"), disabled: true },
+  { value: "tickets_into_work", label: t("Tickets Into Work") },
+  { value: "system_usage", label: t("System usage") },
+  { value: "ticket_distribution", label: t("Ticket Distribution") },
+  { value: "closed_tickets_count", label: t("Closed Tickets Count") },
+  { value: "tickets_by_depart_count", label: t("Tickets By Depart Count") },
+  { value: "ticket_lifetime_stats", label: t("Ticket Lifetime Stats") },
+  { value: "ticket_rate", label: t("Ticket Rate") },
+  { value: "workflow_from_change", label: t("Workflow From Change") },
+  { value: "workflow_to_change", label: t("Workflow Change To") },
+  { value: "ticket_creation", label: t("Ticket Creation") },
+  { value: "workflow_from_de_prelucrat", label: t("Workflow From De Prelucrat") },
+  { value: "workflow_duration", label: t("Workflow Duration") },
+  { value: "ticket_destination", label: t("Ticket Destination") },
 ];
 
 export const Dashboard = () => {
@@ -67,6 +59,7 @@ export const Dashboard = () => {
 
   // имена по user_id
   const { technicians } = useGetTechniciansList();
+  const { accessibleGroupTitles } = useUserPermissions();
   const userNameById = useMemo(() => {
     const map = new Map();
     safeArray(technicians).forEach((t) => {
@@ -96,22 +89,6 @@ export const Dashboard = () => {
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
 
-  // payload под messages (timestamp_after/before)
-  const buildPayloadForType = useCallback(() => {
-    const common = buildPayloadCommon();
-    if (widgetType !== "messages") return common;
-
-    const after = common?.attributes?.timestamp?.from;
-    const before = common?.attributes?.timestamp?.to;
-
-    const msgAttrs =
-      after || before
-        ? { timestamp_after: after, timestamp_before: before }
-        : undefined;
-
-    const { attributes, ...rest } = common;
-    return { ...rest, attributes: msgAttrs };
-  }, [buildPayloadCommon, widgetType]);
 
   // запрос по типу
   const fetchByType = useCallback(
@@ -127,6 +104,32 @@ export const Dashboard = () => {
           res = await api.dashboard.getWidgetMessages(payload);
         } else if (widgetType === "ticket_state") {
           res = await api.dashboard.getTicketStateWidget(payload);
+        } else if (widgetType === "tickets_into_work") {
+          res = await api.dashboard.getTicketsIntoWorkWidget(payload);
+        } else if (widgetType === "system_usage") {
+          res = await api.dashboard.getSystemUsageWidget(payload);
+        } else if (widgetType === "ticket_distribution") {
+          res = await api.dashboard.getTicketDistributionWidget(payload);
+        } else if (widgetType === "closed_tickets_count") {
+          res = await api.dashboard.getClosedTicketsCountWidget(payload);
+        } else if (widgetType === "tickets_by_depart_count") {
+          res = await api.dashboard.getTicketsByDepartCountWidget(payload);
+        } else if (widgetType === "ticket_lifetime_stats") {
+          res = await api.dashboard.getTicketLifetimeStatsWidget(payload);
+        } else if (widgetType === "ticket_rate") {
+          res = await api.dashboard.getTicketRateWidget(payload);
+        } else if (widgetType === "workflow_from_change") {
+          res = await api.dashboard.getWorkflowFromChangeWidget(payload);
+        } else if (widgetType === "workflow_to_change") {
+          res = await api.dashboard.getWorkflowToChangeWidget(payload);
+        } else if (widgetType === "ticket_creation") {
+          res = await api.dashboard.getTicketCreationWidget(payload);
+        } else if (widgetType === "workflow_from_de_prelucrat") {
+          res = await api.dashboard.getWorkflowFromDePrelucratWidget(payload);
+        } else if (widgetType === "workflow_duration") {
+          res = await api.dashboard.getWorkflowDurationWidget(payload);
+        } else if (widgetType === "ticket_destination") {
+          res = await api.dashboard.getTicketDestinationWidget(payload);
         }
         if (requestIdRef.current !== thisReqId) return;
         setRawData(res || null);
@@ -146,8 +149,8 @@ export const Dashboard = () => {
   useEffect(() => {
     const [start, end] = dateRange || [];
     if (!!start !== !!end) return; // нужен полноценный диапазон
-    fetchByType(buildPayloadForType());
-  }, [buildPayloadForType, fetchByType, widgetType]);
+    fetchByType(buildPayloadCommon());
+  }, [buildPayloadCommon, fetchByType, widgetType, dateRange]);
 
   // размеры
   const recalcSizes = useCallback(() => {
@@ -167,274 +170,66 @@ export const Dashboard = () => {
     };
   }, [recalcSizes]);
 
-  // утилиты для чтения разных схем
-  const pickNum = (obj, keys) => {
-    for (const k of keys) {
-      const v = obj?.[k];
-      if (v !== undefined && v !== null && !Number.isNaN(Number(v))) return Number(v);
-    }
-    return 0;
-  };
-  const countsFrom = (obj) => ({
-    incoming: pickNum(obj, ["incoming_calls_count", "incoming_messages_count", "incoming_count", "incoming", "in"]),
-    outgoing: pickNum(obj, ["outgoing_calls_count", "outgoing_messages_count", "outgoing_count", "outgoing", "out"]),
-    total: pickNum(obj, ["total_calls_count", "total_messages_count", "total_count", "total", "count", "all"]),
-  });
-
-  // утилиты для ticket state данных
-  const ticketStateFrom = (obj) => ({
-    oldClientTickets: pickNum(obj, ["old_client_tickets_count", "old_client", "old"]),
-    newClientTickets: pickNum(obj, ["new_client_tickets_count", "new_client", "new"]),
-    totalTickets: pickNum(obj, ["total_tickets_count", "total_tickets", "total"]),
-  });
-
-  // нормализация by_platform (массив/объект → массив)
-  const mapPlatforms = (bp) => {
-    if (!bp) return [];
-    if (Array.isArray(bp)) return bp;
-    if (typeof bp === "object") {
-      return Object.entries(bp).map(([platform, stats]) => ({ platform, ...(stats || {}) }));
-    }
-    return [];
-  };
 
   // построение списка виджетов
-  const widgets = useMemo(() => {
-    const D = rawData || {};
-    const W = [];
+  const widgets = useDashboardData(rawData, userNameById, widgetType, getLanguageByKey);
 
-    // General
-    if (D.general) {
-      if (widgetType === "ticket_state") {
-        const ts = ticketStateFrom(D.general);
-        W.push({
-          id: "general",
-          type: "ticket_state",
-          title: getLanguageByKey("Total tickets for the period"),
-          subtitle: getLanguageByKey("All company"),
-          oldClientTickets: ts.oldClientTickets,
-          newClientTickets: ts.newClientTickets,
-          totalTickets: ts.totalTickets,
-          bg: BG.general,
-        });
-      } else {
-        const c = countsFrom(D.general);
-        W.push({
-          id: "general",
-          type: "general",
-          title: widgetType === "messages" ? getLanguageByKey("Total messages for the period") : getLanguageByKey("Total calls for the period"),
-          subtitle: getLanguageByKey("All company"),
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.general,
-        });
-      }
-    }
-
-    // By group title
-    const byGt = safeArray(D.by_group_title);
-    byGt.forEach((r, idx) => {
-      const name = r.group_title_name ?? r.group_title ?? r.group ?? "-";
-      if (widgetType === "ticket_state") {
-        const ts = ticketStateFrom(r);
-        W.push({
-          id: `gt-${name ?? idx}`,
-          type: "ticket_state",
-          title: getLanguageByKey("Group title"),
-          subtitle: name || "-",
-          oldClientTickets: ts.oldClientTickets,
-          newClientTickets: ts.newClientTickets,
-          totalTickets: ts.totalTickets,
-          bg: BG.by_group_title,
-        });
-      } else {
-        const c = countsFrom(r);
-        W.push({
-          id: `gt-${name ?? idx}`,
-          type: "group",
-          title: getLanguageByKey("Group title"),
-          subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_group_title,
-        });
-      }
-    });
-
-    // By user group
-    const byUserGroup = safeArray(D.by_user_group);
-    byUserGroup.forEach((r, idx) => {
-      const name = r.user_group_name ?? r.user_group ?? r.group ?? "-";
-      if (widgetType === "ticket_state") {
-        const ts = ticketStateFrom(r);
-        W.push({
-          id: `ug-${idx}`,
-          type: "ticket_state",
-          title: getLanguageByKey("User group"),
-          subtitle: name || "-",
-          oldClientTickets: ts.oldClientTickets,
-          newClientTickets: ts.newClientTickets,
-          totalTickets: ts.totalTickets,
-          bg: BG.by_user_group,
-        });
-      } else {
-        const c = countsFrom(r);
-        W.push({
-          id: `ug-${idx}`,
-          type: "group",
-          title: getLanguageByKey("User group"),
-          subtitle: name || "-",
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_user_group,
-        });
-      }
-    });
-
-    // By user
-    const byUser = safeArray(D.by_user);
-    byUser.forEach((r, idx) => {
-      const uid = Number(r.user_id);
-      const name = userNameById.get(uid);
-      const subtitle = (name || (Number.isFinite(uid) ? `ID ${uid}` : "-")) + (r.sipuni_id ? ` • ${r.sipuni_id}` : "");
-      if (widgetType === "ticket_state") {
-        const ts = ticketStateFrom(r);
-        W.push({
-          id: `user-${uid || idx}`,
-          type: "ticket_state",
-          title: getLanguageByKey("User"),
-          subtitle,
-          oldClientTickets: ts.oldClientTickets,
-          newClientTickets: ts.newClientTickets,
-          totalTickets: ts.totalTickets,
-          bg: BG.by_user,
-        });
-      } else {
-        const c = countsFrom(r);
-        W.push({
-          id: `user-${uid || idx}`,
-          type: "user",
-          title: getLanguageByKey("User"),
-          subtitle,
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_user,
-        });
-      }
-    });
-
-    // Топ пользователей (по total по убыванию)
-    if (byUser.length) {
-      const rows = byUser.map((r) => {
-        const uid = Number(r.user_id);
-        if (widgetType === "ticket_state") {
-          const ts = ticketStateFrom(r);
-          return {
-            user_id: uid,
-            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
-            sipuni_id: r.sipuni_id,
-            oldClientTickets: ts.oldClientTickets,
-            newClientTickets: ts.newClientTickets,
-            total: ts.totalTickets,
-          };
-        } else {
-          return {
-            user_id: uid,
-            name: userNameById.get(uid) || (Number.isFinite(uid) ? `ID ${uid}` : "-"),
-            sipuni_id: r.sipuni_id,
-            incoming: Number(r.incoming_calls_count) || 0,
-            outgoing: Number(r.outgoing_calls_count) || 0,
-            total: Number(r.total_calls_count) || 0,
-          };
-        }
-      });
-      W.push({
-        id: "top-users",
-        type: "top_users",
-        title: getLanguageByKey("Top users"),
-        subtitle: getLanguageByKey("By total (desc)"),
-        rows,
-        bg: BG.by_user,
-        widgetType, // Передаем тип виджета
-      });
-    }
-
-    // By platform (для messages)
-    if (widgetType === "messages") {
-      const platforms = mapPlatforms(D.by_platform);
-      platforms.forEach((row, idx) => {
-        const c = countsFrom(row || {});
-        const name = row?.platform || "-";
-        W.push({
-          id: `plat-${name ?? idx}`,
-          type: "source",
-          title: getLanguageByKey("Platform"),
-          subtitle: name,
-          incoming: c.incoming,
-          outgoing: c.outgoing,
-          total: c.total,
-          bg: BG.by_source,
-        });
-      });
-    }
-
-    // By source (для calls — если бэк вернёт)
-    const bySrc = safeArray(D.by_source);
-    bySrc.forEach((r, idx) => {
-      const c = countsFrom(r);
-      const name = r.source ?? r.channel ?? r.platform ?? "-";
-      W.push({
-        id: `src-${name ?? idx}`,
-        type: "source",
-        title: getLanguageByKey("Source"),
-        subtitle: name || "-",
-        incoming: c.incoming,
-        outgoing: c.outgoing,
-        total: c.total,
-        bg: BG.by_source,
-      });
-    });
-
-    return W;
-  }, [rawData, userNameById, widgetType]);
-
-  const handleApplyFilter = useCallback((payload, meta) => {
+  const handleApplyFilter = useCallback((meta) => {
     setSelectedTechnicians(meta?.selectedTechnicians || []);
     setSelectedUserGroups(meta?.selectedUserGroups || []);
     setSelectedGroupTitles(meta?.selectedGroupTitles || []);
     setDateRange(meta?.dateRange || []);
   }, []);
 
+  // Проверяем, активен ли фильтр
+  const isFilterActive = useMemo(() => {
+    const hasTechnicians = selectedTechnicians?.length > 0;
+    const hasUserGroups = selectedUserGroups?.length > 0;
+    const hasGroupTitles = selectedGroupTitles?.length > 0;
+    const hasDateRange = dateRange?.length === 2 && dateRange[0] && dateRange[1];
+
+    return hasTechnicians || hasUserGroups || hasGroupTitles || hasDateRange;
+  }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange]);
+
   return (
     <Stack gap={12}>
-      <Flex ref={headerRowRef} className="dashboard-header-container" p="md">
-        <PageHeader
-          title={getLanguageByKey("Dashboard")}
-          extraInfo={
-            <Group gap="sm">
-              <Tooltip label={getLanguageByKey("Filtru")}>
-                <ActionIcon variant="light" size="lg" onClick={() => setFilterOpened(true)} aria-label="open-filter">
-                  <LuFilter size={18} />
-                </ActionIcon>
-              </Tooltip>
+      {/* Центрированный заголовок */}
+      <Flex ref={headerRowRef} className="dashboard-header-container" p="md" justify="center" style={{ borderBottom: "1px solid #e9ecef" }}>
+        <Stack gap="md" align="center" style={{ width: "100%", maxWidth: "600px" }}>
+          <Text fw={700} size="2rem" style={{ fontSize: "2.5rem", paddingTop: "2rem" }}>
+            {getLanguageByKey("Dashboard")}
+          </Text>
 
-              <Select
-                size="sm"
-                w={220}
-                value={widgetType}
-                onChange={(v) => v && setWidgetType(v)}
-                data={WIDGET_TYPE_OPTIONS}
-                allowDeselect={false}
-                placeholder={getLanguageByKey("Widget type")}
-                aria-label="widget-type"
-              />
-            </Group>
-          }
-        />
+          <Group gap="sm" justify="center">
+            <Select
+              size="sm"
+              w={220}
+              value={widgetType}
+              onChange={(v) => v && setWidgetType(v)}
+              data={WIDGET_TYPE_OPTIONS}
+              allowDeselect={false}
+              placeholder={getLanguageByKey("Widget type")}
+              aria-label="widget-type"
+            />
+
+            <Tooltip label={getLanguageByKey("Filtru")}>
+              <ActionIcon
+                variant="light"
+                size="lg"
+                onClick={() => setFilterOpened(true)}
+                aria-label="open-filter"
+                color={isFilterActive ? "green" : "gray"}
+                style={{
+                  backgroundColor: isFilterActive ? "#51cf66" : "white",
+                  border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
+                  color: isFilterActive ? "white" : "#868e96"
+                }}
+              >
+                <LuFilter size={18} />
+              </ActionIcon>
+            </Tooltip>
+          </Group>
+        </Stack>
       </Flex>
 
       {isLoading ? (
@@ -451,7 +246,7 @@ export const Dashboard = () => {
           style={{ width: "100%", height: scrollHeight, overflowY: "auto", overflowX: "hidden", scrollbarGutter: "stable" }}
           pb="200px" pl="200px" pr="200px" pt="50px"
         >
-          <DashboardGrid widgets={widgets} dateRange={dateRange} />
+          <DashboardGrid widgets={widgets} dateRange={dateRange} widgetType={widgetType} />
         </Box>
       )}
 
@@ -463,6 +258,8 @@ export const Dashboard = () => {
         initialUserGroups={selectedUserGroups}
         initialGroupTitles={selectedGroupTitles}
         initialDateRange={dateRange}
+        widgetType={widgetType}
+        accessibleGroupTitles={accessibleGroupTitles}
       />
     </Stack>
   );
