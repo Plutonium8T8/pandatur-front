@@ -9,6 +9,7 @@ import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectU
 import { user } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
 import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
+import { groupTitleOptions } from "../../../FormOptions";
 
 const GROUP_PREFIX = "__group__";
 const fromGroupKey = (key) => (key?.startsWith(GROUP_PREFIX) ? key.slice(GROUP_PREFIX.length) : key);
@@ -35,6 +36,7 @@ export const Filter = ({
   initialGroupTitles = [],
   initialDateRange = [],
   widgetType = "calls", // Тип виджета для определения доступных фильтров
+  accessibleGroupTitles = [], // Доступные воронки для текущего пользователя
 }) => {
   const { technicians } = useGetTechniciansList();
   const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
@@ -77,15 +79,18 @@ export const Filter = ({
     return () => { mounted = false; };
   }, []);
 
-  const allGroupTitles = useMemo(() => {
-    const all = new Set();
-    Object.values(userGroupsToGroupTitle || {}).forEach((arr) => (arr || []).forEach((v) => all.add(v)));
-    return Array.from(all);
-  }, []);
-  const groupTitleSelectData = useMemo(
-    () => allGroupTitles.map((v) => ({ value: v, label: v })),
-    [allGroupTitles]
-  );
+  // Фильтруем доступные group titles на основе прав пользователя
+  const groupTitleSelectData = useMemo(() => {
+    if (accessibleGroupTitles.length === 0) {
+      // Если нет доступных воронок, показываем все из статического списка
+      return groupTitleOptions;
+    }
+    
+    // Фильтруем статический список по доступным воронкам
+    return groupTitleOptions.filter((option) => 
+      accessibleGroupTitles.includes(option.value)
+    );
+  }, [accessibleGroupTitles]);
 
   // Определяем доступные фильтры в зависимости от типа виджета
   const availableFilters = useMemo(() => {

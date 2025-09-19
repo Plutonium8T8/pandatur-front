@@ -9,7 +9,7 @@ import { api } from "../api";
 import DashboardGrid from "../Components/DashboardComponent/DashboardGrid";
 import { showServerError, getLanguageByKey } from "@utils";
 import { Spin } from "@components";
-import { useGetTechniciansList, useDashboardData } from "../hooks";
+import { useGetTechniciansList, useDashboardData, useUserPermissions } from "../hooks";
 import { Filter } from "../Components/DashboardComponent/Filter/Filter";
 import { safeArray, pickIds } from "../utils/dashboardHelpers";
 
@@ -59,6 +59,7 @@ export const Dashboard = () => {
 
   // имена по user_id
   const { technicians } = useGetTechniciansList();
+  const { accessibleGroupTitles } = useUserPermissions();
   const userNameById = useMemo(() => {
     const map = new Map();
     safeArray(technicians).forEach((t) => {
@@ -258,6 +259,7 @@ export const Dashboard = () => {
         initialGroupTitles={selectedGroupTitles}
         initialDateRange={dateRange}
         widgetType={widgetType}
+        accessibleGroupTitles={accessibleGroupTitles}
       />
     </Stack>
   );
