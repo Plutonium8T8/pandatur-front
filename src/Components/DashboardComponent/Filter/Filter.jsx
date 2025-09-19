@@ -4,7 +4,7 @@ import { Button, Group, MultiSelect, Modal, Stack, Box } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { getLanguageByKey } from "../../utils";
 import { YYYY_MM_DD } from "../../../app-constants";
-import { useGetTechniciansList } from "../../../hooks";
+import { useGetTechniciansList, useUserPermissions } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
 import { user } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
@@ -39,7 +39,38 @@ export const Filter = ({
   accessibleGroupTitles = [], // Доступные воронки для текущего пользователя
 }) => {
   const { technicians } = useGetTechniciansList();
-  const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
+  const { isAdmin, myGroups, userRole, userId } = useUserPermissions();
+
+  // Фильтруем пользователей в зависимости от роли
+  const filteredTechnicians = useMemo(() => {
+    if (!technicians || technicians.length === 0) return [];
+
+    // Если Regular User - показываем только себя
+    // Это обеспечивает безопасность: обычные пользователи не видят других пользователей
+    if (userRole === 'Regular User') {
+      return technicians.filter(tech => tech.value === String(userId));
+    }
+
+    // Для всех остальных ролей (Admin, IT dep., Team Leader) - показываем всех пользователей
+    return technicians;
+  }, [technicians, userRole, userId]);
+
+  const formattedTechnicians = useMemo(() => {
+    const formatted = formatMultiSelectData(filteredTechnicians);
+
+    // Логируем для отладки
+    console.log("🔍 User Filtering:", {
+      userRole,
+      userId,
+      allTechnicians: technicians?.length || 0,
+      filteredTechnicians: filteredTechnicians?.length || 0,
+      formattedTechnicians: formatted?.length || 0,
+      filteredUserNames: filteredTechnicians?.map(t => t.label) || []
+    });
+
+    return formatted;
+  }, [filteredTechnicians, userRole, userId, technicians]);
+
   const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
   const [userGroupsOptions, setUserGroupsOptions] = useState([]);
@@ -66,9 +97,33 @@ export const Filter = ({
       try {
         setLoadingUserGroups(true);
         const data = await user.getGroupsList();
-        const opts = Array.from(new Set((data || []).map((g) => g?.name).filter(Boolean))).map(
+
+        // Фильтруем группы в зависимости от прав пользователя
+        let filteredGroups = data || [];
+
+        if (!isAdmin) {
+          // Если не Admin - показываем только группы, в которых состоит пользователь
+          // Это обеспечивает безопасность: обычные пользователи не видят чужие группы
+          const myGroupNames = myGroups.map(group => group.name);
+          filteredGroups = (data || []).filter(group =>
+            myGroupNames.includes(group.name)
+          );
+        }
+        // Если Admin - показываем все группы (без фильтрации)
+
+        const opts = Array.from(new Set(filteredGroups.map((g) => g?.name).filter(Boolean))).map(
           (name) => ({ value: name, label: name })
         );
+
+        // Логируем для отладки
+        console.log("🔍 User Groups Filtering:", {
+          isAdmin,
+          myGroups: myGroups.map(g => g.name),
+          allGroups: (data || []).map(g => g.name),
+          filteredGroups: filteredGroups.map(g => g.name),
+          finalOptions: opts.map(o => o.label)
+        });
+
         if (mounted) setUserGroupsOptions(opts);
       } catch {
         if (mounted) setUserGroupsOptions([]);
@@ -77,7 +132,7 @@ export const Filter = ({
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [isAdmin, myGroups]);
 
   // Фильтруем доступные group titles на основе прав пользователя
   const groupTitleSelectData = useMemo(() => {
@@ -85,9 +140,9 @@ export const Filter = ({
       // Если нет доступных воронок, показываем все из статического списка
       return groupTitleOptions;
     }
-    
+
     // Фильтруем статический список по доступным воронкам
-    return groupTitleOptions.filter((option) => 
+    return groupTitleOptions.filter((option) =>
       accessibleGroupTitles.includes(option.value)
     );
   }, [accessibleGroupTitles]);
