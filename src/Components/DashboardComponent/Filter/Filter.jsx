@@ -6,7 +6,7 @@ import { getLanguageByKey } from "../../utils";
 import { YYYY_MM_DD } from "../../../app-constants";
 import { useGetTechniciansList } from "../../../hooks";
 import { formatMultiSelectData, getGroupUserMap } from "../../utils/multiSelectUtils";
-import { user as userApi } from "../../../api/user";
+import { user } from "../../../api/user";
 import { userGroupsToGroupTitle } from "../../utils/workflowUtils";
 import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
@@ -64,7 +64,7 @@ export const Filter = ({
     (async () => {
       try {
         setLoadingUserGroups(true);
-        const data = await userApi.getGroupsList();
+        const data = await user.getGroupsList();
         const opts = Array.from(new Set((data || []).map((g) => g?.name).filter(Boolean))).map(
           (name) => ({ value: name, label: name })
         );
@@ -147,7 +147,7 @@ export const Filter = ({
   const buildPayload = useCallback(() => {
     const [fromDate, toDate] = dateRange || [];
     const payload = {};
-    
+
     // Добавляем только доступные фильтры
     if (showUserFilter && selectedTechnicians.length > 0) {
       payload.user_ids = selectedTechnicians;
@@ -159,14 +159,14 @@ export const Filter = ({
       payload.group_titles = selectedGroupTitles;
     }
     if (showDateFilter && (fromDate || toDate)) {
-      payload.attributes = { 
-        timestamp: { 
-          from: toYMD(fromDate || undefined), 
-          to: toYMD(toDate || undefined) 
-        } 
+      payload.attributes = {
+        timestamp: {
+          from: toYMD(fromDate || undefined),
+          to: toYMD(toDate || undefined)
+        }
       };
     }
-    
+
     return payload;
   }, [selectedTechnicians, selectedUserGroups, selectedGroupTitles, dateRange, showUserFilter, showUserGroupsFilter, showGroupTitlesFilter, showDateFilter]);
 
