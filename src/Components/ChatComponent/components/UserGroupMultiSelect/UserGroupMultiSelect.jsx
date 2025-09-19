@@ -1,22 +1,29 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { MultiSelect, Group, Text, Badge, Box } from "@mantine/core";
 import { FaUsers, FaUser, FaCheck } from "react-icons/fa";
 import { useUser } from "@hooks";
 
-export const UserGroupMultiSelect = ({ 
-  value = [], 
-  onChange = () => {}, 
+export const UserGroupMultiSelect = ({
+  value = [],
+  onChange = () => { },
   placeholder = "Select users and groups",
   label = "Users & Groups",
   usersData = [], // Данные пользователей из API (raw data)
   techniciansData = [], // Данные из useGetTechniciansList (formatted)
-  mode = "multi" // "multi" или "single"
+  mode = "multi", // "multi" или "single"
+  allowedUserIds = null, // Set с разрешенными ID пользователей для фильтрации
+  disabled = false
 }) => {
   const [selectedValues, setSelectedValues] = useState(value);
   const { userGroups } = useUser();
 
+  // Синхронизируем selectedValues с внешним value
+  useEffect(() => {
+    setSelectedValues(value);
+  }, [value]);
+
   // Определяем placeholder в зависимости от режима
-  const actualPlaceholder = mode === "single" 
+  const actualPlaceholder = mode === "single"
     ? (placeholder === "Select users and groups" ? "Select user" : placeholder)
     : placeholder;
 
@@ -24,14 +31,40 @@ export const UserGroupMultiSelect = ({
   const options = useMemo(() => {
     // Если есть отформатированные данные из useGetTechniciansList, используем их
     if (techniciansData && techniciansData.length > 0) {
-      // В режиме single отключаем группы, в режиме multi делаем их выбираемыми
-      return techniciansData.map(item => 
-        item.value.startsWith("__group__") 
-          ? { ...item, disabled: mode === "single" }
-          : item
-      );
+      return techniciansData
+        .filter(item => {
+          // Если есть фильтрация по allowedUserIds
+          if (allowedUserIds && !item.value.startsWith("__group__")) {
+            return allowedUserIds.has(item.value);
+          }
+          return true;
+        })
+        .map(item => {
+          const isGroup = item.value.startsWith("__group__");
+
+          // Для групп: проверяем, есть ли в группе разрешенные пользователи
+          if (isGroup && allowedUserIds) {
+            const groupName = item.value.replace("__group__", "");
+            const groupUsers = techniciansData
+              .filter(user => !user.value.startsWith("__group__") && user.groupName === groupName)
+              .map(user => user.value);
+
+            const hasAllowedUsers = groupUsers.some(userId => allowedUserIds.has(userId));
+
+            return {
+              ...item,
+              disabled: mode === "single" || !hasAllowedUsers
+            };
+          }
+
+          // В режиме single отключаем группы, в режиме multi делаем их выбираемыми
+          return {
+            ...item,
+            disabled: isGroup ? (mode === "single") : false
+          };
+        });
     }
-    
+
     // Если есть raw данные пользователей из API, используем их (показываем ВСЕ группы)
     if (usersData && usersData.length > 0) {
       // Собираем все уникальные группы из данных пользователей
@@ -53,7 +86,7 @@ export const UserGroupMultiSelect = ({
 
       // Создаем опции в формате как в существующей системе
       const options = [];
-      
+
       // Добавляем группы и пользователей
       Array.from(allGroups.values()).forEach(group => {
         // Добавляем группу
@@ -62,12 +95,12 @@ export const UserGroupMultiSelect = ({
           label: group.name,
           disabled: mode === "single"
         });
-        
+
         // Добавляем пользователей этой группы
-        const groupUsers = usersData.filter(user => 
+        const groupUsers = usersData.filter(user =>
           user.groups && user.groups.some(g => g.id === group.id)
         );
-        
+
         groupUsers.forEach(user => {
           options.push({
             value: String(user.id.id),
@@ -91,7 +124,7 @@ export const UserGroupMultiSelect = ({
       }));
 
       // Собираем всех пользователей из всех групп
-      const allUsers = userGroups.flatMap(group => 
+      const allUsers = userGroups.flatMap(group =>
         (group.users || []).map(userId => ({
           id: userId,
           groupId: group.id,
@@ -114,7 +147,7 @@ export const UserGroupMultiSelect = ({
 
     // Если нет данных - возвращаем пустой массив
     return [];
-  }, [userGroups, usersData, techniciansData, mode]);
+  }, [userGroups, usersData, techniciansData, mode, allowedUserIds]);
 
   const handleChange = (newValues) => {
     // В режиме single ограничиваем выбор одним пользователем
@@ -138,7 +171,7 @@ export const UserGroupMultiSelect = ({
     if (isGroup) {
       // Если выбрана группа, добавляем или убираем всех пользователей из группы
       const groupName = last.replace("__group__", "");
-      
+
       // Находим всех пользователей из этой группы в techniciansData
       const groupUsers = techniciansData
         ?.filter(item => {
@@ -148,12 +181,12 @@ export const UserGroupMultiSelect = ({
           return item.groupName === groupName;
         })
         ?.map(user => user.value) || [];
-      
+
       const current = selectedValues || [];
-      
+
       // Проверяем, были ли уже выбраны пользователи этой группы
       const groupUsersSelected = groupUsers.every(userId => current.includes(userId));
-      
+
       let newSelection;
       if (groupUsersSelected) {
         // Если группа уже была выбрана - убираем всех её пользователей
@@ -162,7 +195,7 @@ export const UserGroupMultiSelect = ({
         // Если группа не была выбрана - добавляем всех её пользователей
         newSelection = Array.from(new Set([...current, ...groupUsers]));
       }
-      
+
       setSelectedValues(newSelection);
       onChange(newSelection);
     } else {
@@ -176,12 +209,12 @@ export const UserGroupMultiSelect = ({
   const renderOption = ({ option, checked }) => {
     const isGroup = option.value.startsWith("__group__");
     const isDisabled = option.disabled;
-    
+
     return (
-      <Group 
-        gap="xs" 
-        style={{ 
-          padding: '8px 12px', 
+      <Group
+        gap="xs"
+        style={{
+          padding: '8px 12px',
           opacity: isDisabled ? 0.7 : 1,
           backgroundColor: checked ? "#e8f5e8" : "transparent",
           border: checked ? "1px solid #4caf50" : "1px solid transparent",
@@ -224,17 +257,17 @@ export const UserGroupMultiSelect = ({
             <FaCheck size={10} color="white" />
           </Box>
         )}
-        
+
         {/* Отступ для чекбокса */}
         <Box style={{ width: checked ? "24px" : "0px", transition: "width 0.2s ease" }} />
-        
+
         {isGroup ? (
           <FaUsers size={14} color={checked ? "#4caf50" : "#228be6"} />
         ) : (
           <FaUser size={12} color={checked ? "#4caf50" : "#868e96"} />
         )}
-        <Text 
-          size="sm" 
+        <Text
+          size="sm"
           fw={isGroup ? 600 : 400}
           c={checked ? "green" : (isGroup ? "blue" : "dark")}
           style={{
@@ -245,9 +278,9 @@ export const UserGroupMultiSelect = ({
           {option.label}
         </Text>
         {isGroup && (
-          <Badge 
-            size="xs" 
-            variant={checked ? "filled" : "light"} 
+          <Badge
+            size="xs"
+            variant={checked ? "filled" : "light"}
             color={checked ? "green" : "blue"}
           >
             {techniciansData?.filter(item => {
@@ -273,9 +306,10 @@ export const UserGroupMultiSelect = ({
         clearable
         hidePickedOptions={false}
         renderOption={renderOption}
+        disabled={disabled}
         styles={{
           label: { fontSize: 13, fontWeight: 500, color: "#5f6368", marginBottom: 8 },
-          input: { 
+          input: {
             border: "1px solid #dadce0",
             borderRadius: 4,
             fontSize: 14,
