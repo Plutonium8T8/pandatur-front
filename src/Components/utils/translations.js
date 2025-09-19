@@ -3127,6 +3127,11 @@ export const translations = {
     RU: "Выбери номер Viber",
     EN: "Select Viber Number",
   },
+  select_sender_number_telegram: {
+    RO: "Alege nr Telegram",
+    RU: "Выбери номер Telegram",
+    EN: "Select Telegram Number",
+  },
   emailFrom: {
     RO: "De la",
     RU: "От",

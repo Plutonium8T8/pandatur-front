@@ -80,7 +80,9 @@ export const ChatInput = ({
 
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
+  const isTelegram = currentClient?.payload?.platform?.toUpperCase() === "TELEGRAM";
   const isPhoneChat = isWhatsApp || isViber;
+  const needsPandaNumber = isWhatsApp || isViber || isTelegram;
 
   // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
@@ -171,7 +173,7 @@ export const ChatInput = ({
   };
 
   const buildBasePayload = () => ({
-    panda_number: isPhoneChat ? pandaNumber : undefined,
+    panda_number: needsPandaNumber ? pandaNumber : undefined,
     client_phone: isPhoneChat ? currentClient?.payload?.phone : undefined,
   });
 
@@ -352,6 +354,15 @@ export const ChatInput = ({
                   data={pandaNumbersViber}
                 />
               )}
+              {isTelegram && (
+                <Select
+                  className="w-full"
+                  placeholder={getLanguageByKey("select_sender_number_telegram")}
+                  value={pandaNumber}
+                  onChange={setPandaNumber}
+                  data={pandaNumbersWhatsup}
+                />
+              )}
               <Select
                 searchable
                 onChange={(value) => {
@@ -407,7 +418,8 @@ export const ChatInput = ({
                     !currentClient?.payload ||
                     currentClient.payload.platform === "sipuni" ||
                     (isWhatsApp && !pandaNumber) ||
-                    (isViber && !pandaNumber)
+                    (isViber && !pandaNumber) ||
+                    (isTelegram && !pandaNumber)
                   }
                   variant="filled"
                   onClick={sendMessage}
