@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { MultiSelect, Group, Text, Badge, Box } from "@mantine/core";
-import { FaUsers, FaUser } from "react-icons/fa";
+import { FaUsers, FaUser, FaCheck } from "react-icons/fa";
 import { useUser } from "@hooks";
 
 export const UserGroupMultiSelect = ({ 
@@ -183,40 +183,73 @@ export const UserGroupMultiSelect = ({
         style={{ 
           padding: '8px 12px', 
           opacity: isDisabled ? 0.7 : 1,
-          backgroundColor: checked ? "#e3f2fd" : "transparent",
-          color: checked ? "#1976d2" : "inherit",
+          backgroundColor: checked ? "#e8f5e8" : "transparent",
+          border: checked ? "1px solid #4caf50" : "1px solid transparent",
+          borderRadius: checked ? "6px" : "4px",
           cursor: isDisabled ? "not-allowed" : "pointer",
-          transition: "background-color 0.2s ease"
+          transition: "all 0.2s ease",
+          position: "relative"
         }}
         onMouseEnter={(e) => {
           if (!isDisabled && !checked) {
             e.currentTarget.style.backgroundColor = "#f5f5f5";
+            e.currentTarget.style.border = "1px solid #e0e0e0";
           }
         }}
         onMouseLeave={(e) => {
           if (!checked) {
             e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.border = "1px solid transparent";
           }
         }}
       >
+        {/* Чекбокс для выбранных элементов */}
+        {checked && (
+          <Box
+            style={{
+              position: "absolute",
+              left: "4px",
+              top: "50%",
+              transform: "translateY(-50%)",
+              width: "16px",
+              height: "16px",
+              backgroundColor: "#4caf50",
+              borderRadius: "3px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 1
+            }}
+          >
+            <FaCheck size={10} color="white" />
+          </Box>
+        )}
+        
+        {/* Отступ для чекбокса */}
+        <Box style={{ width: checked ? "24px" : "0px", transition: "width 0.2s ease" }} />
+        
         {isGroup ? (
-          <FaUsers size={14} color="#228be6" />
+          <FaUsers size={14} color={checked ? "#4caf50" : "#228be6"} />
         ) : (
-          <FaUser size={12} color="#868e96" />
+          <FaUser size={12} color={checked ? "#4caf50" : "#868e96"} />
         )}
         <Text 
           size="sm" 
           fw={isGroup ? 600 : 400}
-          c={isGroup ? "blue" : "dark"}
+          c={checked ? "green" : (isGroup ? "blue" : "dark")}
           style={{
-            color: isGroup ? "#228be6" : "#333",
-            fontWeight: isGroup ? 600 : 400
+            color: checked ? "#2e7d32" : (isGroup ? "#228be6" : "#333"),
+            fontWeight: checked ? 600 : (isGroup ? 600 : 400)
           }}
         >
           {option.label}
         </Text>
         {isGroup && (
-          <Badge size="xs" variant="light" color="blue">
+          <Badge 
+            size="xs" 
+            variant={checked ? "filled" : "light"} 
+            color={checked ? "green" : "blue"}
+          >
             {techniciansData?.filter(item => {
               if (item.value.startsWith("__group__")) return false;
               return item.groupName === option.value.replace("__group__", "");
