@@ -39,7 +39,7 @@ export const Filter = ({
   accessibleGroupTitles = [], // Доступные воронки для текущего пользователя
 }) => {
   const { technicians } = useGetTechniciansList();
-  const { isAdmin, myGroups, userRole, userId } = useUserPermissions();
+  const { isAdmin, myGroups, userRole, userId, isTeamLeader, supervisedGroups, teamUserIds } = useUserPermissions();
 
   // Фильтруем пользователей в зависимости от роли
   const filteredTechnicians = useMemo(() => {
@@ -51,9 +51,14 @@ export const Filter = ({
       return technicians.filter(tech => tech.value === String(userId));
     }
 
-    // Для всех остальных ролей (Admin, IT dep., Team Leader) - показываем всех пользователей
+    // Если Team Leader - показываем только свою команду (подчиненных)
+    if (userRole === 'Team Leader') {
+      return technicians.filter(tech => teamUserIds.has(tech.value));
+    }
+
+    // Для Admin и IT dep. - показываем всех пользователей
     return technicians;
-  }, [technicians, userRole, userId]);
+  }, [technicians, userRole, userId, teamUserIds]);
 
   const formattedTechnicians = useMemo(() => {
     const formatted = formatMultiSelectData(filteredTechnicians);
@@ -62,6 +67,8 @@ export const Filter = ({
     console.log("🔍 User Filtering:", {
       userRole,
       userId,
+      isTeamLeader,
+      teamUserIds: Array.from(teamUserIds),
       allTechnicians: technicians?.length || 0,
       filteredTechnicians: filteredTechnicians?.length || 0,
       formattedTechnicians: formatted?.length || 0,
@@ -69,7 +76,7 @@ export const Filter = ({
     });
 
     return formatted;
-  }, [filteredTechnicians, userRole, userId, technicians]);
+  }, [filteredTechnicians, userRole, userId, technicians, isTeamLeader, teamUserIds]);
 
   const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
@@ -101,15 +108,23 @@ export const Filter = ({
         // Фильтруем группы в зависимости от прав пользователя
         let filteredGroups = data || [];
 
-        if (!isAdmin) {
-          // Если не Admin - показываем только группы, в которых состоит пользователь
+        if (isAdmin) {
+          // Если Admin - показываем все группы (без фильтрации)
+          filteredGroups = data || [];
+        } else if (isTeamLeader) {
+          // Если Team Leader - показываем только группы, которыми он руководит
+          const supervisedGroupNames = supervisedGroups.map(group => group.name);
+          filteredGroups = (data || []).filter(group =>
+            supervisedGroupNames.includes(group.name)
+          );
+        } else {
+          // Если Regular User - показываем только группы, в которых состоит пользователь
           // Это обеспечивает безопасность: обычные пользователи не видят чужие группы
           const myGroupNames = myGroups.map(group => group.name);
           filteredGroups = (data || []).filter(group =>
             myGroupNames.includes(group.name)
           );
         }
-        // Если Admin - показываем все группы (без фильтрации)
 
         const opts = Array.from(new Set(filteredGroups.map((g) => g?.name).filter(Boolean))).map(
           (name) => ({ value: name, label: name })
@@ -117,8 +132,11 @@ export const Filter = ({
 
         // Логируем для отладки
         console.log("🔍 User Groups Filtering:", {
+          userRole,
           isAdmin,
+          isTeamLeader,
           myGroups: myGroups.map(g => g.name),
+          supervisedGroups: supervisedGroups.map(g => g.name),
           allGroups: (data || []).map(g => g.name),
           filteredGroups: filteredGroups.map(g => g.name),
           finalOptions: opts.map(o => o.label)
@@ -132,7 +150,7 @@ export const Filter = ({
       }
     })();
     return () => { mounted = false; };
-  }, [isAdmin, myGroups]);
+  }, [isAdmin, isTeamLeader, myGroups, supervisedGroups, userRole]);
 
   // Фильтруем доступные group titles на основе прав пользователя
   const groupTitleSelectData = useMemo(() => {
