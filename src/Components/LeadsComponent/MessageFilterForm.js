@@ -18,9 +18,9 @@ import { useGetTechniciansList } from "../../hooks";
 import { getLanguageByKey } from "../utils";
 import { MESSAGES_TYPE_OPTIONS, YYYY_MM_DD_DASH } from "../../app-constants";
 import {
-    getGroupUserMap,
     formatMultiSelectData,
 } from "../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
     const [message, setMessage] = useState("");
@@ -33,7 +33,6 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
 
     const { technicians = [] } = useGetTechniciansList();
     const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-    const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
     const extendedTechnicians = useMemo(
         () => {
@@ -53,29 +52,6 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
         [formattedTechnicians]
     );
 
-    const handleSenderIdsChange = (val) => {
-        const last = val[val.length - 1];
-        const isGroup = last?.startsWith("__group__");
-        if (isGroup) {
-            const groupUsers = groupUserMap.get(last) || [];
-            const unique = Array.from(new Set([...senderIds, ...groupUsers]));
-            setSenderIds(unique);
-        } else {
-            setSenderIds(val);
-        }
-    };
-
-    const handleLastMessageAuthorChange = (val) => {
-        const last = val[val.length - 1];
-        const isGroup = last?.startsWith("__group__");
-        if (isGroup) {
-            const groupUsers = groupUserMap.get(last) || [];
-            const unique = Array.from(new Set([...lastMessageAuthor, ...groupUsers]));
-            setLastMessageAuthor(unique);
-        } else {
-            setLastMessageAuthor(val);
-        }
-    };
 
     useEffect(() => {
         if (!initialData) return;
@@ -167,24 +143,22 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
                     clearable
                 />
 
-                <MultiSelect
+                <UserGroupMultiSelect
                     label={getLanguageByKey("Selectează autor mesaj")}
                     placeholder={getLanguageByKey("Selectează autor mesaj")}
-                    data={formattedTechnicians}
                     value={senderIds}
-                    onChange={handleSenderIdsChange}
-                    searchable
-                    clearable
+                    onChange={setSenderIds}
+                    techniciansData={formattedTechnicians}
+                    mode="multi"
                 />
 
-                <MultiSelect
+                <UserGroupMultiSelect
                     label={getLanguageByKey("Autor ultim mesaj")}
                     placeholder={getLanguageByKey("Selectează autor ultim mesaj")}
-                    data={extendedTechnicians}
                     value={lastMessageAuthor}
-                    onChange={handleLastMessageAuthorChange}
-                    searchable
-                    clearable
+                    onChange={setLastMessageAuthor}
+                    techniciansData={extendedTechnicians}
+                    mode="multi"
                 />
 
                 <Select

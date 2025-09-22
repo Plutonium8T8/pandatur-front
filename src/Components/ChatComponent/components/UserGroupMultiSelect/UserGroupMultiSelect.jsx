@@ -308,7 +308,7 @@ export const UserGroupMultiSelect = ({
         renderOption={renderOption}
         disabled={disabled}
         styles={{
-          label: { fontSize: 13, fontWeight: 500, color: "#5f6368", marginBottom: 8 },
+          label: { fontSize: 13, fontWeight: 500, color: "#000000", marginBottom: 8 },
           input: {
             border: "1px solid #dadce0",
             borderRadius: 4,

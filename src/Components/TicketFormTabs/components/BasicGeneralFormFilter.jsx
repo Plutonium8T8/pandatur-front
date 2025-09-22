@@ -25,6 +25,7 @@ import {
   convertDateToArrayFilter,
 } from "../../LeadsComponent/utils";
 import { YYYY_MM_DD_DASH } from "../../../app-constants";
+import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const GENERAL_FORM_FILTER_ID = "GENERAL_FORM_FILTER_ID";
 
@@ -67,25 +68,6 @@ export const BasicGeneralFormFilter = forwardRef(({ loading, data, formId }, ref
     () => formatMultiSelectData(technicians),
     [technicians]
   );
-
-  const groupUserMap = useMemo(
-    () => getGroupUserMap(technicians),
-    [technicians]
-  );
-
-  const handleTechnicianChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroup = last?.startsWith("__group__");
-
-    if (isGroup) {
-      const groupUsers = groupUserMap.get(last) || [];
-      const current = form.getValues().technician_id || [];
-      const unique = Array.from(new Set([...current, ...groupUsers]));
-      form.setFieldValue("technician_id", unique);
-    } else {
-      form.setFieldValue("technician_id", val);
-    }
-  };
 
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
@@ -159,17 +141,14 @@ export const BasicGeneralFormFilter = forwardRef(({ loading, data, formId }, ref
         {...form.getInputProps("tags")}
       />
 
-      <MultiSelect
-        name="technician_id"
+      <UserGroupMultiSelect
         mt="md"
-        label={getLanguageByKey("Tehnician")}
-        placeholder={getLanguageByKey("Selectează tehnician")}
-        clearable
-        data={formattedTechnicians}
-        key={form.key("technician_id")}
+        label={getLanguageByKey("Responsabil")}
+        placeholder={getLanguageByKey("Selectează responsabil")}
         value={form.values.technician_id}
-        onChange={handleTechnicianChange}
-        searchable
+        onChange={(value) => form.setFieldValue("technician_id", value)}
+        techniciansData={formattedTechnicians}
+        mode="multi"
       />
 
       <DatePickerInput
