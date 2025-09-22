@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from "react";
-import { Modal, Button, Flex, MultiSelect, Select, TextInput, Group } from "@mantine/core";
+import { Modal, Button, Flex, Select, Group } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { Spin } from "@components";
 import { getLanguageByKey } from "../utils";
-import { formatMultiSelectData, getGroupUserMap } from "../utils/multiSelectUtils";
+import { formatMultiSelectData } from "../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 export const CallStatsFilterModal = ({
     opened,
@@ -16,8 +17,6 @@ export const CallStatsFilterModal = ({
     loading = false,
 }) => {
     const formattedTechs = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-    const groupUserMap = useMemo(() => getGroupUserMap(formattedTechs), [formattedTechs]);
-
     const [selectedTechnicians, setSelectedTechnicians] = useState(initialFilters.user_id || []);
     const [status, setStatus] = useState(initialFilters.status || "");
     const [dateFrom, setDateFrom] = useState(initialFilters.date_from || null);
@@ -31,17 +30,6 @@ export const CallStatsFilterModal = ({
         setDateTo(initialFilters.date_to || null);
         setSearchPhone(initialFilters.search || "");
     }, [opened, initialFilters]);
-
-    const handleTechniciansChange = (val) => {
-        const last = val[val.length - 1];
-        if (last?.startsWith("__group__")) {
-            const groupUsers = groupUserMap.get(last) || [];
-            const unique = Array.from(new Set([...selectedTechnicians, ...groupUsers]));
-            setSelectedTechnicians(unique);
-        } else {
-            setSelectedTechnicians(val.filter((v) => !v.startsWith("__group__")));
-        }
-    };
 
     const filteredValues = useMemo(
         () => selectedTechnicians.filter(
@@ -106,14 +94,13 @@ export const CallStatsFilterModal = ({
                     </Flex>
                 ) : (
                     <Flex direction="column" gap={16} style={{ flex: 1 }}>
-                        <MultiSelect
+                        <UserGroupMultiSelect
                             label={getLanguageByKey("Users")}
-                            data={formattedTechs}
-                            value={filteredValues}
-                            onChange={handleTechniciansChange}
                             placeholder={getLanguageByKey("SelectTechnicians")}
-                            searchable
-                            clearable
+                            value={filteredValues}
+                            onChange={setSelectedTechnicians}
+                            techniciansData={formattedTechs}
+                            mode="multi"
                         />
 
                         {mode === "calls" && (
