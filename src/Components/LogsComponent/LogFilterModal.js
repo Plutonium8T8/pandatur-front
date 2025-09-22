@@ -5,7 +5,8 @@ import { DateInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
-import { getGroupUserMap, formatMultiSelectData } from "../utils/multiSelectUtils";
+import { formatMultiSelectData } from "../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const TYPE_OPTIONS = [
     "User logged-in",
@@ -40,7 +41,6 @@ const EVENT_OPTIONS = [
 export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
     const { technicians, loading: loadingTechnicians } = useGetTechniciansList();
     const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-    const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
     const form = useForm({
         initialValues: {
@@ -56,20 +56,6 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
             data_changes_after: filters.data_changes?.after_value || "",
         },
     });
-
-    const handleUserChange = (val) => {
-        const last = val[val.length - 1];
-        const isGroup = last?.startsWith("__group__");
-
-        if (isGroup) {
-            const groupUsers = groupUserMap.get(last) || [];
-            const current = form.values.user_id || [];
-            const unique = Array.from(new Set([...current, ...groupUsers]));
-            form.setFieldValue("user_id", unique);
-        } else {
-            form.setFieldValue("user_id", val);
-        }
-    };
 
     const handleSubmit = (values) => {
         const attributes = {};
@@ -140,15 +126,14 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                 onSubmit={form.onSubmit(handleSubmit)}
                 style={{ display: "flex", flexDirection: "column", gap: 12, height: "100%" }}
             >
-                <MultiSelect
-                    data={formattedTechnicians}
+                <UserGroupMultiSelect
                     label={getLanguageByKey("Users")}
                     placeholder={getLanguageByKey("Users")}
                     value={form.values.user_id}
-                    onChange={handleUserChange}
-                    searchable
-                    clearable
-                    loading={loadingTechnicians ? true : undefined}
+                    onChange={(value) => form.setFieldValue("user_id", value)}
+                    techniciansData={formattedTechnicians}
+                    mode="multi"
+                    disabled={loadingTechnicians}
                 />
                 <MultiSelect
                     data={translatedEventOptions}
