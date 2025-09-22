@@ -31,7 +31,12 @@ export const getGroupUserMap = (technicians) => {
  * @returns {Array}
  */
 export const formatMultiSelectData = (technicians) => {
-    return technicians.map((item) =>
+    // Убираем дублирующиеся опции по value
+    const uniqueItems = technicians.filter((item, index, self) => 
+        index === self.findIndex(t => t.value === item.value)
+    );
+    
+    return uniqueItems.map((item) =>
         item.value.startsWith("__group__")
             ? { ...item, disabled: false }
             : item

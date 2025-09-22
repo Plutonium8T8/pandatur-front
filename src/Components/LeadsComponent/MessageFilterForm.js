@@ -36,11 +36,20 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
     const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
 
     const extendedTechnicians = useMemo(
-        () => [
-            { value: "0", label: getLanguageByKey("Client") },
-            { value: "1", label: getLanguageByKey("System") },
-            ...formattedTechnicians,
-        ],
+        () => {
+            // Создаем мапу существующих значений для проверки дублирования
+            const existingValues = new Set(formattedTechnicians.map(t => t.value));
+            
+            const systemOptions = [
+                { value: "0", label: getLanguageByKey("Client") },
+                { value: "1", label: getLanguageByKey("System") },
+            ];
+            
+            // Фильтруем системные опции, чтобы избежать дублирования
+            const uniqueSystemOptions = systemOptions.filter(opt => !existingValues.has(opt.value));
+            
+            return [...uniqueSystemOptions, ...formattedTechnicians];
+        },
         [formattedTechnicians]
     );
 

@@ -89,7 +89,10 @@ export const BasicGeneralFormFilter = forwardRef(({ loading, data, formId }, ref
 
   form.watch("workflow", ({ value }) => {
     if (Array.isArray(value) && value.includes(getLanguageByKey("selectAll"))) {
-      form.setFieldValue("workflow", workflowOptions);
+      // Убираем selectAll из значения и добавляем все workflowOptions
+      const filteredValue = value.filter(v => v !== getLanguageByKey("selectAll"));
+      const uniqueValue = Array.from(new Set([...filteredValue, ...workflowOptions]));
+      form.setFieldValue("workflow", uniqueValue);
     } else {
       form.setFieldValue("workflow", value);
     }

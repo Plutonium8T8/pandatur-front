@@ -37,11 +37,14 @@ export const useGetTechniciansList = () => {
         const data = await api.users.getTechnicianList();
 
         const groupMap = new Map();
+        const processedUserIds = new Set(); // Добавляем Set для отслеживания обработанных ID
 
         data.forEach((item) => {
           const userId = item?.id?.id;
-          if (!userId) return;
+          if (!userId || processedUserIds.has(userId)) return; // Проверяем на дублирование
 
+          processedUserIds.add(userId); // Добавляем ID в Set
+          
           const groupName = item.groups?.[0]?.name || "Fără grupă";
           const label = `${item.id?.surname || ""} ${item.id?.name || ""}`.trim();
 
@@ -57,9 +60,7 @@ export const useGetTechniciansList = () => {
             groupMap.set(groupName, []);
           }
           const groupUsers = groupMap.get(groupName);
-          if (!groupUsers.some((u) => u.value === userItem.value)) {
-            groupUsers.push(userItem);
-          }
+          groupUsers.push(userItem);
         });
 
         const merged = [];
