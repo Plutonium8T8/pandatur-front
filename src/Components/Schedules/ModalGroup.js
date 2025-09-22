@@ -2,11 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Drawer,
   TextInput,
-  MultiSelect,
   Button,
   Group,
-  Loader,
-  Select,
 } from "@mantine/core";
 import { translations } from "../utils/translations";
 import { useSnackbar } from "notistack";
@@ -14,8 +11,8 @@ import { useGetTechniciansList } from "../../hooks";
 import { api } from "../../api";
 import {
   formatMultiSelectData,
-  getGroupUserMap,
 } from "../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -37,20 +34,6 @@ const ModalGroup = ({
     [technicians]
   );
 
-  const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
-
-  const handleUserChange = (val) => {
-    const last = val[val.length - 1];
-    const isGroup = last?.startsWith("__group__");
-
-    if (isGroup) {
-      const groupUsers = groupUserMap.get(last) || [];
-      const unique = Array.from(new Set([...selectedUserIds, ...groupUsers]));
-      setSelectedUserIds(unique);
-    } else {
-      setSelectedUserIds(val);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!groupName.trim() || selectedUserIds.length === 0 || !selectedSupervisor) {
@@ -138,25 +121,24 @@ const ModalGroup = ({
         onChange={(e) => setGroupName(e.target.value)}
         mb="md"
       />
-      <Select
+      <UserGroupMultiSelect
         label={translations["Team Lead"][language]}
         placeholder={translations["Team Lead"][language]}
-        data={technicians}
-        value={selectedSupervisor}
-        onChange={setSelectedSupervisor}
-        searchable
-        clearable
-        rightSection={loading && <Loader size="xs" />}
+        value={selectedSupervisor ? [selectedSupervisor] : []}
+        onChange={(value) => setSelectedSupervisor(value[0] || null)}
+        techniciansData={formattedTechnicians}
+        mode="single"
+        disabled={loading}
         mb="md"
       />
-      <MultiSelect
-        data={formattedTechnicians}
+      <UserGroupMultiSelect
         label={translations["Utilizatori"][language]}
         placeholder={translations["Selectează utilizator"][language]}
         value={selectedUserIds}
-        onChange={handleUserChange}
-        searchable
-        rightSection={loading && <Loader size="xs" />}
+        onChange={setSelectedUserIds}
+        techniciansData={formattedTechnicians}
+        mode="multi"
+        disabled={loading}
       />
       <Group mt="md" position="right">
         <Button onClick={handleSubmit}>
