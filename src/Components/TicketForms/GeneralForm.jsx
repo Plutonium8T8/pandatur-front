@@ -14,12 +14,16 @@ import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
 import { parseTags } from "../../stringUtils";
 import { AppContext } from "../../contexts/AppContext";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
+import { formatMultiSelectData } from "../utils/multiSelectUtils";
 
 const FINAL_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
 
 export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { workflowOptions, accessibleGroupTitles, isAdmin } = useContext(AppContext);
+
+  const formattedTechnicians = formatMultiSelectData(technicians);
 
   useEffect(() => {
     if (data) {
@@ -33,7 +37,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         description: data.description,
       });
     }
-  }, [data]);
+  }, [data, formInstance]);
 
   const filteredGroupTitleOptions = groupTitleOptions.filter((g) =>
     accessibleGroupTitles.includes(g.value)
@@ -99,15 +103,14 @@ export const GeneralForm = ({ data, formInstance }) => {
         {...formInstance.getInputProps("tags")}
       />
 
-      <Select
-        searchable
+      <UserGroupMultiSelect
         mt="md"
-        label={getLanguageByKey("Tehnician")}
-        placeholder={getLanguageByKey("Selectează tehnician")}
-        clearable
-        data={technicians}
-        key={formInstance.key("technician_id")}
-        {...formInstance.getInputProps("technician_id")}
+        label={getLanguageByKey("Responsabil")}
+        placeholder={getLanguageByKey("Selectează responsabil")}
+        value={formInstance.getValues().technician_id ? [formInstance.getValues().technician_id] : []}
+        onChange={(value) => formInstance.setFieldValue("technician_id", value[0] || undefined)}
+        techniciansData={formattedTechnicians}
+        mode="single"
       />
 
       <Textarea
