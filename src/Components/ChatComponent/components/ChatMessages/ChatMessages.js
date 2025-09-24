@@ -13,12 +13,33 @@ import { InlineNoteComposer } from "../../../InlineNoteComposer";
 import { TicketParticipants } from "../../../TicketParticipants";
 import "./ChatMessages.css";
 
-const getSendedMessage = (msj, currentMsj, statusMessage) =>
-  msj.sender_id === currentMsj.sender_id &&
+const getSendedMessage = (msj, currentMsj, statusMessage) => {
+  // Проверяем точное совпадение по ключевым полям
+  const isExactMatch = msj.sender_id === currentMsj.sender_id &&
     msj.message === currentMsj.message &&
-    msj.time_sent === currentMsj.time_sent
-    ? { ...msj, messageStatus: statusMessage }
-    : msj;
+    msj.time_sent === currentMsj.time_sent &&
+    msj.ticket_id === currentMsj.ticket_id;
+
+  if (isExactMatch) {
+    return { ...msj, messageStatus: statusMessage };
+  }
+
+  // Fallback: ищем PENDING сообщение от того же пользователя в том же тикете
+  const isPendingMatch = msj.sender_id === currentMsj.sender_id &&
+    msj.ticket_id === currentMsj.ticket_id &&
+    msj.messageStatus === MESSAGES_STATUS.PENDING;
+
+  if (isPendingMatch) {
+    console.log("🔄 Found PENDING message for status update:", {
+      from: "PENDING",
+      to: statusMessage,
+      message: msj.message?.substring(0, 50) + "..."
+    });
+    return { ...msj, messageStatus: statusMessage };
+  }
+
+  return msj;
+};
 
 export const ChatMessages = ({
   ticketId,
@@ -50,15 +71,16 @@ export const ChatMessages = ({
 
   const sendMessage = useCallback(
     async (metadataMsj) => {
+      const normalizedMessage = {
+        ...metadataMsj,
+        message: metadataMsj.message || metadataMsj.message_text,
+        seenAt: false,
+      };
+
+      // Сразу добавляем сообщение с PENDING статусом
+      setMessages((prev) => [...prev, normalizedMessage]);
+
       try {
-        const normalizedMessage = {
-          ...metadataMsj,
-          message: metadataMsj.message || metadataMsj.message_text,
-          seenAt: false,
-        };
-
-        setMessages((prev) => [...prev, normalizedMessage]);
-
         let apiUrl = api.messages.send.create;
         const normalizedPlatform = metadataMsj.platform?.toUpperCase?.();
 
@@ -66,14 +88,36 @@ export const ChatMessages = ({
         else if (normalizedPlatform === "VIBER") apiUrl = api.messages.send.viber;
         else if (normalizedPlatform === "WHATSAPP") apiUrl = api.messages.send.whatsapp;
 
-        await apiUrl(metadataMsj);
-
+        // Отправляем на сервер
+        const response = await apiUrl(metadataMsj);
+        
+        console.log("📤 Server response:", response);
+        
+        // Проверяем статус ответа сервера
+        const isSuccess = response?.status === "success" || response?.status === "ok";
+        
+        console.log("✅ Message status check:", {
+          responseStatus: response?.status,
+          isSuccess,
+          willUpdateTo: isSuccess ? "SUCCESS" : "ERROR"
+        });
+        
+        if (isSuccess) {
+          // Обновляем статус на SUCCESS
+          setMessages((prev) =>
+            prev.map((msj) => getSendedMessage(msj, normalizedMessage, MESSAGES_STATUS.SUCCESS))
+          );
+        } else {
+          // Если статус не success, оставляем PENDING или ставим ERROR
+          setMessages((prev) =>
+            prev.map((msj) => getSendedMessage(msj, normalizedMessage, MESSAGES_STATUS.ERROR))
+          );
+        }
+      } catch (error) {
+        console.error("❌ Error sending message:", error);
+        // При ошибке API обновляем статус на ERROR
         setMessages((prev) =>
-          prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.SUCCESS))
-        );
-      } catch {
-        setMessages((prev) =>
-          prev.map((msj) => getSendedMessage(msj, metadataMsj, MESSAGES_STATUS.ERROR))
+          prev.map((msj) => getSendedMessage(msj, normalizedMessage, MESSAGES_STATUS.ERROR))
         );
       }
     },

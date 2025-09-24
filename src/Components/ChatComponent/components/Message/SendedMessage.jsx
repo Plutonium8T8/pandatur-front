@@ -14,13 +14,9 @@ import "./Message.css";
 const DEFAULT_SENDER_NAME = "Panda Tur";
 
 const MESSAGE_STATUS_ICONS = {
-  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark />,
-  [MESSAGES_STATUS.ERROR]: (
-    <Flex c="red">
-      <CiWarning />
-    </Flex>
-  ),
-  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp />,
+  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark size={16} color="#666" />,      // Одна серая галочка
+  [MESSAGES_STATUS.ERROR]: <CiWarning size={16} color="red" />,             // Красный восклицательный знак
+  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} color="green" />, // Две зеленые галочки
 };
 
 export const SendedMessage = ({
