@@ -16,19 +16,19 @@ export const getPandaNumbersByGroupTitle = (groupTitle, platform = 'whatsapp') =
   if (!groupTitle) {
     return PANDA_NUMBERS; // Для всех остальных случаев - показать все номера
   }
-  
+
   const groupTitleUpper = groupTitle.toUpperCase();
-  
-  if (groupTitleUpper.includes('MD')) {
-    // Для MD воронки - показать только MD номер
+
+  // Для MD воронки - показать только MD номер
+  if (groupTitleUpper.includes('MD') || groupTitleUpper.includes('RASCANI')) {
     return PANDA_NUMBERS.filter(num => num.value === "37360991919");
   }
-  
+
   if (groupTitleUpper.includes('RO')) {
     // Для RO воронки - показать только RO номера
     return PANDA_NUMBERS.filter(num => num.value !== "37360991919");
   }
-  
+
   // Для всех остальных случаев - показать все номера
   return PANDA_NUMBERS;
 };
