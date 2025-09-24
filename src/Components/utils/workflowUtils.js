@@ -166,8 +166,8 @@ export const workflowOptionsLimitedFranchiseRascani = [
     "Ofertă trimisă",
     "Aprobat cu client",
     "Contract încheiat",
-    // "Realizat cu succes",
-    // "Închis și nerealizat"
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedAgency = [
