@@ -4,7 +4,7 @@ import { HiPhoneMissedCall } from "react-icons/hi";
 import { HH_mm } from "@app-constants";
 import { parseServerDate, getLanguageByKey } from "@utils";
 import { Audio } from "../../../../Audio";
-import { getFullName } from "@utils";
+import { findCallParticipantName } from "../../../../utils/callUtils";
 import "./Call.css";
 
 const { colors } = DEFAULT_THEME;
@@ -30,24 +30,8 @@ export const Call = ({
 }) => {
   const isMissed = status === "NOANSWER";
 
-  const findNameByNumber = (number) => {
-    const technician = technicians.find(
-      (t) => String(t.sipuni_id) === String(number)
-    );
-    const client = clients.find(
-      (c) => String(c?.sipuni) === String(number)
-    );
-
-    return (
-      technician?.label ||
-      getFullName(client?.id?.name, client?.id?.surname) ||
-      client?.id?.phone ||
-      number
-    );
-  };
-
-  const callerLabel = findNameByNumber(from);
-  const receiverLabel = findNameByNumber(to);
+  const callerLabel = findCallParticipantName(from, technicians, clients);
+  const receiverLabel = findCallParticipantName(to, technicians, clients);
 
   // console.log("%c📞 Звонок", "color: green; font-weight: bold");
   // console.log("⏱ Время:", time);

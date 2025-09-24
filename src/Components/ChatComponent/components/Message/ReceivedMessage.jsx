@@ -7,6 +7,7 @@ import {
 } from "../../../utils";
 import { renderContent } from "../../renderContent";
 import { Call } from "./Call";
+import { parseCallParticipants } from "../../../utils/callUtils";
 
 const { colors } = DEFAULT_THEME;
 
@@ -21,25 +22,21 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
     technicians.find((t) => String(t.sipuni_id) === String(sip));
 
   if (isCall) {
-    const { src_num, short_dst_num, status } = msg.call_metadata || {};
-
-    const receiverClient = findClientByPhone(short_dst_num);
-    const receiverTechnician = findTechnicianBySip(short_dst_num);
-
-    const receiverLabel =
-      getFullName(receiverClient?.name, receiverClient?.surname) ||
-      receiverTechnician?.label ||
-      short_dst_num;
+    const participants = parseCallParticipants(
+      msg.call_metadata, 
+      technicians, 
+      clients
+    );
 
     return (
       <Flex w="100%">
         <Call
           time={msg.time_sent}
-          from={src_num}
-          to={short_dst_num}
-          name={receiverLabel}
+          from={participants.callerId}
+          to={participants.receiverId}
+          name={participants.callerName}
           src={msg.message}
-          status={status}
+          status={msg.call_metadata?.status}
           technicians={technicians}
           clients={clients}
         />

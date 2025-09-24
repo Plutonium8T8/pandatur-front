@@ -8,6 +8,7 @@ import { HH_mm, MEDIA_TYPE } from "../../../../app-constants";
 import { parseServerDate, MESSAGES_STATUS, getFullName } from "../../../utils";
 import { Call } from "./Call";
 import { socialMediaIcons } from "../../../utils";
+import { parseCallParticipants } from "../../../utils/callUtils";
 import "./Message.css";
 
 const DEFAULT_SENDER_NAME = "Panda Tur";
@@ -52,34 +53,23 @@ export const SendedMessage = ({
     DEFAULT_SENDER_NAME;
 
   if (isCall) {
-    const { short_src_num, short_dst_num } = msg.call_metadata || {};
-
-    const callerClient = findClientByPhone(short_src_num);
-    const callerTechnician = findTechnicianBySip(short_src_num);
-
-    const receiverClient = findClientByPhone(short_dst_num);
-    const receiverTechnician = findTechnicianBySip(short_dst_num);
-
-    const callerLabel =
-      getFullName(callerClient?.id?.name, callerClient?.id?.surname) ||
-      getFullName(callerTechnician?.id?.name, callerTechnician?.id?.surname) ||
-      short_src_num;
-
-    const receiverLabel =
-      getFullName(receiverClient?.id?.name, receiverClient?.id?.surname) ||
-      getFullName(receiverTechnician?.id?.name, receiverTechnician?.id?.surname) ||
-      short_dst_num;
+    const participants = parseCallParticipants(
+      msg.call_metadata, 
+      technicians, 
+      personalInfo.clients || []
+    );
 
     return (
       <Flex w="100%" justify="end">
         <Call
           time={msg.time_sent}
-          from={short_src_num}
-          to={short_dst_num}
-          name={callerLabel}
+          from={participants.callerId}
+          to={participants.receiverId}
+          name={participants.callerName}
           src={msg.message}
           status={msg.call_metadata?.status}
           technicians={technicians}
+          clients={personalInfo.clients || []}
         />
       </Flex>
     );
