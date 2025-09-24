@@ -358,58 +358,58 @@ export const AppProvider = ({ children }) => {
       }
 
 
-      case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
-        const { ticket_id, ticket_ids } = message.data || {};
+      // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
+      //   const { ticket_id, ticket_ids } = message.data || {};
 
-        const idsRaw = Array.isArray(ticket_ids)
-          ? ticket_ids
-          : (ticket_id ? [ticket_id] : []);
+      //   const idsRaw = Array.isArray(ticket_ids)
+      //     ? ticket_ids
+      //     : (ticket_id ? [ticket_id] : []);
 
-        const ids = [...new Set(
-          idsRaw
-            .map((v) => Number(v))
-            .filter((v) => Number.isFinite(v))
-        )];
+      //   const ids = [...new Set(
+      //     idsRaw
+      //       .map((v) => Number(v))
+      //       .filter((v) => Number.isFinite(v))
+      //   )];
 
-        if (!ids.length) {
-          break;
-        }
+      //   if (!ids.length) {
+      //     break;
+      //   }
 
-        // console.log("🔄 TICKET_UPDATE received:", {
-        //   ids,
-        //   timestamp: new Date().toISOString()
-        // });
+      //   // console.log("🔄 TICKET_UPDATE received:", {
+      //   //   ids,
+      //   //   timestamp: new Date().toISOString()
+      //   // });
 
-        // Проверяем, есть ли тикеты в нашем списке и обновляем их
-        ids.forEach((id) => {
-          const existsInTickets = tickets.some(t => t.id === id);
-          const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
+      //   // Проверяем, есть ли тикеты в нашем списке и обновляем их
+      //   ids.forEach((id) => {
+      //     const existsInTickets = tickets.some(t => t.id === id);
+      //     const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
           
-        // console.log(`🔍 Checking ticket ${id}:`, {
-        //   existsInTickets,
-        //   existsInChatFiltered,
-        //   shouldUpdate: existsInTickets || existsInChatFiltered,
-        //   totalTickets: tickets.length,
-        //   totalChatFiltered: chatFilteredTickets.length
-        // });
+      //   // console.log(`🔍 Checking ticket ${id}:`, {
+      //   //   existsInTickets,
+      //   //   existsInChatFiltered,
+      //   //   shouldUpdate: existsInTickets || existsInChatFiltered,
+      //   //   totalTickets: tickets.length,
+      //   //   totalChatFiltered: chatFilteredTickets.length
+      //   // });
 
-          if (existsInTickets || existsInChatFiltered) {
-            try {
-              fetchSingleTicket(id);
-            } catch (e) {
-              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
-            }
-          } else {
-            try {
-              fetchSingleTicket(id);
-            } catch (e) {
-              console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
-            }
-          }
-        });
+      //     if (existsInTickets || existsInChatFiltered) {
+      //       try {
+      //         fetchSingleTicket(id);
+      //       } catch (e) {
+      //         console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+      //       }
+      //     } else {
+      //       try {
+      //         fetchSingleTicket(id);
+      //       } catch (e) {
+      //         console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
+      //       }
+      //     }
+      //   });
 
-        break;
-      }
+      //   break;
+      // }
 
       default:
         // console.warn("Invalid socket message type:", message.type);
