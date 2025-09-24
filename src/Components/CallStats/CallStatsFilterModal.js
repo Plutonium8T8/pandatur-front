@@ -73,18 +73,8 @@ export const CallStatsFilterModal = ({
             withCloseButton
             size="lg"
             styles={{
-                content: {
-                    minHeight: 400,
-                    height: 600,
-                    display: "flex",
-                    flexDirection: "column",
-                },
-                body: {
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    paddingBottom: 0,
-                },
+                content: { height: "900px", display: "flex", flexDirection: "column" },
+                body: { flex: "1", overflowY: "auto" },
             }}
         >
             <Flex direction="column" style={{ flex: 1, height: "100%" }}>

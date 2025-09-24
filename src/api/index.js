@@ -8,7 +8,6 @@ import { user } from "./user";
 import { dashboard } from "./dashboard";
 import { task } from "./task";
 import { notification } from "./notification";
-import { standalone } from "./standalone";
 import { activity } from "./activity";
 import { groupSchedules } from "./groupSchedules";
 import { permissions } from "./permissions";
@@ -26,7 +25,6 @@ export const api = {
   dashboard,
   task,
   notification,
-  standalone,
   activity,
   groupSchedules,
   permissions,

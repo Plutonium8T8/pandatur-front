@@ -88,6 +88,10 @@ export const EventsFilterModal = ({
             title={getLanguageByKey("FilterEvents")}
             centered
             size="lg"
+            styles={{
+                content: { height: "900px", display: "flex", flexDirection: "column" },
+                body: { flex: "1", overflowY: "auto" },
+            }}
         >
             <Flex direction="column" gap={16} style={{ minHeight: 320, height: 480 }}>
                 <MultiSelect
