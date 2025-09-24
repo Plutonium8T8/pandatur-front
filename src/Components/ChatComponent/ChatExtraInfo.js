@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { enqueueSnackbar } from "notistack";
 import {
   Tabs,
@@ -52,18 +52,26 @@ const ChatExtraInfo = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
+  // Мемоизируем данные форм для предотвращения перерендера
+  const formData = useMemo(() => ({
+    general: updatedTicket,
+    lead: extraInfo,
+    contract: extraInfo,
+    quality: extraInfo
+  }), [updatedTicket, extraInfo]);
+
   /**
    *
    * @param {number} mergedTicketId
    */
-  const fetchTicketLight = async (mergedTicketId) => {
+  const fetchTicketLight = useCallback(async (mergedTicketId) => {
     try {
       await Promise.all([getTicket(), getUserMessages(ticketId)]);
       setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  };
+  }, [getTicket, getUserMessages, ticketId, setTickets]);
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
@@ -189,6 +197,12 @@ const ChatExtraInfo = ({
       fetchTicketExtraInfo(ticketId);
     }
   }, [ticketId]);
+
+  // Мемоизируем обработчики для стабильности
+  const handleUpdateTicketDate = useCallback(updateTicketDate, [form, ticketId]);
+  const handleSaveTicketExtraDate = useCallback(saveTicketExtraDate, []);
+  const handleMergeClientsData = useCallback(mergeClientsData, [ticketId, fetchTicketLight]);
+  const handleMergeData = useCallback(mergeData, [selectedUser.payload?.id]);
 
   const handleSubmitAllForms = async () => {
     const values = form.getValues();
@@ -335,14 +349,16 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="general">
           <Box p="md">
             <GeneralForm
-              data={updatedTicket}
+              key={`general-${ticketId}-${JSON.stringify(formData.general)}`}
+              data={formData.general}
               formInstance={form}
-              onSubmit={updateTicketDate}
+              onSubmit={handleUpdateTicketDate}
             />
 
             <Divider my="md" size="md" color="green" />
 
             <PersonalData4ClientForm
+              key={`personal-${selectedUser.payload?.id}-${ticketId}`}
               formInstance={form}
               data={selectedUser.payload}
               ticketId={ticketId}
@@ -352,11 +368,12 @@ const ChatExtraInfo = ({
 
             <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
               <Merge
+                key={`merge-tickets-${ticketId}`}
                 buttonText={getLanguageByKey("combineTickets")}
                 loading={isLoadingCombineLead}
                 value={ticketId || ""}
                 onSubmit={(values, resetField) =>
-                  mergeClientsData(values, resetField)
+                  handleMergeClientsData(values, resetField)
                 }
                 placeholder={getLanguageByKey("Introduceți ID lead")}
               />
@@ -364,11 +381,12 @@ const ChatExtraInfo = ({
 
             <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
               <Merge
+                key={`merge-clients-${selectedUser.payload?.id}`}
                 buttonText={getLanguageByKey("combineClient")}
                 loading={isLoadingCombineClient}
                 value={selectedUser.payload?.id || ""}
                 placeholder={getLanguageByKey("Introduceți ID client")}
-                onSubmit={(values) => mergeData(values)}
+                onSubmit={(values) => handleMergeData(values)}
               />
             </Box>
           </Box>
@@ -377,9 +395,10 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="lead">
           <Box p="md">
             <TicketInfoForm
+              key={`lead-${ticketId}-${JSON.stringify(formData.lead)}`}
               formInstance={form}
-              data={extraInfo}
-              onSubmit={(values) => saveTicketExtraDate(values)}
+              data={formData.lead}
+              onSubmit={(values) => handleSaveTicketExtraDate(values)}
             />
           </Box>
         </Tabs.Panel>
@@ -387,9 +406,10 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="contract">
           <Box p="md">
             <ContractForm
+              key={`contract-${ticketId}-${JSON.stringify(formData.contract)}`}
               formInstance={form}
-              data={extraInfo}
-              onSubmit={(values) => saveTicketExtraDate(values)}
+              data={formData.contract}
+              onSubmit={(values) => handleSaveTicketExtraDate(values)}
             />
           </Box>
         </Tabs.Panel>
@@ -409,9 +429,10 @@ const ChatExtraInfo = ({
         <Tabs.Panel value="quality_control">
           <Box p="md">
             <QualityControlForm
+              key={`quality-${ticketId}-${JSON.stringify(formData.quality)}`}
               formInstance={form}
-              data={extraInfo}
-              onSubmit={(values) => saveTicketExtraDate(values)}
+              data={formData.quality}
+              onSubmit={(values) => handleSaveTicketExtraDate(values)}
             />
           </Box>
         </Tabs.Panel>

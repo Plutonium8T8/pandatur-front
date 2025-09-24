@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Select, TextInput, Box } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import {
@@ -7,8 +7,11 @@ import {
 } from "../../FormOptions";
 
 export const QualityControlForm = ({ data, formInstance }) => {
+  const isInitialized = useRef(false);
+
   useEffect(() => {
-    if (data) {
+    if (data && !isInitialized.current) {
+      // Инициализируем форму только один раз при первой загрузке данных
       formInstance.setValues({
         motivul_refuzului: data.motivul_refuzului,
         evaluare_de_odihna: data.evaluare_de_odihna,
@@ -16,8 +19,9 @@ export const QualityControlForm = ({ data, formInstance }) => {
         manager: data.manager,
         vacanta: data.vacanta,
       });
+      isInitialized.current = true;
     }
-  }, [data]);
+  }, [data, formInstance]);
 
   return (
     <>

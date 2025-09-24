@@ -1,6 +1,6 @@
 import { TextInput, Select, NumberInput, Box } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useRef } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
 import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
@@ -16,6 +16,7 @@ export const ContractForm = ({
   formInstance,
 }) => {
   const { userGroups, userId } = useContext(UserContext);
+  const isInitialized = useRef(false);
 
   const { isAdmin } = useWorkflowOptions({
     userGroups,
@@ -27,7 +28,8 @@ export const ContractForm = ({
   const isITDep = userGroups.some((g) => g.name === "IT dep.");
 
   useEffect(() => {
-    if (data) {
+    if (data && !isInitialized.current) {
+      // Инициализируем форму только один раз при первой загрузке данных
       formInstance.setValues({
         data_contractului: parseServerDate(data.data_contractului),
         data_avansului: parseServerDate(data.data_avansului),
@@ -49,8 +51,9 @@ export const ContractForm = ({
           data.comision_companie ??
           (data.budget && data.pret_netto ? data.budget - data.pret_netto : undefined),
       });
+      isInitialized.current = true;
     }
-  }, [data]);
+  }, [data, formInstance]);
 
   return (
     <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>

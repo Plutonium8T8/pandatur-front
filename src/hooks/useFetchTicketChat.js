@@ -59,7 +59,13 @@ export const useFetchTicketChat = (id) => {
     setLoading(true);
     try {
       const ticket = await api.tickets.ticket.getLightById(id);
-      setPersonalInfo(ticket);
+      
+      // Мемоизируем personalInfo чтобы избежать лишних перерендеров
+      setPersonalInfo(prev => {
+        const isEqual = JSON.stringify(prev) === JSON.stringify(ticket);
+        return isEqual ? prev : ticket;
+      });
+      
       const clientList = extractNumbers(ticket.client_id);
       const clients = await Promise.all(
         clientList.map((clientId) => api.users.getUsersClientById(clientId)),
@@ -76,10 +82,18 @@ export const useFetchTicketChat = (id) => {
               payload.id === client_id && payload.platform === platform,
           ) || clientsPlatform[0] || {};
 
-        setSelectedUser(currentClient);
+        // Мемоизируем selectedUser
+        setSelectedUser(prev => {
+          const isEqual = JSON.stringify(prev) === JSON.stringify(currentClient);
+          return isEqual ? prev : currentClient;
+        });
 
       } else {
-        setSelectedUser(clientsPlatform[0] || {});
+        const firstClient = clientsPlatform[0] || {};
+        setSelectedUser(prev => {
+          const isEqual = JSON.stringify(prev) === JSON.stringify(firstClient);
+          return isEqual ? prev : firstClient;
+        });
       }
 
       setMessageSendersByPlatform(normalizeClients(clients) || []);

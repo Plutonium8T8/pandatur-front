@@ -1,7 +1,7 @@
 import { Select, NumberInput, Box } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { MdOutlineEuroSymbol } from "react-icons/md";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import { getLanguageByKey, parseServerDatePicker } from "../utils";
 import {
@@ -22,8 +22,11 @@ export const TicketInfoForm = ({
   setMinDate,
   formInstance,
 }) => {
+  const isInitialized = useRef(false);
+
   useEffect(() => {
-    if (data) {
+    if (data && !isInitialized.current) {
+      // Инициализируем форму только один раз при первой загрузке данных
       formInstance.setValues({
         data_venit_in_oficiu: parseServerDatePicker(data.data_venit_in_oficiu),
         data_plecarii: parseServerDatePicker(data.data_plecarii),
@@ -39,8 +42,9 @@ export const TicketInfoForm = ({
         denumirea_excursiei_turului: data.denumirea_excursiei_turului,
         procesarea_achizitionarii: data.procesarea_achizitionarii,
       });
+      isInitialized.current = true;
     }
-  }, [data]);
+  }, [data, formInstance]);
 
   const parseDate = (input) => {
     const parsed = dayjs(input, YYYY_MM_DD);

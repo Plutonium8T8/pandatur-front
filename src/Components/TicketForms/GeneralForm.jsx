@@ -5,7 +5,7 @@ import {
   TagsInput,
   Box,
 } from "@mantine/core";
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useRef } from "react";
 import {
   priorityOptions,
   groupTitleOptions,
@@ -22,11 +22,13 @@ const FINAL_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
 export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { workflowOptions, accessibleGroupTitles, isAdmin } = useContext(AppContext);
+  const isInitialized = useRef(false);
 
   const formattedTechnicians = formatMultiSelectData(technicians);
 
   useEffect(() => {
-    if (data) {
+    if (data && !isInitialized.current) {
+      // Инициализируем форму только один раз при первой загрузке данных
       formInstance.setValues({
         technician_id: data.technician_id ? `${data.technician_id}` : undefined,
         tags: parseTags(data.tags),
@@ -36,6 +38,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         group_title: data.group_title,
         description: data.description,
       });
+      isInitialized.current = true;
     }
   }, [data, formInstance]);
 
