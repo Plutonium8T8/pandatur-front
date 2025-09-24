@@ -133,13 +133,15 @@ export const SideBar = () => {
             </MenuItem>
           )}
 
-          <MenuItem
-            active={isActive("analytics")}
-            icon={<FaChartBar />}
-            component={<Link to="/analytics" />}
-          >
-            {getLanguageByKey("Analytics")}
-          </MenuItem>
+          {hasStrictPermission(userRoles, "ANALYTICS", "VIEW") && (
+            <MenuItem
+              active={isActive("analytics")}
+              icon={<FaChartBar />}
+              component={<Link to="/analytics" />}
+            >
+              {getLanguageByKey("Analytics")}
+            </MenuItem>
+          )}
 
           {hasStrictPermission(userRoles, "LOGS", "VIEW") && (
             <MenuItem
