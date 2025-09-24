@@ -158,6 +158,17 @@ export const workflowOptionsLimitedFiliale = [
     "Realizat cu succes",
     "Închis și nerealizat"
 ];
+export const workflowOptionsLimitedFranchiseRascani = [
+    // "Interesat",
+    "Apel de intrare",
+    "De prelucrat",
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+    // "Realizat cu succes",
+    // "Închis și nerealizat"
+];
 
 export const workflowOptionsLimitedAgency = [
     "Contactate",
@@ -271,7 +282,7 @@ export const workflowOptionsLimitedByGroupTitle = {
     CAUSENI: workflowOptionsLimitedFiliale,
     SOLDANESTI: workflowOptionsLimitedFiliale,
     REZINA: workflowOptionsLimitedFiliale,
-    RASCANI: workflowOptionsLimitedFiliale,
+    RASCANI: workflowOptionsLimitedFranchiseRascani,
     FranchiseTimisoara: workflowOptionsLimitedFiliale,
     NISPORENI: workflowOptionsLimitedFiliale,
     FranchiseCluj: workflowOptionsLimitedFiliale,
