@@ -100,7 +100,7 @@ export const EventsFilterModal = ({
                     value={event}
                     onChange={handleEventChange}
                     searchable
-                    clearable={false}
+                    clearable
                 />
                 <MultiSelect
                     label={getLanguageByKey("Users")}
@@ -109,21 +109,18 @@ export const EventsFilterModal = ({
                     onChange={handleUsersChange}
                     placeholder={getLanguageByKey("SelectTechnicians")}
                     searchable
-                    clearable
                 />
                 <TextInput
                     label={getLanguageByKey("IP Address")}
                     value={ip}
                     onChange={e => setIp(e.target.value)}
                     placeholder={getLanguageByKey("IP Address")}
-                    clearable
                 />
                 <TextInput
                     label={getLanguageByKey("Object ID")}
                     value={objectId}
                     onChange={e => setObjectId(e.target.value)}
                     placeholder={getLanguageByKey("Object ID")}
-                    clearable
                 />
                 <Group mt="auto" pt={16} pb={8} justify="flex-end">
                     <Button variant="outline" onClick={handleReset}>
