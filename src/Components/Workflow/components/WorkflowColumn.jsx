@@ -140,7 +140,7 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <Flex mt={30} px="8px" direction="column" h="100%" ref={columnRef}>
+      <Flex mt={30} px="8px" direction="column" h="100%" pb="50px" ref={columnRef}>
         <VariableSizeList
           ref={listRef}
           height={columnHeight}

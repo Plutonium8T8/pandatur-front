@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { Modal, Button, Flex, MultiSelect, TextInput, Group } from "@mantine/core";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
-import { formatMultiSelectData, getGroupUserMap } from "../utils/multiSelectUtils";
+import { formatMultiSelectData } from "../utils/multiSelectUtils";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const EVENT_OPTIONS = [
     { value: "Lead", label: "Lead" },
@@ -17,11 +18,10 @@ export const EventsFilterModal = ({
     initialFilters = {},
     loading = false,
 }) => {
-    const defaultEvents = ["Lead", "Task", "Client"];
+    const defaultEvents = useMemo(() => ["Lead", "Task", "Client"], []);
     const { technicians = [] } = useGetTechniciansList();
 
     const formattedTechs = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-    const groupUserMap = useMemo(() => getGroupUserMap(formattedTechs), [formattedTechs]);
 
     const [event, setEvent] = useState(initialFilters.event?.length ? initialFilters.event : defaultEvents);
     const [selectedUsers, setSelectedUsers] = useState(initialFilters.user_id || []);
@@ -35,7 +35,7 @@ export const EventsFilterModal = ({
         setUser(initialFilters.user_identifier || "");
         setIp(initialFilters.ip_address || "");
         setObjectId(initialFilters.object_id || "");
-    }, [opened, initialFilters]);
+    }, [opened, initialFilters, defaultEvents]);
 
     const handleEventChange = (val) => {
         if (val.length === 0) return;
@@ -43,22 +43,11 @@ export const EventsFilterModal = ({
     };
 
     const handleUsersChange = (val) => {
-        const last = val[val.length - 1];
-        if (last?.startsWith("__group__")) {
-            const groupUsers = groupUserMap.get(last) || [];
-            const unique = Array.from(new Set([...selectedUsers, ...groupUsers]));
-            setSelectedUsers(unique);
-        } else {
-            setSelectedUsers(val.filter((v) => !v.startsWith("__group__")));
-        }
+        // UserGroupMultiSelect уже обрабатывает группы, просто обновляем состояние
+        setSelectedUsers(val);
     };
 
-    const filteredUserValues = useMemo(
-        () => selectedUsers.filter(
-            v => formattedTechs.some(t => t.value === v && !t.value.startsWith("__group__"))
-        ),
-        [selectedUsers, formattedTechs]
-    );
+    const filteredUserValues = selectedUsers;
 
     const handleApply = () => {
         const filters = {};
@@ -100,30 +89,27 @@ export const EventsFilterModal = ({
                     value={event}
                     onChange={handleEventChange}
                     searchable
-                    clearable={false}
+                    clearable
                 />
-                <MultiSelect
+                <UserGroupMultiSelect
                     label={getLanguageByKey("Users")}
-                    data={formattedTechs}
+                    techniciansData={formattedTechs}
                     value={filteredUserValues}
                     onChange={handleUsersChange}
                     placeholder={getLanguageByKey("SelectTechnicians")}
-                    searchable
-                    clearable
+                    mode="multi"
                 />
                 <TextInput
                     label={getLanguageByKey("IP Address")}
                     value={ip}
                     onChange={e => setIp(e.target.value)}
                     placeholder={getLanguageByKey("IP Address")}
-                    clearable
                 />
                 <TextInput
                     label={getLanguageByKey("Object ID")}
                     value={objectId}
                     onChange={e => setObjectId(e.target.value)}
                     placeholder={getLanguageByKey("Object ID")}
-                    clearable
                 />
                 <Group mt="auto" pt={16} pb={8} justify="flex-end">
                     <Button variant="outline" onClick={handleReset}>

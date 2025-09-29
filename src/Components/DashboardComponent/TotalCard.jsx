@@ -31,8 +31,8 @@ const getWidgetColors = (widgetType) => {
             };
         case "calls":
             return {
-                in: "emerald",
-                out: "cyan",
+                in: "green",        // изменен с emerald на green для лучшей видимости
+                out: "blue",        // изменен с cyan на blue для лучшей видимости
                 totalAccent: "indigo",
                 bg: "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(45,212,191,0.06))"
             };
