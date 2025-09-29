@@ -163,6 +163,7 @@ export const Leads = () => {
     };
   };
 
+  
   // открытие чата при переходе на /leads/:ticketId
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
