@@ -134,10 +134,10 @@ export const Users = () => {
 
   return (
     <Container 
-      p={20} 
       size="xxl" 
       style={{ 
         height: "100%",
+        padding: "20px",
         paddingTop: isMobile ? "80px" : "20px"
       }}
     >
