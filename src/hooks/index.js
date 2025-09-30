@@ -15,3 +15,4 @@ export * from "./useSocket";
 export * from "./useMessagesContext";
 export * from "./useDashboardData";
 export * from "./useUserPermissions";
+export * from "./useMobile";

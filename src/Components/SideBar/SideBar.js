@@ -12,11 +12,11 @@ import {
   FaChartPie
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
-import { Badge, Flex, Divider, Select } from "@mantine/core";
+import { Badge, Flex, Divider, Select, Burger } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
-import { useApp, useLanguageToggle, useUser } from "../../hooks";
+import { useApp, useLanguageToggle, useUser, useMobile } from "../../hooks";
 import { getLanguageByKey } from "@utils";
 import Can from "../CanComponent/Can";
 import "./SideBar.css";
@@ -32,6 +32,8 @@ export const SideBar = () => {
   const { unreadCount, isCollapsed, setIsCollapsed } = useApp();
   const { surname, name, userId, userRoles } = useUser();
   const [loading, setLoading] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isMobile = useMobile();
   const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS, LANGUAGES } = useLanguageToggle();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
@@ -55,28 +57,83 @@ export const SideBar = () => {
     }
   };
 
+  const handleMenuClick = () => {
+    if (isMobile) {
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
     <>
-      <BaseSideBar collapsed={isCollapsed} backgroundColor="#1f2937">
+      {/* Мобильная верхняя панель */}
+      {isMobile && (
+        <div className="mobile-header">
+          <img className="logo" src={LOGO} alt="PANDATUR CRM" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <Select
+              value={selectedLanguage}
+              onChange={setLanguage}
+              data={LANGUAGE_OPTIONS}
+              size="xs"
+              w={80}
+              styles={{
+                input: {
+                  backgroundColor: "transparent",
+                  color: "white",
+                  border: "1px solid transparent",
+                  fontSize: "12px"
+                },
+                dropdown: {
+                  backgroundColor: "white",
+                  color: "black",
+                },
+              }}
+            />
+            <Burger
+              opened={mobileMenuOpen}
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              color="white"
+              size="sm"
+              className="burger"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Оверлей для мобильного меню */}
+      {isMobile && mobileMenuOpen && (
+        <div
+          className="mobile-overlay"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      <BaseSideBar 
+        collapsed={isMobile ? false : isCollapsed} 
+        backgroundColor="#1f2937"
+        className={isMobile && mobileMenuOpen ? 'mobile-open' : ''}
+      >
         <Menu>
-          <MenuItem
-            suffix={<FaBars />}
-            onClick={() => setIsCollapsed((prev) => !prev)}
-            className="logo-menu"
-            icon={isCollapsed && <FaBars />}
-          >
-            {!isCollapsed && (
-              <Flex ml="8px">
-                <img width="80px" height="100%" src={LOGO} alt="PANDATUR CRM" />
-              </Flex>
-            )}
-          </MenuItem>
+          {!isMobile && (
+            <MenuItem
+              suffix={<FaBars />}
+              onClick={() => setIsCollapsed((prev) => !prev)}
+              className="logo-menu"
+              icon={isCollapsed && <FaBars />}
+            >
+              {!isCollapsed && (
+                <Flex ml="8px">
+                  <img width="80px" height="100%" src={LOGO} alt="PANDATUR CRM" />
+                </Flex>
+              )}
+            </MenuItem>
+          )}
 
           {hasStrictPermission(userRoles, "USERS", "VIEW") && (
             <MenuItem
               active={isActive("users")}
               icon={<FaUsers />}
-              component={<Link to="/users" />}
+              component={<Link to="/users" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Users")}
             </MenuItem>
@@ -86,7 +143,7 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("dashboard")}
               icon={<FaChartPie />}
-              component={<Link to="/dashboard" />}
+              component={<Link to="/dashboard" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Dashboard")}
             </MenuItem>
@@ -96,7 +153,7 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("leads")}
               icon={<FaClipboardList />}
-              component={<Link to="/leads" />}
+              component={<Link to="/leads" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Leads")} {currentGroupTitle && `(${currentGroupTitle})`}
             </MenuItem>
@@ -107,7 +164,7 @@ export const SideBar = () => {
               suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
               active={isActive("chat")}
               icon={<FaComments />}
-              component={<Link to="/chat" />}
+              component={<Link to="/chat" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Chat")}
             </MenuItem>
@@ -117,7 +174,7 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("tasks")}
               icon={<FaTasks />}
-              component={<Link to="/tasks" />}
+              component={<Link to="/tasks" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Taskuri")}
             </MenuItem>
@@ -127,7 +184,7 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("schedules")}
               icon={<FaCalendar />}
-              component={<Link to="/schedules" />}
+              component={<Link to="/schedules" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("schedules")}
             </MenuItem>
@@ -137,7 +194,7 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("analytics")}
               icon={<FaChartBar />}
-              component={<Link to="/analytics" />}
+              component={<Link to="/analytics" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Analytics")}
             </MenuItem>
@@ -147,47 +204,49 @@ export const SideBar = () => {
             <MenuItem
               active={isActive("logs")}
               icon={<FaHistory />}
-              component={<Link to="/logs" />}
+              component={<Link to="/logs" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("logs")}
             </MenuItem>
           )}
 
-          <MenuItem>
-            {isCollapsed ? (
-              <div
-                style={{ textAlign: "center", fontSize: "20px", cursor: "pointer" }}
-                onClick={() => {
-                  const nextLanguage = selectedLanguage === "RO" ? "RU" : selectedLanguage === "RU" ? "EN" : "RO";
-                  setLanguage(nextLanguage);
-                }}
-                title={selectedLanguage}
-              >
-                {LANGUAGES[selectedLanguage].icon}
-              </div>
-            ) : (
-              <Select
-                value={selectedLanguage}
-                onChange={setLanguage}
-                data={LANGUAGE_OPTIONS}
-                styles={{
-                  input: {
-                    backgroundColor: "transparent",
-                    color: "white",
-                    border: "1px solid transparent",
-                  },
-                  dropdown: {
-                    backgroundColor: "white",
-                    color: "black",
-                  },
-                }}
-              />
-            )}
-          </MenuItem>
+          {!isMobile && (
+            <MenuItem>
+              {isCollapsed ? (
+                <div
+                  style={{ textAlign: "center", fontSize: "20px", cursor: "pointer" }}
+                  onClick={() => {
+                    const nextLanguage = selectedLanguage === "RO" ? "RU" : selectedLanguage === "RU" ? "EN" : "RO";
+                    setLanguage(nextLanguage);
+                  }}
+                  title={selectedLanguage}
+                >
+                  {LANGUAGES[selectedLanguage].icon}
+                </div>
+              ) : (
+                <Select
+                  value={selectedLanguage}
+                  onChange={setLanguage}
+                  data={LANGUAGE_OPTIONS}
+                  styles={{
+                    input: {
+                      backgroundColor: "transparent",
+                      color: "white",
+                      border: "1px solid transparent",
+                    },
+                    dropdown: {
+                      backgroundColor: "white",
+                      color: "black",
+                    },
+                  }}
+                />
+              )}
+            </MenuItem>
+          )}
         </Menu>
 
         <Menu>
-          {!isCollapsed && (
+          {(!isCollapsed || isMobile) && (
             <MenuItem>
               {surname} {name} ({userId})
             </MenuItem>
