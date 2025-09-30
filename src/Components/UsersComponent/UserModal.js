@@ -424,6 +424,12 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         required
         rightSection={groupsLoading ? <Loader size="xs" /> : null}
         searchable
+        disabled={groupsLoading || groupsList.length === 0}
+        styles={{
+          dropdown: {
+            zIndex: 10009
+          }
+        }}
       />
 
       <TextInput
@@ -454,6 +460,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           value={form.permissionGroupId}
           onChange={handlePermissionGroupChange}
           rightSection={groupsLoading ? <Loader size="xs" /> : null}
+          styles={{
+            dropdown: {
+              zIndex: 10009
+            }
+          }}
         />
       )}
 
