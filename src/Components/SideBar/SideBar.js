@@ -68,7 +68,12 @@ export const SideBar = () => {
       {/* Мобильная верхняя панель */}
       {isMobile && (
         <div className="mobile-header">
-          <img className="logo" src={LOGO} alt="PANDATUR CRM" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img className="logo" src={LOGO} alt="PANDATUR CRM" />
+            <div style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+              {surname} {name}
+            </div>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <Select
               value={selectedLanguage}
@@ -89,6 +94,24 @@ export const SideBar = () => {
                 },
               }}
             />
+            <button
+              onClick={logout}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'white',
+                cursor: 'pointer',
+                padding: '8px',
+                borderRadius: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '12px'
+              }}
+              title={getLanguageByKey("Log Out")}
+            >
+              <FaSignOutAlt size={14} />
+            </button>
             <Burger
               opened={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -114,11 +137,15 @@ export const SideBar = () => {
         className={isMobile && mobileMenuOpen ? 'mobile-open' : ''}
       >
         <Menu>
-          {/* Информация о пользователе в самом верху */}
-          <MenuItem>
-            {surname} {name} ({userId})
-          </MenuItem>
-          <Divider />
+          {/* Информация о пользователе в мобильном меню */}
+          {isMobile && (
+            <>
+              <MenuItem>
+                {surname} {name} ({userId})
+              </MenuItem>
+              <Divider />
+            </>
+          )}
           
           {!isMobile && (
             <MenuItem
@@ -252,9 +279,25 @@ export const SideBar = () => {
         </Menu>
 
         <Menu>
-          <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
-            {getLanguageByKey("Log Out")}
-          </MenuItem>
+          {/* Информация о пользователе на десктопе */}
+          {!isMobile && (
+            <>
+              <MenuItem>
+                {surname} {name} ({userId})
+              </MenuItem>
+              <Divider />
+              <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
+                {getLanguageByKey("Log Out")}
+              </MenuItem>
+            </>
+          )}
+          
+          {/* Кнопка logout в мобильном меню */}
+          {isMobile && (
+            <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
+              {getLanguageByKey("Log Out")}
+            </MenuItem>
+          )}
         </Menu>
       </BaseSideBar>
 
