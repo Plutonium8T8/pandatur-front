@@ -6,8 +6,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  background: url("https://storage.googleapis.com/pandatur_bucket/utils/Panda%20Tur%20Logo%20Blur.png")
-    no-repeat center center fixed;
+  background: url("https://storage.googleapis.com/pandatur_bucket/utils/Panda%20Tur%20Logo%20Blur.png") no-repeat center center fixed;
   background-size: cover;
   background-blend-mode: overlay;
 }
@@ -35,4 +34,39 @@
   align-items: center;
   z-index: 1;
   transition: all 0.5s ease;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 768px) {
+  .body-login {
+    justify-content: center;
+    align-items: center;
+  }
+
+  .body-login-form {
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .login-form {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    min-height: 500px;
+    border-radius: 8px;
+    padding: 30px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .body-login-form {
+    padding: 10px;
+  }
+
+  .login-form {
+    padding: 20px 15px;
+    min-height: 450px;
+    min-width: 350px
+  }
 }

@@ -83,10 +83,10 @@ export const Login = ({ onLoginSuccess }) => {
     <div className="body-login">
       <div className="body-login-form">
         <Box w="40%" className="login-form">
-          <Title mb="md" order={2}>
+          <Title mb="md" order={2} ta="center">
             {isLogin ? "Login" : "Register"}
           </Title>
-          <Box w="80%">
+          <Box w="80%" maw="100%">
             {!isLogin && (
               <TextInput
                 name="username"
@@ -118,12 +118,12 @@ export const Login = ({ onLoginSuccess }) => {
               disabled={isLoading}
             />
 
-            <Flex gap="md">
+            <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
               <Button fullWidth disabled={isLoading} onClick={handleSubmit}>
                 {isLogin ? "Login" : "Register"}
               </Button>
 
-              <Button fullWidth onClick={handleSwitch} disabled={isLoading}>
+              <Button fullWidth onClick={handleSwitch} disabled={isLoading} variant="outline">
                 {isLogin ? "Register" : "Login"}
               </Button>
             </Flex>
