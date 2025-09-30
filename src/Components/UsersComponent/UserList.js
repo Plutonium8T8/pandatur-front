@@ -1,5 +1,5 @@
 import { RcTable } from "../RcTable";
-import { Button, Menu, Checkbox, Flex } from "@mantine/core";
+import { Button, Menu, Checkbox, Flex, Card, Text, Stack, Group, Badge, ActionIcon } from "@mantine/core";
 import {
   IoEllipsisHorizontal,
   IoCheckmarkCircle,
@@ -11,7 +11,7 @@ import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 import GroupChangeModal from "./GroupsUsers/GroupChangeModal";
-import { useConfirmPopup } from "../../hooks";
+import { useConfirmPopup, useMobile } from "../../hooks";
 import PermissionGroupAssignModal from "./Roles/PermissionGroupAssignModal";
 import { useUser } from "../../hooks";
 import { hasStrictPermission } from "../utils/permissions";
@@ -31,6 +31,7 @@ const UserList = ({
   const [groupModalOpen, setGroupModalOpen] = useState(false);
   const [permissionModalOpen, setPermissionModalOpen] = useState(false);
   const { userRoles } = useUser();
+  const isMobile = useMobile();
   const canDelete = hasStrictPermission(userRoles, "USERS", "DELETE", "ALLOWED");
   const canEdit = hasStrictPermission(userRoles, "USERS", "EDIT", "ALLOWED");
 
@@ -160,6 +161,129 @@ const UserList = ({
         variant: "error",
       });
     }
+  };
+
+  // Мобильный компонент карточки пользователя
+  const MobileUserCard = ({ user }) => {
+    const userId = extractId(user);
+    const isSelected = selectedIds.includes(userId);
+
+    return (
+      <Card 
+        shadow="sm" 
+        padding="md" 
+        radius="md" 
+        withBorder
+        style={{ 
+          opacity: isSelected ? 0.7 : 1,
+          borderColor: isSelected ? '#0f824c' : undefined
+        }}
+      >
+        <Flex justify="space-between" align="flex-start" mb="sm">
+          <Flex align="center" gap="sm">
+            {(canEdit || canDelete) && (
+              <Checkbox
+                checked={isSelected}
+                onChange={() => toggleSelect(userId)}
+              />
+            )}
+            <Text fw={600} size="sm">
+              {user.name} {user.surname}
+            </Text>
+          </Flex>
+          <Menu shadow="md" width={200} position="bottom-end">
+            <Menu.Target>
+              <ActionIcon variant="default" size="sm">
+                <IoEllipsisHorizontal size={16} />
+              </ActionIcon>
+            </Menu.Target>
+            <Menu.Dropdown>
+              {canEdit && (
+                <Menu.Item
+                  leftSection={<IoCheckmarkCircle size={16} />}
+                  onClick={() => toggleUserStatus(user.id, user.status)}
+                >
+                  {user.status
+                    ? translations["Dezactivați"][language]
+                    : translations["Activați"][language]}
+                </Menu.Item>
+              )}
+              {canEdit && (
+                <Menu.Item
+                  leftSection={<IoPencil size={16} />}
+                  onClick={() => openEditUser(user)}
+                >
+                  {translations["Modificați"][language]}
+                </Menu.Item>
+              )}
+              {canDelete && (
+                <Menu.Item
+                  leftSection={<IoTrash size={16} />}
+                  onClick={() => handleDeleteUsersWithConfirm([user.id])}
+                  color="red"
+                >
+                  {translations["Ștergeți"][language]}
+                </Menu.Item>
+              )}
+            </Menu.Dropdown>
+          </Menu>
+        </Flex>
+
+        <Stack gap="xs">
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">ID:</Text>
+            <Text size="xs">{user.id}</Text>
+          </Group>
+          
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{translations["Email"][language]}:</Text>
+            <Text size="xs" style={{ wordBreak: 'break-word' }}>{user.email}</Text>
+          </Group>
+
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{translations["Grup"][language]}:</Text>
+            <Text size="xs">
+              {Array.isArray(user.groups)
+                ? user.groups.map((g) => (typeof g === "string" ? g : g.name)).join(", ")
+                : "—"}
+            </Text>
+          </Group>
+
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{translations["Grup permisiuni"][language]}:</Text>
+            <Text size="xs">
+              {Array.isArray(user.permissions) && user.permissions.length > 0
+                ? user.permissions[0].name
+                : "—"}
+            </Text>
+          </Group>
+
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{translations["Funcție"][language]}:</Text>
+            <Text size="xs">{user.jobTitle || "—"}</Text>
+          </Group>
+
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{translations["Status"][language]}:</Text>
+            <Badge 
+              size="xs" 
+              color={user.status ? "green" : "red"}
+            >
+              {user.status
+                ? translations["Activ"][language]
+                : translations["Inactiv"][language]}
+            </Badge>
+          </Group>
+
+          {user.sipuni_id && (
+            <Group justify="space-between">
+              <Text size="xs" c="dimmed">Sipuni ID:</Text>
+              <Text size="xs">{user.sipuni_id}</Text>
+            </Group>
+          )}
+        </Stack>
+      </Card>
+    );
   };
 
   const columns = [
@@ -327,20 +451,24 @@ const UserList = ({
   return (
     <>
       {selectedIds.length > 0 && (
-        <div style={{ marginBottom: 16, display: "flex", gap: 8 }}>
-
+        <div style={{ marginBottom: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
           {canEdit && (
             <Button
               variant="light"
               color="blue"
               onClick={handleToggleStatusSelected}
+              size={isMobile ? "sm" : "md"}
             >
               {translations["Schimbǎ status"][language]}
             </Button>
           )}
 
           {canEdit && (
-            <Button variant="light" onClick={() => setGroupModalOpen(true)}>
+            <Button 
+              variant="light" 
+              onClick={() => setGroupModalOpen(true)}
+              size={isMobile ? "sm" : "md"}
+            >
               {translations["Schimbă grupul"][language]}
             </Button>
           )}
@@ -350,6 +478,7 @@ const UserList = ({
               variant="light"
               color="grape"
               onClick={() => setPermissionModalOpen(true)}
+              size={isMobile ? "sm" : "md"}
             >
               {translations["Schimbǎ grup de permisiuni"][language]}
             </Button>
@@ -360,6 +489,7 @@ const UserList = ({
               variant="light"
               color="red"
               onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
+              size={isMobile ? "sm" : "md"}
             >
               {translations["Șterge"][language]}
             </Button>
@@ -379,21 +509,38 @@ const UserList = ({
         onConfirm={handleAssignPermissionGroup}
       />
 
-      <RcTable
-        rowKey={(row) => extractId(row)}
-        columns={columns}
-        data={users}
-        loading={loading}
-        bordered
-        selectedRow={[]}
-        pagination={false}
-        scroll={{ y: "calc(100vh - 200px)" }}
-        onRow={(row) => ({
-          onDoubleClick: () => {
-            if (canEdit) openEditUser(row);
-          },
-        })}
-      />
+      {isMobile ? (
+        <div 
+          style={{ 
+            height: "calc(100vh - 300px)", 
+            overflowY: "auto",
+            paddingRight: "8px"
+          }}
+          className="mobile-scroll-container"
+        >
+          <Stack gap="md">
+            {users.map((user) => (
+              <MobileUserCard key={extractId(user)} user={user} />
+            ))}
+          </Stack>
+        </div>
+      ) : (
+        <RcTable
+          rowKey={(row) => extractId(row)}
+          columns={columns}
+          data={users}
+          loading={loading}
+          bordered
+          selectedRow={[]}
+          pagination={false}
+          scroll={{ y: "calc(100vh - 200px)" }}
+          onRow={(row) => ({
+            onDoubleClick: () => {
+              if (canEdit) openEditUser(row);
+            },
+          })}
+        />
+      )}
     </>
   );
 };
