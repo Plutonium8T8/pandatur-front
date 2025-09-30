@@ -27,6 +27,10 @@
   color: white;
 }
 
+.ps-sidebar-container .ps-menu {
+  margin-top: 20px;
+}
+
 .ps-sidebar-root.css-1wvake5 {
   border-right: none;
 }
@@ -50,6 +54,10 @@
   .ps-sidebar-container {
     height: 100vh;
     overflow-y: auto;
+  }
+  
+  .ps-sidebar-container .ps-menu {
+    margin-top: 30px;
   }
   
   /* Мобильная верхняя панель */
@@ -76,7 +84,6 @@
   .mobile-header .burger {
     color: white;
     cursor: pointer;
-    padding: 8px;
     border-radius: 4px;
     transition: background-color 0.2s;
   }

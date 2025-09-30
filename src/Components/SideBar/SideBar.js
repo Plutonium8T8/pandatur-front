@@ -114,6 +114,12 @@ export const SideBar = () => {
         className={isMobile && mobileMenuOpen ? 'mobile-open' : ''}
       >
         <Menu>
+          {/* Информация о пользователе в самом верху */}
+          <MenuItem>
+            {surname} {name} ({userId})
+          </MenuItem>
+          <Divider />
+          
           {!isMobile && (
             <MenuItem
               suffix={<FaBars />}
@@ -246,12 +252,6 @@ export const SideBar = () => {
         </Menu>
 
         <Menu>
-          {(!isCollapsed || isMobile) && (
-            <MenuItem>
-              {surname} {name} ({userId})
-            </MenuItem>
-          )}
-          <Divider />
           <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
             {getLanguageByKey("Log Out")}
           </MenuItem>
