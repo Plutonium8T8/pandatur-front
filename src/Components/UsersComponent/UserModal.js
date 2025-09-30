@@ -9,7 +9,10 @@ import {
   Group,
   Select,
   PasswordInput,
-  Loader
+  Loader,
+  Modal,
+  ScrollArea,
+  Title
 } from "@mantine/core";
 import {
   safeParseJson,
@@ -21,6 +24,7 @@ import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
 import { DEFAULT_PHOTO } from "../../app-constants";
+import { useMobile } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -40,6 +44,7 @@ const initialFormState = {
 
 const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const { enqueueSnackbar } = useSnackbar();
+  const isMobile = useMobile();
   const [form, setForm] = useState(initialFormState);
   const [groupsList, setGroupsList] = useState([]);
   const [permissionGroups, setPermissionGroups] = useState([]);
@@ -353,7 +358,219 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     }
   };
 
-  return (
+  const formContent = (
+    <Stack spacing="md">
+      <Switch
+        label={translations["Activ"][language]}
+        checked={form.status}
+        onChange={(e) =>
+          setForm({ ...form, status: e.currentTarget.checked })
+        }
+        required
+      />
+
+      <TextInput
+        label={translations["Nume"][language]}
+        placeholder={translations["Nume"][language]}
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+        required
+      />
+
+      <TextInput
+        label={translations["Prenume"][language]}
+        placeholder={translations["Prenume"][language]}
+        value={form.surname}
+        onChange={(e) => setForm({ ...form, surname: e.target.value })}
+        required
+      />
+
+      {!initialUser && (
+        <TextInput
+          label={translations["Login"][language]}
+          placeholder={translations["Login"][language]}
+          value={form.username}
+          onChange={(e) => setForm({ ...form, username: e.target.value })}
+          required
+        />
+      )}
+
+      <TextInput
+        type="email"
+        label={translations["Email"][language]}
+        placeholder={translations["Email"][language]}
+        value={form.email}
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
+        autoComplete="off"
+        required
+      />
+
+      <PasswordInput
+        label={translations["password"][language]}
+        placeholder={translations["password"][language]}
+        value={form.password}
+        onChange={(e) => setForm({ ...form, password: e.target.value })}
+        required={!initialUser}
+        autoComplete="new-password"
+        name="new-password-field"
+      />
+
+      <Select
+        label={translations["Grup utilizator"][language]}
+        placeholder={translations["Alege grupul"][language]}
+        data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
+        value={form.groups}
+        onChange={(value) => setForm({ ...form, groups: value || "" })}
+        required
+        rightSection={groupsLoading ? <Loader size="xs" /> : null}
+        searchable
+      />
+
+      <TextInput
+        label={translations["Funcție"][language]}
+        placeholder={translations["Funcție"][language]}
+        value={form.job_title}
+        onChange={(e) => setForm({ ...form, job_title: e.target.value })}
+        required
+      />
+
+      <TextInput
+        label="Sipuni ID"
+        placeholder="Sipuni ID"
+        value={form.sipuni_id}
+        onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
+        required
+      />
+
+      {initialUser && (
+        <Select
+          clearable
+          label={translations["Grup permisiuni"][language]}
+          placeholder={translations["Alege grupul de permisiuni"][language]}
+          data={permissionGroups.map((g) => ({
+            value: g.permission_id.toString(),
+            label: g.permission_name,
+          }))}
+          value={form.permissionGroupId}
+          onChange={handlePermissionGroupChange}
+          rightSection={groupsLoading ? <Loader size="xs" /> : null}
+        />
+      )}
+
+      {initialUser && (
+        <RoleMatrix
+          key={form.permissionGroupId}
+          permissions={form.roleMatrix}
+          onChange={updateRoleMatrix}
+        />
+      )}
+
+      <Button fullWidth mt="sm" onClick={handleCreate} loading={isSubmitting}>
+        {initialUser
+          ? translations["Salvează"][language]
+          : translations["Creează"][language]}
+      </Button>
+    </Stack>
+  );
+
+  return isMobile ? (
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      zIndex={10002}
+      title={
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          width: '100%',
+          zIndex: 10003,
+          position: 'relative'
+        }}>
+          <Title order={4} style={{ margin: 0, color: '#333' }}>
+            {initialUser
+              ? translations["Modificați utilizator"][language]
+              : translations["Adaugă utilizator"][language]}
+          </Title>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              fontSize: '24px',
+              color: '#666',
+              cursor: 'pointer',
+              padding: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: '32px',
+              minHeight: '32px',
+              fontWeight: 'bold',
+              zIndex: 10002,
+              position: 'relative'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.color = '#333';
+              e.target.style.backgroundColor = '#f5f5f5';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.color = '#666';
+              e.target.style.backgroundColor = 'transparent';
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      }
+      size="xl"
+      fullScreen
+      withCloseButton={false}
+      closeOnClickOutside={false}
+      closeOnEscape
+      styles={{
+        body: { 
+          padding: 0,
+          height: 'calc(100vh - 60px)',
+          overflow: 'hidden'
+        },
+        content: { 
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          zIndex: 10000
+        },
+        header: { 
+          padding: '16px 20px',
+          borderBottom: '1px solid #e9ecef',
+          backgroundColor: 'white',
+          zIndex: 10001
+        },
+        overlay: {
+          zIndex: 9999
+        }
+      }}
+    >
+      <ScrollArea 
+        style={{ 
+          height: 'calc(100vh - 80px)',
+          flex: 1
+        }}
+        type="scroll"
+        scrollbarSize={8}
+        scrollHideDelay={0}
+      >
+        <div style={{ padding: '16px', paddingBottom: '80px' }}>
+          <Stack spacing="md">
+            <Group position="center" mb="md">
+              <Avatar src={DEFAULT_PHOTO} size={80} />
+            </Group>
+            {formContent}
+          </Stack>
+        </div>
+      </ScrollArea>
+    </Modal>
+  ) : (
     <Drawer
       opened={opened}
       onClose={onClose}
@@ -368,119 +585,9 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     >
       <Group align="flex-start" spacing="xl">
         <Avatar src={DEFAULT_PHOTO} size={120} />
-
-        <Stack style={{ flex: 1 }}>
-          <Switch
-            label={translations["Activ"][language]}
-            checked={form.status}
-            onChange={(e) =>
-              setForm({ ...form, status: e.currentTarget.checked })
-            }
-            required
-          />
-
-          <TextInput
-            label={translations["Nume"][language]}
-            placeholder={translations["Nume"][language]}
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            required
-          />
-
-          <TextInput
-            label={translations["Prenume"][language]}
-            placeholder={translations["Prenume"][language]}
-            value={form.surname}
-            onChange={(e) => setForm({ ...form, surname: e.target.value })}
-            required
-          />
-
-          {!initialUser && (
-            <TextInput
-              label={translations["Login"][language]}
-              placeholder={translations["Login"][language]}
-              value={form.username}
-              onChange={(e) => setForm({ ...form, username: e.target.value })}
-              required
-            />
-          )}
-
-          <TextInput
-            type="email"
-            label={translations["Email"][language]}
-            placeholder={translations["Email"][language]}
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            autoComplete="off"
-            required
-          />
-
-          <PasswordInput
-            label={translations["password"][language]}
-            placeholder={translations["password"][language]}
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            required={!initialUser}
-            autoComplete="new-password"
-            name="new-password-field"
-          />
-
-          <Select
-            label={translations["Grup utilizator"][language]}
-            placeholder={translations["Alege grupul"][language]}
-            data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
-            value={form.groups}
-            onChange={(value) => setForm({ ...form, groups: value || "" })}
-            required
-            rightSection={groupsLoading ? <Loader size="xs" /> : null}
-            searchable
-          />
-
-          <TextInput
-            label={translations["Funcție"][language]}
-            placeholder={translations["Funcție"][language]}
-            value={form.job_title}
-            onChange={(e) => setForm({ ...form, job_title: e.target.value })}
-            required
-          />
-
-          <TextInput
-            label="Sipuni ID"
-            placeholder="Sipuni ID"
-            value={form.sipuni_id}
-            onChange={(e) => setForm({ ...form, sipuni_id: e.target.value })}
-            required
-          />
-
-          {initialUser && (
-            <Select
-              clearable
-              label={translations["Grup permisiuni"][language]}
-              placeholder={translations["Alege grupul de permisiuni"][language]}
-              data={permissionGroups.map((g) => ({
-                value: g.permission_id.toString(),
-                label: g.permission_name,
-              }))}
-              value={form.permissionGroupId}
-              onChange={handlePermissionGroupChange}
-              rightSection={groupsLoading ? <Loader size="xs" /> : null}
-            />
-          )}
-
-          {initialUser && (
-            <RoleMatrix
-              key={form.permissionGroupId}
-              permissions={form.roleMatrix}
-              onChange={updateRoleMatrix}
-            />
-          )}
-
-          <Button fullWidth mt="sm" onClick={handleCreate} loading={isSubmitting}>
-            {initialUser
-              ? translations["Salvează"][language]
-              : translations["Creează"][language]}
-          </Button>
-        </Stack>
+        <div style={{ flex: 1 }}>
+          {formContent}
+        </div>
       </Group>
     </Drawer>
   );

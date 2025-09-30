@@ -533,6 +533,7 @@ const UserList = ({
           bordered
           selectedRow={[]}
           pagination={false}
+          showHeader={true}
           scroll={{ y: "calc(100vh - 200px)" }}
           onRow={(row) => ({
             onDoubleClick: () => {
