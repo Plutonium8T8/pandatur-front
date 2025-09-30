@@ -18,7 +18,7 @@ import UserList from "@components/UsersComponent/UserList";
 import EditGroupsListModal from "@components/UsersComponent/GroupsUsers/EditGroupsListModal";
 import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
 import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
-import { useUser } from "@hooks";
+import { useUser, useMobile } from "@hooks";
 import { hasStrictPermission } from "../Components/utils/permissions";
 
 const language = localStorage.getItem("language") || "RO";
@@ -28,6 +28,7 @@ export const Users = () => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const { userRoles } = useUser();
+  const isMobile = useMobile();
   const canCreateUser = hasStrictPermission(userRoles, "USERS", "CREATE", "ALLOWED");
   const canEdit = hasStrictPermission(userRoles, "USERS", "EDIT", "ALLOWED");
 
@@ -128,7 +129,14 @@ export const Users = () => {
   }, [users, search, filters]);
 
   return (
-    <Container p={20} size="xxl" style={{ height: "100%" }}>
+    <Container 
+      p={20} 
+      size="xxl" 
+      style={{ 
+        height: "100%",
+        paddingTop: isMobile ? "80px" : "20px"
+      }}
+    >
       <PageHeader
         title={translations["Utilizatori"][language]}
         count={filtered.length}
