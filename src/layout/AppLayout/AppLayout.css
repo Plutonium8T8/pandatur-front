@@ -1,10 +1,14 @@
 .app-container {
   display: flex;
+  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  min-height: 133.33vh;
+  width: 133.33vw; /* Компенсируем уменьшение ширины от zoom */
 }
 
 .page-content {
-  height: 100vh;
-  width: calc(100% - var(--side-bar-width));
+  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  min-height: 133.33vh;
+  width: calc(133.33vw - var(--side-bar-width)); /* Компенсируем уменьшение ширины от zoom */
   overflow: hidden;
 }
 

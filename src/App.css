@@ -1,3 +1,22 @@
+html {
+  zoom: 0.75;
+  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  overflow: hidden;
+}
+
+#root {
+  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  width: 133.33vw; /* Компенсируем уменьшение ширины от zoom */
+  overflow: hidden;
+}
+
 a {
   text-decoration: none;
 }
