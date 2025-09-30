@@ -5,6 +5,10 @@ import {
   Button,
   Menu,
   ActionIcon,
+  Text,
+  Badge,
+  Stack,
+  Flex,
 } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
 import { LuFilter } from "react-icons/lu";
@@ -137,59 +141,125 @@ export const Users = () => {
         paddingTop: isMobile ? "80px" : "20px"
       }}
     >
-      <PageHeader
-        title={translations["Utilizatori"][language]}
-        count={filtered.length}
-        extraInfo={
-          <>
-            {canEdit && (
-              <Menu shadow="md" width={200}>
-                <Menu.Target>
-                  <ActionIcon size="lg" variant="default">
-                    <BsThreeDots />
-                  </ActionIcon>
-                </Menu.Target>
-                <Menu.Dropdown>
-                  <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
-                    {translations["Editează grupurile"][language]}
-                  </Menu.Item>
-                  <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
-                    {translations["Editează rolurile"][language]}
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
-            )}
-            <ActionIcon
-              onClick={() => setModals((m) => ({ ...m, filter: true }))}
-              variant={hasActiveFilters ? "filled" : "default"}
-              color={hasActiveFilters ? "custom" : "gray"}
-              size="36"
-            >
-              <LuFilter size={16} />
-            </ActionIcon>
-
-            <TextInput
-              placeholder={translations["Căutare utilizator"][language]}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="min-w-300"
-              autoComplete="off"
-            />
-
-            {canCreateUser && (
-              <Button
-                leftSection={<IoMdAdd size={16} />}
-                onClick={() => {
-                  setEditUser(null);
-                  setModals((m) => ({ ...m, user: true }));
-                }}
+      {isMobile ? (
+        <Stack gap="md" mb="md">
+          {/* Первый ряд: Заголовок, счетчик, три точки, фильтр */}
+          <Flex align="center" justify="space-between" w="100%">
+            <Flex align="center" gap="8">
+              <Text fw={700} size="lg">
+                {translations["Utilizatori"][language]}
+              </Text>
+              <Badge size="md" bg="#0f824c">
+                {filtered.length}
+              </Badge>
+            </Flex>
+            <Flex align="center" gap="sm">
+              {canEdit && (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon size="md" variant="default">
+                      <BsThreeDots />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
+                      {translations["Editează grupurile"][language]}
+                    </Menu.Item>
+                    <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
+                      {translations["Editează rolurile"][language]}
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+              <ActionIcon
+                onClick={() => setModals((m) => ({ ...m, filter: true }))}
+                variant={hasActiveFilters ? "filled" : "default"}
+                color={hasActiveFilters ? "custom" : "gray"}
+                size="md"
               >
-                {translations["Adaugă utilizator"][language]}
-              </Button>
-            )}
-          </>
-        }
-      />
+                <LuFilter size={16} />
+              </ActionIcon>
+            </Flex>
+          </Flex>
+
+          {/* Второй ряд: Поиск */}
+          <TextInput
+            placeholder={translations["Căutare utilizator"][language]}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            w="100%"
+            autoComplete="off"
+          />
+
+          {/* Третий ряд: Кнопка добавления */}
+          {canCreateUser && (
+            <Button
+              leftSection={<IoMdAdd size={16} />}
+              onClick={() => {
+                setEditUser(null);
+                setModals((m) => ({ ...m, user: true }));
+              }}
+              w="100%"
+            >
+              {translations["Adaugă utilizator"][language]}
+            </Button>
+          )}
+        </Stack>
+      ) : (
+        <PageHeader
+          title={translations["Utilizatori"][language]}
+          count={filtered.length}
+          extraInfo={
+            <>
+              {canEdit && (
+                <Menu shadow="md" width={200}>
+                  <Menu.Target>
+                    <ActionIcon size="lg" variant="default">
+                      <BsThreeDots />
+                    </ActionIcon>
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
+                      {translations["Editează grupurile"][language]}
+                    </Menu.Item>
+                    <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
+                      {translations["Editează rolurile"][language]}
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
+              <ActionIcon
+                onClick={() => setModals((m) => ({ ...m, filter: true }))}
+                variant={hasActiveFilters ? "filled" : "default"}
+                color={hasActiveFilters ? "custom" : "gray"}
+                size="36"
+              >
+                <LuFilter size={16} />
+              </ActionIcon>
+
+              <TextInput
+                placeholder={translations["Căutare utilizator"][language]}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="min-w-300"
+                autoComplete="off"
+              />
+
+              {canCreateUser && (
+                <Button
+                  leftSection={<IoMdAdd size={16} />}
+                  onClick={() => {
+                    setEditUser(null);
+                    setModals((m) => ({ ...m, user: true }));
+                  }}
+                >
+                  {translations["Adaugă utilizator"][language]}
+                </Button>
+              )}
+            </>
+          }
+        />
+      )}
 
       <UserList
         users={filtered}
