@@ -129,7 +129,7 @@ export const WorkflowColumn = ({
     <Flex
       pos="relative"
       direction="column"
-      bg={colors.gray[1]}
+      bg={colors.white}
       style={{
         borderRadius: 32,
         flex: "0 0 340px",

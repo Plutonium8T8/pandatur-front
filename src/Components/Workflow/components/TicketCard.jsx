@@ -1,9 +1,7 @@
 import { Link } from "react-router-dom";
-import { BsThreeDots, BsTagsFill } from "react-icons/bs";
-import { FaHeadphones, FaFingerprint } from "react-icons/fa6";
+import { BsThreeDots } from "react-icons/bs";
+import { FaHeadphones } from "react-icons/fa6";
 import {
-  MdAccessTime,
-  MdOutlineLocalPhone,
   MdModeEdit,
   MdDelete,
 } from "react-icons/md";
@@ -18,10 +16,8 @@ import {
   Menu,
   ActionIcon,
 } from "@mantine/core";
-import { parseTags } from "../../../stringUtils";
 import { parseServerDate, getLanguageByKey } from "../../utils";
-import { Tag } from "../../Tag";
-import { DEFAULT_PHOTO, YYYY_MM_DD, HH_mm } from "../../../app-constants";
+import { DEFAULT_PHOTO, YYYY_MM_DD } from "../../../app-constants";
 import Can from "../../CanComponent/Can";
 
 const { colors } = DEFAULT_THEME;
@@ -40,8 +36,6 @@ export const TicketCard = ({
   onDeleteTicket,
   technician,
 }) => {
-  const tags = parseTags(ticket.tags);
-  const firstClient = ticket.clients?.[0];
   const responsibleId = String(ticket.technician_id || "");
 
   return (
@@ -51,7 +45,7 @@ export const TicketCard = ({
         shadow="sm"
         radius="lg"
         pos="relative"
-        bg="white"
+        bg="#f8f9fa"
         p="8px"
       >
         <Box
@@ -116,93 +110,121 @@ export const TicketCard = ({
           )}
         </Can>
 
-        <Box p="8">
-          <Flex align="center" gap="xs">
-            <Box w="48" h="48">
+        <Box p="8" pos="relative">
+          {/* Фото и основная информация */}
+          <Flex align="flex-start" gap="xs" mb="xs">
+            <Box w="48" h="48" style={{ flexShrink: 0, borderRadius: '50%', overflow: 'hidden' }}>
               <Image
-                src={ticket?.photo_url ? ticket.photo_url : DEFAULT_PHOTO}
+                src={ticket?.clients?.[0]?.photo || ticket?.photo_url || DEFAULT_PHOTO}
                 fallbackSrc={DEFAULT_PHOTO}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </Box>
 
-            <Box>
-              {(firstClient?.name || firstClient?.surname) && (
-                <Text fw="bold" c={colors.dark[4]}>
-                  {firstClient.name} {firstClient.surname}
+            <Box style={{ flex: 1, minWidth: 0 }}>
+              {/* Contact (имя тикета) и номер */}
+              <Flex align="center" gap="4">
+                {ticket.contact && (
+                  <Text
+                    fw="600"
+                    c={colors.dark[7]}
+                    size="sm"
+                    style={{
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    {ticket.contact}
+                  </Text>
+                )}
+                <Text
+                  size="xs"
+                  c={colors.gray[5]}
+                  style={{
+                    fontSize: '10px',
+                    flexShrink: 0
+                  }}
+                >
+                  #{ticket.id}
+                </Text>
+              </Flex>
+
+              {/* Дата создания под именем тикета */}
+              <Text
+                size="xs"
+                c={colors.black}
+                style={{ fontSize: '14px', marginTop: '2px' }}
+              >
+                {parseServerDate(ticket.creation_date)?.format(YYYY_MM_DD)}
+              </Text>
+
+              {/* Номер телефона клиента */}
+              {ticket?.clients?.[0]?.phone && (
+                <Text
+                  size="xs"
+                  c={colors.dark[6]}
+                  style={{ fontSize: '14px', marginTop: '2px' }}
+                  fw="bold"
+                >
+                  {ticket.clients[0].phone}
                 </Text>
               )}
-
-              {ticket.contact && (
-                <Text c={colors.dark[4]}>{ticket.contact}</Text>
-              )}
-
-              <Flex c={colors.dark[3]} align="center" gap="4">
-                <MdAccessTime />
-                <Flex direction="column">
-                  <Text size="xs">
-                    {parseServerDate(ticket.creation_date)?.format(YYYY_MM_DD)}:{" "}
-                    {parseServerDate(ticket.creation_date)?.format(HH_mm)}
-                  </Text>
-                  <Text size="xs">
-                    {parseServerDate(ticket.last_interaction_date)?.format(YYYY_MM_DD)}
-                    {ticket.last_interaction_date
-                      ? `: ${parseServerDate(ticket.last_interaction_date)?.format(HH_mm)}`
-                      : null}
-                  </Text>
-                </Flex>
-              </Flex>
             </Box>
           </Flex>
 
-          <Divider my="xs" />
+          {/* Last messages */}
+          {ticket.last_message && (
+            <Text
+              size="xs"
+              c={colors.gray[6]}
+              mb="xs"
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                lineHeight: '1.4',
+                fontSize: '12px'
+              }}
+            >
+              {ticket.last_message}
+            </Text>
+          )}
 
-          <Flex direction="column" gap="8" mb="8">
-            <Flex align="center" gap="8">
-              <FaFingerprint />
-              <Text>{ticket.id}</Text>
-            </Flex>
-
-            {firstClient?.phone && (
-              <Flex align="center" gap="8">
-                <MdOutlineLocalPhone />
-                <Text>{firstClient?.phone}</Text>
+          {/* Ответственный и Task в одной строке */}
+          <Flex justify="space-between" align="center">
+            {/* Ответственный (Responsabil lead) */}
+            {technician?.label ? (
+              <Flex align="center" gap="4">
+                <FaHeadphones size={12} color={colors.gray[6]} />
+                <Text
+                  size="xs"
+                  c={colors.gray[7]}
+                  style={{
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontSize: '11px'
+                  }}
+                >
+                  {technician.label}
+                </Text>
               </Flex>
+            ) : (
+              <Box />
             )}
+
+            {/* Task placeholder */}
+            <Text
+              size="xs"
+              c={colors.gray[5]}
+              style={{ fontSize: '10px' }}
+            >
+              Task
+            </Text>
           </Flex>
-
-          {!!tags?.length && (
-            <Flex pos="relative" align="center" gap="8">
-              <Box w="16px">
-                <BsTagsFill size="16" />
-              </Box>
-              <Flex gap="4px" style={{ overflow: "hidden" }}>
-                {tags.map((tag) => (
-                  <Tag key={tag}>{tag}</Tag>
-                ))}
-              </Flex>
-              <Box
-                pos="absolute"
-                right="0px"
-                w="60px"
-                h="100%"
-                style={{
-                  background:
-                    "linear-gradient(to right, rgba(255, 255, 255, 0) 0%, #ffffff 80%)",
-                }}
-              />
-            </Flex>
-          )}
-
-          {technician?.value && <Divider my="xs" />}
-
-          {technician?.value && (
-            <Flex align="center" gap="8">
-              <FaHeadphones />
-              <Text>
-                {technician.label} #{technician.value}
-              </Text>
-            </Flex>
-          )}
         </Box>
       </Card>
     </Link>
