@@ -18,10 +18,20 @@ import {
 } from "@mantine/core";
 import { parseServerDate, getLanguageByKey } from "../../utils";
 import { DEFAULT_PHOTO, YYYY_MM_DD } from "../../../app-constants";
+import { parseTags } from "../../../stringUtils";
+import { Tag } from "../../Tag";
 import Can from "../../CanComponent/Can";
 import { useUser } from "../../../hooks";
 
 const { colors } = DEFAULT_THEME;
+
+const MAX_TAGS_COUNT = 2;
+
+const renderTags = (tags) => {
+  const tagList = parseTags(tags).slice(0, MAX_TAGS_COUNT);
+  const isTags = tagList.some(Boolean);
+  return isTags ? tagList.map((tag, index) => <Tag key={index} size="xs">{tag}</Tag>) : null;
+};
 
 export const priorityTagColors = {
   joasă: "green",
@@ -196,6 +206,13 @@ export const TicketCard = ({
             >
               {ticket.last_message}
             </Text>
+          )}
+
+          {/* Tags */}
+          {ticket.tags && (
+            <Flex gap="4" wrap="wrap" style={{ marginTop: '4px' }}>
+              {renderTags(ticket.tags)}
+            </Flex>
           )}
 
           {/* Ответственный и Task в одной строке */}
