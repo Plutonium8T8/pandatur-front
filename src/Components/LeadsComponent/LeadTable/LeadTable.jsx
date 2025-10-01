@@ -397,14 +397,14 @@ export const LeadTable = ({
           </Paper>
         )}
 
-        <div style={{ overflowX: "auto", overflowY: "hidden", width: "100%" }}>
+        <div style={{ height: "calc(133.33vh - 148px)" }}>
           <RcTable
             rowKey="id"
             columns={rcColumn}
             data={visibleLeads}
             selectedRow={selectTicket}
             bordered
-            scroll={{ y: "calc(100vh - 230px)" }}
+            scroll={{ y: "100%" }}
           />
         </div>
 

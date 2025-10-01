@@ -18,7 +18,7 @@ import { api } from "@api";
 import { translations } from "@utils";
 import { PageHeader } from "@components";
 import UserModal from "../Components/UsersComponent/UserModal";
-import UserList from "@components/UsersComponent/UserList";
+import UserList from "../Components/UsersComponent/UserList";
 import EditGroupsListModal from "../Components/UsersComponent/GroupsUsers/EditGroupsListModal";
 import CreatePermissionGroupModal from "../Components/UsersComponent/Roles/CreatePermissionGroupModal";
 import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
