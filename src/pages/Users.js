@@ -20,7 +20,7 @@ import { PageHeader } from "@components";
 import UserModal from "../Components/UsersComponent/UserModal";
 import UserList from "@components/UsersComponent/UserList";
 import EditGroupsListModal from "../Components/UsersComponent/GroupsUsers/EditGroupsListModal";
-import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
+import CreatePermissionGroupModal from "../Components/UsersComponent/Roles/CreatePermissionGroupModal";
 import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
 import { useUser, useMobile } from "@hooks";
 import { hasStrictPermission } from "../Components/utils/permissions";

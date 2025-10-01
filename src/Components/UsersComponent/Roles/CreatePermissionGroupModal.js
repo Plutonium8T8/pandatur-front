@@ -9,8 +9,10 @@ import {
     Group,
     Loader,
     Center,
+    Grid,
+    Paper,
 } from "@mantine/core";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { api } from "../../../api";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./RoleMatrix";
@@ -35,21 +37,13 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         subTitle: translations["Sigur doriți să ștergeți acest grup?"][language],
     });
 
-    useEffect(() => {
-        if (opened) {
-            loadPermissionGroups();
-        } else {
-            resetForm();
-        }
-    }, [opened]);
-
-    const resetForm = () => {
+    const resetForm = useCallback(() => {
         setGroupName("");
         setRoleMatrix({});
         setEditingGroupId(null);
-    };
+    }, []);
 
-    const loadPermissionGroups = async () => {
+    const loadPermissionGroups = useCallback(async () => {
         setLoading(true);
         try {
             const groups = await api.permissions.getAllPermissionGroups();
@@ -62,7 +56,15 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [enqueueSnackbar]);
+
+    useEffect(() => {
+        if (opened) {
+            loadPermissionGroups();
+        } else {
+            resetForm();
+        }
+    }, [opened, loadPermissionGroups, resetForm]);
 
     const handleMatrixChange = (key, value) => {
         setRoleMatrix((prev) => ({ ...prev, [key]: value }));
@@ -187,82 +189,109 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     ? translations["Editează grup de permisiuni"][language]
                     : translations["Creează grup de permisiuni"][language]
             }
-            size="lg"
+            size="xl"
         >
-            <Stack>
-                <Box>
-                    <TextInput
-                        label={translations["Nume grup"][language]}
-                        placeholder={translations["Nume grup"][language]}
-                        value={groupName}
-                        onChange={(e) => setGroupName(e.target.value)}
-                        required
-                        mb="md"
-                    />
+            <Stack gap="md">
+                {/* Поле ввода названия группы */}
+                <TextInput
+                    label={translations["Nume grup"][language]}
+                    placeholder={translations["Nume grup"][language]}
+                    value={groupName}
+                    onChange={(e) => setGroupName(e.target.value)}
+                    required
+                />
 
-                    <Text fw={600} mb={4}>
-                        {translations["Selectați permisiunile"][language]}
-                    </Text>
+                {/* Двухколоночный layout */}
+                <Grid gutter="md">
+                    {/* Левая колонка - RoleMatrix */}
+                    <Grid.Col span={8}>
+                        <Box>
+                            <Text fw={600} mb="xs">
+                                {translations["Selectați permisiunile"][language]}
+                            </Text>
+                            <RoleMatrix permissions={roleMatrix} onChange={handleMatrixChange} />
+                        </Box>
+                    </Grid.Col>
 
-                    <RoleMatrix permissions={roleMatrix} onChange={handleMatrixChange} />
+                    {/* Правая колонка - Список групп */}
+                    <Grid.Col span={4}>
+                        <Box>
+                            <Text fw={600} mb="xs">
+                                {translations["Grupuri existente"][language]}
+                            </Text>
+                            
+                            {loading ? (
+                                <Center py="xl">
+                                    <Loader />
+                                </Center>
+                            ) : existingGroups.length > 0 ? (
+                                <Stack gap="xs">
+                                    {existingGroups.map((group) => (
+                                        <Paper
+                                            key={group.permission_id}
+                                            p="sm"
+                                            withBorder
+                                            shadow="xs"
+                                            onClick={() => handleSelectGroup(group)}
+                                            style={{
+                                                cursor: "pointer",
+                                                backgroundColor: editingGroupId === group.permission_id ? "#e7f5ff" : "#f8f9fa",
+                                                borderColor: editingGroupId === group.permission_id ? "#339af0" : "#dee2e6",
+                                                transition: "all 0.2s",
+                                            }}
+                                            onMouseEnter={(e) => {
+                                                if (editingGroupId !== group.permission_id) {
+                                                    e.currentTarget.style.backgroundColor = "#f1f3f5";
+                                                    e.currentTarget.style.borderColor = "#adb5bd";
+                                                }
+                                            }}
+                                            onMouseLeave={(e) => {
+                                                if (editingGroupId !== group.permission_id) {
+                                                    e.currentTarget.style.backgroundColor = "#f8f9fa";
+                                                    e.currentTarget.style.borderColor = "#dee2e6";
+                                                }
+                                            }}
+                                        >
+                                            <Text 
+                                                fw={editingGroupId === group.permission_id ? 600 : 500}
+                                                c={editingGroupId === group.permission_id ? "blue" : "dark"}
+                                            >
+                                                {group.permission_name}
+                                            </Text>
+                                        </Paper>
+                                    ))}
+                                </Stack>
+                            ) : (
+                                <Paper p="md" withBorder>
+                                    <Text size="sm" c="dimmed" ta="center">
+                                        {translations["Nu există grupuri"][language]}
+                                    </Text>
+                                </Paper>
+                            )}
+                        </Box>
+                    </Grid.Col>
+                </Grid>
 
-                    <Group mt="sm">
-                        <Button onClick={handleSave} loading={saving}>
-                            {editingGroupId
-                                ? translations["Salvează modificările"][language]
-                                : translations["Creează"][language]}
-                        </Button>
+                <Divider />
 
-                        {editingGroupId && (
-                            <>
-                                <Button color="red" onClick={handleDelete} loading={deleting}>
-                                    {translations["Șterge grupul"][language]}
-                                </Button>
-                                <Button variant="default" onClick={resetForm}>
-                                    {translations["Anuleazǎ"][language]}
-                                </Button>
-                            </>
-                        )}
-                    </Group>
-
-                    <Divider my="sm" />
-                </Box>
-
-                {loading ? (
-                    <Center my="sm">
-                        <Loader />
-                    </Center>
-                ) : (
-                    existingGroups.length > 0 && (
+                {/* Кнопки действий */}
+                <Group justify="flex-end">
+                    {editingGroupId && (
                         <>
-                            <Text fw={600}>{translations["Grupuri existente"][language]}</Text>
-                            <Stack spacing={4}>
-                                {existingGroups.map((group) => (
-                                    <Box
-                                        key={group.permission_id}
-                                        onClick={() => handleSelectGroup(group)}
-                                        style={{
-                                            cursor: "pointer",
-                                            padding: 8,
-                                            borderRadius: 4,
-                                            background: "#f8f9fa",
-                                            border: "1px solid #dee2e6",
-                                            transition: "background 0.2s",
-                                        }}
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.background = "#f1f3f5")
-                                        }
-                                        onMouseLeave={(e) =>
-                                            (e.currentTarget.style.background = "#f8f9fa")
-                                        }
-                                    >
-                                        <Text fw={500}>{group.permission_name}</Text>
-                                    </Box>
-                                ))}
-                            </Stack>
+                            <Button variant="default" onClick={resetForm}>
+                                {translations["Anuleazǎ"][language]}
+                            </Button>
+                            <Button color="red" onClick={handleDelete} loading={deleting}>
+                                {translations["Șterge grupul"][language]}
+                            </Button>
                         </>
-                    )
-                )}
+                    )}
+                    <Button onClick={handleSave} loading={saving}>
+                        {editingGroupId
+                            ? translations["Salvează modificările"][language]
+                            : translations["Creează"][language]}
+                    </Button>
+                </Group>
             </Stack>
         </Modal>
     );
