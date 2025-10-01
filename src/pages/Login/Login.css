@@ -1,7 +1,8 @@
 .body-login {
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: 133.33vh; /* Компенсируем zoom: 0.75 */
+  width: 133.33vw; /* Компенсируем zoom: 0.75 */
   overflow: hidden;
   display: flex;
   justify-content: flex-end;
@@ -41,6 +42,8 @@
   .body-login {
     justify-content: center;
     align-items: center;
+    height: 100vh; /* На мобильных устройствах не применяем компенсацию */
+    width: 100vw;
   }
 
   .body-login-form {
@@ -51,22 +54,21 @@
 
   .login-form {
     width: 100%;
-    max-width: 400px;
+    max-width: 450px;
     height: auto;
-    min-height: 500px;
-    border-radius: 8px;
-    padding: 30px 20px;
+    min-height: auto;
+    border-radius: 12px;
+    padding: 24px 20px;
   }
 }
 
 @media (max-width: 480px) {
   .body-login-form {
-    padding: 10px;
+    padding: 16px;
   }
 
   .login-form {
-    padding: 20px 15px;
-    min-height: 450px;
-    min-width: 350px
+    padding: 20px 16px;
+    max-width: 95%;
   }
 }

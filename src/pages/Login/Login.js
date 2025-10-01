@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
 import { useSnackbar } from "notistack";
-import { Button, Flex, TextInput, Title, Box, Text } from "@mantine/core";
+import { Button, Flex, TextInput, Title, Box, Text, Stack } from "@mantine/core";
 import { api } from "../../api";
 import { showServerError } from "../../Components/utils/showServerError";
 import { LoadingOverlay } from "../../Components/LoadingOverlay";
+import { useMobile } from "../../hooks";
 import "./Login.css";
 
 const setCookieToken = (token) => {
@@ -23,6 +24,7 @@ export const Login = ({ onLoginSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const isMobile = useMobile();
 
   const handleInputChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -82,19 +84,34 @@ export const Login = ({ onLoginSuccess }) => {
   return (
     <div className="body-login">
       <div className="body-login-form">
-        <Box w="40%" className="login-form">
-          <Title mb="md" order={2} ta="center">
-            {isLogin ? "Login" : "Register"}
+        <Box
+          w={isMobile ? "100%" : "40%"}
+          className="login-form"
+          maw={isMobile ? "90%" : "100%"}
+        >
+          <Title
+            order={1}
+            ta="center"
+            mb={isMobile ? "md" : "lg"}
+            style={{
+              color: '#fff',
+              fontSize: isMobile ? '24px' : '32px',
+              fontWeight: 700,
+              letterSpacing: '1px'
+            }}
+          >
+            Panda Tur CRM
           </Title>
-          <Box w="80%" maw="100%">
+
+          <Stack w={isMobile ? "100%" : "80%"} gap={isMobile ? "sm" : "md"}>
             {!isLogin && (
               <TextInput
                 name="username"
                 value={form.username}
                 onChange={handleInputChange}
                 placeholder="Username"
-                mb="md"
                 disabled={isLoading}
+                size={isMobile ? "sm" : "md"}
               />
             )}
 
@@ -104,8 +121,8 @@ export const Login = ({ onLoginSuccess }) => {
               value={form.email}
               onChange={handleInputChange}
               placeholder="Email"
-              mb="md"
               disabled={isLoading}
+              size={isMobile ? "sm" : "md"}
             />
 
             <TextInput
@@ -114,16 +131,27 @@ export const Login = ({ onLoginSuccess }) => {
               value={form.password}
               onChange={handleInputChange}
               placeholder="Password"
-              mb="md"
               disabled={isLoading}
+              size={isMobile ? "sm" : "md"}
             />
 
-            <Flex gap="md" direction={{ base: 'column', sm: 'row' }}>
-              <Button fullWidth disabled={isLoading} onClick={handleSubmit}>
+            <Flex gap={isMobile ? "sm" : "md"} direction="column">
+              <Button
+                fullWidth
+                disabled={isLoading}
+                onClick={handleSubmit}
+                size={isMobile ? "sm" : "md"}
+              >
                 {isLogin ? "Login" : "Register"}
               </Button>
 
-              <Button fullWidth onClick={handleSwitch} disabled={isLoading} variant="outline">
+              <Button
+                fullWidth
+                onClick={handleSwitch}
+                disabled={isLoading}
+                variant="outline"
+                size={isMobile ? "sm" : "md"}
+              >
                 {isLogin ? "Register" : "Login"}
               </Button>
             </Flex>
@@ -131,11 +159,11 @@ export const Login = ({ onLoginSuccess }) => {
             {isLoading && <LoadingOverlay />}
 
             {message && (
-              <Text c="red" size="md" mt="md">
+              <Text c="red" size={isMobile ? "sm" : "md"} mt={isMobile ? "sm" : "md"}>
                 {message}
               </Text>
             )}
-          </Box>
+          </Stack>
         </Box>
       </div>
     </div>

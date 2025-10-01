@@ -525,7 +525,7 @@ const UserList = ({
           </Stack>
         </div>
       ) : (
-        <div style={{ height: "calc(133.33vh - 148px)" }}>
+        <div style={{ height: "calc(133.33vh - 90px)" }}>
           <RcTable
             rowKey={(row) => extractId(row)}
             columns={columns}

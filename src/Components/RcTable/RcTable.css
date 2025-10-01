@@ -20,7 +20,7 @@
 .table thead .rc-table-cell,
 .table tbody .rc-table-cell {
   border-bottom: 1px solid var(--mantine-color-gray-4);
-  padding: 16px;
+  padding: 8px;
 }
 
 .table thead .rc-table-cell {
