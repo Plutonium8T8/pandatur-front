@@ -7,8 +7,6 @@ import {
     Flex,
     Paper,
     Text,
-    Select,
-    MultiSelect,
     Collapse,
     Loader,
 } from "@mantine/core";
@@ -20,7 +18,7 @@ import { useSnackbar } from "notistack";
 import {
     formatMultiSelectData,
 } from "../../utils/multiSelectUtils";
-import { useDebounce } from "../../../hooks";
+import { UserGroupMultiSelect } from "../../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -28,7 +26,6 @@ const language = localStorage.getItem("language") || "RO";
 const GroupItem = memo(({ 
     group, 
     isExpanded, 
-    technicians, 
     formattedTechnicians,
     onToggle, 
     onDelete, 
@@ -37,28 +34,14 @@ const GroupItem = memo(({
 }) => {
     // Локальное состояние для редактируемых полей
     const [editableName, setEditableName] = useState(group.name || "");
-    const [supervisorId, setSupervisorId] = useState(group.supervisor_id?.toString() || null);
+    const [supervisorId, setSupervisorId] = useState(group.supervisor_id ? [group.supervisor_id.toString()] : []);
     const [userIds, setUserIds] = useState(group.users?.map(String) || []);
-    const [searchValue, setSearchValue] = useState("");
-    
-    const debouncedSearch = useDebounce(searchValue, 300);
-
-    // Фильтрация для MultiSelect с лимитом
-    const filteredTechnicians = useMemo(() => {
-        if (!debouncedSearch) {
-            return formattedTechnicians.slice(0, 50); // Лимит по умолчанию
-        }
-        const filtered = formattedTechnicians.filter(tech => 
-            tech.label.toLowerCase().includes(debouncedSearch.toLowerCase())
-        );
-        return filtered.slice(0, 50);
-    }, [formattedTechnicians, debouncedSearch]);
 
     // Обработчик сохранения с передачей данных наружу
     const handleSave = useCallback(() => {
         onSave(group.id, {
             editableName,
-            supervisor_id: supervisorId,
+            supervisor_id: supervisorId[0] || null, // Берем первый элемент массива
             user_ids: userIds
         });
     }, [group.id, editableName, supervisorId, userIds, onSave]);
@@ -82,21 +65,14 @@ const GroupItem = memo(({
         });
     }, []);
 
-    // Обработчик изменения supervisor
+    // Обработчик изменения supervisor (теперь массив)
     const handleSupervisorChange = useCallback((val) => {
-        setSupervisorId(val || null);
+        setSupervisorId(val || []);
     }, []);
 
     // Обработчик изменения users
     const handleUsersChange = useCallback((val) => {
         setUserIds(val);
-    }, []);
-
-    // Обработчик поиска в MultiSelect
-    const handleSearchChange = useCallback((value) => {
-        startTransition(() => {
-            setSearchValue(value);
-        });
     }, []);
 
     return (
@@ -126,29 +102,23 @@ const GroupItem = memo(({
                             onChange={handleNameChange}
                             disabled={loading}
                         />
-                        <Select
+                        <UserGroupMultiSelect
                             label={translations["Team Lead"][language]}
                             placeholder={translations["Selectați Team Lead"][language]}
-                            data={technicians}
                             value={supervisorId}
                             onChange={handleSupervisorChange}
-                            searchable
-                            clearable
+                            techniciansData={formattedTechnicians}
+                            mode="single"
                             disabled={loading}
-                            limit={50}
                         />
-                        <MultiSelect
+                        <UserGroupMultiSelect
                             label={translations["Selectează operator"][language]}
                             placeholder={translations["Selectează operator"][language]}
-                            data={filteredTechnicians}
                             value={userIds}
                             onChange={handleUsersChange}
-                            searchable
-                            clearable
+                            techniciansData={formattedTechnicians}
+                            mode="multi"
                             disabled={loading}
-                            searchValue={searchValue}
-                            onSearchChange={handleSearchChange}
-                            limit={50}
                         />
                         <Button 
                             onClick={handleSave} 
@@ -336,7 +306,6 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                             key={group.id}
                             group={group}
                             isExpanded={expandedGroupId === group.id}
-                            technicians={technicians}
                             formattedTechnicians={formattedTechnicians}
                             onToggle={handleGroupToggle}
                             onDelete={handleDelete}
