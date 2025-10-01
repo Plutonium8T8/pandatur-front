@@ -177,7 +177,7 @@ export const TicketCard = ({
           {ticket.last_message && (
             <Text
               size="xs"
-              c={colors.gray[6]}
+              c={colors.black}
               mb="xs"
               style={{
                 overflow: 'hidden',
@@ -186,7 +186,7 @@ export const TicketCard = ({
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 lineHeight: '1.4',
-                fontSize: '12px'
+                fontSize: '12px',
               }}
             >
               {ticket.last_message}

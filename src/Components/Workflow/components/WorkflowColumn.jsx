@@ -132,7 +132,7 @@ export const WorkflowColumn = ({
       bg={colors.white}
       style={{
         borderRadius: 32,
-        flex: "0 0 340px",
+        flex: "0 0 440px",
       }}
     >
       <WorkflowColumnHeader

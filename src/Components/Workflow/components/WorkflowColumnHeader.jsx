@@ -24,16 +24,6 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
     >
       <Badge bg="white" c="white" size="lg">
         <Flex gap="xs">
-          <Text fw="bold" c="red">
-            {
-              filteredTickets.filter(
-                (ticket) =>
-                  ticket.creation_date === ticket.last_interaction_date,
-              ).length
-            }
-          </Text>
-
-          <Text c={colors.dark[7]}>/</Text>
 
           <Text fw="bold" c="green">
             {filteredTickets.length}
