@@ -231,7 +231,7 @@ export const Filter = ({
       size="lg"
       centered
       styles={{
-        content: { height: 900, display: "flex", flexDirection: "column" },
+        content: { height: 700, display: "flex", flexDirection: "column" },
         body: { flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" },
       }}
     >
