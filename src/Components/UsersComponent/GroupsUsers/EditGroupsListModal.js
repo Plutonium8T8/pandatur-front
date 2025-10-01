@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback, memo, startTransition } from "react";
 import {
     Modal,
     Button,
@@ -18,18 +18,157 @@ import { translations } from "../../utils/translations";
 import { useConfirmPopup, useGetTechniciansList } from "../../../hooks";
 import { useSnackbar } from "notistack";
 import {
-    getGroupUserMap,
     formatMultiSelectData,
-    createMultiSelectGroupHandler,
 } from "../../utils/multiSelectUtils";
+import { useDebounce } from "../../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
+
+// Оптимизированный компонент строки группы
+const GroupItem = memo(({ 
+    group, 
+    isExpanded, 
+    technicians, 
+    formattedTechnicians,
+    onToggle, 
+    onDelete, 
+    onSave,
+    loading 
+}) => {
+    // Локальное состояние для редактируемых полей
+    const [editableName, setEditableName] = useState(group.name || "");
+    const [supervisorId, setSupervisorId] = useState(group.supervisor_id?.toString() || null);
+    const [userIds, setUserIds] = useState(group.users?.map(String) || []);
+    const [searchValue, setSearchValue] = useState("");
+    
+    const debouncedSearch = useDebounce(searchValue, 300);
+
+    // Фильтрация для MultiSelect с лимитом
+    const filteredTechnicians = useMemo(() => {
+        if (!debouncedSearch) {
+            return formattedTechnicians.slice(0, 50); // Лимит по умолчанию
+        }
+        const filtered = formattedTechnicians.filter(tech => 
+            tech.label.toLowerCase().includes(debouncedSearch.toLowerCase())
+        );
+        return filtered.slice(0, 50);
+    }, [formattedTechnicians, debouncedSearch]);
+
+    // Обработчик сохранения с передачей данных наружу
+    const handleSave = useCallback(() => {
+        onSave(group.id, {
+            editableName,
+            supervisor_id: supervisorId,
+            user_ids: userIds
+        });
+    }, [group.id, editableName, supervisorId, userIds, onSave]);
+
+    // Обработчик удаления
+    const handleDelete = useCallback((e) => {
+        e.stopPropagation();
+        onDelete(group.id);
+    }, [group.id, onDelete]);
+
+    // Обработчик переключения раскрытия
+    const handleToggle = useCallback(() => {
+        onToggle(group.id);
+    }, [group.id, onToggle]);
+
+    // Обработчик изменения имени с startTransition
+    const handleNameChange = useCallback((e) => {
+        const value = e.target.value;
+        startTransition(() => {
+            setEditableName(value);
+        });
+    }, []);
+
+    // Обработчик изменения supervisor
+    const handleSupervisorChange = useCallback((val) => {
+        setSupervisorId(val || null);
+    }, []);
+
+    // Обработчик изменения users
+    const handleUsersChange = useCallback((val) => {
+        setUserIds(val);
+    }, []);
+
+    // Обработчик поиска в MultiSelect
+    const handleSearchChange = useCallback((value) => {
+        startTransition(() => {
+            setSearchValue(value);
+        });
+    }, []);
+
+    return (
+        <Paper withBorder p="sm" radius="md">
+            <Flex 
+                justify="space-between" 
+                align="center" 
+                onClick={handleToggle} 
+                className="pointer"
+                style={{ cursor: 'pointer' }}
+            >
+                <Text>{group.name}</Text>
+                <IoTrash
+                    color="red"
+                    onClick={handleDelete}
+                    style={{ cursor: 'pointer' }}
+                />
+            </Flex>
+
+            {isExpanded && (
+                <Collapse in={isExpanded}>
+                    <Stack mt="sm">
+                        <TextInput
+                            label={translations["Nume grup"][language]}
+                            placeholder={translations["Nume grup"][language]}
+                            value={editableName}
+                            onChange={handleNameChange}
+                            disabled={loading}
+                        />
+                        <Select
+                            label={translations["Team Lead"][language]}
+                            placeholder={translations["Selectați Team Lead"][language]}
+                            data={technicians}
+                            value={supervisorId}
+                            onChange={handleSupervisorChange}
+                            searchable
+                            clearable
+                            disabled={loading}
+                            limit={50}
+                        />
+                        <MultiSelect
+                            label={translations["Selectează operator"][language]}
+                            placeholder={translations["Selectează operator"][language]}
+                            data={filteredTechnicians}
+                            value={userIds}
+                            onChange={handleUsersChange}
+                            searchable
+                            clearable
+                            disabled={loading}
+                            searchValue={searchValue}
+                            onSearchChange={handleSearchChange}
+                            limit={50}
+                        />
+                        <Button 
+                            onClick={handleSave} 
+                            disabled={loading || !editableName.trim()}
+                        >
+                            {translations["Salvează"][language]}
+                        </Button>
+                    </Stack>
+                </Collapse>
+            )}
+        </Paper>
+    );
+});
+
+GroupItem.displayName = 'GroupItem';
 
 const EditGroupsListModal = ({ opened, onClose }) => {
     const [groups, setGroups] = useState([]);
     const [newGroup, setNewGroup] = useState("");
     const [expandedGroupId, setExpandedGroupId] = useState(null);
-    const [groupState, setGroupState] = useState({});
     const [loading, setLoading] = useState(false);
 
     const { enqueueSnackbar } = useSnackbar();
@@ -39,24 +178,12 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
     const { technicians } = useGetTechniciansList();
     const formattedTechnicians = useMemo(() => formatMultiSelectData(technicians), [technicians]);
-    const groupUserMap = useMemo(() => getGroupUserMap(technicians), [technicians]);
-    const handleMultiSelectChange = createMultiSelectGroupHandler({ groupUserMap, setGroupState });
 
-    const fetchGroups = async () => {
+    const fetchGroups = useCallback(async () => {
         setLoading(true);
         try {
             const data = await api.user.getGroupsList();
             setGroups(data.sort((a, b) => a.name.localeCompare(b.name)));
-
-            const initialState = {};
-            data.forEach((group) => {
-                initialState[group.id] = {
-                    supervisor_id: group.supervisor_id?.toString() || null,
-                    user_ids: group.users?.map(String) || [],
-                    editableName: group.name || "",
-                };
-            });
-            setGroupState(initialState);
         } catch (err) {
             enqueueSnackbar(translations["Eroare la încărcarea grupurilor"][language], {
                 variant: "error",
@@ -64,22 +191,15 @@ const EditGroupsListModal = ({ opened, onClose }) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [enqueueSnackbar]);
 
-    const handleAdd = async () => {
+    const handleAdd = useCallback(async () => {
         const trimmed = newGroup.trim();
         if (trimmed && !groups.find((g) => g.name === trimmed)) {
             try {
                 const created = await api.user.createGroup({ group_name: trimmed });
+                // Оптимистическое обновление
                 setGroups((prev) => [...prev, created].sort((a, b) => a.name.localeCompare(b.name)));
-                setGroupState((prev) => ({
-                    ...prev,
-                    [created.id]: {
-                        supervisor_id: created.supervisor_id?.toString() || null,
-                        user_ids: created.users?.map(String) || [],
-                        editableName: created.name || "",
-                    },
-                }));
                 setNewGroup("");
                 enqueueSnackbar(translations["Grup adăugat cu succes"][language], {
                     variant: "success",
@@ -88,15 +208,20 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 enqueueSnackbar(translations["Eroare la crearea grupului"][language], {
                     variant: "error",
                 });
+                // Откатываем изменения при ошибке
+                fetchGroups();
             }
         }
-    };
+    }, [newGroup, groups, enqueueSnackbar, fetchGroups]);
 
-    const handleDelete = async (groupId) => {
+    const handleDelete = useCallback((groupId) => {
         confirmDelete(async () => {
+            // Оптимистическое обновление
+            const deletedGroup = groups.find(g => g.id === groupId);
+            setGroups((prev) => prev.filter((g) => g.id !== groupId));
+            
             try {
                 await api.user.deleteGroups(groupId);
-                setGroups((prev) => prev.filter((g) => g.id !== groupId));
                 enqueueSnackbar(translations["Grup șters cu succes"][language], {
                     variant: "success",
                 });
@@ -104,17 +229,22 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                 enqueueSnackbar(translations["Eroare la ștergerea grupului"][language], {
                     variant: "error",
                 });
+                // Откатываем изменения при ошибке
+                if (deletedGroup) {
+                    setGroups((prev) => [...prev, deletedGroup].sort((a, b) => a.name.localeCompare(b.name)));
+                }
             }
         });
-    };
+    }, [confirmDelete, groups, enqueueSnackbar]);
 
-    const handleGroupToggle = (groupId) => {
+    const handleGroupToggle = useCallback((groupId) => {
         setExpandedGroupId((prev) => (prev === groupId ? null : groupId));
-    };
+    }, []);
 
-    const handleSave = async (groupId, groupName) => {
-        const current = groupState[groupId];
-        if (!groupName) {
+    const handleSave = useCallback(async (groupId, data) => {
+        const { editableName, supervisor_id, user_ids } = data;
+        
+        if (!editableName?.trim()) {
             enqueueSnackbar(translations["Completați toate câmpurile obligatorii"][language], {
                 variant: "warning",
             });
@@ -123,26 +253,35 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
         const payload = {
             group_id: groupId,
-            group_name: groupName,
-            user_ids: current.user_ids.map(Number),
+            group_name: editableName,
+            user_ids: user_ids.map(Number),
         };
 
-        if (current.supervisor_id) {
-            payload.supervisor_id = Number(current.supervisor_id);
+        if (supervisor_id) {
+            payload.supervisor_id = Number(supervisor_id);
         }
+
+        // Оптимистическое обновление
+        const oldGroups = [...groups];
+        setGroups((prev) => prev.map(g => 
+            g.id === groupId 
+                ? { ...g, name: editableName, supervisor_id, users: user_ids }
+                : g
+        ));
 
         try {
             await api.user.updateGroupData({ body: payload });
             enqueueSnackbar(translations["Grup actualizat cu succes"][language], {
                 variant: "success",
             });
-            fetchGroups();
         } catch (err) {
             enqueueSnackbar(translations["Eroare la actualizarea grupului"][language], {
                 variant: "error",
             });
+            // Откатываем изменения при ошибке
+            setGroups(oldGroups);
         }
-    };
+    }, [groups, enqueueSnackbar]);
 
     useEffect(() => {
         if (opened) {
@@ -151,9 +290,16 @@ const EditGroupsListModal = ({ opened, onClose }) => {
             setGroups([]);
             setNewGroup("");
             setExpandedGroupId(null);
-            setGroupState({});
         }
-    }, [opened]);
+    }, [opened, fetchGroups]);
+
+    // Обработчик изменения нового группы с startTransition
+    const handleNewGroupChange = useCallback((e) => {
+        const value = e.target.value;
+        startTransition(() => {
+            setNewGroup(value);
+        });
+    }, []);
 
     return (
         <Modal opened={opened} onClose={onClose} title={translations["Editează grupurile"][language]} size="md">
@@ -162,7 +308,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
                     <TextInput
                         placeholder={translations["Grup nou"][language]}
                         value={newGroup}
-                        onChange={(e) => setNewGroup(e.target.value)}
+                        onChange={handleNewGroupChange}
                         style={{ flex: 1 }}
                         disabled={loading}
                     />
@@ -186,69 +332,17 @@ const EditGroupsListModal = ({ opened, onClose }) => {
 
                 {!loading &&
                     groups.map((group) => (
-                        <Paper key={group.id} withBorder p="sm" radius="md">
-                            <Flex justify="space-between" align="center" onClick={() => handleGroupToggle(group.id)} className="pointer">
-                                <Text>{group.name}</Text>
-                                <IoTrash
-                                    color="red"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDelete(group.id);
-                                    }}
-                                />
-                            </Flex>
-
-                            <Collapse in={expandedGroupId === group.id}>
-                                <Stack mt="sm">
-                                    <TextInput
-                                        label={translations["Nume grup"][language]}
-                                        placeholder={translations["Nume grup"][language]}
-                                        value={groupState[group.id]?.editableName || ""}
-                                        onChange={(e) =>
-                                            setGroupState((prev) => ({
-                                                ...prev,
-                                                [group.id]: {
-                                                    ...prev[group.id],
-                                                    editableName: e.target.value,
-                                                },
-                                            }))
-                                        }
-                                        disabled={loading}
-                                    />
-                                    <Select
-                                        label={translations["Team Lead"][language]}
-                                        placeholder={translations["Selectați Team Lead"][language]}
-                                        data={technicians}
-                                        value={groupState[group.id]?.supervisor_id || null}
-                                        onChange={(val) =>
-                                            setGroupState((prev) => ({
-                                                ...prev,
-                                                [group.id]: {
-                                                    ...prev[group.id],
-                                                    supervisor_id: val || null,
-                                                },
-                                            }))
-                                        }
-                                        searchable
-                                        clearable
-                                        disabled={loading}
-                                    />
-                                    <MultiSelect
-                                        label={translations["Selectează operator"][language]}
-                                        placeholder={translations["Selectează operator"][language]}
-                                        data={formattedTechnicians}
-                                        value={groupState[group.id]?.user_ids || []}
-                                        onChange={handleMultiSelectChange(group.id)}
-                                        searchable
-                                        clearable
-                                        disabled={loading}
-                                    />
-                                    <Button onClick={() => handleSave(group.id, groupState[group.id]?.editableName)} disabled={loading}>
-                                        {translations["Salvează"][language]}
-                                    </Button>
-                                </Stack>
-                            </Collapse>
-                        </Paper>
+                        <GroupItem
+                            key={group.id}
+                            group={group}
+                            isExpanded={expandedGroupId === group.id}
+                            technicians={technicians}
+                            formattedTechnicians={formattedTechnicians}
+                            onToggle={handleGroupToggle}
+                            onDelete={handleDelete}
+                            onSave={handleSave}
+                            loading={loading}
+                        />
                     ))}
             </Stack>
         </Modal>
