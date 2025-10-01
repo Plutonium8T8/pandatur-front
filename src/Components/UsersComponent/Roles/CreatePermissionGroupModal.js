@@ -216,22 +216,21 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                     {/* Правая колонка - Список групп */}
                     <Grid.Col span={4}>
                         <Box>
-                            <Text fw={600} mb="xs">
+                            <Text fw={600} mb={4} size="xs">
                                 {translations["Grupuri existente"][language]}
                             </Text>
                             
                             {loading ? (
-                                <Center py="xl">
-                                    <Loader />
+                                <Center py="md">
+                                    <Loader size="sm" />
                                 </Center>
                             ) : existingGroups.length > 0 ? (
-                                <Stack gap="xs">
+                                <Stack gap={4}>
                                     {existingGroups.map((group) => (
                                         <Paper
                                             key={group.permission_id}
-                                            p="sm"
+                                            p={6}
                                             withBorder
-                                            shadow="xs"
                                             onClick={() => handleSelectGroup(group)}
                                             style={{
                                                 cursor: "pointer",
@@ -255,6 +254,7 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                             <Text 
                                                 fw={editingGroupId === group.permission_id ? 600 : 500}
                                                 c={editingGroupId === group.permission_id ? "blue" : "dark"}
+                                                size="xs"
                                             >
                                                 {group.permission_name}
                                             </Text>
@@ -262,8 +262,8 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                     ))}
                                 </Stack>
                             ) : (
-                                <Paper p="md" withBorder>
-                                    <Text size="sm" c="dimmed" ta="center">
+                                <Paper p={8} withBorder>
+                                    <Text size="xs" c="dimmed" ta="center">
                                         {translations["Nu există grupuri"][language]}
                                     </Text>
                                 </Paper>
