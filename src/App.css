@@ -1,19 +1,25 @@
 html {
-  zoom: 0.75;
-  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  height: 133.33vh;
   overflow: hidden;
+}
+
+#root {
+  zoom: 0.75;
 }
 
 body {
   margin: 0;
   padding: 0;
-  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
+  height: 133.33vh;
+  /* Компенсируем уменьшение высоты от zoom */
   overflow: hidden;
 }
 
 #root {
-  height: 133.33vh; /* Компенсируем уменьшение высоты от zoom */
-  width: 133.33vw; /* Компенсируем уменьшение ширины от zoom */
+  height: 133.33vh;
+  /* Компенсируем уменьшение высоты от zoom */
+  width: 133.33vw;
+  /* Компенсируем уменьшение ширины от zoom */
   overflow: hidden;
 }
 
