@@ -26,20 +26,18 @@ export const RcTable = ({
 }) => {
   return (
     <div className="table-container-custom">
-      <div className="rc-table-scroll-container">
-        <Table
-          className="table"
-          tableLayout="fixed"
-          emptyText={renderSpinOrEmptyBox(loading)}
-          rowClassName={({ id }) =>
-            `${bordered ? "border" : ""} ${selectedRow?.includes(id) ? "row-selection" : ""}`
-          }
-          columns={columns}
-          data={data}
-          scroll={{ x: true }}
-          {...props}
-        />
-      </div>
+      <Table
+        className="table"
+        tableLayout="fixed"
+        emptyText={renderSpinOrEmptyBox(loading)}
+        rowClassName={({ id }) =>
+          `${bordered ? "border" : ""} ${selectedRow?.includes(id) ? "row-selection" : ""}`
+        }
+        columns={columns}
+        data={data}
+        scroll={{ x: true }}
+        {...props}
+      />
     </div>
   );
 };

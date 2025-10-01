@@ -63,20 +63,13 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 500px;
-}
-
-/* TODO  fix height component */
-.rc-table-scroll-container {
-  max-height: calc(100vh - 140px);
-  overflow-y: auto;
-  position: relative;
+  height: 667px; /* Компенсируем zoom: 0.75 (500 * 1.3333) */
 }
 
 .table-container-custom {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 
 .table .rc-table-expanded-row-fixed {

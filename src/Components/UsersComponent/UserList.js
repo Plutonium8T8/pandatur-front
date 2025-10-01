@@ -169,12 +169,12 @@ const UserList = ({
     const isSelected = selectedIds.includes(userId);
 
     return (
-      <Card 
-        shadow="sm" 
-        padding="md" 
-        radius="md" 
+      <Card
+        shadow="sm"
+        padding="md"
+        radius="md"
         withBorder
-        style={{ 
+        style={{
           opacity: isSelected ? 0.7 : 1,
           borderColor: isSelected ? '#0f824c' : undefined
         }}
@@ -234,7 +234,7 @@ const UserList = ({
             <Text size="xs" c="dimmed">ID:</Text>
             <Text size="xs">{user.id}</Text>
           </Group>
-          
+
           <Group justify="space-between">
             <Text size="xs" c="dimmed">{translations["Email"][language]}:</Text>
             <Text size="xs" style={{ wordBreak: 'break-word' }}>{user.email}</Text>
@@ -265,8 +265,8 @@ const UserList = ({
 
           <Group justify="space-between">
             <Text size="xs" c="dimmed">{translations["Status"][language]}:</Text>
-            <Badge 
-              size="xs" 
+            <Badge
+              size="xs"
               color={user.status ? "green" : "red"}
             >
               {user.status
@@ -464,8 +464,8 @@ const UserList = ({
           )}
 
           {canEdit && (
-            <Button 
-              variant="light" 
+            <Button
+              variant="light"
               onClick={() => setGroupModalOpen(true)}
               size={isMobile ? "sm" : "md"}
             >
@@ -510,9 +510,9 @@ const UserList = ({
       />
 
       {isMobile ? (
-        <div 
-          style={{ 
-            height: "calc(100vh - 300px)", 
+        <div
+          style={{
+            height: "calc(133.33vh - 400px)", // Компенсируем zoom: 0.75
             overflowY: "auto",
             paddingRight: "8px"
           }}
@@ -525,21 +525,23 @@ const UserList = ({
           </Stack>
         </div>
       ) : (
-        <RcTable
-          rowKey={(row) => extractId(row)}
-          columns={columns}
-          data={users}
-          loading={loading}
-          bordered
-          selectedRow={[]}
-          pagination={false}
-          scroll={{ y: "calc(100vh - 200px)" }}
-          onRow={(row) => ({
-            onDoubleClick: () => {
-              if (canEdit) openEditUser(row);
-            },
-          })}
-        />
+        <div style={{ height: "calc(133.33vh - 148px)" }}>
+          <RcTable
+            rowKey={(row) => extractId(row)}
+            columns={columns}
+            data={users}
+            loading={loading}
+            bordered
+            selectedRow={[]}
+            pagination={false}
+            scroll={{ y: "100%" }}
+            onRow={(row) => ({
+              onDoubleClick: () => {
+                if (canEdit) openEditUser(row);
+              },
+            })}
+          />
+        </div>
       )}
     </>
   );
