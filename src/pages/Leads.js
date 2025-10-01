@@ -5,7 +5,7 @@ import { Divider, Modal, Button, ActionIcon, Input, SegmentedControl, Flex, Sele
 import { useDOMElementHeight, useApp, useConfirmPopup, useGetTechniciansList } from "@hooks";
 import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
-import { SpinnerRightBottom, MantineModal, AddLeadModal, PageHeader, Spin } from "@components";
+import { SpinnerRightBottom, AddLeadModal, PageHeader, Spin } from "@components";
 import { WorkflowColumns } from "../Components/Workflow/WorkflowColumns";
 import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
@@ -488,16 +488,25 @@ export const Leads = () => {
       {spinnerTickets && <SpinnerRightBottom />}
       {kanbanSpinner && viewMode === VIEW_MODE.KANBAN && <SpinnerRightBottom />}
 
-      <MantineModal
-        title={false}
-        fullScreen
-        open={isChatOpen && ticketId}
-        withCloseButton={false}
-        height="100%"
+      <Modal
+        opened={isChatOpen && !!ticketId}
         onClose={closeChatModal}
+        size="100%"
+        fullScreen
+        withCloseButton={false}
+        styles={{
+          content: {
+            height: "100vh",
+            maxHeight: "100vh",
+          },
+          body: {
+            height: "100%",
+            padding: 0,
+          },
+        }}
       >
         <SingleChat ticketId={ticketId} onClose={closeChatModal} technicians={technicians} />
-      </MantineModal>
+      </Modal>
 
       <Modal
         opened={isOpenAddLeadModal}

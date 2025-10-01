@@ -17,9 +17,7 @@ body {
 
 #root {
   height: 133.33vh;
-  /* Компенсируем уменьшение высоты от zoom */
   width: 133.33vw;
-  /* Компенсируем уменьшение ширины от zoom */
   overflow: hidden;
 }
 
@@ -198,4 +196,21 @@ a {
 
 [data-mantine-color-scheme] .mantine-SegmentedControl-indicator {
   zoom: 1.3333;
+}
+
+/* Компенсация zoom для Mantine Modal */
+[data-mantine-color-scheme] .mantine-Modal-root {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Modal-content {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Modal-body {
+  zoom: 0.75;
+}
+
+[data-mantine-color-scheme] .mantine-Modal-header {
+  zoom: 0.75;
 }

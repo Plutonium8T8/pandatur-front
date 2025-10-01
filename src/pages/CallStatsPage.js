@@ -8,6 +8,7 @@ import {
   Text,
   Paper,
   Group,
+  Modal,
 } from "@mantine/core";
 import { useParams, useNavigate } from "react-router-dom";
 import { dashboard } from "../api/dashboard";
@@ -16,7 +17,7 @@ import { PageHeader } from "../Components/PageHeader";
 import { LuFilter } from "react-icons/lu";
 import { CallListTable } from "../Components/CallStats/CallListTable";
 import { CallStatsChartCard } from "../Components/CallStats/CallStatsChartCards";
-import { MantineModal, Spin } from "@components";
+import { Spin } from "@components";
 import SingleChat from "@components/ChatComponent/SingleChat";
 import { getLanguageByKey } from "../Components/utils";
 import { CallStatsFilterModal } from "../Components/CallStats/CallStatsFilterModal";
@@ -341,14 +342,22 @@ export const CallStatsPage = () => {
         mode={mode}
       />
 
-      <MantineModal
-        fullScreen
-        open={!!ticketId}
+      <Modal
+        opened={!!ticketId}
         onClose={closeChat}
-        title={false}
+        size="100%"
+        fullScreen
         withCloseButton={false}
-        style={{ padding: 0 }}
-        height="100%"
+        styles={{
+          content: {
+            height: "100vh",
+            maxHeight: "100vh",
+          },
+          body: {
+            height: "100%",
+            padding: 0,
+          },
+        }}
       >
         {ticketId && (
           <SingleChat
@@ -357,7 +366,7 @@ export const CallStatsPage = () => {
             technicians={technicians}
           />
         )}
-      </MantineModal>
+      </Modal>
     </Box>
   );
 };
