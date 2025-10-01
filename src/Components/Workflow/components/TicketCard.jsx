@@ -80,18 +80,36 @@ export const TicketCard = ({
                 if (!canEdit && !canDelete) return null;
 
                 return (
-                  <Box
+                  <div
+                    style={{
+                      position: "absolute",
+                      right: "16px",
+                      top: "16px",
+                      zIndex: 10,
+                      pointerEvents: "auto"
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }}
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    pos="absolute"
-                    right="16px"
-                    top="16px"
                   >
                     <Menu shadow="md">
                       <Menu.Target>
-                        <ActionIcon variant="default">
+                        <ActionIcon 
+                          variant="default"
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
                           <BsThreeDots />
                         </ActionIcon>
                       </Menu.Target>
@@ -99,7 +117,11 @@ export const TicketCard = ({
                       <Menu.Dropdown>
                         {canEdit && (
                           <Menu.Item
-                            onClick={() => onEditTicket(ticket)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              onEditTicket(ticket);
+                            }}
                             leftSection={<MdModeEdit />}
                           >
                             {getLanguageByKey("edit")}
@@ -110,7 +132,11 @@ export const TicketCard = ({
 
                         {canDelete && (
                           <Menu.Item
-                            onClick={() => onDeleteTicket(ticket.id)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              onDeleteTicket(ticket.id);
+                            }}
                             color="red"
                             leftSection={<MdDelete />}
                           >
@@ -119,7 +145,7 @@ export const TicketCard = ({
                         )}
                       </Menu.Dropdown>
                     </Menu>
-                  </Box>
+                  </div>
                 );
               }}
             </Can>
