@@ -132,7 +132,7 @@ export const WorkflowColumn = ({
       bg={colors.white}
       style={{
         borderRadius: 32,
-        flex: "0 0 440px",
+        flex: "0 0 400px",
       }}
     >
       <WorkflowColumnHeader
@@ -140,7 +140,7 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <Flex mt={30} px="8px" direction="column" h="100%" pb="50px" ref={columnRef}>
+      <Flex mt={30} direction="column" h="100%" pb="50px" ref={columnRef}>
         <VariableSizeList
           ref={listRef}
           height={columnHeight}

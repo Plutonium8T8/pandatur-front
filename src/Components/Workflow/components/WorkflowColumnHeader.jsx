@@ -18,14 +18,14 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
       align="center"
       style={{
         backgroundColor: getBrightByWorkflowType(workflow, ""),
-        borderRadius: "50px",
+        borderRadius: "12px",
         zIndex: 1,
       }}
     >
-      <Badge bg="white" c="white" size="lg">
+      <Badge bg="transparent" size="xs">
         <Flex gap="xs">
 
-          <Text fw="bold" c="green">
+          <Text fw="bold" c="black">
             {filteredTickets.length}
           </Text>
         </Flex>

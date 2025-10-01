@@ -19,6 +19,7 @@ import {
 import { parseServerDate, getLanguageByKey } from "../../utils";
 import { DEFAULT_PHOTO, YYYY_MM_DD } from "../../../app-constants";
 import Can from "../../CanComponent/Can";
+import { useUser } from "../../../hooks";
 
 const { colors } = DEFAULT_THEME;
 
@@ -36,17 +37,22 @@ export const TicketCard = ({
   onDeleteTicket,
   technician,
 }) => {
+  const { user } = useUser();
   const responsibleId = String(ticket.technician_id || "");
+  const isMyTicket = user?.id && String(user.id) === responsibleId;
 
   return (
     <Link to={`/leads/${ticket.id}`}>
       <Card
         withBorder
-        shadow="sm"
-        radius="lg"
+        radius="md"
         pos="relative"
-        bg="#f8f9fa"
+        bg={isMyTicket ? "#e7f5ff" : "#f8f9fa"}
         p="8px"
+        style={{
+          borderColor: isMyTicket ? "#339af0" : undefined,
+          borderWidth: isMyTicket ? "2px" : undefined,
+        }}
       >
         <Box
           w="8"
@@ -110,9 +116,9 @@ export const TicketCard = ({
           )}
         </Can>
 
-        <Box p="8" pos="relative">
+        <Box p={4} pos="relative">
           {/* Фото и основная информация */}
-          <Flex align="flex-start" gap="xs" mb="xs">
+          <Flex align="flex-start" gap="xs" >
             <Box w="48" h="48" style={{ flexShrink: 0, borderRadius: '50%', overflow: 'hidden' }}>
               <Image
                 src={ticket?.clients?.[0]?.photo || ticket?.photo_url || DEFAULT_PHOTO}
@@ -178,7 +184,6 @@ export const TicketCard = ({
             <Text
               size="xs"
               c={colors.black}
-              mb="xs"
               style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
