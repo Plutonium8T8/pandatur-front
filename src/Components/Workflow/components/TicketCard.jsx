@@ -57,10 +57,10 @@ export const TicketCard = ({
         withBorder
         radius="md"
         pos="relative"
-        bg={isMyTicket ? "#e7f5ff" : "#f8f9fa"}
+        bg={isMyTicket ? "#dcfce7" : "#f8f9fa"}
         p="8px"
         style={{
-          borderColor: isMyTicket ? "#339af0" : undefined,
+          borderColor: isMyTicket ? "#22c55e" : undefined,
           borderWidth: isMyTicket ? "2px" : undefined,
         }}
       >
@@ -264,13 +264,19 @@ export const TicketCard = ({
               <Box />
             )}
 
-            {/* Task placeholder */}
+            {/* Task count */}
             <Text
               size="xs"
-              c={colors.gray[5]}
-              style={{ fontSize: '10px' }}
+              c={ticket.active_task_count > 0 ? (isMyTicket ? colors.blue[6] : colors.orange[6]) : colors.gray[5]}
+              fw={ticket.active_task_count > 0 ? "bold" : "normal"}
+              style={{ 
+                fontSize: '10px',
+                backgroundColor: ticket.active_task_count > 0 ? (isMyTicket ? colors.green[0] : colors.orange[0]) : 'transparent',
+                padding: ticket.active_task_count > 0 ? '2px 6px' : '0',
+                borderRadius: ticket.active_task_count > 0 ? '4px' : '0'
+              }}
             >
-              Task
+              {ticket.active_task_count > 0 ? `${ticket.active_task_count} tasks` : 'No tasks'}
             </Text>
           </Flex>
         </Box>
