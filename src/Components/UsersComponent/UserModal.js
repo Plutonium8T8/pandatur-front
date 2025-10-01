@@ -591,11 +591,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           ? translations["Modificați utilizator"][language]
           : translations["Adaugă utilizator"][language]
       }
-      padding="md"
-      size="xl"
+      padding="lg"
+      size="lg"
     >
       <Group align="flex-start" spacing="xl">
-        <Avatar src={DEFAULT_PHOTO} size={120} />
+        <Avatar src={DEFAULT_PHOTO} size={60} />
         <div style={{ flex: 1 }}>
           {formContent}
         </div>

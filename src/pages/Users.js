@@ -17,7 +17,7 @@ import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { translations } from "@utils";
 import { PageHeader } from "@components";
-import UserModal from "@components/UsersComponent/UserModal";
+import UserModal from "../Components/UsersComponent/UserModal";
 import UserList from "@components/UsersComponent/UserList";
 import EditGroupsListModal from "@components/UsersComponent/GroupsUsers/EditGroupsListModal";
 import CreatePermissionGroupModal from "@components/UsersComponent/Roles/CreatePermissionGroupModal";
