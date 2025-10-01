@@ -195,3 +195,7 @@ a {
   overflow-wrap: break-word;
   white-space: normal;
 }
+
+[data-mantine-color-scheme] .mantine-SegmentedControl-indicator {
+  zoom: 1.3333;
+}
