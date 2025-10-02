@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@mantine/core";
 import { IoMdAdd } from "react-icons/io";
-import SchedulesList from "@components/Schedules/SchedulesGroupList";
+import SchedulesList from "../Components/Schedules/SchedulesGroupList";
 import { translations } from "@utils";
 import ModalGroup from "@components/Schedules/ModalGroup";
 import { PageHeader } from "@components";
