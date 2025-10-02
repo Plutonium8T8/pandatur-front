@@ -173,14 +173,14 @@ export const EventsList = () => {
 
     return (
         <Box
-            h="calc(100vh - 24px)"
+            h="120vh"
             style={{
-                overflowY: "auto",
                 background: COLORS.bgMain,
-                minHeight: "100vh",
+                display: "flex",
+                flexDirection: "column",
             }}
         >
-            <Box px={32} mb={32}>
+            <Box px={32} py={24} style={{ flexShrink: 0 }}>
                 <Flex align="center" justify="space-between" gap={24}>
                     <PageHeader
                         title={getLanguageByKey("Events")}
@@ -203,26 +203,32 @@ export const EventsList = () => {
                     </Flex>
                 </Flex>
             </Box>
-            <Box px={32}>
-                <RcTable
-                    columns={columns}
-                    data={data}
-                    loading={loading}
-                    rowKey="id"
-                    style={{ minWidth: 920 }}
-                    scroll={{ y: "calc(100vh - 350px)" }}
-                />
-                <Flex justify="center" mt={24} mb={40}>
-                    <Pagination
-                        total={pagination.total_pages}
-                        value={pagination.page}
-                        onChange={page => {
-                            setPagination(prev => ({ ...prev, page }));
-                            fetchData(page, filters);
-                        }}
-                        size="md"
+            
+            <Box px={32} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                    <RcTable
+                        columns={columns}
+                        data={data}
+                        loading={loading}
+                        rowKey="id"
+                        style={{ minWidth: 920, height: "100%" }}
+                        scroll={{ y: "100%" }}
                     />
-                </Flex>
+                </div>
+                
+                <Box style={{ flexShrink: 0, padding: "24px 0 40px 0" }}>
+                    <Flex justify="center">
+                        <Pagination
+                            total={pagination.total_pages}
+                            value={pagination.page}
+                            onChange={page => {
+                                setPagination(prev => ({ ...prev, page }));
+                                fetchData(page, filters);
+                            }}
+                            size="md"
+                        />
+                    </Flex>
+                </Box>
             </Box>
             <EventsFilterModal
                 opened={filterModalOpen}
