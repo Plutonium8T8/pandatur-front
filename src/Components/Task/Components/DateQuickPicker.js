@@ -1,68 +1,126 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button, Popover, Flex, Stack, TextInput } from "@mantine/core";
 import { DatePicker, TimeInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { applyOffset, quickOptions, translations } from "../../utils";
-import { YYYY_MM_DD, HH_mm } from "../../../app-constants";
+import { HH_mm } from "../../../app-constants";
 
 const language = localStorage.getItem("language") || "RO";
 
-const coerceToDate = (val) => {
+// Универсальная функция парсинга даты
+const parseDate = (val) => {
     if (!val) return null;
     if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
-    if (typeof val === "number") {
-        const d = new Date(val);
-        return isNaN(d.getTime()) ? null : d;
-    }
+    if (typeof val === "number") return new Date(val);
     if (typeof val === "string") {
-        const s = val.trim().replace(" ", "T").replace(/Z$/, "");
-        const d = new Date(s);
-        return isNaN(d.getTime()) ? null : d;
+        const s = val.trim();
+        // Пробуем разные форматы
+        if (s.match(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/)) {
+            return new Date(s);
+        }
+        if (s.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+            return new Date(s);
+        }
+        if (s.match(/^\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}:\d{2}$/)) {
+            const [datePart, timePart] = s.split(" ");
+            const [day, month, year] = datePart.split(".").map(Number);
+            return new Date(year, month - 1, day, ...timePart.split(":").map(Number));
+        }
+        return new Date(s);
     }
     return null;
 };
 
-const buildDate = (dateStr, timeStr) => {
+// Создание даты из строк даты и времени
+const createDate = (dateStr, timeStr) => {
     if (!dateStr) return null;
-    const ds = dateStr.replace(/\./g, "-");
-    const [y, m, d] = ds.split("-").map((x) => Number(x));
-    const [hh, mm] = (timeStr || "00:00").split(":").map((x) => Number(x));
-    if (!y || !m || !d) return null;
-    const dt = new Date(y, m - 1, d, hh || 0, mm || 0, 0);
-    return isNaN(dt.getTime()) ? null : dt;
+
+    let year, month, day;
+    if (dateStr.includes("-")) {
+        [year, month, day] = dateStr.split("-").map(Number);
+    } else if (dateStr.includes(".")) {
+        [day, month, year] = dateStr.split(".").map(Number);
+    } else {
+        return null;
+    }
+
+    const [hour, minute] = (timeStr || "00:00").split(":").map(Number);
+    if (!year || !month || !day) return null;
+
+    const date = new Date(year, month - 1, day, hour || 0, minute || 0, 0);
+    return isNaN(date.getTime()) ? null : date;
 };
 
 const DateQuickInput = ({ value, onChange, disabled = false }) => {
     const [popoverOpen, setPopoverOpen] = useState(false);
-    const [date, setDate] = useState("");
-    const [time, setTime] = useState("");
+    const [internalDate, setInternalDate] = useState("");
+    const [internalTime, setInternalTime] = useState("");
 
+    // Инициализация внутреннего состояния из внешнего value
     useEffect(() => {
-        const d = coerceToDate(value);
-        if (d) {
-            const dj = dayjs(d);
-            setDate(dj.format(YYYY_MM_DD));
-            setTime(dj.format(HH_mm));
+        const parsedDate = parseDate(value);
+        if (parsedDate) {
+            const dayjsDate = dayjs(parsedDate);
+            setInternalDate(dayjsDate.format("YYYY-MM-DD"));
+            setInternalTime(dayjsDate.format(HH_mm));
         } else {
-            setDate("");
-            setTime("");
+            setInternalDate("");
+            setInternalTime("");
         }
     }, [value]);
 
-    const composed = useMemo(() => buildDate(date, time), [date, time]);
-    const display = composed ? dayjs(composed).format("YYYY-MM-DD HH:mm:ss") : "";
+    // Создание итоговой даты из внутреннего состояния
+    const finalDate = createDate(internalDate, internalTime);
+    const displayValue = finalDate ? dayjs(finalDate).format("YYYY-MM-DD HH:mm:ss") : "";
 
-    useEffect(() => {
-        if (!disabled && composed && onChange) onChange(composed);
-    }, [composed, disabled, onChange]);
+    // Уведомление родительского компонента об изменении
+    const notifyChange = useCallback((newDate) => {
+        if (!disabled && onChange && newDate) {
+            onChange(newDate);
+        }
+    }, [disabled, onChange]);
 
-    const handleQuickSelect = (option) => {
+    // Обработка быстрого выбора
+    const handleQuickSelect = useCallback((option) => {
         if (disabled) return;
-        const base = composed && dayjs(composed).isAfter(dayjs()) ? dayjs(composed) : dayjs();
-        const result = option.custom ? option.custom() : applyOffset(base, option.offset);
-        setDate(result.format(YYYY_MM_DD));
-        setTime(result.format(HH_mm));
-    };
+
+        const baseDate = finalDate && dayjs(finalDate).isAfter(dayjs()) ? dayjs(finalDate) : dayjs();
+        const resultDate = option.custom ? option.custom() : applyOffset(baseDate, option.offset);
+
+        const newDateStr = resultDate.format("YYYY-MM-DD");
+        const newTimeStr = resultDate.format(HH_mm);
+
+        setInternalDate(newDateStr);
+        setInternalTime(newTimeStr);
+
+        // Сразу уведомляем об изменении
+        const newDate = createDate(newDateStr, newTimeStr);
+        notifyChange(newDate);
+    }, [disabled, finalDate, notifyChange]);
+
+    // Обработка изменения даты
+    const handleDateChange = useCallback((newDateStr) => {
+        setInternalDate(newDateStr);
+        const newDate = createDate(newDateStr, internalTime);
+        notifyChange(newDate);
+    }, [internalTime, notifyChange]);
+
+    // Обработка изменения времени
+    const handleTimeChange = useCallback((newTimeStr) => {
+        setInternalTime(newTimeStr);
+        const newDate = createDate(internalDate, newTimeStr);
+        notifyChange(newDate);
+    }, [internalDate, notifyChange]);
+
+    // Обработка выбора из DatePicker
+    const handleDatePickerChange = useCallback((date) => {
+        if (date) {
+            const newDateStr = dayjs(date).format("YYYY-MM-DD");
+            setInternalDate(newDateStr);
+            const newDate = createDate(newDateStr, internalTime);
+            notifyChange(newDate);
+        }
+    }, [internalTime, notifyChange]);
 
     return (
         <Popover
@@ -74,7 +132,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
         >
             <Popover.Target>
                 <TextInput
-                    value={display}
+                    value={displayValue}
                     readOnly
                     onClick={() => !disabled && setPopoverOpen(true)}
                     label={translations["Deadline"][language]}
@@ -85,6 +143,7 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
 
             <Popover.Dropdown>
                 <Flex gap="md" align="flex-start">
+                    {/* Быстрые опции */}
                     <Stack gap="xs" w={180}>
                         {quickOptions.map((option) => (
                             <Button
@@ -100,23 +159,24 @@ const DateQuickInput = ({ value, onChange, disabled = false }) => {
                         ))}
                     </Stack>
 
+                    {/* Ручной ввод */}
                     <Stack gap="xs">
                         <TextInput
                             label={translations["Date"][language]}
-                            value={date}
-                            onChange={(e) => setDate(e.currentTarget.value)}
+                            value={internalDate}
+                            onChange={(e) => handleDateChange(e.currentTarget.value)}
                             placeholder="yyyy-mm-dd / dd.mm.yyyy"
                             disabled={disabled}
                         />
                         <TimeInput
                             label={translations["Hour"][language]}
-                            value={time}
-                            onChange={(e) => setTime(e.currentTarget.value)}
+                            value={internalTime}
+                            onChange={(e) => handleTimeChange(e.currentTarget.value)}
                             disabled={disabled}
                         />
                         <DatePicker
-                            value={composed ?? null}
-                            onChange={(d) => d && setDate(dayjs(d).format(YYYY_MM_DD))}
+                            value={finalDate ?? null}
+                            onChange={handleDatePickerChange}
                             size="md"
                             minDate={new Date()}
                             disabled={disabled}

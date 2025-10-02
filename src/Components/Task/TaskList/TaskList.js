@@ -6,7 +6,7 @@ import { translations } from "../../utils/translations";
 import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
-import { Menu, Button, Flex } from "@mantine/core";
+import { Menu, Button, Flex, Text } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components/WorkflowTag";
@@ -200,6 +200,18 @@ const TaskList = ({
         ),
       },
       {
+        title: translations["ID"][language],
+        dataIndex: "id",
+        key: "id",
+        width: 80,
+        align: "center",
+        render: (id) => (
+          <Text size="sm" fw={600} c="blue">
+            #{id}
+          </Text>
+        ),
+      },
+      {
         title: translations["Deadline"][language],
         dataIndex: "scheduled_time",
         key: "scheduled_time",
@@ -312,7 +324,7 @@ const TaskList = ({
         render: (_, row) => <ActionMenu row={row} />,
       },
     ],
-    [language, selectedRow, currentUserId, allSelected, tasks]
+    [selectedRow, allSelected, tasks]
   );
 
   return (
