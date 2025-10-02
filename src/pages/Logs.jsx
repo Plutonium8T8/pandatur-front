@@ -213,7 +213,6 @@ export const Logs = () => {
             rowKey="id"
             columns={rcColumn}
             data={logList}
-            scroll={{ y: 'calc(100vh - 220px)' }}
           />
           <Flex
             pt="10"
