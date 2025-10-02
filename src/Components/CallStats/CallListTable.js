@@ -175,7 +175,7 @@ export const CallListTable = ({
                     data={data}
                     bordered
                     loading={false}
-                    scroll={{ y: "calc(100vh - 330px)" }}
+                    scroll={{ y: "calc(100vh" }}
                     rowKey={(_, index) => `row_${index}`}
                     style={{ opacity: overlayVisible ? 0.7 : 1, transition: "opacity .15s ease" }}
                 />

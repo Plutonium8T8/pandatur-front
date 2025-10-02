@@ -167,7 +167,7 @@ export const CallStatsPage = () => {
       style={{
         overflowY: "auto",
         background: COLORS.bgMain,
-        minHeight: "100vh",
+        minHeight: "120vh",
         paddingBottom: 130,
       }}
     >
