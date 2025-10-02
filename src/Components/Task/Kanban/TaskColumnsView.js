@@ -2,6 +2,7 @@ import React from "react";
 import { Box } from "@mantine/core";
 import dayjs from "dayjs";
 import TaskColumn from "./TaskColumn";
+import "./TaskKanban.css";
 
 // Универсальная функция парсинга даты
 const parseTaskDate = (dateString) => {
@@ -67,16 +68,16 @@ const TaskColumnsView = ({ tasks = [], onEdit }) => {
     const { grouped, now } = groupTasksByDate(tasks);
 
     return (
-        <Box mt="md" display="flex" gap="md" h="85vh">
+        <Box className="task-columns-container">
             {TASK_GROUPS.map((key) => (
-                <Box key={key} flex={1} display="flex">
-                    <TaskColumn
-                        titleKey={`${key}Tasks`}
-                        tasksList={grouped[key]}
-                        now={now}
-                        onEdit={onEdit}
-                    />
-                </Box>
+                <TaskColumn
+                    key={key}
+                    titleKey={`${key}Tasks`}
+                    tasksList={grouped[key]}
+                    now={now}
+                    onEdit={onEdit}
+                    columnType={key}
+                />
             ))}
         </Box>
     );

@@ -143,8 +143,6 @@ const TaskModal = ({
         task_type: task.taskType,
         created_by: task.createdBy,
         created_for: task.createdFor,
-        priority: "",
-        status_task: "",
       };
 
       if (selectedTask) {

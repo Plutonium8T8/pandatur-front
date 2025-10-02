@@ -1,8 +1,8 @@
 import React from "react";
-import { Paper, ScrollArea, Stack, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import TaskCard from "./TaskCard";
 import { translations } from "../../utils/translations";
+import "./TaskKanban.css";
 
 // Универсальная функция парсинга даты
 const parseTaskDate = (dateString) => {
@@ -29,47 +29,56 @@ const parseTaskDate = (dateString) => {
 
 const language = localStorage.getItem("language") || "RO";
 
-const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
-    return (
-        <Paper
-            withBorder
-            shadow="xs"
-            p="xl"
-            radius="md"
-            h="100%"
-            style={{ flex: 1, display: "flex", flexDirection: "column" }}
-        >
-            <Text fw={600} size="md" mb="xs">
-                {translations[titleKey][language]} — {tasksList.length}
-            </Text>
+const TaskColumn = ({ titleKey, tasksList, now, onEdit, columnType }) => {
+    const getColumnConfig = (key) => {
+        const configs = {
+            overdue: { icon: "⚠️", title: "Просроченные" },
+            today: { icon: "📅", title: "Сегодня" },
+            tomorrow: { icon: "⏰", title: "Завтра" }
+        };
+        return configs[key] || { icon: "📋", title: "Задачи" };
+    };
 
-            <ScrollArea style={{ flex: 1 }}>
-                <Stack gap="sm">
-                    {tasksList.length === 0 ? (
-                        <Text c="dimmed" size="sm">
-                            {translations["noTasks"][language]}
-                        </Text>
-                    ) : (
-                        tasksList.map((task) => {
-                            const deadline = parseTaskDate(task.scheduled_time);
-                            if (!deadline || !deadline.isValid()) {
-                                console.log("Не удалось распарсить дату в TaskColumn:", task.id, task.scheduled_time);
-                                return null;
-                            }
-                            return (
-                                <TaskCard
-                                    key={task.id}
-                                    task={task}
-                                    deadline={deadline}
-                                    now={now}
-                                    onClick={onEdit}
-                                />
-                            );
-                        })
-                    )}
-                </Stack>
-            </ScrollArea>
-        </Paper>
+    const config = getColumnConfig(columnType);
+
+    return (
+        <div className={`task-column ${columnType}`}>
+            {/* Заголовок колонки */}
+            <div className="task-column-header">
+                <h3 className="task-column-title">
+                    {config.icon} {translations[titleKey][language]}
+                    <span className="task-count">
+                        {tasksList.length}
+                    </span>
+                </h3>
+            </div>
+
+            {/* Список задач */}
+            <div style={{ flex: 1, overflowY: "auto" }}>
+                {tasksList.length === 0 ? (
+                    <div className="task-empty">
+                        {translations["noTasks"][language]}
+                    </div>
+                ) : (
+                    tasksList.map((task) => {
+                        const deadline = parseTaskDate(task.scheduled_time);
+                        if (!deadline || !deadline.isValid()) {
+                            console.log("Не удалось распарсить дату в TaskColumn:", task.id, task.scheduled_time);
+                            return null;
+                        }
+                        return (
+                            <TaskCard
+                                key={task.id}
+                                task={task}
+                                deadline={deadline}
+                                now={now}
+                                onClick={onEdit}
+                            />
+                        );
+                    })
+                )}
+            </div>
+        </div>
     );
 };
 
