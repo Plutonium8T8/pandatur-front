@@ -17,6 +17,8 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: all 0.2s ease;
   min-height: 500px;
+  display: flex;
+  flex-direction: column;
 }
 
 .task-column.overdue {
@@ -44,6 +46,14 @@
   border-bottom: 2px solid #e2e8f0;
   background: #f8fafc;
   border-radius: 6px 6px 0 0;
+  flex-shrink: 0;
+}
+
+.task-list-scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  max-height: calc(133vh - 200px);
 }
 
 .task-column.overdue .task-column-header {
@@ -178,6 +188,7 @@
   margin-bottom: 12px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -285,6 +296,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 

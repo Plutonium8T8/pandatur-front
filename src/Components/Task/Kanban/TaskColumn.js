@@ -39,7 +39,7 @@ const TaskColumn = ({ titleKey, tasksList, now, onEdit, columnType }) => {
             </div>
 
             {/* Список задач */}
-            <div style={{ flex: 1, overflowY: "auto" }}>
+            <div className="task-list-scroll-area">
                 {tasksList.length === 0 ? (
                     <div className="task-empty">
                         {translations["noTasks"][language]}
