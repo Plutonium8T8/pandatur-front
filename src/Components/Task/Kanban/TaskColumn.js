@@ -4,6 +4,29 @@ import dayjs from "dayjs";
 import TaskCard from "./TaskCard";
 import { translations } from "../../utils/translations";
 
+// Универсальная функция парсинга даты
+const parseTaskDate = (dateString) => {
+  if (!dateString) return null;
+  
+  // Пробуем разные форматы
+  let parsed = dayjs(dateString);
+  if (parsed.isValid()) return parsed;
+  
+  // Пробуем формат DD-MM-YYYY HH:mm:ss
+  parsed = dayjs(dateString, "DD-MM-YYYY HH:mm:ss");
+  if (parsed.isValid()) return parsed;
+  
+  // Пробуем формат YYYY-MM-DD HH:mm:ss
+  parsed = dayjs(dateString, "YYYY-MM-DD HH:mm:ss");
+  if (parsed.isValid()) return parsed;
+  
+  // Пробуем ISO формат
+  parsed = dayjs(dateString, "YYYY-MM-DDTHH:mm:ss");
+  if (parsed.isValid()) return parsed;
+  
+  return null;
+};
+
 const language = localStorage.getItem("language") || "RO";
 
 const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
@@ -28,7 +51,11 @@ const TaskColumn = ({ titleKey, tasksList, now, onEdit }) => {
                         </Text>
                     ) : (
                         tasksList.map((task) => {
-                            const deadline = dayjs(task.scheduled_time, "DD-MM-YYYY HH:mm:ss");
+                            const deadline = parseTaskDate(task.scheduled_time);
+                            if (!deadline || !deadline.isValid()) {
+                                console.log("Не удалось распарсить дату в TaskColumn:", task.id, task.scheduled_time);
+                                return null;
+                            }
                             return (
                                 <TaskCard
                                     key={task.id}

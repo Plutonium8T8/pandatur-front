@@ -17,8 +17,54 @@ import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { parseDate, formatDate } from "../utils/date";
 import { useGetTechniciansList, useUser } from "../../hooks";
+import dayjs from "dayjs";
 
 const language = localStorage.getItem("language") || "RO";
+
+// Универсальная функция парсинга даты
+const parseTaskDate = (dateString) => {
+  if (!dateString) return null;
+  
+  console.log("Парсинг даты:", dateString);
+  
+  // Пробуем разные форматы
+  let parsed = dayjs(dateString);
+  if (parsed.isValid()) {
+    console.log("Успешно распарсено как:", parsed.format());
+    return parsed.toDate();
+  }
+  
+  // Пробуем формат DD-MM-YYYY HH:mm:ss
+  parsed = dayjs(dateString, "DD-MM-YYYY HH:mm:ss");
+  if (parsed.isValid()) {
+    console.log("Успешно распарсено как DD-MM-YYYY HH:mm:ss:", parsed.format());
+    return parsed.toDate();
+  }
+  
+  // Пробуем формат YYYY-MM-DD HH:mm:ss
+  parsed = dayjs(dateString, "YYYY-MM-DD HH:mm:ss");
+  if (parsed.isValid()) {
+    console.log("Успешно распарсено как YYYY-MM-DD HH:mm:ss:", parsed.format());
+    return parsed.toDate();
+  }
+  
+  // Пробуем ISO формат
+  parsed = dayjs(dateString, "YYYY-MM-DDTHH:mm:ss");
+  if (parsed.isValid()) {
+    console.log("Успешно распарсено как ISO:", parsed.format());
+    return parsed.toDate();
+  }
+  
+  // Пробуем parseDate из utils
+  const parsedDate = parseDate(dateString);
+  if (parsedDate && !isNaN(parsedDate.getTime())) {
+    console.log("Успешно распарсено через parseDate:", parsedDate);
+    return parsedDate;
+  }
+  
+  console.log("Не удалось распарсить дату:", dateString);
+  return null;
+};
 
 const TaskModal = ({
   isOpen,
@@ -47,7 +93,7 @@ const TaskModal = ({
         createdFor: selectedTask.created_for?.toString() || "",
       });
 
-      setScheduledTime(parseDate(selectedTask.scheduled_time));
+      setScheduledTime(parseTaskDate(selectedTask.scheduled_time));
     } else {
       setTask({
         ticketId: defaultTicketId?.toString() || "",
