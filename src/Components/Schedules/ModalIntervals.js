@@ -247,7 +247,7 @@ const ModalIntervals = ({
       onClose={onClose}
       title={getSelectedNames()}
       position="right"
-      size="lg"
+      size="md"
       padding="xl"
     >
       <form onSubmit={(e) => e.preventDefault()}>

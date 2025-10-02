@@ -214,3 +214,33 @@ a {
 [data-mantine-color-scheme] .mantine-Modal-header {
   zoom: 0.75;
 }
+
+[data-mantine-color-scheme] .mantine-Drawer-root {
+  zoom: 1;
+}
+
+
+[data-mantine-color-scheme] .mantine-Drawer-content {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Drawer-body .mantine-Button-root {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Drawer-body {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Drawer-header {
+  zoom: 1;
+}
+
+[data-mantine-color-scheme] .mantine-Drawer-title {
+  zoom: 0.75;
+}
+
+
+[data-mantine-color-scheme] .mantine-Drawer-body .mantine-Select-root {
+  zoom: 0.75;
+}
