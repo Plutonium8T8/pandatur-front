@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect, useContext } from "react";
 import {
-  Button,
   TextInput,
   SegmentedControl,
   Box,
@@ -11,7 +10,7 @@ import {
   ActionIcon,
   Pagination
 } from "@mantine/core";
-import { IoMdAdd, IoMdClose } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import { TbLayoutKanbanFilled } from "react-icons/tb";
 import { FaList } from "react-icons/fa6";
 import { LuFilter } from "react-icons/lu";
@@ -63,7 +62,6 @@ const TaskComponent = ({
     try {
       const res = await api.task.filterTasks({
         ...appliedFilters,
-        search: searchQuery,
         page: currentPage,
         sort_by: "scheduled_time",
       });
@@ -84,7 +82,7 @@ const TaskComponent = ({
 
   useEffect(() => {
     fetchTasks();
-  }, [filters, searchQuery, currentPage]);
+  }, [filters, currentPage]);
 
   useEffect(() => {
     const defaultFilters = {
@@ -95,11 +93,6 @@ const TaskComponent = ({
     };
     setFilters(defaultFilters);
   }, [currentUserId, accessibleGroupTitles, workflowOptions]);
-
-  const openNewTask = () => {
-    setSelectedTask(null);
-    setIsModalOpen(true);
-  };
 
   const openEditTask = (task) => {
     setSelectedTask(task);
@@ -157,7 +150,7 @@ const TaskComponent = ({
               ]}
             />
             <TextInput
-              placeholder={translations["Cautare"][language]}
+              placeholder="Поиск по ID тикета, имени ответственного..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.currentTarget.value)}
               w={350}
@@ -189,7 +182,7 @@ const TaskComponent = ({
           fetchTasks={fetchTasks}
         />
       ) : (
-        <TaskColumnsView tasks={tasks} onEdit={openEditTask} />
+        <TaskColumnsView tasks={tasks} onEdit={openEditTask} searchQuery={searchQuery} />
       )}
 
       {totalPages > 1 && (

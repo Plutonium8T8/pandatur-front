@@ -43,11 +43,49 @@ const TaskList = ({
   loading = false,
   openEditTask,
   fetchTasks,
+  searchQuery = "",
 }) => {
   const [selectedRow, setSelectedRow] = useState([]);
   const { enqueueSnackbar } = useSnackbar();
   const { user } = useUser();
   const currentUserId = user?.id?.toString();
+
+  // Фильтрация задач по поисковому запросу
+  const filteredTasks = useMemo(() => {
+    if (!searchQuery.trim()) return tasks;
+    
+    const query = searchQuery.toLowerCase().trim();
+    console.log("Поиск по запросу:", query);
+    console.log("Всего задач:", tasks.length);
+    
+    const filtered = tasks.filter(task => {
+      // Поиск по ID тикета
+      const ticketId = task.ticket_id?.toString() || "";
+      if (ticketId.includes(query)) {
+        console.log("Найдено по ID тикета:", task.ticket_id);
+        return true;
+      }
+      
+      // Поиск по имени ответственного
+      const responsibleName = task.created_for_full_name?.toLowerCase() || "";
+      if (responsibleName.includes(query)) {
+        console.log("Найдено по имени ответственного:", task.created_for_full_name);
+        return true;
+      }
+      
+      // Поиск по имени автора
+      const authorName = task.creator_by_full_name?.toLowerCase() || "";
+      if (authorName.includes(query)) {
+        console.log("Найдено по имени автора:", task.creator_by_full_name);
+        return true;
+      }
+      
+      return false;
+    });
+    
+    console.log("Отфильтровано задач:", filtered.length);
+    return filtered;
+  }, [tasks, searchQuery]);
 
   const handleDeleteTaskById = useConfirmPopup({
     subTitle: translations["Sigur doriți să ștergeți acest task?"][language],
@@ -281,11 +319,18 @@ const TaskList = ({
     <RcTable
       rowKey={({ id }) => id}
       columns={columns}
-      data={tasks}
+      data={filteredTasks}
       selectedRow={selectedRow}
       loading={loading}
       bordered
       scroll={{ y: "calc(100vh - 200px)" }}
+      onRow={(record) => ({
+        onDoubleClick: () => {
+          console.log("Двойной клик по задаче:", record);
+          openEditTask(record);
+        },
+        style: { cursor: "pointer" }
+      })}
     />
   );
 };

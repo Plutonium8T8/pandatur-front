@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Box } from "@mantine/core";
 import dayjs from "dayjs";
 import TaskColumn from "./TaskColumn";
@@ -49,8 +49,31 @@ const groupTasksByDate = (tasks) => {
     return { grouped, now };
 };
 
-const TaskColumnsView = ({ tasks = [], onEdit }) => {
-    const { grouped, now } = groupTasksByDate(tasks);
+const TaskColumnsView = ({ tasks = [], onEdit, searchQuery = "" }) => {
+    // Фильтрация задач по поисковому запросу
+    const filteredTasks = useMemo(() => {
+        if (!searchQuery.trim()) return tasks;
+        
+        const query = searchQuery.toLowerCase().trim();
+        
+        return tasks.filter(task => {
+            // Поиск по ID тикета
+            const ticketId = task.ticket_id?.toString() || "";
+            if (ticketId.includes(query)) return true;
+            
+            // Поиск по имени ответственного
+            const responsibleName = task.created_for_full_name?.toLowerCase() || "";
+            if (responsibleName.includes(query)) return true;
+            
+            // Поиск по имени автора
+            const authorName = task.creator_by_full_name?.toLowerCase() || "";
+            if (authorName.includes(query)) return true;
+            
+            return false;
+        });
+    }, [tasks, searchQuery]);
+
+    const { grouped, now } = groupTasksByDate(filteredTasks);
 
     return (
         <Box className="task-columns-container">
