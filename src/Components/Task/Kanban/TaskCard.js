@@ -1,16 +1,22 @@
 import React from "react";
 import { TypeTask } from "../OptionsTaskType";
 import { Link } from "react-router-dom";
-import { FaFingerprint } from "react-icons/fa6";
+import { FaFingerprint, FaClock, FaUser } from "react-icons/fa6";
+import { FaCheckCircle } from "react-icons/fa";
+import dayjs from "dayjs";
+import { translations } from "../../utils/translations";
 import "./TaskKanban.css";
 
 const TaskCard = ({ task, deadline, now, onClick }) => {
+    const language = localStorage.getItem("language") || "RO";
     const taskTypeObj = TypeTask.find((t) => t.name === task.task_type);
     const isOverdue = deadline.isBefore(now, "day");
     const isToday = deadline.isSame(now, "day");
     const isTomorrow = deadline.isSame(now.add(1, "day"), "day");
+    const isCompleted = task.status === 1 || task.status === true;
 
     const getCardClass = () => {
+        if (isCompleted) return "task-card task-card-completed";
         if (isOverdue) return "task-card task-card-overdue";
         if (isToday) return "task-card task-card-today";
         if (isTomorrow) return "task-card task-card-tomorrow";
@@ -19,43 +25,93 @@ const TaskCard = ({ task, deadline, now, onClick }) => {
 
     return (
         <div className={getCardClass()} onClick={() => onClick(task)}>
-            {/* Header with Ticket ID and Time */}
-            <div className="task-card-header">
-                <Link
-                    to={`/tasks/${task.ticket_id}`}
-                    className="task-id"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <FaFingerprint size={12} style={{ marginRight: "4px" }} />
-                    #{task.ticket_id}
-                </Link>
-                <div className="task-time">
-                    {deadline.format("DD.MM HH:mm")}
+            {/* ID */}
+            <div className="task-field">
+                <div className="field-label">
+                    <FaFingerprint size={10} />
+                    {translations["id"][language]}:
+                </div>
+                <div className="field-value">
+                    <Link
+                        to={`/tasks/${task.ticket_id}`}
+                        className="task-id-link"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        #{task.ticket_id}
+                    </Link>
                 </div>
             </div>
 
-            {/* Task Type */}
-            <div className="task-type">
-                <span className="task-type-icon">
-                    {taskTypeObj?.icon}
-                </span>
-                <span className="task-type-text">
-                    {task.task_type}
-                </span>
+            {/* Статус */}
+            <div className="task-field">
+                <div className="field-label">
+                    <FaCheckCircle size={10} />
+                    {translations["status"][language]}:
+                </div>
+                <div className="field-value">
+                    <span className={`status-badge ${isCompleted ? 'completed' : 'not-completed'}`}>
+                        {isCompleted ? translations["completed"][language] : translations["notCompleted"][language]}
+                    </span>
+                </div>
             </div>
 
-            {/* Description */}
+            {/* Тип задачи */}
+            <div className="task-field">
+                <div className="field-label">
+                    <span className="field-icon">{taskTypeObj?.icon}</span>
+                    {translations["type"][language]}:
+                </div>
+                <div className="field-value">
+                    {task.task_type}
+                </div>
+            </div>
+
+            {/* Дедлайн */}
+            <div className="task-field">
+                <div className="field-label">
+                    <FaClock size={10} />
+                    {translations["deadline"][language]}:
+                </div>
+                <div className="field-value">
+                    {deadline.format("DD.MM.YYYY HH:mm")}
+                </div>
+            </div>
+
+
+            {/* Описание */}
             {task.description && (
-                <div className="task-description">
-                    {task.description}
+                <div className="task-field task-field-description">
+                    <div className="field-label">
+                        {translations["description"][language]}:
+                    </div>
+                    <div className="field-value">
+                        <div className="task-description">
+                            {task.description}
+                        </div>
+                    </div>
                 </div>
             )}
 
-            {/* Users */}
-            <div className="task-users">
-                <span>{task.creator_by_full_name}</span>
-                <span>→</span>
-                <span>{task.created_for_full_name}</span>
+            {/* Автор */}
+            <div className="task-field">
+                <div className="field-label">
+                    <FaUser size={10} />
+                    {translations["author"][language]}:
+                </div>
+                <div className="field-value">
+                    {task.creator_by_full_name}
+                </div>
+            </div>
+
+            {/* Ответственный */}
+            <div className="task-field">
+                <div className="field-label">
+                    <FaUser size={10} />
+                    {translations["responsible"][language]}:
+                </div>
+                <div className="field-value">
+                    {task.created_for_full_name}
+                </div>
             </div>
         </div>
     );

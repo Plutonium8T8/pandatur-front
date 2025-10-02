@@ -4583,4 +4583,109 @@ export const translations = {
     RU: "Перетащите файлы сюда для прикрепления",
     EN: "Drop files here to attach",
   },
+  "id": {
+    RO: "ID",
+    RU: "ID",
+    EN: "ID",
+  },
+  "status": {
+    RO: "Status",
+    RU: "Статус",
+    EN: "Status",
+  },
+  "completed": {
+    RO: "Completat",
+    RU: "Выполнено",
+    EN: "Completed",
+  },
+  "notCompleted": {
+    RO: "Necompletat",
+    RU: "Не выполнено",
+    EN: "Not completed",
+  },
+  "overdue": {
+    RO: "Întârziat",
+    RU: "Просрочено",
+    EN: "Overdue",
+  },
+  "urgent": {
+    RO: "Urgent",
+    RU: "Срочно",
+    EN: "Urgent",
+  },
+  "active": {
+    RO: "Activ",
+    RU: "Активно",
+    EN: "Active",
+  },
+  "type": {
+    RO: "Tip",
+    RU: "Тип",
+    EN: "Type",
+  },
+  "deadline": {
+    RO: "Termen limită",
+    RU: "Дедлайн",
+    EN: "Deadline",
+  },
+  "remaining": {
+    RO: "Rămas",
+    RU: "Осталось",
+    EN: "Remaining",
+  },
+  "description": {
+    RO: "Descriere",
+    RU: "Описание",
+    EN: "Description",
+  },
+  "tags": {
+    RO: "Etichete",
+    RU: "Теги",
+    EN: "Tags",
+  },
+  "author": {
+    RO: "Autor",
+    RU: "Автор",
+    EN: "Author",
+  },
+  "responsible": {
+    RO: "Responsabil",
+    RU: "Ответственный",
+    EN: "Responsible",
+  },
+  "created": {
+    RO: "Creat",
+    RU: "Создано",
+    EN: "Created",
+  },
+  "today": {
+    RO: "Astăzi",
+    RU: "Сегодня",
+    EN: "Today",
+  },
+  "tomorrow": {
+    RO: "Mâine",
+    RU: "Завтра",
+    EN: "Tomorrow",
+  },
+  "lessThan2Hours": {
+    RO: "Mai puțin de 2 ore",
+    RU: "Менее 2 часов",
+    EN: "Less than 2 hours",
+  },
+  "in": {
+    RO: "În",
+    RU: "Через",
+    EN: "In",
+  },
+  "days": {
+    RO: "zile",
+    RU: "дн.",
+    EN: "days",
+  },
+  "soon": {
+    RO: "În curând",
+    RU: "Скоро",
+    EN: "Soon",
+  },
 };
