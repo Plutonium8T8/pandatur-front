@@ -7,7 +7,7 @@ import { useGetTechniciansList } from "../hooks";
 import ChatExtraInfo from "@components/ChatComponent/ChatExtraInfo";
 import ChatList from "@components/ChatComponent/ChatList";
 import { getFullName } from "@utils";
-import { ChatMessages } from "@components/ChatComponent/components";
+import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";
 import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
@@ -41,7 +41,7 @@ export const Chat = () => {
 
   return (
     <Flex h="100%" className="chat-wrapper">
-      <Flex w="80%" h="100%" className="chat-container">
+      <Flex w="100%" h="100%" className="chat-container">
         {isChatListVisible && <ChatList ticketId={ticketId} />}
 
         <Can
