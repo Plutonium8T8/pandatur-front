@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import { useState, useRef, useMemo, useCallback } from "react";
 import { FixedSizeList } from "react-window";
 import { LuFilter } from "react-icons/lu";
 import {
@@ -61,7 +61,6 @@ const ChatList = ({ ticketId }) => {
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
   const [chatFilters, setChatFilters] = useState({});
 
-  const chatListRef = useRef(null);
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
   const [activeTab, setActiveTab] = useState("filter_ticket");
@@ -106,14 +105,6 @@ const ChatList = ({ ticketId }) => {
     return [...filteredTickets].sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
   }, [filteredTickets]);
 
-  useEffect(() => {
-    if (chatListRef.current && ticketId) {
-      const element = chatListRef.current.querySelector(`[data-ticket-id="${ticketId}"]`);
-      if (element) {
-        element.scrollIntoView({ block: "center", behavior: "smooth" });
-      }
-    }
-  }, [ticketId]);
 
   const ChatItem = useCallback(
     ({ index, style }) => (
@@ -128,7 +119,7 @@ const ChatList = ({ ticketId }) => {
 
   return (
     <>
-      <Box direction="column" w="20%" ref={chatListRef}>
+      <Box direction="column" w="20%">
         <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>

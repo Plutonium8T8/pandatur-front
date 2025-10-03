@@ -41,7 +41,7 @@ export const Chat = () => {
 
   return (
     <Flex h="100%" className="chat-wrapper">
-      <Flex w="100%" h="100%" className="chat-container">
+      <Flex w="80%" h="100%" className="chat-container">
         {isChatListVisible && <ChatList ticketId={ticketId} />}
 
         <Can

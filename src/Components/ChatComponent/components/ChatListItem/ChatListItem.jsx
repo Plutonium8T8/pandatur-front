@@ -81,12 +81,33 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
     navigate(`/chat/${id}`);
   };
 
+  // Получаем фото пользователя - сначала из тикета, потом из клиентов
+  const getUserPhoto = () => {
+    // Если есть фото в тикете
+    if (chat.photo_url && chat.photo_url.trim() !== "") {
+      return chat.photo_url;
+    }
+    
+    // Если есть клиенты с фото
+    if (chat.clients && chat.clients.length > 0) {
+      const clientWithPhoto = chat.clients.find(client => client.photo && client.photo.trim() !== "");
+      if (clientWithPhoto) {
+        return clientWithPhoto.photo;
+      }
+    }
+    
+    // Возвращаем null для использования fallback
+    return null;
+  };
+
+  const userPhoto = getUserPhoto();
+
   return (
     <div style={style}>
       <Box
         py="10px"
-        pr="16px"
-        pl="24px"
+        pr="10px"
+        pl="10px"
         key={chat.id}
         className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
         onClick={() => choseChat(chat.id)}
@@ -94,7 +115,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         pos="relative"
       >
         {chat.unseen_count > 0 && (
-          <Box pos="absolute" right="16px" className="right">
+          <Box pos="absolute" right="6px" className="right">
             <Badge size="md" bg="red" circle className="right-count">
               {chat.unseen_count}
             </Badge>
@@ -103,9 +124,10 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
         <Flex gap="12" align="center" w="100%">
           <Image
-            w={36}
-            h={36}
+            w={46}
+            h={46}
             radius="50%"
+            src={userPhoto}
             fallbackSrc={DEFAULT_PHOTO}
           />
 
