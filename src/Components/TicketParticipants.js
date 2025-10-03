@@ -133,9 +133,9 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
 
     return (
         <Group align="center" gap="8" wrap="nowrap" style={{ width: "100%" }}>
-            <Badge variant="light">{total}</Badge>
+            <Badge size="lg" variant="light">{total}</Badge>
 
-            <Text size="sm" c="dimmed" style={{ whiteSpace: "nowrap" }}>
+            <Text size="sm" c="black" style={{ whiteSpace: "nowrap" }}>
                 {getLanguageByKey("inTicket")}:
             </Text>
 
@@ -161,7 +161,7 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
             )}
 
             {hasMore && (
-                <Popover width={320} position="bottom-end" withArrow shadow="md">
+                <Popover width={320} position="bottom-end" withArrow>
                     <Popover.Target>
                         <Text
                             size="sm"

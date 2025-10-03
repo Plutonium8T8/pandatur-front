@@ -90,18 +90,18 @@ export const ChatMessages = ({
 
         // Отправляем на сервер
         const response = await apiUrl(metadataMsj);
-        
+
         console.log("📤 Server response:", response);
-        
+
         // Проверяем статус ответа сервера
         const isSuccess = response?.status === "success" || response?.status === "ok";
-        
+
         console.log("✅ Message status check:", {
           responseStatus: response?.status,
           isSuccess,
           willUpdateTo: isSuccess ? "SUCCESS" : "ERROR"
         });
-        
+
         if (isSuccess) {
           // Обновляем статус на SUCCESS
           setMessages((prev) =>
@@ -211,7 +211,7 @@ export const ChatMessages = ({
   return (
     <Flex w="100%" direction="column" className="chat-area">
       {ticketId && (
-        <Paper p="8" style={{ borderRadius: 12, margin: "12px 42px" }}>
+        <Paper p="8" bg="#ccffcc" style={{ borderRadius: 12, margin: "6px 6px 12px 42px" }}>
           <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
         </Paper>
       )}
@@ -222,7 +222,6 @@ export const ChatMessages = ({
         direction="column"
         className="chat-messages"
         ref={messageContainerRef}
-        bg="#f9fff9"
       >
         {renderMessagesContent()}
       </Flex>
