@@ -1,11 +1,10 @@
 import { useMemo, useState } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button } from "@mantine/core";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button, Box } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
-import { YYYY_MM_DD, YYYY_MM_DD_HH_mm_ss } from "@app-constants";
-import { getFullName, getLanguageByKey } from "@utils";
+import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
+import { getLanguageByKey } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
-import { socialMediaIcons } from "../../../utils";
 import { ChatNoteCard } from "../../../ChatNoteCard";
 import { useLiveTicketLogs } from "../../../../hooks/useLiveTicketLogs";
 import { useLiveTicketNotes } from "../../../../hooks/useLiveTicketNotes";
@@ -88,7 +87,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         ...msg,
         itemType: "message",
         sortTime: dj.valueOf(),
-        dateDivider: dj.format(YYYY_MM_DD),
+        dateDivider: dj.format("DD.MM.YYYY"),
         clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
         platform: msg.platform?.toLowerCase?.() || "",
       };
@@ -118,7 +117,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         ...log,
         itemType: "log",
         sortTime: dj.valueOf(),
-        dateDivider: dj.format(YYYY_MM_DD),
+        dateDivider: dj.format("DD.MM.YYYY"),
         isLive: !!log.__live,
       };
     });
@@ -154,7 +153,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         ...n,
         itemType: "note",
         sortTime: dj.valueOf(),
-        dateDivider: dj.format(YYYY_MM_DD),
+        dateDivider: dj.format("DD.MM.YYYY"),
         timeCreatedDisplay: dj.format(YYYY_MM_DD_HH_mm_ss),
         isLive: !!n.__live,
       };
@@ -180,9 +179,68 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
   // отсортированный список дат
   const allDates = useMemo(() => {
     return Object.keys(itemsByDate).sort(
-      (a, b) => dayjs(a, YYYY_MM_DD, true).valueOf() - dayjs(b, YYYY_MM_DD, true).valueOf()
+      (a, b) => dayjs(a, "DD.MM.YYYY", true).valueOf() - dayjs(b, "DD.MM.YYYY", true).valueOf()
     );
   }, [itemsByDate]);
+
+  // Функция для создания диалоговых блоков
+  const createDialogBlocks = (dayItems) => {
+    const blocks = [];
+    let currentDialogBlock = null;
+    let currentLogCluster = null;
+
+    const flushDialogBlock = () => {
+      if (currentDialogBlock) {
+        blocks.push(currentDialogBlock);
+        currentDialogBlock = null;
+      }
+    };
+
+    const flushLogCluster = () => {
+      if (currentLogCluster) {
+        blocks.push({ logs: currentLogCluster });
+        currentLogCluster = null;
+      }
+    };
+
+    dayItems.forEach((item) => {
+      if (item.itemType === "message") {
+        // Прерываем лог-кластер при появлении сообщения
+        flushLogCluster();
+
+        // Определяем, нужно ли создать новый диалоговый блок
+        const needNewDialog = !currentDialogBlock;
+
+        if (needNewDialog) {
+          flushDialogBlock();
+          currentDialogBlock = {
+            type: "dialog",
+            items: [item],
+            startTime: item.sortTime,
+          };
+        } else {
+          // Добавляем сообщение в текущий диалоговый блок
+          currentDialogBlock.items.push(item);
+        }
+      } else if (item.itemType === "log") {
+        // Прерываем диалоговый блок при появлении лога
+        flushDialogBlock();
+        if (!currentLogCluster) currentLogCluster = [];
+        currentLogCluster.push(item);
+      } else if (item.itemType === "note") {
+        // Прерываем диалоговый блок и лог-кластер при появлении заметки
+        flushDialogBlock();
+        flushLogCluster();
+        blocks.push({ note: item });
+      }
+    });
+
+    // Завершаем последние блоки
+    flushDialogBlock();
+    flushLogCluster();
+
+    return blocks;
+  };
 
   return (
     <Flex direction="column" gap="xl" h="100%">
@@ -190,57 +248,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         <Flex direction="column" gap="xs">
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
-
-            const blocks = [];
-            let currentMsgBlock = null;
-            let currentLogCluster = null;
-
-            const flushMsgBlock = () => {
-              if (currentMsgBlock) {
-                blocks.push(currentMsgBlock);
-                currentMsgBlock = null;
-              }
-            };
-            const flushLogCluster = () => {
-              if (currentLogCluster) {
-                blocks.push({ logs: currentLogCluster });
-                currentLogCluster = null;
-              }
-            };
-
-            dayItems.forEach((item) => {
-              if (item.itemType === "message") {
-                flushLogCluster();
-                const currentClientId = item.clientId?.toString();
-                const currentPlatform = item.platform || "";
-                const needNew =
-                  !currentMsgBlock ||
-                  String(currentMsgBlock.clientId) !== String(currentClientId) ||
-                  currentMsgBlock.platform !== currentPlatform;
-
-                if (needNew) {
-                  flushMsgBlock();
-                  currentMsgBlock = {
-                    clientId: Number(currentClientId),
-                    platform: currentPlatform,
-                    items: [item],
-                  };
-                } else {
-                  currentMsgBlock.items.push(item);
-                }
-              } else if (item.itemType === "log") {
-                flushMsgBlock();
-                if (!currentLogCluster) currentLogCluster = [];
-                currentLogCluster.push(item);
-              } else if (item.itemType === "note") {
-                flushMsgBlock();
-                flushLogCluster();
-                blocks.push({ note: item });
-              }
-            });
-
-            flushMsgBlock();
-            flushLogCluster();
+            const blocks = createDialogBlocks(dayItems);
 
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
@@ -250,6 +258,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                 />
 
                 {blocks.map((block, i) => {
+                  // Системные логи
                   if (block.logs) {
                     return (
                       <LogCluster
@@ -260,6 +269,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                     );
                   }
 
+                  // Системные заметки
                   if (block.note) {
                     const n = block.note;
                     const tech =
@@ -275,62 +285,54 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                     );
                   }
 
-                  const clientInfo =
-                    personalInfo?.clients?.find((c) => c.id === block.clientId) || {};
-                  const clientName =
-                    getFullName(clientInfo.name, clientInfo.surname) || `#${block.clientId}`;
-                  const platform = block.platform;
-                  const platformIcon = socialMediaIcons[platform] || null;
-                  const platformLabel = platform ? platform[0].toUpperCase() + platform.slice(1) : "";
+                  // Диалоговый блок
+                  if (block.type === "dialog") {
 
-                  return (
-                    <Flex
-                      direction="column"
-                      gap="xs"
-                      key={`msgs-${date}-${block.clientId}-${platform}-${i}`}
-                    >
-                      <Flex justify="center" align="center" gap={6}>
-                        <Badge c="black" size="lg" bg={colors.gray[2]} px={12}>
-                          {getLanguageByKey("Mesajele clientului")}: {clientName}
-                          {platformIcon ? (
-                            <span style={{ marginLeft: 8, verticalAlign: "middle" }}>
-                              {platformIcon}
-                            </span>
-                          ) : platformLabel ? (
-                            <span style={{ marginLeft: 8, color: "#777" }}>
-                              {platformLabel}
-                            </span>
-                          ) : null}
-                        </Badge>
-                      </Flex>
+                    return (
+                      <Box
+                        key={`dialog-${date}-${i}`}
+                        p="md"
+                        mb="md"
+                        style={{
+                          backgroundColor: "#e9ecef",
+                          borderRadius: "12px",
+                          border: "1px solid #dee2e6",
+                        }}
+                      >
 
-                      {block.items.map((msg, idx) => {
-                        const senderIdStr = String(msg.sender_id);
-                        const msgClientIds = Array.isArray(msg.client_id)
-                          ? msg.client_id.map(String)
-                          : [String(msg.client_id)];
-                        const isClientMessage =
-                          msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
+                        {/* Сообщения в диалоговом блоке */}
+                        <Flex direction="column" gap="xs">
+                          {block.items.map((msg, idx) => {
+                            const senderIdStr = String(msg.sender_id);
+                            const msgClientIds = Array.isArray(msg.client_id)
+                              ? msg.client_id.map(String)
+                              : [String(msg.client_id)];
+                            const isClientMessage =
+                              msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
 
-                        const technician = technicianMap.get(Number(msg.sender_id));
-                        return isClientMessage ? (
-                          <ReceivedMessage
-                            key={`${msg.id}-${idx}`}
-                            msg={msg}
-                            personalInfo={personalInfo}
-                            technicians={technicians}
-                          />
-                        ) : (
-                          <SendedMessage
-                            key={`${msg.id}-${idx}`}
-                            msg={msg}
-                            technician={technician}
-                            technicians={technicians}
-                          />
-                        );
-                      })}
-                    </Flex>
-                  );
+                            const technician = technicianMap.get(Number(msg.sender_id));
+                            return isClientMessage ? (
+                              <ReceivedMessage
+                                key={`${msg.id}-${idx}`}
+                                msg={msg}
+                                personalInfo={personalInfo}
+                                technicians={technicians}
+                              />
+                            ) : (
+                              <SendedMessage
+                                key={`${msg.id}-${idx}`}
+                                msg={msg}
+                                technician={technician}
+                                technicians={technicians}
+                              />
+                            );
+                          })}
+                        </Flex>
+                      </Box>
+                    );
+                  }
+
+                  return null;
                 })}
               </Flex>
             );
