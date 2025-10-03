@@ -173,7 +173,7 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
 
     return (
         <Paper
-            p="0"
+            mb="15"
             radius="lg"
             withBorder
             className={className}
@@ -200,6 +200,7 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
                     >
                         <Icon size={16} />
                     </span>
+                    {getLanguageByKey("Notice")}
                     <Badge variant="light" radius="sm" color="gray">
                         {getLanguageByKey(meta.label)}
                     </Badge>

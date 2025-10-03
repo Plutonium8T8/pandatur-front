@@ -26,7 +26,10 @@ export const getMediaType = (mimeType) => {
 };
 
 export const renderContent = (msg) => {
-  if (!msg.message?.trim()) {
+  // Определяем URL для медиа контента
+  const mediaUrl = msg.media_url || msg.message;
+  
+  if (!mediaUrl?.trim() && !msg.message?.trim()) {
     return (
       <div style={textMessageStyle}>
         {getLanguageByKey("Mesajul lipseste")}
@@ -34,13 +37,13 @@ export const renderContent = (msg) => {
     );
   }
 
-  const type = msg.mtype || msg.media_type;
+  const type = msg.mtype || msg.media_type || msg.last_message_type;
 
   switch (type) {
     case MEDIA_TYPE.IMAGE:
       return (
         <CheckedImage
-          url={msg.message}
+          url={mediaUrl}
           style={{ maxWidth: 500, maxHeight: 500 }}
           renderFallbackImage={() => (
             <Text c="red" size="xs">
@@ -56,20 +59,20 @@ export const renderContent = (msg) => {
           controls
           style={{ borderRadius: 8, maxWidth: 500, maxHeight: 500 }}
         >
-          <source src={msg.message} type="video/mp4" />
+          <source src={mediaUrl} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
       );
 
     case MEDIA_TYPE.AUDIO:
-      return <Audio src={msg.message} />;
+      return <Audio src={mediaUrl} />;
 
     case MEDIA_TYPE.FILE:
       return (
         <File
           bg={colors.gray[4]}
-          label={spliceMessage(msg.message)}
-          src={msg.message}
+          label={spliceMessage(mediaUrl)}
+          src={mediaUrl}
         />
       );
 
@@ -79,17 +82,17 @@ export const renderContent = (msg) => {
           controls
           style={{ borderRadius: "8", maxWidth: 500, maxHeight: 500 }}
         >
-          <source src={msg.message} type="video/mp4" />
+          <source src={mediaUrl} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
         </video>
       );
 
     case MEDIA_TYPE.SHARE: {
-      const isImage = msg.message.match(/\.(jpeg|jpg|png|webp|gif|photo)$/i);
+      const isImage = mediaUrl.match(/\.(jpeg|jpg|png|webp|gif|photo)$/i);
 
       return isImage ? (
         <CheckedImage
-          url={msg.message}
+          url={mediaUrl}
           style={{ maxWidth: 500, maxHeight: 500 }}
           renderFallbackImage={() => (
             <Text c="red" size="xs">
@@ -98,7 +101,7 @@ export const renderContent = (msg) => {
           )}
         />
       ) : (
-        <Text>{msg.message}</Text>
+        <Text>{mediaUrl}</Text>
       );
     }
 
@@ -110,13 +113,14 @@ export const renderContent = (msg) => {
       />;
 
     default:
-      const { message } = msg;
+      // Для текстовых сообщений используем message, для медиа - mediaUrl
+      const displayText = msg.message || mediaUrl;
 
-      return isStoreFile(message) ? (
+      return isStoreFile(displayText) ? (
         <File
           bg={colors.gray[4]}
-          label={spliceMessage(message)}
-          src={message}
+          label={spliceMessage(displayText)}
+          src={displayText}
         />
       ) : (
         <Box maw="600px" w="100%">
@@ -124,7 +128,7 @@ export const renderContent = (msg) => {
             style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}
             truncate
           >
-            {message}
+            {displayText}
           </Text>
         </Box>
       );

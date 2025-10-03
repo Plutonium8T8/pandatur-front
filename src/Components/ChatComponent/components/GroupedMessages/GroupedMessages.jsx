@@ -1,17 +1,19 @@
-import { useMemo, useState } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text, Button, Box } from "@mantine/core";
+import { useMemo } from "react";
+import { Flex, Badge, DEFAULT_THEME, Divider, Text, Box } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { getLanguageByKey } from "@utils";
 import dayjs from "dayjs";
-import { SendedMessage, ReceivedMessage, MessagesLogItem } from "../Message";
+import { SendedMessage, ReceivedMessage } from "../Message";
 import { ChatNoteCard } from "../../../ChatNoteCard";
 import { useLiveTicketLogs } from "../../../../hooks/useLiveTicketLogs";
 import { useLiveTicketNotes } from "../../../../hooks/useLiveTicketNotes";
+import BackTabs from "../BackTabs/BackTabs";
+import LogCluster from "../LogCluster/LogCluster";
 import "./GroupedMessages.css";
 
 const { colors } = DEFAULT_THEME;
-const MAX_LOGS_COLLAPSED = 5;
+
 
 const toDate = (val) => {
   if (!val) return null;
@@ -28,38 +30,6 @@ const toDate = (val) => {
 const makeNoteKey = (n) =>
   `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
 
-const LogCluster = ({ logs = [], technicians }) => {
-  const [expanded, setExpanded] = useState(false);
-
-  const collapsedStart = Math.max(0, logs.length - MAX_LOGS_COLLAPSED);
-  const lastFive = logs.slice(collapsedStart);
-  const visible = expanded ? logs : lastFive;
-  const hidden = expanded ? 0 : collapsedStart;
-
-  return (
-    <Flex direction="column" gap="xs">
-      {visible.map((l, i) => {
-        const logKey = String(l.id ?? `${l.timestamp}-${i}`);
-        return (
-          <MessagesLogItem
-            key={`log-${logKey}`}
-            log={l}
-            technicians={technicians}
-            isLive={l.isLive}
-          />
-        );
-      })}
-
-      {logs.length > MAX_LOGS_COLLAPSED && (
-        <Flex justify="center" mt={4}>
-          <Button size="xs" variant="light" onClick={() => setExpanded((v) => !v)}>
-            {expanded ? getLanguageByKey("Collapse") : `${getLanguageByKey("ShowMore")} ${hidden}`}
-          </Button>
-        </Flex>
-      )}
-    </Flex>
-  );
-};
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
@@ -292,13 +262,16 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                       <Box
                         key={`dialog-${date}-${i}`}
                         p="md"
-                        mb="md"
                         style={{
                           backgroundColor: "#f0fdf4",
                           borderRadius: "12px",
                           border: "1px solid #d1fae5",
+                          position: "relative",
                         }}
                       >
+                        {/* Иллюзия открытых вкладок позади */}
+                        <BackTabs palette="green" />
+                        {/* <BackTabs palette="navy" /> */}
 
                         {/* Сообщения в диалоговом блоке */}
                         <Flex direction="column" gap="xs">
