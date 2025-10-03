@@ -241,20 +241,6 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                 <AttachmentsPreview />
 
                 <Flex justify="space-between" align="center" gap="8">
-                    <Flex gap="6" align="center">
-                        <FileButton
-                            onChange={handleFileButton}
-                            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
-                            multiple
-                        >
-                            {(props) => (
-                                <ActionIcon {...props} title={getLanguageByKey("Attach files")}>
-                                    <RiAttachment2 size={18} />
-                                </ActionIcon>
-                            )}
-                        </FileButton>
-                        {(uploading || loading || sending) && <Loader size="xs" />}
-                    </Flex>
 
                     <Flex gap="8">
                         <Button
@@ -273,6 +259,22 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                             {getLanguageByKey("Save")}
                         </Button>
                     </Flex>
+
+                    <Flex gap="6" align="center">
+                        <FileButton
+                            onChange={handleFileButton}
+                            accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
+                            multiple
+                        >
+                            {(props) => (
+                                <ActionIcon {...props} title={getLanguageByKey("Attach files")}>
+                                    <RiAttachment2 size={18} />
+                                </ActionIcon>
+                            )}
+                        </FileButton>
+                        {(uploading || loading || sending) && <Loader size="xs" />}
+                    </Flex>
+
                 </Flex>
             </Flex>
         </Paper>
