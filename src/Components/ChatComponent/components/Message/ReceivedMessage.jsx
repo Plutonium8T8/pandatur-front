@@ -67,7 +67,7 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
             direction="column"
             p="8"
             className="text"
-            bg="#ccffcc"
+            bg="#fef3c7"
           >
             <Flex c={colors.gray[7]} align="center" gap="4">
               <Text size="sm" fw="bold">

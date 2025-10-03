@@ -294,9 +294,9 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         p="md"
                         mb="md"
                         style={{
-                          backgroundColor: "#e9ecef",
+                          backgroundColor: "#f0fdf4",
                           borderRadius: "12px",
-                          border: "1px solid #dee2e6",
+                          border: "1px solid #d1fae5",
                         }}
                       >
 
