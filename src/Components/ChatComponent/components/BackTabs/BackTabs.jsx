@@ -4,9 +4,9 @@ const BackTabs = ({ palette = "green" }) => {
   // две палитры на выбор: "green" (как у тебя) и "navy" amo
   const palettes = {
     green: {
-      bg3: "#f0fdf4", border3: "#a7f3d0",
-      bg2: "#ecfdf5", border2: "#bbf7d0",
-      bg1: "#e5f3e5", border1: "#d1fae5",
+      bg3: "#f8fff8", border3: "#d0e8d0",
+      bg2: "#f0f8f0", border2: "#d8e8d8",
+      bg1: "#e8f0e8", border1: "#e0e8e0",
     },
     navy: {
       bg3: "#112838", border3: "#2a4a5e",

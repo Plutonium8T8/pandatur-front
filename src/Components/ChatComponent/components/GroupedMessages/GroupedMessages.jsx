@@ -263,9 +263,9 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         key={`dialog-${date}-${i}`}
                         p="md"
                         style={{
-                          backgroundColor: "#f0fdf4",
+                          backgroundColor: "#f8fff8",
                           borderRadius: "12px",
-                          border: "1px solid #d1fae5",
+                          border: "1px solid #e8f5e8",
                           position: "relative",
                         }}
                       >

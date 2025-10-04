@@ -76,7 +76,7 @@ export const SendedMessage = ({
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
           <Flex>
-            <Flex miw="250px" direction="column" p="8" className="text" bg="#e6f3ff">
+            <Flex miw="250px" direction="column" p="8" className="text" bg="#f0f8f0">
               <Flex align="center" gap={8}>
                 <FaHeadphones size={12} />
                 <Text fw="bold" size="sm">
