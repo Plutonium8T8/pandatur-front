@@ -4693,4 +4693,9 @@ export const translations = {
     RU: "Поиск по ID тикета, имени ответственного...",
     EN: "Search by task ID, responsible name...",
   },
+  "accessDenied": {
+    RO: "Acces interzis. Contactați administratorul pentru a obține permisiuni.",
+    RU: "Доступ запрещен. Обратитесь к администратору для получения прав доступа.",
+    EN: "Access denied. Contact administrator to get access permissions.",
+  },
 };

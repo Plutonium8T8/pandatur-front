@@ -4,7 +4,7 @@ import { enqueueSnackbar } from "notistack";
 import Cookies from "js-cookie";
 import { useUser } from "@hooks";
 import { api } from "@api";
-import { showServerError } from "@utils";
+import { showServerError, getLanguageByKey } from "@utils";
 import { LoadingOverlay } from "@components";
 
 export const Session = ({ children }) => {
@@ -23,6 +23,14 @@ export const Session = ({ children }) => {
   const fetchSession = async () => {
     try {
       const data = await api.auth.session();
+
+      // Проверяем роль пользователя
+      if (data.roles && data.roles.includes("ROLE_USER")) {
+        handleLogout();
+        navigate("/auth");
+        enqueueSnackbar(getLanguageByKey("accessDenied"), { variant: "error" });
+        return;
+      }
 
       setUserId(data.user_id);
       setName(data.username || "");

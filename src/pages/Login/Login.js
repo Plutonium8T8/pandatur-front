@@ -21,6 +21,7 @@ export const Login = ({ onLoginSuccess }) => {
   const [form, setForm] = useState({ email: "", username: "", password: "" });
   const [isLogin, setIsLogin] = useState(true);
   const [message, setMessage] = useState("");
+  const [messageType, setMessageType] = useState("error"); // "success" или "error"
   const [isLoading, setIsLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
@@ -33,14 +34,17 @@ export const Login = ({ onLoginSuccess }) => {
   const validateForm = () => {
     if (!form.email || !/\S+@\S+\.\S+/.test(form.email)) {
       setMessage("Invalid email address.");
+      setMessageType("error");
       return false;
     }
     if (!form.password || form.password.length < 6) {
       setMessage("Password must be at least 6 characters long.");
+      setMessageType("error");
       return false;
     }
     if (!isLogin && !form.username) {
       setMessage("Username is required for registration.");
+      setMessageType("error");
       return false;
     }
     return true;
@@ -61,6 +65,7 @@ export const Login = ({ onLoginSuccess }) => {
       const { token, message } = response;
 
       setMessage(message || "Success!");
+      setMessageType("success");
 
       if (isLogin) {
         setCookieToken(token);
@@ -69,7 +74,8 @@ export const Login = ({ onLoginSuccess }) => {
         window.location.reload();
       }
     } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
+      setMessage(showServerError(error));
+      setMessageType("error");
     } finally {
       setIsLoading(false);
     }
@@ -79,6 +85,7 @@ export const Login = ({ onLoginSuccess }) => {
     setIsLogin(!isLogin);
     setForm({ ...form, username: "" });
     setMessage("");
+    setMessageType("error");
   };
 
   return (
@@ -159,7 +166,12 @@ export const Login = ({ onLoginSuccess }) => {
             {isLoading && <LoadingOverlay />}
 
             {message && (
-              <Text c="red" size={isMobile ? "sm" : "md"} mt={isMobile ? "sm" : "md"}>
+              <Text 
+                c={messageType === "success" ? "green" : "red"} 
+                size={isMobile ? "sm" : "md"} 
+                mt={isMobile ? "sm" : "md"}
+                fw={500}
+              >
                 {message}
               </Text>
             )}
