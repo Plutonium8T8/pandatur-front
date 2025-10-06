@@ -1313,6 +1313,11 @@ export const translations = {
     RU: "Ответственный за лид",
     EN: "Lead responsible"
   },
+  "Etap": {
+    RO: "Etap",
+    RU: "Этап",
+    EN: "Stage"
+  },
   "Alege responsabil lead": {
     RO: "Alege responsabil lead",
     RU: "Выберите ответственного за лид",

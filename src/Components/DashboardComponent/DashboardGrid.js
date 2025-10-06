@@ -3,6 +3,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { Box } from "@mantine/core";
+import { useZoomScale } from "@hooks";
 import { TotalCard } from "./TotalCard";
 import { TopUsersCard } from "./TopUsersCard";
 import { TicketStateCard } from "./TicketStateCard";
@@ -199,9 +200,19 @@ const pickAnyBpLayout = (layouts) =>
     layouts.lg || layouts.md || layouts.sm || layouts.xs || layouts.xxs || [];
 
 const DashboardGrid = ({ widgets = [], dateRange, widgetType = "calls" }) => {
+    // Определяем текущий zoom из CSS для компенсации позиционирования
+    const transformScale = useZoomScale(1);
+
     const COLS = useMemo(
         () => ({ lg: COLS_MAX, md: COLS_MAX, sm: COLS_MAX, xs: COLS_MAX, xxs: COLS_MAX }),
         []
+    );
+
+    // Универсальная обертка для виджетов (без drag handle)
+    const renderWidgetWrapper = (children, key) => (
+        <div key={key} style={{ height: "100%", cursor: "move" }}>
+            {children}
+        </div>
     );
 
     const visibleWidgets = useMemo(
@@ -248,303 +259,270 @@ const DashboardGrid = ({ widgets = [], dateRange, widgetType = "calls" }) => {
                 isDraggable
                 onLayoutChange={handleLayoutChange}
                 draggableCancel=".mantine-Badge,.mantine-Progress,.mantine-Button,.mantine-Input"
+                transformScale={transformScale}
+                useCSSTransforms={true}
             >
                 {orderedByRows.map((w) => {
                     const li = currentLayout.find((l) => l.i === String(w.id));
                     const sizeInfo = li ? `${li.w} × ${li.h}` : null;
 
                     if (w.type === "top_users") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <TopUsersCard 
-                                    title={w.title} 
-                                    subtitle={w.subtitle} 
-                                    rows={w.rows} 
-                                    bg={w.bg} 
-                                    widgetType={w.widgetType}
-                                    width={w.w}
-                                    height={w.h}
-                                />
-                            </div>
+                        return renderWidgetWrapper(
+                            <TopUsersCard
+                                title={w.title}
+                                subtitle={w.subtitle}
+                                rows={w.rows}
+                                bg={w.bg}
+                                widgetType={w.widgetType}
+                                width={w.w}
+                                height={w.h}
+                            />,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_state") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketStateCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        oldClientTickets={Number.isFinite(w.oldClientTickets) ? w.oldClientTickets : 0}
-                                        newClientTickets={Number.isFinite(w.newClientTickets) ? w.newClientTickets : 0}
-                                        totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketStateCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    oldClientTickets={Number.isFinite(w.oldClientTickets) ? w.oldClientTickets : 0}
+                                    newClientTickets={Number.isFinite(w.newClientTickets) ? w.newClientTickets : 0}
+                                    totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "tickets_into_work") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketsIntoWorkCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        takenIntoWorkTickets={Number.isFinite(w.takenIntoWorkTickets) ? w.takenIntoWorkTickets : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketsIntoWorkCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    takenIntoWorkTickets={Number.isFinite(w.takenIntoWorkTickets) ? w.takenIntoWorkTickets : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "system_usage") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <SystemUsageCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        activityMinutes={Number.isFinite(w.activityMinutes) ? w.activityMinutes : 0}
-                                        activityHours={Number.isFinite(w.activityHours) ? w.activityHours : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <SystemUsageCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    activityMinutes={Number.isFinite(w.activityMinutes) ? w.activityMinutes : 0}
+                                    activityHours={Number.isFinite(w.activityHours) ? w.activityHours : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_distribution") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketDistributionCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        distributedTickets={Number.isFinite(w.distributedTickets) ? w.distributedTickets : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketDistributionCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    distributedTickets={Number.isFinite(w.distributedTickets) ? w.distributedTickets : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "closed_tickets_count") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <ClosedTicketsCountCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        olderThan11Days={Number.isFinite(w.olderThan11Days) ? w.olderThan11Days : 0}
-                                        newerThan11Days={Number.isFinite(w.newerThan11Days) ? w.newerThan11Days : 0}
-                                        totalClosedTickets={Number.isFinite(w.totalClosedTickets) ? w.totalClosedTickets : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <ClosedTicketsCountCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    olderThan11Days={Number.isFinite(w.olderThan11Days) ? w.olderThan11Days : 0}
+                                    newerThan11Days={Number.isFinite(w.newerThan11Days) ? w.newerThan11Days : 0}
+                                    totalClosedTickets={Number.isFinite(w.totalClosedTickets) ? w.totalClosedTickets : 0}
+                                    dateRange={dateRange}
+                                    sizeInfo={sizeInfo}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "tickets_by_depart_count") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketsByDepartCountCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        lessThan14Days={Number.isFinite(w.lessThan14Days) ? w.lessThan14Days : 0}
-                                        between14And30Days={Number.isFinite(w.between14And30Days) ? w.between14And30Days : 0}
-                                        moreThan30Days={Number.isFinite(w.moreThan30Days) ? w.moreThan30Days : 0}
-                                        totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketsByDepartCountCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    lessThan14Days={Number.isFinite(w.lessThan14Days) ? w.lessThan14Days : 0}
+                                    between14And30Days={Number.isFinite(w.between14And30Days) ? w.between14And30Days : 0}
+                                    moreThan30Days={Number.isFinite(w.moreThan30Days) ? w.moreThan30Days : 0}
+                                    totalTickets={Number.isFinite(w.totalTickets) ? w.totalTickets : 0}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_lifetime_stats") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketLifetimeStatsCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        totalLifetimeMinutes={Number.isFinite(w.totalLifetimeMinutes) ? w.totalLifetimeMinutes : 0}
-                                        averageLifetimeMinutes={Number.isFinite(w.averageLifetimeMinutes) ? w.averageLifetimeMinutes : 0}
-                                        ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
-                                        totalLifetimeHours={Number.isFinite(w.totalLifetimeHours) ? w.totalLifetimeHours : 0}
-                                        averageLifetimeHours={Number.isFinite(w.averageLifetimeHours) ? w.averageLifetimeHours : 0}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketLifetimeStatsCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    totalLifetimeMinutes={Number.isFinite(w.totalLifetimeMinutes) ? w.totalLifetimeMinutes : 0}
+                                    averageLifetimeMinutes={Number.isFinite(w.averageLifetimeMinutes) ? w.averageLifetimeMinutes : 0}
+                                    ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
+                                    totalLifetimeHours={Number.isFinite(w.totalLifetimeHours) ? w.totalLifetimeHours : 0}
+                                    averageLifetimeHours={Number.isFinite(w.averageLifetimeHours) ? w.averageLifetimeHours : 0}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_rate") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketRateCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        totalTransitions={Number.isFinite(w.totalTransitions) ? w.totalTransitions : 0}
-                                        directlyClosedCount={Number.isFinite(w.directlyClosedCount) ? w.directlyClosedCount : 0}
-                                        directlyClosedPercentage={Number.isFinite(w.directlyClosedPercentage) ? w.directlyClosedPercentage : 0}
-                                        workedOnCount={Number.isFinite(w.workedOnCount) ? w.workedOnCount : 0}
-                                        workedOnPercentage={Number.isFinite(w.workedOnPercentage) ? w.workedOnPercentage : 0}
-                                        bg={w.bg}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketRateCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    totalTransitions={Number.isFinite(w.totalTransitions) ? w.totalTransitions : 0}
+                                    directlyClosedCount={Number.isFinite(w.directlyClosedCount) ? w.directlyClosedCount : 0}
+                                    directlyClosedPercentage={Number.isFinite(w.directlyClosedPercentage) ? w.directlyClosedPercentage : 0}
+                                    workedOnCount={Number.isFinite(w.workedOnCount) ? w.workedOnCount : 0}
+                                    workedOnPercentage={Number.isFinite(w.workedOnPercentage) ? w.workedOnPercentage : 0}
+                                    bg={w.bg}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "workflow_from_change") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <WorkflowFromChangeCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        luatInLucruChangedCount={Number.isFinite(w.luatInLucruChangedCount) ? w.luatInLucruChangedCount : 0}
-                                        ofertaTrimisaChangedCount={Number.isFinite(w.ofertaTrimisaChangedCount) ? w.ofertaTrimisaChangedCount : 0}
-                                        totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <WorkflowFromChangeCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    luatInLucruChangedCount={Number.isFinite(w.luatInLucruChangedCount) ? w.luatInLucruChangedCount : 0}
+                                    ofertaTrimisaChangedCount={Number.isFinite(w.ofertaTrimisaChangedCount) ? w.ofertaTrimisaChangedCount : 0}
+                                    totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "workflow_to_change") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <WorkflowToChangeCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        contractIncheiatChangedCount={Number.isFinite(w.contractIncheiatChangedCount) ? w.contractIncheiatChangedCount : 0}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <WorkflowToChangeCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    contractIncheiatChangedCount={Number.isFinite(w.contractIncheiatChangedCount) ? w.contractIncheiatChangedCount : 0}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_creation") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketCreationCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        ticketsCreatedCount={Number.isFinite(w.ticketsCreatedCount) ? w.ticketsCreatedCount : 0}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketCreationCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    ticketsCreatedCount={Number.isFinite(w.ticketsCreatedCount) ? w.ticketsCreatedCount : 0}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "workflow_from_de_prelucrat") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <WorkflowFromDePrelucratCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        workflowChanges={w.workflowChanges || []}
-                                        totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <WorkflowFromDePrelucratCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    workflowChanges={w.workflowChanges || []}
+                                    totalChanges={Number.isFinite(w.totalChanges) ? w.totalChanges : 0}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "workflow_duration") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <WorkflowDurationCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        totalDurationMinutes={Number.isFinite(w.totalDurationMinutes) ? w.totalDurationMinutes : 0}
-                                        averageDurationMinutes={Number.isFinite(w.averageDurationMinutes) ? w.averageDurationMinutes : 0}
-                                        ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <WorkflowDurationCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    totalDurationMinutes={Number.isFinite(w.totalDurationMinutes) ? w.totalDurationMinutes : 0}
+                                    averageDurationMinutes={Number.isFinite(w.averageDurationMinutes) ? w.averageDurationMinutes : 0}
+                                    ticketsProcessed={Number.isFinite(w.ticketsProcessed) ? w.ticketsProcessed : 0}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     if (w.type === "ticket_destination") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TicketDestinationCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        destinationData={w.destinationData || {}}
-                                        bg={w.bg}
-                                        width={w.w}
-                                        height={w.h}
-                                    />
-                                </Box>
-                            </div>
+                        return renderWidgetWrapper(
+                            <Box style={{ height: "100%" }}>
+                                <TicketDestinationCard
+                                    title={w.title}
+                                    subtitle={w.subtitle}
+                                    destinationData={w.destinationData || {}}
+                                    bg={w.bg}
+                                    width={w.w}
+                                    height={w.h}
+                                />
+                            </Box>,
+                            w.id
                         );
                     }
 
                     // Source widgets (Platform, Source) - используют TotalCard
                     if (w.type === "source") {
-                        return (
-                            <div key={w.id} style={{ height: "100%" }}>
-                                <Box style={{ height: "100%" }}>
-                                    <TotalCard
-                                        title={w.title}
-                                        subtitle={w.subtitle}
-                                        totalAll={Number.isFinite(w.total) ? w.total : 0}
-                                        totalIncoming={Number.isFinite(w.incoming) ? w.incoming : 0}
-                                        totalOutgoing={Number.isFinite(w.outgoing) ? w.outgoing : 0}
-                                        dateRange={dateRange}
-                                        sizeInfo={sizeInfo}
-                                        bg={w.bg}
-                                        widgetType={widgetType}
-                                    />
-                                </Box>
-                            </div>
-                        );
-                    }
-
-                    return (
-                        <div key={w.id} style={{ height: "100%" }}>
+                        return renderWidgetWrapper(
                             <Box style={{ height: "100%" }}>
                                 <TotalCard
                                     title={w.title}
@@ -557,8 +535,26 @@ const DashboardGrid = ({ widgets = [], dateRange, widgetType = "calls" }) => {
                                     bg={w.bg}
                                     widgetType={widgetType}
                                 />
-                            </Box>
-                        </div>
+                            </Box>,
+                            w.id
+                        );
+                    }
+
+                    return renderWidgetWrapper(
+                        <Box style={{ height: "100%" }}>
+                            <TotalCard
+                                title={w.title}
+                                subtitle={w.subtitle}
+                                totalAll={Number.isFinite(w.total) ? w.total : 0}
+                                totalIncoming={Number.isFinite(w.incoming) ? w.incoming : 0}
+                                totalOutgoing={Number.isFinite(w.outgoing) ? w.outgoing : 0}
+                                dateRange={dateRange}
+                                sizeInfo={sizeInfo}
+                                bg={w.bg}
+                                widgetType={widgetType}
+                            />
+                        </Box>,
+                        w.id
                     );
                 })}
             </ResponsiveGridLayout>
