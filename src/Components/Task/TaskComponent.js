@@ -150,7 +150,7 @@ const TaskComponent = ({
               ]}
             />
             <TextInput
-              placeholder="Поиск по ID тикета, имени ответственного..."
+              placeholder={translations["searchTasksPlaceholder"][language]}
               value={searchInput}
               onChange={(e) => setSearchInput(e.currentTarget.value)}
               w={350}
@@ -164,9 +164,6 @@ const TaskComponent = ({
                 ) : null
               }
             />
-            {/* <Button leftSection={<IoMdAdd size={16} />} onClick={openNewTask}>
-              {translations["New Task"][language]}
-            </Button> */}
           </Group>
         }
       />

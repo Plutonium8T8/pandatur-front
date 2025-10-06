@@ -4688,4 +4688,9 @@ export const translations = {
     RU: "Скоро",
     EN: "Soon",
   },
+  "searchTasksPlaceholder": {
+    RO: "Caută după ID task, numele responsabilului...",
+    RU: "Поиск по ID тикета, имени ответственного...",
+    EN: "Search by task ID, responsible name...",
+  },
 };
