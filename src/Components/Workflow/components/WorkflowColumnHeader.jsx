@@ -31,6 +31,7 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
       <Flex
         direction="column"
         align="center"
+        p="12px"
         gap="4px"
         style={{
           zIndex: 1,

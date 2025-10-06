@@ -348,7 +348,8 @@ export const Leads = () => {
         ref={refLeadsHeader}
         style={{ "--side-bar-width": isCollapsed ? "79px" : "249px" }}
         className="leads-header-container"
-      >
+        bg="var(--crm-ui-kit-palette-background-primary)"
+>
         <PageHeader
           count={viewMode === VIEW_MODE.LIST ? totalLeads : visibleTickets.length}
           title={getLanguageByKey("Leads")}
