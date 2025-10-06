@@ -3,9 +3,6 @@ html {
   overflow: hidden;
 }
 
-#root {
-  zoom: 0.75;
-}
 
 body {
   margin: 0;
@@ -16,6 +13,7 @@ body {
 }
 
 #root {
+  zoom: 0.75;
   height: 133.33vh;
   width: 133.33vw;
   overflow: hidden;
