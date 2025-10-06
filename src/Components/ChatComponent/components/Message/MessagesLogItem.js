@@ -58,13 +58,11 @@ export const MessagesLogItem = ({ log, technicians }) => {
 
     return (
         <Box
-            // p="16px"
-            mb="12px"
+            mb="6px"
             style={{
                 backgroundColor: colors.bg,
-                border: `2px solid ${colors.border}`,
+                border: `1px solid ${colors.border}`,
                 borderRadius: "12px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                 position: "relative",
                 overflow: "hidden"
             }}
