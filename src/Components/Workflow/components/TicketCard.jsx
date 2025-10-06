@@ -248,13 +248,14 @@ export const TicketCard = ({
               <Flex align="center" gap="4">
                 <FaHeadphones size={12} color={colors.gray[6]} />
                 <Text
-                  size="xs"
-                  c={colors.gray[7]}
+                  size="sm"
+                  c="dark"
+                  fw={600}
                   style={{
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
-                    fontSize: '11px'
+                    fontSize: '12px'
                   }}
                 >
                   {technician.label}
