@@ -1,4 +1,4 @@
-import { Flex, Text, Badge, DEFAULT_THEME } from "@mantine/core";
+import { Flex, Text, Box, DEFAULT_THEME } from "@mantine/core";
 import { getBrightByWorkflowType } from "./WorkflowTag";
 import { getLanguageByKey } from "../../utils";
 
@@ -6,34 +6,57 @@ const { colors } = DEFAULT_THEME;
 
 export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
   return (
-    <Flex
-      pos="absolute"
-      top={0}
-      left={0}
-      right={0}
+    <Box
+      pos="relative"
       w="100%"
-      p="8"
-      pr="16"
-      justify="space-between"
-      align="center"
+      h="60px"
       style={{
-        backgroundColor: getBrightByWorkflowType(workflow, ""),
-        borderRadius: "12px",
-        zIndex: 1,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
       }}
     >
-      <Badge bg="transparent" size="xs">
-        <Flex gap="xs">
-
-          <Text fw="bold" c="black">
-            {filteredTickets.length}
-          </Text>
-        </Flex>
-      </Badge>
-
-      <Text c={colors.dark[7]} fw="bold">
-        {getLanguageByKey(workflow)}
-      </Text>
-    </Flex>
+      {/* Цветная линия внизу */}
+      <Box
+        pos="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        h="4px"
+        style={{
+          backgroundColor: getBrightByWorkflowType(workflow, ""),
+          borderRadius: "2px",
+        }}
+      />
+      
+      {/* Контент поверх линии */}
+      <Flex
+        direction="column"
+        align="center"
+        gap="4px"
+        style={{
+          zIndex: 1,
+          position: "relative",
+        }}
+      >
+        <Text 
+          fw="bold" 
+          c={colors.dark[7]}
+          size="sm"
+          ta="center"
+        >
+          {getLanguageByKey(workflow)}
+        </Text>
+        
+        <Text 
+          fw="bold" 
+          c={colors.dark[5]}
+          size="xs"
+          ta="center"
+        >
+          {filteredTickets.length} leads
+        </Text>
+      </Flex>
+    </Box>
   );
 };
