@@ -1318,6 +1318,21 @@ export const translations = {
     RU: "Этап",
     EN: "Stage"
   },
+  "Task completed": {
+    RO: "Task completat",
+    RU: "Задача завершена",
+    EN: "Task completed"
+  },
+  "Task reassigned": {
+    RO: "Task redistribuit",
+    RU: "Задача переназначена",
+    EN: "Task reassigned"
+  },
+  "Task author changed": {
+    RO: "Autor task modificat",
+    RU: "Автор задачи изменен",
+    EN: "Task author changed"
+  },
   "Alege responsabil lead": {
     RO: "Alege responsabil lead",
     RU: "Выберите ответственного за лид",

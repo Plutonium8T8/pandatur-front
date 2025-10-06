@@ -1,7 +1,7 @@
 import { Text, Box, Flex, Badge } from "@mantine/core";
 import { parseServerDate, getFullName } from "../../../utils";
 import { getLanguageByKey } from "../../../utils";
-import { FaUser, FaCalendarAlt, FaCog, FaCogs, FaRoute } from "react-icons/fa";
+import { FaUser, FaCalendarAlt, FaCog, FaCogs, FaRoute, FaCheck, FaExchangeAlt, FaEdit } from "react-icons/fa";
 
 export const MessagesLogItem = ({ log, technicians }) => {
     const date = parseServerDate(log.timestamp).format("DD.MM.YYYY HH:mm");
@@ -41,6 +41,27 @@ export const MessagesLogItem = ({ log, technicians }) => {
     } else if (log.action === "updated" && log.subject === "workflow") {
         // Специальная обработка для изменения этапа workflow
         changed = `${getLanguageByKey("Etap")}: ${log.from} → ${log.to}`;
+    } else if (log.action === "updated" && log.subject === "status" && log.type === "task" && log.from === "false" && log.to === "true") {
+        // Специальная обработка для завершения задачи
+        changed = getLanguageByKey("Task completed");
+    } else if (log.action === "updated" && log.subject === "created_for" && log.type === "task") {
+        // Специальная обработка для переназначения задачи
+        const fromTech = technicians?.find((t) => String(t.value) === String(log.from)) || {};
+        const toTech = technicians?.find((t) => String(t.value) === String(log.to)) || {};
+        
+        const fromName = log.from === "1" ? "System" : (fromTech.label || getFullName(fromTech.name, fromTech.surname) || `#${log.from}`);
+        const toName = log.to === "1" ? "System" : (toTech.label || getFullName(toTech.name, toTech.surname) || `#${log.to}`);
+        
+        changed = `${getLanguageByKey("Task reassigned")}: ${fromName} → ${toName}`;
+    } else if (log.action === "updated" && log.subject === "created_by" && log.type === "task") {
+        // Специальная обработка для изменения автора задачи
+        const fromTech = technicians?.find((t) => String(t.value) === String(log.from)) || {};
+        const toTech = technicians?.find((t) => String(t.value) === String(log.to)) || {};
+        
+        const fromName = log.from === "1" ? "System" : (fromTech.label || getFullName(fromTech.name, fromTech.surname) || `#${log.from}`);
+        const toName = log.to === "1" ? "System" : (toTech.label || getFullName(toTech.name, toTech.surname) || `#${log.to}`);
+        
+        changed = `${getLanguageByKey("Task author changed")}: ${fromName} → ${toName}`;
     } else if (log.subject && log.from && log.to) {
         changed = `${log.subject}: ${log.from} → ${log.to}`;
     } else if (log.subject) {
@@ -49,18 +70,45 @@ export const MessagesLogItem = ({ log, technicians }) => {
         changed = log.action || "modified";
     }
 
-    // Определяем цветовую схему в зависимости от типа действия
+    // Определяем цветовую схему в зависимости от типа действия и объекта
     const getActionColor = () => {
-        if (log.action === "created") return { bg: "#e8f5e8", border: "#4caf50", icon: "#2e7d32" };
-        if (log.action === "updated") {
-            // Специальная цветовая схема для workflow этапов
-            if (log.subject === "workflow") {
-                return { bg: "#fff3e0", border: "#ff9800", icon: "#e65100" };
-            }
-            return { bg: "#e3f2fd", border: "#2196f3", icon: "#1565c0" };
+        // Цвета в зависимости от типа объекта
+        const ticketColors = { bg: "#e3f2fd", border: "#2196f3", icon: "#1565c0" }; // Синий для ticket
+        const taskColors = { bg: "#fff3e0", border: "#ff9800", icon: "#e65100" }; // Оранжевый для task
+        const defaultColors = { bg: "#f5f5f5", border: "#9e9e9e", icon: "#616161" }; // Серый по умолчанию
+
+        if (log.action === "created") {
+            if (log.type === "ticket") return ticketColors;
+            if (log.type === "task") return taskColors;
+            return { bg: "#e8f5e8", border: "#4caf50", icon: "#2e7d32" }; // Зеленый для создания по умолчанию
         }
-        if (log.action === "deleted") return { bg: "#ffebee", border: "#f44336", icon: "#c62828" };
-        return { bg: "#f5f5f5", border: "#9e9e9e", icon: "#616161" };
+        
+        if (log.action === "updated") {
+            // Специальная цветовая схема для завершенных задач
+            if (log.subject === "status" && log.type === "task" && log.from === "false" && log.to === "true") {
+                return taskColors; // Оранжевый для завершенных задач
+            }
+            // Специальная цветовая схема для переназначенных задач
+            if (log.subject === "created_for" && log.type === "task") {
+                return taskColors; // Оранжевый для переназначенных задач
+            }
+            // Специальная цветовая схема для изменения автора задачи
+            if (log.subject === "created_by" && log.type === "task") {
+                return taskColors; // Оранжевый для изменения автора задачи
+            }
+            // Цвета в зависимости от типа объекта
+            if (log.type === "ticket") return ticketColors;
+            if (log.type === "task") return taskColors;
+            return ticketColors; // По умолчанию синий для обновлений
+        }
+        
+        if (log.action === "deleted") {
+            if (log.type === "ticket") return { bg: "#ffebee", border: "#f44336", icon: "#c62828" };
+            if (log.type === "task") return { bg: "#ffebee", border: "#ff5722", icon: "#d84315" }; // Темно-оранжевый для удаления task
+            return { bg: "#ffebee", border: "#f44336", icon: "#c62828" }; // Красный по умолчанию для удаления
+        }
+        
+        return defaultColors;
     };
 
     const colors = getActionColor();
@@ -117,7 +165,11 @@ export const MessagesLogItem = ({ log, technicians }) => {
                         boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
                     }}
                     leftSection={
-                        log.subject === "workflow" ? <FaRoute size={10} /> : <FaCog size={10} />
+                        log.subject === "workflow" ? <FaRoute size={10} /> :
+                        (log.subject === "status" && log.type === "task" && log.from === "false" && log.to === "true") ? <FaCheck size={10} /> :
+                        (log.subject === "created_for" && log.type === "task") ? <FaExchangeAlt size={10} /> :
+                        (log.subject === "created_by" && log.type === "task") ? <FaEdit size={10} /> :
+                        <FaCog size={10} />
                     }
                 >
                     {object}
