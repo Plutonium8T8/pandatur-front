@@ -1,8 +1,6 @@
-import { Flex, Text, Box, DEFAULT_THEME } from "@mantine/core";
+import { Flex, Text, Box } from "@mantine/core";
 import { getBrightByWorkflowType } from "./WorkflowTag";
 import { getLanguageByKey } from "../../utils";
-
-const { colors } = DEFAULT_THEME;
 
 export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
   return (
@@ -28,7 +26,7 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
           borderRadius: "2px",
         }}
       />
-      
+
       {/* Контент поверх линии */}
       <Flex
         direction="column"
@@ -39,18 +37,18 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
           position: "relative",
         }}
       >
-        <Text 
-          fw="bold" 
-          c={colors.dark[7]}
+        <Text
+          fw="bold"
+          c="var(--crm-ui-kit-palette-text-primary)"
           size="sm"
           ta="center"
         >
           {getLanguageByKey(workflow)}
         </Text>
-        
-        <Text 
-          fw="bold" 
-          c={colors.dark[5]}
+
+        <Text
+          fw="bold"
+          c="var(--crm-ui-kit-palette-text-secondary-light)"
           size="xs"
           ta="center"
         >

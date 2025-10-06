@@ -129,10 +129,12 @@ export const WorkflowColumn = ({
     <Flex
       pos="relative"
       direction="column"
-      bg={colors.white}
+      bg="var(--crm-ui-kit-palette-background-primary)"
       style={{
         borderRadius: 32,
         flex: "0 0 400px",
+        color: "var(--crm-ui-kit-palette-text-primary)",
+        border: "1px solid var(--crm-ui-kit-palette-border-primary)",
       }}
     >
       <WorkflowColumnHeader
@@ -140,7 +142,7 @@ export const WorkflowColumn = ({
         filteredTickets={filteredTickets}
       />
 
-      <Flex mt={20} direction="column" h="100%" pb="50px" ref={columnRef}>
+      <Flex direction="column" h="100%" pb="50px" ref={columnRef}>
         <VariableSizeList
           ref={listRef}
           height={columnHeight}

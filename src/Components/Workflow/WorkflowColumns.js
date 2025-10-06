@@ -2,6 +2,7 @@ import { Flex } from "@mantine/core";
 import { useRef, useEffect } from "react";
 import { WorkflowColumn } from "./components";
 import { useGetTechniciansList, useApp } from "../../hooks";
+import "./WorkflowColumns.css";
 
 export const WorkflowColumns = ({
   tickets,
@@ -71,13 +72,7 @@ export const WorkflowColumns = ({
   return (
     <div
       ref={wrapperRef}
-      style={{
-        overflowX: "scroll",
-        overflowY: "hidden",
-        height: "100%",
-        cursor: "grab",
-        padding: "0 20px",
-      }}
+      className="workflow-columns"
     >
       <Flex gap="xs" w="fit-content" h="100%">
         {visibleWorkflows.map((workflow) => (

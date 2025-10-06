@@ -25,9 +25,9 @@ a {
 /* Leads Page */
 
 .leads-container {
-  margin-top: 66px;
+  margin-top: 60px;
   height: calc(100% - calc(var(--leads-filter-height) + 10px));
-  padding-top: 10px;
+  /* padding-top: 10px; */
 }
 
 /* Chat Page */

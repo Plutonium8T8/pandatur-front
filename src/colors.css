@@ -1,0 +1,45 @@
+:root {
+  /* Фоны */
+  --crm-ui-kit-palette-background-default: #0f2231; /* Базовый фон приложения */
+  --crm-ui-kit-palette-background-primary: #153043; /* Основной фон блоков/карточек */
+  --crm-ui-kit-palette-background-primary-disabled: #132b3c; /* Отключенные/неактивные элементы */
+
+  /* Текст */
+  --crm-ui-kit-palette-text-primary: #f2f2f2; /* Основной цвет текста */
+  --crm-ui-kit-palette-text-secondary-light: #7f8ba4; /* Вторичный текст (светлый) */
+  --crm-ui-kit-palette-text-secondary-dark: #8092ad; /* Вторичный текст (тёмный) */
+
+  /* Ссылки */
+  --crm-ui-kit-palette-link-primary: #1691ff; /* Основной цвет ссылок/активных элементов */
+  --crm-ui-kit-palette-link-hover-primary: #1691ff; /* Цвет ссылок при наведении */
+
+  /* Границы */
+  --crm-ui-kit-palette-border-default: #596683; /* Базовые границы/разделители */
+  --crm-ui-kit-palette-border-primary: #284860; /* Акцентные/активные границы */
+
+  /* Плейсхолдеры */
+  --crm-ui-kit-palette-placeholder-primary: #6a7991; /* Плейсхолдер активных инпутов */
+  --crm-ui-kit-palette-placeholder-default: #6a7991; /* Плейсхолдер по умолчанию */
+
+  /* Поверхности */
+  --crm-ui-kit-palette-surface-background-color: #0f2231; /* Фон поверхностей/карточек */
+  --crm-ui-kit-palette-surface-hover-background-color: #264b79; /* Ховер для поверхностей */
+  --crm-ui-kit-palette-surface-text-color: #f2f2f2; /* Текст на поверхностях */
+
+  /* Скроллбар */
+  --crm-ui-kit-palette-scrollbar-thumb-background: #394e5f; /* Цвет бегунка скроллбара */
+
+  /* Кнопки */
+  --crm-ui-kit-palette-button-classic-hover-background: #19374d; /* Фон кнопки (hover) */
+
+  /* Тени */
+  --crm-ui-kit-palette-box-shadow-default: #132b3c; /* Базовый цвет тени (если используется) */
+  --crm-ui-kit-palette-content-block-box-shadow: none; /* Отключение тени контент-блоков */
+  --crm-ui-kit-palette-accordion-item-box-shadow: 0px 1px 6px 2px rgba(0, 19, 45, .06); /* Тень элементов аккордеона */
+
+  /* Всплывающие блоки (callouts) */
+  --crm-ui-kit-palette-callout-error-background-color: #0f2231; /* Ошибка — фон */
+  --crm-ui-kit-palette-callout-warning-background-color: #264b79; /* Предупреждение — фон */
+  --crm-ui-kit-palette-callout-info-background-color: #264b79; /* Информация — фон */
+  --crm-ui-kit-palette-callout-success-background-color: #0f2231; /* Успех — фон */
+}

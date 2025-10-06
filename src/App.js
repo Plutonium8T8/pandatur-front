@@ -19,6 +19,7 @@ import { publicRoutes } from "./routes";
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import "./App.css";
+import "./colors.css";
 
 dayjs.extend(customParseFormat);
 

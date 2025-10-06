@@ -57,11 +57,12 @@ export const TicketCard = ({
         withBorder
         radius="md"
         pos="relative"
-        bg={isMyTicket ? "#dcfce7" : "#f8f9fa"}
+        bg={isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)"}
         p="8px"
         style={{
-          borderColor: isMyTicket ? "#22c55e" : undefined,
-          borderWidth: isMyTicket ? "2px" : undefined,
+          borderColor: isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-border-default)",
+          borderWidth: isMyTicket ? "2px" : "1px",
+          color: "var(--crm-ui-kit-palette-text-primary)",
         }}
       >
         <Box
@@ -99,7 +100,7 @@ export const TicketCard = ({
                   >
                     <Menu shadow="md">
                       <Menu.Target>
-                        <ActionIcon 
+                        <ActionIcon
                           variant="default"
                           onMouseDown={(e) => {
                             e.preventDefault();
@@ -169,7 +170,7 @@ export const TicketCard = ({
                 {ticket.contact && (
                   <Text
                     fw="600"
-                    c={colors.dark[7]}
+                    c="var(--crm-ui-kit-palette-text-primary)"
                     size="sm"
                     style={{
                       overflow: 'hidden',
@@ -182,7 +183,7 @@ export const TicketCard = ({
                 )}
                 <Text
                   size="xs"
-                  c={colors.gray[5]}
+                  c="var(--crm-ui-kit-palette-text-secondary-light)"
                   style={{
                     fontSize: '10px',
                     flexShrink: 0
@@ -195,7 +196,7 @@ export const TicketCard = ({
               {/* Дата создания под именем тикета */}
               <Text
                 size="xs"
-                c={colors.black}
+                c="var(--crm-ui-kit-palette-text-secondary-dark)"
                 style={{ fontSize: '14px', marginTop: '2px' }}
               >
                 {parseServerDate(ticket.creation_date)?.format(YYYY_MM_DD)}
@@ -205,7 +206,7 @@ export const TicketCard = ({
               {ticket?.clients?.[0]?.phone && (
                 <Text
                   size="xs"
-                  c={colors.dark[6]}
+                  c="var(--crm-ui-kit-palette-text-primary)"
                   style={{ fontSize: '14px', marginTop: '2px' }}
                   fw="bold"
                 >
@@ -219,7 +220,7 @@ export const TicketCard = ({
           {ticket.last_message && (
             <Text
               size="xs"
-              c={colors.black}
+              c="var(--crm-ui-kit-palette-text-secondary-light)"
               style={{
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -246,10 +247,10 @@ export const TicketCard = ({
             {/* Ответственный (Responsabil lead) */}
             {technician?.label ? (
               <Flex align="center" gap="4">
-                <FaHeadphones size={12} color={colors.gray[6]} />
+                <FaHeadphones size={12} color="var(--crm-ui-kit-palette-text-secondary-light)" />
                 <Text
                   size="sm"
-                  c="dark"
+                  c="var(--crm-ui-kit-palette-text-primary)"
                   fw={600}
                   style={{
                     overflow: 'hidden',
@@ -268,11 +269,11 @@ export const TicketCard = ({
             {/* Task count */}
             <Text
               size="xs"
-              c={ticket.active_task_count > 0 ? (isMyTicket ? colors.blue[6] : colors.orange[6]) : colors.gray[5]}
+              c={ticket.active_task_count > 0 ? (isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-secondary-light)") : "var(--crm-ui-kit-palette-text-secondary-light)"}
               fw={ticket.active_task_count > 0 ? "bold" : "normal"}
-              style={{ 
+              style={{
                 fontSize: '10px',
-                backgroundColor: ticket.active_task_count > 0 ? (isMyTicket ? colors.green[0] : colors.orange[0]) : 'transparent',
+                backgroundColor: ticket.active_task_count > 0 ? (isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)") : 'transparent',
                 padding: ticket.active_task_count > 0 ? '2px 6px' : '0',
                 borderRadius: ticket.active_task_count > 0 ? '4px' : '0'
               }}

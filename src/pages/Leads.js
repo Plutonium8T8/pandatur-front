@@ -456,7 +456,7 @@ export const Leads = () => {
       </Flex>
 
       <div style={{ "--leads-filter-height": `${leadsFilterHeight}px` }} className="leads-container">
-        <Divider mb="md" />
+        <Divider style={{ borderColor: 'var(--crm-ui-kit-palette-border-primary)' }} />
         {loading ? (
           <div className="d-flex align-items-center justify-content-center h-full">
             <Spin />
