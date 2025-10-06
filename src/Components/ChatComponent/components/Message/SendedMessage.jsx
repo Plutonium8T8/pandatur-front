@@ -1,10 +1,10 @@
-import { Flex, Text } from "@mantine/core";
+import { Flex, Text, Image } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { FaHeadphones } from "react-icons/fa6";
 import { IoMdCheckmark } from "react-icons/io";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { renderContent } from "../../renderContent";
-import { HH_mm, MEDIA_TYPE } from "../../../../app-constants";
+import { HH_mm, MEDIA_TYPE, DEFAULT_PHOTO } from "../../../../app-constants";
 import { parseServerDate, MESSAGES_STATUS, getFullName } from "../../../utils";
 import { Call } from "./Call";
 import { socialMediaIcons } from "../../../utils";
@@ -48,6 +48,19 @@ export const SendedMessage = ({
     resolvedTechnician?.label ||
     DEFAULT_SENDER_NAME;
 
+  // Получаем фото техника
+  const getTechnicianPhoto = () => {
+    // Если есть фото у техника
+    if (resolvedTechnician?.id?.photo && resolvedTechnician.id.photo.trim() !== "") {
+      return resolvedTechnician.id.photo;
+    }
+    
+    // Возвращаем null для использования fallback
+    return null;
+  };
+
+  const technicianPhoto = getTechnicianPhoto();
+
   if (isCall) {
     const participants = parseCallParticipants(
       msg.call_metadata, 
@@ -75,6 +88,13 @@ export const SendedMessage = ({
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
+          <Image 
+            w={36} 
+            h={36} 
+            radius="50%" 
+            src={technicianPhoto}
+            fallbackSrc={DEFAULT_PHOTO} 
+          />
           <Flex>
             <Flex miw="250px" direction="column" p="8" className="text" bg="#f0f8f0">
               <Flex align="center" gap={8}>

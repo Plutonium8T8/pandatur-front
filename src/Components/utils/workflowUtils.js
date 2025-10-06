@@ -1,5 +1,5 @@
 export const workflowOptionsSalesMD = [
-    "GPT",
+    // "GPT",
     "Interesat",
     "Apel de intrare",
     "De prelucrat",
@@ -14,7 +14,7 @@ export const workflowOptionsSalesMD = [
 ];
 
 export const workflowOptionsSalesRO = [
-    "GPT",
+    // "GPT",
     "Interesat",
     "De prelucrat",
     "Luat în lucru",

@@ -57,11 +57,35 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
     senderTechnician?.label ||
     `#${msg.sender_id}`;
 
+  // Получаем фото клиента - сначала из клиента, потом из тикета
+  const getClientPhoto = () => {
+    // Если есть фото у клиента
+    if (senderClient?.photo && senderClient.photo.trim() !== "") {
+      return senderClient.photo;
+    }
+    
+    // Если есть фото в тикете
+    if (personalInfo?.photo_url && personalInfo.photo_url.trim() !== "") {
+      return personalInfo.photo_url;
+    }
+    
+    // Возвращаем null для использования fallback
+    return null;
+  };
+
+  const clientPhoto = getClientPhoto();
+
   return (
     <Flex w="100%">
       <Flex w="90%" direction="column" className="chat-message received">
         <Flex gap="8">
-          <Image w={36} h={36} radius="50%" fallbackSrc={DEFAULT_PHOTO} />
+          <Image 
+            w={36} 
+            h={36} 
+            radius="50%" 
+            src={clientPhoto}
+            fallbackSrc={DEFAULT_PHOTO} 
+          />
           <Flex
             miw="250px"
             direction="column"
