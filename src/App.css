@@ -221,7 +221,7 @@ a {
 
 
 [data-mantine-color-scheme] .mantine-Drawer-content {
-  zoom: 1;
+  zoom: 0.75;
 }
 
 [data-mantine-color-scheme] .mantine-Drawer-body .mantine-Button-root {

@@ -139,16 +139,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
                 </Flex>
                 
                 <Flex align="center" gap="xs">
-                    {log.ticket_id && (
-                        <Badge 
-                            size="xs" 
-                            variant="outline" 
-                            color="blue"
-                            style={{ fontWeight: 600 }}
-                        >
-                            Ticket #{log.ticket_id}
-                        </Badge>
-                    )}
                     {log.task_id && (
                         <Badge 
                             size="xs" 
