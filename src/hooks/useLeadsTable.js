@@ -11,7 +11,7 @@ import { showServerError } from "../Components/utils";
  * - иначе, если поиск включён -> используем полный workflowOptions
  * - иначе -> workflowOptions без [Realizat..., Închis...]
  */
-export const useLeadsTable = () => {
+export const useLeadsTable = (debouncedSearchTerm = "") => {
     const { enqueueSnackbar } = useSnackbar();
     const { groupTitleForApi, workflowOptions } = useApp();
 
@@ -21,7 +21,6 @@ export const useLeadsTable = () => {
     const [totalLeads, setTotalLeads] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
     const [perPage, setPerPage] = useState(50);
-    const [searchTerm, setSearchTerm] = useState("");
 
     const hardReqIdRef = useRef(0);
 
@@ -44,7 +43,7 @@ export const useLeadsTable = () => {
             setLoading(true);
 
             const excludedWorkflows = ["Realizat cu succes", "Închis și nerealizat"];
-            const isSearchingInList = !!searchTerm?.trim();
+            const isSearchingInList = !!debouncedSearchTerm?.trim();
 
             const effectiveWorkflow =
                 hardTicketFilters.workflow?.length > 0
@@ -66,6 +65,7 @@ export const useLeadsTable = () => {
                     ...restFilters,
                     workflow: effectiveWorkflow,
                     ...(search?.trim() ? { search: search.trim() } : {}),
+                    ...(debouncedSearchTerm?.trim() ? { search: debouncedSearchTerm.trim() } : {}),
                 },
             });
 
@@ -82,7 +82,7 @@ export const useLeadsTable = () => {
                 setLoading(false);
             }
         }
-    }, [enqueueSnackbar, groupTitleForApi, workflowOptions, hardTicketFilters, perPage, searchTerm]);
+    }, [enqueueSnackbar, groupTitleForApi, workflowOptions, hardTicketFilters, perPage, debouncedSearchTerm]);
 
     // useLeadsTable.js
     const handleApplyFiltersHardTicket = useCallback((selectedFilters) => {
@@ -124,13 +124,11 @@ export const useLeadsTable = () => {
         currentPage,
         perPage,
         hasHardFilters,
-        searchTerm,
 
         // actions
         fetchHardTickets,
         setHardTicketFilters,
         setCurrentPage,
-        setSearchTerm,
         handleApplyFiltersHardTicket,
         handlePerPageChange,
     };

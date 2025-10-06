@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useSnackbar } from "notistack";
 import { Divider, Modal, Button, ActionIcon, Input, SegmentedControl, Flex, Select } from "@mantine/core";
-import { useDOMElementHeight, useApp, useConfirmPopup, useGetTechniciansList } from "@hooks";
+import { useDOMElementHeight, useApp, useConfirmPopup, useGetTechniciansList, useDebounce } from "@hooks";
 import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
 import { SpinnerRightBottom, AddLeadModal, PageHeader, Spin } from "@components";
@@ -85,6 +85,10 @@ export const Leads = () => {
     setChoiceWorkflow,
   } = useLeadsKanban();
 
+  // Debounce для поиска в таблице
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 2000);
+
   // --- ТАБЛИЦА (hard) ---
   const {
     hardTickets,
@@ -94,14 +98,19 @@ export const Leads = () => {
     currentPage,
     perPage,
     hasHardFilters,
-    searchTerm,
     fetchHardTickets,
     setHardTicketFilters,
     setCurrentPage,
-    setSearchTerm,
     handleApplyFiltersHardTicket,
     handlePerPageChange,
-  } = useLeadsTable();
+  } = useLeadsTable(debouncedSearchTerm);
+
+  // Сброс страницы при изменении поиска
+  useEffect(() => {
+    if (viewMode === VIEW_MODE.LIST) {
+      setCurrentPage(1); // сбрасываем на первую страницу при поиске
+    }
+  }, [debouncedSearchTerm, viewMode, setCurrentPage]);
 
   // --- Выделение текущего списка ---
   const {
@@ -174,7 +183,7 @@ export const Leads = () => {
     if (viewMode === VIEW_MODE.LIST && filtersReady) {
       fetchHardTickets(currentPage);
     }
-  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage]);
+  }, [hardTicketFilters, groupTitleForApi, workflowOptions, currentPage, viewMode, filtersReady, perPage, fetchHardTickets]);
 
   // ПАРАЛЛЕЛЬНО: ids-only запрос под те же фильтры (без пагинации)
   useEffect(() => {
