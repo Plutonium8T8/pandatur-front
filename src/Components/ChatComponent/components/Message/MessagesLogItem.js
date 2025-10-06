@@ -58,7 +58,7 @@ export const MessagesLogItem = ({ log, technicians }) => {
 
     return (
         <Box
-            p="16px"
+            // p="16px"
             mb="12px"
             style={{
                 backgroundColor: colors.bg,
@@ -69,17 +69,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
                 overflow: "hidden"
             }}
         >
-            {/* Декоративная полоса сверху */}
-            <Box
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: "3px",
-                    background: `linear-gradient(90deg, ${colors.border}, ${colors.icon})`
-                }}
-            />
 
             <Flex align="center" gap="sm" wrap="wrap" p="xs" style={{ backgroundColor: "rgba(255,255,255,0.3)", borderRadius: "8px" }}>
                 <Box

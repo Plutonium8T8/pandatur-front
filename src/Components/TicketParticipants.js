@@ -1,8 +1,9 @@
-import React, { useContext, useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Badge, Group, Text, Popover, ScrollArea } from "@mantine/core";
+import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Text, Popover, ScrollArea, Box, Flex, Avatar, Divider } from "@mantine/core";
 import { SocketContext } from "../contexts/SocketContext";
 import { useGetTechniciansList } from "@hooks";
 import { getLanguageByKey } from "@utils";
+import { FaUser, FaCogs } from "react-icons/fa";
 
 const SERVER = {
     INIT: "ticket_clients",
@@ -132,53 +133,117 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
     const hasMore = rest.length > 0;
 
     return (
-        <Group align="center" gap="8" wrap="nowrap" style={{ width: "100%" }}>
-            <Badge size="lg" variant="light">{total}</Badge>
+        <Box
+            style={{
+                backgroundColor: "#f8f9fa",
+                border: "1px solid #e9ecef",
+                borderRadius: "12px",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
+            }}
+        >
+            <Flex align="center" gap="md" wrap="wrap">
+                <Flex align="center" gap="xs">
+                    <Text pl="xs" size="sm" fw={900} c="dark" style={{ whiteSpace: "nowrap" }}>
+                        LIVE
+                    </Text>
+                </Flex>
 
-            <Text size="sm" c="black" style={{ whiteSpace: "nowrap" }}>
-                {getLanguageByKey("inTicket")}:
-            </Text>
+                {fullNames.length > 0 ? (
+                    <Flex align="center" gap="xs" style={{ flex: 1, minWidth: 0 }}>
+                        {inline.map((name, index) => {
+                            const isCurrentUser = String(name) === String(currentUserId);
 
-            {fullNames.length > 0 ? (
-                <Text
-                    size="sm"
-                    style={{
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        flex: 1,
-                        minWidth: 0,
-                    }}
-                    title={inline.join(", ")}
-                >
-                    {inline.join(", ")}
-                    {hasMore && "…"}
-                </Text>
-            ) : (
-                <Text size="sm" c="dimmed">
-                    {getLanguageByKey("noParticipantsInTicket")}
-                </Text>
-            )}
-
-            {hasMore && (
-                <Popover width={320} position="bottom-end" withArrow>
-                    <Popover.Target>
-                        <Text
-                            size="sm"
-                            c="blue"
-                            style={{ cursor: "pointer", userSelect: "none", whiteSpace: "nowrap" }}
-                            aria-label={getLanguageByKey("showAllParticipants")}
-                        >
-                            {getLanguageByKey("andMore")} {rest.length}
-                        </Text>
-                    </Popover.Target>
-                    <Popover.Dropdown>
-                        <ScrollArea.Autosize mah={220} type="auto">
-                            <Text size="sm">{rest.join(", ")}</Text>
-                        </ScrollArea.Autosize>
-                    </Popover.Dropdown>
-                </Popover>
-            )}
-        </Group>
+                            return (
+                                <Flex key={index} align="center" gap="xs">
+                                    <Box
+                                        style={{
+                                            width: "8px",
+                                            height: "8px",
+                                            borderRadius: "50%",
+                                            backgroundColor: "#4caf50",
+                                            boxShadow: "0 0 6px rgba(76, 175, 80, 0.6)"
+                                        }}
+                                    />
+                                    <Text
+                                        size="sm"
+                                        fw={isCurrentUser ? 700 : 500}
+                                        c={isCurrentUser ? "blue" : "dark"}
+                                        style={{
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                            maxWidth: "120px"
+                                        }}
+                                        title={name}
+                                    >
+                                        {name}
+                                    </Text>
+                                    {index < inline.length - 1 && (
+                                        <Text size="xs" c="dimmed">•</Text>
+                                    )}
+                                </Flex>
+                            );
+                        })}
+                        {hasMore && (
+                            <Popover width={320} position="bottom-end" withArrow>
+                                <Popover.Target>
+                                    <Text
+                                        size="sm"
+                                        c="blue"
+                                        fw={600}
+                                        style={{
+                                            cursor: "pointer",
+                                            userSelect: "none",
+                                            whiteSpace: "nowrap",
+                                            textDecoration: "underline"
+                                        }}
+                                        aria-label={getLanguageByKey("showAllParticipants")}
+                                    >
+                                        +{rest.length} {getLanguageByKey("andMore")}
+                                    </Text>
+                                </Popover.Target>
+                                <Popover.Dropdown>
+                                    <Box p="md">
+                                        <Text size="sm" fw={600} mb="sm" c="dark">
+                                            {getLanguageByKey("showAllParticipants")}
+                                        </Text>
+                                        <Divider mb="sm" />
+                                        <ScrollArea.Autosize mah={220} type="auto">
+                                            <Flex direction="column" gap="xs">
+                                                {rest.map((name, index) => {
+                                                    const isSystem = name === "System";
+                                                    return (
+                                                        <Flex key={index} align="center" gap="sm">
+                                                            <Avatar
+                                                                size="20px"
+                                                                radius="xl"
+                                                                color="green"
+                                                            >
+                                                                {isSystem ? (
+                                                                    <FaCogs size={10} color="white" />
+                                                                ) : (
+                                                                    <FaUser size={10} color="white" />
+                                                                )}
+                                                            </Avatar>
+                                                            <Text size="sm" c="dark">
+                                                                {name}
+                                                            </Text>
+                                                        </Flex>
+                                                    );
+                                                })}
+                                            </Flex>
+                                        </ScrollArea.Autosize>
+                                    </Box>
+                                </Popover.Dropdown>
+                            </Popover>
+                        )}
+                    </Flex>
+                ) : (
+                    <Text size="sm" c="dimmed" fw={500}>
+                        {getLanguageByKey("noParticipantsInTicket")}
+                    </Text>
+                )}
+            </Flex>
+        </Box>
     );
 };
