@@ -4,6 +4,7 @@ import { SocketContext } from "../contexts/SocketContext";
 import { useGetTechniciansList } from "@hooks";
 import { getLanguageByKey } from "@utils";
 import { FaUser, FaCogs } from "react-icons/fa";
+import "./TicketParticipants.css";
 
 const SERVER = {
     INIT: "ticket_clients",
@@ -156,6 +157,7 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                             return (
                                 <Flex key={index} align="center" gap="xs">
                                     <Box
+                                        className="status-indicator"
                                         style={{
                                             width: "8px",
                                             height: "8px",

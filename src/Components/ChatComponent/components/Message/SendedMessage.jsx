@@ -14,9 +14,9 @@ import "./Message.css";
 const DEFAULT_SENDER_NAME = "Panda Tur";
 
 const MESSAGE_STATUS_ICONS = {
-  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark size={16} color="#666" />,      // Одна серая галочка
-  [MESSAGES_STATUS.ERROR]: <CiWarning size={16} color="red" />,             // Красный восклицательный знак
-  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} color="green" />, // Две зеленые галочки
+  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark size={16} color="#666" />,
+  [MESSAGES_STATUS.ERROR]: <CiWarning size={16} color="red" />,
+  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} color="green" />,
 };
 
 export const SendedMessage = ({
@@ -54,7 +54,7 @@ export const SendedMessage = ({
     if (resolvedTechnician?.id?.photo && resolvedTechnician.id.photo.trim() !== "") {
       return resolvedTechnician.id.photo;
     }
-    
+
     // Возвращаем null для использования fallback
     return null;
   };
@@ -63,8 +63,8 @@ export const SendedMessage = ({
 
   if (isCall) {
     const participants = parseCallParticipants(
-      msg.call_metadata, 
-      technicians, 
+      msg.call_metadata,
+      technicians,
       personalInfo.clients || []
     );
 
@@ -88,13 +88,6 @@ export const SendedMessage = ({
     <Flex w="100%" justify="end">
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
-          <Image 
-            w={36} 
-            h={36} 
-            radius="50%" 
-            src={technicianPhoto}
-            fallbackSrc={DEFAULT_PHOTO} 
-          />
           <Flex>
             <Flex miw="250px" direction="column" p="8" className="text" bg="#f0f8f0">
               <Flex align="center" gap={8}>
@@ -118,6 +111,13 @@ export const SendedMessage = ({
               </Flex>
             </Flex>
           </Flex>
+          <Image
+            w={36}
+            h={36}
+            radius="50%"
+            src={technicianPhoto}
+            fallbackSrc={DEFAULT_PHOTO}
+          />
         </Flex>
       </Flex>
     </Flex>
