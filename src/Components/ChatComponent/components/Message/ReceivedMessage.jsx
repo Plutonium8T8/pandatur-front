@@ -1,4 +1,4 @@
-import { Flex, Text, Image, DEFAULT_THEME } from "@mantine/core";
+import { Flex, Text, Image } from "@mantine/core";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "../../../../app-constants";
 import {
   getFullName,
@@ -8,8 +8,6 @@ import {
 import { renderContent } from "../../renderContent";
 import { Call } from "./Call";
 import { parseCallParticipants } from "../../../utils/callUtils";
-
-const { colors } = DEFAULT_THEME;
 
 export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
   const clients = personalInfo?.clients || [];
@@ -91,16 +89,16 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
             direction="column"
             p="8"
             className="text"
-            bg="#f5f8f5"
+            style={{ backgroundColor: "var(--crm-ui-kit-palette-callout-success-background-color)" }}
           >
-            <Flex c={colors.gray[7]} align="center" gap="4">
+            <Flex align="center" gap="4" style={{ color: "var(--crm-ui-kit-palette-text-secondary-dark)" }}>
               <Text size="sm" fw="bold">
                 {senderName}
               </Text>
               {socialMediaIcons[msg.platform] || null}
             </Flex>
             {renderContent(msg)}
-            <Text c={colors.gray[7]} size="sm" ta="end">
+            <Text size="sm" ta="end" style={{ color: "var(--crm-ui-kit-palette-text-secondary-dark)" }}>
               {parseServerDate(msg.time_sent).format(HH_mm)}
             </Text>
           </Flex>

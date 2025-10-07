@@ -221,6 +221,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
+                color="var(--crm-ui-kit-palette-border-default)"
                   label={
                     <Badge 
                       size="lg" 
@@ -271,15 +272,14 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         key={`dialog-${date}-${i}`}
                         p="md"
                         style={{
-                          backgroundColor: "var(--crm-ui-kit-palette-callout-success-background-color)",
+                          backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
                           borderRadius: "12px",
                           border: "1px solid var(--crm-ui-kit-palette-border-default)",
                           position: "relative",
                         }}
                       >
                         {/* Иллюзия открытых вкладок позади */}
-                        <BackTabs palette="green" />
-                        {/* <BackTabs palette="navy" /> */}
+                        <BackTabs />
 
                         {/* Сообщения в диалоговом блоке */}
                         <Flex direction="column" gap="xs">

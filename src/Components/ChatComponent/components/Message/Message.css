@@ -6,10 +6,6 @@
   max-height: 65vh;
 }
 
-.chat-message.received .text {
-  border: 1px solid var(--mantine-color-gray-4);
-}
-
 .chat-message.sent .text {
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark-9);

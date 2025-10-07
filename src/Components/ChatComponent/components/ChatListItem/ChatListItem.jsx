@@ -165,7 +165,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         </Flex>
       </Box>
 
-      <Divider />
+      <Divider color="var(--crm-ui-kit-palette-border-default)" />
     </div>
   );
 };

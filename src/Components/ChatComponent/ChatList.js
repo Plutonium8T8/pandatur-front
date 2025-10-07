@@ -147,7 +147,7 @@ const ChatList = ({ ticketId }) => {
           />
         </Flex>
 
-        <Divider />
+        <Divider color="var(--crm-ui-kit-palette-border-default)" />
 
         <Box style={{ height: "calc(100% - 127px)", position: "relative" }} ref={wrapperChatItemRef}>
           {sortedTickets.length === 0 ? (

@@ -14,9 +14,9 @@ import "./Message.css";
 const DEFAULT_SENDER_NAME = "Panda Tur";
 
 const MESSAGE_STATUS_ICONS = {
-  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark size={16} color="#666" />,
-  [MESSAGES_STATUS.ERROR]: <CiWarning size={16} color="red" />,
-  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} color="green" />,
+  [MESSAGES_STATUS.PENDING]: <IoMdCheckmark size={16} style={{ color: "var(--crm-ui-kit-palette-text-secondary-dark)" }} />,
+  [MESSAGES_STATUS.ERROR]: <CiWarning size={16} style={{ color: "var(--mantine-color-red-6)" }} />,
+  [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} style={{ color: "var(--crm-ui-kit-palette-link-primary)" }} />,
 };
 
 export const SendedMessage = ({
@@ -89,7 +89,13 @@ export const SendedMessage = ({
       <Flex w="90%" direction="column" className="chat-message sent">
         <Flex justify="end" gap="8">
           <Flex>
-            <Flex miw="250px" direction="column" p="8" className="text" bg="#f0f8f0">
+            <Flex 
+              miw="250px" 
+              direction="column" 
+              p="8" 
+              className="text" 
+              style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)" }}
+            >
               <Flex align="center" gap={8}>
                 <FaHeadphones size={12} />
                 <Text fw="bold" size="sm">
