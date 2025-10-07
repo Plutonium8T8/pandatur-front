@@ -240,7 +240,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
     );
 
     return (
-      <Card withBorder radius="md" shadow="xs" p="sm" key={id}>
+      <Card withBorder radius="md" p="sm" key={id}>
         {!isNew && (
           <Box onClick={() => setExpandedCard(expandedCard === id ? null : id)} style={{ cursor: "pointer" }}>
             <Group justify="space-between" align="center">
@@ -401,7 +401,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
 
   return (
     <Box pos="relative" p="xs" w="100%">
-      <Paper shadow="xs" radius="md" withBorder p="xs">
+      <Paper radius="md">
         <Box
           onClick={toggleList}
           role="button"

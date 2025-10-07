@@ -221,10 +221,10 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
-                color="var(--crm-ui-kit-palette-border-default)"
+                  color="var(--crm-ui-kit-palette-border-default)"
                   label={
-                    <Badge 
-                      size="lg" 
+                    <Badge
+                      size="lg"
                       style={{
                         backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)",
                         color: "var(--crm-ui-kit-palette-text-primary)"
@@ -274,7 +274,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         style={{
                           backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
                           borderRadius: "12px",
-                          border: "1px solid var(--crm-ui-kit-palette-border-default)",
+                          // border: "1px solid var(--crm-ui-kit-palette-border-default)",
                           position: "relative",
                         }}
                       >
