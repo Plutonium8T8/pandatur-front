@@ -213,9 +213,9 @@ export const Dashboard = () => {
           aria-label="open-filter"
           color={isFilterActive ? "green" : "gray"}
           style={{
-            backgroundColor: isFilterActive ? "#51cf66" : "white",
-            border: isFilterActive ? "1px solid #51cf66" : "1px solid #e9ecef",
-            color: isFilterActive ? "white" : "#868e96"
+            backgroundColor: isFilterActive ? "#51cf66" : "var(--crm-ui-kit-palette-background-primary)",
+            border: isFilterActive ? "1px solid #51cf66" : "1px solid var(--crm-ui-kit-palette-border-default)",
+            color: isFilterActive ? "white" : "var(--crm-ui-kit-palette-text-primary)"
           }}
         >
           <LuFilter size={18} />

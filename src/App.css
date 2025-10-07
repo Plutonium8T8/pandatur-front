@@ -233,6 +233,8 @@ a {
 
 [data-mantine-color-scheme] .mantine-Drawer-header {
   zoom: 1;
+  background: var(--crm-ui-kit-palette-background-primary);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 [data-mantine-color-scheme] .mantine-Drawer-title {
@@ -241,7 +243,7 @@ a {
 
 
 [data-mantine-color-scheme] .mantine-Drawer-body .mantine-Select-root {
-  zoom: 0.75;
+  zoom: 1;
 }
 
 /* Стили для Mantine Menu/Dropdown под темы */

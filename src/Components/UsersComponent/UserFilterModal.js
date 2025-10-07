@@ -84,7 +84,6 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
             withCloseButton
             centered
             size="lg"
-            bg="var(--crm-ui-kit-palette-background-primary)"
             styles={{
                 content: {
                     height: "700px",
@@ -96,6 +95,9 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
                     overflowY: "auto",
                     padding: "1rem"
                 },
+                title: {
+                    color: "var(--crm-ui-kit-palette-text-primary)"
+                }
             }}
         >
             <Flex direction="column" h="100%" justify="space-between">

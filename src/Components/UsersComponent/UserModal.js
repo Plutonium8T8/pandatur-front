@@ -5,8 +5,6 @@ import {
   Stack,
   TextInput,
   Switch,
-  Avatar,
-  Group,
   Select,
   PasswordInput,
   Loader,
@@ -23,7 +21,6 @@ import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
 import { translations } from "../utils/translations";
-import { DEFAULT_PHOTO } from "../../app-constants";
 import { useMobile } from "../../hooks";
 
 const language = localStorage.getItem("language") || "RO";
@@ -498,7 +495,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           zIndex: 10003,
           position: 'relative'
         }}>
-          <Title order={4} style={{ margin: 0, color: '#333' }}>
+          <Title order={4} style={{ margin: 0, color: 'var(--crm-ui-kit-palette-text-primary)' }}>
             {initialUser
               ? translations["Modificați utilizator"][language]
               : translations["Adaugă utilizator"][language]}
@@ -509,7 +506,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
               background: 'transparent',
               border: 'none',
               fontSize: '24px',
-              color: '#666',
+              color: 'var(--crm-ui-kit-palette-text-secondary-light)',
               cursor: 'pointer',
               padding: '8px',
               display: 'flex',
@@ -522,11 +519,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
               position: 'relative'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = '#333';
-              e.target.style.backgroundColor = '#f5f5f5';
+              e.target.style.color = 'var(--crm-ui-kit-palette-text-primary)';
+              e.target.style.backgroundColor = 'var(--crm-ui-kit-palette-button-classic-hover-background)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = '#666';
+              e.target.style.color = 'var(--crm-ui-kit-palette-text-secondary-light)';
               e.target.style.backgroundColor = 'transparent';
             }}
           >
@@ -553,8 +550,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         },
         header: { 
           padding: '16px 20px',
-          borderBottom: '1px solid #e9ecef',
-          backgroundColor: 'white',
+          borderBottom: '1px solid var(--crm-ui-kit-palette-border-primary)',
+          backgroundColor: 'var(--crm-ui-kit-palette-background-primary)',
           zIndex: 10001
         },
         overlay: {
@@ -573,9 +570,6 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       >
         <div style={{ padding: '16px', paddingBottom: '80px' }}>
           <Stack spacing="md">
-            <Group position="center" mb="md">
-              <Avatar src={DEFAULT_PHOTO} size={80} />
-            </Group>
             {formContent}
           </Stack>
         </div>
@@ -594,12 +588,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       padding="lg"
       size="lg"
     >
-      <Group align="flex-start" spacing="xl">
-        <Avatar src={DEFAULT_PHOTO} size={60} />
-        <div style={{ flex: 1 }}>
-          {formContent}
-        </div>
-      </Group>
+      {formContent}
     </Drawer>
   );
 };
