@@ -102,9 +102,10 @@ const NoteContent = ({ note }) => {
                         maxHeight: 460, 
                         objectFit: "contain", 
                         borderRadius: 10, 
-                        boxShadow: "0 2px 10px rgba(0,0,0,.06)",
+                        boxShadow: "0 2px 10px rgba(0,0,0,.2)",
                         cursor: "pointer",
-                        transition: "transform 0.2s ease"
+                        transition: "transform 0.2s ease",
+                        background: "var(--crm-ui-kit-palette-background-primary-disabled)"
                     }}
                     onClick={() => window.open(url, '_blank')}
                     onMouseEnter={(e) => {
@@ -129,7 +130,7 @@ const NoteContent = ({ note }) => {
     if (kind === "video") {
         return (
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <video src={url} controls style={{ width: "100%", maxHeight: 520, borderRadius: 10, boxShadow: "0 2px 10px rgba(0,0,0,.06)" }} />
+                <video src={url} controls style={{ width: "100%", maxHeight: 520, borderRadius: 10, boxShadow: "0 2px 10px rgba(0,0,0,.2)", background: "var(--crm-ui-kit-palette-background-primary-disabled)" }} />
                 <Anchor href={url} target="_blank" rel="noopener noreferrer">
                     {getLanguageByKey("Открыть/скачать")} ({fileName})
                 </Anchor>
@@ -159,11 +160,11 @@ const NoteContent = ({ note }) => {
 };
 
 const NOTE_STYLE = {
-    text: { border: "#ffe58f", bg: "linear-gradient(180deg,#fffdf2 0%,#ffffff 60%)", icon: FiFileText, label: "Text" },
-    image: { border: "#91d5ff", bg: "linear-gradient(180deg,#f0f9ff 0%,#ffffff 60%)", icon: FiImage, label: "Image" },
-    video: { border: "#b37feb", bg: "linear-gradient(180deg,#f7f0ff 0%,#ffffff 60%)", icon: FiVideo, label: "Video" },
-    audio: { border: "#95de64", bg: "linear-gradient(180deg,#f3fff0 0%,#ffffff 60%)", icon: FiMusic, label: "Audio" },
-    file: { border: "#d9d9d9", bg: "linear-gradient(180deg,#fafafa 0%,#ffffff 60%)", icon: FiFileText, label: "File" },
+    text: { borderColor: "rgba(255, 229, 143, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#ffe58f", icon: FiFileText, label: "Text" },
+    image: { borderColor: "rgba(145, 213, 255, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#91d5ff", icon: FiImage, label: "Image" },
+    video: { borderColor: "rgba(179, 127, 235, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#b37feb", icon: FiVideo, label: "Video" },
+    audio: { borderColor: "rgba(149, 222, 100, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#95de64", icon: FiMusic, label: "Audio" },
+    file: { borderColor: "var(--crm-ui-kit-palette-border-default)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#d9d9d9", icon: FiFileText, label: "File" },
 };
 
 export const ChatNoteCard = ({ note, techLabel, showActions = true, className, style }) => {
@@ -179,13 +180,22 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
             className={className}
             style={{
                 overflow: "hidden",
-                background: meta.bg,
-                borderColor: meta.border,
-                boxShadow: "0 8px 20px rgba(0,0,0,.05), 0 2px 6px rgba(0,0,0,.05)",
+                background: meta.bgColor,
+                borderColor: meta.borderColor,
+                boxShadow: "0 2px 8px rgba(0,0,0,.1)",
                 ...style,
             }}
         >
-            <Flex align="center" justify="space-between" px="14" py="10" style={{ borderBottom: `1px solid ${meta.border}` }}>
+            <Flex 
+                align="center" 
+                justify="space-between" 
+                px="14" 
+                py="10" 
+                style={{ 
+                    borderBottom: `1px solid ${meta.borderColor}`,
+                    background: "var(--crm-ui-kit-palette-background-primary-disabled)"
+                }}
+            >
                 <Group gap={10}>
                     <span
                         style={{
@@ -195,13 +205,21 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
                             borderRadius: 8,
                             alignItems: "center",
                             justifyContent: "center",
-                            background: "rgba(0,0,0,.04)",
+                            background: `${meta.accentColor}20`,
+                            color: meta.accentColor,
                         }}
                     >
                         <Icon size={16} />
                     </span>
-                    {getLanguageByKey("Notice")}
-                    <Badge variant="light" radius="sm" color="gray">
+                    <Text fw={600} size="sm">{getLanguageByKey("Notice")}</Text>
+                    <Badge 
+                        variant="light" 
+                        radius="sm" 
+                        style={{
+                            background: `${meta.accentColor}20`,
+                            color: "var(--crm-ui-kit-palette-text-primary)"
+                        }}
+                    >
                         {getLanguageByKey(meta.label)}
                     </Badge>
                 </Group>
@@ -211,7 +229,16 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
                 <NoteContent note={note} />
             </Flex>
 
-            <Flex align="center" justify="space-between" px="12" py="8" style={{ borderTop: "1px solid rgba(0,0,0,.06)" }}>
+            <Flex 
+                align="center" 
+                justify="space-between" 
+                px="12" 
+                py="8" 
+                style={{ 
+                    borderTop: `1px solid ${meta.borderColor}`,
+                    background: "var(--crm-ui-kit-palette-background-primary-disabled)"
+                }}
+            >
                 <Text size="xs" c="dimmed">
                     {getLanguageByKey("Заметка")} · {techLabel}
                 </Text>
