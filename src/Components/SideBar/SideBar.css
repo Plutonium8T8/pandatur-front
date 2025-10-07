@@ -1,9 +1,16 @@
+/* Переопределение фона корневого элемента сайдбара */
+.ps-sidebar-root,
+.ps-sidebar-root > *,
+aside[class*="css-"] {
+  background-color: #1f2937 !important;
+}
+
 .ps-sidebar-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: var(--crm-ui-kit-palette-surface-text-color);
-  background-color: var(--crm-ui-kit-palette-background-default);
+  color: white;
+  background-color: #1f2937 !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button {
@@ -11,18 +18,18 @@
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
+  background-color: #19374d !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active {
-  background-color: var(--crm-ui-kit-palette-background-primary);
-  color: var(--crm-ui-kit-palette-surface-text-color);
-  border-left: 3px solid var(--crm-ui-kit-palette-link-primary);
+  background-color: #153043 !important;
+  color: white !important;
+  border-left: 3px solid #1691ff !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active:hover {
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
-  color: var(--crm-ui-kit-palette-surface-text-color);
+  background-color: #264b79 !important;
+  color: white !important;
 }
 
 .ps-sidebar-container .ps-menu {
@@ -43,7 +50,7 @@
     height: 100vh;
     z-index: 1000;
     transition: left 0.3s ease;
-    background-color: var(--crm-ui-kit-palette-background-default);
+    background-color: #1f2937 !important;
   }
   
   .ps-sidebar-root.mobile-open {
@@ -66,14 +73,14 @@
     left: 0;
     right: 0;
     height: 60px;
-    background-color: var(--crm-ui-kit-palette-background-primary);
+    background-color: #1f2937 !important;
     z-index: 1001;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    border-bottom: 1px solid var(--crm-ui-kit-palette-border-primary);
-    color: var(--crm-ui-kit-palette-surface-text-color);
+    border-bottom: 1px solid #374151;
+    color: white;
   }
   
   .mobile-header .logo {

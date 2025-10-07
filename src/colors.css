@@ -1,8 +1,11 @@
-:root {
+/* Тёмная тема (по умолчанию) */
+:root,
+:root[data-theme="dark"] {
   /* Фоны */
   --crm-ui-kit-palette-background-default: #0f2231; /* Базовый фон приложения */
   --crm-ui-kit-palette-background-primary: #153043; /* Основной фон блоков/карточек */
   --crm-ui-kit-palette-background-primary-disabled: #132b3c; /* Отключенные/неактивные элементы */
+  --crm-ui-kit-palette-sidebar-background: #1f2937; /* Фон сайдбара */
 
   /* Текст */
   --crm-ui-kit-palette-text-primary: #f2f2f2; /* Основной цвет текста */
@@ -42,4 +45,52 @@
   --crm-ui-kit-palette-callout-warning-background-color: #264b79; /* Предупреждение — фон */
   --crm-ui-kit-palette-callout-info-background-color: #264b79; /* Информация — фон */
   --crm-ui-kit-palette-callout-success-background-color: #0f2231; /* Успех — фон */
+}
+
+/* Светлая тема */
+:root[data-theme="light"] {
+  /* Фоны */
+  --crm-ui-kit-palette-background-default: #f8f9fa; /* Базовый фон приложения */
+  --crm-ui-kit-palette-background-primary: #ffffff; /* Основной фон блоков/карточек */
+  --crm-ui-kit-palette-background-primary-disabled: #e9ecef; /* Отключенные/неактивные элементы */
+  --crm-ui-kit-palette-sidebar-background: #1f2937; /* Фон сайдбара (одинаковый для обеих тем) */
+
+  /* Текст */
+  --crm-ui-kit-palette-text-primary: #212529; /* Основной цвет текста */
+  --crm-ui-kit-palette-text-secondary-light: #6c757d; /* Вторичный текст (светлый) */
+  --crm-ui-kit-palette-text-secondary-dark: #495057; /* Вторичный текст (тёмный) */
+
+  /* Ссылки */
+  --crm-ui-kit-palette-link-primary: #0d6efd; /* Основной цвет ссылок/активных элементов */
+  --crm-ui-kit-palette-link-hover-primary: #0a58ca; /* Цвет ссылок при наведении */
+
+  /* Границы */
+  --crm-ui-kit-palette-border-default: #dee2e6; /* Базовые границы/разделители */
+  --crm-ui-kit-palette-border-primary: #ced4da; /* Акцентные/активные границы */
+
+  /* Плейсхолдеры */
+  --crm-ui-kit-palette-placeholder-primary: #adb5bd; /* Плейсхолдер активных инпутов */
+  --crm-ui-kit-palette-placeholder-default: #adb5bd; /* Плейсхолдер по умолчанию */
+
+  /* Поверхности */
+  --crm-ui-kit-palette-surface-background-color: #ffffff; /* Фон поверхностей/карточек */
+  --crm-ui-kit-palette-surface-hover-background-color: #e7f1ff; /* Ховер для поверхностей */
+  --crm-ui-kit-palette-surface-text-color: #212529; /* Текст на поверхностях */
+
+  /* Скроллбар */
+  --crm-ui-kit-palette-scrollbar-thumb-background: #ced4da; /* Цвет бегунка скроллбара */
+
+  /* Кнопки */
+  --crm-ui-kit-palette-button-classic-hover-background: #e9ecef; /* Фон кнопки (hover) */
+
+  /* Тени */
+  --crm-ui-kit-palette-box-shadow-default: rgba(0, 0, 0, 0.1); /* Базовый цвет тени (если используется) */
+  --crm-ui-kit-palette-content-block-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); /* Тень контент-блоков */
+  --crm-ui-kit-palette-accordion-item-box-shadow: 0px 1px 6px 2px rgba(0, 0, 0, 0.06); /* Тень элементов аккордеона */
+
+  /* Всплывающие блоки (callouts) */
+  --crm-ui-kit-palette-callout-error-background-color: #f8d7da; /* Ошибка — фон */
+  --crm-ui-kit-palette-callout-warning-background-color: #fff3cd; /* Предупреждение — фон */
+  --crm-ui-kit-palette-callout-info-background-color: #cfe2ff; /* Информация — фон */
+  --crm-ui-kit-palette-callout-success-background-color: #d1e7dd; /* Успех — фон */
 }

@@ -9,6 +9,8 @@ body {
   height: 133.33vh;
   /* Компенсируем уменьшение высоты от zoom */
   overflow: hidden;
+  background-color: var(--crm-ui-kit-palette-background-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 #root {

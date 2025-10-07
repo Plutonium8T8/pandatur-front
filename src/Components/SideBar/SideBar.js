@@ -12,11 +12,12 @@ import {
   FaChartPie
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
+import { MdLightMode, MdDarkMode } from "react-icons/md";
 import { Badge, Flex, Divider, Select, Burger } from "@mantine/core";
 import { clearCookies } from "@utils";
 import { api } from "@api";
 import { LoadingOverlay } from "@components";
-import { useApp, useLanguageToggle, useUser, useMobile } from "../../hooks";
+import { useApp, useLanguageToggle, useUser, useMobile, useTheme } from "../../hooks";
 import { getLanguageByKey } from "@utils";
 import Can from "../CanComponent/Can";
 import "./SideBar.css";
@@ -35,6 +36,7 @@ export const SideBar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useMobile();
   const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS, LANGUAGES } = useLanguageToggle();
+  const { theme, toggleTheme, isDark } = useTheme();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
   const currentGroupTitle = customGroupTitle || groupTitleForApi;
@@ -144,6 +146,15 @@ export const SideBar = () => {
                 {surname} {name} ({userId})
               </MenuItem>
               <Divider />
+              
+              {/* Переключатель темы для мобильных */}
+              <MenuItem 
+                icon={isDark ? <MdLightMode /> : <MdDarkMode />}
+                onClick={toggleTheme}
+              >
+                {isDark ? "Light" : "Dark"}
+              </MenuItem>
+              <Divider />
             </>
           )}
           
@@ -244,37 +255,48 @@ export const SideBar = () => {
           )}
 
           {!isMobile && (
-            <MenuItem>
-              {isCollapsed ? (
-                <div
-                  style={{ textAlign: "center", fontSize: "20px", cursor: "pointer" }}
-                  onClick={() => {
-                    const nextLanguage = selectedLanguage === "RO" ? "RU" : selectedLanguage === "RU" ? "EN" : "RO";
-                    setLanguage(nextLanguage);
-                  }}
-                  title={selectedLanguage}
-                >
-                  {LANGUAGES[selectedLanguage].icon}
-                </div>
-              ) : (
-                <Select
-                  value={selectedLanguage}
-                  onChange={setLanguage}
-                  data={LANGUAGE_OPTIONS}
-                  styles={{
-                    input: {
-                      backgroundColor: "transparent",
-                      color: "white",
-                      border: "1px solid transparent",
-                    },
-                    dropdown: {
-                      backgroundColor: "white",
-                      color: "black",
-                    },
-                  }}
-                />
-              )}
-            </MenuItem>
+            <>
+              {/* Переключатель темы */}
+              <MenuItem 
+                icon={isDark ? <MdLightMode /> : <MdDarkMode />}
+                onClick={toggleTheme}
+              >
+                {isDark ? "Light" : "Dark"}
+              </MenuItem>
+              
+              {/* Переключатель языка */}
+              <MenuItem>
+                {isCollapsed ? (
+                  <div
+                    style={{ textAlign: "center", fontSize: "20px", cursor: "pointer" }}
+                    onClick={() => {
+                      const nextLanguage = selectedLanguage === "RO" ? "RU" : selectedLanguage === "RU" ? "EN" : "RO";
+                      setLanguage(nextLanguage);
+                    }}
+                    title={selectedLanguage}
+                  >
+                    {LANGUAGES[selectedLanguage].icon}
+                  </div>
+                ) : (
+                  <Select
+                    value={selectedLanguage}
+                    onChange={setLanguage}
+                    data={LANGUAGE_OPTIONS}
+                    styles={{
+                      input: {
+                        backgroundColor: "transparent",
+                        color: "white",
+                        border: "1px solid transparent",
+                      },
+                      dropdown: {
+                        backgroundColor: "white",
+                        color: "black",
+                      },
+                    }}
+                  />
+                )}
+              </MenuItem>
+            </>
           )}
         </Menu>
 

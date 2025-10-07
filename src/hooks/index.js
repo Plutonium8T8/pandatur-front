@@ -17,3 +17,4 @@ export * from "./useDashboardData";
 export * from "./useUserPermissions";
 export * from "./useMobile";
 export * from "./useZoomScale";
+export * from "./useTheme";

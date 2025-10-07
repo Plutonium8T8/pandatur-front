@@ -1,4 +1,14 @@
 export const translations = {
+  "Темная тема": {
+    RO: "Temă întunecată",
+    RU: "Темная тема",
+    EN: "Dark theme",
+  },
+  "Светлая тема": {
+    RO: "Temă luminoasă",
+    RU: "Светлая тема",
+    EN: "Light theme",
+  },
   "Adaugă lead": {
     RO: "Adaugă lead",
     RU: "Добавить лид",
