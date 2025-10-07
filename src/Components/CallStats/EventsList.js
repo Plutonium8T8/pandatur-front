@@ -9,8 +9,8 @@ import { EventsFilterModal } from "./EventsFilterModal";
 import { getChangedFields } from "../utils/logsUtils";
 
 const COLORS = {
-    total: "#0f824c",
-    bgMain: "white",
+    total: "var(--crm-ui-kit-palette-link-primary)",
+    bgMain: "var(--crm-ui-kit-palette-background-default)",
 };
 
 const PAGE_SIZE = 20;
@@ -152,13 +152,13 @@ export const EventsList = () => {
                         {changes.map((ch, i) =>
                             <Text size="md" key={i}>
                                 <b>{ch.field}:</b>{" "}
-                                <span style={{ color: "red" }}>{String(ch.from)}</span>
+                                <span style={{ color: "#ef4444" }}>{String(ch.from)}</span>
                                 <span style={{
                                     fontWeight: 700,
-                                    color: "#bbb",
+                                    color: "var(--crm-ui-kit-palette-text-secondary-light)",
                                     margin: "0 6px"
                                 }}>→</span>
-                                <span style={{ color: "green" }}>{String(ch.to)}</span>
+                                <span style={{ color: "#22c55e" }}>{String(ch.to)}</span>
                             </Text>
                         )}
                     </Box>
@@ -181,27 +181,22 @@ export const EventsList = () => {
             }}
         >
             <Box px={32} py={24} style={{ flexShrink: 0 }}>
-                <Flex align="center" justify="space-between" gap={24}>
-                    <PageHeader
-                        title={getLanguageByKey("Events")}
-                        count={pagination.total}
-                        badgeColor={COLORS.total}
-                        withDivider={false}
-                    />
-                    <Flex align="center" gap={12}>
-                        <Tooltip label={getLanguageByKey("Filter")} position="bottom">
-                            <ActionIcon
-                                variant="filled"
-                                size="lg"
-                                color={filters.event?.length > 0 ? COLORS.total : "gray"}
-                                onClick={() => setFilterModalOpen(true)}
-                                style={{ color: filters.event?.length > 0 ? "white" : "#a6a6a6" }}
-                            >
-                                <LuFilter size={22} />
-                            </ActionIcon>
-                        </Tooltip>
-                    </Flex>
-                </Flex>
+                <PageHeader
+                    title={getLanguageByKey("Events")}
+                    count={pagination.total}
+                    badgeColor={COLORS.total}
+                    withDivider={false}
+                    extraInfo={
+                        <ActionIcon
+                            variant={filters.event?.length > 0 ? "filled" : "default"}
+                            size="36"
+                            onClick={() => setFilterModalOpen(true)}
+                            title={getLanguageByKey("Filter")}
+                        >
+                            <LuFilter size={16} />
+                        </ActionIcon>
+                    }
+                />
             </Box>
             
             <Box px={32} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
