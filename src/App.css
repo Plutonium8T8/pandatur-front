@@ -506,3 +506,111 @@ a {
 .mantine-Combobox-option[data-selected="true"] {
   background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
 }
+
+/* DatePickerInput стили */
+.mantine-DatePickerInput-root .mantine-Input-input,
+.mantine-DateInput-root .mantine-Input-input {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-DatePickerInput-root .mantine-Input-input::placeholder,
+.mantine-DateInput-root .mantine-Input-input::placeholder {
+  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+}
+
+.mantine-DatePickerInput-root .mantine-Input-input:focus,
+.mantine-DateInput-root .mantine-Input-input:focus {
+  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+.mantine-DatePickerInput-label,
+.mantine-DateInput-label {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* DatePicker Popover и Calendar */
+.mantine-Popover-dropdown {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-DatePicker-calendarHeader,
+.mantine-MonthPicker-calendarHeader,
+.mantine-YearPicker-calendarHeader {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+}
+
+.mantine-DatePicker-calendarHeaderControl,
+.mantine-MonthPicker-calendarHeaderControl,
+.mantine-YearPicker-calendarHeaderControl {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-DatePicker-calendarHeaderControl:hover,
+.mantine-MonthPicker-calendarHeaderControl:hover,
+.mantine-YearPicker-calendarHeaderControl:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-DatePicker-calendarHeaderLevel {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-DatePicker-calendarHeaderLevel:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-DatePicker-weekday,
+.mantine-MonthPicker-monthsListCell,
+.mantine-YearPicker-yearsListCell {
+  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+}
+
+.mantine-DatePicker-day,
+.mantine-MonthPicker-monthsListCell button,
+.mantine-YearPicker-yearsListCell button {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-DatePicker-day:hover,
+.mantine-MonthPicker-monthsListCell button:hover,
+.mantine-YearPicker-yearsListCell button:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-DatePicker-day[data-selected="true"],
+.mantine-MonthPicker-monthsListCell button[data-selected="true"],
+.mantine-YearPicker-yearsListCell button[data-selected="true"] {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: white !important;
+}
+
+.mantine-DatePicker-day[data-weekend="true"] {
+  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+}
+
+/* Дополнительные DatePicker стили для Mantine v8 */
+[class*="DatePicker"] [class*="calendar"],
+[class*="DatePickerInput"] [class*="dropdown"],
+div[class*="mantine-"][class*="Popover-dropdown"] {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+}
+
+button[class*="mantine-DatePicker"],
+button[class*="mantine-MonthPicker"],
+button[class*="mantine-YearPicker"] {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+button[class*="mantine-DatePicker"]:hover,
+button[class*="mantine-MonthPicker"]:hover,
+button[class*="mantine-YearPicker"]:hover:not([data-selected="true"]) {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+button[class*="mantine-"][data-selected="true"] {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: white !important;
+}

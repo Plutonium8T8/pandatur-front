@@ -7,11 +7,11 @@ import { EventsList } from "../Components/CallStats/EventsList";
 import { useNavigate, useLocation } from "react-router-dom";
 
 const COLORS = {
-    main: "#0f824c",
-    bg: "#fff",
-    tabInactive: "#e8f3ef",
-    textDark: "#232b3a",
-    textInactive: "#000",
+    main: "var(--crm-ui-kit-palette-link-primary)",
+    bg: "var(--crm-ui-kit-palette-background-primary)",
+    tabInactive: "var(--crm-ui-kit-palette-surface-hover-background-color)",
+    textDark: "var(--crm-ui-kit-palette-text-primary)",
+    textInactive: "var(--crm-ui-kit-palette-text-secondary-light)",
 };
 
 export const Analytics = () => {
@@ -31,7 +31,7 @@ export const Analytics = () => {
     }, [location.pathname, navigate]);
 
     return (
-        <Box p={0} h="100%" style={{ background: COLORS.bg }}>
+        <Box p={0} h="100%" style={{ background: "var(--crm-ui-kit-palette-background-default)" }}>
             <Paper
                 radius={24}
                 p={0}
@@ -44,7 +44,8 @@ export const Analytics = () => {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "0 4px 24px 0 rgba(18,36,64,0.06)",
+                    boxShadow: "var(--crm-ui-kit-palette-content-block-box-shadow)",
+                    borderColor: "var(--crm-ui-kit-palette-border-default)",
                 }}
             >
                 <Group gap={20} p={12}>

@@ -162,7 +162,7 @@ export const CallListTable = ({
     const overlayVisible = loading || localLoading;
 
     return (
-        <Box p="xs">
+        <Box>
             <Box pos="relative">
                 <LoadingOverlay
                     visible={overlayVisible}

@@ -23,11 +23,11 @@ import { getLanguageByKey } from "../Components/utils";
 import { CallStatsFilterModal } from "../Components/CallStats/CallStatsFilterModal";
 
 const COLORS = {
-  total: "#0f824c",
-  bgMain: "#fff",
+  total: "var(--crm-ui-kit-palette-link-primary)",
+  bgMain: "var(--crm-ui-kit-palette-background-default)",
   to: "#81c784",
   from: "#4fc3f7",
-  textMain: "#232b3a",
+  textMain: "var(--crm-ui-kit-palette-text-primary)",
 };
 
 const formatDuration = (totalSeconds = 0) => {
@@ -172,69 +172,51 @@ export const CallStatsPage = () => {
       }}
     >
       <Box px={32} mb={32}>
-        <Flex align="center" justify="space-between" mb={20} gap={24}>
-          <PageHeader
-            title={
-              mode === "stats"
-                ? getLanguageByKey("CallStats")
-                : getLanguageByKey("AllCalls")
-            }
-            count={mode === "stats" ? filteredStats.length : pagination.total}
-            badgeColor={COLORS.total}
-            withDivider={false}
-          />
-          <Flex align="center" gap={12}>
-            <ActionIcon
-              variant={isFilterActive(filters) ? "filled" : "default"}
-              color={isFilterActive(filters) ? COLORS.total : "gray"}
-              size="lg"
-              onClick={() => setFilterModalOpen(true)}
-              title={getLanguageByKey("Filter")}
-              style={{
-                border: isFilterActive(filters)
-                  ? `1.5px solid ${COLORS.total}`
-                  : undefined,
-                background: isFilterActive(filters) ? COLORS.total : undefined,
-                color: isFilterActive(filters) ? "white" : undefined,
-                boxShadow: isFilterActive(filters)
-                  ? "0 2px 12px 0 rgba(15,130,76,0.12)"
-                  : undefined,
-              }}
-            >
-              <LuFilter size={22} />
-            </ActionIcon>
+        <PageHeader
+          title={
+            mode === "stats"
+              ? getLanguageByKey("CallStats")
+              : getLanguageByKey("AllCalls")
+          }
+          count={mode === "stats" ? filteredStats.length : pagination.total}
+          badgeColor={COLORS.total}
+          withDivider={false}
+          extraInfo={
+            <>
+              <ActionIcon
+                variant={isFilterActive(filters) ? "filled" : "default"}
+                size="36"
+                onClick={() => setFilterModalOpen(true)}
+                title={getLanguageByKey("Filter")}
+              >
+                <LuFilter size={16} />
+              </ActionIcon>
 
-            {mode === "stats" && (
-              <TextInput
-                w={320}
-                placeholder={getLanguageByKey("SearchTechnician")}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{ minWidth: 220 }}
+              {mode === "stats" && (
+                <TextInput
+                  w={320}
+                  placeholder={getLanguageByKey("SearchTechnician")}
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{ minWidth: 220 }}
+                  className="min-w-300"
+                />
+              )}
+
+              <SegmentedControl
+                value={mode}
+                onChange={(value) => {
+                  setMode(value);
+                  setPagination({ page: 1, total_pages: 1, total: 0 });
+                }}
+                data={[
+                  { label: getLanguageByKey("Stats"), value: "stats" },
+                  { label: getLanguageByKey("Calls"), value: "calls" },
+                ]}
               />
-            )}
-
-            <SegmentedControl
-              value={mode}
-              onChange={(value) => {
-                setMode(value);
-                setPagination({ page: 1, total_pages: 1, total: 0 });
-              }}
-              data={[
-                { label: getLanguageByKey("Stats"), value: "stats" },
-                { label: getLanguageByKey("Calls"), value: "calls" },
-              ]}
-              color="teal"
-              radius="xl"
-              size="md"
-              style={{
-                minWidth: 220,
-                background: "#f7f7fa",
-                fontWeight: 700,
-              }}
-            />
-          </Flex>
-        </Flex>
+            </>
+          }
+        />
       </Box>
 
       {mode === "stats" && (
@@ -245,8 +227,8 @@ export const CallStatsPage = () => {
             p="xl"
             mb="xl"
             style={{
-              background: "#fff",
-              boxShadow: "0 4px 24px 0 rgba(18,36,64,0.08)",
+              background: "var(--crm-ui-kit-palette-background-primary)",
+              boxShadow: "var(--crm-ui-kit-palette-content-block-box-shadow)",
             }}
           >
             <Flex align="center" gap={40} wrap="wrap">
