@@ -5,14 +5,7 @@ import { getLanguageByKey } from "../Components/utils";
 import { CallStatsPage } from "./CallStatsPage";
 import { EventsList } from "../Components/CallStats/EventsList";
 import { useNavigate, useLocation } from "react-router-dom";
-
-const COLORS = {
-    main: "var(--crm-ui-kit-palette-link-primary)",
-    bg: "var(--crm-ui-kit-palette-background-primary)",
-    tabInactive: "var(--crm-ui-kit-palette-surface-hover-background-color)",
-    textDark: "var(--crm-ui-kit-palette-text-primary)",
-    textInactive: "var(--crm-ui-kit-palette-text-secondary-light)",
-};
+import "./Analytics.css";
 
 export const Analytics = () => {
     const navigate = useNavigate();
@@ -31,58 +24,32 @@ export const Analytics = () => {
     }, [location.pathname, navigate]);
 
     return (
-        <Box p={0} h="100%" style={{ background: "var(--crm-ui-kit-palette-background-default)" }}>
+        <Box p={0} h="100%" className="analytics-container">
             <Paper
                 radius={24}
                 p={0}
                 my={28}
                 mx={32}
                 withBorder
-                style={{
-                    background: COLORS.bg,
-                    minHeight: 74,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    boxShadow: "var(--crm-ui-kit-palette-content-block-box-shadow)",
-                    borderColor: "var(--crm-ui-kit-palette-border-default)",
-                }}
+                className="analytics-tabs-panel"
             >
                 <Group gap={20} p={12}>
                     <Button
-                        variant={tab === "calls" ? "filled" : "light"}
-                        color="teal"
+                        variant="outline"
                         size="lg"
                         radius="lg"
                         leftSection={<FaChartBar size={20} />}
-                        style={{
-                            fontWeight: 700,
-                            fontSize: 18,
-                            background: tab === "calls" ? COLORS.tabInactive : COLORS.bg,
-                            color: tab === "calls" ? COLORS.main : COLORS.textInactive,
-                            boxShadow: tab === "calls" ? "0 2px 8px 0 rgba(15,130,76,0.10)" : "none",
-                            border: tab === "calls" ? `1.5px solid ${COLORS.main}` : "1.5px solid transparent",
-                            transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
-                        }}
+                        className={`analytics-tab-button ${tab === "calls" ? "active" : "inactive"}`}
                         onClick={() => handleTabChange("calls")}
                     >
                         {getLanguageByKey("Calls")}
                     </Button>
                     <Button
-                        variant={tab === "events" ? "filled" : "light"}
-                        color="teal"
+                        variant="outline"
                         size="lg"
                         radius="lg"
                         leftSection={<FaRegCalendarCheck size={20} />}
-                        style={{
-                            fontWeight: 700,
-                            fontSize: 18,
-                            background: tab === "events" ? COLORS.tabInactive : COLORS.bg,
-                            color: tab === "events" ? COLORS.main : COLORS.textInactive,
-                            boxShadow: tab === "events" ? "0 2px 8px 0 rgba(15,130,76,0.10)" : "none",
-                            border: tab === "events" ? `1.5px solid ${COLORS.main}` : "1.5px solid transparent",
-                            transition: "background 0.18s, color 0.18s, box-shadow 0.18s",
-                        }}
+                        className={`analytics-tab-button ${tab === "events" ? "active" : "inactive"}`}
                         onClick={() => handleTabChange("events")}
                     >
                         {getLanguageByKey("Events")}
@@ -90,7 +57,7 @@ export const Analytics = () => {
                 </Group>
             </Paper>
 
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="analytics-content">
                 {tab === "calls" && <CallStatsPage />}
                 {tab === "events" && <EventsList />}
             </div>
