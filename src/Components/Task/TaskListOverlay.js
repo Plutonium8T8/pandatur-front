@@ -249,7 +249,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 <Text fw={500}>
                   {taskEdits[id]?.task_type}
                   {!isNew && id && (
-                    <Text span size="sm" c="dimmed" ml={6} style={{ fontWeight: 400 }}>
+                    <Text span size="sm" ml={6} style={{ fontWeight: 400, color: "var(--crm-ui-kit-palette-text-secondary-light)" }}>
                       #{id}
                     </Text>
                   )}
@@ -342,6 +342,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                   <Button
                     size="xs"
                     variant="filled"
+                    color="green"
                     onClick={() => handleMarkDone(id)}
                     leftSection={<FaCheck />}
                     loading={actionLoading}
@@ -351,6 +352,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                   <Button
                     size="xs"
                     variant="light"
+                    bg="var(--mantine-color-orange-6) !important"
                     onClick={() => {
                       const original = tasks.find((t) => t.id === id);
                       if (original) {
@@ -378,7 +380,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                   <Button
                     size="xs"
                     variant="subtle"
-                    color="red"
+                    bg="var(--mantine-color-red-6) !important"
                     onClick={() => handleDeleteTask(id)}
                     leftSection={<FaTrash />}
                     loading={actionLoading}

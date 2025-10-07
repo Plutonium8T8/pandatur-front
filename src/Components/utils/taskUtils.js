@@ -15,14 +15,14 @@ const toDate = (val) => {
 
 export const getDeadlineColor = (date) => {
     const d = toDate(date);
-    if (!d) return "black";
+    if (!d) return "var(--crm-ui-kit-palette-text-primary)";
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (d < today) return "red";
-    if (d.toDateString() === today.toDateString()) return "green";
-    return "black";
+    if (d < today) return "var(--mantine-color-red-6)";
+    if (d.toDateString() === today.toDateString()) return "var(--crm-ui-kit-palette-link-primary)";
+    return "var(--crm-ui-kit-palette-text-primary)";
 };
 
 export const getBadgeColor = (tasks = []) => {
@@ -32,15 +32,15 @@ export const getBadgeColor = (tasks = []) => {
         const d = toDate(task?.scheduled_time);
         return d && dayjs(d).isBefore(today, "day");
     });
-    if (hasOverdue) return "red";
+    if (hasOverdue) return "red"; // Mantine color
 
     const hasToday = tasks.some((task) => {
         const d = toDate(task?.scheduled_time);
         return d && dayjs(d).isSame(today, "day");
     });
-    if (hasToday) return "green";
+    if (hasToday) return "green"; // Mantine color
 
-    return "gray";
+    return "gray"; // Mantine color
 };
 
 export const formatTasksToEdits = (tasks) => {
