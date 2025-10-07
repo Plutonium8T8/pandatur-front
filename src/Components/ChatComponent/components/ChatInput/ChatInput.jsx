@@ -514,8 +514,7 @@ export const ChatInput = ({
               <Flex>
                 <ActionIcon
                   onClick={() => setShowEmailForm(true)}
-                  c="black"
-                  bg="white"
+                  variant="default"
                   title="Trimite Email"
                 >
                   <FaEnvelope size={20} />
@@ -527,20 +526,19 @@ export const ChatInput = ({
                   multiple
                 >
                   {(props) => (
-                    <ActionIcon {...props} c="black" bg="white" title={getLanguageByKey("attachFiles")}>
+                    <ActionIcon {...props} variant="default" title={getLanguageByKey("attachFiles")}>
                       <RiAttachment2 size={20} />
                     </ActionIcon>
                   )}
                 </FileButton>
 
-                <ActionIcon onClick={handleEmojiClickButton} c="black" bg="white">
+                <ActionIcon onClick={handleEmojiClickButton} variant="default">
                   <LuSmile size={20} />
                 </ActionIcon>
 
                 <ActionIcon
                   onClick={onToggleNoteComposer}
-                  c="black"
-                  bg="white"
+                  variant="default"
                   title={getLanguageByKey("Заметка")}
                 >
                   <LuStickyNote size={20} />
@@ -549,8 +547,7 @@ export const ChatInput = ({
                 <Can permission={{ module: "TASK", action: "CREATE" }}>
                   <ActionIcon
                     onClick={onCreateTask}
-                    c="black"
-                    bg="white"
+                    variant="default"
                     title={getLanguageByKey("New Task")}
                   >
                     <FaTasks size={20} />

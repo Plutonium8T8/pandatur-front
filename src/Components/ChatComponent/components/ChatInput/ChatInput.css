@@ -7,5 +7,5 @@
 }
 
 .chat-input {
-  border-top: 1px solid var(--mantine-color-gray-4);
+  border-top: 1px solid var(--crm-ui-kit-palette-border-default);
 }
