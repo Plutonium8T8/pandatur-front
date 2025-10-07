@@ -1,7 +1,7 @@
 import { Text, Box, Flex, Badge } from "@mantine/core";
 import { parseServerDate, getFullName } from "../../../utils";
 import { getLanguageByKey } from "../../../utils";
-import { FaUser, FaCalendarAlt, FaCog, FaCogs, FaRoute, FaCheck, FaExchangeAlt, FaEdit } from "react-icons/fa";
+import { FaCalendarAlt, FaCog, FaRoute, FaCheck, FaExchangeAlt, FaEdit } from "react-icons/fa";
 
 export const MessagesLogItem = ({ log, technicians }) => {
     const date = parseServerDate(log.timestamp).format("DD.MM.YYYY HH:mm");
@@ -145,34 +145,14 @@ export const MessagesLogItem = ({ log, technicians }) => {
         <Box
             mb="6px"
             style={{
-                backgroundColor: colors.bg,
+                backgroundColor: "transparent",
                 borderRadius: "12px",
                 position: "relative",
                 overflow: "hidden"
             }}
         >
 
-            <Flex align="center" gap="sm" wrap="wrap" p="xs" style={{ backgroundColor: "color-mix(in srgb, var(--crm-ui-kit-palette-background-primary) 30%, transparent)", borderRadius: "8px" }}>
-                <Box
-                    style={{
-                        width: "28px",
-                        height: "28px",
-                        borderRadius: "50%",
-                        backgroundColor: colors.border,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                        boxShadow: "0 2px 4px var(--crm-ui-kit-palette-box-shadow-default)"
-                    }}
-                >
-                    {String(log.by) === "1" ? (
-                        <FaCogs size={14} color="var(--crm-ui-kit-palette-text-primary)" />
-                    ) : (
-                        <FaUser size={14} color="var(--crm-ui-kit-palette-text-primary)" />
-                    )}
-                </Box>
-                
+            <Flex align="center" gap="sm" wrap="wrap" p="xs" style={{ backgroundColor: "transparent", borderRadius: "8px" }}>
                 <Box style={{ borderLeft: "2px solid", borderColor: colors.border, paddingLeft: "8px" }}>
                     <Text size="sm" fw={700} c="dark" style={{ lineHeight: 1.2 }}>
                         {author}
@@ -208,7 +188,7 @@ export const MessagesLogItem = ({ log, technicians }) => {
                     </Text>
                 </Box>
                 
-                <Flex align="center" gap="xs" style={{ backgroundColor: "rgba(0,0,0,0.05)", padding: "4px 8px", borderRadius: "6px" }}>
+                <Flex align="center" gap="xs" style={{ backgroundColor: "transparent", padding: "4px 8px", borderRadius: "6px" }}>
                     <FaCalendarAlt size={11} color={colors.icon} />
                     <Text size="xs" fw={600} c="dimmed">
                         {date}
