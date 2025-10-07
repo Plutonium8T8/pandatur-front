@@ -286,7 +286,7 @@ const ChatExtraInfo = ({
             position: "sticky",
             top: 0,
             zIndex: 10,
-            backgroundColor: "white",
+            backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
           }}
           p="md"
         >
@@ -300,7 +300,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorsTicketInfoForm ? "red" : "black"}
+                c={hasErrorsTicketInfoForm ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
                 truncate="end"
               >
                 {getLanguageByKey("lead")}
@@ -310,7 +310,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorsContractForm ? "red" : "black"}
+                c={hasErrorsContractForm ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
               >
                 {getLanguageByKey("Contract")}
               </Text>
@@ -329,7 +329,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorQualityControl ? "red" : "black"}
+                c={hasErrorQualityControl ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
               >
                 {getLanguageByKey("quality")}
               </Text>
@@ -366,7 +366,7 @@ const ChatExtraInfo = ({
 
             <Divider my="md" size="md" color="green" />
 
-            <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
+            <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
               <Merge
                 key={`merge-tickets-${ticketId}`}
                 buttonText={getLanguageByKey("combineTickets")}
@@ -379,7 +379,7 @@ const ChatExtraInfo = ({
               />
             </Box>
 
-            <Box mt="md" bg="#e9ecef" p="md" style={{ borderRadius: 8 }}>
+            <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
               <Merge
                 key={`merge-clients-${selectedUser.payload?.id}`}
                 buttonText={getLanguageByKey("combineClient")}

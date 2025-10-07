@@ -295,7 +295,7 @@ export const ChatInput = ({
                 borderRadius: 8,
                 overflow: "hidden",
                 border: "1px solid var(--mantine-color-gray-3)",
-                background: "#fafafa",
+                background: "var(--crm-ui-kit-palette-background-default)",
               }}
               title={att.name}
             >
@@ -314,7 +314,7 @@ export const ChatInput = ({
               <CloseButton
                 size="sm"
                 onClick={() => removeAttachment(att.media_url)}
-                style={{ position: "absolute", top: 2, right: 2, background: "white" }}
+                style={{ position: "absolute", top: 2, right: 2, background: "var(--crm-ui-kit-palette-background-primary)" }}
               />
             </Box>
           );

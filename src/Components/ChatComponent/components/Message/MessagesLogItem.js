@@ -72,40 +72,68 @@ export const MessagesLogItem = ({ log, technicians }) => {
 
     // Определяем цветовую схему в зависимости от типа действия и объекта
     const getActionColor = () => {
-        // Цвета в зависимости от типа объекта
-        const ticketColors = { bg: "#e3f2fd", border: "#2196f3", icon: "#1565c0" }; // Синий для ticket
-        const taskColors = { bg: "#fff3e0", border: "#ff9800", icon: "#e65100" }; // Оранжевый для task
-        const defaultColors = { bg: "#f5f5f5", border: "#9e9e9e", icon: "#616161" }; // Серый по умолчанию
+        // Цвета в зависимости от типа объекта - используем CSS переменные
+        const ticketColors = { 
+            bg: "var(--crm-ui-kit-palette-callout-info-background-color)", 
+            border: "var(--crm-ui-kit-palette-link-primary)", 
+            icon: "var(--crm-ui-kit-palette-link-hover-primary)" 
+        }; // Информация для ticket
+        const taskColors = { 
+            bg: "var(--crm-ui-kit-palette-callout-warning-background-color)", 
+            border: "var(--crm-ui-kit-palette-link-primary)", 
+            icon: "var(--crm-ui-kit-palette-link-hover-primary)" 
+        }; // Предупреждение для task
+        const defaultColors = { 
+            bg: "var(--crm-ui-kit-palette-background-primary-disabled)", 
+            border: "var(--crm-ui-kit-palette-border-default)", 
+            icon: "var(--crm-ui-kit-palette-text-secondary-dark)" 
+        }; // Серый по умолчанию
 
         if (log.action === "created") {
             if (log.type === "ticket") return ticketColors;
             if (log.type === "task") return taskColors;
-            return { bg: "#e8f5e8", border: "#4caf50", icon: "#2e7d32" }; // Зеленый для создания по умолчанию
+            return { 
+                bg: "var(--crm-ui-kit-palette-callout-success-background-color)", 
+                border: "var(--crm-ui-kit-palette-link-primary)", 
+                icon: "var(--crm-ui-kit-palette-link-hover-primary)" 
+            }; // Успех для создания по умолчанию
         }
         
         if (log.action === "updated") {
             // Специальная цветовая схема для завершенных задач
             if (log.subject === "status" && log.type === "task" && log.from === "false" && log.to === "true") {
-                return taskColors; // Оранжевый для завершенных задач
+                return taskColors; // Предупреждение для завершенных задач
             }
             // Специальная цветовая схема для переназначенных задач
             if (log.subject === "created_for" && log.type === "task") {
-                return taskColors; // Оранжевый для переназначенных задач
+                return taskColors; // Предупреждение для переназначенных задач
             }
             // Специальная цветовая схема для изменения автора задачи
             if (log.subject === "created_by" && log.type === "task") {
-                return taskColors; // Оранжевый для изменения автора задачи
+                return taskColors; // Предупреждение для изменения автора задачи
             }
             // Цвета в зависимости от типа объекта
             if (log.type === "ticket") return ticketColors;
             if (log.type === "task") return taskColors;
-            return ticketColors; // По умолчанию синий для обновлений
+            return ticketColors; // По умолчанию информация для обновлений
         }
         
         if (log.action === "deleted") {
-            if (log.type === "ticket") return { bg: "#ffebee", border: "#f44336", icon: "#c62828" };
-            if (log.type === "task") return { bg: "#ffebee", border: "#ff5722", icon: "#d84315" }; // Темно-оранжевый для удаления task
-            return { bg: "#ffebee", border: "#f44336", icon: "#c62828" }; // Красный по умолчанию для удаления
+            if (log.type === "ticket") return { 
+                bg: "var(--crm-ui-kit-palette-callout-error-background-color)", 
+                border: "var(--crm-ui-kit-palette-border-primary)", 
+                icon: "var(--crm-ui-kit-palette-text-secondary-dark)" 
+            };
+            if (log.type === "task") return { 
+                bg: "var(--crm-ui-kit-palette-callout-error-background-color)", 
+                border: "var(--crm-ui-kit-palette-border-primary)", 
+                icon: "var(--crm-ui-kit-palette-text-secondary-dark)" 
+            }; // Ошибка для удаления task
+            return { 
+                bg: "var(--crm-ui-kit-palette-callout-error-background-color)", 
+                border: "var(--crm-ui-kit-palette-border-primary)", 
+                icon: "var(--crm-ui-kit-palette-text-secondary-dark)" 
+            }; // Ошибка по умолчанию для удаления
         }
         
         return defaultColors;
@@ -125,7 +153,7 @@ export const MessagesLogItem = ({ log, technicians }) => {
             }}
         >
 
-            <Flex align="center" gap="sm" wrap="wrap" p="xs" style={{ backgroundColor: "rgba(255,255,255,0.3)", borderRadius: "8px" }}>
+            <Flex align="center" gap="sm" wrap="wrap" p="xs" style={{ backgroundColor: "color-mix(in srgb, var(--crm-ui-kit-palette-background-primary) 30%, transparent)", borderRadius: "8px" }}>
                 <Box
                     style={{
                         width: "28px",
@@ -136,13 +164,13 @@ export const MessagesLogItem = ({ log, technicians }) => {
                         alignItems: "center",
                         justifyContent: "center",
                         flexShrink: 0,
-                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)"
+                        boxShadow: "0 2px 4px var(--crm-ui-kit-palette-box-shadow-default)"
                     }}
                 >
                     {String(log.by) === "1" ? (
-                        <FaCogs size={14} color="white" />
+                        <FaCogs size={14} color="var(--crm-ui-kit-palette-text-primary)" />
                     ) : (
-                        <FaUser size={14} color="white" />
+                        <FaUser size={14} color="var(--crm-ui-kit-palette-text-primary)" />
                     )}
                 </Box>
                 
@@ -160,9 +188,9 @@ export const MessagesLogItem = ({ log, technicians }) => {
                     variant="filled" 
                     style={{
                         backgroundColor: colors.border,
-                        color: "white",
+                        color: "var(--crm-ui-kit-palette-text-primary)",
                         fontWeight: 600,
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.2)"
+                        boxShadow: "0 1px 3px var(--crm-ui-kit-palette-box-shadow-default)"
                     }}
                     leftSection={
                         log.subject === "workflow" ? <FaRoute size={10} /> :

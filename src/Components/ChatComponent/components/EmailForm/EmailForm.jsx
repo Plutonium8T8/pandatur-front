@@ -256,7 +256,7 @@ export const EmailForm = ({
           borderRadius: 8,
           overflow: "hidden",
           border: "1px solid var(--mantine-color-gray-3)",
-          background: "#f8f9fa",
+          background: "var(--crm-ui-kit-palette-background-default)",
           marginBottom: 8,
         }}
       >
@@ -292,22 +292,22 @@ export const EmailForm = ({
             position: "absolute",
             top: 2,
             right: 2,
-            background: "rgba(255,255,255,0.9)",
+            background: "color-mix(in srgb, var(--crm-ui-kit-palette-background-primary) 90%, transparent)",
             borderRadius: "50%"
           }}
         />
         <Box
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            background: "rgba(0,0,0,0.7)",
-            color: "white",
-            padding: "2px 4px",
-            fontSize: 10,
-            textAlign: "center"
-          }}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: "color-mix(in srgb, var(--crm-ui-kit-palette-background-default) 70%, transparent)",
+              color: "var(--crm-ui-kit-palette-text-primary)",
+              padding: "2px 4px",
+              fontSize: 10,
+              textAlign: "center"
+            }}
         >
           {formatFileSize(attachment.size)}
         </Box>
@@ -318,10 +318,10 @@ export const EmailForm = ({
   return (
     <Box
       style={{
-        background: "white",
-        border: "1px solid #dadce0",
+        background: "var(--crm-ui-kit-palette-background-primary)",
+        border: "1px solid var(--crm-ui-kit-palette-border-default)",
         borderRadius: 8,
-        boxShadow: "0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15)",
+        boxShadow: "0 1px 3px var(--crm-ui-kit-palette-box-shadow-default)",
         minHeight: 400,
       }}
     >
@@ -331,8 +331,8 @@ export const EmailForm = ({
         align="center"
         p="12px 16px"
         style={{
-          borderBottom: "1px solid #dadce0",
-          background: "#f8f9fa",
+          borderBottom: "1px solid var(--crm-ui-kit-palette-border-default)",
+          background: "var(--crm-ui-kit-palette-background-default)",
           borderRadius: "8px 8px 0 0",
         }}
       >
@@ -517,14 +517,14 @@ export const EmailForm = ({
             value={emailFields.subject}
             onChange={(e) => handleFieldChange("subject", e.target.value)}
             styles={{
-              label: { fontSize: 13, fontWeight: 500, color: "#5f6368" },
+              label: { fontSize: 13, fontWeight: 500, color: "var(--crm-ui-kit-palette-text-secondary-dark)" },
               input: {
-                border: "1px solid #dadce0",
+                border: "1px solid var(--crm-ui-kit-palette-border-default)",
                 borderRadius: 4,
                 fontSize: 14,
                 "&:focus": {
-                  borderColor: "#1a73e8",
-                  boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
+                  borderColor: "var(--crm-ui-kit-palette-link-primary)",
+                  boxShadow: "0 0 0 2px color-mix(in srgb, var(--crm-ui-kit-palette-link-primary) 20%, transparent)"
                 }
               }
             }}
@@ -626,12 +626,12 @@ export const EmailForm = ({
                   size="sm"
                   styles={{
                     root: {
-                      borderColor: "#dadce0",
-                      color: "#5f6368",
+                      borderColor: "var(--crm-ui-kit-palette-border-default)",
+                      color: "var(--crm-ui-kit-palette-text-secondary-dark)",
                       "&:hover": {
-                        backgroundColor: "#f8f9fa",
-                        borderColor: "#1a73e8",
-                        color: "#1a73e8"
+                        backgroundColor: "var(--crm-ui-kit-palette-background-default)",
+                        borderColor: "var(--crm-ui-kit-palette-link-primary)",
+                        color: "var(--crm-ui-kit-palette-link-primary)"
                       }
                     }
                   }}
@@ -648,10 +648,10 @@ export const EmailForm = ({
                 size="sm"
                 styles={{
                   root: {
-                    borderColor: "#dadce0",
-                    color: "#5f6368",
+                    borderColor: "var(--crm-ui-kit-palette-border-default)",
+                    color: "var(--crm-ui-kit-palette-text-secondary-dark)",
                     "&:hover": {
-                      backgroundColor: "#f8f9fa"
+                      backgroundColor: "var(--crm-ui-kit-palette-background-default)"
                     }
                   }
                 }}
@@ -665,13 +665,13 @@ export const EmailForm = ({
                 disabled={!emailFields.to.trim() || !emailFields.subject.trim() || isLoading}
                 styles={{
                   root: {
-                    backgroundColor: "#1a73e8",
+                    backgroundColor: "var(--crm-ui-kit-palette-link-primary)",
                     "&:hover": {
-                      backgroundColor: "#1557b0"
+                      backgroundColor: "var(--crm-ui-kit-palette-link-hover-primary)"
                     },
                     "&:disabled": {
-                      backgroundColor: "#dadce0",
-                      color: "#5f6368"
+                      backgroundColor: "var(--crm-ui-kit-palette-border-default)",
+                      color: "var(--crm-ui-kit-palette-text-secondary-dark)"
                     }
                   }
                 }}
