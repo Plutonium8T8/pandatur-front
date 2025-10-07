@@ -443,15 +443,42 @@ export const ChatInput = ({
                   {getLanguageByKey("Trimite")}
                 </Button>
 
-                <Button onClick={clearState} variant="default">
+                <Button 
+                  onClick={clearState} 
+                  variant="default" 
+                  color="gray"
+                  styles={{
+                    root: {
+                      backgroundColor: 'var(--mantine-color-gray-2) !important',
+                      color: 'var(--mantine-color-gray-7) !important',
+                      '&:hover': {
+                        backgroundColor: 'var(--mantine-color-gray-3) !important',
+                      }
+                    }
+                  }}
+                >
                   {getLanguageByKey("Anulează")}
                 </Button>
 
                 <Flex gap="xs">
                   <Button
                     onClick={handleMarkAsRead}
-                    variant={unseenCount > 0 ? "filled" : "light"}
-                    color={unseenCount > 0 ? "red" : "green"}
+                    variant="filled"
+                    styles={{
+                      root: unseenCount > 0 ? {
+                        backgroundColor: 'var(--mantine-color-red-6) !important',
+                        color: 'white !important',
+                        '&:hover': {
+                          backgroundColor: 'var(--mantine-color-red-7) !important',
+                        }
+                      } : {
+                        backgroundColor: 'var(--crm-ui-kit-palette-link-primary) !important',
+                        color: 'white !important',
+                        '&:hover': {
+                          backgroundColor: 'var(--crm-ui-kit-palette-link-hover-primary) !important',
+                        }
+                      }
+                    }}
                   >
                     {unseenCount > 0
                       ? getLanguageByKey("ReadChat")
@@ -461,8 +488,22 @@ export const ChatInput = ({
 
                 <Button
                   onClick={handleMarkActionResolved}
-                  variant="light"
-                  color={actionNeeded ? "orange" : "green"}
+                  variant="filled"
+                  styles={{
+                    root: actionNeeded ? {
+                      backgroundColor: 'var(--mantine-color-orange-6) !important',
+                      color: 'white !important',
+                      '&:hover': {
+                        backgroundColor: 'var(--mantine-color-orange-7) !important',
+                      }
+                    } : {
+                      backgroundColor: 'var(--crm-ui-kit-palette-link-primary) !important',
+                      color: 'white !important',
+                      '&:hover': {
+                        backgroundColor: 'var(--crm-ui-kit-palette-link-hover-primary) !important',
+                      }
+                    }
+                  }}
                 >
                   {getLanguageByKey(
                     actionNeeded ? "Acțiune necesară" : "Nu acțiune necesară"
