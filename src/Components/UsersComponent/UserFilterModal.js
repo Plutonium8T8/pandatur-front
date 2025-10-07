@@ -84,6 +84,7 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
             withCloseButton
             centered
             size="lg"
+            bg="var(--crm-ui-kit-palette-background-primary)"
             styles={{
                 content: {
                     height: "700px",

@@ -131,10 +131,10 @@ export const WorkflowColumn = ({
       direction="column"
       bg="var(--crm-ui-kit-palette-background-primary)"
       style={{
-        borderRadius: 32,
+        // borderRadius: 32,
         flex: "0 0 400px",
         color: "var(--crm-ui-kit-palette-text-primary)",
-        border: "1px solid var(--crm-ui-kit-palette-border-primary)",
+        // border: "1px solid var(--crm-ui-kit-palette-border-primary)",
       }}
     >
       <WorkflowColumnHeader

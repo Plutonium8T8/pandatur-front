@@ -60,7 +60,7 @@ export const TicketCard = ({
         bg={isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)"}
         p="8px"
         style={{
-          borderColor: isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-border-default)",
+          borderColor: isMyTicket ? "#4caf50" : "var(--crm-ui-kit-palette-border-default)",
           borderWidth: isMyTicket ? "2px" : "1px",
           color: "var(--crm-ui-kit-palette-text-primary)",
         }}

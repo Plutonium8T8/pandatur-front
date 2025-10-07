@@ -13,8 +13,8 @@
   --crm-ui-kit-palette-text-secondary-dark: #8092ad; /* Вторичный текст (тёмный) */
 
   /* Ссылки */
-  --crm-ui-kit-palette-link-primary: #1691ff; /* Основной цвет ссылок/активных элементов */
-  --crm-ui-kit-palette-link-hover-primary: #1691ff; /* Цвет ссылок при наведении */
+  --crm-ui-kit-palette-link-primary: #009b3b; /* Основной цвет ссылок/активных элементов */
+  --crm-ui-kit-palette-link-hover-primary: #017909; /* Цвет ссылок при наведении */
 
   /* Границы */
   --crm-ui-kit-palette-border-default: #596683; /* Базовые границы/разделители */

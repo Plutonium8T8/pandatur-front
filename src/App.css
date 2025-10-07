@@ -243,3 +243,218 @@ a {
 [data-mantine-color-scheme] .mantine-Drawer-body .mantine-Select-root {
   zoom: 0.75;
 }
+
+/* Стили для Mantine Menu/Dropdown под темы */
+.mantine-Menu-dropdown {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Menu-item {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Menu-item:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-Menu-divider {
+  border-color: var(--crm-ui-kit-palette-border-primary) !important;
+}
+
+/* ActionIcon стили */
+.mantine-ActionIcon-root[data-variant="default"] {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-ActionIcon-root[data-variant="default"]:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+/* Input стили (TextInput, Input, Select и т.д.) */
+.mantine-Input-input,
+.mantine-TextInput-input,
+.mantine-Select-input,
+.mantine-Textarea-input,
+.mantine-NumberInput-input {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Input-input::placeholder,
+.mantine-TextInput-input::placeholder,
+.mantine-Select-input::placeholder,
+.mantine-Textarea-input::placeholder,
+.mantine-NumberInput-input::placeholder {
+  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+}
+
+.mantine-Input-input:focus,
+.mantine-TextInput-input:focus,
+.mantine-Select-input:focus,
+.mantine-Textarea-input:focus,
+.mantine-NumberInput-input:focus {
+  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+/* Select dropdown */
+.mantine-Select-dropdown {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-Select-option {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Select-option:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-Select-option[data-selected="true"] {
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
+}
+
+/* Modal стили */
+.mantine-Modal-content {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Modal-header {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border-bottom: 1px solid var(--crm-ui-kit-palette-border-primary) !important;
+}
+
+.mantine-Modal-title {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+  font-weight: 600;
+}
+
+.mantine-Modal-close {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Modal-close:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+/* Paper стили */
+.mantine-Paper-root {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border-color: var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* Button стили */
+.mantine-Button-root {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: white !important;
+  border: none !important;
+}
+
+.mantine-Button-root:hover:not(:disabled) {
+  background-color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+  opacity: 0.9;
+}
+
+.mantine-Button-root:disabled {
+  background-color: var(--crm-ui-kit-palette-background-primary-disabled) !important;
+  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+  opacity: 0.6;
+}
+
+/* Button outline variant */
+.mantine-Button-root[data-variant="outline"] {
+  background-color: transparent !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Button-root[data-variant="outline"]:hover:not(:disabled) {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  opacity: 1;
+}
+
+/* Button danger/warning variants */
+.mantine-Button-root[data-variant="danger"] {
+  background-color: #ef4444 !important;
+  color: white !important;
+}
+
+.mantine-Button-root[data-variant="warning"] {
+  background-color: #f59e0b !important;
+  color: white !important;
+}
+
+/* Text стили */
+.mantine-Text-root {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* Loader стили */
+.mantine-Loader-root {
+  color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+/* Collapse стили */
+.mantine-Collapse-root {
+  background-color: transparent !important;
+}
+
+/* Stack стили */
+.mantine-Stack-root {
+  background-color: transparent !important;
+}
+
+/* MultiSelect стили */
+.mantine-MultiSelect-input {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-MultiSelect-input::placeholder {
+  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+}
+
+.mantine-MultiSelect-input:focus {
+  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+.mantine-MultiSelect-dropdown {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-MultiSelect-option {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-MultiSelect-option:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-MultiSelect-label {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* Badge стили */
+.mantine-Badge-root {
+  color: white !important;
+}
+
+.mantine-Badge-root[data-variant="light"] {
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Badge-root[data-variant="filled"] {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: white !important;
+}

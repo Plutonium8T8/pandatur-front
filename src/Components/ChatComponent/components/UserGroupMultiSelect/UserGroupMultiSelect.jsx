@@ -216,8 +216,8 @@ export const UserGroupMultiSelect = ({
         style={{
           padding: '8px 12px',
           opacity: isDisabled ? 0.7 : 1,
-          backgroundColor: checked ? "#e8f5e8" : "transparent",
-          border: checked ? "1px solid #4caf50" : "1px solid transparent",
+          backgroundColor: checked ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "transparent",
+          border: checked ? "1px solid var(--crm-ui-kit-palette-link-primary)" : "1px solid transparent",
           borderRadius: checked ? "6px" : "4px",
           cursor: isDisabled ? "not-allowed" : "pointer",
           transition: "all 0.2s ease",
@@ -225,8 +225,8 @@ export const UserGroupMultiSelect = ({
         }}
         onMouseEnter={(e) => {
           if (!isDisabled && !checked) {
-            e.currentTarget.style.backgroundColor = "#f5f5f5";
-            e.currentTarget.style.border = "1px solid #e0e0e0";
+            e.currentTarget.style.backgroundColor = "var(--crm-ui-kit-palette-button-classic-hover-background)";
+            e.currentTarget.style.border = "1px solid var(--crm-ui-kit-palette-border-default)";
           }
         }}
         onMouseLeave={(e) => {
@@ -246,7 +246,7 @@ export const UserGroupMultiSelect = ({
               transform: "translateY(-50%)",
               width: "16px",
               height: "16px",
-              backgroundColor: "#4caf50",
+              backgroundColor: "var(--crm-ui-kit-palette-link-primary)",
               borderRadius: "3px",
               display: "flex",
               alignItems: "center",
@@ -262,16 +262,15 @@ export const UserGroupMultiSelect = ({
         <Box style={{ width: checked ? "24px" : "0px", transition: "width 0.2s ease" }} />
 
         {isGroup ? (
-          <FaUsers size={14} color={checked ? "#4caf50" : "#228be6"} />
+          <FaUsers size={14} style={{ color: checked ? "var(--crm-ui-kit-palette-link-primary)" : "#4caf50" }} />
         ) : (
-          <FaUser size={12} color={checked ? "#4caf50" : "#868e96"} />
+          <FaUser size={12} style={{ color: checked ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-secondary-light)" }} />
         )}
         <Text
           size="sm"
           fw={isGroup ? 600 : 400}
-          c={checked ? "green" : (isGroup ? "blue" : "dark")}
           style={{
-            color: checked ? "#2e7d32" : (isGroup ? "#228be6" : "#333"),
+            color: checked ? "var(--crm-ui-kit-palette-link-primary)" : (isGroup ? "#4caf50" : "var(--crm-ui-kit-palette-text-primary)"),
             fontWeight: checked ? 600 : (isGroup ? 600 : 400)
           }}
         >
@@ -281,7 +280,7 @@ export const UserGroupMultiSelect = ({
           <Badge
             size="xs"
             variant={checked ? "filled" : "light"}
-            color={checked ? "green" : "blue"}
+            color={checked ? "blue" : "green"}
           >
             {techniciansData?.filter(item => {
               if (item.value.startsWith("__group__")) return false;
@@ -308,21 +307,15 @@ export const UserGroupMultiSelect = ({
         renderOption={renderOption}
         disabled={disabled}
         styles={{
-          label: { fontSize: 13, fontWeight: 500, color: "#000000", marginBottom: 8 },
+          label: { fontSize: 13, fontWeight: 500, marginBottom: 8 },
           input: {
-            border: "1px solid #dadce0",
             borderRadius: 4,
             fontSize: 14,
-            minHeight: "36px",
-            "&:focus": {
-              borderColor: "#1a73e8",
-              boxShadow: "0 0 0 2px rgba(26,115,232,.2)"
-            }
+            minHeight: "36px"
           },
           dropdown: {
-            border: "1px solid #dadce0",
             borderRadius: 8,
-            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+            boxShadow: "0 4px 6px -1px var(--crm-ui-kit-palette-box-shadow-default)"
           },
           option: {
             padding: 0

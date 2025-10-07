@@ -274,7 +274,7 @@ const EditGroupsListModal = ({ opened, onClose }) => {
     return (
         <Modal opened={opened} onClose={onClose} title={translations["Editează grupurile"][language]} size="md">
             <Stack>
-                <Flex gap="sm">
+                <Flex gap="sm" pt="md">
                     <TextInput
                         placeholder={translations["Grup nou"][language]}
                         value={newGroup}
