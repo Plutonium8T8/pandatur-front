@@ -319,6 +319,12 @@ export const UserGroupMultiSelect = ({
           },
           option: {
             padding: 0
+          },
+          pill: {
+            backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)",
+            color: "var(--crm-ui-kit-palette-text-primary)",
+            border: "1px solid var(--crm-ui-kit-palette-border-default)",
+            fontWeight: 600
           }
         }}
       />
