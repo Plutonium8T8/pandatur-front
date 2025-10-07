@@ -2,7 +2,7 @@
 .ps-sidebar-root,
 .ps-sidebar-root > *,
 aside[class*="css-"] {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  background-color: var(--crm-ui-kit-palette-sidebar-background) !important;
 }
 
 .ps-sidebar-container {
@@ -10,7 +10,7 @@ aside[class*="css-"] {
   flex-direction: column;
   justify-content: space-between;
   color: white;
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  background-color: var(--crm-ui-kit-palette-sidebar-background) !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button {
@@ -50,7 +50,7 @@ aside[class*="css-"] {
     height: 100vh;
     z-index: 1000;
     transition: left 0.3s ease;
-    background-color: var(--crm-ui-kit-palette-background-primary) !important;
+    background-color: var(--crm-ui-kit-palette-sidebar-background) !important;
   }
   
   .ps-sidebar-root.mobile-open {
@@ -73,7 +73,7 @@ aside[class*="css-"] {
     left: 0;
     right: 0;
     height: 60px;
-    background-color: var(--crm-ui-kit-palette-background-primary) !important;
+    background-color: var(--crm-ui-kit-palette-sidebar-background) !important;
     z-index: 1001;
     display: flex;
     align-items: center;
