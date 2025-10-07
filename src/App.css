@@ -312,6 +312,23 @@ a {
   border-color: var(--crm-ui-kit-palette-link-primary) !important;
 }
 
+/* Кнопки очистки инпутов (крестики) */
+.mantine-CloseButton-root,
+.mantine-Input-section[data-position="right"] button,
+.mantine-Select-section[data-position="right"] button,
+.mantine-MultiSelect-section[data-position="right"] button {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: transparent !important;
+}
+
+.mantine-CloseButton-root:hover,
+.mantine-Input-section[data-position="right"] button:hover,
+.mantine-Select-section[data-position="right"] button:hover,
+.mantine-MultiSelect-section[data-position="right"] button:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
 /* Select dropdown */
 .mantine-Select-dropdown {
   background-color: var(--crm-ui-kit-palette-background-primary) !important;
