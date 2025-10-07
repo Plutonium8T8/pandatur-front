@@ -294,6 +294,17 @@ a {
   background-color: var(--crm-ui-kit-palette-background-primary) !important;
   border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
   color: var(--crm-ui-kit-palette-text-primary) !important;
+  font-weight: 500 !important;
+}
+
+/* Акцентирование значений в инпутах формы белым цветом */
+.mantine-Input-input:not(:placeholder-shown),
+.mantine-TextInput-input:not(:placeholder-shown),
+.mantine-Select-input:not(:placeholder-shown),
+.mantine-Textarea-input:not(:placeholder-shown),
+.mantine-NumberInput-input:not(:placeholder-shown) {
+  color: #ffffff !important;
+  font-weight: 600 !important;
 }
 
 .mantine-Input-input::placeholder,
