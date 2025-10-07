@@ -87,9 +87,9 @@ export const CallListTable = ({
             align: "center",
             render: (id) =>
                 id ? (
-                    <Link 
+                    <Link
                         to={`/analytics/calls/${id}`}
-                        style={{ 
+                        style={{
                             textDecoration: 'underline',
                             color: '#007bff',
                             fontWeight: 'bold'
@@ -160,7 +160,7 @@ export const CallListTable = ({
     ], [techniciansMap, playingUrl]);
 
     const handlePaginate = (p) => {
-        setLocalLoading(true);      
+        setLocalLoading(true);
         onPageChange?.(p);
     };
 
@@ -174,17 +174,16 @@ export const CallListTable = ({
                     zIndex={10}
                     overlayProps={{ blur: 1, backgroundOpacity: 0.35 }}
                 />
-
-                <RcTable
-                    columns={columns}
-                    data={data}
-                    bordered
-                    loading={false}
-                    scroll={{ y: "calc(100vh" }}
-                    rowKey={(_, index) => `row_${index}`}
-                    style={{ opacity: overlayVisible ? 0.7 : 1, transition: "opacity .15s ease" }}
-                />
-
+                <div style={{ height: "calc(100vh)" }}>
+                    <RcTable
+                        columns={columns}
+                        data={data}
+                        bordered
+                        loading={false}
+                        rowKey={(_, index) => `row_${index}`}
+                        style={{ opacity: overlayVisible ? 0.7 : 1, transition: "opacity .15s ease" }}
+                    />
+                </div>
                 <Flex justify="center" mt="md" style={{ position: "relative", minHeight: 48 }}>
                     <Pagination
                         total={pagination?.total_pages || 1}

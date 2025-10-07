@@ -168,7 +168,6 @@ export const CallStatsPage = () => {
         overflowY: "auto",
         background: COLORS.bgMain,
         minHeight: "120vh",
-        paddingBottom: 130,
       }}
     >
       <Box px={32} mb={32}>
