@@ -1,7 +1,7 @@
 import { useForm } from "@mantine/form";
 import { useMemo } from "react";
 import { Modal, Button, Flex, MultiSelect, TextInput } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { getLanguageByKey } from "../utils";
 import { useGetTechniciansList } from "../../hooks";
@@ -152,7 +152,7 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                     clearable
                 />
                 <Flex gap={8} direction="row">
-                    <DateInput
+                    <DatePickerInput
                         label={getLanguageByKey("Date from")}
                         placeholder={getLanguageByKey("Start date")}
                         {...form.getInputProps("timestamp_from")}
@@ -160,7 +160,7 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                         style={{ flex: 1 }}
                         clearable
                     />
-                    <DateInput
+                    <DatePickerInput
                         label={getLanguageByKey("Date to")}
                         placeholder={getLanguageByKey("End date")}
                         {...form.getInputProps("timestamp_until")}
@@ -198,7 +198,7 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
                         bottom: 16,
                         right: 24,
                         left: 24,
-                        background: "var(--mantine-color-body, #fff)",
+                        background: "var(--crm-ui-kit-palette-background-primary)",
                         zIndex: 10,
                         paddingTop: 12,
                     }}

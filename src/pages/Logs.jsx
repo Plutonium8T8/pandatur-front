@@ -156,13 +156,13 @@ export const Logs = () => {
             {changes.map((ch, i) =>
               <Text size="md" key={i}>
                 <b>{ch.field}:</b>{" "}
-                <span style={{ color: "red" }}>{String(ch.from)}</span>
+                <span style={{ color: "#ef4444" }}>{String(ch.from)}</span>
                 <span style={{
                   fontWeight: 700,
-                  color: "#bbb",
+                  color: "var(--crm-ui-kit-palette-text-secondary-light)",
                   margin: "0 6px"
                 }}>→</span>
-                <span style={{ color: "green" }}>{String(ch.to)}</span>
+                <span style={{ color: "#22c55e" }}>{String(ch.to)}</span>
               </Text>
             )}
           </Box>
@@ -173,27 +173,29 @@ export const Logs = () => {
 
   return (
     <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
-      <Flex align="center" justify="space-between" mb={20}>
-        <PageHeader title={getLanguageByKey("logs")} count={totalItems} />
-        <Flex align="center" gap={8}>
-          <ActionIcon
-            variant={isFilterActive(filters) ? "filled" : "default"}
-            color={isFilterActive(filters) ? "#0f824c" : "gray"}
-            size="lg"
-            onClick={() => setFilterModalOpen(true)}
-            title="Фильтр"
-          >
-            <LuFilter size={22} />
-          </ActionIcon>
-          <TextInput
-            w={350}
-            placeholder={getLanguageByKey("Search text")}
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            style={{ minWidth: 260 }}
-          />
-        </Flex>
-      </Flex>
+      <PageHeader 
+        title={getLanguageByKey("logs")} 
+        count={totalItems}
+        extraInfo={
+          <>
+            <ActionIcon
+              variant={isFilterActive(filters) ? "filled" : "default"}
+              size="36"
+              onClick={() => setFilterModalOpen(true)}
+              title={getLanguageByKey("Filter")}
+            >
+              <LuFilter size={16} />
+            </ActionIcon>
+            <TextInput
+              w={350}
+              placeholder={getLanguageByKey("Search text")}
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="min-w-300"
+            />
+          </>
+        }
+      />
 
       <LogFilterModal
         opened={filterModalOpen}
@@ -217,7 +219,7 @@ export const Logs = () => {
           <Flex
             pt="10"
             justify="center"
-            style={{ borderTop: "1px solid var(--mantine-color-gray-4)" }}
+            style={{ borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)" }}
           >
             <Pagination
               total={pagination.totalPages}
