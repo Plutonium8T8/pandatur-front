@@ -1,6 +1,8 @@
 .schedule-container {
   height: 100%;
   padding: 20px;
+  background-color: var(--crm-ui-kit-palette-background-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .week-navigation {
@@ -8,10 +10,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .week-navigation button {
-  background-color: #0f824c;
+  background-color: var(--crm-ui-kit-palette-link-primary);
   color: white;
   border: none;
   padding: 10px 15px;
@@ -26,7 +29,8 @@
 }
 
 .week-navigation button:hover {
-  background-color: #0f824c;
+  background-color: var(--crm-ui-kit-palette-link-hover-primary);
+  opacity: 0.9;
 }
 
 .schedule-table-container {
@@ -40,21 +44,23 @@
   table-layout: fixed;
   width: 100%;
   min-width: fit-content;
+  background-color: var(--crm-ui-kit-palette-background-primary);
 }
 
 .schedule-table th,
 .schedule-table td {
-  border: 1px solid #ddd;
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
   padding: 10px;
   text-align: center;
   font-size: 14px;
   height: 50px;
   min-width: 140px;
   word-break: break-word;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .schedule-table th {
-  background-color: #0f824c;
+  background-color: var(--crm-ui-kit-palette-link-primary);
   color: white;
   font-weight: bold;
 }
@@ -75,7 +81,7 @@
 }
 
 .schedule-table td {
-  background-color: #fff;
+  background-color: var(--crm-ui-kit-palette-background-primary);
 }
 
 .shift-cell :first-child {
@@ -83,7 +89,7 @@
 }
 
 .schedule-table td:hover {
-  background-color: #f1f1f1;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
   cursor: pointer;
 }
 
@@ -148,7 +154,7 @@
   display: flex;
   text-align: center;
   align-items: center;
-  color: #007bff;
+  color: var(--crm-ui-kit-palette-link-primary);
   font-size: 20px;
 }
 
@@ -209,6 +215,7 @@
   align-items: center;
   text-align: center;
   justify-content: center;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .time-interval,

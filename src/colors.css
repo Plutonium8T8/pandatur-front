@@ -20,10 +20,12 @@
   /* Вторичный текст (тёмный) */
 
   /* Ссылки */
-  --crm-ui-kit-palette-link-primary: #009b3b;
-  /* Основной цвет ссылок/активных элементов */
-  --crm-ui-kit-palette-link-hover-primary: #017909;
-  /* Цвет ссылок при наведении */
+  --crm-ui-kit-palette-link-primary: #10b981;
+  /* Основной цвет ссылок/активных элементов - мягкий зелёный */
+  --crm-ui-kit-palette-link-hover-primary: #059669;
+  /* Цвет ссылок при наведении - чуть темнее */
+  --crm-ui-kit-palette-button-active-background: #047857;
+  /* Фон активных/выбранных кнопок - тёмно-зелёный */
 
   /* Границы */
   --crm-ui-kit-palette-border-default: #596683;
@@ -93,10 +95,12 @@
   /* Вторичный текст (тёмный) */
 
   /* Ссылки */
-  --crm-ui-kit-palette-link-primary: #009b3b;
-  /* Основной цвет ссылок/активных элементов */
-  --crm-ui-kit-palette-link-hover-primary: #017909;
-  /* Цвет ссылок при наведении */
+  --crm-ui-kit-palette-link-primary: #10b981;
+  /* Основной цвет ссылок/активных элементов - мягкий зелёный */
+  --crm-ui-kit-palette-link-hover-primary: #059669;
+  /* Цвет ссылок при наведении - чуть темнее */
+  --crm-ui-kit-palette-button-active-background: #047857;
+  /* Фон активных/выбранных кнопок - тёмно-зелёный */
 
   /* Границы */
   --crm-ui-kit-palette-border-default: #dee2e6;

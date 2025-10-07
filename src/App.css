@@ -276,6 +276,15 @@ a {
   background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
 }
 
+.mantine-ActionIcon-root[data-variant="filled"] {
+  background-color: var(--crm-ui-kit-palette-button-active-background) !important;
+  color: white !important;
+}
+
+.mantine-ActionIcon-root[data-variant="filled"]:hover {
+  background-color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+}
+
 /* Input стили (TextInput, Input, Select и т.д.) */
 .mantine-Input-input,
 .mantine-TextInput-input,
