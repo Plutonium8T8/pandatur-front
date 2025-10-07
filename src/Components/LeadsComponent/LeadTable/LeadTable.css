@@ -7,14 +7,14 @@
 
 .row-id {
   color: #007bff;
-  text-decoration: none;
+  text-decoration: underline;
   font-weight: bold;
 }
 
 .row-id:hover {
-  text-decoration: underline;
+  color: #0056b3;
 }
 
 .leads-table-pagination {
-  border-top: 1px solid var(--mantine-color-gray-4);
+  border-top: 1px solid var(--crm-ui-kit-palette-border-primary);
 }

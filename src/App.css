@@ -614,3 +614,36 @@ button[class*="mantine-"][data-selected="true"] {
   background-color: var(--crm-ui-kit-palette-link-primary) !important;
   color: white !important;
 }
+
+/* Pagination стили */
+.mantine-Pagination-control {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Pagination-control:hover:not([data-active="true"]):not(:disabled) {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-Pagination-control[data-active="true"] {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: white !important;
+  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+/* Tooltip стили */
+.mantine-Tooltip-tooltip {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+/* Anchor стили */
+.mantine-Anchor-root {
+  color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+.mantine-Anchor-root:hover {
+  color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+}

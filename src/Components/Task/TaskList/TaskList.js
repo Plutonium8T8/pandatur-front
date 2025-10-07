@@ -257,8 +257,15 @@ const TaskList = ({
         width: 120,
         align: "center",
         render: (ticketId) => (
-          <Link to={`/tasks/${ticketId}`} style={{ textDecoration: 'none' }}>
-            <Flex justify="center" gap="8" align="center" style={{ color: '#007bff' }}>
+          <Link 
+            to={`/tasks/${ticketId}`} 
+            style={{ 
+              textDecoration: 'underline',
+              color: '#007bff',
+              fontWeight: 'bold'
+            }}
+          >
+            <Flex justify="center" gap="8" align="center">
               <FaFingerprint />
               {ticketId}
             </Flex>

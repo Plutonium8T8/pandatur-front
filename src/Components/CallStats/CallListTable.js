@@ -5,7 +5,7 @@ import {
 import { RcTable } from "../RcTable";
 import { getLanguageByKey } from "@utils";
 import { format } from "date-fns";
-import { FaDownload, FaPlay, FaPause } from "react-icons/fa";
+import { FaDownload, FaPlay, FaPause, FaFingerprint } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const formatDate = (ts) => {
@@ -84,18 +84,23 @@ export const CallListTable = ({
             title: getLanguageByKey("Ticket"),
             dataIndex: "ticket_id",
             width: 140,
+            align: "center",
             render: (id) =>
                 id ? (
-                    <Anchor
-                        component={Link}
+                    <Link 
                         to={`/analytics/calls/${id}`}
-                        c="blue"
-                        underline="always"
-                        fw={600}
+                        style={{ 
+                            textDecoration: 'underline',
+                            color: '#007bff',
+                            fontWeight: 'bold'
+                        }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        {id}
-                    </Anchor>
+                        <Flex justify="center" gap="8" align="center">
+                            <FaFingerprint />
+                            {id}
+                        </Flex>
+                    </Link>
                 ) : "-",
         },
         {
