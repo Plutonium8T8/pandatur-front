@@ -479,3 +479,21 @@ a {
 .mantine-SegmentedControl-control[data-active="true"] .mantine-SegmentedControl-label {
   color: white !important;
 }
+
+/* Combobox стили */
+.mantine-Combobox-dropdown {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-Combobox-option {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Combobox-option:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+}
+
+.mantine-Combobox-option[data-selected="true"] {
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
+}

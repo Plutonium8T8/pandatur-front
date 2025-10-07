@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import {
   Textarea,
   Button,
-  Select as MantineSelect,
   Group,
   Stack,
   Grid,
@@ -13,6 +12,7 @@ import DateQuickInput from "./Components/DateQuickPicker";
 import { useSnackbar } from "notistack";
 import { api } from "../../api";
 import IconSelect from "../IconSelect/IconSelect";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 import { TypeTask } from "./OptionsTaskType";
 import { translations } from "../utils/translations";
 import { formatDate } from "../utils/date";
@@ -172,27 +172,25 @@ const TaskModal = ({
 
           <Grid>
             <Grid.Col span={6}>
-              <MantineSelect
+              <UserGroupMultiSelect
                 label={translations["Autor"][language]}
-                data={userList}
-                value={task.createdBy}
-                onChange={(value) => setTask((prev) => ({ ...prev, createdBy: value }))}
+                techniciansData={userList}
+                value={task.createdBy ? [task.createdBy] : []}
+                onChange={(value) => setTask((prev) => ({ ...prev, createdBy: value[0] || "" }))}
                 placeholder={translations["Autor"][language]}
-                required
-                searchable
+                mode="single"
                 disabled={!!defaultCreatedBy}
               />
             </Grid.Col>
 
             <Grid.Col span={6}>
-              <MantineSelect
+              <UserGroupMultiSelect
                 label={translations["Responsabil"][language]}
-                data={userList}
-                value={task.createdFor}
-                onChange={(value) => setTask((prev) => ({ ...prev, createdFor: value }))}
+                techniciansData={userList}
+                value={task.createdFor ? [task.createdFor] : []}
+                onChange={(value) => setTask((prev) => ({ ...prev, createdFor: value[0] || "" }))}
                 placeholder={translations["Responsabil"][language]}
-                required
-                searchable
+                mode="single"
               />
             </Grid.Col>
           </Grid>

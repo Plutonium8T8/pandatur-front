@@ -225,7 +225,7 @@ const TaskList = ({
           const today = dayjs().startOf("day");
           const isToday = parsed.isSame(today, "day");
           const isPast = parsed.isBefore(today, "day");
-          const color = isPast ? "#d32f2f" : isToday ? "#2e7d32" : "#000000";
+          const color = isPast ? "#ef4444" : isToday ? "#22c55e" : "var(--crm-ui-kit-palette-text-primary)";
 
           return (
             <span style={{ color, fontWeight: 500 }}>
@@ -257,8 +257,8 @@ const TaskList = ({
         width: 120,
         align: "center",
         render: (ticketId) => (
-          <Link to={`/tasks/${ticketId}`}>
-            <Flex justify="center" gap="8" align="center">
+          <Link to={`/tasks/${ticketId}`} style={{ textDecoration: 'none' }}>
+            <Flex justify="center" gap="8" align="center" style={{ color: '#007bff' }}>
               <FaFingerprint />
               {ticketId}
             </Flex>
