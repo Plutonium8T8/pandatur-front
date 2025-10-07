@@ -172,9 +172,9 @@ export const Logs = () => {
   ];
 
   return (
-    <Box h="calc(100% - (32px + 33px + 32px))" p="20px">
-      <PageHeader 
-        title={getLanguageByKey("logs")} 
+    <Box h="100%" p="20px" style={{ display: 'flex', flexDirection: 'column' }}>
+      <PageHeader
+        title={getLanguageByKey("logs")}
         count={totalItems}
         extraInfo={
           <>
@@ -209,17 +209,23 @@ export const Logs = () => {
           <Spin />
         </Flex>
       ) : (
-        <>
-          <RcTable
-            bordered
-            rowKey="id"
-            columns={rcColumn}
-            data={logList}
-          />
+        <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+          <Box style={{ flex: 1, overflow: 'auto' }}>
+            <RcTable
+              bordered
+              rowKey="id"
+              columns={rcColumn}
+              data={logList}
+            />
+          </Box>
           <Flex
-            pt="10"
+            pt="16"
+            pb="16"
             justify="center"
-            style={{ borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)" }}
+            style={{
+              borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)",
+              backgroundColor: "var(--crm-ui-kit-palette-background-primary)"
+            }}
           >
             <Pagination
               total={pagination.totalPages}
@@ -229,7 +235,7 @@ export const Logs = () => {
               }
             />
           </Flex>
-        </>
+        </Box>
       )}
     </Box>
   );
