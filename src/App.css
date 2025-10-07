@@ -460,3 +460,22 @@ a {
   background-color: var(--crm-ui-kit-palette-link-primary) !important;
   color: white !important;
 }
+
+/* SegmentedControl стили */
+.mantine-SegmentedControl-root {
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-SegmentedControl-label {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-SegmentedControl-indicator {
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
+  box-shadow: none !important;
+}
+
+.mantine-SegmentedControl-control[data-active="true"] .mantine-SegmentedControl-label {
+  color: white !important;
+}

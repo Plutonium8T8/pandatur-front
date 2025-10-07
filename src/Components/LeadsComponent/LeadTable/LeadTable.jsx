@@ -367,7 +367,7 @@ export const LeadTable = ({
 
   return (
     <>
-      <Box px="20px">
+      <Box>
         {selectTicket.length > 0 && allResultIds.length > 0 && !isAllResultsSelected && (
           <Paper p="xs" mb="xs" withBorder>
             <Text size="sm">
