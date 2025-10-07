@@ -134,17 +134,10 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
     const hasMore = rest.length > 0;
 
     return (
-        <Box
-            style={{
-                backgroundColor: "#f8f9fa",
-                border: "1px solid #e9ecef",
-                borderRadius: "12px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.1)"
-            }}
-        >
+        <Box>
             <Flex align="center" gap="md" wrap="wrap">
                 <Flex align="center" gap="xs">
-                    <Text pl="xs" size="sm" fw={900} c="dark" style={{ whiteSpace: "nowrap" }}>
+                    <Text pl="xs" size="sm" fw={900} style={{ whiteSpace: "nowrap", color: "var(--crm-ui-kit-palette-text-primary)" }}>
                         LIVE
                     </Text>
                 </Flex>
@@ -162,19 +155,19 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                             width: "8px",
                                             height: "8px",
                                             borderRadius: "50%",
-                                            backgroundColor: "#4caf50",
-                                            boxShadow: "0 0 6px rgba(76, 175, 80, 0.6)"
+                                            backgroundColor: "var(--crm-ui-kit-palette-link-primary)",
+                                            boxShadow: "0 0 6px color-mix(in srgb, var(--crm-ui-kit-palette-link-primary) 60%, transparent)"
                                         }}
                                     />
                                     <Text
                                         size="sm"
                                         fw={isCurrentUser ? 700 : 500}
-                                        c={isCurrentUser ? "blue" : "dark"}
                                         style={{
                                             whiteSpace: "nowrap",
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
-                                            maxWidth: "120px"
+                                            maxWidth: "120px",
+                                            color: isCurrentUser ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-primary)"
                                         }}
                                         title={name}
                                     >
@@ -191,13 +184,13 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                 <Popover.Target>
                                     <Text
                                         size="sm"
-                                        c="blue"
                                         fw={600}
                                         style={{
                                             cursor: "pointer",
                                             userSelect: "none",
                                             whiteSpace: "nowrap",
-                                            textDecoration: "underline"
+                                            textDecoration: "underline",
+                                            color: "var(--crm-ui-kit-palette-link-primary)"
                                         }}
                                         aria-label={getLanguageByKey("showAllParticipants")}
                                     >
@@ -206,7 +199,7 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                 </Popover.Target>
                                 <Popover.Dropdown>
                                     <Box p="md">
-                                        <Text size="sm" fw={600} mb="sm" c="dark">
+                                        <Text size="sm" fw={600} mb="sm" style={{ color: "var(--crm-ui-kit-palette-text-primary)" }}>
                                             {getLanguageByKey("showAllParticipants")}
                                         </Text>
                                         <Divider mb="sm" />
@@ -219,15 +212,19 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                                             <Avatar
                                                                 size="20px"
                                                                 radius="xl"
-                                                                color="green"
+                                                                styles={{
+                                                                    root: {
+                                                                        backgroundColor: "var(--crm-ui-kit-palette-link-primary)"
+                                                                    }
+                                                                }}
                                                             >
                                                                 {isSystem ? (
-                                                                    <FaCogs size={10} color="white" />
+                                                                    <FaCogs size={10} style={{ color: "var(--crm-ui-kit-palette-text-primary)" }} />
                                                                 ) : (
-                                                                    <FaUser size={10} color="white" />
+                                                                    <FaUser size={10} style={{ color: "var(--crm-ui-kit-palette-text-primary)" }} />
                                                                 )}
                                                             </Avatar>
-                                                            <Text size="sm" c="dark">
+                                                            <Text size="sm" style={{ color: "var(--crm-ui-kit-palette-text-primary)" }}>
                                                                 {name}
                                                             </Text>
                                                         </Flex>
@@ -246,6 +243,6 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                     </Text>
                 )}
             </Flex>
-        </Box>
+        </Box >
     );
 };

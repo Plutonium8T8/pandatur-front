@@ -146,7 +146,6 @@ export const MessagesLogItem = ({ log, technicians }) => {
             mb="6px"
             style={{
                 backgroundColor: colors.bg,
-                border: `1px solid ${colors.border}`,
                 borderRadius: "12px",
                 position: "relative",
                 overflow: "hidden"

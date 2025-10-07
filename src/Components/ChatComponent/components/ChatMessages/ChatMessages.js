@@ -211,7 +211,7 @@ export const ChatMessages = ({
   return (
     <Flex w="100%" direction="column" className="chat-area">
       {ticketId && (
-        <Paper p="8" bg="var(--crm-ui-kit-palette-callout-success-background-color)" style={{ borderRadius: 12, margin: "6px 6px 12px 42px" }}>
+        <Paper p="8" style={{ margin: "12px 0px 12px 42px" }}>
           <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
         </Paper>
       )}
