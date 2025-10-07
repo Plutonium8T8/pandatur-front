@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Flex, Badge, DEFAULT_THEME, Divider, Text, Box } from "@mantine/core";
+import { Flex, Badge, Divider, Text, Box } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
 import { getLanguageByKey } from "@utils";
@@ -11,8 +11,6 @@ import { useLiveTicketNotes } from "../../../../hooks/useLiveTicketNotes";
 import BackTabs from "../BackTabs/BackTabs";
 import LogCluster from "../LogCluster/LogCluster";
 import "./GroupedMessages.css";
-
-const { colors } = DEFAULT_THEME;
 
 
 const toDate = (val) => {
@@ -223,7 +221,17 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
-                  label={<Badge c="black" size="lg" bg={colors.gray[2]}>{date}</Badge>}
+                  label={
+                    <Badge 
+                      size="lg" 
+                      style={{
+                        backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)",
+                        color: "var(--crm-ui-kit-palette-text-primary)"
+                      }}
+                    >
+                      {date}
+                    </Badge>
+                  }
                   labelPosition="center"
                 />
 
@@ -263,9 +271,9 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         key={`dialog-${date}-${i}`}
                         p="md"
                         style={{
-                          backgroundColor: "#f8fff8",
+                          backgroundColor: "var(--crm-ui-kit-palette-callout-success-background-color)",
                           borderRadius: "12px",
-                          border: "1px solid #e8f5e8",
+                          border: "1px solid var(--crm-ui-kit-palette-border-default)",
                           position: "relative",
                         }}
                       >
