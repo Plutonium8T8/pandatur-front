@@ -18,17 +18,17 @@ aside[class*="css-"] {
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button:hover {
-  background-color: #19374d !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active {
-  background-color: #153043 !important;
+  background-color: var(--crm-ui-kit-palette-background-primary-disabled) !important;
   color: white !important;
-  border-left: 3px solid #1691ff !important;
+  border-left: 3px solid var(--crm-ui-kit-palette-link-primary) !important;
 }
 
 .ps-sidebar-container .ps-menuitem-root .ps-menu-button.ps-active:hover {
-  background-color: #264b79 !important;
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
   color: white !important;
 }
 
@@ -79,7 +79,7 @@ aside[class*="css-"] {
     align-items: center;
     justify-content: space-between;
     padding: 0 16px;
-    border-bottom: 1px solid #374151;
+    border-bottom: 1px solid var(--crm-ui-kit-palette-border-primary);
     color: white;
   }
   
