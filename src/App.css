@@ -647,3 +647,47 @@ button[class*="mantine-"][data-selected="true"] {
 .mantine-Anchor-root:hover {
   color: var(--crm-ui-kit-palette-link-hover-primary) !important;
 }
+
+/* Tabs стили */
+.mantine-Tabs-root {
+  background-color: transparent !important;
+}
+
+.mantine-Tabs-list {
+  background-color: transparent !important;
+  border-bottom: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-Tabs-tab {
+  background-color: transparent !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+  border: none !important;
+  border-bottom: 2px solid transparent !important;
+  transition: all 0.2s ease;
+}
+
+.mantine-Tabs-tab:hover:not([data-active="true"]) {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  border-bottom-color: var(--crm-ui-kit-palette-border-default) !important;
+}
+
+.mantine-Tabs-tab[data-active="true"] {
+  background-color: transparent !important;
+  color: var(--crm-ui-kit-palette-link-primary) !important;
+  border-bottom-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+.mantine-Tabs-panel {
+  background-color: transparent !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* Title стили */
+.mantine-Title-root {
+  color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+/* Divider стили */
+.mantine-Divider-root {
+  border-color: var(--crm-ui-kit-palette-border-default) !important;
+}

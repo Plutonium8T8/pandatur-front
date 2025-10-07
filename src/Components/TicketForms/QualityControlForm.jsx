@@ -25,7 +25,7 @@ export const QualityControlForm = ({ data, formInstance }) => {
 
   return (
     <>
-      <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
+      <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
         <Select
           clearable
           searchable

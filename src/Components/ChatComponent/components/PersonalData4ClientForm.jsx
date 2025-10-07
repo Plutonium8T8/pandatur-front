@@ -76,7 +76,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
   };
 
   return (
-    <Box bg="#f1f3f5" p="md" style={{ borderRadius: 8 }}>
+    <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
       <Flex justify="space-between" align="center">
         <Title order={3}>{getLanguageByKey("Date personale")}</Title>
         <ActionIcon onClick={handleAddClient} variant="filled">

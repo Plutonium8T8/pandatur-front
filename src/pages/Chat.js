@@ -4,7 +4,7 @@ import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useFetchTicketChat } from "@hooks";
 import { useGetTechniciansList } from "../hooks";
-import ChatExtraInfo from "@components/ChatComponent/ChatExtraInfo";
+import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
 import ChatList from "@components/ChatComponent/ChatList";
 import { getFullName } from "@utils";
 import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";

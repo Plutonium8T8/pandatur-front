@@ -14,15 +14,15 @@
 }
 
 .media-wrapper.media-files {
-  border: 1px solid var(--mantine-color-gray-4);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .file-link {
-  color: var(--mantine-color-black);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .file-link:hover {
-  color: var(--mantine-color-blue-8);
+  color: var(--crm-ui-kit-palette-link-hover-primary);
 }
 
 .media-tabs .mantine-Tabs-panel[data-orientation="horizontal"] {

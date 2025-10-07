@@ -355,7 +355,7 @@ const ChatExtraInfo = ({
               onSubmit={handleUpdateTicketDate}
             />
 
-            <Divider my="md" size="md" color="green" />
+            <Divider my="md" size="md" />
 
             <PersonalData4ClientForm
               key={`personal-${selectedUser.payload?.id}-${ticketId}`}
@@ -364,7 +364,7 @@ const ChatExtraInfo = ({
               ticketId={ticketId}
             />
 
-            <Divider my="md" size="md" color="green" />
+            <Divider my="md" size="md" />
 
             <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
               <Merge

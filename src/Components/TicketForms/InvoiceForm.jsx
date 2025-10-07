@@ -58,7 +58,7 @@ export const InvoiceForm = ({
 
   return (
     <>
-      <Box bg="#f8f9fa" p="md" style={{ borderRadius: 8 }}>
+      <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
         <TextInput
           label={getLanguageByKey("F/service")}
           placeholder={getLanguageByKey("F/service")}

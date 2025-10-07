@@ -34,17 +34,20 @@ export const Merge = ({
         value={value ?? ""}
         placeholder={getLanguageByKey("Introduceți ID vechi")}
         variant="filled"
-        styles={(theme) => ({
+        styles={{
           root: { opacity: 1 },
           input: {
-            color: theme.black,
-            WebkitTextFillColor: theme.black,
+            color: "var(--crm-ui-kit-palette-text-primary)",
+            WebkitTextFillColor: "var(--crm-ui-kit-palette-text-primary)",
             opacity: 1,
-            backgroundColor: theme.colors.gray[1],
+            backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
             fontWeight: 600,
-            "::placeholder": { color: theme.colors.gray[7], opacity: 1 },
+            "::placeholder": { 
+              color: "var(--crm-ui-kit-palette-placeholder-default)", 
+              opacity: 1 
+            },
           },
-        })}
+        }}
       />
 
       <NumberInput
