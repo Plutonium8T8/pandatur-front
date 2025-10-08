@@ -124,7 +124,12 @@ const ChatList = ({ ticketId }) => {
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
-              <Badge bg="#0f824c">{sortedTickets.length}</Badge>
+              <Badge 
+                variant="filled"
+                style={{ backgroundColor: "var(--crm-ui-kit-palette-link-primary)" }}
+              >
+                {sortedTickets.length}
+              </Badge>
             </Flex>
             <ActionIcon
               variant={isFiltered ? "filled" : "default"}

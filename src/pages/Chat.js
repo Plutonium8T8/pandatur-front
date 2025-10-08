@@ -5,7 +5,7 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import { useApp, useFetchTicketChat } from "@hooks";
 import { useGetTechniciansList } from "../hooks";
 import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
-import ChatList from "@components/ChatComponent/ChatList";
+import ChatList from "../Components/ChatComponent/ChatList";
 import { getFullName } from "@utils";
 import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";
 import Can from "@components/CanComponent/Can";
