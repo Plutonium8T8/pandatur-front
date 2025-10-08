@@ -160,7 +160,7 @@ const NoteContent = ({ note }) => {
 };
 
 const NOTE_STYLE = {
-    text: { borderColor: "rgba(255, 229, 143, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#ffe58f", icon: FiFileText, label: "Text" },
+    text: { borderColor: "rgba(255, 229, 143, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#FFA500", icon: FiFileText, label: "Text" },
     image: { borderColor: "rgba(145, 213, 255, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#91d5ff", icon: FiImage, label: "Image" },
     video: { borderColor: "rgba(179, 127, 235, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#b37feb", icon: FiVideo, label: "Video" },
     audio: { borderColor: "rgba(149, 222, 100, 0.3)", bgColor: "var(--crm-ui-kit-palette-background-primary)", accentColor: "#95de64", icon: FiMusic, label: "Audio" },
