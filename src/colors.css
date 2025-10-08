@@ -10,6 +10,8 @@
   /* Отключенные/неактивные элементы */
   --crm-ui-kit-palette-sidebar-background: #0a1929;
   /* Фон сайдбара - темно-синий */
+  --crm-ui-kit-palette-sidebar-text: #f2f2f2;
+  /* Цвет текста в сайдбаре */
 
   /* Текст */
   --crm-ui-kit-palette-text-primary: #f2f2f2;
@@ -83,8 +85,10 @@
   /* Основной фон блоков/карточек */
   --crm-ui-kit-palette-background-primary-disabled: #e9ecef;
   /* Отключенные/неактивные элементы */
-  --crm-ui-kit-palette-sidebar-background: #0a1929;
-  /* Фон сайдбара - темно-синий (одинаковый для обеих тем) */
+  --crm-ui-kit-palette-sidebar-background: #ffffff;
+  /* Фон сайдбара - белый для светлой темы */
+  --crm-ui-kit-palette-sidebar-text: #212529;
+  /* Цвет текста в сайдбаре - темный для светлой темы */
 
   /* Текст */
   --crm-ui-kit-palette-text-primary: #212529;

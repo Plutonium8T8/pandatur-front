@@ -41,7 +41,7 @@ a {
 /* Mobile scroll styles */
 .mobile-scroll-container {
   scrollbar-width: thin;
-  scrollbar-color: #c1c1c1 transparent;
+  scrollbar-color: var(--crm-ui-kit-palette-scrollbar-thumb-background) transparent;
 }
 
 .mobile-scroll-container::-webkit-scrollbar {
@@ -53,12 +53,12 @@ a {
 }
 
 .mobile-scroll-container::-webkit-scrollbar-thumb {
-  background-color: #c1c1c1;
+  background-color: var(--crm-ui-kit-palette-scrollbar-thumb-background);
   border-radius: 3px;
 }
 
 .mobile-scroll-container::-webkit-scrollbar-thumb:hover {
-  background-color: #a1a1a1;
+  background-color: var(--crm-ui-kit-palette-border-default);
 }
 
 .chat-container {
@@ -85,12 +85,12 @@ a {
 }
 
 .dashboard-layout>div {
-  border: 1px solid #ccc;
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-size: 14px;
   text-align: center;
-  background-color: white;
+  background-color: var(--crm-ui-kit-palette-background-primary);
   padding: 12px;
   cursor: pointer;
 }
@@ -297,13 +297,13 @@ a {
   font-weight: 500 !important;
 }
 
-/* Акцентирование значений в инпутах формы белым цветом */
+/* Акцентирование значений в инпутах формы - адаптивный цвет */
 .mantine-Input-input:not(:placeholder-shown),
 .mantine-TextInput-input:not(:placeholder-shown),
 .mantine-Select-input:not(:placeholder-shown),
 .mantine-Textarea-input:not(:placeholder-shown),
 .mantine-NumberInput-input:not(:placeholder-shown) {
-  color: #ffffff !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
   font-weight: 600 !important;
 }
 

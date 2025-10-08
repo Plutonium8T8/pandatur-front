@@ -36,7 +36,7 @@ export const SideBar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isMobile = useMobile();
   const { setLanguage, selectedLanguage, LANGUAGE_OPTIONS, LANGUAGES } = useLanguageToggle();
-  const { theme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
   const currentGroupTitle = customGroupTitle || groupTitleForApi;
@@ -72,7 +72,7 @@ export const SideBar = () => {
         <div className="mobile-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img className="logo" src={LOGO} alt="PANDATUR CRM" />
-            <div style={{ color: 'white', fontSize: '12px', fontWeight: 'bold' }}>
+            <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
               {surname} {name}
             </div>
           </div>
@@ -86,13 +86,13 @@ export const SideBar = () => {
               styles={{
                 input: {
                   backgroundColor: "transparent",
-                  color: "white",
+                  color: "var(--crm-ui-kit-palette-sidebar-text)",
                   border: "1px solid transparent",
                   fontSize: "12px"
                 },
                 dropdown: {
-                  backgroundColor: "white",
-                  color: "black",
+                  backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
+                  color: "var(--crm-ui-kit-palette-text-primary)",
                 },
               }}
             />
@@ -101,7 +101,7 @@ export const SideBar = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'white',
+                color: 'var(--crm-ui-kit-palette-sidebar-text)',
                 cursor: 'pointer',
                 padding: '8px',
                 borderRadius: '4px',
@@ -117,7 +117,7 @@ export const SideBar = () => {
             <Burger
               opened={mobileMenuOpen}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              color="white"
+              color="var(--crm-ui-kit-palette-sidebar-text)"
               size="sm"
               className="burger"
             />
@@ -135,7 +135,6 @@ export const SideBar = () => {
 
       <BaseSideBar 
         collapsed={isMobile ? false : isCollapsed} 
-        backgroundColor="#1f2937"
         className={isMobile && mobileMenuOpen ? 'mobile-open' : ''}
       >
         <Menu>
@@ -285,12 +284,12 @@ export const SideBar = () => {
                     styles={{
                       input: {
                         backgroundColor: "transparent",
-                        color: "white",
+                        color: "var(--crm-ui-kit-palette-sidebar-text)",
                         border: "1px solid transparent",
                       },
                       dropdown: {
-                        backgroundColor: "white",
-                        color: "black",
+                        backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
+                        color: "var(--crm-ui-kit-palette-text-primary)",
                       },
                     }}
                   />
