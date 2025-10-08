@@ -433,7 +433,7 @@ a {
 
 /* Text стили */
 .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-text-primary);
+  color: var(--crm-ui-kit-palette-text-primary) !important;
 }
 
 /* Loader стили */
@@ -484,10 +484,6 @@ a {
 }
 
 /* Badge стили */
-.mantine-Badge-root {
-  color: white !important;
-}
-
 .mantine-Badge-root[data-variant="light"] {
   background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
   color: var(--crm-ui-kit-palette-text-primary) !important;
@@ -502,6 +498,10 @@ a {
   background-color: transparent !important;
   border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
   color: var(--crm-ui-kit-palette-text-primary) !important;
+}
+
+.mantine-Badge-root:not([data-variant]) {
+  color: white !important;
 }
 
 /* SegmentedControl стили */
@@ -700,7 +700,7 @@ button[class*="mantine-"][data-selected="true"] {
 }
 
 .mantine-Tabs-tab .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-text-primary);
+  color: var(--crm-ui-kit-palette-text-primary) !important;
 }
 
 .mantine-Tabs-tab:hover:not([data-active="true"]) {
@@ -714,7 +714,7 @@ button[class*="mantine-"][data-selected="true"] {
 }
 
 .mantine-Tabs-tab[data-active="true"] .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-link-primary);
+  color: var(--crm-ui-kit-palette-link-primary) !important;
 }
 
 .mantine-Tabs-panel {
@@ -734,8 +734,9 @@ button[class*="mantine-"][data-selected="true"] {
 
 /* Ticket Card стили */
 .mantine-Card-root {
-  background-color: var(--crm-ui-kit-palette-background-primary);
-  border-color: var(--crm-ui-kit-palette-border-default);
+  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  border-color: var(--crm-ui-kit-palette-border-default) !important;
+  color: var(--crm-ui-kit-palette-text-primary) !important;
 }
 
 /* Ticket Card - My Ticket стили */
