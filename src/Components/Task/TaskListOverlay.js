@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback, useRef, startTransition } from "react";
 import {
   Paper, Text, Box, Group, Stack, Card, Divider, Collapse,
-  TextInput, Button, Select, ActionIcon, Loader, Center
+  TextInput, Button, Select, ActionIcon, Loader, Center, Badge
 } from "@mantine/core";
 import { FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
 import { getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate } from "../utils/taskUtils";
@@ -13,7 +13,6 @@ import DateQuickInput from "./Components/DateQuickPicker";
 import { useGetTechniciansList, useUser, useConfirmPopup } from "../../hooks";
 import IconSelect from "../IconSelect/IconSelect";
 import { useSnackbar } from "notistack";
-import { PageHeader } from "../PageHeader";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
@@ -411,42 +410,55 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
             if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleList(); }
           }}
           style={{ cursor: "pointer" }}
+          p="xs"
         >
-          <PageHeader
-            title={translations["Tasks"][language]}
-            count={tasks.length}
-            badgeColor={getBadgeColor(tasks)}
-            withDivider={false}
-            extraInfo={
-              <Group gap="xs" onClick={(e) => e.stopPropagation()}>
-                <ActionIcon
-                  variant="light"
-                  onClick={(e) => { e.stopPropagation(); toggleList(); }}
+          <Group justify="space-between" align="center">
+            <Group gap="sm">
+              <Text fw={600} size="md" style={{ color: "var(--crm-ui-kit-palette-text-primary)" }}>
+                {translations["Tasks"][language]}
+              </Text>
+              {tasks.length > 0 && (
+                <Badge
+                  size="lg"
+                  style={{
+                    backgroundColor: getBadgeColor(tasks),
+                    color: "#ffffff"
+                  }}
                 >
-                  {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
-                </ActionIcon>
-                {listLoading && <Loader size="sm" />}
-              </Group>
-            }
-          />
+                  {tasks.length}
+                </Badge>
+              )}
+            </Group>
+            <Group gap="xs" onClick={(e) => e.stopPropagation()}>
+              <ActionIcon
+                variant="light"
+                onClick={(e) => { e.stopPropagation(); toggleList(); }}
+              >
+                {listCollapsed ? <FaChevronDown size={16} /> : <FaChevronUp size={16} />}
+              </ActionIcon>
+              {listLoading && <Loader size="sm" />}
+            </Group>
+          </Group>
         </Box>
 
         <Collapse in={!listCollapsed}>
-          {listLoading && tasks.length === 0 && (
-            <Center my="md"><Loader /></Center>
-          )}
+          <Box p="md" pt={0}>
+            {listLoading && tasks.length === 0 && (
+              <Center my="md"><Loader /></Center>
+            )}
 
-          {!listLoading && tasks.length > 0 && (
-            <Stack spacing="xs" mt="xs">
-              {tasks.map((task) => renderTaskForm(task.id))}
-            </Stack>
-          )}
+            {!listLoading && tasks.length > 0 && (
+              <Stack spacing="xs" mt="xs">
+                {tasks.map((task) => renderTaskForm(task.id))}
+              </Stack>
+            )}
 
-          {creatingTask && (
-            <Stack spacing="xs" mt="xs">
-              {renderTaskForm("new", true)}
-            </Stack>
-          )}
+            {creatingTask && (
+              <Stack spacing="xs" mt="xs">
+                {renderTaskForm("new", true)}
+              </Stack>
+            )}
+          </Box>
         </Collapse>
       </Paper>
     </Box>
