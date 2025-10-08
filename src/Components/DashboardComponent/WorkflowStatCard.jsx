@@ -23,9 +23,9 @@ export const WorkflowStatCard = ({
     <Box
       style={{
         padding: "12px",
-        backgroundColor: "#f8f9fa",
+        backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)",
         borderRadius: "8px",
-        border: "1px solid #e9ecef",
+        border: "1px solid var(--crm-ui-kit-palette-border-default)",
       }}
     >
       <Group justify="space-between" align="center" mb="xs">

@@ -52,7 +52,7 @@ export const WorkflowToChangeCard = ({
         </Group>
 
         {/* Статистика по "Contract încheiat" */}
-        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)", borderRadius: "6px" }}>
           <Group gap="xs">
             <FaFileContract size={isVeryCompact ? 12 : 14} color="#28a745" />
             <Text fw={500} size={isVeryCompact ? "xs" : "xs"} c="dark">

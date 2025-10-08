@@ -11,7 +11,7 @@ export const ClosedTicketsCountCard = ({
   olderThan11Days = 0, 
   newerThan11Days = 0,
   totalClosedTickets = 0,
-  bg = "#FFFFFF",
+  bg,
   icons = {} 
 }) => {
   const colors = {

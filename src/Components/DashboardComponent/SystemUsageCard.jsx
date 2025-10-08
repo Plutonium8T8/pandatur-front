@@ -24,7 +24,7 @@ export const SystemUsageCard = ({
   subtitle, 
   activityMinutes = 0, 
   activityHours = 0, 
-  bg = "#FFFFFF",
+  bg,
   icons = {} 
 }) => {
   const colors = {

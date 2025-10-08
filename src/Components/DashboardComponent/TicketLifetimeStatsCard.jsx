@@ -43,7 +43,7 @@ export const TicketLifetimeStatsCard = ({
   averageLifetimeHours = 0,
   title,
   subtitle,
-  bg = "#FFFFFF"
+  bg
 }) => {
   const getEfficiencyColor = (avgHours) => {
     if (avgHours <= 1) return "green"; // Очень быстро

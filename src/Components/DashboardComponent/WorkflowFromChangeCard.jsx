@@ -67,7 +67,7 @@ export const WorkflowFromChangeCard = ({
         </Group>
 
         {/* Статистика по "Luat în lucru" */}
-        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)", borderRadius: "6px" }}>
           <Group gap="xs">
             <FaHandPaper size={isVeryCompact ? 12 : 14} color="#28a745" />
             <Text fw={500} size={isVeryCompact ? "xs" : "xs"} c="dark">
@@ -85,7 +85,7 @@ export const WorkflowFromChangeCard = ({
         </Group>
 
         {/* Статистика по "Ofertă trimisă" */}
-        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "#f8f9fa", borderRadius: "6px" }}>
+        <Group justify="space-between" align="center" p={isVeryCompact ? "xs" : "xs"} style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)", borderRadius: "6px" }}>
           <Group gap="xs">
             <FaFileContract size={isVeryCompact ? 12 : 14} color="#007bff" />
             <Text fw={500} size={isVeryCompact ? "xs" : "xs"} c="dark">

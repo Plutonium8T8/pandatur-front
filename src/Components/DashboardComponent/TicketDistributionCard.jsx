@@ -9,7 +9,7 @@ export const TicketDistributionCard = ({
   title, 
   subtitle, 
   distributedTickets = 0, 
-  bg = "#FFFFFF",
+  bg,
   icons = {} 
 }) => {
   const colors = {

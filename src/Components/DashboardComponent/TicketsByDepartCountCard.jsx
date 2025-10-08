@@ -12,7 +12,7 @@ export const TicketsByDepartCountCard = ({
   totalTickets = 0,
   title,
   subtitle,
-  bg = "#FFFFFF"
+  bg
 }) => {
   const total = lessThan14Days + between14And30Days + moreThan30Days;
   

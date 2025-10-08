@@ -104,8 +104,8 @@ export const TotalCard = ({
                 display: "flex",
                 flexDirection: "column",
                 background: bg || widgetColors.bg,
-                borderColor: "rgba(0,0,0,0.08)",
-                boxShadow: "0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1)",
+                borderColor: "var(--crm-ui-kit-palette-border-default)",
+                boxShadow: "var(--crm-ui-kit-palette-content-block-box-shadow)",
                 transition: "all 0.2s ease",
             }}
         >
@@ -118,7 +118,6 @@ export const TotalCard = ({
                             radius="xl"
                             variant="gradient"
                             gradient={{ from: widgetColors.totalAccent, to: widgetColors.totalAccent, deg: 45 }}
-                            style={{ boxShadow: "0 2px 8px rgba(0,0,0,0.1)" }}
                         >
                             {TotalIconNode}
                         </ThemeIcon>
@@ -163,7 +162,7 @@ export const TotalCard = ({
                 </Box>
             </Flex>
 
-            <Divider color="rgba(0,0,0,0.08)" my="md" />
+            <Divider my="md" />
 
             {/* Body */}
             <Stack gap="lg" style={{ flex: 1 }}>
@@ -199,8 +198,7 @@ export const TotalCard = ({
                         radius="xl"
                         color={widgetColors.in}
                         style={{
-                            backgroundColor: `var(--mantine-color-${widgetColors.in}-1)`,
-                            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)"
+                            backgroundColor: `var(--mantine-color-${widgetColors.in}-1)`
                         }}
                     />
                 </Box>
@@ -237,8 +235,7 @@ export const TotalCard = ({
                         radius="xl"
                         color={widgetColors.out}
                         style={{
-                            backgroundColor: `var(--mantine-color-${widgetColors.out}-1)`,
-                            boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)"
+                            backgroundColor: `var(--mantine-color-${widgetColors.out}-1)`
                         }}
                     />
                 </Box>

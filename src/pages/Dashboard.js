@@ -207,16 +207,11 @@ export const Dashboard = () => {
 
       <Tooltip label={getLanguageByKey("Filtru")}>
         <ActionIcon
-          variant="light"
+          variant={isFilterActive ? "filled" : "default"}
           size="lg"
           onClick={() => setFilterOpened(true)}
           aria-label="open-filter"
-          color={isFilterActive ? "green" : "gray"}
-          style={{
-            backgroundColor: isFilterActive ? "#51cf66" : "var(--crm-ui-kit-palette-background-primary)",
-            border: isFilterActive ? "1px solid #51cf66" : "1px solid var(--crm-ui-kit-palette-border-default)",
-            color: isFilterActive ? "white" : "var(--crm-ui-kit-palette-text-primary)"
-          }}
+          color={isFilterActive ? "green" : undefined}
         >
           <LuFilter size={18} />
         </ActionIcon>
@@ -230,7 +225,7 @@ export const Dashboard = () => {
         <PageHeader
           title={getLanguageByKey("Dashboard")}
           extraInfo={extraInfo}
-          badgeColor="#0f824c"
+          badgeColor="green"
           withDivider={true}
         />
       </div>

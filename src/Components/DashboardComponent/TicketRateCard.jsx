@@ -13,7 +13,7 @@ export const TicketRateCard = ({
   workedOnPercentage = 0,
   title,
   subtitle,
-  bg = "#FFFFFF"
+  bg
 }) => {
   const getQualityColor = (directlyClosedPct) => {
     if (directlyClosedPct <= 10) return "green"; // Хорошо - мало прямых закрытий
