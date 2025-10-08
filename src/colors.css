@@ -74,6 +74,12 @@
   /* Информация — фон */
   --crm-ui-kit-palette-callout-success-background-color: #0f2231;
   /* Успех — фон */
+
+  /* Сообщения чата */
+  --crm-ui-kit-palette-message-received-background: #0f2231;
+  /* Фон полученных сообщений (от клиента) */
+  --crm-ui-kit-palette-message-sent-background: #1e3548;
+  /* Фон отправленных сообщений (от техника) */
 }
 
 /* Светлая тема */
@@ -151,4 +157,10 @@
   /* Информация — фон */
   --crm-ui-kit-palette-callout-success-background-color: #d1e7dd;
   /* Успех — фон */
+
+  /* Сообщения чата */
+  --crm-ui-kit-palette-message-received-background: #d1e7dd;
+  /* Фон полученных сообщений (от клиента) - светло-зеленый */
+  --crm-ui-kit-palette-message-sent-background: #e9ecef;
+  /* Фон отправленных сообщений (от техника) - светло-серый */
 }

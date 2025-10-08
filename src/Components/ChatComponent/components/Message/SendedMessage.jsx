@@ -1,4 +1,4 @@
-import { Flex, Text, Image } from "@mantine/core";
+import { Flex, Text, Image, Box } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { FaHeadphones } from "react-icons/fa6";
 import { IoMdCheckmark } from "react-icons/io";
@@ -94,7 +94,7 @@ export const SendedMessage = ({
               direction="column" 
               p="8" 
               className="text" 
-              style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)" }}
+              style={{ backgroundColor: "var(--crm-ui-kit-palette-message-sent-background)" }}
             >
               <Flex align="center" gap={8}>
                 <FaHeadphones size={12} />
@@ -104,7 +104,9 @@ export const SendedMessage = ({
                 {socialMediaIcons[msg.platform] || null}
               </Flex>
 
-              {renderContent(msg)}
+              <Box mt="xs">
+                {renderContent(msg)}
+              </Box>
 
               <Flex justify="end" align="center" gap={4}>
                 <Flex align="center">

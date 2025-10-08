@@ -1,12 +1,10 @@
-import { Text, Box, DEFAULT_THEME } from "@mantine/core";
+import { Text, Box } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
 import { File } from "../File";
 import { MEDIA_TYPE } from "../../app-constants";
 import { Image as CheckedImage } from "../Image";
 import { EmailMessage } from "./components/EmailMessage/EmailMessage";
-
-const { colors } = DEFAULT_THEME;
 
 const spliceMessage = (message) => {
   return `${message.slice(0, 15)}...`;
@@ -70,7 +68,7 @@ export const renderContent = (msg) => {
     case MEDIA_TYPE.FILE:
       return (
         <File
-          bg={colors.gray[4]}
+          style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)" }}
           label={spliceMessage(mediaUrl)}
           src={mediaUrl}
         />
@@ -118,7 +116,7 @@ export const renderContent = (msg) => {
 
       return isStoreFile(displayText) ? (
         <File
-          bg={colors.gray[4]}
+          style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)" }}
           label={spliceMessage(displayText)}
           src={displayText}
         />
