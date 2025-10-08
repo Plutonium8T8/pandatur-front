@@ -78,7 +78,7 @@
   /* Сообщения чата */
   --crm-ui-kit-palette-message-received-background: #0f2231;
   /* Фон полученных сообщений (от клиента) */
-  --crm-ui-kit-palette-message-sent-background: #1e3548;
+  --crm-ui-kit-palette-message-sent-background: #203e57;
   /* Фон отправленных сообщений (от техника) */
 }
 
