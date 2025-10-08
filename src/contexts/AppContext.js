@@ -225,11 +225,13 @@ export const AppProvider = ({ children }) => {
       setChatFilteredTickets((prev) => {
         const exists = prev.find((t) => t.id === ticketId);
         
+        // Обновляем только существующие тикеты, не добавляем новые
+        // Новые тикеты должны проходить через фильтр при повторном применении фильтра
         if (exists) {
           return prev.map((t) => (t.id === ticketId ? ticket : t));
-        } else {
-          return [...prev, ticket];
         }
+        
+        return prev;
       });
 
       setUnreadCount((prev) => prev + (ticket?.unseen_count || 0));
