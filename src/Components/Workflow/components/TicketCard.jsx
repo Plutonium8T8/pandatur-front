@@ -54,12 +54,11 @@ export const TicketCard = ({
         withBorder
         radius="md"
         pos="relative"
-        bg={isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)"}
         p="8px"
+        className={isMyTicket ? "ticket-card-my-ticket" : ""}
         style={{
-          borderColor: isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-border-default)",
-          borderWidth: isMyTicket ? "2px" : "1px",
           color: "var(--crm-ui-kit-palette-text-primary)",
+          transition: "background-color 0.2s ease, border-color 0.2s ease"
         }}
       >
         <Box
@@ -182,7 +181,7 @@ export const TicketCard = ({
                   size="xs"
                   c="var(--crm-ui-kit-palette-text-secondary-light)"
                   style={{
-                    fontSize: '10px',
+                    fontSize: '12px',
                     flexShrink: 0
                   }}
                 >
