@@ -223,15 +223,20 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                 <Divider
                   color="var(--crm-ui-kit-palette-border-default)"
                   label={
-                    <Badge
-                      size="lg"
+                    <Box
+                      px="sm"
+                      py={4}
                       style={{
                         backgroundColor: "var(--crm-ui-kit-palette-background-primary-disabled)",
-                        color: "var(--crm-ui-kit-palette-text-primary)"
+                        color: "var(--crm-ui-kit-palette-text-primary)",
+                        fontWeight: 500,
+                        fontSize: "14px",
+                        borderRadius: "16px",
+                        border: "1px solid var(--crm-ui-kit-palette-border-default)"
                       }}
                     >
                       {date}
-                    </Badge>
+                    </Box>
                   }
                   labelPosition="center"
                 />
