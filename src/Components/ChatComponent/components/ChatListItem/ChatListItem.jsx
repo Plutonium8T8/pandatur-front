@@ -140,8 +140,8 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
                 <Text>{chat.id || "-"}</Text>
               </Flex>
 
-              <Divider orientation="vertical" />
-              <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag>
+              {/* <Divider orientation="vertical" />
+              <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag> */}
             </Flex>
           </Box>
         </Flex>
