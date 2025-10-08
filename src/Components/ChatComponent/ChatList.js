@@ -120,7 +120,7 @@ const ChatList = ({ ticketId }) => {
   return (
     <>
       <Box direction="column" w="20%">
-        <Flex direction="column" gap="xs" my="xs" pl="24px" pr="16px">
+        <Flex direction="column" gap="xs" my="xs" pl="xs" pr="xs">
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
