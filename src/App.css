@@ -433,7 +433,7 @@ a {
 
 /* Text стили */
 .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Loader стили */
@@ -694,10 +694,13 @@ button[class*="mantine-"][data-selected="true"] {
 
 .mantine-Tabs-tab {
   background-color: transparent !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
   border: none !important;
   border-bottom: 2px solid transparent !important;
   transition: all 0.2s ease;
+}
+
+.mantine-Tabs-tab .mantine-Text-root {
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Tabs-tab:hover:not([data-active="true"]) {
@@ -707,8 +710,11 @@ button[class*="mantine-"][data-selected="true"] {
 
 .mantine-Tabs-tab[data-active="true"] {
   background-color: transparent !important;
-  color: var(--crm-ui-kit-palette-link-primary) !important;
   border-bottom-color: var(--crm-ui-kit-palette-link-primary) !important;
+}
+
+.mantine-Tabs-tab[data-active="true"] .mantine-Text-root {
+  color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-Tabs-panel {

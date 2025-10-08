@@ -8,7 +8,6 @@ import {
 import {
   Image,
   Box,
-  DEFAULT_THEME,
   Card,
   Flex,
   Text,
@@ -23,8 +22,6 @@ import { Tag } from "../../Tag";
 import Can from "../../CanComponent/Can";
 import { useUser } from "../../../hooks";
 
-const { colors } = DEFAULT_THEME;
-
 const MAX_TAGS_COUNT = 2;
 
 const renderTags = (tags) => {
@@ -34,7 +31,7 @@ const renderTags = (tags) => {
 };
 
 export const priorityTagColors = {
-  joasă: "green",
+  joasă: "var(--crm-ui-kit-palette-link-primary)",
   medie: "blue",
   înaltă: "yellow",
   critică: "red",
@@ -60,7 +57,7 @@ export const TicketCard = ({
         bg={isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)"}
         p="8px"
         style={{
-          borderColor: isMyTicket ? "#4caf50" : "var(--crm-ui-kit-palette-border-default)",
+          borderColor: isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-border-default)",
           borderWidth: isMyTicket ? "2px" : "1px",
           color: "var(--crm-ui-kit-palette-text-primary)",
         }}

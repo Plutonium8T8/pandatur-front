@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm } from "@mantine/form";
 import { formatDate, getLanguageByKey } from "@utils";
 
@@ -9,6 +9,8 @@ export const useFormTicket = () => {
 
   const form = useForm({
     mode: "uncontrolled",
+    validateInputOnChange: true,
+    validateInputOnBlur: true,
 
     onValuesChange: (values) => {
       const budget = values.buget;
@@ -315,6 +317,9 @@ export const useFormTicket = () => {
     },
   });
 
+  // Мемоизируем строковое представление ошибок для отслеживания изменений
+  const errorsJson = useMemo(() => JSON.stringify(form.errors), [form.errors]);
+
   useEffect(() => {
     const {
       sursa_lead,
@@ -340,9 +345,12 @@ export const useFormTicket = () => {
       data_contractului,
       contract_trimis,
       contract_semnat,
+      achitare_efectuata,
     } = form.errors;
 
-    if (motivul_refuzului) {
+    console.log('useFormTicket - форма errors:', form.errors);
+
+    if (motivul_refuzului || control) {
       setHasErrorQualityControl(true);
     } else {
       setHasErrorQualityControl(false);
@@ -351,7 +359,6 @@ export const useFormTicket = () => {
     if (
       [
         numar_de_contract,
-        control,
         pret_netto,
         statutul_platii,
         contract_arhivat,
@@ -361,6 +368,7 @@ export const useFormTicket = () => {
         data_contractului,
         contract_trimis,
         contract_semnat,
+        achitare_efectuata,
       ].some((value) => value)
     ) {
       setHasErrorsContractForm(true);
@@ -387,7 +395,8 @@ export const useFormTicket = () => {
     } else {
       setHasErrorsTicketInfoForm(false);
     }
-  }, [form]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [errorsJson]);
 
   return {
     form,

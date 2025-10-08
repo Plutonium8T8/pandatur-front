@@ -52,6 +52,14 @@ const ChatExtraInfo = ({
     hasErrorQualityControl,
   } = useFormTicket();
 
+  // Отладка: проверяем, обновляются ли ошибки
+  console.log('Errors state:', {
+    hasErrorsTicketInfoForm,
+    hasErrorsContractForm,
+    hasErrorQualityControl,
+    formErrors: form.errors
+  });
+
   // Мемоизируем данные форм для предотвращения перерендера
   const formData = useMemo(() => ({
     general: updatedTicket,
@@ -300,7 +308,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorsTicketInfoForm ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
+                style={{ color: hasErrorsTicketInfoForm ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
                 truncate="end"
               >
                 {getLanguageByKey("lead")}
@@ -310,7 +318,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorsContractForm ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
+                style={{ color: hasErrorsContractForm ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
               >
                 {getLanguageByKey("Contract")}
               </Text>
@@ -329,7 +337,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                c={hasErrorQualityControl ? "red" : "var(--crm-ui-kit-palette-text-primary)"}
+                style={{ color: hasErrorQualityControl ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
               >
                 {getLanguageByKey("quality")}
               </Text>
