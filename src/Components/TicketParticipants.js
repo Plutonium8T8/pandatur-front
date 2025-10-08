@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Text, Popover, ScrollArea, Box, Flex, Avatar, Divider } from "@mantine/core";
+import { Text, Popover, ScrollArea, Box, Flex, Divider } from "@mantine/core";
 import { SocketContext } from "../contexts/SocketContext";
 import { useGetTechniciansList } from "@hooks";
 import { getLanguageByKey } from "@utils";
-import { FaUser, FaCogs } from "react-icons/fa";
 import "./TicketParticipants.css";
 
 const SERVER = {
@@ -112,7 +111,7 @@ const MAX_INLINE_NAMES = 4;
 
 export const TicketParticipants = ({ ticketId, currentUserId }) => {
     const { technicians } = useGetTechniciansList();
-    const { clients, total } = useTicketPresence(ticketId, currentUserId);
+    const { clients } = useTicketPresence(ticketId, currentUserId);
 
     const techMap = useMemo(() => {
         const map = new Map();
@@ -120,17 +119,20 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
         return map;
     }, [technicians]);
 
-    const fullNames = useMemo(() => {
+    const participants = useMemo(() => {
         return clients.map((id) => {
-            if (Number(id) === SYSTEM_ID) return "System";
+            const isSystem = Number(id) === SYSTEM_ID;
             const t = techMap.get(Number(id));
-            const base = t?.label || [t?.name, t?.surname].filter(Boolean).join(" ") || `User ${id}`;
-            return String(id) === String(currentUserId) ? `${base}` : base;
+            const name = isSystem 
+                ? "System" 
+                : t?.label || [t?.name, t?.surname].filter(Boolean).join(" ") || `User ${id}`;
+            const isCurrentUser = String(id) === String(currentUserId);
+            return { id, name, isCurrentUser, isSystem };
         });
     }, [clients, techMap, currentUserId]);
 
-    const inline = fullNames.slice(0, MAX_INLINE_NAMES);
-    const rest = fullNames.slice(MAX_INLINE_NAMES);
+    const inline = participants.slice(0, MAX_INLINE_NAMES);
+    const rest = participants.slice(MAX_INLINE_NAMES);
     const hasMore = rest.length > 0;
 
     return (
@@ -142,13 +144,10 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                     </Text>
                 </Flex>
 
-                {fullNames.length > 0 ? (
+                {participants.length > 0 ? (
                     <Flex align="center" gap="xs" style={{ flex: 1, minWidth: 0 }}>
-                        {inline.map((name, index) => {
-                            const isCurrentUser = String(name) === String(currentUserId);
-
-                            return (
-                                <Flex key={index} align="center" gap="xs">
+                        {inline.map((participant, index) => (
+                                <Flex key={participant.id || index} align="center" gap="xs">
                                     <Box
                                         className="status-indicator"
                                         style={{
@@ -161,24 +160,21 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                     />
                                     <Text
                                         size="sm"
-                                        fw={isCurrentUser ? 700 : 500}
+                                        fw={participant.isCurrentUser ? 700 : 500}
                                         style={{
                                             whiteSpace: "nowrap",
                                             overflow: "hidden",
                                             textOverflow: "ellipsis",
                                             maxWidth: "120px",
-                                            color: isCurrentUser ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-primary)"
+                                            color: participant.isCurrentUser ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-primary)"
                                         }}
-                                        title={name}
+                                        title={participant.name}
                                     >
-                                        {name}
+                                        {participant.name}
                                     </Text>
-                                    {index < inline.length - 1 && (
-                                        <Text size="xs" c="dimmed">•</Text>
-                                    )}
                                 </Flex>
-                            );
-                        })}
+                            )
+                        )}
                         {hasMore && (
                             <Popover width={320} position="bottom-end" withArrow>
                                 <Popover.Target>
@@ -205,31 +201,31 @@ export const TicketParticipants = ({ ticketId, currentUserId }) => {
                                         <Divider mb="sm" />
                                         <ScrollArea.Autosize mah={220} type="auto">
                                             <Flex direction="column" gap="xs">
-                                                {rest.map((name, index) => {
-                                                    const isSystem = name === "System";
-                                                    return (
-                                                        <Flex key={index} align="center" gap="sm">
-                                                            <Avatar
-                                                                size="20px"
-                                                                radius="xl"
-                                                                styles={{
-                                                                    root: {
-                                                                        backgroundColor: "var(--crm-ui-kit-palette-link-primary)"
-                                                                    }
+                                                {rest.map((participant, index) => (
+                                                        <Flex key={participant.id || index} align="center" gap="xs">
+                                                            <Box
+                                                                style={{
+                                                                    width: "8px",
+                                                                    height: "8px",
+                                                                    borderRadius: "50%",
+                                                                    backgroundColor: "var(--crm-ui-kit-palette-link-primary)",
+                                                                    boxShadow: "0 0 6px color-mix(in srgb, var(--crm-ui-kit-palette-link-primary) 60%, transparent)"
+                                                                }}
+                                                            />
+                                                            <Text 
+                                                                size="sm" 
+                                                                fw={participant.isCurrentUser ? 700 : 500}
+                                                                style={{ 
+                                                                    color: participant.isCurrentUser 
+                                                                        ? "var(--crm-ui-kit-palette-link-primary)" 
+                                                                        : "var(--crm-ui-kit-palette-text-primary)" 
                                                                 }}
                                                             >
-                                                                {isSystem ? (
-                                                                    <FaCogs size={10} style={{ color: "var(--crm-ui-kit-palette-text-primary)" }} />
-                                                                ) : (
-                                                                    <FaUser size={10} style={{ color: "var(--crm-ui-kit-palette-text-primary)" }} />
-                                                                )}
-                                                            </Avatar>
-                                                            <Text size="sm" style={{ color: "var(--crm-ui-kit-palette-text-primary)" }}>
-                                                                {name}
+                                                                {participant.name}
                                                             </Text>
                                                         </Flex>
-                                                    );
-                                                })}
+                                                    )
+                                                )}
                                             </Flex>
                                         </ScrollArea.Autosize>
                                     </Box>
