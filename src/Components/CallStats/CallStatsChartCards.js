@@ -29,8 +29,7 @@ export const CallStatsChartCard = ({ user, fullName }) => {
             p="lg"
             mb="xs"
             style={{
-                background: COLORS.bgCard,
-                boxShadow: "0 2px 18px 0 rgba(44,59,99,0.08)",
+                background: "--crm-ui-kit-palette-background-default",
                 minWidth: 340,
             }}
         >
