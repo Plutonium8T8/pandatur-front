@@ -1,4 +1,4 @@
-import { Text, Box } from "@mantine/core";
+import { Text, Box, Anchor } from "@mantine/core";
 import { getLanguageByKey, isStoreFile } from "../utils";
 import { Audio } from "../Audio";
 import { File } from "../File";
@@ -14,6 +14,43 @@ const textMessageStyle = {
   wordWrap: "break-word",
   overflowWrap: "break-word",
   wordBreak: "break-word",
+};
+
+// Функция для обработки текста с URL (только HTTPS делаются кликабельными)
+const renderTextWithLinks = (text) => {
+  if (!text) return text;
+
+  // Регулярное выражение для поиска URL
+  const urlRegex = /(https?:\/\/[^\s]+)/gi;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) => {
+    // Проверяем, является ли часть URL
+    if (part.match(urlRegex)) {
+      // Проверяем, начинается ли с HTTPS (безопасная ссылка)
+      if (part.toLowerCase().startsWith('https://')) {
+        return (
+          <Anchor
+            key={index}
+            href={part}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ 
+              color: "var(--crm-ui-kit-palette-link-primary)",
+              textDecoration: "underline",
+              wordBreak: "break-all"
+            }}
+          >
+            {part}
+          </Anchor>
+        );
+      }
+      // HTTP ссылки остаются как обычный текст (небезопасно)
+      return <span key={index} style={{ color: "var(--mantine-color-orange-6)" }}>{part}</span>;
+    }
+    // Обычный текст
+    return part;
+  });
 };
 
 export const getMediaType = (mimeType) => {
@@ -99,7 +136,9 @@ export const renderContent = (msg) => {
           )}
         />
       ) : (
-        <Text>{mediaUrl}</Text>
+        <Text style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}>
+          {renderTextWithLinks(mediaUrl)}
+        </Text>
       );
     }
 
@@ -124,9 +163,8 @@ export const renderContent = (msg) => {
         <Box maw="600px" w="100%">
           <Text
             style={{ whiteSpace: "pre-line", wordWrap: "break-word" }}
-            truncate
           >
-            {displayText}
+            {renderTextWithLinks(displayText)}
           </Text>
         </Box>
       );
