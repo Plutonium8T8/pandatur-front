@@ -83,7 +83,7 @@ const ChatList = ({ ticketId }) => {
       result = result.filter((ticket) => {
         const idMatch = ticket.id.toString().includes(query);
         const contactMatch = ticket.contact?.toLowerCase().includes(query);
-        
+
         // Поиск по клиентам
         const clientMatches = ticket.clients?.some((client) => {
           const phoneMatch = client.phone?.toString().toLowerCase().includes(query);
@@ -92,7 +92,7 @@ const ChatList = ({ ticketId }) => {
           const surnameMatch = client.surname?.toLowerCase().includes(query);
           return phoneMatch || clientIdMatch || nameMatch || surnameMatch;
         }) || false;
-        
+
         return idMatch || contactMatch || clientMatches;
       });
     }
@@ -124,7 +124,7 @@ const ChatList = ({ ticketId }) => {
           <Flex align="center" justify="space-between">
             <Flex align="center" gap={8}>
               <Title order={3}>{getLanguageByKey("Chat")}</Title>
-              <Badge 
+              <Badge
                 variant="filled"
                 style={{ backgroundColor: "var(--crm-ui-kit-palette-link-primary)" }}
               >
@@ -144,6 +144,7 @@ const ChatList = ({ ticketId }) => {
             label={getLanguageByKey("Leadurile mele")}
             onChange={(e) => setShowMyTickets(e.target.checked)}
             checked={showMyTickets}
+            color="var(--crm-ui-kit-palette-link-primary)"
           />
 
           <TextInput

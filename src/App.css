@@ -277,7 +277,7 @@ a {
 }
 
 .mantine-ActionIcon-root[data-variant="filled"] {
-  background-color: var(--crm-ui-kit-palette-button-active-background) !important;
+  background-color: var(--crm-ui-kit-palette-link-primary) !important;
   color: white !important;
 }
 
