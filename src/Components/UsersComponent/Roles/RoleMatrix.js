@@ -13,7 +13,7 @@ const getCircleStyle = (isActive, color) => ({
 
 const RoleMatrix = ({ permissions = {}, onChange }) => {
     return (
-        <Paper withBorder p="xs" radius="md">
+        <Paper withBorder p="xs" radius="md" style={{ backgroundColor: "#f9f9f9" }}>
             <Grid columns={actions.length + 2} gutter={4} mb={4} align="center">
                 <Grid.Col span={1}></Grid.Col>
                 {actions.map((action) => (

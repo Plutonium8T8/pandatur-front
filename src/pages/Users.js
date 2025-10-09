@@ -133,9 +133,9 @@ export const Users = () => {
   }, [users, search, filters]);
 
   return (
-    <Container
-      size="xxl"
-      style={{
+    <Container 
+      size="xxl" 
+      style={{ 
         height: "100%",
         padding: "20px",
         paddingTop: isMobile ? "80px" : "20px"
@@ -247,7 +247,6 @@ export const Users = () => {
 
               {canCreateUser && (
                 <Button
-                  bg={"var(--crm-ui-kit-palette-link-primary)"}
                   leftSection={<IoMdAdd size={16} />}
                   onClick={() => {
                     setEditUser(null);

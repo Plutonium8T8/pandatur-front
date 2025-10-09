@@ -454,7 +454,7 @@ const UserList = ({
         <div style={{ marginBottom: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
           {canEdit && (
             <Button
-              variant="filled"
+              variant="light"
               color="blue"
               onClick={handleToggleStatusSelected}
               size={isMobile ? "sm" : "md"}
@@ -465,8 +465,7 @@ const UserList = ({
 
           {canEdit && (
             <Button
-              variant="filled"
-              color="teal"
+              variant="light"
               onClick={() => setGroupModalOpen(true)}
               size={isMobile ? "sm" : "md"}
             >
@@ -476,7 +475,7 @@ const UserList = ({
 
           {canEdit && (
             <Button
-              variant="filled"
+              variant="light"
               color="grape"
               onClick={() => setPermissionModalOpen(true)}
               size={isMobile ? "sm" : "md"}
@@ -487,7 +486,7 @@ const UserList = ({
 
           {canDelete && (
             <Button
-              variant="filled"
+              variant="light"
               color="red"
               onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
               size={isMobile ? "sm" : "md"}

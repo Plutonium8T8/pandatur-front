@@ -234,34 +234,26 @@ const CreatePermissionGroupModal = ({ opened, onClose }) => {
                                             onClick={() => handleSelectGroup(group)}
                                             style={{
                                                 cursor: "pointer",
-                                                backgroundColor: editingGroupId === group.permission_id 
-                                                    ? "var(--crm-ui-kit-palette-surface-hover-background-color)" 
-                                                    : "var(--crm-ui-kit-palette-background-primary)",
-                                                borderColor: editingGroupId === group.permission_id 
-                                                    ? "var(--crm-ui-kit-palette-link-primary)" 
-                                                    : "var(--crm-ui-kit-palette-border-default)",
+                                                backgroundColor: editingGroupId === group.permission_id ? "#e7f5ff" : "#f8f9fa",
+                                                borderColor: editingGroupId === group.permission_id ? "#339af0" : "#dee2e6",
                                                 transition: "all 0.2s",
                                             }}
                                             onMouseEnter={(e) => {
                                                 if (editingGroupId !== group.permission_id) {
-                                                    e.currentTarget.style.backgroundColor = "var(--crm-ui-kit-palette-button-classic-hover-background)";
-                                                    e.currentTarget.style.borderColor = "var(--crm-ui-kit-palette-border-primary)";
+                                                    e.currentTarget.style.backgroundColor = "#f1f3f5";
+                                                    e.currentTarget.style.borderColor = "#adb5bd";
                                                 }
                                             }}
                                             onMouseLeave={(e) => {
                                                 if (editingGroupId !== group.permission_id) {
-                                                    e.currentTarget.style.backgroundColor = "var(--crm-ui-kit-palette-background-primary)";
-                                                    e.currentTarget.style.borderColor = "var(--crm-ui-kit-palette-border-default)";
+                                                    e.currentTarget.style.backgroundColor = "#f8f9fa";
+                                                    e.currentTarget.style.borderColor = "#dee2e6";
                                                 }
                                             }}
                                         >
                                             <Text 
                                                 fw={editingGroupId === group.permission_id ? 600 : 500}
-                                                style={{
-                                                    color: editingGroupId === group.permission_id 
-                                                        ? "var(--crm-ui-kit-palette-link-primary)" 
-                                                        : "var(--crm-ui-kit-palette-text-primary)"
-                                                }}
+                                                c={editingGroupId === group.permission_id ? "blue" : "dark"}
                                                 size="xs"
                                             >
                                                 {group.permission_name}
