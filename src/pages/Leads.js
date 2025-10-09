@@ -506,7 +506,7 @@ export const Leads = () => {
         withCloseButton={false}
         styles={{
           content: {
-            height: "700px",
+            height: "100vh",
             maxHeight: "100vh",
           },
           body: {
