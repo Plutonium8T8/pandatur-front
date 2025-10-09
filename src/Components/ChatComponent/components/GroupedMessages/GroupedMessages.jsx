@@ -279,7 +279,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                         style={{
                           backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
                           borderRadius: "12px",
-                          // border: "1px solid var(--crm-ui-kit-palette-border-default)",
+                          border: "1px solid var(--crm-ui-kit-palette-border-default)",
                           position: "relative",
                         }}
                       >
