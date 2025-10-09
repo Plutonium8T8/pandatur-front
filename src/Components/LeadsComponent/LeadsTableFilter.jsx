@@ -99,7 +99,7 @@ export const LeadsTableFilter = ({
         <Button variant="outline" onClick={handleReset}>
           {getLanguageByKey("Reset filter")}
         </Button>
-        <Button variant="default" onClick={onClose}>
+        <Button variant="outline" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
         <Button variant="filled" loading={loading} onClick={handleSubmit}>

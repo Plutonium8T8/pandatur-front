@@ -115,6 +115,7 @@ export const LeadTable = ({
       title: (
         <Flex justify="center">
           <Checkbox
+          color="var(--crm-ui-kit-palette-link-primary)"
             checked={isAllSelected}
             onChange={() => {
               const allIds = visibleLeads.map((l) => l.id);
@@ -125,7 +126,7 @@ export const LeadTable = ({
       ),
       render: (id) => (
         <Flex justify="center">
-          <Checkbox checked={selectTicket.includes(id)} onChange={() => onSelectRow(id)} />
+          <Checkbox color="var(--crm-ui-kit-palette-link-primary)" checked={selectTicket.includes(id)} onChange={() => onSelectRow(id)} />
         </Flex>
       ),
     },
@@ -355,7 +356,7 @@ export const LeadTable = ({
               </Can>
               <Can permission={{ module: "leads", action: "edit" }} context={{ responsibleId }}>
                 <ActionIcon variant="outline" onClick={() => setId(ticket.id)}>
-                  <MdEdit />
+                  <MdEdit color="var(--crm-ui-kit-palette-link-primary)"/>
                 </ActionIcon>
               </Can>
             </Flex>

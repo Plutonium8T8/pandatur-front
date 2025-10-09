@@ -286,7 +286,7 @@
 }
 
 .container-interval {
-  background-color: #28a745;
+  background-color: var(--crm-ui-kit-palette-link-primary);
   color: #fff;
   border-radius: 4px;
 }

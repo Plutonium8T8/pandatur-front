@@ -238,7 +238,7 @@ const ChatList = ({ ticketId }) => {
             >
               {getLanguageByKey("Reset filter")}
             </Button>
-            <Button variant="default" onClick={() => setOpenFilter(false)}>
+            <Button variant="outline" onClick={() => setOpenFilter(false)}>
               {getLanguageByKey("Închide")}
             </Button>
             <Button
