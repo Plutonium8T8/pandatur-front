@@ -198,7 +198,7 @@ export const EventsList = () => {
                     }
                 />
             </Box>
-            
+
             <Box px={32} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
                 <div style={{ flex: 1, overflow: "hidden" }}>
                     <RcTable
@@ -210,20 +210,27 @@ export const EventsList = () => {
                         scroll={{ y: "100%" }}
                     />
                 </div>
-                
-                <Box style={{ flexShrink: 0, padding: "24px 0 40px 0" }}>
-                    <Flex justify="center">
-                        <Pagination
-                            total={pagination.total_pages}
-                            value={pagination.page}
-                            onChange={page => {
-                                setPagination(prev => ({ ...prev, page }));
-                                fetchData(page, filters);
-                            }}
-                            size="md"
-                        />
-                    </Flex>
-                </Box>
+
+                <Flex
+                    pt={24}
+                    pb={24}
+                    justify="center"
+                    style={{
+                        flexShrink: 0,
+                        borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)",
+                        backgroundColor: "var(--crm-ui-kit-palette-background-primary)"
+                    }}
+                >
+                    <Pagination
+                        total={pagination.total_pages}
+                        value={pagination.page}
+                        onChange={page => {
+                            setPagination(prev => ({ ...prev, page }));
+                            fetchData(page, filters);
+                        }}
+                        size="md"
+                    />
+                </Flex>
             </Box>
             <EventsFilterModal
                 opened={filterModalOpen}

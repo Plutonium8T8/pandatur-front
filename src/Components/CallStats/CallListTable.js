@@ -184,7 +184,15 @@ export const CallListTable = ({
                         style={{ opacity: overlayVisible ? 0.7 : 1, transition: "opacity .15s ease" }}
                     />
                 </div>
-                <Flex justify="center" mt="md" style={{ position: "relative", minHeight: 48 }}>
+                <Flex
+                    pt={24}
+                    pb={24}
+                    justify="center"
+                    style={{
+                        borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)",
+                        backgroundColor: "var(--crm-ui-kit-palette-background-primary)"
+                    }}
+                >
                     <Pagination
                         total={pagination?.total_pages || 1}
                         value={pagination?.page || 1}

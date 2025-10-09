@@ -183,7 +183,16 @@ const TaskComponent = ({
       )}
 
       {totalPages > 1 && (
-        <Flex p="20" justify="center" className="leads-table-pagination">
+        <Flex
+          pt={24}
+          pb={24}
+          justify="center"
+          className="leads-table-pagination"
+          style={{
+            borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)",
+            backgroundColor: "var(--crm-ui-kit-palette-background-primary)"
+          }}
+        >
           <Pagination
             total={totalPages}
             value={currentPage}

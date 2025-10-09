@@ -411,16 +411,21 @@ export const LeadTable = ({
 
         {!!totalLeadsPages && (
           <Flex
-            justify="center"
+            pt={24}
+            pb={24}
+            justify="space-between"
             align="center"
             className="leads-table-pagination"
-            pt="10"
-            style={{ position: "relative", minHeight: 48 }}
+            style={{
+              borderTop: "1px solid var(--crm-ui-kit-palette-border-primary)",
+              backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
+              paddingLeft: "16px",
+              paddingRight: "16px"
+            }}
           >
-            <Pagination total={totalLeadsPages} value={currentPage} onChange={onChangePagination} />
             <Select
-              size="xs"
-              w={70}
+              size="sm"
+              w={80}
               value={String(perPage)}
               onChange={(val) => setPerPage(Number(val))}
               data={[
@@ -429,16 +434,9 @@ export const LeadTable = ({
                 { value: "100", label: "100" },
                 { value: "200", label: "200" },
               ]}
-              label=""
-              style={{
-                position: "absolute",
-                right: 0,
-                bottom: 0,
-                margin: "0 10px 2px 0",
-                zIndex: 2,
-              }}
-              placeholder="на стр."
             />
+            <Pagination total={totalLeadsPages} value={currentPage} onChange={onChangePagination} />
+            <Box w={80} />
           </Flex>
         )}
       </Box>
