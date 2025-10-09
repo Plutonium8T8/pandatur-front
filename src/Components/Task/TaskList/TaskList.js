@@ -53,11 +53,11 @@ const TaskList = ({
   // Фильтрация задач по поисковому запросу
   const filteredTasks = useMemo(() => {
     if (!searchQuery.trim()) return tasks;
-    
+
     const query = searchQuery.toLowerCase().trim();
     console.log("Поиск по запросу:", query);
     console.log("Всего задач:", tasks.length);
-    
+
     const filtered = tasks.filter(task => {
       // Поиск по ID тикета
       const ticketId = task.ticket_id?.toString() || "";
@@ -65,24 +65,24 @@ const TaskList = ({
         console.log("Найдено по ID тикета:", task.ticket_id);
         return true;
       }
-      
+
       // Поиск по имени ответственного
       const responsibleName = task.created_for_full_name?.toLowerCase() || "";
       if (responsibleName.includes(query)) {
         console.log("Найдено по имени ответственного:", task.created_for_full_name);
         return true;
       }
-      
+
       // Поиск по имени автора
       const authorName = task.creator_by_full_name?.toLowerCase() || "";
       if (authorName.includes(query)) {
         console.log("Найдено по имени автора:", task.creator_by_full_name);
         return true;
       }
-      
+
       return false;
     });
-    
+
     console.log("Отфильтровано задач:", filtered.length);
     return filtered;
   }, [tasks, searchQuery]);
@@ -184,11 +184,13 @@ const TaskList = ({
             checked={allSelected}
             indeterminate={selectedRow.length > 0 && selectedRow.length < tasks.length ? true : undefined}
             onChange={() => { setSelectedRow(allSelected ? [] : tasks.map((t) => t.id)); }}
+            color="var(--crm-ui-kit-palette-link-primary)"
           />
         ),
         render: (row) => (
           <Checkbox
             checked={selectedRow.includes(row.id)}
+            color="var(--crm-ui-kit-palette-link-primary)"
             onChange={() => {
               setSelectedRow((prev) =>
                 prev.includes(row.id)
@@ -257,9 +259,9 @@ const TaskList = ({
         width: 120,
         align: "center",
         render: (ticketId) => (
-          <Link 
-            to={`/tasks/${ticketId}`} 
-            style={{ 
+          <Link
+            to={`/tasks/${ticketId}`}
+            style={{
               textDecoration: 'underline',
               color: '#007bff',
               fontWeight: 'bold'

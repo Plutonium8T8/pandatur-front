@@ -102,6 +102,7 @@ export const ContractForm = ({
 
       <LabelSwitch
         mt="md"
+        color="var(--crm-ui-kit-palette-link-primary)"
         label={getLanguageByKey("Contract trimis")}
         key={formInstance.key("contract_trimis")}
         {...formInstance.getInputProps("contract_trimis", {
@@ -111,6 +112,7 @@ export const ContractForm = ({
 
       <LabelSwitch
         mt="md"
+        color="var(--crm-ui-kit-palette-link-primary)"
         label={getLanguageByKey("Contract semnat")}
         key={formInstance.key("contract_semnat")}
         {...formInstance.getInputProps("contract_semnat", {
@@ -136,6 +138,7 @@ export const ContractForm = ({
 
       <LabelSwitch
         mt="md"
+        color="var(--crm-ui-kit-palette-link-primary)"
         label={getLanguageByKey("Achitare efectuată")}
         key={formInstance.key("achitare_efectuata")}
         {...formInstance.getInputProps("achitare_efectuata", {
@@ -145,6 +148,7 @@ export const ContractForm = ({
 
       <LabelSwitch
         mt="md"
+        color="var(--crm-ui-kit-palette-link-primary)"
         label={getLanguageByKey("Rezervare confirmată")}
         key={formInstance.key("rezervare_confirmata")}
         {...formInstance.getInputProps("rezervare_confirmata", {
@@ -154,6 +158,7 @@ export const ContractForm = ({
 
       <LabelSwitch
         mt="md"
+        color="var(--crm-ui-kit-palette-link-primary)"
         label={getLanguageByKey("Contract arhivat")}
         key={formInstance.key("contract_arhivat")}
         {...formInstance.getInputProps("contract_arhivat", {
@@ -244,6 +249,7 @@ export const ContractForm = ({
       {(isAdmin || isITDep) && (
         <LabelSwitch
           mt="md"
+          color="var(--crm-ui-kit-palette-link-primary)"
           label={getLanguageByKey("Control Admin")}
           key={formInstance.key("control")}
           {...formInstance.getInputProps("control", { type: "checkbox" })}

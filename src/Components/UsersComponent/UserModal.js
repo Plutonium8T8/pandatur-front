@@ -360,6 +360,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       <Switch
         label={translations["Activ"][language]}
         checked={form.status}
+        color="var(--crm-ui-kit-palette-link-primary)"
         onChange={(e) =>
           setForm({ ...form, status: e.currentTarget.checked })
         }

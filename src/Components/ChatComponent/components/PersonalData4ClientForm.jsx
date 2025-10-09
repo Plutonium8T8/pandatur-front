@@ -119,7 +119,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
 
       {showSave && (
         <Group mt="md" grow>
-          <Button color="gray" onClick={handleCancel}>
+          <Button variant="outline" onClick={handleCancel}>
             {getLanguageByKey("Anulează")}
           </Button>
           <Button onClick={handleSaveClient}>

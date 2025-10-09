@@ -195,6 +195,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
             <tr>
               <th style={{ width: 40 }}>
                 <Checkbox
+                  color="var(--crm-ui-kit-palette-link-primary)"
                   checked={
                     selectedTechnicians.length === schedule.length &&
                     schedule.length > 0
@@ -229,6 +230,7 @@ const ScheduleView = ({ groupUsers, groupName, groupId, onGroupUpdate }) => {
                   <Checkbox
                     checked={selectedTechnicians.includes(employee.id)}
                     onChange={() => toggleTechnician(employee.id)}
+                    color="var(--crm-ui-kit-palette-link-primary)"
                   />
                 </td>
                 <td>{employee.name}</td>
