@@ -96,40 +96,41 @@ export const LeadsKanbanFilter = ({
 
 
   return (
-    <Tabs
-      h="100%"
-      className="leads-modal-filter-tabs"
-      defaultValue="filter_ticket"
-      value={activeTab}
-      onChange={setActiveTab}
-      pb="48px"
-    >
-      <Tabs.List>
-        <Tabs.Tab value="filter_ticket">
-          {getLanguageByKey("Filtru pentru Lead")}
-        </Tabs.Tab>
-        <Tabs.Tab value="filter_message">
-          {getLanguageByKey("Filtru dupǎ mesaje")}
-        </Tabs.Tab>
-      </Tabs.List>
+    <Flex direction="column" h="100%">
+      <Tabs
+        style={{ flex: 1, display: "flex", flexDirection: "column" }}
+        className="leads-modal-filter-tabs"
+        defaultValue="filter_ticket"
+        value={activeTab}
+        onChange={setActiveTab}
+      >
+        <Tabs.List>
+          <Tabs.Tab value="filter_ticket">
+            {getLanguageByKey("Filtru pentru Lead")}
+          </Tabs.Tab>
+          <Tabs.Tab value="filter_message">
+            {getLanguageByKey("Filtru dupǎ mesaje")}
+          </Tabs.Tab>
+        </Tabs.List>
 
-      <Tabs.Panel value="filter_ticket" pt="xs">
-        <TicketFormTabs
-          ref={ticketFormRef}
-          initialData={initialData}
-          loading={loading}
-        />
-      </Tabs.Panel>
+        <Tabs.Panel value="filter_ticket" pt="xs" style={{ flex: 1, overflowY: "auto" }}>
+          <TicketFormTabs
+            ref={ticketFormRef}
+            initialData={initialData}
+            loading={loading}
+          />
+        </Tabs.Panel>
 
-      <Tabs.Panel value="filter_message" pt="xs">
-        <MessageFilterForm
-          ref={messageFormRef}
-          initialData={initialData}
-          loading={loading}
-        />
-      </Tabs.Panel>
+        <Tabs.Panel value="filter_message" pt="xs" style={{ flex: 1, overflowY: "auto" }}>
+          <MessageFilterForm
+            ref={messageFormRef}
+            initialData={initialData}
+            loading={loading}
+          />
+        </Tabs.Panel>
+      </Tabs>
 
-      <Flex justify="end" gap="md" mt="md" pr="md">
+      <Flex justify="end" gap="md" pt={16} pb={8} pr="md" style={{ borderTop: "1px solid var(--mantine-color-gray-3)" }}>
         <Button variant="outline" onClick={handleReset}>
           {getLanguageByKey("Reset filter")}
         </Button>
@@ -140,6 +141,6 @@ export const LeadsKanbanFilter = ({
           {getLanguageByKey("Aplică")}
         </Button>
       </Flex>
-    </Tabs>
+    </Flex>
   );
 };

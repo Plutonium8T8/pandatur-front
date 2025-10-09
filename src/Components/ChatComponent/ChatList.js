@@ -185,17 +185,21 @@ const ChatList = ({ ticketId }) => {
         title={getLanguageByKey("Filtrează tichete")}
         withCloseButton
         centered
-        size="xl"
+        size="lg"
         styles={{
           content: {
-            height: "900px",
+            height: "700px",
             display: "flex",
             flexDirection: "column",
           },
           body: {
             flex: 1,
             overflowY: "auto",
+            padding: "1rem"
           },
+          title: {
+            color: "var(--crm-ui-kit-palette-text-primary)"
+          }
         }}
       >
         <Tabs

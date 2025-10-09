@@ -107,100 +107,100 @@ export const LogFilterModal = ({ opened, onClose, filters = {}, onApply }) => {
             title={getLanguageByKey("Log filter")}
             centered
             withCloseButton
-            size="xl"
+            size="lg"
             styles={{
                 content: {
-                    height: "900px",
+                    height: "700px",
                     display: "flex",
                     flexDirection: "column",
                 },
                 body: {
-                    flex: "1 1 auto",
+                    flex: 1,
                     overflowY: "auto",
-                    position: "relative",
-                    paddingBottom: 80,
+                    padding: "1rem"
                 },
+                title: {
+                    color: "var(--crm-ui-kit-palette-text-primary)"
+                }
             }}
         >
             <form
                 onSubmit={form.onSubmit(handleSubmit)}
-                style={{ display: "flex", flexDirection: "column", gap: 12, height: "100%" }}
+                style={{ display: "flex", flexDirection: "column", height: "100%" }}
             >
-                <UserGroupMultiSelect
-                    label={getLanguageByKey("Users")}
-                    placeholder={getLanguageByKey("Users")}
-                    value={form.values.user_id}
-                    onChange={(value) => form.setFieldValue("user_id", value)}
-                    techniciansData={formattedTechnicians}
-                    mode="multi"
-                    disabled={loadingTechnicians}
-                />
-                <MultiSelect
-                    data={translatedEventOptions}
-                    label={getLanguageByKey("Events")}
-                    placeholder={getLanguageByKey("Select events")}
-                    {...form.getInputProps("event")}
-                    searchable
-                    clearable
-                />
-                <MultiSelect
-                    data={translatedTypeOptions}
-                    label={getLanguageByKey("Types")}
-                    placeholder={getLanguageByKey("Select type")}
-                    {...form.getInputProps("type")}
-                    searchable
-                    clearable
-                />
-                <Flex gap={8} direction="row">
-                    <DatePickerInput
-                        label={getLanguageByKey("Date from")}
-                        placeholder={getLanguageByKey("Start date")}
-                        {...form.getInputProps("timestamp_from")}
-                        valueFormat="DD-MM-YYYY"
-                        style={{ flex: 1 }}
+                <Flex direction="column" gap={12} style={{ flex: 1, overflowY: "auto" }}>
+                    <UserGroupMultiSelect
+                        label={getLanguageByKey("Users")}
+                        placeholder={getLanguageByKey("Users")}
+                        value={form.values.user_id}
+                        onChange={(value) => form.setFieldValue("user_id", value)}
+                        techniciansData={formattedTechnicians}
+                        mode="multi"
+                        disabled={loadingTechnicians}
+                    />
+                    <MultiSelect
+                        data={translatedEventOptions}
+                        label={getLanguageByKey("Events")}
+                        placeholder={getLanguageByKey("Select events")}
+                        {...form.getInputProps("event")}
+                        searchable
                         clearable
                     />
-                    <DatePickerInput
-                        label={getLanguageByKey("Date to")}
-                        placeholder={getLanguageByKey("End date")}
-                        {...form.getInputProps("timestamp_until")}
-                        valueFormat="DD-MM-YYYY"
-                        style={{ flex: 1 }}
+                    <MultiSelect
+                        data={translatedTypeOptions}
+                        label={getLanguageByKey("Types")}
+                        placeholder={getLanguageByKey("Select type")}
+                        {...form.getInputProps("type")}
+                        searchable
                         clearable
                     />
-                </Flex>
-                <Flex gap={8}>
-                    <TextInput
-                        label={getLanguageByKey("Changed field (key)") || "Changed field (key)"}
-                        placeholder={getLanguageByKey("Field name (example: status)") || "Field name (example: status)"}
-                        {...form.getInputProps("data_changes_key")}
-                        style={{ flex: 1 }}
-                    />
-                    <TextInput
-                        label={getLanguageByKey("Before value") || "Before value"}
-                        placeholder={getLanguageByKey("Old value (optional)") || "Old value (optional)"}
-                        {...form.getInputProps("data_changes_before")}
-                        style={{ flex: 1 }}
-                    />
-                    <TextInput
-                        label={getLanguageByKey("After value") || "After value"}
-                        placeholder={getLanguageByKey("New value (optional)") || "New value (optional)"}
-                        {...form.getInputProps("data_changes_after")}
-                        style={{ flex: 1 }}
-                    />
+                    <Flex gap={8} direction="row">
+                        <DatePickerInput
+                            label={getLanguageByKey("Date from")}
+                            placeholder={getLanguageByKey("Start date")}
+                            {...form.getInputProps("timestamp_from")}
+                            valueFormat="DD-MM-YYYY"
+                            style={{ flex: 1 }}
+                            clearable
+                        />
+                        <DatePickerInput
+                            label={getLanguageByKey("Date to")}
+                            placeholder={getLanguageByKey("End date")}
+                            {...form.getInputProps("timestamp_until")}
+                            valueFormat="DD-MM-YYYY"
+                            style={{ flex: 1 }}
+                            clearable
+                        />
+                    </Flex>
+                    <Flex gap={8}>
+                        <TextInput
+                            label={getLanguageByKey("Changed field (key)") || "Changed field (key)"}
+                            placeholder={getLanguageByKey("Field name (example: status)") || "Field name (example: status)"}
+                            {...form.getInputProps("data_changes_key")}
+                            style={{ flex: 1 }}
+                        />
+                        <TextInput
+                            label={getLanguageByKey("Before value") || "Before value"}
+                            placeholder={getLanguageByKey("Old value (optional)") || "Old value (optional)"}
+                            {...form.getInputProps("data_changes_before")}
+                            style={{ flex: 1 }}
+                        />
+                        <TextInput
+                            label={getLanguageByKey("After value") || "After value"}
+                            placeholder={getLanguageByKey("New value (optional)") || "New value (optional)"}
+                            {...form.getInputProps("data_changes_after")}
+                            style={{ flex: 1 }}
+                        />
+                    </Flex>
                 </Flex>
 
                 <Flex
                     justify="flex-end"
                     gap={8}
+                    pt={16}
+                    pb={8}
                     style={{
-                        position: "absolute",
-                        bottom: 16,
-                        right: 24,
-                        left: 24,
-                        background: "var(--crm-ui-kit-palette-background-primary)",
-                        zIndex: 10,
-                        paddingTop: 12,
+                        borderTop: "1px solid var(--mantine-color-gray-3)",
                     }}
                 >
                     <Button variant="outline" onClick={handleReset}>

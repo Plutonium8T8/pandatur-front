@@ -286,7 +286,7 @@ export const Filter = ({
             {showDateFilter && (
               <Group gap="xs" align="center">
                 <Button
-                  variant={isToday ? "filled" : "outline"}s
+                  variant={isToday ? "filled" : "outline"}
                   onClick={() => setDateRange(getStartEndDateRange(new Date()))}
                 >
                   {getLanguageByKey("azi")}

@@ -172,7 +172,7 @@ export const Leads = () => {
     };
   };
 
-  
+
   // открытие чата при переходе на /leads/:ticketId
   useEffect(() => {
     if (ticketId) setIsChatOpen(true);
@@ -349,7 +349,7 @@ export const Leads = () => {
         style={{ "--side-bar-width": isCollapsed ? "79px" : "249px" }}
         className="leads-header-container"
         bg="var(--crm-ui-kit-palette-background-primary)"
->
+      >
         <PageHeader
           count={viewMode === VIEW_MODE.LIST ? totalLeads : visibleTickets.length}
           title={getLanguageByKey("Leads")}
@@ -506,7 +506,7 @@ export const Leads = () => {
         withCloseButton={false}
         styles={{
           content: {
-            height: "100vh",
+            height: "700px",
             maxHeight: "100vh",
           },
           body: {
@@ -540,10 +540,21 @@ export const Leads = () => {
         title={getLanguageByKey("Filtrează tichete")}
         withCloseButton
         centered
-        size="xl"
+        size="lg"
         styles={{
-          content: { height: "900px", display: "flex", flexDirection: "column" },
-          body: { flex: "1", overflowY: "auto" },
+          content: {
+            height: "700px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem"
+          },
+          title: {
+            color: "var(--crm-ui-kit-palette-text-primary)"
+          }
         }}
       >
         <LeadsKanbanFilter
@@ -570,10 +581,21 @@ export const Leads = () => {
         title={getLanguageByKey("Filtrează tichete")}
         withCloseButton
         centered
-        size="xl"
+        size="lg"
         styles={{
-          content: { height: "900px", display: "flex", flexDirection: "column" },
-          body: { flex: 1, overflowY: "auto" },
+          content: {
+            height: "700px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem"
+          },
+          title: {
+            color: "var(--crm-ui-kit-palette-text-primary)"
+          }
         }}
       >
         <LeadsTableFilter

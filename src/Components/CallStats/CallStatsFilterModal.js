@@ -73,17 +73,28 @@ export const CallStatsFilterModal = ({
             withCloseButton
             size="lg"
             styles={{
-                content: { height: "900px", display: "flex", flexDirection: "column" },
-                body: { flex: "1", overflowY: "auto" },
+                content: {
+                    height: "700px",
+                    display: "flex",
+                    flexDirection: "column",
+                },
+                body: {
+                    flex: 1,
+                    overflowY: "auto",
+                    padding: "1rem"
+                },
+                title: {
+                    color: "var(--crm-ui-kit-palette-text-primary)"
+                }
             }}
         >
-            <Flex direction="column" style={{ flex: 1, height: "100%" }}>
+            <Flex direction="column" style={{ height: "100%" }}>
                 {loading ? (
-                    <Flex align="center" justify="center" style={{ minHeight: 150 }}>
+                    <Flex align="center" justify="center" style={{ flex: 1 }}>
                         <Spin />
                     </Flex>
                 ) : (
-                    <Flex direction="column" gap={16} style={{ flex: 1 }}>
+                    <Flex direction="column" gap={16} style={{ flex: 1, overflowY: "auto" }}>
                         <UserGroupMultiSelect
                             label={getLanguageByKey("Users")}
                             placeholder={getLanguageByKey("SelectTechnicians")}
@@ -128,7 +139,7 @@ export const CallStatsFilterModal = ({
                         </Flex>
                     </Flex>
                 )}
-                <Group mt="auto" pt={16} pb={16} justify="flex-end">
+                <Group pt={16} pb={8} justify="flex-end" style={{ borderTop: "1px solid var(--mantine-color-gray-3)" }}>
                     <Button variant="outline" onClick={handleReset}>
                         {getLanguageByKey("Reset")}
                     </Button>

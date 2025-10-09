@@ -78,40 +78,53 @@ export const EventsFilterModal = ({
             centered
             size="lg"
             styles={{
-                content: { height: "900px", display: "flex", flexDirection: "column" },
-                body: { flex: "1", overflowY: "auto" },
+                content: {
+                    height: "700px",
+                    display: "flex",
+                    flexDirection: "column",
+                },
+                body: {
+                    flex: 1,
+                    overflowY: "auto",
+                    padding: "1rem"
+                },
+                title: {
+                    color: "var(--crm-ui-kit-palette-text-primary)"
+                }
             }}
         >
-            <Flex direction="column" gap={16} style={{ minHeight: 320, height: 480 }}>
-                <MultiSelect
-                    label={getLanguageByKey("EventType") || "Тип события"}
-                    data={EVENT_OPTIONS}
-                    value={event}
-                    onChange={handleEventChange}
-                    searchable
-                    clearable
-                />
-                <UserGroupMultiSelect
-                    label={getLanguageByKey("Users")}
-                    techniciansData={formattedTechs}
-                    value={filteredUserValues}
-                    onChange={handleUsersChange}
-                    placeholder={getLanguageByKey("SelectTechnicians")}
-                    mode="multi"
-                />
-                <TextInput
-                    label={getLanguageByKey("IP Address")}
-                    value={ip}
-                    onChange={e => setIp(e.target.value)}
-                    placeholder={getLanguageByKey("IP Address")}
-                />
-                <TextInput
-                    label={getLanguageByKey("Object ID")}
-                    value={objectId}
-                    onChange={e => setObjectId(e.target.value)}
-                    placeholder={getLanguageByKey("Object ID")}
-                />
-                <Group mt="auto" pt={16} pb={8} justify="flex-end">
+            <Flex direction="column" style={{ height: "100%" }}>
+                <Flex direction="column" gap={16} style={{ flex: 1, overflowY: "auto" }}>
+                    <MultiSelect
+                        label={getLanguageByKey("EventType") || "Тип события"}
+                        data={EVENT_OPTIONS}
+                        value={event}
+                        onChange={handleEventChange}
+                        searchable
+                        clearable
+                    />
+                    <UserGroupMultiSelect
+                        label={getLanguageByKey("Users")}
+                        techniciansData={formattedTechs}
+                        value={filteredUserValues}
+                        onChange={handleUsersChange}
+                        placeholder={getLanguageByKey("SelectTechnicians")}
+                        mode="multi"
+                    />
+                    <TextInput
+                        label={getLanguageByKey("IP Address")}
+                        value={ip}
+                        onChange={e => setIp(e.target.value)}
+                        placeholder={getLanguageByKey("IP Address")}
+                    />
+                    <TextInput
+                        label={getLanguageByKey("Object ID")}
+                        value={objectId}
+                        onChange={e => setObjectId(e.target.value)}
+                        placeholder={getLanguageByKey("Object ID")}
+                    />
+                </Flex>
+                <Group pt={16} pb={8} justify="flex-end" style={{ borderTop: "1px solid var(--mantine-color-gray-3)" }}>
                     <Button variant="outline" onClick={handleReset}>
                         {getLanguageByKey("Reset")}
                     </Button>

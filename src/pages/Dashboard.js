@@ -194,16 +194,6 @@ export const Dashboard = () => {
 
   const extraInfo = (
     <Group gap="sm">
-      <Select
-        size="sm"
-        w={220}
-        value={widgetType}
-        onChange={(v) => v && setWidgetType(v)}
-        data={WIDGET_TYPE_OPTIONS}
-        allowDeselect={false}
-        placeholder={getLanguageByKey("Widget type")}
-        aria-label="widget-type"
-      />
 
       <Tooltip label={getLanguageByKey("Filtru")}>
         <ActionIcon
@@ -216,6 +206,17 @@ export const Dashboard = () => {
           <LuFilter size={18} />
         </ActionIcon>
       </Tooltip>
+
+      <Select
+        size="sm"
+        w={220}
+        value={widgetType}
+        onChange={(v) => v && setWidgetType(v)}
+        data={WIDGET_TYPE_OPTIONS}
+        allowDeselect={false}
+        placeholder={getLanguageByKey("Widget type")}
+        aria-label="widget-type"
+      />
     </Group>
   );
 

@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
-import { Box, Button, Group, MultiSelect, Select, Flex, Modal } from "@mantine/core";
+import { Button, Group, MultiSelect, Select, Flex, Modal } from "@mantine/core";
 import { translations } from "../utils";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
@@ -100,61 +100,57 @@ const UserFilterModal = ({ opened, onClose, onApply, users }) => {
                 }
             }}
         >
-            <Flex direction="column" h="100%" justify="space-between">
-                <Box p="sm">
-                    <Flex direction="column" gap="sm">
-                        <MultiSelect
-                            label={translations["Grup utilizator"][language]}
-                            placeholder={translations["Alege grupul"][language]}
-                            data={groupOptions}
-                            value={Array.isArray(filters.group) ? filters.group : []}
-                            onChange={(val) => updateFilter("group", val)}
-                            clearable
-                            searchable
-                        />
+            <Flex direction="column" style={{ height: "100%" }}>
+                <Flex direction="column" gap="sm" style={{ flex: 1, overflowY: "auto", padding: "0.5rem" }}>
+                    <MultiSelect
+                        label={translations["Grup utilizator"][language]}
+                        placeholder={translations["Alege grupul"][language]}
+                        data={groupOptions}
+                        value={Array.isArray(filters.group) ? filters.group : []}
+                        onChange={(val) => updateFilter("group", val)}
+                        clearable
+                        searchable
+                    />
 
-                        <MultiSelect
-                            label={translations["Grup permisiuni"][language]}
-                            placeholder={translations["Alege grupul de permisiuni"][language]}
-                            data={permissionOptions}
-                            value={Array.isArray(filters.role) ? filters.role : []}
-                            onChange={(val) => updateFilter("role", val)}
-                            clearable
-                            searchable
-                        />
+                    <MultiSelect
+                        label={translations["Grup permisiuni"][language]}
+                        placeholder={translations["Alege grupul de permisiuni"][language]}
+                        data={permissionOptions}
+                        value={Array.isArray(filters.role) ? filters.role : []}
+                        onChange={(val) => updateFilter("role", val)}
+                        clearable
+                        searchable
+                    />
 
-                        <Select
-                            label={translations["Status"][language]}
-                            placeholder={translations["Status"][language]}
-                            data={statusOptions}
-                            value={filters.status || null}
-                            onChange={(val) => updateFilter("status", val)}
-                            clearable
-                            searchable
-                        />
+                    <Select
+                        label={translations["Status"][language]}
+                        placeholder={translations["Status"][language]}
+                        data={statusOptions}
+                        value={filters.status || null}
+                        onChange={(val) => updateFilter("status", val)}
+                        clearable
+                        searchable
+                    />
 
-                        <Select
-                            label={translations["Funcție"][language]}
-                            placeholder={translations["Funcție"][language]}
-                            data={functieOptions}
-                            value={filters.functie || null}
-                            onChange={(val) => updateFilter("functie", val)}
-                            clearable
-                            searchable
-                        />
-                    </Flex>
-                </Box>
+                    <Select
+                        label={translations["Funcție"][language]}
+                        placeholder={translations["Funcție"][language]}
+                        data={functieOptions}
+                        value={filters.functie || null}
+                        onChange={(val) => updateFilter("functie", val)}
+                        clearable
+                        searchable
+                    />
+                </Flex>
 
-                <Box p="sm">
-                    <Group justify="flex-end">
-                        <Button variant="outline" onClick={resetFilters}>
-                            {translations["Reset filtru"][language]}
-                        </Button>
-                        <Button onClick={applyFilters}>
-                            {translations["Aplică"][language]}
-                        </Button>
-                    </Group>
-                </Box>
+                <Group pt={16} pb={8} justify="flex-end" style={{ borderTop: "1px solid var(--mantine-color-gray-3)", padding: "1rem 0.5rem 0.5rem" }}>
+                    <Button variant="outline" onClick={resetFilters}>
+                        {translations["Reset filtru"][language]}
+                    </Button>
+                    <Button onClick={applyFilters}>
+                        {translations["Aplică"][language]}
+                    </Button>
+                </Group>
             </Flex>
         </Modal>
     );

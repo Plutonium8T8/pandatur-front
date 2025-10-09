@@ -179,139 +179,146 @@ const TaskFilterModal = ({ opened, onClose, filters, onApply }) => {
       title={translations["Filtru"][language]}
       withCloseButton
       centered
-      size="xl"
+      size="lg"
       styles={{
         content: {
+          height: "700px",
           display: "flex",
           flexDirection: "column",
         },
         body: {
           flex: 1,
           overflowY: "auto",
+          padding: "1rem"
         },
+        title: {
+          color: "var(--crm-ui-kit-palette-text-primary)"
+        }
       }}
     >
-      <Flex gap="sm" direction="column">
-        <DatePickerInput
-          type="range"
-          label={translations["intervalDate"][language]}
-          value={getDateRangeValue(
-            localFilters.date_from,
-            localFilters.date_to,
-          )}
-          onChange={handleDateRangeChange}
-          clearable
-          valueFormat="DD-MM-YYYY"
-          placeholder={translations["intervalDate"][language]}
-        />
+      <Flex direction="column" style={{ height: "100%" }}>
+        <Flex gap="sm" direction="column" style={{ flex: 1, overflowY: "auto" }}>
+          <DatePickerInput
+            type="range"
+            label={translations["intervalDate"][language]}
+            value={getDateRangeValue(
+              localFilters.date_from,
+              localFilters.date_to,
+            )}
+            onChange={handleDateRangeChange}
+            clearable
+            valueFormat="DD-MM-YYYY"
+            placeholder={translations["intervalDate"][language]}
+          />
 
-        <MultiSelect
-          label={translations["Autor"][language]}
-          data={technicians}
-          value={localFilters.created_by || []}
-          onChange={(val) => handleChange("created_by", val)}
-          placeholder={translations["Autor"][language]}
-          clearable
-          searchable
-          nothingFoundMessage={translations["noResult"][language]}
-          disabled={loadingTechnicians}
-        />
+          <MultiSelect
+            label={translations["Autor"][language]}
+            data={technicians}
+            value={localFilters.created_by || []}
+            onChange={(val) => handleChange("created_by", val)}
+            placeholder={translations["Autor"][language]}
+            clearable
+            searchable
+            nothingFoundMessage={translations["noResult"][language]}
+            disabled={loadingTechnicians}
+          />
 
-        <UserGroupMultiSelect
-          label={translations["Responsabil"][language]}
-          techniciansData={formattedTechnicians}
-          value={
-            isIfResponsible
-              ? [String(userId)]
-              : localFilters.created_for || []
-          }
-          onChange={handleCreatedForChange}
-          placeholder={translations["Responsabil"][language]}
-          mode="multi"
-          // Добавляем фильтрацию по ролям
-          allowedUserIds={
-            isTeam
-              ? new Set([...teamUserIds, String(userId)])
-              : isIfResponsible
-                ? new Set([String(userId)])
-                : null
-          }
-          disabled={loadingTechnicians || isIfResponsible}
-        />
+          <UserGroupMultiSelect
+            label={translations["Responsabil"][language]}
+            techniciansData={formattedTechnicians}
+            value={
+              isIfResponsible
+                ? [String(userId)]
+                : localFilters.created_for || []
+            }
+            onChange={handleCreatedForChange}
+            placeholder={translations["Responsabil"][language]}
+            mode="multi"
+            // Добавляем фильтрацию по ролям
+            allowedUserIds={
+              isTeam
+                ? new Set([...teamUserIds, String(userId)])
+                : isIfResponsible
+                  ? new Set([String(userId)])
+                  : null
+            }
+            disabled={loadingTechnicians || isIfResponsible}
+          />
 
-        <MultiSelect
-          label={translations["Tipul Taskului"][language]}
-          data={taskTypeOptions}
-          value={localFilters.task_type || []}
-          onChange={(val) => handleChange("task_type", val)}
-          placeholder={translations["Tipul Taskului"][language]}
-          clearable
-          searchable
-        />
+          <MultiSelect
+            label={translations["Tipul Taskului"][language]}
+            data={taskTypeOptions}
+            value={localFilters.task_type || []}
+            onChange={(val) => handleChange("task_type", val)}
+            placeholder={translations["Tipul Taskului"][language]}
+            clearable
+            searchable
+          />
 
-        <MultiSelect
-          label={translations["Alege grupul"][language]}
-          placeholder={translations["Alege grupul"][language]}
-          data={groupOptions}
-          value={localFilters.user_group_names || []}
-          onChange={(val) => handleChange("user_group_names", val)}
-          clearable
-          searchable
-          nothingFoundMessage={translations["noResult"][language]}
-        />
+          <MultiSelect
+            label={translations["Alege grupul"][language]}
+            placeholder={translations["Alege grupul"][language]}
+            data={groupOptions}
+            value={localFilters.user_group_names || []}
+            onChange={(val) => handleChange("user_group_names", val)}
+            clearable
+            searchable
+            nothingFoundMessage={translations["noResult"][language]}
+          />
 
-        <MultiSelect
-          label={translations["groupTitle"][language]}
-          placeholder={translations["groupTitle"][language]}
-          data={allowedGroupTitleOptions}
-          value={localFilters.group_titles?.length ? localFilters.group_titles : accessibleGroupTitles}
-          onChange={(val) =>
-            handleChange(
-              "group_titles",
-              val.length > 0 ? val : accessibleGroupTitles
-            )
-          }
-          clearable={false}
-          searchable
-          disabled={accessibleGroupTitles.length === 1}
-        />
+          <MultiSelect
+            label={translations["groupTitle"][language]}
+            placeholder={translations["groupTitle"][language]}
+            data={allowedGroupTitleOptions}
+            value={localFilters.group_titles?.length ? localFilters.group_titles : accessibleGroupTitles}
+            onChange={(val) =>
+              handleChange(
+                "group_titles",
+                val.length > 0 ? val : accessibleGroupTitles
+              )
+            }
+            clearable={false}
+            searchable
+            disabled={accessibleGroupTitles.length === 1}
+          />
 
-        <SelectWorkflow
-          selectedValues={localFilters.workflows || []}
-          onChange={(val) => handleChange("workflows", val)}
-          options={workflowOptions}
-        />
+          <SelectWorkflow
+            selectedValues={localFilters.workflows || []}
+            onChange={(val) => handleChange("workflows", val)}
+            options={workflowOptions}
+          />
 
-        <Select
-          label={translations["Status"][language]}
-          placeholder={translations["ChoiseStatus"][language]}
-          data={[
-            { value: "true", label: translations["done"][language] },
-            { value: "false", label: translations["toDo"][language] },
-          ]}
-          value={
-            typeof localFilters.status === "boolean"
-              ? String(localFilters.status)
-              : localFilters.status || null
-          }
-          onChange={(val) =>
-            handleChange(
-              "status",
-              val === "true" ? true : val === "false" ? false : null,
-            )
-          }
-          clearable
-        />
+          <Select
+            label={translations["Status"][language]}
+            placeholder={translations["ChoiseStatus"][language]}
+            data={[
+              { value: "true", label: translations["done"][language] },
+              { value: "false", label: translations["toDo"][language] },
+            ]}
+            value={
+              typeof localFilters.status === "boolean"
+                ? String(localFilters.status)
+                : localFilters.status || null
+            }
+            onChange={(val) =>
+              handleChange(
+                "status",
+                val === "true" ? true : val === "false" ? false : null,
+              )
+            }
+            clearable
+          />
+        </Flex>
+
+        <Group pt={16} pb={8} justify="flex-end" style={{ borderTop: "1px solid var(--mantine-color-gray-3)" }}>
+          <Button variant="outline" onClick={handleClear}>
+            {translations["Reset filtru"][language]}
+          </Button>
+          <Button onClick={handleApply}>
+            {translations["Aplică"][language]}
+          </Button>
+        </Group>
       </Flex>
-
-      <Group mt="md" justify="flex-end">
-        <Button variant="outline" onClick={handleClear}>
-          {translations["Reset filtru"][language]}
-        </Button>
-        <Button onClick={handleApply}>
-          {translations["Aplică"][language]}
-        </Button>
-      </Group>
     </Modal>
   );
 };
