@@ -248,41 +248,41 @@ a {
 
 /* Стили для Mantine Menu/Dropdown под темы */
 .mantine-Menu-dropdown {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Menu-item {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Menu-item:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-Menu-divider {
-  border-color: var(--crm-ui-kit-palette-border-primary) !important;
+  border-color: var(--crm-ui-kit-palette-border-primary);
 }
 
 /* ActionIcon стили */
 .mantine-ActionIcon-root[data-variant="default"] {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-ActionIcon-root[data-variant="default"]:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-ActionIcon-root[data-variant="filled"] {
-  background-color: var(--crm-ui-kit-palette-button-active-background) !important;
-  color: white !important;
+  background-color: var(--crm-ui-kit-palette-button-active-background);
+  color: white;
 }
 
 .mantine-ActionIcon-root[data-variant="filled"]:hover {
-  background-color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+  background-color: var(--crm-ui-kit-palette-link-hover-primary);
 }
 
 /* Input стили (TextInput, Input, Select и т.д.) */
@@ -291,10 +291,10 @@ a {
 .mantine-Select-input,
 .mantine-Textarea-input,
 .mantine-NumberInput-input {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
-  font-weight: 500 !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
+  font-weight: 500;
 }
 
 /* Акцентирование значений в инпутах формы - адаптивный цвет */
@@ -303,8 +303,8 @@ a {
 .mantine-Select-input:not(:placeholder-shown),
 .mantine-Textarea-input:not(:placeholder-shown),
 .mantine-NumberInput-input:not(:placeholder-shown) {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
-  font-weight: 600 !important;
+  color: var(--crm-ui-kit-palette-text-primary);
+  font-weight: 600;
 }
 
 .mantine-Input-input::placeholder,
@@ -312,7 +312,7 @@ a {
 .mantine-Select-input::placeholder,
 .mantine-Textarea-input::placeholder,
 .mantine-NumberInput-input::placeholder {
-  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+  color: var(--crm-ui-kit-palette-placeholder-default);
 }
 
 .mantine-Input-input:focus,
@@ -320,7 +320,7 @@ a {
 .mantine-Select-input:focus,
 .mantine-Textarea-input:focus,
 .mantine-NumberInput-input:focus {
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  border-color: var(--crm-ui-kit-palette-link-primary);
 }
 
 /* Кнопки очистки инпутов (крестики) */
@@ -328,420 +328,420 @@ a {
 .mantine-Input-section[data-position="right"] button,
 .mantine-Select-section[data-position="right"] button,
 .mantine-MultiSelect-section[data-position="right"] button {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
-  background-color: transparent !important;
+  color: var(--crm-ui-kit-palette-text-primary);
+  background-color: transparent;
 }
 
 .mantine-CloseButton-root:hover,
 .mantine-Input-section[data-position="right"] button:hover,
 .mantine-Select-section[data-position="right"] button:hover,
 .mantine-MultiSelect-section[data-position="right"] button:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Select dropdown */
 .mantine-Select-dropdown {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-Select-option {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Select-option:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-Select-option[data-selected="true"] {
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
 }
 
 /* Modal стили */
 .mantine-Modal-content {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Modal-header {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border-bottom: 1px solid var(--crm-ui-kit-palette-border-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border-bottom: 1px solid var(--crm-ui-kit-palette-border-primary);
 }
 
 .mantine-Modal-title {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
   font-weight: 600;
 }
 
 .mantine-Modal-close {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Modal-close:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 /* Paper стили */
 .mantine-Paper-root {
   background-color: var(--crm-ui-kit-palette-background-primary);
-  border-color: var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  border-color: var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Button стили */
 .mantine-Button-root {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  color: white !important;
-  border: none !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  color: white;
+  border: none;
 }
 
 .mantine-Button-root:hover:not(:disabled) {
-  background-color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+  background-color: var(--crm-ui-kit-palette-link-hover-primary);
   opacity: 0.9;
 }
 
 .mantine-Button-root:disabled {
-  background-color: var(--crm-ui-kit-palette-background-primary-disabled) !important;
-  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary-disabled);
+  color: var(--crm-ui-kit-palette-text-secondary-light);
   opacity: 0.6;
 }
 
 /* Button outline variant */
 .mantine-Button-root[data-variant="outline"] {
-  background-color: transparent !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: transparent;
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Button-root[data-variant="outline"]:hover:not(:disabled) {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
+  border-color: var(--crm-ui-kit-palette-link-primary);
   opacity: 1;
 }
 
 /* Button danger/warning variants */
 .mantine-Button-root[data-variant="danger"] {
-  background-color: #ef4444 !important;
-  color: white !important;
+  background-color: #ef4444;
+  color: white;
 }
 
 .mantine-Button-root[data-variant="warning"] {
-  background-color: #f59e0b !important;
-  color: white !important;
+  background-color: #f59e0b;
+  color: white;
 }
 
 /* Text стили */
 .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Loader стили */
 .mantine-Loader-root {
-  color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: var(--crm-ui-kit-palette-link-primary);
 }
 
 /* Collapse стили */
 .mantine-Collapse-root {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 /* Stack стили */
 .mantine-Stack-root {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 /* MultiSelect стили */
 .mantine-MultiSelect-input {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-MultiSelect-input::placeholder {
-  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+  color: var(--crm-ui-kit-palette-placeholder-default);
 }
 
 .mantine-MultiSelect-input:focus {
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  border-color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-MultiSelect-dropdown {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-MultiSelect-option {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-MultiSelect-option:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-MultiSelect-label {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Badge стили */
 .mantine-Badge-root[data-variant="light"] {
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Badge-root[data-variant="filled"] {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  color: white !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  color: white;
 }
 
 .mantine-Badge-root[data-variant="outline"] {
-  background-color: transparent !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: transparent;
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Badge-root:not([data-variant]) {
-  color: white !important;
+  color: white;
 }
 
 /* SegmentedControl стили */
 .mantine-SegmentedControl-root {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-SegmentedControl-label {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-SegmentedControl-indicator {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  box-shadow: none !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  box-shadow: none;
 }
 
 .mantine-SegmentedControl-control[data-active="true"] .mantine-SegmentedControl-label {
-  color: white !important;
+  color: white;
 }
 
 /* Combobox стили */
 .mantine-Combobox-dropdown {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-Combobox-option {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Combobox-option:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-Combobox-option[data-selected="true"] {
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
 }
 
 /* DatePickerInput стили */
 .mantine-DatePickerInput-root .mantine-Input-input,
 .mantine-DateInput-root .mantine-Input-input {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-DatePickerInput-root .mantine-Input-input::placeholder,
 .mantine-DateInput-root .mantine-Input-input::placeholder {
-  color: var(--crm-ui-kit-palette-placeholder-default) !important;
+  color: var(--crm-ui-kit-palette-placeholder-default);
 }
 
 .mantine-DatePickerInput-root .mantine-Input-input:focus,
 .mantine-DateInput-root .mantine-Input-input:focus {
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  border-color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-DatePickerInput-label,
 .mantine-DateInput-label {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* DatePicker Popover и Calendar */
 .mantine-Popover-dropdown {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-DatePicker-calendarHeader,
 .mantine-MonthPicker-calendarHeader,
 .mantine-YearPicker-calendarHeader {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
 }
 
 .mantine-DatePicker-calendarHeaderControl,
 .mantine-MonthPicker-calendarHeaderControl,
 .mantine-YearPicker-calendarHeaderControl {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-DatePicker-calendarHeaderControl:hover,
 .mantine-MonthPicker-calendarHeaderControl:hover,
 .mantine-YearPicker-calendarHeaderControl:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-DatePicker-calendarHeaderLevel {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-DatePicker-calendarHeaderLevel:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-DatePicker-weekday,
 .mantine-MonthPicker-monthsListCell,
 .mantine-YearPicker-yearsListCell {
-  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+  color: var(--crm-ui-kit-palette-text-secondary-light);
 }
 
 .mantine-DatePicker-day,
 .mantine-MonthPicker-monthsListCell button,
 .mantine-YearPicker-yearsListCell button {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-DatePicker-day:hover,
 .mantine-MonthPicker-monthsListCell button:hover,
 .mantine-YearPicker-yearsListCell button:hover {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-DatePicker-day[data-selected="true"],
 .mantine-MonthPicker-monthsListCell button[data-selected="true"],
 .mantine-YearPicker-yearsListCell button[data-selected="true"] {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  color: white !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  color: white;
 }
 
 .mantine-DatePicker-day[data-weekend="true"] {
-  color: var(--crm-ui-kit-palette-text-secondary-light) !important;
+  color: var(--crm-ui-kit-palette-text-secondary-light);
 }
 
 /* Дополнительные DatePicker стили для Mantine v8 */
 [class*="DatePicker"] [class*="calendar"],
 [class*="DatePickerInput"] [class*="dropdown"],
 div[class*="mantine-"][class*="Popover-dropdown"] {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
 }
 
 button[class*="mantine-DatePicker"],
 button[class*="mantine-MonthPicker"],
 button[class*="mantine-YearPicker"] {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 button[class*="mantine-DatePicker"]:hover,
 button[class*="mantine-MonthPicker"]:hover,
 button[class*="mantine-YearPicker"]:hover:not([data-selected="true"]) {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 button[class*="mantine-"][data-selected="true"] {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  color: white !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  color: white;
 }
 
 /* Pagination стили */
 .mantine-Pagination-control {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Pagination-control:hover:not([data-active="true"]):not(:disabled) {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
 }
 
 .mantine-Pagination-control[data-active="true"] {
-  background-color: var(--crm-ui-kit-palette-link-primary) !important;
-  color: white !important;
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
+  background-color: var(--crm-ui-kit-palette-link-primary);
+  color: white;
+  border-color: var(--crm-ui-kit-palette-link-primary);
 }
 
 /* Tooltip стили */
 .mantine-Tooltip-tooltip {
-  background-color: var(--crm-ui-kit-palette-background-primary) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
-  border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  color: var(--crm-ui-kit-palette-text-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 /* Anchor стили */
 .mantine-Anchor-root {
-  color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-Anchor-root:hover {
-  color: var(--crm-ui-kit-palette-link-hover-primary) !important;
+  color: var(--crm-ui-kit-palette-link-hover-primary);
 }
 
 /* Tabs стили */
 .mantine-Tabs-root {
-  background-color: transparent !important;
+  background-color: transparent;
 }
 
 .mantine-Tabs-list {
-  background-color: transparent !important;
-  border-bottom: 1px solid var(--crm-ui-kit-palette-border-default) !important;
+  background-color: transparent;
+  border-bottom: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-Tabs-tab {
-  background-color: transparent !important;
-  border: none !important;
-  border-bottom: 2px solid transparent !important;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
 .mantine-Tabs-tab .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 .mantine-Tabs-tab:hover:not([data-active="true"]) {
-  background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
-  border-bottom-color: var(--crm-ui-kit-palette-border-default) !important;
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
+  border-bottom-color: var(--crm-ui-kit-palette-border-default);
 }
 
 .mantine-Tabs-tab[data-active="true"] {
-  background-color: transparent !important;
-  border-bottom-color: var(--crm-ui-kit-palette-link-primary) !important;
+  background-color: transparent;
+  border-bottom-color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-Tabs-tab[data-active="true"] .mantine-Text-root {
-  color: var(--crm-ui-kit-palette-link-primary) !important;
+  color: var(--crm-ui-kit-palette-link-primary);
 }
 
 .mantine-Tabs-panel {
-  background-color: transparent !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  background-color: transparent;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Title стили */
 .mantine-Title-root {
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Divider стили */
 .mantine-Divider-root {
-  border-color: var(--crm-ui-kit-palette-border-default) !important;
+  border-color: var(--crm-ui-kit-palette-border-default);
 }
 
 /* Ticket Card стили */
 .mantine-Card-root {
   background-color: var(--crm-ui-kit-palette-background-primary);
-  border-color: var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  border-color: var(--crm-ui-kit-palette-border-default);
+  color: var(--crm-ui-kit-palette-text-primary);
 }
 
 /* Ticket Card - My Ticket стили */
 .ticket-card-my-ticket {
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color) !important;
-  border-color: var(--crm-ui-kit-palette-link-primary) !important;
-  border-width: 2px !important;
+  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
+  border-color: var(--crm-ui-kit-palette-link-primary);
+  border-width: 2px;
 }
