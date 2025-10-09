@@ -199,7 +199,7 @@ export const EventsList = () => {
                 />
             </Box>
 
-            <Box px={32} style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+            <Box style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
                 <div style={{ flex: 1, overflow: "hidden" }}>
                     <RcTable
                         columns={columns}
