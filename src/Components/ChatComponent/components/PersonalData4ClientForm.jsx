@@ -49,7 +49,15 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         email: values.email,
       });
 
+      // Диспатчим событие для обновления данных тикета и клиентов
+      window.dispatchEvent(new CustomEvent('ticketUpdated', { 
+        detail: { ticketId } 
+      }));
+
       setShowSave(false);
+      enqueueSnackbar(getLanguageByKey("Clientul a fost adăugat cu succes"), { 
+        variant: "success" 
+      });
     } catch (e) {
       enqueueSnackbar(showServerError(e), { variant: "error" });
     }
