@@ -16,7 +16,6 @@ import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
-import { BsBorder } from "react-icons/bs";
 
 const language = localStorage.getItem("language") || "RO";
 
