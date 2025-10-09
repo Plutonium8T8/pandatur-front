@@ -53,12 +53,12 @@ const ChatExtraInfo = ({
   } = useFormTicket();
 
   // Отладка: проверяем, обновляются ли ошибки
-  console.log('Errors state:', {
-    hasErrorsTicketInfoForm,
-    hasErrorsContractForm,
-    hasErrorQualityControl,
-    formErrors: form.errors
-  });
+  // console.log('Errors state:', {
+  //   hasErrorsTicketInfoForm,
+  //   hasErrorsContractForm,
+  //   hasErrorQualityControl,
+  //   formErrors: form.errors
+  // });
 
   // Мемоизируем данные форм для предотвращения перерендера
   const formData = useMemo(() => ({

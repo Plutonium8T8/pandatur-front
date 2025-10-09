@@ -102,10 +102,9 @@ const NoteContent = ({ note }) => {
                         maxHeight: 460, 
                         objectFit: "contain", 
                         borderRadius: 10, 
-                        boxShadow: "0 2px 10px rgba(0,0,0,.2)",
                         cursor: "pointer",
                         transition: "transform 0.2s ease",
-                        background: "var(--crm-ui-kit-palette-background-primary-disabled)"
+                        background: "var(--crm-ui-kit-palette-background-primary)"
                     }}
                     onClick={() => window.open(url, '_blank')}
                     onMouseEnter={(e) => {
@@ -182,7 +181,6 @@ export const ChatNoteCard = ({ note, techLabel, showActions = true, className, s
                 overflow: "hidden",
                 background: meta.bgColor,
                 borderColor: meta.borderColor,
-                boxShadow: "0 2px 8px rgba(0,0,0,.1)",
                 ...style,
             }}
         >

@@ -348,7 +348,7 @@ export const useFormTicket = () => {
       achitare_efectuata,
     } = form.errors;
 
-    console.log('useFormTicket - форма errors:', form.errors);
+    // console.log('useFormTicket - форма errors:', form.errors);
 
     if (motivul_refuzului || control) {
       setHasErrorQualityControl(true);

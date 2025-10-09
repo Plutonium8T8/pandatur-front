@@ -193,7 +193,7 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
     };
 
     return (
-        <Paper p="12" radius="md" withBorder style={{ background: "#fffef7" }}>
+        <Paper p="12" radius="md" withBorder style={{ background: "var(--crm-ui-kit-palette-background-primary)" }}>
             <Flex direction="column" gap="8">
                 <Flex
                     align="center"
@@ -244,24 +244,26 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
 
                     <Flex gap="8">
                         <Button
-                            variant="subtle"
-                            color="gray"
-                            onClick={onCancel}
-                            disabled={uploading || loading || sending}
-                        >
-                            {getLanguageByKey("Anuleaza")}
-                        </Button>
-                        <Button
                             onClick={handleSend}
                             disabled={!canSend}
                             loading={uploading || loading || sending}
                         >
                             {getLanguageByKey("Save")}
                         </Button>
-                    </Flex>
+                        <Button
+                            variant="outline"
+                            color="gray"
+                            onClick={onCancel}
+                            disabled={uploading || loading || sending}
+                        >
+                            {getLanguageByKey("Anuleaza")}
+                        </Button>
+                    </Flex>z
 
                     <Flex gap="6" align="center">
                         <FileButton
+                            variant="outline"
+                            color="var(--crm-ui-kit-palette-link-primary)"
                             onChange={handleFileButton}
                             accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt"
                             multiple
