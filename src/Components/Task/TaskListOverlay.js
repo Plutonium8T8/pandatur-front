@@ -16,6 +16,7 @@ import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
+import { BsBorder } from "react-icons/bs";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -399,7 +400,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
   if (!isVisible) return null;
 
   return (
-    <Box pos="relative" p="xs" w="100%">
+    <Box pos="relative" p="xs" w="100%" style={{ border: "1px solid var(--crm-ui-kit-palette-border-primary)" }}>
       <Paper radius="md">
         <Box
           onClick={toggleList}
