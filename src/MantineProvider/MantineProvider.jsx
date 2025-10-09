@@ -9,7 +9,7 @@ import classes from "./MantineProvider.module.css";
 
 const theme = createTheme({
   fontFamily:
-    "--apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
+    "'Lato', -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif",
   colors: {
     custom: colorsTuple("#0f824c"),
   },
