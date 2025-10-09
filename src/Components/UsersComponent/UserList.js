@@ -183,6 +183,7 @@ const UserList = ({
           <Flex align="center" gap="sm">
             {(canEdit || canDelete) && (
               <Checkbox
+                color="var(--crm-ui-kit-palette-link-primary)"
                 checked={isSelected}
                 onChange={() => toggleSelect(userId)}
               />
@@ -292,6 +293,7 @@ const UserList = ({
         {
           title: (
             <Checkbox
+              color="var(--crm-ui-kit-palette-link-primary)"
               checked={allSelected}
               indeterminate={selectedIds.length > 0 && !allSelected}
               onChange={toggleSelectAll}
@@ -304,6 +306,7 @@ const UserList = ({
             const rowId = extractId(row);
             return (
               <Checkbox
+                color="var(--crm-ui-kit-palette-link-primary)"
                 checked={selectedIds.includes(rowId)}
                 onChange={() => toggleSelect(rowId)}
               />

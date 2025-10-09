@@ -286,13 +286,13 @@ export const Filter = ({
             {showDateFilter && (
               <Group gap="xs" align="center">
                 <Button
-                  variant={isToday ? "filled" : "default"}
+                  variant={isToday ? "filled" : "outline"}s
                   onClick={() => setDateRange(getStartEndDateRange(new Date()))}
                 >
                   {getLanguageByKey("azi")}
                 </Button>
                 <Button
-                  variant={isYesterday ? "filled" : "default"}
+                  variant={isYesterday ? "filled" : "outline"}
                   onClick={() => setDateRange(getYesterdayDate())}
                 >
                   {getLanguageByKey("ieri")}
@@ -313,11 +313,11 @@ export const Filter = ({
         {/* Футер ВСЕГДА снизу */}
         <Box style={{ borderTop: "1px solid var(--mantine-color-gray-3)", paddingTop: 12, marginTop: 12 }}>
           <Group justify="space-between">
-            <Button variant="default" onClick={handleReset}>
+            <Button variant="outline" onClick={handleReset}>
               {getLanguageByKey("Reset")}
             </Button>
             <Group>
-              <Button variant="default" onClick={onClose}>
+              <Button variant="outline" onClick={onClose}>
                 {getLanguageByKey("Anulează")}
               </Button>
               <Button onClick={handleApply}>
