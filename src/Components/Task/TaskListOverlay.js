@@ -322,7 +322,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 <Button size="xs" onClick={handleCreateTask} loading={actionLoading}>
                   {translations["Adaugă task"][language]}
                 </Button>
-                <Button size="xs" variant="subtle" onClick={() => setCreatingTask(false)} disabled={actionLoading}>
+                <Button size="xs" variant="outline" onClick={() => setCreatingTask(false)} disabled={actionLoading}>
                   {translations["Anulare"][language]}
                 </Button>
               </>
@@ -331,7 +331,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 <Button size="xs" onClick={() => handleUpdateTask(id)} variant="filled" loading={actionLoading}>
                   {translations["Save"][language]}
                 </Button>
-                <Button size="xs" variant="subtle" onClick={() => handleCancelEdit(id)} disabled={actionLoading}>
+                <Button size="xs" variant="outline" onClick={() => handleCancelEdit(id)} disabled={actionLoading}>
                   {translations["Anulare"][language]}
                 </Button>
               </>

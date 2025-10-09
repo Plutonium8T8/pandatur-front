@@ -31,7 +31,7 @@ export const ClosedTicketsCountCard = ({
       radius="md"
       withBorder
       style={{ 
-        backgroundColor: bg,
+        backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
         height: "100%",
         display: "flex",
         flexDirection: "column"

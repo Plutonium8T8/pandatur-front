@@ -36,7 +36,7 @@ export const TicketsIntoWorkCard = ({
                 display: "flex",
                 flexDirection: "column",
                 background:
-                    bg ||
+                "var(--crm-ui-kit-palette-background-primary)" ||
                     "linear-gradient(135deg, rgba(99,102,241,0.06), rgba(45,212,191,0.06))",
                 borderColor: "var(--crm-ui-kit-palette-border-default)",
             }}

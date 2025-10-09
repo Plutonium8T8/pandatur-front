@@ -502,7 +502,7 @@ a {
 .mantine-Badge-root[data-variant="outline"] {
   background-color: transparent !important;
   border: 1px solid var(--crm-ui-kit-palette-border-default) !important;
-  color: var(--crm-ui-kit-palette-text-primary) !important;
+  /* color: var(--crm-ui-kit-palette-text-primary) !important; */
 }
 
 .mantine-Badge-root:not([data-variant]) {

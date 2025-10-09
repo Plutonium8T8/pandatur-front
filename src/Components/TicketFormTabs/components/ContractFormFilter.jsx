@@ -165,12 +165,14 @@ export const ContractFormFilter = forwardRef(
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Contract trimis")}
             {...form.getInputProps("contract_trimis", { type: "checkbox" })}
           />
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Contract semnat")}
             {...form.getInputProps("contract_semnat", { type: "checkbox" })}
           />
@@ -193,18 +195,21 @@ export const ContractFormFilter = forwardRef(
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Achitare efectuată")}
             {...form.getInputProps("achitare_efectuata", { type: "checkbox" })}
           />
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Rezervare confirmată")}
             {...form.getInputProps("rezervare_confirmata", { type: "checkbox" })}
           />
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Contract arhivat")}
             {...form.getInputProps("contract_arhivat", { type: "checkbox" })}
           />
@@ -284,6 +289,7 @@ export const ContractFormFilter = forwardRef(
 
           <LabelSwitch
             mt="md"
+            color="var(--crm-ui-kit-palette-link-primary)"
             label={getLanguageByKey("Control Admin")}
             {...form.getInputProps("control", { type: "checkbox" })}
           />

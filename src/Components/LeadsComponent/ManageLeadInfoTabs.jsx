@@ -159,7 +159,7 @@ export const ManageLeadInfoTabs = ({
       </Tabs>
 
       <Flex justify="flex-end" gap="sm" p="md" mt="auto">
-        <Button variant="default" onClick={onClose}>
+        <Button variant="outline" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>
         <Button loading={loading} onClick={handleSubmit}>

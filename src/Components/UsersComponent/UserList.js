@@ -457,6 +457,7 @@ const UserList = ({
         <div style={{ marginBottom: 16, display: "flex", gap: 8, flexWrap: "wrap" }}>
           {canEdit && (
             <Button
+              variant="outline"
               color="blue"
               onClick={handleToggleStatusSelected}
               size={isMobile ? "sm" : "md"}
@@ -467,7 +468,7 @@ const UserList = ({
 
           {canEdit && (
             <Button
-            variant="outline"
+              // variant="outline"
               onClick={() => setGroupModalOpen(true)}
               size={isMobile ? "sm" : "md"}
             >

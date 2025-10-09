@@ -47,7 +47,7 @@ export const WorkflowDurationCard = ({
       radius="md"
       withBorder
       style={{
-        backgroundColor: bg || "#fff",
+        backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
         height: "100%",
         display: "flex",
         flexDirection: "column",

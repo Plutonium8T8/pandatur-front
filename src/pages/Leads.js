@@ -7,7 +7,7 @@ import { priorityOptions, groupTitleOptions } from "../FormOptions";
 import { workflowOptions as defaultWorkflowOptions } from "../FormOptions/workflowOptions";
 import { SpinnerRightBottom, AddLeadModal, PageHeader, Spin } from "@components";
 import { WorkflowColumns } from "../Components/Workflow/WorkflowColumns";
-import { ManageLeadInfoTabs } from "@components/LeadsComponent/ManageLeadInfoTabs";
+import { ManageLeadInfoTabs } from "../Components/LeadsComponent/ManageLeadInfoTabs";
 import { LeadsTableFilter } from "../Components/LeadsComponent/LeadsTableFilter";
 import { LeadsKanbanFilter } from "../Components/LeadsComponent/LeadsKanbanFilter";
 import SingleChat from "@components/ChatComponent/SingleChat";

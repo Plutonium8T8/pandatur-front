@@ -65,7 +65,7 @@ export const TicketLifetimeStatsCard = ({
       padding="lg"
       radius="md"
       withBorder
-      style={{ backgroundColor: bg, height: "100%" }}
+      style={{ backgroundColor: "var(--crm-ui-kit-palette-background-primary)", height: "100%" }}
     >
       <Stack gap="sm">
         <Group justify="space-between" align="flex-start">

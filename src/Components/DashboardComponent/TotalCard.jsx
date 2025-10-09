@@ -103,9 +103,7 @@ export const TotalCard = ({
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
-                background: bg || widgetColors.bg,
                 borderColor: "var(--crm-ui-kit-palette-border-default)",
-                boxShadow: "var(--crm-ui-kit-palette-content-block-box-shadow)",
                 transition: "all 0.2s ease",
             }}
         >

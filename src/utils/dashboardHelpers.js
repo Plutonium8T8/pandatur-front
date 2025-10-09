@@ -198,10 +198,10 @@ export const createTicketDestinationData = (obj) => {
  * Цвета фона для виджетов
  */
 export const BG_COLORS = {
-  general: "#FFFFFF",     // белый
-  by_user_group: "#93C5FD", // синий темнее (blue-300)
-  by_user: "#DBEAFE",       // светло-синий темнее (blue-100)
-  by_group_title: "#FFF5CC",// жёлтый (бледный)
+  general: "var(--crm-ui-kit-palette-background-primary)",     // белый
+  by_user_group: "var(--crm-ui-kit-palette-background-primary)", // синий темнее (blue-300)
+  by_user: "var(--crm-ui-kit-palette-background-primary)",       // светло-синий темнее (blue-100)
+  by_group_title: "var(--crm-ui-kit-palette-background-primary)",// жёлтый (бледный)
   by_source: "#FFE8E8",     // красный (бледный)
 };
 
