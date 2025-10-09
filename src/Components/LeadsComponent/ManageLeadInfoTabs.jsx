@@ -101,12 +101,16 @@ export const ManageLeadInfoTabs = ({
     if (id) {
       getTicketInfo(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return (
-    <Flex direction="column" h="100%">
-      <Tabs defaultValue="general_info" style={{ flex: 1 }}>
-        <Tabs.List>
+    <Flex direction="column" h="100%" style={{ overflow: "hidden" }}>
+      <Tabs 
+        defaultValue="general_info" 
+        style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}
+      >
+        <Tabs.List style={{ flexShrink: 0 }}>
           <Tabs.Tab value="general_info">
             <Text size="sm" truncate="end">
               {getLanguageByKey("Informații generale")}
@@ -141,24 +145,35 @@ export const ManageLeadInfoTabs = ({
           </Tabs.Tab>
         </Tabs.List>
 
-        <Tabs.Panel value="general_info" pt="xs">
+        <Tabs.Panel value="general_info" pt="xs" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
           <GeneralForm data={generalInfoLightTicket} formInstance={form} />
         </Tabs.Panel>
 
-        <Tabs.Panel value="ticket_info" pt="xs">
+        <Tabs.Panel value="ticket_info" pt="xs" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
           <TicketInfoForm formInstance={form} setMinDate={new Date()} data={ticketInfo} />
         </Tabs.Panel>
 
-        <Tabs.Panel value="contact" pt="xs">
+        <Tabs.Panel value="contact" pt="xs" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
           <ContractForm formInstance={form} setMinDate={new Date()} data={ticketInfo} />
         </Tabs.Panel>
 
-        <Tabs.Panel value="quality_control" pt="xs">
+        <Tabs.Panel value="quality_control" pt="xs" style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
           <QualityControlForm formInstance={form} data={ticketInfo} />
         </Tabs.Panel>
       </Tabs>
 
-      <Flex justify="flex-end" gap="sm" p="md" mt="auto">
+      <Flex 
+        justify="flex-end" 
+        gap="sm" 
+        pt={16} 
+        pb={8} 
+        pr="md" 
+        style={{ 
+          borderTop: "1px solid var(--mantine-color-gray-3)",
+          flexShrink: 0,
+          backgroundColor: "var(--crm-ui-kit-palette-background-primary)"
+        }}
+      >
         <Button variant="outline" onClick={onClose}>
           {getLanguageByKey("Închide")}
         </Button>

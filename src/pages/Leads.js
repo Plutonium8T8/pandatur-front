@@ -617,7 +617,22 @@ export const Leads = () => {
         title={getLanguageByKey("Editarea tichetelor în grup")}
         withCloseButton
         centered
-        size="xl"
+        size="lg"
+        styles={{
+          content: {
+            height: "700px",
+            display: "flex",
+            flexDirection: "column",
+          },
+          body: {
+            flex: 1,
+            overflowY: "auto",
+            padding: "1rem"
+          },
+          title: {
+            color: "var(--crm-ui-kit-palette-text-primary)"
+          }
+        }}
       >
         <ManageLeadInfoTabs
           onClose={() => setIsModalOpen(false)}
