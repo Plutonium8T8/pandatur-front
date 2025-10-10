@@ -28,6 +28,7 @@ export const MESSAGES_TYPE_OPTIONS = [
   { value: "image", label: "Image" },
   { value: "audio", label: "Audio" },
   { value: "file", label: "File" },
+  { value: "email", label: "Email" },
   { value: "url", label: "URL" },
   { value: "call", label: "Call" },
   { value: "video", label: "Video" },

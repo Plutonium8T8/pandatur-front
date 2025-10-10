@@ -48,6 +48,16 @@ export const TicketCard = ({
   const responsibleId = String(ticket.technician_id || "");
   const isMyTicket = user?.id && String(user.id) === responsibleId;
 
+  // Функция для получения превью последнего сообщения
+  const getLastMessagePreview = (ticket) => {
+    if (!ticket.last_message) return "";
+    const messageType = ticket.last_message_type;
+    if (messageType === "email") {
+      return `📧 ${getLanguageByKey("Email")}`;
+    }
+    return ticket.last_message;
+  };
+
   return (
     <Link to={`/leads/${ticket.id}`}>
       <Card
@@ -227,7 +237,7 @@ export const TicketCard = ({
                 fontSize: '12px',
               }}
             >
-              {ticket.last_message}
+              {getLastMessagePreview(ticket)}
             </Text>
           )}
 
