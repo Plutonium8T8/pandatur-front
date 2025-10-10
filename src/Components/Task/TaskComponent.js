@@ -109,7 +109,7 @@ const TaskComponent = ({
     : false;
 
   return (
-    <Box p="md">
+    <Box h="100%" p="20px" style={{ display: 'flex', flexDirection: 'column' }}>
       <PageHeader
         title={translations["Tasks"][language]}
         count={tasks.length}
@@ -168,21 +168,20 @@ const TaskComponent = ({
         }
       />
 
-      {viewMode === "list" ? (
-        <TaskList
-          tasks={tasks}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onChangePagination={setCurrentPage}
-          searchQuery={searchQuery}
-          openEditTask={openEditTask}
-          fetchTasks={fetchTasks}
-        />
-      ) : (
-        <TaskColumnsView tasks={tasks} onEdit={openEditTask} searchQuery={searchQuery} />
-      )}
+      <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+        {viewMode === "list" ? (
+          <TaskList
+            tasks={tasks}
+            searchQuery={searchQuery}
+            openEditTask={openEditTask}
+            fetchTasks={fetchTasks}
+          />
+        ) : (
+          <TaskColumnsView tasks={tasks} onEdit={openEditTask} searchQuery={searchQuery} />
+        )}
+      </Box>
 
-      {totalPages > 1 && (
+      {viewMode === "list" && totalPages > 1 && (
         <Flex
           pt={24}
           pb={24}

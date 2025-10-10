@@ -39,7 +39,6 @@ const toDate = (val) => {
 
 const TaskList = ({
   tasks = [],
-  userList = [],
   loading = false,
   openEditTask,
   fetchTasks,
@@ -184,7 +183,7 @@ const TaskList = ({
             checked={allSelected}
             indeterminate={selectedRow.length > 0 && selectedRow.length < tasks.length ? true : undefined}
             onChange={() => { setSelectedRow(allSelected ? [] : tasks.map((t) => t.id)); }}
-            color="var(--crm-ui-kit-palette-link-primary)"
+            color="var(--crm-ui-kit-palette-link primary)"
           />
         ),
         render: (row) => (
@@ -337,22 +336,24 @@ const TaskList = ({
   );
 
   return (
-    <RcTable
-      rowKey={({ id }) => id}
-      columns={columns}
-      data={filteredTasks}
-      selectedRow={selectedRow}
-      loading={loading}
-      bordered
-      scroll={{ y: "calc(100vh - 200px)" }}
-      onRow={(record) => ({
-        onDoubleClick: () => {
-          console.log("Двойной клик по задаче:", record);
-          openEditTask(record);
-        },
-        style: { cursor: "pointer" }
-      })}
-    />
+    <div style={{ flex: 1, overflow: 'auto' }}>
+      <RcTable
+        rowKey={({ id }) => id}
+        columns={columns}
+        data={filteredTasks}
+        selectedRow={selectedRow}
+        loading={loading}
+        bordered
+        scroll={{ y: "100%" }}
+        onRow={(record) => ({
+          onDoubleClick: () => {
+            console.log("Двойной клик по задаче:", record);
+            openEditTask(record);
+          },
+          style: { cursor: "pointer" }
+        })}
+      />
+    </div>
   );
 };
 
