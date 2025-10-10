@@ -38,7 +38,7 @@ export const getBadgeColor = (tasks = []) => {
         const d = toDate(task?.scheduled_time);
         return d && dayjs(d).isSame(today, "day");
     });
-    if (hasToday) return "green"; // Mantine color
+    if (hasToday) return "var(--crm-ui-kit-palette-link-primary)"; // Mantine color
 
     return "gray"; // Mantine color
 };

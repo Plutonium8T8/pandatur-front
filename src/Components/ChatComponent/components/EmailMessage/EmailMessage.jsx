@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Card,
@@ -14,8 +14,34 @@ import {
 import { FaEnvelope, FaCode, FaPaperclip, FaDownload } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
 
-export const EmailMessage = ({ message, platform_id, page_id }) => {
+export const EmailMessage = React.memo(({ message, platform_id, page_id }) => {
   const [modalOpened, setModalOpened] = useState(false);
+
+  // ОПТИМИЗАЦИЯ: Парсим только легкие поля для превью (не парсим тяжелый HTML)
+  const emailPreview = useMemo(() => {
+    try {
+      const data = JSON.parse(message);
+      return {
+        from: data.from || "",
+        to: data.to || "",
+        subject: data.subject || "",
+        attachmentsCount: data.attachments?.length || 0,
+        hasHtml: !!data.html,
+      };
+    } catch (error) {
+      return null;
+    }
+  }, [message]);
+
+  // ЛЕНИВАЯ ЗАГРУЗКА: Парсим полный JSON (с HTML) только при открытии модалки
+  const fullEmailData = useMemo(() => {
+    if (!modalOpened) return null;
+    try {
+      return JSON.parse(message);
+    } catch (error) {
+      return null;
+    }
+  }, [message, modalOpened]);
 
   // Компонент для отображения attachment
   const AttachmentItem = ({ attachment }) => {
@@ -61,46 +87,67 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
     );
   };
 
-  try {
-    const emailData = JSON.parse(message);
+  const formatEmailList = (emailList) => {
+    if (!emailList) return "";
+    if (typeof emailList === "string") return emailList;
+    if (Array.isArray(emailList)) return emailList.join(", ");
+    return String(emailList);
+  };
 
-    const {
-      from,
-      to,
-      subject,
-      html,
-      attachments = []
-    } = emailData;
-
-    const formatEmailList = (emailList) => {
-      if (!emailList) return "";
-      if (typeof emailList === "string") return emailList;
-      if (Array.isArray(emailList)) return emailList.join(", ");
-      return String(emailList);
-    };
-
+  // Если парсинг превью не удался - показываем ошибку
+  if (!emailPreview) {
     return (
-      <>
-        <Card
-          shadow="sm"
-          padding="md"
-          radius="md"
-          withBorder
-          style={{
-            maxWidth: "500px",
-            backgroundColor: "#f8f9fa",
-            border: "1px solid #e9ecef",
-          }}
-        >
-          <Stack gap="sm">
-            {/* Header */}
-            <Group justify="space-between" align="flex-start">
-              <Group gap="xs">
-                <FaEnvelope size={16} color="#6c757d" />
-                <Text fw={600} size="sm" c="dark">
-                  {getLanguageByKey("Email")}
-                </Text>
-              </Group>
+      <Card
+        shadow="sm"
+        padding="md"
+        radius="md"
+        withBorder
+        style={{
+          maxWidth: "500px",
+          backgroundColor: "#f8f9fa",
+          border: "1px solid #e9ecef",
+        }}
+      >
+        <Group gap="xs" mb="xs">
+          <FaEnvelope size={16} color="#6c757d" />
+          <Text fw={600} size="sm" c="dark">
+            {getLanguageByKey("Email")}
+          </Text>
+          <Badge size="sm" variant="light" color="red">
+            {getLanguageByKey("Invalid format")}
+          </Badge>
+        </Group>
+        <Text size="sm" c="dimmed" style={{ fontFamily: "monospace" }}>
+          {message?.slice(0, 100)}...
+        </Text>
+      </Card>
+    );
+  }
+
+  return (
+    <>
+      {/* ПРЕВЬЮ - показываем только легкие данные */}
+      <Card
+        shadow="sm"
+        padding="md"
+        radius="md"
+        withBorder
+        style={{
+          maxWidth: "500px",
+          backgroundColor: " var(--crm-ui-kit-palette-background-primary)",
+          border: "1px solid #e9ecef",
+        }}
+      >
+        <Stack gap="sm">
+          {/* Header */}
+          <Group justify="space-between" align="flex-start">
+            <Group gap="xs">
+              <FaEnvelope size={16} color="#6c757d" />
+              <Text fw={600} size="sm" c="dark">
+                {getLanguageByKey("Email")}
+              </Text>
+            </Group>
+            {emailPreview.hasHtml && (
               <Button
                 size="xs"
                 variant="light"
@@ -109,52 +156,53 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
               >
                 {getLanguageByKey("View HTML")}
               </Button>
-            </Group>
+            )}
+          </Group>
 
-            {/* Email Details */}
-            <Stack gap="xs">
-              <Box>
-                <Text size="xs" c="dimmed" fw={500} mb="2px">
-                  {getLanguageByKey("emailFrom")}:
-                </Text>
-                <Text size="sm" c="dark">
-                  {formatEmailList(from)}
-                </Text>
-              </Box>
+          {/* Email Details - используем только данные из превью */}
+          <Stack gap="xs">
+            <Box>
+              <Text size="xs" c="dimmed" fw={500} mb="2px">
+                {getLanguageByKey("emailFrom")}:
+              </Text>
+              <Text size="sm" c="dark">
+                {formatEmailList(emailPreview.from)}
+              </Text>
+            </Box>
 
-              <Box>
-                <Text size="xs" c="dimmed" fw={500} mb="2px">
-                  {getLanguageByKey("emailTo")}:
-                </Text>
-                <Text size="sm" c="dark">
-                  {formatEmailList(to)}
-                </Text>
-              </Box>
+            <Box>
+              <Text size="xs" c="dimmed" fw={500} mb="2px">
+                {getLanguageByKey("emailTo")}:
+              </Text>
+              <Text size="sm" c="dark">
+                {formatEmailList(emailPreview.to)}
+              </Text>
+            </Box>
 
-              <Box>
-                <Text size="xs" c="dimmed" fw={500} mb="2px">
-                  {getLanguageByKey("emailSubject")}:
-                </Text>
-                <Text size="sm" c="dark" fw={500}>
-                  {subject || getLanguageByKey("No subject")}
-                </Text>
-              </Box>
+            <Box>
+              <Text size="xs" c="dimmed" fw={500} mb="2px">
+                {getLanguageByKey("emailSubject")}:
+              </Text>
+              <Text size="sm" c="dark" fw={500}>
+                {emailPreview.subject || getLanguageByKey("No subject")}
+              </Text>
+            </Box>
 
-              {/* Attachments indicator */}
-              {attachments && attachments.length > 0 && (
-                <Group gap="xs">
-                  <FaPaperclip size={12} color="#6c757d" />
-                  <Text size="xs" c="dimmed">
-                    {attachments.length} {attachments.length === 1 ? getLanguageByKey("attachment") : getLanguageByKey("Attachments").toLowerCase()}
-                  </Text>
-                </Group>
-              )}
-
-            </Stack>
+            {/* Attachments indicator */}
+            {emailPreview.attachmentsCount > 0 && (
+              <Group gap="xs">
+                <FaPaperclip size={12} color="#6c757d" />
+                <Text size="xs" c="dimmed">
+                  {emailPreview.attachmentsCount} {emailPreview.attachmentsCount === 1 ? getLanguageByKey("attachment") : getLanguageByKey("Attachments").toLowerCase()}
+                </Text>
+              </Group>
+            )}
           </Stack>
-        </Card>
+        </Stack>
+      </Card>
 
-        {/* HTML Modal */}
+      {/* МОДАЛКА - ЛЕНИВАЯ ЗАГРУЗКА: парсим полный JSON только при открытии */}
+      {modalOpened && fullEmailData && (
         <Modal
           opened={modalOpened}
           onClose={() => setModalOpened(false)}
@@ -181,18 +229,18 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
             {/* Email Info */}
             <Box>
               <Text size="sm" c="dimmed" mb="xs">
-                <strong>{getLanguageByKey("emailFrom")}:</strong> {formatEmailList(from)}
+                <strong>{getLanguageByKey("emailFrom")}:</strong> {formatEmailList(fullEmailData.from)}
               </Text>
               <Text size="sm" c="dimmed" mb="xs">
-                <strong>{getLanguageByKey("emailTo")}:</strong> {formatEmailList(to)}
+                <strong>{getLanguageByKey("emailTo")}:</strong> {formatEmailList(fullEmailData.to)}
               </Text>
               <Text size="sm" c="dimmed" mb="md">
-                <strong>{getLanguageByKey("emailSubject")}:</strong> {subject || getLanguageByKey("No subject")}
+                <strong>{getLanguageByKey("emailSubject")}:</strong> {fullEmailData.subject || getLanguageByKey("No subject")}
               </Text>
             </Box>
 
             {/* HTML Content */}
-            {html && (
+            {fullEmailData.html && (
               <Box>
                 <Text size="sm" fw={600} c="dark" mb="md">
                   {getLanguageByKey("Email content")}
@@ -204,21 +252,21 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
                     border: "1px solid #e9ecef",
                     borderRadius: "4px",
                   }}
-                  dangerouslySetInnerHTML={{ __html: html }}
+                  dangerouslySetInnerHTML={{ __html: fullEmailData.html }}
                 />
               </Box>
             )}
 
             {/* Attachments */}
-            {attachments && attachments.length > 0 && (
+            {fullEmailData.attachments && fullEmailData.attachments.length > 0 && (
               <>
                 <Divider />
                 <Box>
                   <Text size="sm" fw={600} c="dark" mb="md">
-                    {getLanguageByKey("Attachments")} ({attachments.length})
+                    {getLanguageByKey("Attachments")} ({fullEmailData.attachments.length})
                   </Text>
                   <Stack gap="sm">
-                    {attachments.map((attachment, index) => (
+                    {fullEmailData.attachments.map((attachment, index) => (
                       <AttachmentItem key={index} attachment={attachment} />
                     ))}
                   </Stack>
@@ -227,35 +275,9 @@ export const EmailMessage = ({ message, platform_id, page_id }) => {
             )}
           </Stack>
         </Modal>
-      </>
-    );
-  } catch (error) {
-    // Fallback for invalid JSON
-    return (
-      <Card
-        shadow="sm"
-        padding="md"
-        radius="md"
-        withBorder
-        style={{
-          maxWidth: "500px",
-          backgroundColor: "#f8f9fa",
-          border: "1px solid #e9ecef",
-        }}
-      >
-        <Group gap="xs" mb="xs">
-          <FaEnvelope size={16} color="#6c757d" />
-          <Text fw={600} size="sm" c="dark">
-            {getLanguageByKey("Email")}
-          </Text>
-          <Badge size="sm" variant="light" color="red">
-            {getLanguageByKey("Invalid format")}
-          </Badge>
-        </Group>
-        <Text size="sm" c="dimmed" style={{ fontFamily: "monospace" }}>
-          {message}
-        </Text>
-      </Card>
-    );
-  }
-};
+      )}
+    </>
+  );
+});
+
+EmailMessage.displayName = 'EmailMessage';
