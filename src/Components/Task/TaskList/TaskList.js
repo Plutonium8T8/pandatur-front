@@ -1,12 +1,11 @@
 import { useState, useMemo } from "react";
 import { RcTable } from "../../RcTable";
 import { FaFingerprint } from "react-icons/fa6";
-import { Checkbox } from "../../Checkbox";
 import { translations } from "../../utils/translations";
 import { TypeTask } from "../OptionsTaskType";
 import { useSnackbar } from "notistack";
 import { api } from "../../../api";
-import { Menu, Button, Flex, Text } from "@mantine/core";
+import { Menu, Button, Flex, Text, Checkbox } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { Tag } from "../../Tag";
 import { WorkflowTag } from "../../Workflow/components/WorkflowTag";
@@ -183,8 +182,8 @@ const TaskList = ({
             checked={allSelected}
             indeterminate={selectedRow.length > 0 && selectedRow.length < tasks.length ? true : undefined}
             onChange={() => { setSelectedRow(allSelected ? [] : tasks.map((t) => t.id)); }}
-            color="var(--crm-ui-kit-palette-link primary)"
-          />
+            color="var(--crm-ui-kit-palette-link-primary)"
+            />
         ),
         render: (row) => (
           <Checkbox
