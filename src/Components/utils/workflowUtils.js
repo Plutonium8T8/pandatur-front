@@ -243,7 +243,7 @@ export const workflowOptionsByGroupTitle = {
     SalesUA: workflowOptionsSalesUA,
     // Франшизы с новыми значениями
     ORHEI: workflowOptionsFranchiseOrhei,
-    CANTEMIR: workflowOptionsFranchiseCantemir,
+    CANTEMIR: workflowOptionsFranchiseRascani,
     EDINET: workflowOptionsFranchise,
     DROCHIA: workflowOptionsFranchiseRascani,
     IALOVENI: workflowOptionsFranchise,
@@ -274,7 +274,7 @@ export const workflowOptionsLimitedByGroupTitle = {
     SalesUA: workflowOptionsLimitedSalesUA,
     // Франшизы с новыми значениями
     ORHEI: workflowOptionsLimitedFranchiseOrhei,
-    CANTEMIR: workflowOptionsLimitedFranchiseCantemir,
+    CANTEMIR: workflowOptionsLimitedFranchiseRascani,
     EDINET: workflowOptionsLimitedFiliale,
     DROCHIA: workflowOptionsLimitedFranchiseRascani,
     IALOVENI: workflowOptionsLimitedFiliale,
