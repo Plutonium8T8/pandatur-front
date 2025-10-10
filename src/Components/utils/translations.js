@@ -4728,4 +4728,9 @@ export const translations = {
     RU: "Доступ запрещен. Обратитесь к администратору для получения прав доступа.",
     EN: "Access denied. Contact administrator to get access permissions.",
   },
+  "Load more emails": {
+    RO: "Încarcă mai multe emailuri",
+    RU: "Загрузить еще письма",
+    EN: "Load more emails",
+  },
 };

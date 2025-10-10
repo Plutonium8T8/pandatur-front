@@ -1,7 +1,7 @@
-import { useMemo } from "react";
-import { Flex, Badge, Divider, Text, Box } from "@mantine/core";
+import { useMemo, useState } from "react";
+import { Flex, Divider, Text, Box, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
-import { YYYY_MM_DD_HH_mm_ss } from "@app-constants";
+import { YYYY_MM_DD_HH_mm_ss, MEDIA_TYPE } from "@app-constants";
 import { getLanguageByKey } from "@utils";
 import dayjs from "dayjs";
 import { SendedMessage, ReceivedMessage } from "../Message";
@@ -34,6 +34,9 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
   const { liveLogs = [] } = useLiveTicketLogs(ticketId);
   const { liveNotes = [] } = useLiveTicketNotes(ticketId);
 
+  // ОПТИМИЗАЦИЯ: Количество показываемых email сообщений
+  const [visibleEmailCount, setVisibleEmailCount] = useState(10);
+
   const technicianMap = useMemo(() => {
     const map = new Map();
     technicians?.forEach((t) => map.set(t.value, t));
@@ -45,10 +48,42 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     [personalInfo]
   );
 
-  // сообщения
-  const messages = rawMessages
-    .filter((msg) => Number(msg.ticket_id) === Number(ticketId))
-    .map((msg) => {
+  // ОПТИМИЗАЦИЯ: Подсчет email сообщений и фильтрация
+  const { emailMessages, nonEmailMessages, totalEmailCount } = useMemo(() => {
+    const ticketMessages = rawMessages.filter((msg) => Number(msg.ticket_id) === Number(ticketId));
+    
+    const emails = [];
+    const nonEmails = [];
+    
+    ticketMessages.forEach((msg) => {
+      const messageType = msg.mtype || msg.media_type || msg.last_message_type;
+      if (messageType === MEDIA_TYPE.EMAIL) {
+        emails.push(msg);
+      } else {
+        nonEmails.push(msg);
+      }
+    });
+
+    // Сортируем email по времени (от новых к старым)
+    emails.sort((a, b) => {
+      const timeA = toDate(a.time_sent)?.getTime() || 0;
+      const timeB = toDate(b.time_sent)?.getTime() || 0;
+      return timeB - timeA;
+    });
+
+    // Берем только последние N email
+    const visibleEmails = emails.slice(0, visibleEmailCount);
+
+    return {
+      emailMessages: visibleEmails,
+      nonEmailMessages: nonEmails,
+      totalEmailCount: emails.length,
+    };
+  }, [rawMessages, ticketId, visibleEmailCount]);
+
+  // Объединяем отфильтрованные email с остальными сообщениями
+  const messages = useMemo(() => {
+    return [...emailMessages, ...nonEmailMessages].map((msg) => {
       const d = toDate(msg.time_sent) || new Date(0);
       const dj = dayjs(d);
       return {
@@ -60,6 +95,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         platform: msg.platform?.toLowerCase?.() || "",
       };
     });
+  }, [emailMessages, nonEmailMessages]);
 
   // логи (мердж статики и live)
   const mergedLogs = useMemo(() => {
@@ -210,8 +246,24 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     return blocks;
   };
 
+  // Количество скрытых email сообщений
+  const hiddenEmailCount = totalEmailCount - visibleEmailCount;
+
   return (
     <Flex direction="column" gap="xl" h="100%">
+      {/* Кнопка загрузить еще email (если есть скрытые) */}
+      {hiddenEmailCount > 0 && (
+        <Flex justify="center" pt="md">
+          <Button
+            variant="light"
+            size="sm"
+            onClick={() => setVisibleEmailCount(prev => prev + 10)}
+          >
+            {getLanguageByKey("Load more emails")} ({hiddenEmailCount})
+          </Button>
+        </Flex>
+      )}
+
       {allDates.length ? (
         <Flex direction="column" gap="xs">
           {allDates.map((date) => {
