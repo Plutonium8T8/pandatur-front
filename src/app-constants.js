@@ -5,7 +5,7 @@ export const HH_mm = "HH:mm";
 export const YYYY_MM_DD_HH_mm_ss = "YYYY-MM-DD HH:mm:ss";
 
 export const DEFAULT_PHOTO =
-  "https://storage.googleapis.com/pandatur_bucket/utils/icon-5359554_640.webp";
+  "https://storage.googleapis.com/pandatur_bucket/user.png";
 
 export const FALLBACK_IMAGE =
   "https://www.okm.md/_ipx/f_webp&q_75/fallback.webp";
