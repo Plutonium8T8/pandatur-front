@@ -82,25 +82,25 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   };
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
-  // const getUserPhoto = () => {
-  //   // Если есть фото в тикете
-  //   if (chat.photo_url && chat.photo_url.trim() !== "") {
-  //     return chat.photo_url;
-  //   }
+  const getUserPhoto = () => {
+    // Если есть фото в тикете
+    if (chat.photo_url && chat.photo_url.trim() !== "") {
+      return chat.photo_url;
+    }
     
-  //   // Если есть клиенты с фото
-  //   if (chat.clients && chat.clients.length > 0) {
-  //     const clientWithPhoto = chat.clients.find(client => client.photo && client.photo.trim() !== "");
-  //     if (clientWithPhoto) {
-  //       return clientWithPhoto.photo;
-  //     }
-  //   }
+    // Если есть клиенты с фото
+    if (chat.clients && chat.clients.length > 0) {
+      const clientWithPhoto = chat.clients.find(client => client.photo && client.photo.trim() !== "");
+      if (clientWithPhoto) {
+        return clientWithPhoto.photo;
+      }
+    }
     
-  //   // Возвращаем null для использования fallback
-  //   return null;
-  // };
+    // Возвращаем null для использования fallback
+    return null;
+  };
 
-  // const userPhoto = getUserPhoto();
+  const userPhoto = getUserPhoto();
 
   return (
     <div style={style}>
@@ -127,8 +127,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
             w={46}
             h={46}
             radius="50%"
-            // src={userPhoto}
-            src={DEFAULT_PHOTO}
+            src={userPhoto}
             fallbackSrc={DEFAULT_PHOTO}
           />
 
