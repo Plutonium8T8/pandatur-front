@@ -267,6 +267,11 @@ const ChatExtraInfo = ({
 
       await api.tickets.ticket.create(ticketId, extraFields);
 
+      // Диспатчим событие для обновления данных тикета и клиентов
+      window.dispatchEvent(new CustomEvent('ticketUpdated', {
+        detail: { ticketId }
+      }));
+
       enqueueSnackbar(
         getLanguageByKey("Datele despre ticket au fost create cu succes"),
         { variant: "success" }

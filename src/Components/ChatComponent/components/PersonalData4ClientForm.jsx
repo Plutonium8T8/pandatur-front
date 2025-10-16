@@ -56,8 +56,8 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
       }));
 
       setShowSave(false);
-      enqueueSnackbar(getLanguageByKey("Clientul a fost adăugat cu succes"), { 
-        variant: "success" 
+      enqueueSnackbar(getLanguageByKey("Clientul a fost adăugat cu succes"), {
+        variant: "success"
       });
     } catch (e) {
       // Ошибка обрабатывается автоматически
