@@ -258,7 +258,7 @@ export const InlineNoteComposer = ({ ticketId, technicianId, onCancel, onSave, l
                         >
                             {getLanguageByKey("Anuleaza")}
                         </Button>
-                    </Flex>z
+                    </Flex>
 
                     <Flex gap="6" align="center">
                         <FileButton

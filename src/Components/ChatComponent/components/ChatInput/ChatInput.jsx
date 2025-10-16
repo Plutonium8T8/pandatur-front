@@ -511,7 +511,7 @@ export const ChatInput = ({
                 </Button>
               </Flex>
 
-              <Flex>
+              <Flex gap="xs">
                 <ActionIcon
                   onClick={() => setShowEmailForm(true)}
                   variant="default"
@@ -524,6 +524,7 @@ export const ChatInput = ({
                   onChange={handleFileButton}
                   accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.ppt,.pptx"
                   multiple
+                  title={getLanguageByKey("attachFiles")}
                 >
                   {(props) => (
                     <ActionIcon {...props} variant="default" title={getLanguageByKey("attachFiles")}>
