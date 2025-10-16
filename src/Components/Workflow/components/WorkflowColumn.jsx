@@ -1,6 +1,6 @@
 import { VariableSizeList } from "react-window";
-import { Flex, DEFAULT_THEME, Box } from "@mantine/core";
-import { useRef, useEffect, forwardRef } from "react";
+import { Flex, Box } from "@mantine/core";
+import { useRef, useEffect, forwardRef, useMemo, useCallback, memo } from "react";
 import { useSnackbar } from "notistack";
 import { TicketCard } from "./TicketCard";
 import { useDOMElementHeight, useConfirmPopup } from "../../../hooks";
@@ -8,7 +8,6 @@ import { WorkflowColumnHeader } from "./WorkflowColumnHeader";
 import { showServerError, getLanguageByKey } from "../../utils";
 import { api } from "../../../api";
 
-const { colors } = DEFAULT_THEME;
 
 const DEFAULT_TICKET_CARD_HEIGHT = 190;
 const SPACE_BETWEEN_CARDS = 12;
@@ -55,7 +54,7 @@ const wrapperColumn = forwardRef(({ style, ...rest }, ref) => (
   />
 ));
 
-export const WorkflowColumn = ({
+export const WorkflowColumn = memo(({
   onEditTicket,
   searchTerm,
   workflow,
@@ -73,43 +72,50 @@ export const WorkflowColumn = ({
     subTitle: getLanguageByKey("confirm_delete_lead"),
   });
 
-  const filteredTickets = filterTickets(workflow, tickets);
+  // Мемоизируем отфильтрованные тикеты
+  const filteredTickets = useMemo(() => 
+    filterTickets(workflow, tickets), 
+    [workflow, tickets]
+  );
 
-  const CardItem = ({ index, style }) => {
+  const setRowHeight = useCallback((index, size) => {
+    listRef.current.resetAfterIndex(0);
+    rowHeights.current = { ...rowHeights.current, [index]: size };
+  }, []);
+
+  const handleDeleteLead = useCallback((id) => {
+    deleteTicketById(async () => {
+      try {
+        await api.tickets.deleteById([id]);
+        enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
+          variant: "success",
+        });
+        await fetchTickets();
+      } catch (error) {
+        enqueueSnackbar(showServerError(error), {
+          variant: "error",
+        });
+      }
+    });
+  }, [deleteTicketById, enqueueSnackbar, fetchTickets]);
+
+  const CardItem = memo(({ index, style }) => {
     const rowRef = useRef(null);
     const ticket = filteredTickets[index];
 
-    const technician = technicianList.find(
-      ({ value }) => Number(value) === ticket.technician_id,
+    const technician = useMemo(() => 
+      technicianList.find(
+        ({ value }) => Number(value) === ticket.technician_id,
+      ),
+      [ticket.technician_id]
     );
-
-    function setRowHeight(index, size) {
-      listRef.current.resetAfterIndex(0);
-      rowHeights.current = { ...rowHeights.current, [index]: size };
-    }
-
-    const handleDeleteLead = (id) => {
-      deleteTicketById(async () => {
-        try {
-          await api.tickets.deleteById([id]);
-          enqueueSnackbar(getLanguageByKey("lead_deleted_successfully"), {
-            variant: "success",
-          });
-          await fetchTickets();
-        } catch (error) {
-          enqueueSnackbar(showServerError(error), {
-            variant: "error",
-          });
-        }
-      });
-    };
 
     useEffect(() => {
       if (rowRef.current) {
         setRowHeight(index, rowRef.current.clientHeight + SPACE_BETWEEN_CARDS);
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rowRef]);
+    }, [rowRef, index, setRowHeight]);
 
     return (
       <div style={style}>
@@ -123,7 +129,7 @@ export const WorkflowColumn = ({
         </div>
       </div>
     );
-  };
+  });
 
   return (
     <Flex
@@ -157,4 +163,4 @@ export const WorkflowColumn = ({
       </Flex>
     </Flex>
   );
-};
+});

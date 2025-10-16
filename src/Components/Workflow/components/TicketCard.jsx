@@ -21,6 +21,7 @@ import { parseTags } from "../../../stringUtils";
 import { Tag } from "../../Tag";
 import Can from "../../CanComponent/Can";
 import { useUser } from "../../../hooks";
+import { useMemo, memo } from "react";
 
 const MAX_TAGS_COUNT = 2;
 
@@ -37,7 +38,7 @@ export const priorityTagColors = {
   critică: "red",
 };
 
-export const TicketCard = ({
+export const TicketCard = memo(({
   ticket,
   onEditTicket,
   technicianList,
@@ -48,15 +49,26 @@ export const TicketCard = ({
   const responsibleId = String(ticket.technician_id || "");
   const isMyTicket = user?.id && String(user.id) === responsibleId;
 
-  // Функция для получения превью последнего сообщения
-  const getLastMessagePreview = (ticket) => {
+  // Мемоизируем URL фото, чтобы предотвратить перезагрузку изображения
+  const clientPhoto = ticket?.clients?.[0]?.photo;
+  const photoUrl = useMemo(() => {
+    return clientPhoto || ticket?.photo_url || DEFAULT_PHOTO;
+  }, [clientPhoto, ticket?.photo_url]);
+
+  // Мемоизируем превью последнего сообщения
+  const lastMessagePreview = useMemo(() => {
     if (!ticket.last_message) return "";
     const messageType = ticket.last_message_type;
     if (messageType === "email") {
       return `📧 ${getLanguageByKey("Email")}`;
     }
     return ticket.last_message;
-  };
+  }, [ticket.last_message, ticket.last_message_type]);
+
+  // Мемоизируем теги
+  const renderedTags = useMemo(() => {
+    return renderTags(ticket.tags);
+  }, [ticket.tags]);
 
   return (
     <Link to={`/leads/${ticket.id}`}>
@@ -164,7 +176,7 @@ export const TicketCard = ({
           <Flex align="flex-start" gap="xs" >
             <Box w="48" h="48" style={{ flexShrink: 0, borderRadius: '50%', overflow: 'hidden' }}>
               <Image
-                src={ticket?.clients?.[0]?.photo || ticket?.photo_url || DEFAULT_PHOTO}
+                src={photoUrl}
                 fallbackSrc={DEFAULT_PHOTO}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -237,14 +249,14 @@ export const TicketCard = ({
                 fontSize: '12px',
               }}
             >
-              {getLastMessagePreview(ticket)}
+              {lastMessagePreview}
             </Text>
           )}
 
           {/* Tags */}
           {ticket.tags && (
             <Flex gap="4" wrap="wrap" style={{ marginTop: '4px' }}>
-              {renderTags(ticket.tags)}
+              {renderedTags}
             </Flex>
           )}
 
@@ -291,4 +303,4 @@ export const TicketCard = ({
       </Card>
     </Link>
   );
-};
+});
