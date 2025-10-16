@@ -50,8 +50,9 @@ export const WorkflowColumnHeader = ({ workflow, filteredTickets }) => {
         <Text
           fw="bold"
           c="var(--crm-ui-kit-palette-text-secondary-light)"
-          size="xs"
+          size="md"
           ta="center"
+          pb={"6px"}
         >
           {filteredTickets.length} leads
         </Text>

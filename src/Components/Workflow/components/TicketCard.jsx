@@ -246,7 +246,9 @@ export const TicketCard = memo(({
                 WebkitLineClamp: 2,
                 WebkitBoxOrient: 'vertical',
                 lineHeight: '1.4',
-                fontSize: '12px',
+                fontSize: '14px',
+                fontWeight: '700',
+                letterSpacing: "0.5px",
               }}
             >
               {lastMessagePreview}
