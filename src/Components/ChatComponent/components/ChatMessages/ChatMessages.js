@@ -209,19 +209,19 @@ export const ChatMessages = ({
   }, []);
 
   return (
-    <Flex w="100%" direction="column" className="chat-area">
+    <Flex w="100%" h="100%" direction="column" className="chat-area">
       {ticketId && (
-        <Paper p="8" style={{ margin: "12px 0px 12px 42px" }}>
+        <Paper p="8" style={{ margin: "12px 0px 12px 42px", flexShrink: 0 }}>
           <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
         </Paper>
       )}
 
       <Flex
-        h="100vh"
         p="16"
         direction="column"
         className="chat-messages"
         ref={messageContainerRef}
+        style={{ flex: 1, overflow: 'auto' }}
       >
         {renderMessagesContent()}
       </Flex>
@@ -229,7 +229,7 @@ export const ChatMessages = ({
       {ticketId && !messagesLoading && (
         <>
           {noteMode && (
-            <div style={{ padding: 16 }}>
+            <div style={{ padding: 16, flexShrink: 0 }}>
               <InlineNoteComposer
                 ticketId={ticketId}
                 technicianId={Number(userId)}
@@ -254,34 +254,36 @@ export const ChatMessages = ({
             setCreatingTask={setCreatingTask}
           />
 
-          <ChatInput
-            loading={loading}
-            id={ticketId}
-            clientList={messageSendersByPlatform}
-            ticketId={ticketId}
-            unseenCount={unseenCount}
-            currentClient={selectedClient}
-            personalInfo={personalInfo}
-            onCreateTask={() => setCreatingTask(true)}
-            onToggleNoteComposer={handleToggleNoteComposer}
-            onSendMessage={(value) => {
-              if (!selectedClient.payload) return;
-              sendMessage({
-                sender_id: Number(userId),
-                client_id: selectedClient.payload.id,
-                platform: selectedClient.payload.platform,
-                ticket_id: ticketId,
-                time_sent: dayjs().format(YYYY_MM_DD_HH_mm_ss),
-                messageStatus: MESSAGES_STATUS.PENDING,
-                ...value,
-              });
-            }}
-            onChangeClient={(value) => {
-              if (!value) return;
-              const [clientId, platform] = value.split("-");
-              onChangeSelectedUser(Number(clientId), platform);
-            }}
-          />
+          <div style={{ flexShrink: 0 }}>
+            <ChatInput
+              loading={loading}
+              id={ticketId}
+              clientList={messageSendersByPlatform}
+              ticketId={ticketId}
+              unseenCount={unseenCount}
+              currentClient={selectedClient}
+              personalInfo={personalInfo}
+              onCreateTask={() => setCreatingTask(true)}
+              onToggleNoteComposer={handleToggleNoteComposer}
+              onSendMessage={(value) => {
+                if (!selectedClient.payload) return;
+                sendMessage({
+                  sender_id: Number(userId),
+                  client_id: selectedClient.payload.id,
+                  platform: selectedClient.payload.platform,
+                  ticket_id: ticketId,
+                  time_sent: dayjs().format(YYYY_MM_DD_HH_mm_ss),
+                  messageStatus: MESSAGES_STATUS.PENDING,
+                  ...value,
+                });
+              }}
+              onChangeClient={(value) => {
+                if (!value) return;
+                const [clientId, platform] = value.split("-");
+                onChangeSelectedUser(Number(clientId), platform);
+              }}
+            />
+          </div>
         </>
       )}
     </Flex>
