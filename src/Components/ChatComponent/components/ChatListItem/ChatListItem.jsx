@@ -127,7 +127,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
             w={46}
             h={46}
             radius="50%"
-            src={userPhoto}
+            // src={userPhoto}
             fallbackSrc={DEFAULT_PHOTO}
           />
 
