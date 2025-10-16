@@ -88,6 +88,7 @@ export const Login = ({ onLoginSuccess }) => {
 
   return (
     <div className="body-login">
+      <div className="login-background"></div>
       <div className="body-login-form">
         <Box
           w={isMobile ? "100%" : "20%"}

@@ -7,10 +7,24 @@
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  background: linear-gradient(135deg, #0f2231 0%, #153043 25%, #264b79 50%, #203e57 75%, #0a1929 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 15s ease infinite;
   position: relative;
+}
+
+.login-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url("/public/log_background2.jpg") no-repeat center center fixed;
+  background-size: cover;
+  z-index: 0;
+  blur: 15px;
+  -webkit-filter: blur(15px);
+  -moz-filter: blur(15px);
+  -o-filter: blur(15px);
+  -ms-filter: blur(15px);
+  filter: blur(10px);
 }
 
 .body-login::before {
@@ -20,22 +34,8 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 50%, rgba(0, 0, 0, 0.6) 100%);
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0.7) 100%);
   z-index: 0;
-}
-
-.body-login::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.15) 0%, transparent 50%),
-              radial-gradient(circle at 40% 40%, rgba(40, 72, 96, 0.2) 0%, transparent 50%);
-  z-index: 0;
-  animation: floatingOrbs 20s ease-in-out infinite;
 }
 
 .body-login-form {
@@ -153,29 +153,6 @@
   }
 }
 
-@keyframes gradientShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes floatingOrbs {
-  0%, 100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-30px) rotate(120deg);
-  }
-  66% {
-    transform: translateY(15px) rotate(240deg);
-  }
-}
 
 .login-form {
   animation: slideInRight 0.8s ease-out;
