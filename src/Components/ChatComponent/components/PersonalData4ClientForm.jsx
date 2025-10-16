@@ -8,12 +8,13 @@ import {
   Group,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { getLanguageByKey, showServerError } from "../../utils";
+import { getLanguageByKey } from "../../utils";
 import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
-import { enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 
 export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
+  const { enqueueSnackbar } = useSnackbar();
   const [showSave, setShowSave] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
 
@@ -50,8 +51,8 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
       });
 
       // Диспатчим событие для обновления данных тикета и клиентов
-      window.dispatchEvent(new CustomEvent('ticketUpdated', { 
-        detail: { ticketId } 
+      window.dispatchEvent(new CustomEvent('ticketUpdated', {
+        detail: { ticketId }
       }));
 
       setShowSave(false);
@@ -59,7 +60,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         variant: "success" 
       });
     } catch (e) {
-      enqueueSnackbar(showServerError(e), { variant: "error" });
+      // Ошибка обрабатывается автоматически
     }
   };
 

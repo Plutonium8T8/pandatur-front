@@ -153,7 +153,7 @@ export const MessagesLogItem = ({ log, technicians }) => {
             <Flex
                 align="center"
                 gap="md"
-                wrap="wrap"
+                wrap="nowrap"
                 // p="xs" 
                 style={{
                     backgroundColor: "transparent",
@@ -185,15 +185,10 @@ export const MessagesLogItem = ({ log, technicians }) => {
                 </Text>
 
                 {/* Что сделал */}
-                <Box style={{ flex: 1, minWidth: "200px" }}>
-                    <Text size="sm" fw={500} c="dark" style={{ lineHeight: 1.3 }}>
-                        {changed}
+                <Box style={{ flex: 1, minWidth: "200px", overflow: "hidden" }}>
+                    <Text size="sm" fw={500} c="dark" style={{ lineHeight: 1.3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {changed} {" "} {log.task_id && `Task #${log.task_id}`}
                     </Text>
-                    {log.task_id && (
-                        <Text size="xs" c="dimmed" fw={500} style={{ marginTop: "2px" }}>
-                            Task #{log.task_id}
-                        </Text>
-                    )}
                 </Box>
             </Flex>
         </Box>
