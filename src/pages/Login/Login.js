@@ -5,7 +5,6 @@ import { useSnackbar } from "notistack";
 import { Button, Flex, TextInput, Title, Box, Text, Stack } from "@mantine/core";
 import { api } from "../../api";
 import { showServerError } from "../../Components/utils/showServerError";
-import { LoadingOverlay } from "../../Components/LoadingOverlay";
 import { useMobile } from "../../hooks";
 import "./Login.css";
 
@@ -23,7 +22,6 @@ export const Login = ({ onLoginSuccess }) => {
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("error"); // "success" или "error"
   const [isLoading, setIsLoading] = useState(false);
-  const { enqueueSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const isMobile = useMobile();
 
@@ -92,20 +90,20 @@ export const Login = ({ onLoginSuccess }) => {
     <div className="body-login">
       <div className="body-login-form">
         <Box
-          w={isMobile ? "100%" : "40%"}
+          w={isMobile ? "100%" : "20%"}
           className="login-form"
           maw={isMobile ? "90%" : "100%"}
         >
+          <img
+            src="/panda-tur.png"
+            alt="Panda Tur Logo"
+            className="login-panda-logo"
+          />
+          
           <Title
             order={1}
             ta="center"
             mb={isMobile ? "md" : "lg"}
-            style={{
-              color: '#fff',
-              fontSize: isMobile ? '24px' : '32px',
-              fontWeight: 700,
-              letterSpacing: '1px'
-            }}
           >
             Panda Tur CRM
           </Title>
@@ -163,12 +161,10 @@ export const Login = ({ onLoginSuccess }) => {
               </Button>
             </Flex>
 
-            {isLoading && <LoadingOverlay />}
-
             {message && (
-              <Text 
-                c={messageType === "success" ? "green" : "red"} 
-                size={isMobile ? "sm" : "md"} 
+              <Text
+                c={messageType === "success" ? "green" : "red"}
+                size={isMobile ? "sm" : "md"}
                 mt={isMobile ? "sm" : "md"}
                 fw={500}
               >
@@ -176,6 +172,16 @@ export const Login = ({ onLoginSuccess }) => {
               </Text>
             )}
           </Stack>
+
+          <Text
+            c="dimmed"
+            size="xs"
+            ta="center"
+            mt="xl"
+            style={{ opacity: 0.7 }}
+          >
+            © 2025 Panda Tur CRM. All rights reserved.
+          </Text>
         </Box>
       </div>
     </div>

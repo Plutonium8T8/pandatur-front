@@ -175,7 +175,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "USERS", "VIEW") && (
             <MenuItem
               active={isActive("users")}
-              icon={<FaUsers />}
+              icon={<FaUsers size={24} />}
               component={<Link to="/users" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Users")}
@@ -185,7 +185,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "DASHBOARD", "VIEW") && (
             <MenuItem
               active={isActive("dashboard")}
-              icon={<FaChartPie />}
+              icon={<FaChartPie size={24} />}
               component={<Link to="/dashboard" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Dashboard")}
@@ -195,7 +195,7 @@ export const SideBar = () => {
           <Can permission={{ module: "chat", action: "view" }} skipContextCheck>
             <MenuItem
               active={isActive("leads")}
-              icon={<FaClipboardList />}
+              icon={<FaClipboardList size={24} />}
               component={<Link to="/leads" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Leads")} {currentGroupTitle && `(${currentGroupTitle})`}
@@ -206,7 +206,7 @@ export const SideBar = () => {
             <MenuItem
               suffix={unreadCount > 0 && <Badge bg="red">{unreadCount}</Badge>}
               active={isActive("chat")}
-              icon={<FaComments />}
+              icon={<FaComments size={24} />}
               component={<Link to="/chat" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Chat")}
@@ -226,7 +226,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "SCHEDULES", "VIEW") && (
             <MenuItem
               active={isActive("schedules")}
-              icon={<FaCalendar />}
+              icon={<FaCalendar size={24} />}
               component={<Link to="/schedules" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("schedules")}
@@ -236,7 +236,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "ANALYTICS", "VIEW") && (
             <MenuItem
               active={isActive("analytics")}
-              icon={<FaChartBar />}
+              icon={<FaChartBar size={24} />}
               component={<Link to="/analytics" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("Analytics")}
@@ -246,7 +246,7 @@ export const SideBar = () => {
           {hasStrictPermission(userRoles, "LOGS", "VIEW") && (
             <MenuItem
               active={isActive("logs")}
-              icon={<FaHistory />}
+              icon={<FaHistory size={24} />}
               component={<Link to="/logs" onClick={handleMenuClick} />}
             >
               {getLanguageByKey("logs")}
@@ -257,7 +257,7 @@ export const SideBar = () => {
             <>
               {/* Переключатель темы */}
               <MenuItem 
-                icon={isDark ? <MdLightMode /> : <MdDarkMode />}
+                icon={isDark ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
                 onClick={toggleTheme}
               >
                 {isDark ? "Light" : "Dark"}

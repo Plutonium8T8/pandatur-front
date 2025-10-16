@@ -164,7 +164,7 @@ export const TicketCard = ({
           <Flex align="flex-start" gap="xs" >
             <Box w="48" h="48" style={{ flexShrink: 0, borderRadius: '50%', overflow: 'hidden' }}>
               <Image
-                // src={ticket?.clients?.[0]?.photo || ticket?.photo_url || DEFAULT_PHOTO}
+                src={ticket?.clients?.[0]?.photo || ticket?.photo_url || DEFAULT_PHOTO}
                 fallbackSrc={DEFAULT_PHOTO}
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
