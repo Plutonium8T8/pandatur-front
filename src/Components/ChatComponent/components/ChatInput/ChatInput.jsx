@@ -522,7 +522,7 @@ export const ChatInput = ({
 
                 <FileButton
                   onChange={handleFileButton}
-                  accept="image/*,video/*,audio/*,.pdf"
+                  accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.ppt,.pptx"
                   multiple
                 >
                   {(props) => (
