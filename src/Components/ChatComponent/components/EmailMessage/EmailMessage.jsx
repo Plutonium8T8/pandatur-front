@@ -248,7 +248,6 @@ export const EmailMessage = React.memo(({ message, platform_id, page_id }) => {
                 <Box
                   p="md"
                   style={{
-                    backgroundColor: "#f8f9fa",
                     border: "1px solid #e9ecef",
                     borderRadius: "4px",
                   }}
