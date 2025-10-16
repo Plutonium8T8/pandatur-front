@@ -209,25 +209,26 @@ export const ChatMessages = ({
   }, []);
 
   return (
-    <Flex w="100%" direction="column" className="chat-area">
+    <Flex w="100%" direction="column" className="chat-area" style={{ height: "100vh" }}>
       {ticketId && (
-        <Paper p="8" style={{ margin: "12px 0px 12px 42px" }}>
+        <Paper p="8" style={{ margin: "12px 0px 12px 42px", flexShrink: 0 }}>
           <TicketParticipants ticketId={ticketId} currentUserId={Number(userId)} />
         </Paper>
       )}
 
       <Flex
-        h="100vh"
+        flex={1}
         p="16"
         direction="column"
         className="chat-messages"
         ref={messageContainerRef}
+        style={{ minHeight: 0 }} // Важно для правильного скролла
       >
         {renderMessagesContent()}
       </Flex>
 
       {ticketId && !messagesLoading && (
-        <>
+        <div style={{ flexShrink: 0 }}>
           {noteMode && (
             <div style={{ padding: 16 }}>
               <InlineNoteComposer
@@ -282,7 +283,7 @@ export const ChatMessages = ({
               onChangeSelectedUser(Number(clientId), platform);
             }}
           />
-        </>
+        </div>
       )}
     </Flex>
   );
