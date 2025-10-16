@@ -308,8 +308,8 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                style={{ color: hasErrorsTicketInfoForm ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
                 truncate="end"
+                data-error={hasErrorsTicketInfoForm ? "true" : undefined}
               >
                 {getLanguageByKey("lead")}
               </Text>
@@ -318,7 +318,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                style={{ color: hasErrorsContractForm ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
+                data-error={hasErrorsContractForm ? "true" : undefined}
               >
                 {getLanguageByKey("Contract")}
               </Text>
@@ -337,7 +337,7 @@ const ChatExtraInfo = ({
               <Text
                 fw={900}
                 size="sm"
-                style={{ color: hasErrorQualityControl ? "red" : "var(--crm-ui-kit-palette-text-primary)" }}
+                data-error={hasErrorQualityControl ? "true" : undefined}
               >
                 {getLanguageByKey("quality")}
               </Text>

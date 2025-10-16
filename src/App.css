@@ -708,6 +708,11 @@ button[class*="mantine-"][data-selected="true"] {
   color: var(--crm-ui-kit-palette-text-primary) !important;
 }
 
+/* Специальное правило для ошибок валидации - должно переопределить стандартный цвет */
+.mantine-Tabs-tab .mantine-Text-root[data-error="true"] {
+  color: red !important;
+}
+
 .mantine-Tabs-tab:hover:not([data-active="true"]) {
   background-color: var(--crm-ui-kit-palette-button-classic-hover-background) !important;
   border-bottom-color: var(--crm-ui-kit-palette-border-default) !important;
