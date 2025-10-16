@@ -12,6 +12,7 @@ import {
   Group,
   Text,
   Select,
+  Loader,
 } from "@mantine/core";
 import { FaEnvelope, FaPaperclip, FaTimes } from "react-icons/fa";
 import { getLanguageByKey } from "../../../utils";
@@ -65,6 +66,8 @@ export const EmailForm = ({
   const [isDragOver, setIsDragOver] = useState(false);
   const { uploadFile } = useUploadMediaFile();
   const { enqueueSnackbar } = useSnackbar();
+  const [uploadingCount, setUploadingCount] = useState(0);
+  const isUploading = uploadingCount > 0;
 
 
   // Обновляем поле "from" когда загружается email пользователя или fromEmails
@@ -113,6 +116,7 @@ export const EmailForm = ({
     if (!files?.length) return;
 
     try {
+      setUploadingCount((c) => c + 1);
       for (const file of files) {
         const url = await uploadFile(file);
         if (url) {
@@ -131,6 +135,8 @@ export const EmailForm = ({
       }
     } catch (e) {
       console.error("Failed to upload attachment:", e);
+    } finally {
+      setUploadingCount((c) => Math.max(0, c - 1));
     }
   };
 
@@ -142,6 +148,7 @@ export const EmailForm = ({
   const uploadAndAddFiles = async (files) => {
     if (!files?.length) return;
     try {
+      setUploadingCount((c) => c + 1);
       for (const file of files) {
         const url = await uploadFile(file);
         if (url) {
@@ -155,6 +162,8 @@ export const EmailForm = ({
     } catch (e) {
       console.error("Error uploading file:", e);
       enqueueSnackbar("Error uploading file", { variant: "error" });
+    } finally {
+      setUploadingCount((c) => Math.max(0, c - 1));
     }
   };
 
@@ -531,12 +540,31 @@ export const EmailForm = ({
           />
 
           {/* Attachments */}
-          {attachments.length > 0 && (
+          {(attachments.length > 0 || isUploading) && (
             <Box>
               <Text size="sm" fw={500} mb="xs" c="dark">
                 {getLanguageByKey("Attachments")} ({attachments.length})
               </Text>
               <Flex wrap="wrap" gap="xs">
+                {isUploading && (
+                  <Box
+                    style={{
+                      position: "relative",
+                      width: 80,
+                      height: 80,
+                      borderRadius: 8,
+                      overflow: "hidden",
+                      border: "1px solid var(--mantine-color-gray-3)",
+                      background: "var(--crm-ui-kit-palette-background-default)",
+                      marginBottom: 8,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Loader size="sm" />
+                  </Box>
+                )}
                 {attachments.map((attachment) => (
                   <AttachmentPreview
                     key={attachment.media_url}
@@ -622,6 +650,8 @@ export const EmailForm = ({
                 <Button
                   {...props}
                   variant="outline"
+                  loading={isUploading}
+                  disabled={isUploading}
                   leftSection={<FaPaperclip size={14} />}
                   size="sm"
                   styles={{
@@ -662,7 +692,7 @@ export const EmailForm = ({
                 onClick={handleSend}
                 size="sm"
                 loading={isLoading}
-                disabled={!emailFields.to.trim() || !emailFields.subject.trim() || isLoading}
+                disabled={!emailFields.to.trim() || !emailFields.subject.trim() || isLoading || isUploading}
                 styles={{
                   root: {
                     backgroundColor: "var(--crm-ui-kit-palette-link-primary)",
