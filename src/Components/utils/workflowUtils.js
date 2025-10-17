@@ -300,10 +300,9 @@ export const userGroupsToGroupTitle = {
     "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
     "Front Office": ["MD"],
     "Distribution": [""],
-    "Back Flagman": ["MD"],
-    "Minions": ["MD"],
+    "Back Flagman": ["MD","RO"],
+    "Minions": ["MD","RO"],
     "Back Headline": ["MD"],
-    "Back EliteSales": ["MD"],
     "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
 
     // RO 5
@@ -311,7 +310,7 @@ export const userGroupsToGroupTitle = {
     "Bucharest RO": ["RO"],
     "Brasov RO": ["RO"],
     "Iasi RO": ["RO"],
-    "Back RO": ["RO"],
+    "Back RO": ["RO,MD"],
 
     // other 10
     "Company branches": ["Filiale"],
