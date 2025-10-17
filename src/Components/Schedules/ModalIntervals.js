@@ -13,6 +13,7 @@ import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { showServerError } from "../utils/showServerError";
 import { translations } from "../utils/translations";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -200,34 +201,30 @@ const ModalIntervals = ({
 
   const getSelectedNames = () => {
     if (selectedTechnicians.length > 1) {
-      const names = schedule
+      // Преобразуем данные schedule в формат для UserGroupMultiSelect
+      const techniciansData = schedule
         .filter((s) => selectedTechnicians.includes(s.id))
-        .map((s) => s.name);
+        .map((s) => ({
+          value: String(s.id),
+          label: s.name,
+          groupName: s.group || "Default"
+        }));
 
       return (
-        <>
-          <div style={{ fontWeight: 500, marginBottom: 5 }}>
+        <Group direction="column" spacing="xs">
+          <Text fw={500} size="sm">
             {translations["Utilizatori selectați"][language]}:
-          </div>
-          <div
-            style={{
-              border: "1px solid #ccc",
-              borderRadius: 8,
-              padding: "8px 12px",
-              background: "#f9f9f9",
-              display: "flex",
-              flexDirection: "row",
-              gap: "4px",
-            }}
-          >
-            {names.map((name, idx) => (
-              <div key={idx}>
-                {name}
-                {idx !== names.length - 1 ? "," : ""}
-              </div>
-            ))}
-          </div>
-        </>
+          </Text>
+          <UserGroupMultiSelect
+            value={selectedTechnicians.map(id => String(id))}
+            onChange={() => {}} // disabled, не изменяем
+            techniciansData={techniciansData}
+            disabled={true}
+            mode="multi"
+            label=""
+            placeholder=""
+          />
+        </Group>
       );
     }
 
