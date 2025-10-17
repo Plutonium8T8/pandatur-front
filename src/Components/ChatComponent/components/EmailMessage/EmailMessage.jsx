@@ -133,7 +133,7 @@ export const EmailMessage = React.memo(({ message, platform_id, page_id }) => {
         radius="md"
         withBorder
         style={{
-          maxWidth: "500px",
+          minWidth: "400px",
           backgroundColor: " var(--crm-ui-kit-palette-background-primary)",
           border: "1px solid #e9ecef",
         }}
@@ -162,28 +162,28 @@ export const EmailMessage = React.memo(({ message, platform_id, page_id }) => {
           {/* Email Details - используем только данные из превью */}
           <Stack gap="xs">
             <Box>
-              <Text size="xs" c="dimmed" fw={500} mb="2px">
+              <Text size="lg" c="dimmed" fw={700} mb="2px" >
                 {getLanguageByKey("emailFrom")}:
               </Text>
-              <Text size="sm" c="dark">
+              <Text size="md" c="dark">
                 {formatEmailList(emailPreview.from)}
               </Text>
             </Box>
 
             <Box>
-              <Text size="xs" c="dimmed" fw={500} mb="2px">
+              <Text size="lg" c="dimmed" fw={700} mb="2px">
                 {getLanguageByKey("emailTo")}:
               </Text>
-              <Text size="sm" c="dark">
+              <Text size="md" c="dark">
                 {formatEmailList(emailPreview.to)}
               </Text>
             </Box>
 
             <Box>
-              <Text size="xs" c="dimmed" fw={500} mb="2px">
+              <Text size="lg" c="dimmed" fw={700} mb="2px">
                 {getLanguageByKey("emailSubject")}:
               </Text>
-              <Text size="sm" c="dark" fw={500}>
+              <Text size="md" c="dark" fw={500}>
                 {emailPreview.subject || getLanguageByKey("No subject")}
               </Text>
             </Box>
@@ -192,7 +192,7 @@ export const EmailMessage = React.memo(({ message, platform_id, page_id }) => {
             {emailPreview.attachmentsCount > 0 && (
               <Group gap="xs">
                 <FaPaperclip size={12} color="#6c757d" />
-                <Text size="xs" c="dimmed">
+                <Text size="md" c="dimmed">
                   {emailPreview.attachmentsCount} {emailPreview.attachmentsCount === 1 ? getLanguageByKey("attachment") : getLanguageByKey("Attachments").toLowerCase()}
                 </Text>
               </Group>
