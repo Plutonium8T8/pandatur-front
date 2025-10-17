@@ -212,7 +212,7 @@ const ModalIntervals = ({
 
       return (
         <Group direction="column" spacing="xs">
-          <Text fw={500} size="sm">
+          <Text fw={500} size="lg">
             {translations["Utilizatori selectați"][language]}:
           </Text>
           <UserGroupMultiSelect
@@ -266,15 +266,46 @@ const ModalIntervals = ({
             </Button>
 
             {DAYS.map((day) => (
-              <Button
+              <button
                 key={day.value}
-                size="xs"
-                variant={selectedDays.includes(day.value) ? "filled" : "default"}
                 onClick={() => toggleDay(day.value)}
-                style={{ width: 54 }}
+                style={{
+                  width: 54,
+                  height: 32,
+                  padding: '4px 8px',
+                  border: selectedDays.includes(day.value) 
+                    ? '1px solid #1a73e8' 
+                    : '1px solid #dadce0',
+                  borderRadius: 4,
+                  backgroundColor: selectedDays.includes(day.value) 
+                    ? '#1a73e8' 
+                    : 'white',
+                  color: selectedDays.includes(day.value) 
+                    ? 'white' 
+                    : '#3c4043',
+                  fontSize: 12,
+                  fontWeight: selectedDays.includes(day.value) ? 600 : 400,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  if (!selectedDays.includes(day.value)) {
+                    e.target.style.backgroundColor = '#f8f9fa';
+                    e.target.style.borderColor = '#1a73e8';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!selectedDays.includes(day.value)) {
+                    e.target.style.backgroundColor = 'white';
+                    e.target.style.borderColor = '#dadce0';
+                  }
+                }}
               >
                 {day.label}
-              </Button>
+              </button>
             ))}
 
             <Group align="flex-end" mt="md">

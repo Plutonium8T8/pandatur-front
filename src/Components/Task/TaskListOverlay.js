@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback, useRef, startTransition } from "react";
 import {
   Paper, Text, Box, Group, Stack, Card, Divider, Collapse,
-  TextInput, Button, Select, ActionIcon, Loader, Center, Badge
+  TextInput, Button, ActionIcon, Loader, Center, Badge
 } from "@mantine/core";
 import { FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
 import { getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate } from "../utils/taskUtils";
@@ -16,6 +16,7 @@ import { useSnackbar } from "notistack";
 import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
+import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -282,29 +283,23 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
               onChange={(value) => updateTaskField(id, "scheduled_time", value)}
               disabled={!isEditing || actionLoading}
             />
-            <Select
-              data={users}
-              value={taskEdits[id]?.created_by}
-              onChange={(value) => updateTaskField(id, "created_by", value)}
-              w={180}
+            <UserGroupMultiSelect
+              techniciansData={users}
+              value={taskEdits[id]?.created_by ? [String(taskEdits[id].created_by)] : []}
+              onChange={(values) => updateTaskField(id, "created_by", values[0] || "")}
+              mode="single"
               label={translations["Autor"][language]}
-              placeholder={translations["Autor"][language]}
+              // placeholder={translations["Autor"][language]}
               disabled={!isEditing || actionLoading}
-              required
-              searchable
-              clearable
             />
-            <Select
-              data={users}
-              value={taskEdits[id]?.created_for}
-              onChange={(value) => updateTaskField(id, "created_for", value)}
-              w={180}
+            <UserGroupMultiSelect
+              techniciansData={users}
+              value={taskEdits[id]?.created_for ? [String(taskEdits[id].created_for)] : []}
+              onChange={(values) => updateTaskField(id, "created_for", values[0] || "")}
+              mode="single"
               label={translations["Responsabil"][language]}
+              // placeholder={translations["Responsabil"][language]}
               disabled={!isEditing || actionLoading}
-              placeholder={translations["Responsabil"][language]}
-              required
-              searchable
-              clearable
             />
             <TextInput
               label={translations["Comentariu"][language]}
