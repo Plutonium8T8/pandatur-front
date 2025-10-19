@@ -349,16 +349,21 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
                               msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
 
                             const technician = technicianMap.get(Number(msg.sender_id));
+                            
+                            // Создаем уникальный ключ, который изменится при обновлении содержимого
+                            // Для звонков включаем URL записи, чтобы компонент перерисовался при его появлении
+                            const messageKey = `${msg.message_id || msg.id}-${msg.time_sent}-${msg.message || ''}`.slice(0, 200);
+                            
                             return isClientMessage ? (
                               <ReceivedMessage
-                                key={`${msg.id}-${idx}`}
+                                key={messageKey}
                                 msg={msg}
                                 personalInfo={personalInfo}
                                 technicians={technicians}
                               />
                             ) : (
                               <SendedMessage
-                                key={`${msg.id}-${idx}`}
+                                key={messageKey}
                                 msg={msg}
                                 technician={technician}
                                 technicians={technicians}

@@ -71,7 +71,22 @@ export const useMessages = () => {
   };
 
   const updateMessage = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
+    setMessages((prevMessages) => {
+      // Проверяем, есть ли уже сообщение с таким message_id
+      const existingIndex = prevMessages.findIndex(
+        (msg) => Number(msg.message_id) === Number(message.message_id)
+      );
+
+      // Если сообщение существует - обновляем его
+      if (existingIndex !== -1) {
+        const updated = [...prevMessages];
+        updated[existingIndex] = message;
+        return updated;
+      }
+
+      // Если сообщения нет - добавляем новое
+      return [...prevMessages, message];
+    });
   };
 
   const markMessageSeen = (id, seenAt) => {

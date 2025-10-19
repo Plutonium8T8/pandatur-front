@@ -44,6 +44,9 @@ export const AppProvider = ({ children }) => {
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
   
+  // Для отслеживания обработанных message_id (чтобы не дублировать счётчик при обновлении сообщений)
+  const processedMessageIds = useRef(new Set());
+  
   // Получаем данные всех пользователей
   const { technicians } = useGetTechniciansList();
 
@@ -257,9 +260,18 @@ export const AppProvider = ({ children }) => {
   const handleWebSocketMessage = (message) => {
     switch (message.type) {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
-        const { ticket_id, message: msgText, time_sent, mtype, sender_id } = message.data;
+        const { ticket_id, message: msgText, time_sent, mtype, sender_id, message_id } = message.data;
 
         const isFromAnotherUser = String(sender_id) !== String(userId) && String(sender_id) !== "1";
+        
+        // Проверяем, было ли это сообщение уже обработано (для избежания дублирования счётчика)
+        const isNewMessage = !processedMessageIds.current.has(message_id);
+        if (message_id && isNewMessage) {
+          processedMessageIds.current.add(message_id);
+        }
+        
+        // Увеличиваем счётчик только для новых сообщений от других пользователей
+        const shouldIncrement = isFromAnotherUser && isNewMessage;
         let increment = 0;
 
         setTickets((prev) => {
@@ -268,8 +280,8 @@ export const AppProvider = ({ children }) => {
           const updated = prev.map((ticket) => {
             if (ticket.id === ticket_id) {
               found = true;
-              const newUnseen = ticket.unseen_count + (isFromAnotherUser ? 1 : 0);
-              if (isFromAnotherUser) increment = 1;
+              const newUnseen = ticket.unseen_count + (shouldIncrement ? 1 : 0);
+              if (shouldIncrement) increment = 1;
               return {
                 ...ticket,
                 unseen_count: newUnseen,
@@ -293,7 +305,7 @@ export const AppProvider = ({ children }) => {
             ticket.id === ticket_id
               ? {
                 ...ticket,
-                unseen_count: ticket.unseen_count + (isFromAnotherUser ? 1 : 0),
+                unseen_count: ticket.unseen_count + (shouldIncrement ? 1 : 0),
                 last_message_type: mtype,
                 last_message: msgText,
                 time_sent,
