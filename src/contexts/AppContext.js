@@ -63,6 +63,10 @@ export const AppProvider = ({ children }) => {
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
 
+    // Находим тикет и получаем количество непрочитанных сообщений
+    const ticket = tickets.find(t => t.id === ticketId);
+    const unseenCount = ticket?.unseen_count || 0;
+
     setTickets((prev) =>
       prev.map((t) => {
         if (t.id === ticketId) {
@@ -80,6 +84,11 @@ export const AppProvider = ({ children }) => {
         return t;
       })
     );
+
+    // Уменьшаем общий счетчик на количество прочитанных сообщений
+    if (unseenCount > 0) {
+      setUnreadCount((prev) => Math.max(0, prev - unseenCount));
+    }
   };
 
   const getTicketsListRecursively = async (page = 1, requestId) => {
@@ -250,7 +259,7 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
         const { ticket_id, message: msgText, time_sent, mtype, sender_id } = message.data;
 
-        const isFromAnotherUser = String(sender_id) !== String(userId);
+        const isFromAnotherUser = String(sender_id) !== String(userId) && String(sender_id) !== "1";
         let increment = 0;
 
         setTickets((prev) => {
@@ -301,11 +310,20 @@ export const AppProvider = ({ children }) => {
         const isSeenByAnotherUser = String(sender_id) !== String(userId);
 
         if (isSeenByAnotherUser) {
+          // Находим тикет и получаем количество непрочитанных сообщений
+          const ticket = tickets.find(t => t.id === ticket_id);
+          const unseenCount = ticket?.unseen_count || 0;
+
           setTickets((prev) =>
             prev.map((ticket) =>
               ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
             )
           );
+
+          // Уменьшаем общий счетчик на количество прочитанных сообщений
+          if (unseenCount > 0) {
+            setUnreadCount((prev) => Math.max(0, prev - unseenCount));
+          }
         }
 
         break;

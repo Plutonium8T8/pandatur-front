@@ -14,7 +14,7 @@ export const MessagesProvider = ({ children }) => {
   const handleIncomingMessage = (message) => {
     const incoming = message.data;
 
-    if (Number(incoming.sender_id) !== Number(userId)) {
+    if (Number(incoming.sender_id) !== Number(userId) && Number(incoming.sender_id) !== 1) {
       messages.updateMessage(incoming);
       return;
     }
