@@ -27,9 +27,15 @@ export const useLeadsKanban = () => {
 
     const isSearching = !!kanbanSearchTerm?.trim();
     const debouncedSearch = useDebounce(kanbanSearchTerm, 2000);
+    
+    // Защита от "гонки" - отслеживаем актуальный запрос
+    const kanbanReqIdRef = useRef(0);
 
     // загрузка light с локальными фильтрами (для канбана)
     const fetchKanbanTickets = useCallback(async (filters = {}) => {
+        // Увеличиваем ID запроса - это делает предыдущие запросы неактуальными
+        const reqId = ++kanbanReqIdRef.current;
+        
         setKanbanSpinner(true);
         setKanbanFilters(filters);
         setKanbanTickets([]);
@@ -41,6 +47,11 @@ export const useLeadsKanban = () => {
             const { group_title, search, ...attributes } = filters;
 
             while (page <= totalPages) {
+                // Проверяем перед каждым запросом: актуален ли еще этот запрос?
+                if (reqId !== kanbanReqIdRef.current) {
+                    return; // Если начался новый запрос - останавливаем текущий
+                }
+
                 const res = await api.tickets.filters({
                     page,
                     type: "light",
@@ -50,6 +61,11 @@ export const useLeadsKanban = () => {
                         ...(search?.trim() ? { search: search.trim() } : {}),
                     },
                 });
+
+                // Проверяем после получения ответа: актуален ли еще этот запрос?
+                if (reqId !== kanbanReqIdRef.current) {
+                    return; // Если начался новый запрос - не обновляем состояние
+                }
 
                 const normalized = res.tickets.map((t) => ({
                     ...t,
@@ -64,9 +80,15 @@ export const useLeadsKanban = () => {
                 page += 1;
             }
         } catch (e) {
-            enqueueSnackbar(showServerError(e), { variant: "error" });
+            // Показываем ошибку только если этот запрос еще актуален
+            if (reqId === kanbanReqIdRef.current) {
+                enqueueSnackbar(showServerError(e), { variant: "error" });
+            }
         } finally {
-            setKanbanSpinner(false);
+            // Убираем спиннер только если этот запрос еще актуален
+            if (reqId === kanbanReqIdRef.current) {
+                setKanbanSpinner(false);
+            }
         }
     }, [enqueueSnackbar, groupTitleForApi]);
 
