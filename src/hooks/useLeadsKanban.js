@@ -40,45 +40,37 @@ export const useLeadsKanban = () => {
         setKanbanFilters(filters);
         setKanbanTickets([]);
 
-        let page = 1;
-        let totalPages = 1;
-
         try {
             const { group_title, search, ...attributes } = filters;
 
-            while (page <= totalPages) {
-                // Проверяем перед каждым запросом: актуален ли еще этот запрос?
-                if (reqId !== kanbanReqIdRef.current) {
-                    return; // Если начался новый запрос - останавливаем текущий
-                }
-
-                const res = await api.tickets.filters({
-                    page,
-                    type: "light",
-                    group_title: group_title || groupTitleForApi,
-                    attributes: {
-                        ...attributes,
-                        ...(search?.trim() ? { search: search.trim() } : {}),
-                    },
-                });
-
-                // Проверяем после получения ответа: актуален ли еще этот запрос?
-                if (reqId !== kanbanReqIdRef.current) {
-                    return; // Если начался новый запрос - не обновляем состояние
-                }
-
-                const normalized = res.tickets.map((t) => ({
-                    ...t,
-                    last_message: t.last_message || getLanguageByKey("no_messages"),
-                    time_sent: t.time_sent || null,
-                    unseen_count: t.unseen_count || 0,
-                }));
-
-                setKanbanTickets((prev) => [...prev, ...normalized]);
-
-                totalPages = res.pagination?.total_pages || 1;
-                page += 1;
+            // Проверяем перед запросом: актуален ли еще этот запрос?
+            if (reqId !== kanbanReqIdRef.current) {
+                return; // Если начался новый запрос - останавливаем текущий
             }
+
+            const res = await api.tickets.filters({
+                page: 1,
+                type: "light",
+                group_title: group_title || groupTitleForApi,
+                attributes: {
+                    ...attributes,
+                    ...(search?.trim() ? { search: search.trim() } : {}),
+                },
+            });
+
+            // Проверяем после получения ответа: актуален ли еще этот запрос?
+            if (reqId !== kanbanReqIdRef.current) {
+                return; // Если начался новый запрос - не обновляем состояние
+            }
+
+            const normalized = res.tickets.map((t) => ({
+                ...t,
+                last_message: t.last_message || getLanguageByKey("no_messages"),
+                time_sent: t.time_sent || null,
+                unseen_count: t.unseen_count || 0,
+            }));
+
+            setKanbanTickets(normalized);
         } catch (e) {
             // Показываем ошибку только если этот запрос еще актуален
             if (reqId === kanbanReqIdRef.current) {

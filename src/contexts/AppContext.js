@@ -112,7 +112,6 @@ export const AppProvider = ({ children }) => {
 
       if (requestIdRef.current !== requestId) return;
 
-      const totalPages = data.pagination?.total_pages || 1;
       const totalUnread = data.tickets.reduce(
         (sum, ticket) => sum + (ticket.unseen_count || 0),
         0
@@ -121,12 +120,7 @@ export const AppProvider = ({ children }) => {
       setUnreadCount((prev) => prev + totalUnread);
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => [...prev, ...processedTickets]);
-
-      if (page < totalPages) {
-        await getTicketsListRecursively(page + 1, requestId);
-      } else {
-        setSpinnerTickets(false);
-      }
+      setSpinnerTickets(false);
     } catch (error) {
       if (requestIdRef.current !== requestId) return;
       enqueueSnackbar(showServerError(error), { variant: "error" });
@@ -150,27 +144,18 @@ export const AppProvider = ({ children }) => {
     setChatFilteredTickets([]);
 
     try {
-      const loadPage = async (page = 1) => {
-        const res = await api.tickets.filters({
-          page,
-          type: "light",
-          group_title: groupTitleForApi,
-          sort_by: "creation_date",
-          order: "DESC",
-          attributes: filters,
-        });
+      const res = await api.tickets.filters({
+        page: 1,
+        type: "light",
+        group_title: groupTitleForApi,
+        sort_by: "creation_date",
+        order: "DESC",
+        attributes: filters,
+      });
 
-        const normalized = normalizeLightTickets(res.tickets);
-        setChatFilteredTickets((prev) => [...prev, ...normalized]);
-
-        if (page < res.pagination?.total_pages) {
-          await loadPage(page + 1);
-        } else {
-          setChatSpinner(false);
-        }
-      };
-
-      await loadPage(1);
+      const normalized = normalizeLightTickets(res.tickets);
+      setChatFilteredTickets(normalized);
+      setChatSpinner(false);
     } catch (err) {
       enqueueSnackbar(showServerError(err), { variant: "error" });
       setChatSpinner(false);
