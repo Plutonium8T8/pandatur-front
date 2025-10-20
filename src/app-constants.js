@@ -59,3 +59,9 @@ export const TYPE_TICKET = {
   HARD: "hard",
   LIGHT: "light",
 };
+
+export const CALL_STATUS = {
+  IN_PROCESS: "IN_PROCESS",     // Звонок в процессе (как приходит с сервера)
+  ANSWER: "ANSWER",             // Звонок отвечен
+  NOANSWER: "NOANSWER",         // Нет ответа
+};

@@ -1,6 +1,6 @@
 import React, { createContext, useEffect } from "react";
 import { useMessages, useSocket, useUser } from "@hooks";
-import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { TYPE_SOCKET_EVENTS, MEDIA_TYPE } from "@app-constants";
 
 export const MessagesContext = createContext();
 
@@ -14,11 +14,27 @@ export const MessagesProvider = ({ children }) => {
   const handleIncomingMessage = (message) => {
     const incoming = message.data;
 
-    if (Number(incoming.sender_id) !== Number(userId) && Number(incoming.sender_id) !== 1) {
+    // Для звонков: всегда обновляем сообщение (независимо от sender_id)
+    // Потому что звонок сначала приходит без записи, потом с URL записи
+    const isCall = incoming.mtype === MEDIA_TYPE.CALL;
+    
+    // Для сообщений от других пользователей: добавляем/обновляем
+    const isFromAnotherUser = Number(incoming.sender_id) !== Number(userId) && Number(incoming.sender_id) !== 1;
+    
+    if (isCall || isFromAnotherUser) {
+      if (isCall) {
+        // eslint-disable-next-line no-console
+        console.log(`📞 WebSocket: Получен звонок #${incoming.message_id}:`, {
+          status: incoming.call_metadata?.status,
+          hasRecording: !!incoming.message,
+          time: incoming.time_sent,
+        });
+      }
       messages.updateMessage(incoming);
       return;
     }
 
+    // Обработка ошибок для сообщений текущего пользователя
     if (!incoming.message?.startsWith(ERROR_PREFIX)) return;
 
     messages.setMessages((prev) => {

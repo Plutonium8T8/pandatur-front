@@ -262,15 +262,27 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
         const { ticket_id, message: msgText, time_sent, mtype, sender_id, message_id } = message.data;
 
+        // Сообщение считается от другого пользователя, если sender_id не совпадает с текущим userId и это не система (id=1)
         const isFromAnotherUser = String(sender_id) !== String(userId) && String(sender_id) !== "1";
         
-        // Проверяем, было ли это сообщение уже обработано (для избежания дублирования счётчика)
-        const isNewMessage = !processedMessageIds.current.has(message_id);
+        // Проверяем, было ли это сообщение уже обработано
+        // Для звонков: первое событие - создание звонка, второе - обновление с URL записи
+        // Нужно увеличить счетчик только один раз
+        const isNewMessage = message_id ? !processedMessageIds.current.has(message_id) : true;
+        
         if (message_id && isNewMessage) {
           processedMessageIds.current.add(message_id);
+          
+          // Очистка старых ID (храним последние 1000)
+          if (processedMessageIds.current.size > 1000) {
+            const iterator = processedMessageIds.current.values();
+            for (let i = 0; i < 500; i++) {
+              processedMessageIds.current.delete(iterator.next().value);
+            }
+          }
         }
         
-        // Увеличиваем счётчик только для новых сообщений от других пользователей
+        // Увеличиваем счётчик только для НОВЫХ сообщений от ДРУГИХ пользователей
         const shouldIncrement = isFromAnotherUser && isNewMessage;
         let increment = 0;
 

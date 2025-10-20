@@ -83,7 +83,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
   // Объединяем отфильтрованные email с остальными сообщениями
   const messages = useMemo(() => {
-    return [...emailMessages, ...nonEmailMessages].map((msg) => {
+    const allMessages = [...emailMessages, ...nonEmailMessages].map((msg) => {
       const d = toDate(msg.time_sent) || new Date(0);
       const dj = dayjs(d);
       return {
@@ -95,6 +95,22 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         platform: msg.platform?.toLowerCase?.() || "",
       };
     });
+    
+    // Логируем звонки для отладки
+    const calls = allMessages.filter(m => m.mtype === MEDIA_TYPE.CALL);
+    if (calls.length > 0) {
+      // eslint-disable-next-line no-console
+      console.log(`📊 GroupedMessages: Всего звонков в списке: ${calls.length}`, 
+        calls.map(c => ({
+          id: c.message_id,
+          status: c.call_metadata?.status,
+          time: c.time_sent,
+          hasRecording: !!c.message
+        }))
+      );
+    }
+    
+    return allMessages;
   }, [emailMessages, nonEmailMessages]);
 
   // логи (мердж статики и live)
@@ -350,9 +366,11 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                             const technician = technicianMap.get(Number(msg.sender_id));
                             
-                            // Создаем уникальный ключ, который изменится при обновлении содержимого
-                            // Для звонков включаем URL записи, чтобы компонент перерисовался при его появлении
-                            const messageKey = `${msg.message_id || msg.id}-${msg.time_sent}-${msg.message || ''}`.slice(0, 200);
+                            // Создаем уникальный ключ на основе message_id
+                            // Для сообщений без message_id используем id или комбинацию полей
+                            const messageKey = msg.message_id 
+                              ? `msg-${msg.message_id}` 
+                              : `${msg.id || 'temp'}-${msg.time_sent}`;
                             
                             return isClientMessage ? (
                               <ReceivedMessage

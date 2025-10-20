@@ -3829,6 +3829,16 @@ export const translations = {
     RO: "Nu răspunde",
     EN: "No answer"
   },
+  "InProgress": {
+    RU: "В процессе",
+    RO: "În proces",
+    EN: "In progress"
+  },
+  "Unknown": {
+    RU: "Неизвестно",
+    RO: "Necunoscut",
+    EN: "Unknown"
+  },
   "Record": {
     RU: "Запись",
     RO: "Înregistrare",
