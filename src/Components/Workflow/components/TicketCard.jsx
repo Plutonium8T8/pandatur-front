@@ -59,10 +59,51 @@ export const TicketCard = memo(({
   const lastMessagePreview = useMemo(() => {
     if (!ticket.last_message) return "";
     const messageType = ticket.last_message_type;
+    const message = ticket.last_message;
+
+    // Проверка 1: По типу сообщения (если есть)
     if (messageType === "email") {
-      return `📧 ${getLanguageByKey("Email")}`;
+      return `📧 ${getLanguageByKey("email")}`;
     }
-    return ticket.last_message;
+    if (messageType === "photo" || messageType === "image") {
+      return `📷 ${getLanguageByKey("photo")}`;
+    }
+    if (messageType === "video") {
+      return `🎥 ${getLanguageByKey("video")}`;
+    }
+    if (messageType === "audio" || messageType === "voice") {
+      return `🎵 ${getLanguageByKey("audio")}`;
+    }
+    if (messageType === "call") {
+      return `📞 ${getLanguageByKey("call")}`;
+    }
+    if (messageType === "file") {
+      return `📎 ${getLanguageByKey("file")}`;
+    }
+    if (messageType === "url") {
+      return `🔗 ${getLanguageByKey("link")}`;
+    }
+
+    // Проверка 2: По расширению файла в URL (если type не определен)
+    const lowerMessage = message.toLowerCase();
+    
+    // Проверяем на изображения
+    if (lowerMessage.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg|ico)(\?|$)/i)) {
+      return `📷 ${getLanguageByKey("photo")}`;
+    }
+    
+    // Проверяем на видео
+    if (lowerMessage.match(/\.(mp4|avi|mov|wmv|flv|mkv|webm|m4v)(\?|$)/i)) {
+      return `🎥 ${getLanguageByKey("video")}`;
+    }
+    
+    // Проверяем на аудио
+    if (lowerMessage.match(/\.(mp3|wav|ogg|m4a|aac|flac|wma|opus)(\?|$)/i)) {
+      return `🎵 ${getLanguageByKey("audio")}`;
+    }
+
+    // Если ничего не подошло - возвращаем оригинальное сообщение
+    return message;
   }, [ticket.last_message, ticket.last_message_type]);
 
   // Мемоизируем теги
