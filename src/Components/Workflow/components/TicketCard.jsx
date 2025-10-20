@@ -59,9 +59,40 @@ export const TicketCard = memo(({
   const lastMessagePreview = useMemo(() => {
     if (!ticket.last_message) return "";
     const messageType = ticket.last_message_type;
+    
     if (messageType === "email") {
       return `📧 ${getLanguageByKey("Email")}`;
     }
+    
+    if (messageType === "call") {
+      return `📞 ${getLanguageByKey("call")}`;
+    }
+    
+    if (messageType === "audio") {
+      return `🎵 ${getLanguageByKey("Audio")}`;
+    }
+    
+    if (messageType === "image") {
+      return `🖼️ ${getLanguageByKey("Image")}`;
+    }
+    
+    if (messageType === "video") {
+      return `🎥 ${getLanguageByKey("Video")}`;
+    }
+    
+    if (messageType === "file") {
+      return `📄 ${getLanguageByKey("File")}`;
+    }
+    
+    if (messageType === "ig_reel") {
+      return `📱 ${getLanguageByKey("Instagram Reel")}`;
+    }
+    
+    if (messageType === "share") {
+      return `🔗 ${getLanguageByKey("Shared Content")}`;
+    }
+    
+    // Для текстовых сообщений и URL показываем содержимое
     return ticket.last_message;
   }, [ticket.last_message, ticket.last_message_type]);
 

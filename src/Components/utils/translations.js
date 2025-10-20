@@ -3984,6 +3984,16 @@ export const translations = {
     RO: "Fișier",
     EN: "File",
   },
+  "Instagram Reel": {
+    RU: "Instagram Reel",
+    RO: "Instagram Reel",
+    EN: "Instagram Reel",
+  },
+  "Shared Content": {
+    RU: "Поделенный контент",
+    RO: "Conținut partajat",
+    EN: "Shared Content",
+  },
   you: {
     RU: "Вы",
     RO: "Tu",
