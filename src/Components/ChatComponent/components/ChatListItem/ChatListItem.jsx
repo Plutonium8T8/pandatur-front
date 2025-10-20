@@ -72,30 +72,6 @@ const MESSAGE_INDICATOR = {
   ),
 };
 
-// Вспомогательная функция для определения типа медиа по URL
-const getMediaTypeFromUrl = (message) => {
-  if (!message || typeof message !== "string") return null;
-  
-  const lowerMessage = message.toLowerCase();
-  
-  // Проверяем на изображения
-  if (lowerMessage.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg|ico)(\?|$)/i)) {
-    return MEDIA_TYPE.IMAGE;
-  }
-  
-  // Проверяем на видео
-  if (lowerMessage.match(/\.(mp4|avi|mov|wmv|flv|mkv|webm|m4v)(\?|$)/i)) {
-    return MEDIA_TYPE.VIDEO;
-  }
-  
-  // Проверяем на аудио
-  if (lowerMessage.match(/\.(mp3|wav|ogg|m4a|aac|flac|wma|opus)(\?|$)/i)) {
-    return MEDIA_TYPE.AUDIO;
-  }
-  
-  return null;
-};
-
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const navigate = useNavigate();
 
@@ -172,25 +148,11 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
         <Flex justify="space-between" gap="6" align="center">
           <Box mt="4px" w="60%">
-            {(() => {
-              // Сначала проверяем по типу сообщения
-              if (chat.last_message_type && MESSAGE_INDICATOR[chat.last_message_type]) {
-                return MESSAGE_INDICATOR[chat.last_message_type];
-              }
-              
-              // Если тип не определен, проверяем по расширению файла
-              const mediaTypeFromUrl = getMediaTypeFromUrl(chat.last_message);
-              if (mediaTypeFromUrl && MESSAGE_INDICATOR[mediaTypeFromUrl]) {
-                return MESSAGE_INDICATOR[mediaTypeFromUrl];
-              }
-              
-              // Если ничего не подошло - показываем текст
-              return (
-                <Text h="20px" c="dimmed" size="sm" truncate>
-                  {chat.last_message}
-                </Text>
-              );
-            })()}
+            {MESSAGE_INDICATOR[chat.last_message_type] || (
+              <Text h="20px" c="dimmed" size="sm" truncate>
+                {chat.last_message}
+              </Text>
+            )}
           </Box>
           <Text size="sm" c="dimmed">
             {formatDate ? formatDate.format("DD.MM.YYYY")
