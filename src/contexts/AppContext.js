@@ -390,58 +390,76 @@ export const AppProvider = ({ children }) => {
       }
 
 
-      // case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
-      //   const { ticket_id, ticket_ids } = message.data || {};
+      case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
+        const { ticket_id, ticket_ids, tickets: ticketsList } = message.data || {};
 
-      //   const idsRaw = Array.isArray(ticket_ids)
-      //     ? ticket_ids
-      //     : (ticket_id ? [ticket_id] : []);
+        // Если пришел массив tickets с объектами
+        if (Array.isArray(ticketsList) && ticketsList.length > 0) {
+          ticketsList.forEach((ticketData) => {
+            const { id, technician_id, workflow } = ticketData;
+            
+            if (!id) return;
 
-      //   const ids = [...new Set(
-      //     idsRaw
-      //       .map((v) => Number(v))
-      //       .filter((v) => Number.isFinite(v))
-      //   )];
+            // Проверяем, совпадает ли technician_id с текущим userId (для не-админов)
+            const isResponsible = String(technician_id) === String(userId);
+            
+            // Проверяем, входит ли workflow в список доступных пользователю
+            const isWorkflowAllowed = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
 
-      //   if (!ids.length) {
-      //     break;
-      //   }
+            // Для админа: проверяем только workflow
+            // Для обычного пользователя: проверяем и technician_id, и workflow
+            const shouldFetch = isAdmin ? isWorkflowAllowed : (isResponsible && isWorkflowAllowed);
 
-      //   // console.log("🔄 TICKET_UPDATE received:", {
-      //   //   ids,
-      //   //   timestamp: new Date().toISOString()
-      //   // });
+            if (shouldFetch) {
+              // Получаем полный тикет
+              try {
+                fetchSingleTicket(id);
+              } catch (e) {
+                console.error(`Failed to fetch updated ticket ${id}:`, e);
+              }
+            } else {
+              // Условия не выполнены - удаляем тикет из списка
+              setTickets((prev) => prev.filter((t) => t.id !== id));
+              setChatFilteredTickets((prev) => prev.filter((t) => t.id !== id));
+              
+              // Уменьшаем счётчик непрочитанных, если тикет был непрочитан
+              const removedTicket = tickets.find(t => t.id === id);
+              if (removedTicket?.unseen_count > 0) {
+                setUnreadCount((prev) => Math.max(0, prev - removedTicket.unseen_count));
+              }
+            }
+          });
+        } 
+        // Старый формат с ticket_ids или ticket_id (без проверки technician_id)
+        else {
+          const idsRaw = Array.isArray(ticket_ids)
+            ? ticket_ids
+            : (ticket_id ? [ticket_id] : []);
 
-      //   // Проверяем, есть ли тикеты в нашем списке и обновляем их
-      //   ids.forEach((id) => {
-      //     const existsInTickets = tickets.some(t => t.id === id);
-      //     const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
-          
-      //   // console.log(`🔍 Checking ticket ${id}:`, {
-      //   //   existsInTickets,
-      //   //   existsInChatFiltered,
-      //   //   shouldUpdate: existsInTickets || existsInChatFiltered,
-      //   //   totalTickets: tickets.length,
-      //   //   totalChatFiltered: chatFilteredTickets.length
-      //   // });
+          const ids = [...new Set(
+            idsRaw
+              .map((v) => Number(v))
+              .filter((v) => Number.isFinite(v))
+          )];
 
-      //     if (existsInTickets || existsInChatFiltered) {
-      //       try {
-      //         fetchSingleTicket(id);
-      //       } catch (e) {
-      //         console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
-      //       }
-      //     } else {
-      //       try {
-      //         fetchSingleTicket(id);
-      //       } catch (e) {
-      //         console.error(`❌ Failed to fetch updated ticket ${id}:`, e);
-      //       }
-      //     }
-      //   });
+          if (ids.length > 0) {
+            ids.forEach((id) => {
+              const existsInTickets = tickets.some(t => t.id === id);
+              const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
 
-      //   break;
-      // }
+              if (existsInTickets || existsInChatFiltered) {
+                try {
+                  fetchSingleTicket(id);
+                } catch (e) {
+                  console.error(`Failed to fetch updated ticket ${id}:`, e);
+                }
+              }
+            });
+          }
+        }
+
+        break;
+      }
 
       default:
         // console.warn("Invalid socket message type:", message.type);
