@@ -301,7 +301,7 @@ export const userGroupsToGroupTitle = {
     "Front Office": ["MD"],
     "Distribution": [""],
     "Back Flagman": ["MD","RO"],
-    "Minions": ["MD","RO"],
+    "Back Minions": ["MD","RO"],
     "Back Headline": ["MD"],
     "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
 
