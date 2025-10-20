@@ -54,6 +54,8 @@ const wrapperColumn = forwardRef(({ style, ...rest }, ref) => (
   />
 ));
 
+wrapperColumn.displayName = 'WrapperColumn';
+
 export const WorkflowColumn = memo(({
   onEditTicket,
   searchTerm,
@@ -79,8 +81,14 @@ export const WorkflowColumn = memo(({
   );
 
   const setRowHeight = useCallback((index, size) => {
-    listRef.current.resetAfterIndex(0);
-    rowHeights.current = { ...rowHeights.current, [index]: size };
+    // Оптимизация: обновляем только если высота изменилась
+    if (rowHeights.current[index] !== size) {
+      rowHeights.current[index] = size;
+      // Сбрасываем кеш только с текущего индекса, не с 0
+      if (listRef.current) {
+        listRef.current.resetAfterIndex(index, false);
+      }
+    }
   }, []);
 
   const handleDeleteLead = useCallback((id) => {
@@ -112,10 +120,10 @@ export const WorkflowColumn = memo(({
 
     useEffect(() => {
       if (rowRef.current) {
-        setRowHeight(index, rowRef.current.clientHeight + SPACE_BETWEEN_CARDS);
+        const height = rowRef.current.clientHeight + SPACE_BETWEEN_CARDS;
+        setRowHeight(index, height);
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [rowRef, index, setRowHeight]);
+    }, [index, ticket.id]); // Зависим только от индекса и ID тикета
 
     return (
       <div style={style}>
@@ -130,6 +138,8 @@ export const WorkflowColumn = memo(({
       </div>
     );
   });
+
+  CardItem.displayName = 'WorkflowCardItem';
 
   return (
     <Flex
@@ -156,7 +166,9 @@ export const WorkflowColumn = memo(({
           itemSize={(index) =>
             rowHeights.current[index] || DEFAULT_TICKET_CARD_HEIGHT
           }
+          width="100%"
           innerElementType={wrapperColumn}
+          overscanCount={2}
         >
           {CardItem}
         </VariableSizeList>
@@ -164,3 +176,5 @@ export const WorkflowColumn = memo(({
     </Flex>
   );
 });
+
+WorkflowColumn.displayName = 'WorkflowColumn';
