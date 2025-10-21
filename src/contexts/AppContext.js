@@ -330,24 +330,27 @@ export const AppProvider = ({ children }) => {
       }
 
       case TYPE_SOCKET_EVENTS.SEEN: {
-        const { ticket_id, sender_id } = message.data;
-        const isSeenByAnotherUser = String(sender_id) !== String(userId);
+        const { ticket_id } = message.data;
+        
+        // Находим тикет и получаем количество непрочитанных сообщений
+        const ticket = tickets.find(t => t.id === ticket_id);
+        const unseenCount = ticket?.unseen_count || 0;
 
-        if (isSeenByAnotherUser) {
-          // Находим тикет и получаем количество непрочитанных сообщений
-          const ticket = tickets.find(t => t.id === ticket_id);
-          const unseenCount = ticket?.unseen_count || 0;
+        setTickets((prev) =>
+          prev.map((ticket) =>
+            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
+          )
+        );
 
-          setTickets((prev) =>
-            prev.map((ticket) =>
-              ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
-            )
-          );
+        setChatFilteredTickets((prev) =>
+          prev.map((ticket) =>
+            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
+          )
+        );
 
-          // Уменьшаем общий счетчик на количество прочитанных сообщений
-          if (unseenCount > 0) {
-            setUnreadCount((prev) => Math.max(0, prev - unseenCount));
-          }
+        // Уменьшаем общий счетчик на количество прочитанных сообщений
+        if (unseenCount > 0) {
+          setUnreadCount((prev) => Math.max(0, prev - unseenCount));
         }
 
         break;
