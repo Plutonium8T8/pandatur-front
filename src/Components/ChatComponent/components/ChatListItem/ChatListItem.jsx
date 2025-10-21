@@ -1,5 +1,5 @@
 import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
 import { IoIosVideocam } from "react-icons/io";
@@ -73,13 +73,7 @@ const MESSAGE_INDICATOR = {
 };
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
-  const navigate = useNavigate();
-
   const formatDate = parseServerDate(chat.time_sent);
-
-  const choseChat = async (id) => {
-    navigate(`/chat/${id}`);
-  };
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
   const getUserPhoto = () => {
@@ -104,16 +98,16 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
   return (
     <div style={style}>
-      <Box
-        py="10px"
-        pr="10px"
-        pl="10px"
-        key={chat.id}
-        className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
-        onClick={() => choseChat(chat.id)}
-        data-ticket-id={chat.id}
-        pos="relative"
-      >
+      <Link to={`/chat/${chat.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Box
+          py="10px"
+          pr="10px"
+          pl="10px"
+          key={chat.id}
+          className={`chat-item ${chat.id === selectTicketId ? "active" : ""} pointer`}
+          data-ticket-id={chat.id}
+          pos="relative"
+        >
         {chat.unseen_count > 0 && (
           <Box pos="absolute" right="6px" className="right">
             <Badge size="md" bg="red" circle className="right-count">
@@ -163,7 +157,8 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
               : null}
           </Text>
         </Flex>
-      </Box>
+        </Box>
+      </Link>
 
       <Divider color="var(--crm-ui-kit-palette-border-default)" />
     </div>
