@@ -77,6 +77,7 @@ export const Leads = () => {
     fetchKanbanTickets,
     currentFetchTickets,
     applyKanbanFilters,
+    refreshKanbanTickets,
     resetKanban,
     setKanbanFilters,
     setKanbanTickets,
@@ -484,6 +485,7 @@ export const Leads = () => {
           <WorkflowColumns
             kanbanFilterActive={kanbanFilterActive}
             fetchTickets={currentFetchTickets}
+            refreshKanbanTickets={refreshKanbanTickets}
             selectedWorkflow={choiceWorkflow}
             tickets={visibleTickets}
             searchTerm={debouncedSearch}
@@ -637,7 +639,14 @@ export const Leads = () => {
         <ManageLeadInfoTabs
           onClose={() => setIsModalOpen(false)}
           selectedTickets={selectedTickets}
-          fetchLeads={() => fetchHardTickets(currentPage)}
+          fetchLeads={async () => {
+            // Обновляем таблицу
+            await fetchHardTickets(currentPage);
+            // Обновляем канбан, если активен фильтр
+            if (kanbanFilterActive) {
+              refreshKanbanTickets();
+            }
+          }}
           id={selectedTickets.length === 1 ? selectedTickets[0] : currentTicket?.id}
         />
       </Modal>

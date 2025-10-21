@@ -63,6 +63,7 @@ export const WorkflowColumn = memo(({
   tickets,
   technicianList,
   fetchTickets,
+  refreshKanbanTickets,
 }) => {
   const columnRef = useRef(null);
   const columnHeight = useDOMElementHeight(columnRef);

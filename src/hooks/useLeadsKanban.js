@@ -110,6 +110,29 @@ export const useLeadsKanban = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedSearch, groupTitleForApi]);
 
+    // синхронизация локального состояния канбана с глобальным при обновлении тикетов
+    useEffect(() => {
+        if (kanbanFilterActive && kanbanTickets.length > 0) {
+            // Создаем Map для быстрого поиска обновленных тикетов
+            const globalTicketsMap = new Map(globalTickets.map(ticket => [ticket.id, ticket]));
+            
+            // Обновляем локальные тикеты, если они изменились в глобальном состоянии
+            setKanbanTickets(prevKanbanTickets => {
+                let hasChanges = false;
+                const updatedTickets = prevKanbanTickets.map(localTicket => {
+                    const globalTicket = globalTicketsMap.get(localTicket.id);
+                    if (globalTicket && JSON.stringify(localTicket) !== JSON.stringify(globalTicket)) {
+                        hasChanges = true;
+                        return globalTicket;
+                    }
+                    return localTicket;
+                });
+                
+                return hasChanges ? updatedTickets : prevKanbanTickets;
+            });
+        }
+    }, [globalTickets, kanbanFilterActive]);
+
     // вычисление видимых тикетов
     const visibleTickets = useMemo(() => {
         return (isSearching || kanbanSpinner || kanbanFilterActive) ? kanbanTickets : globalTickets;
@@ -126,6 +149,14 @@ export const useLeadsKanban = () => {
         setKanbanFilters(selectedFilters);
         setKanbanFilterActive(true);
     }, [setLightTicketFilters]);
+
+    // принудительное обновление отфильтрованных тикетов
+    const refreshKanbanTickets = useCallback(() => {
+        if (kanbanFilterActive) {
+            // Пересчитываем фильтры с текущими параметрами
+            fetchKanbanTickets(kanbanFilters);
+        }
+    }, [kanbanFilterActive, kanbanFilters, fetchKanbanTickets]);
 
     // полный сброс канбана (как в handleReset)
     const resetKanban = useCallback(() => {
@@ -155,6 +186,7 @@ export const useLeadsKanban = () => {
         fetchKanbanTickets,
         currentFetchTickets,
         applyKanbanFilters,
+        refreshKanbanTickets,
         resetKanban,
         setKanbanFilters,
         setKanbanTickets,

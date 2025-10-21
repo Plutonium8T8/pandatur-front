@@ -9,6 +9,7 @@ export const WorkflowColumns = ({
   searchTerm,
   onEditTicket,
   fetchTickets,
+  refreshKanbanTickets,
   kanbanFilterActive,
   selectedWorkflow,
 }) => {
@@ -84,6 +85,7 @@ export const WorkflowColumns = ({
             onEditTicket={onEditTicket}
             technicianList={technicians}
             fetchTickets={fetchTickets}
+            refreshKanbanTickets={refreshKanbanTickets}
           />
         ))}
       </Flex>
