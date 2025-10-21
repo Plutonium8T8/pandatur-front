@@ -74,8 +74,6 @@ export const useMessages = () => {
     setMessages((prevMessages) => {
       if (!message?.message_id) {
         // Если нет message_id - просто добавляем (старая логика для совместимости)
-        // eslint-disable-next-line no-console
-        console.warn('⚠️ Сообщение без message_id, добавляем в конец:', message);
         return [...prevMessages, message];
       }
 
@@ -98,32 +96,11 @@ export const useMessages = () => {
           call_metadata: message.call_metadata || existingMsg.call_metadata,
         };
         
-        // eslint-disable-next-line no-console
-        console.log(`🔄 Обновлено сообщение #${message.message_id}:`, {
-          was: existingMsg.mtype === MEDIA_TYPE.CALL ? `${existingMsg.call_metadata?.status} (${existingMsg.message ? 'с записью' : 'без записи'})` : existingMsg.mtype,
-          now: message.mtype === MEDIA_TYPE.CALL ? `${message.call_metadata?.status} (${message.message ? 'с записью' : 'без записи'})` : message.mtype,
-        });
-        
         return updated;
       }
 
       // Если сообщения нет - добавляем новое в конец списка
-      // eslint-disable-next-line no-console
-      console.log(`➕ Добавлено новое сообщение #${message.message_id}:`, 
-        message.mtype === MEDIA_TYPE.CALL ? `${message.call_metadata?.status} (${message.message ? 'с записью' : 'без записи'})` : message.mtype
-      );
-      const newMessages = [...prevMessages, message];
-      
-      // Проверяем на дубли
-      const callsInList = newMessages.filter(m => m.mtype === MEDIA_TYPE.CALL && m.ticket_id === message.ticket_id);
-      if (callsInList.length > 1 && message.mtype === MEDIA_TYPE.CALL) {
-        // eslint-disable-next-line no-console
-        console.warn(`⚠️ ВНИМАНИЕ: В списке ${callsInList.length} звонков для ticket #${message.ticket_id}:`, 
-          callsInList.map(c => ({ id: c.message_id, status: c.call_metadata?.status }))
-        );
-      }
-      
-      return newMessages;
+      return [...prevMessages, message];
     });
     
     // Обновляем mediaFiles если это медиа-сообщение

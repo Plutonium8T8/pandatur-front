@@ -83,7 +83,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
   // Объединяем отфильтрованные email с остальными сообщениями
   const messages = useMemo(() => {
-    const allMessages = [...emailMessages, ...nonEmailMessages].map((msg) => {
+    return [...emailMessages, ...nonEmailMessages].map((msg) => {
       const d = toDate(msg.time_sent) || new Date(0);
       const dj = dayjs(d);
       return {
@@ -95,22 +95,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         platform: msg.platform?.toLowerCase?.() || "",
       };
     });
-    
-    // Логируем звонки для отладки
-    const calls = allMessages.filter(m => m.mtype === MEDIA_TYPE.CALL);
-    if (calls.length > 0) {
-      // eslint-disable-next-line no-console
-      console.log(`📊 GroupedMessages: Всего звонков в списке: ${calls.length}`, 
-        calls.map(c => ({
-          id: c.message_id,
-          status: c.call_metadata?.status,
-          time: c.time_sent,
-          hasRecording: !!c.message
-        }))
-      );
-    }
-    
-    return allMessages;
   }, [emailMessages, nonEmailMessages]);
 
   // логи (мердж статики и live)
