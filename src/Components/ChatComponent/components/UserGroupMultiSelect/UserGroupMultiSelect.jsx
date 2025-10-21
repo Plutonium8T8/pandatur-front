@@ -27,6 +27,11 @@ export const UserGroupMultiSelect = ({
     ? (placeholder === "Select users and groups" ? "Select user" : placeholder)
     : placeholder;
 
+  // Функция для создания краткого имени для pills
+  const getShortName = (user) => {
+    return `${user.id.name} ${user.id.surname}`.trim();
+  };
+
   // Создаем опции для мультиселекта из реальных данных
   const options = useMemo(() => {
     // Если есть отформатированные данные из useGetTechniciansList, используем их
@@ -58,10 +63,29 @@ export const UserGroupMultiSelect = ({
           }
 
           // В режиме single отключаем группы, в режиме multi делаем их выбираемыми
-          return {
-            ...item,
-            disabled: isGroup ? (mode === "single") : false
-          };
+          if (isGroup) {
+            return {
+              ...item,
+              disabled: mode === "single"
+            };
+          } else {
+            // Для пользователей добавляем SIP ID и ID техника из techniciansData
+            let enhancedLabel = item.label;
+
+            // Используем данные из techniciansData, так как usersData пустой
+            if (item.sipuni_id || item.id) {
+              const sipuniId = item.sipuni_id ? ` (SIP: ${item.sipuni_id})` : '';
+              const userId = item.id?.id ? ` (ID: ${item.id.id})` : '';
+              const name = item.id ? `${item.id.name} ${item.id.surname}`.trim() : item.label;
+              enhancedLabel = name + sipuniId + userId;
+            }
+
+            return {
+              ...item,
+              label: enhancedLabel,
+              disabled: false
+            };
+          }
         });
     }
 
@@ -102,9 +126,13 @@ export const UserGroupMultiSelect = ({
         );
 
         groupUsers.forEach(user => {
+          const name = `${user.id.name} ${user.id.surname}`.trim();
+          const sipuniId = user.sipuni_id ? ` (SIP: ${user.sipuni_id})` : '';
+          const userId = ` (ID: ${user.id.id})`;
+
           options.push({
             value: String(user.id.id),
-            label: `${user.id.name} ${user.id.surname}`.trim()
+            label: `${name}${sipuniId}${userId}`
           });
         });
       });
@@ -135,7 +163,7 @@ export const UserGroupMultiSelect = ({
 
       const userOptions = allUsers.map(user => ({
         value: `user_${user.id}`,
-        label: user.name,
+        label: `${user.name} (ID: ${user.id})`,
         isGroup: false,
         userId: user.id,
         groupId: user.groupId,
@@ -205,6 +233,7 @@ export const UserGroupMultiSelect = ({
     }
   };
 
+
   // Рендер элемента в выпадающем списке
   const renderOption = ({ option, checked }) => {
     const isGroup = option.value.startsWith("__group__");
@@ -266,16 +295,18 @@ export const UserGroupMultiSelect = ({
         ) : (
           <FaUser size={12} style={{ color: checked ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-secondary-light)" }} />
         )}
-        <Text
-          size="sm"
-          fw={isGroup ? 600 : 400}
-          style={{
-            color: checked ? "var(--crm-ui-kit-palette-link-primary)" : (isGroup ? "#4caf50" : "var(--crm-ui-kit-palette-text-primary)"),
-            fontWeight: checked ? 600 : (isGroup ? 600 : 400)
-          }}
-        >
-          {option.label}
-        </Text>
+        <Box style={{ flex: 1 }}>
+          <Text
+            size="sm"
+            fw={isGroup ? 600 : 400}
+            style={{
+              color: checked ? "var(--crm-ui-kit-palette-link-primary)" : (isGroup ? "#4caf50" : "var(--crm-ui-kit-palette-text-primary)"),
+              fontWeight: checked ? 600 : (isGroup ? 600 : 400)
+            }}
+          >
+            {option.label}
+          </Text>
+        </Box>
         {isGroup && (
           <Badge
             size="xs"
