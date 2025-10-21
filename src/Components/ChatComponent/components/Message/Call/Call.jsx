@@ -75,7 +75,7 @@ export const Call = ({
   // console.log("🎧 Аудио:", src);
 
   return (
-    <Box maw="700px" p="xs" mx="auto" className="call-message">
+    <Box maw="800px" p="xs" mx="auto" className="call-message">
       <Flex w="100%" gap="8" justify="space-between">
         <Flex gap="12" align="center" wrap="wrap">
           {statusInfo.icon}
