@@ -51,7 +51,6 @@ export const GeneralForm = ({ data, formInstance }) => {
   const isWorkflowDisabled = !isAdmin && isFinalWorkflow;
 
   const filteredWorkflowOptions = workflowOptions
-    .filter((w) => isAdmin || w !== "Realizat cu succes")
     .map((w) => ({ value: w, label: w }));
 
   return (
