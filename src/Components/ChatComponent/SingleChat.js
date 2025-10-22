@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
-import { useApp, useFetchTicketChat, useMessagesContext } from "@hooks";
+import { useApp, useClientContacts, useMessagesContext } from "@hooks";
 import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
@@ -11,18 +11,17 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { setTickets, tickets } = useApp();
   const { getUserMessages } = useMessagesContext();
 
+  const currentTicket = tickets.find(t => t.id === Number(ticketId));
+  
   const {
-    personalInfo,
-    messageSendersByPlatform,
+    clientContacts,
+    selectedClient,
     loading,
-    selectedUser,
-    changeUser,
-    setPersonalInfo,
-    setMessageSendersByPlatform,
-    setSelectedUser,
-  } = useFetchTicketChat(ticketId);
+    changeClient,
+    updateClientData,
+  } = useClientContacts(ticketId, currentTicket);
 
-  const responsibleId = personalInfo?.technician_id?.toString() ?? null;
+  const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
   useEffect(() => {
     if (ticketId) {
@@ -42,11 +41,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       <Can permission={{ module: "chat", action: "edit" }} context={{ responsibleId }}>
         <Flex w="70%">
           <ChatMessages
-            selectedClient={selectedUser}
+            selectedClient={selectedClient}
             ticketId={ticketId ? Number(ticketId) : undefined}
-            personalInfo={personalInfo}
-            messageSendersByPlatform={messageSendersByPlatform || []}
-            onChangeSelectedUser={changeUser}
+            personalInfo={currentTicket}
+            messageSendersByPlatform={clientContacts || []}
+            onChangeSelectedUser={changeClient}
             loading={loading}
             technicians={technicians}
             unseenCount={unseenCount}
@@ -55,47 +54,10 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       </Can>
       <Can permission={{ module: "chat", action: "edit" }} context={{ responsibleId }}>
         <ChatExtraInfo
-          technicians={technicians}
-          selectedUser={selectedUser}
+          selectedClient={selectedClient}
           ticketId={ticketId}
-          updatedTicket={personalInfo}
-          onUpdatePersonalInfo={(payload, values) => {
-            const identifier =
-              getFullName(values.name, values.surname) || `#${payload.id}`;
-            const clientTicketList = personalInfo.clients.map((client) =>
-              client.id === payload.id
-                ? { ...client, ...values }
-                : client,
-            );
-            setSelectedUser((prev) => ({
-              ...prev,
-              label: identifier,
-              payload: { ...prev.payload, ...values },
-            }));
-            setMessageSendersByPlatform((prev) =>
-              prev.map((client) =>
-                client.payload.id === payload.id &&
-                  client.payload.platform === payload.platform
-                  ? {
-                    ...client,
-                    label: `${identifier} - ${payload.platform}`,
-                    payload: { ...payload, ...values },
-                  }
-                  : client,
-              ),
-            );
-            setTickets((prev) =>
-              prev.map((ticket) =>
-                ticket.id === personalInfo.id
-                  ? { ...ticket, ...personalInfo, clients: clientTicketList }
-                  : ticket,
-              ),
-            );
-            setPersonalInfo((prev) => ({
-              ...prev,
-              clients: clientTicketList,
-            }));
-          }}
+          updatedTicket={currentTicket}
+          onUpdateClientData={updateClientData}
         />
       </Can>
     </div>

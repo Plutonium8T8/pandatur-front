@@ -13,7 +13,7 @@ import { LuPlus } from "react-icons/lu";
 import { api } from "../../../api";
 import { useSnackbar } from "notistack";
 
-export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
+export const PersonalData4ClientForm = ({ formInstance, data, ticketId, onUpdateClientData }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [showSave, setShowSave] = useState(false);
   const [phoneValue, setPhoneValue] = useState("");
@@ -30,7 +30,7 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
       formInstance.setValues(values);
       setPhoneValue(values.phone);
     }
-  }, [data, showSave]);
+  }, [data, showSave, formInstance, ticketId]);
 
   const handleAddClient = () => {
     formInstance.setValues({ name: "", surname: "", phone: "", email: "" });
@@ -49,6 +49,16 @@ export const PersonalData4ClientForm = ({ formInstance, data, ticketId }) => {
         phone: values.phone,
         email: values.email,
       });
+
+      // Обновляем данные клиента в родительском компоненте
+      if (onUpdateClientData && data?.id) {
+        onUpdateClientData(data.id, data.platform, {
+          name: values.name,
+          surname: values.surname,
+          phone: values.phone,
+          email: values.email,
+        });
+      }
 
       // Диспатчим событие для обновления данных тикета и клиентов
       window.dispatchEvent(new CustomEvent('ticketUpdated', {

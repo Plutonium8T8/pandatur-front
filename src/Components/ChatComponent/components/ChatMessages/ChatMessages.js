@@ -255,6 +255,12 @@ export const ChatMessages = ({
           />
 
           <div style={{ flexShrink: 0 }}>
+            {console.log("🔍 ChatMessages - Passing to ChatInput:", {
+              loading,
+              clientList: messageSendersByPlatform,
+              currentClient: selectedClient,
+              personalInfo
+            })}
             <ChatInput
               loading={loading}
               id={ticketId}
@@ -279,8 +285,7 @@ export const ChatMessages = ({
               }}
               onChangeClient={(value) => {
                 if (!value) return;
-                const [clientId, platform] = value.split("-");
-                onChangeSelectedUser(Number(clientId), platform);
+                onChangeSelectedUser(value);
               }}
             />
           </div>

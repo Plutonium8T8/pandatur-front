@@ -15,7 +15,6 @@ import { api } from "../../api";
 import {
   useFormTicket,
   useApp,
-  useFetchTicketChat,
   useMessagesContext,
 } from "@hooks";
 import { PersonalData4ClientForm, Merge, Media } from "./components";
@@ -29,10 +28,10 @@ import { InvoiceTab } from "./components";
 
 const ChatExtraInfo = ({
   selectTicketId,
-  onUpdatePersonalInfo,
   updatedTicket,
   ticketId,
-  selectedUser,
+  selectedClient,
+  onUpdateClientData,
 }) => {
   const [extraInfo, setExtraInfo] = useState({});
   const [isLoadingExtraInfo, setIsLoadingExtraInfo] = useState(true);
@@ -43,7 +42,6 @@ const ChatExtraInfo = ({
 
   const { setTickets } = useApp();
   const { getUserMessages, mediaFiles } = useMessagesContext();
-  const { getTicket } = useFetchTicketChat(ticketId);
 
   const {
     form,
@@ -74,12 +72,12 @@ const ChatExtraInfo = ({
    */
   const fetchTicketLight = useCallback(async (mergedTicketId) => {
     try {
-      await Promise.all([getTicket(), getUserMessages(ticketId)]);
+      await getUserMessages(ticketId);
       setTickets((prev) => prev.filter(({ id }) => id !== mergedTicketId));
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }, [getTicket, getUserMessages, ticketId, setTickets]);
+  }, [getUserMessages, ticketId, setTickets]);
 
   const updateTicketDate = async (values) => {
     if (form.validate().hasErrors) {
@@ -164,7 +162,7 @@ const ChatExtraInfo = ({
     setIsLoadingClient(true);
     try {
       await api.users.clientMerge({
-        old_user_id: selectedUser.payload?.id,
+        old_user_id: selectedClient.payload?.id,
         new_user_id: id,
       });
 
@@ -210,7 +208,7 @@ const ChatExtraInfo = ({
   const handleUpdateTicketDate = useCallback(updateTicketDate, [form, ticketId]);
   const handleSaveTicketExtraDate = useCallback(saveTicketExtraDate, []);
   const handleMergeClientsData = useCallback(mergeClientsData, [ticketId, fetchTicketLight]);
-  const handleMergeData = useCallback(mergeData, [selectedUser.payload?.id]);
+  const handleMergeData = useCallback(mergeData, [selectedClient.payload?.id]);
 
   const handleSubmitAllForms = async () => {
     const values = form.getValues();
@@ -257,12 +255,12 @@ const ChatExtraInfo = ({
         ...generalFields,
       });
 
-      await api.users.getUsersClientContacts(selectedUser.payload?.id, {
+      // Обновляем данные клиента через новый API метод
+      await api.users.updateUser(selectedClient.payload?.id, {
         name,
         surname,
         phone,
         email,
-        ticket_id
       });
 
       await api.tickets.ticket.create(ticketId, extraFields);
@@ -371,10 +369,11 @@ const ChatExtraInfo = ({
             <Divider my="md" size="md" />
 
             <PersonalData4ClientForm
-              key={`personal-${selectedUser.payload?.id}-${ticketId}`}
+              key={`personal-${selectedClient.payload?.id}-${ticketId}`}
               formInstance={form}
-              data={selectedUser.payload}
+              data={selectedClient.payload}
               ticketId={ticketId}
+              onUpdateClientData={onUpdateClientData}
             />
 
             <Divider my="md" size="md" />
@@ -394,10 +393,10 @@ const ChatExtraInfo = ({
 
             <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
               <Merge
-                key={`merge-clients-${selectedUser.payload?.id}`}
+                key={`merge-clients-${selectedClient.payload?.id}`}
                 buttonText={getLanguageByKey("combineClient")}
                 loading={isLoadingCombineClient}
-                value={selectedUser.payload?.id || ""}
+                value={selectedClient.payload?.id || ""}
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => handleMergeData(values)}
               />
@@ -429,7 +428,7 @@ const ChatExtraInfo = ({
 
         <Tabs.Panel value="documents">
           <Box p="md">
-            <InvoiceTab extraInfo={extraInfo} clientInfo={selectedUser.payload} />
+            <InvoiceTab extraInfo={extraInfo} clientInfo={selectedClient.payload} />
           </Box>
         </Tabs.Panel>
 

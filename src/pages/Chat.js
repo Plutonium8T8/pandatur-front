@@ -2,16 +2,16 @@ import React, { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useFetchTicketChat } from "@hooks";
+import { useApp, useClientContacts } from "@hooks";
 import { useGetTechniciansList } from "../hooks";
 import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
 import ChatList from "../Components/ChatComponent/ChatList";
-import { getFullName } from "@utils";
 import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";
 import Can from "@components/CanComponent/Can";
+import { ClientContactsDebug } from "../debug/ClientContactsDebug";
 
 export const Chat = () => {
-  const { tickets, setTickets } = useApp();
+  const { tickets } = useApp();
   const { ticketId: ticketIdParam } = useParams();
   const ticketId = useMemo(() => {
     const parsed = Number(ticketIdParam);
@@ -21,28 +21,34 @@ export const Chat = () => {
   const { technicians } = useGetTechniciansList();
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
+  const currentTicket = useMemo(() => {
+    const found = tickets?.find((t) => t.id === ticketId);
+    console.log("🎫 Chat - currentTicket:", { 
+      ticketId, 
+      ticketsCount: tickets?.length, 
+      currentTicket: found,
+      client_id: found?.client_id 
+    });
+    return found;
+  }, [tickets, ticketId]);
+
   const {
-    personalInfo,
-    messageSendersByPlatform,
+    clientContacts,
+    selectedClient,
     loading,
-    selectedUser,
-    changeUser,
-    setPersonalInfo,
-    setMessageSendersByPlatform,
-    setSelectedUser,
-  } = useFetchTicketChat(ticketId);
+    changeClient,
+    updateClientData,
+  } = useClientContacts(ticketId, currentTicket);
 
-  const currentChat = useMemo(
-    () => tickets?.find((t) => t.id === ticketId),
-    [tickets, ticketId]
-  );
-
-  const responsibleId = personalInfo?.technician_id?.toString() ?? null;
+  const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
   return (
     <Flex h="100%" className="chat-wrapper">
       <Flex w="100%" h="100%" className="chat-container">
         {isChatListVisible && <ChatList ticketId={ticketId} />}
+        
+        {/* Debug component - remove in production */}
+        {/* {ticketId && <ClientContactsDebug ticketId={ticketId} />} */}
 
         <Can
           permission={{ module: "chat", action: "edit" }}
@@ -64,13 +70,13 @@ export const Chat = () => {
 
             <ChatMessages
               ticketId={ticketId}
-              selectedClient={selectedUser}
-              personalInfo={personalInfo}
-              messageSendersByPlatform={messageSendersByPlatform || []}
-              onChangeSelectedUser={changeUser}
+              selectedClient={selectedClient}
+              personalInfo={currentTicket}
+              messageSendersByPlatform={clientContacts || []}
+              onChangeSelectedUser={changeClient}
               loading={loading}
               technicians={technicians}
-              unseenCount={currentChat?.unseen_count || 0}
+              unseenCount={currentTicket?.unseen_count || 0}
             />
           </Flex>
         </Can>
@@ -81,54 +87,10 @@ export const Chat = () => {
             context={{ responsibleId }}
           >
             <ChatExtraInfo
-              selectedUser={selectedUser}
+              selectedClient={selectedClient}
               ticketId={ticketId}
-              updatedTicket={personalInfo}
-              onUpdatePersonalInfo={(payload, values) => {
-                const identifier =
-                  getFullName(values.name, values.surname) || `#${payload.id}`;
-                const clientTicketList = personalInfo.clients.map((client) =>
-                  client.id === payload.id
-                    ? { ...client, ...values }
-                    : client
-                );
-
-                setSelectedUser((prev) => ({
-                  ...prev,
-                  label: identifier,
-                  payload: { ...prev.payload, ...values },
-                }));
-
-                setMessageSendersByPlatform((prev) =>
-                  prev.map((client) =>
-                    client.payload.id === payload.id &&
-                      client.payload.platform === payload.platform
-                      ? {
-                        ...client,
-                        label: `${identifier} - ${payload.platform}`,
-                        payload: { ...payload, ...values },
-                      }
-                      : client
-                  )
-                );
-
-                setTickets((prev) =>
-                  prev.map((ticket) =>
-                    ticket.id === personalInfo.id
-                      ? {
-                        ...ticket,
-                        ...personalInfo,
-                        clients: clientTicketList,
-                      }
-                      : ticket
-                  )
-                );
-
-                setPersonalInfo((prev) => ({
-                  ...prev,
-                  clients: clientTicketList,
-                }));
-              }}
+              updatedTicket={currentTicket}
+              onUpdateClientData={updateClientData}
             />
           </Can>
         )}
