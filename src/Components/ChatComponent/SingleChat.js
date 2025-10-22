@@ -4,22 +4,24 @@ import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useApp, useClientContacts, useMessagesContext } from "@hooks";
-import { getFullName } from "@utils";
 import Can from "@components/CanComponent/Can";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
-  const { setTickets, tickets } = useApp();
+  const { tickets } = useApp();
   const { getUserMessages } = useMessagesContext();
 
   const currentTicket = tickets.find(t => t.id === Number(ticketId));
   
   const {
-    clientContacts,
+    platformOptions,
+    selectedPlatform,
+    changePlatform,
+    contactOptions,
+    changeContact,
     selectedClient,
     loading,
-    changeClient,
     updateClientData,
-  } = useClientContacts(ticketId, currentTicket);
+  } = useClientContacts(ticketId);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
@@ -27,7 +29,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     if (ticketId) {
       getUserMessages(Number(ticketId));
     }
-  }, [ticketId]);
+  }, [ticketId, getUserMessages]);
 
   const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
 
@@ -44,8 +46,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             selectedClient={selectedClient}
             ticketId={ticketId ? Number(ticketId) : undefined}
             personalInfo={currentTicket}
-            messageSendersByPlatform={clientContacts || []}
-            onChangeSelectedUser={changeClient}
+            platformOptions={platformOptions}
+            selectedPlatform={selectedPlatform}
+            changePlatform={changePlatform}
+            contactOptions={contactOptions}
+            changeContact={changeContact}
             loading={loading}
             technicians={technicians}
             unseenCount={unseenCount}

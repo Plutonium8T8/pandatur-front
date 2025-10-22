@@ -1,200 +1,82 @@
 import { useState, useEffect, useCallback } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
-import { extractNumbers, showServerError, getFullName } from "@utils";
+import { showServerError, getFullName } from "@utils";
 
-const normalizeClientContacts = (clientData, contactsResponse) => {
-  if (!clientData || !contactsResponse) return [];
+const normalizeClientContacts = (ticketData) => {
+  if (!ticketData?.clients) return [];
   
-  const { id, name, surname, photo } = clientData;
-  
-  // Собираем уникальные платформы (типы контактов)
+  // Собираем уникальные платформы из всех клиентов
   const platforms = new Set();
   
-  // Добавляем платформы из всех массивов контактов
-  if (contactsResponse.phones?.length > 0) platforms.add('phone');
-  if (contactsResponse.emails?.length > 0) platforms.add('email');
-  if (contactsResponse.instagram?.length > 0) platforms.add('instagram');
-  if (contactsResponse.facebook?.length > 0) platforms.add('facebook');
-  if (contactsResponse.telegram?.length > 0) platforms.add('telegram');
-  
-  const identifier = getFullName(name, surname) || `#${id}`;
+  // Проходим по всем клиентам и собираем платформы
+  ticketData.clients.forEach(client => {
+    if (client.contacts) {
+      client.contacts.forEach(contact => {
+        platforms.add(contact.contact_type);
+      });
+    }
+  });
   
   // Создаем опции для каждой платформы
   return Array.from(platforms).map(platform => {
-    // Находим основной контакт для этой платформы
-    const platformContacts = [
-      ...(contactsResponse.phones || []),
-      ...(contactsResponse.emails || []),
-      ...(contactsResponse.instagram || []),
-      ...(contactsResponse.facebook || []),
-      ...(contactsResponse.telegram || []),
-    ].filter(contact => contact.contact_type === platform);
+    // Собираем всех клиентов с контактами этой платформы
+    const platformClients = ticketData.clients.filter(client => 
+      client.contacts?.some(contact => contact.contact_type === platform)
+    );
     
-    const primaryContact = platformContacts.find(contact => contact.is_primary) || platformContacts[0];
+    // Создаем все контакты для этой платформы
+    const allContacts = platformClients.flatMap(client => 
+      client.contacts
+        .filter(contact => contact.contact_type === platform)
+        .map(contact => ({
+          ...contact,
+          client_id: client.id,
+          client_name: client.name,
+          client_surname: client.surname,
+          client_photo: client.photo
+        }))
+    );
     
     return {
-      label: `${identifier} - ${platform}`,
-      value: `${id}-${platform}`,
+      label: platform,
+      value: platform,
       payload: {
-        id: id,
         platform: platform,
-        name: name,
-        surname: surname,
-        phone: platform === 'phone' ? primaryContact?.contact_value : '',
-        email: platform === 'email' ? primaryContact?.contact_value : '',
-        contact_value: primaryContact?.contact_value || '',
-        is_primary: primaryContact?.is_primary || false,
-        photo: photo,
-        allContacts: platformContacts // Сохраняем все контакты этой платформы
+        allContacts: allContacts
       },
     };
   });
 };
 
-export const useClientContacts = (ticketId, ticketData) => {
+export const useClientContacts = (ticketId) => {
   const { enqueueSnackbar } = useSnackbar();
   
-  const [clientContacts, setClientContacts] = useState([]);
+  const [platformOptions, setPlatformOptions] = useState([]);
+  const [selectedPlatform, setSelectedPlatform] = useState(null);
+  const [contactOptions, setContactOptions] = useState([]);
   const [selectedClient, setSelectedClient] = useState({});
   const [loading, setLoading] = useState(false);
+  const [ticketData, setTicketData] = useState(null);
 
   const fetchClientContacts = useCallback(async () => {
-    console.log("🔍 useClientContacts - fetchClientContacts called:", {
-      ticketId,
-      ticketData,
-      client_id: ticketData?.client_id
-    });
-    
     if (!ticketId) {
-      console.log("❌ Missing ticketId:", { ticketId });
-      return;
-    }
-    
-    if (!ticketData) {
-      console.log("⏳ Ticket data not loaded yet, waiting...");
-      return;
-    }
-    
-    // Проверяем, есть ли client_id или clients в тикете
-    if (!ticketData.client_id && !ticketData.clients?.length) {
-      console.log("❌ No client_id or clients in ticket data:", { 
-        ticketData,
-        availableKeys: Object.keys(ticketData),
-        client_id: ticketData.client_id,
-        clients: ticketData.clients
-      });
-      return;
-    }
-    
-    // Если есть clients в тикете, используем их напрямую
-    if (ticketData.clients?.length > 0) {
-      console.log("✅ Using clients from ticket data:", ticketData.clients);
-      
-      setLoading(true);
-      try {
-        // Загружаем контакты для каждого клиента
-        const clientsData = await Promise.all(
-          ticketData.clients.map(async (client) => {
-            console.log("🔄 Fetching contacts for client:", client.id);
-            const contactsResponse = await api.users.getUsersClientContacts(client.id);
-            console.log("📊 Client contacts response:", { 
-              clientId: client.id, 
-              contactsResponse,
-              phonesCount: contactsResponse?.phones?.length || 0,
-              emailsCount: contactsResponse?.emails?.length || 0,
-              instagramCount: contactsResponse?.instagram?.length || 0,
-              facebookCount: contactsResponse?.facebook?.length || 0,
-              telegramCount: contactsResponse?.telegram?.length || 0
-            });
-            
-            return {
-              clientData: client,
-              contactsResponse: contactsResponse || {}
-            };
-          })
-        );
-        
-        // Нормализуем данные для каждого клиента
-        const allContacts = clientsData.flatMap(({ clientData, contactsResponse }) => 
-          normalizeClientContacts(clientData, contactsResponse)
-        );
-        
-        console.log("🎯 Normalized contacts from ticket clients:", allContacts);
-        
-        setClientContacts(allContacts);
-        
-        // Выбираем первого клиента по умолчанию
-        if (allContacts.length > 0) {
-          console.log("✅ Setting first client as selected:", allContacts[0]);
-          setSelectedClient(allContacts[0]);
-        } else {
-          console.log("❌ No contacts found after normalization");
-        }
-        
-      } catch (error) {
-        enqueueSnackbar(showServerError(error), {
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
       return;
     }
     
     setLoading(true);
     try {
-      // Извлекаем ID клиентов из тикета
-      const clientIds = extractNumbers(ticketData.client_id);
-      console.log("📋 Extracted client IDs:", clientIds);
+      // Используем новый API для получения клиентов по платформам
+      const response = await api.users.getUsersClientContactsByPlatform(ticketId);
       
-      if (clientIds.length === 0) {
-        console.log("❌ No client IDs found in:", ticketData.client_id);
-        return;
-      }
+      // Нормализуем данные для платформ
+      const platforms = normalizeClientContacts(response);
+      setPlatformOptions(platforms);
+      setTicketData(response);
       
-      // Загружаем данные клиентов и их контакты
-      const clientsData = await Promise.all(
-        clientIds.map(async (clientId) => {
-          console.log("🔄 Fetching data for client ID:", clientId);
-          const [clientData, contactsResponse] = await Promise.all([
-            api.users.getUsersClientById(clientId),
-            api.users.getUsersClientContacts(clientId)
-          ]);
-          
-          console.log("📊 Client data:", { 
-            clientId, 
-            clientData, 
-            contactsResponse,
-            phonesCount: contactsResponse?.phones?.length || 0,
-            emailsCount: contactsResponse?.emails?.length || 0,
-            instagramCount: contactsResponse?.instagram?.length || 0,
-            facebookCount: contactsResponse?.facebook?.length || 0,
-            telegramCount: contactsResponse?.telegram?.length || 0
-          });
-          
-          return {
-            clientData,
-            contactsResponse: contactsResponse || {}
-          };
-        })
-      );
-      
-      // Нормализуем данные для каждого клиента
-      const allContacts = clientsData.flatMap(({ clientData, contactsResponse }) => 
-        normalizeClientContacts(clientData, contactsResponse)
-      );
-      
-      console.log("🎯 Normalized contacts:", allContacts);
-      
-      setClientContacts(allContacts);
-      
-      // Выбираем первого клиента по умолчанию
-      if (allContacts.length > 0) {
-        console.log("✅ Setting first client as selected:", allContacts[0]);
-        setSelectedClient(allContacts[0]);
-      } else {
-        console.log("❌ No contacts found after normalization");
+      // Выбираем первую платформу по умолчанию
+      if (platforms.length > 0) {
+        setSelectedPlatform(platforms[0].value);
       }
       
     } catch (error) {
@@ -204,49 +86,117 @@ export const useClientContacts = (ticketId, ticketData) => {
     } finally {
       setLoading(false);
     }
-  }, [ticketId, ticketData, enqueueSnackbar]);
+  }, [ticketId, enqueueSnackbar]);
 
-  const changeClient = useCallback((value) => {
-    // value теперь в формате "clientId-platform"
-    const client = clientContacts.find(
-      ({ value: clientValue }) => clientValue === value
+  const updateContactOptions = useCallback((platform) => {
+    if (!ticketData?.clients) {
+      setContactOptions([]);
+      return;
+    }
+
+    // Собираем всех клиентов с контактами выбранной платформы
+    const platformClients = ticketData.clients.filter(client => 
+      client.contacts?.some(contact => contact.contact_type === platform)
     );
     
-    if (client) {
-      setSelectedClient(client);
+    // Создаем опции контактов для выбранной платформы
+    const contacts = platformClients.flatMap(client => 
+      client.contacts
+        .filter(contact => contact.contact_type === platform)
+        .map(contact => {
+          const clientName = getFullName(client.name, client.surname) || `#${client.id}`;
+          
+          // Форматируем лейбл в зависимости от платформы
+          let label;
+          if (['phone', 'telegram', 'whatsapp', 'viber'].includes(platform)) {
+            label = `${platform} - ${clientName} - ${contact.contact_value}${contact.is_primary ? ' (Primary)' : ''}`;
+          } else {
+            label = `${platform} - ${clientName}${contact.is_primary ? ' (Primary)' : ''}`;
+          }
+          
+          return {
+            label,
+            value: `${client.id}-${contact.id}`,
+            payload: {
+              id: client.id,
+              contact_id: contact.id,
+              platform: platform,
+              name: client.name,
+              surname: client.surname,
+              phone: platform === 'phone' ? contact.contact_value : '',
+              email: platform === 'email' ? contact.contact_value : '',
+              contact_value: contact.contact_value,
+              is_primary: contact.is_primary,
+              photo: client.photo
+            },
+          };
+        })
+    );
+    
+    setContactOptions(contacts);
+  }, [ticketData]);
+
+  const changePlatform = useCallback((platform) => {
+    setSelectedPlatform(platform);
+    updateContactOptions(platform);
+    setSelectedClient({}); // Сбрасываем выбранный контакт
+  }, [updateContactOptions]);
+
+  const changeContact = useCallback((value) => {
+    const contact = contactOptions.find(option => option.value === value);
+    if (contact) {
+      setSelectedClient(contact);
     }
-  }, [clientContacts]);
+  }, [contactOptions]);
 
   const updateClientData = useCallback((clientId, platform, newData) => {
-    setClientContacts(prev => 
-      prev.map(client => 
-        client.payload.id === clientId && client.payload.platform === platform
-          ? {
-              ...client,
-              payload: { ...client.payload, ...newData }
-            }
-          : client
-      )
-    );
+    // Обновляем данные в ticketData
+    setTicketData(prev => {
+      if (!prev?.clients) return prev;
+      
+      return {
+        ...prev,
+        clients: prev.clients.map(client => 
+          client.id === clientId
+            ? {
+                ...client,
+                name: newData.name || client.name,
+                surname: newData.surname || client.surname,
+                phone: newData.phone || client.phone,
+                email: newData.email || client.email
+              }
+            : client
+        )
+      };
+    });
     
     // Обновляем selectedClient если это тот же клиент
     setSelectedClient(prev => 
-      prev.payload.id === clientId && prev.payload.platform === platform
+      prev.payload?.id === clientId
         ? { ...prev, payload: { ...prev.payload, ...newData } }
         : prev
     );
   }, []);
 
+  // Обновляем опции контактов при изменении выбранной платформы
   useEffect(() => {
-    console.log("🔄 useClientContacts useEffect triggered:", { ticketId, ticketData });
+    if (selectedPlatform) {
+      updateContactOptions(selectedPlatform);
+    }
+  }, [selectedPlatform, updateContactOptions]);
+
+  useEffect(() => {
     fetchClientContacts();
-  }, [fetchClientContacts, ticketId, ticketData]);
+  }, [fetchClientContacts]);
 
   return {
-    clientContacts,
+    platformOptions,
+    selectedPlatform,
+    changePlatform,
+    contactOptions,
+    changeContact,
     selectedClient,
     loading,
-    changeClient,
     updateClientData,
     refetch: fetchClientContacts
   };

@@ -45,8 +45,11 @@ export const ChatMessages = ({
   ticketId,
   selectedClient,
   personalInfo,
-  messageSendersByPlatform,
-  onChangeSelectedUser,
+  platformOptions,
+  selectedPlatform,
+  changePlatform,
+  contactOptions,
+  changeContact,
   loading,
   technicians,
   unseenCount = 0,
@@ -255,16 +258,14 @@ export const ChatMessages = ({
           />
 
           <div style={{ flexShrink: 0 }}>
-            {console.log("🔍 ChatMessages - Passing to ChatInput:", {
-              loading,
-              clientList: messageSendersByPlatform,
-              currentClient: selectedClient,
-              personalInfo
-            })}
             <ChatInput
               loading={loading}
               id={ticketId}
-              clientList={messageSendersByPlatform}
+              platformOptions={platformOptions}
+              selectedPlatform={selectedPlatform}
+              changePlatform={changePlatform}
+              contactOptions={contactOptions}
+              changeContact={changeContact}
               ticketId={ticketId}
               unseenCount={unseenCount}
               currentClient={selectedClient}
@@ -282,10 +283,6 @@ export const ChatMessages = ({
                   messageStatus: MESSAGES_STATUS.PENDING,
                   ...value,
                 });
-              }}
-              onChangeClient={(value) => {
-                if (!value) return;
-                onChangeSelectedUser(value);
               }}
             />
           </div>

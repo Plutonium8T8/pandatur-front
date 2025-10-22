@@ -8,7 +8,6 @@ import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
 import ChatList from "../Components/ChatComponent/ChatList";
 import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";
 import Can from "@components/CanComponent/Can";
-import { ClientContactsDebug } from "../debug/ClientContactsDebug";
 
 export const Chat = () => {
   const { tickets } = useApp();
@@ -33,12 +32,15 @@ export const Chat = () => {
   }, [tickets, ticketId]);
 
   const {
-    clientContacts,
+    platformOptions,
+    selectedPlatform,
+    changePlatform,
+    contactOptions,
+    changeContact,
     selectedClient,
     loading,
-    changeClient,
     updateClientData,
-  } = useClientContacts(ticketId, currentTicket);
+  } = useClientContacts(ticketId);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
@@ -47,8 +49,6 @@ export const Chat = () => {
       <Flex w="100%" h="100%" className="chat-container">
         {isChatListVisible && <ChatList ticketId={ticketId} />}
         
-        {/* Debug component - remove in production */}
-        {/* {ticketId && <ClientContactsDebug ticketId={ticketId} />} */}
 
         <Can
           permission={{ module: "chat", action: "edit" }}
@@ -72,8 +72,11 @@ export const Chat = () => {
               ticketId={ticketId}
               selectedClient={selectedClient}
               personalInfo={currentTicket}
-              messageSendersByPlatform={clientContacts || []}
-              onChangeSelectedUser={changeClient}
+              platformOptions={platformOptions}
+              selectedPlatform={selectedPlatform}
+              changePlatform={changePlatform}
+              contactOptions={contactOptions}
+              changeContact={changeContact}
               loading={loading}
               technicians={technicians}
               unseenCount={currentTicket?.unseen_count || 0}

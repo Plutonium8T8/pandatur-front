@@ -33,8 +33,11 @@ import "./ChatInput.css";
 export const ChatInput = ({
   onSendMessage,
   onHandleFileSelect,
-  clientList,
-  onChangeClient,
+  platformOptions,
+  selectedPlatform,
+  changePlatform,
+  contactOptions,
+  changeContact,
   currentClient,
   loading,
   onCreateTask,
@@ -335,21 +338,92 @@ export const ChatInput = ({
               {loading ? (
                 <Loader size="xs" />
               ) : (
-                <Select
-                  className="w-full"
-                  onChange={onChangeClient}
-                  placeholder={getLanguageByKey("selectUser")}
-                  value={currentClient?.value}
-                  data={clientList}
-                  searchable
-                  clearable
-                  styles={{
-                    input: {
-                      fontSize: '14px',
-                      minHeight: '36px'
-                    }
-                  }}
-                />
+                <Flex direction="column" gap="xs" w="100%">
+                  {/* Первый ряд: Platform + Template */}
+                  <Flex gap="md" w="100%">
+                    {/* 1. Platform select */}
+                    <Select
+                      onChange={changePlatform}
+                      className="w-full"
+                      placeholder="Выберите платформу"
+                      value={selectedPlatform}
+                      data={platformOptions}
+                      searchable
+                      clearable
+                      label="Платформа"
+                      styles={{
+                        input: {
+                          fontSize: '16px',
+                          minHeight: '48px',
+                          padding: '12px 16px'
+                        }
+                      }}
+                    />
+                    
+                    {/* 2. Template select */}
+                    <Select
+                      searchable
+                      label="Шаблон"
+                      className="w-full"
+                      onChange={(value) => {
+                        setMessage(value ? templateOptions[value] : "");
+                        setTemplate(value);
+                      }}
+                      value={template}
+                      placeholder={getLanguageByKey("select_message_template")}
+                      data={Object.keys(templateOptions).map((key) => ({
+                        value: key,
+                        label: key,
+                      }))}
+                      styles={{
+                        input: {
+                          fontSize: '16px',
+                          minHeight: '48px',
+                          padding: '12px 16px'
+                        }
+                      }}
+                    />
+                  </Flex>
+                  
+                  {/* Второй ряд: User pick number + Void select */}
+                  <Flex gap="md" w="100%">
+                    {/* 3. User pick number (contact) */}
+                    <Select
+                      onChange={changeContact}
+                      placeholder="Выберите контакт"
+                      value={currentClient?.value}
+                      data={contactOptions}
+                      label="Контакт"
+                      className="w-full"
+                      searchable
+                      clearable
+                      disabled={!selectedPlatform}
+                      styles={{
+                        input: {
+                          fontSize: '16px',
+                          minHeight: '48px',
+                          padding: '12px 16px'
+                        }
+                      }}
+                    />
+                    
+                    {/* 4. Void select */}
+                    <Select
+                      searchable
+                      label="Дополнительный селект"
+                      placeholder="Дополнительный селект"
+                      data={[]}
+                      className="w-full"
+                      styles={{
+                        input: {
+                          fontSize: '16px',
+                          minHeight: '48px',
+                          padding: '12px 16px',
+                        }
+                      }}
+                    />
+                  </Flex>
+                </Flex>
               )}
               {isWhatsApp && (
                 <Select
@@ -378,20 +452,6 @@ export const ChatInput = ({
                   data={telegramNumbers}
                 />
               )}
-              <Select
-                searchable
-                onChange={(value) => {
-                  setMessage(value ? templateOptions[value] : "");
-                  setTemplate(value);
-                }}
-                className="w-full"
-                value={template}
-                placeholder={getLanguageByKey("select_message_template")}
-                data={Object.keys(templateOptions).map((key) => ({
-                  value: key,
-                  label: key,
-                }))}
-              />
             </Flex>
 
             <AttachmentsPreview />
@@ -563,7 +623,7 @@ export const ChatInput = ({
             onCancel={() => setShowEmailForm(false)}
             ticketId={ticketId}
             clientEmail={currentClient?.payload?.email}
-            ticketClients={clientList}
+            ticketClients={platformOptions}
             groupTitle={groupTitle}
             fromEmails={fromEmails}
           />

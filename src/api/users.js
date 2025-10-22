@@ -46,9 +46,9 @@ export const users = {
       group_id: body.group_id,
       user_ids: body.user_ids,
     });
-  
+
     return data;
-  },  
+  },
 
   deleteMultipleUsers: async (body) => {
     const { data } = await baseAxios.delete("/admin/users", { data: body });
@@ -76,6 +76,16 @@ export const users = {
 
   getUsersClientContacts: async (id) => {
     const { data } = await baseAxios.get(`/api/users-client/${id}/contacts`);
+
+    return data;
+  },
+
+  getUsersClientContactsByPlatform: async (id, platform) => {
+    const { data } = await baseAxios.get(`/api/tickets/${id}/clients-by-platform`, {
+      params: {
+        platform,
+      },
+    });
 
     return data;
   },
