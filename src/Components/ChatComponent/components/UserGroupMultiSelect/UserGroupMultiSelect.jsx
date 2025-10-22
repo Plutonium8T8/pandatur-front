@@ -27,11 +27,6 @@ export const UserGroupMultiSelect = ({
     ? (placeholder === "Select users and groups" ? "Select user" : placeholder)
     : placeholder;
 
-  // Функция для создания краткого имени для pills
-  const getShortName = (user) => {
-    return `${user.id.name} ${user.id.surname}`.trim();
-  };
-
   // Создаем опции для мультиселекта из реальных данных
   const options = useMemo(() => {
     // Если есть отформатированные данные из useGetTechniciansList, используем их
@@ -47,37 +42,27 @@ export const UserGroupMultiSelect = ({
         .map(item => {
           const isGroup = item.value.startsWith("__group__");
 
-          // Для групп: проверяем, есть ли в группе разрешенные пользователи
-          if (isGroup && allowedUserIds) {
-            const groupName = item.value.replace("__group__", "");
-            const groupUsers = techniciansData
-              .filter(user => !user.value.startsWith("__group__") && user.groupName === groupName)
-              .map(user => user.value);
-
-            const hasAllowedUsers = groupUsers.some(userId => allowedUserIds.has(userId));
-
-            return {
-              ...item,
-              disabled: mode === "single" || !hasAllowedUsers
-            };
-          }
-
-          // В режиме single отключаем группы, в режиме multi делаем их выбираемыми
+          // В режиме single отключаем группы
           if (isGroup) {
             return {
               ...item,
               disabled: mode === "single"
             };
           } else {
-            // Для пользователей добавляем SIP ID и ID техника из techniciansData
-            let enhancedLabel = item.label;
+            // Для пользователей проверяем фильтрацию и обновляем label
+            if (allowedUserIds && !allowedUserIds.has(item.value)) {
+              return {
+                ...item,
+                disabled: true
+              };
+            }
 
-            // Используем данные из techniciansData, так как usersData пустой
+            // Обновляем label с ID техника и SIP ID
+            let enhancedLabel = item.label;
             if (item.sipuni_id || item.id) {
               const sipuniId = item.sipuni_id ? ` (SIP: ${item.sipuni_id})` : '';
-              const userId = item.id?.id ? ` (ID: ${item.id.id})` : '';
-              const name = item.id ? `${item.id.name} ${item.id.surname}`.trim() : item.label;
-              enhancedLabel = name + sipuniId + userId;
+              const technicianId = item.id ? ` (ID: ${item.id})` : '';
+              enhancedLabel = item.label + sipuniId + technicianId;
             }
 
             return {
@@ -103,7 +88,8 @@ export const UserGroupMultiSelect = ({
                 users: []
               });
             }
-            allGroups.get(group.id).users.push(user.id.id);
+            // Используем user.id напрямую, так как в новой структуре это уже ID пользователя
+            allGroups.get(group.id).users.push(user.id);
           });
         }
       });
@@ -126,12 +112,12 @@ export const UserGroupMultiSelect = ({
         );
 
         groupUsers.forEach(user => {
-          const name = `${user.id.name} ${user.id.surname}`.trim();
+          const name = `${user.name} ${user.surname}`.trim();
           const sipuniId = user.sipuni_id ? ` (SIP: ${user.sipuni_id})` : '';
-          const userId = ` (ID: ${user.id.id})`;
+          const userId = ` (ID: ${user.id})`;
 
           options.push({
-            value: String(user.id.id),
+            value: String(user.id),
             label: `${name}${sipuniId}${userId}`
           });
         });
@@ -143,7 +129,7 @@ export const UserGroupMultiSelect = ({
     // Fallback: используем данные из UserContext (только группы текущего пользователя)
     if (userGroups && userGroups.length > 0) {
       const groupOptions = userGroups.map(group => ({
-        value: `group_${group.id}`,
+        value: `__group__${group.id}`,
         label: group.name,
         isGroup: true,
         groupId: group.id,
@@ -162,7 +148,7 @@ export const UserGroupMultiSelect = ({
       );
 
       const userOptions = allUsers.map(user => ({
-        value: `user_${user.id}`,
+        value: String(user.id),
         label: `${user.name} (ID: ${user.id})`,
         isGroup: false,
         userId: user.id,
@@ -198,17 +184,37 @@ export const UserGroupMultiSelect = ({
 
     if (isGroup) {
       // Если выбрана группа, добавляем или убираем всех пользователей из группы
-      const groupName = last.replace("__group__", "");
+      const groupId = last.replace("__group__", "");
 
-      // Находим всех пользователей из этой группы в techniciansData
-      const groupUsers = techniciansData
-        ?.filter(item => {
-          // Пропускаем группы, берем только пользователей
-          if (item.value.startsWith("__group__")) return false;
-          // Проверяем, принадлежит ли пользователь к выбранной группе
-          return item.groupName === groupName;
-        })
-        ?.map(user => user.value) || [];
+      // Находим всех пользователей из этой группы
+      let groupUsers = [];
+      
+      // Сначала пробуем найти в techniciansData
+      if (techniciansData && techniciansData.length > 0) {
+        groupUsers = techniciansData
+          ?.filter(item => {
+            // Пропускаем группы, берем только пользователей
+            if (item.value.startsWith("__group__")) return false;
+            // Проверяем, принадлежит ли пользователь к выбранной группе
+            return item.groupName && item.groupName === techniciansData.find(g => g.value === `__group__${groupId}`)?.label;
+          })
+          ?.map(item => item.value) || [];
+      }
+      
+      // Если не нашли в techniciansData, пробуем в usersData
+      if (groupUsers.length === 0 && usersData && usersData.length > 0) {
+        groupUsers = usersData
+          .filter(user => user.groups && user.groups.some(g => g.id === groupId))
+          .map(user => String(user.id));
+      }
+      
+      // Если не нашли в usersData, пробуем в userGroups (fallback)
+      if (groupUsers.length === 0 && userGroups && userGroups.length > 0) {
+        const group = userGroups.find(g => g.id === groupId);
+        if (group && group.users) {
+          groupUsers = group.users.map(userId => String(userId));
+        }
+      }
 
       const current = selectedValues || [];
 
@@ -313,10 +319,27 @@ export const UserGroupMultiSelect = ({
             variant={checked ? "filled" : "light"}
             color={checked ? "blue" : "green"}
           >
-            {techniciansData?.filter(item => {
-              if (item.value.startsWith("__group__")) return false;
-              return item.groupName === option.value.replace("__group__", "");
-            })?.length || 0} users
+            {(() => {
+              const groupId = option.value.replace("__group__", "");
+              let userCount = 0;
+              
+              // Считаем пользователей в группе из разных источников данных
+              if (techniciansData && techniciansData.length > 0) {
+                const groupName = techniciansData.find(g => g.value === `__group__${groupId}`)?.label;
+                userCount = techniciansData.filter(item => {
+                  return !item.value.startsWith("__group__") && item.groupName === groupName;
+                }).length;
+              } else if (usersData && usersData.length > 0) {
+                userCount = usersData.filter(user => 
+                  user.groups && user.groups.some(g => g.id === groupId)
+                ).length;
+              } else if (userGroups && userGroups.length > 0) {
+                const group = userGroups.find(g => g.id === groupId);
+                userCount = group?.users?.length || 0;
+              }
+              
+              return `${userCount} users`;
+            })()}
           </Badge>
         )}
       </Group>

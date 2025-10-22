@@ -40,19 +40,23 @@ export const useGetTechniciansList = () => {
         const processedUserIds = new Set(); // Добавляем Set для отслеживания обработанных ID
 
         data.forEach((item) => {
-          const userId = item?.id?.id;
+          const userId = item?.user?.id;
           if (!userId || processedUserIds.has(userId)) return; // Проверяем на дублирование
 
           processedUserIds.add(userId); // Добавляем ID в Set
           
           const groupName = item.groups?.[0]?.name || "Fără grupă";
-          const label = `${item.id?.surname || ""} ${item.id?.name || ""}`.trim();
+          const label = `${item.surname || ""} ${item.name || ""}`.trim();
 
           const userItem = {
             value: `${userId}`,
             label,
-            id: item.id,
+            id: item.id, // ID техника
+            user: item.user, // Данные пользователя
+            name: item.name,
+            surname: item.surname,
             sipuni_id: item.sipuni_id,
+            groups: item.groups,
             groupName,
           };
 
@@ -65,8 +69,10 @@ export const useGetTechniciansList = () => {
 
         const merged = [];
         for (const [groupName, users] of groupMap.entries()) {
+          // Получаем ID группы из первого пользователя
+          const groupId = users[0]?.groups?.[0]?.id;
           merged.push({
-            value: `__group__${groupName}`,
+            value: `__group__${groupId || groupName}`,
             label: groupName,
             disabled: true,
           });

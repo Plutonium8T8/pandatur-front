@@ -30,10 +30,10 @@ export const UserProvider = ({ children }) => {
   const teamUserIds = useMemo(() => {
     const groups = userGroups || [];
     const all = groups
-      .filter((group) => group.users?.includes(userId))
+      .filter((group) => group.users?.includes(technician?.id))
       .flatMap((group) => group.users || []);
     return new Set(all.map(String));
-  }, [userGroups, userId]);
+  }, [userGroups, technician?.id]);
 
   const isSameTeam = (responsibleId) => {
     if (!responsibleId) return false;
@@ -107,17 +107,27 @@ export const UserProvider = ({ children }) => {
         return;
       }
 
-      const data = await api.users.getById(userId);
-      const rawRoles = JSON.parse(data.roles);
       const groups = await api.user.getGroupsList();
-      const myGroups = (groups || []).filter((g) => (g.users || []).includes(userId));
-
       const technicians = await api.users.getTechnicianList();
-      const me = technicians.find((t) => t.id?.user?.id === userId);
+      const me = technicians.find((t) => t.user?.id === userId);
+
+      // Получаем роли из technicians (из me.user.roles)
+      const rawRoles = me?.user?.roles ? JSON.parse(me.user.roles) : [];
+
+      // Находим группы, в которых состоит текущий пользователь
+      // Используем ID техника (me.id), а не ID пользователя (userId)
+      const myGroups = (groups || []).filter((g) => (g.users || []).includes(me?.id));
 
       setUserRoles(rawRoles);
       setUserGroups(myGroups);
       setTechnician(me || null);
+      
+      // Обновляем имя и фамилию из новой структуры данных
+      if (me) {
+        setName(me.name || null);
+        setSurname(me.surname || null);
+      }
+      
       localStorage.setItem("user_roles", JSON.stringify(rawRoles));
     } catch (error) {
       console.error("error get data users", error.message);

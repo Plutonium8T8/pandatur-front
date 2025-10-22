@@ -15,7 +15,7 @@ import { LuFilter } from "react-icons/lu";
 import { BsThreeDots } from "react-icons/bs";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
-import { translations } from "@utils";
+import { getLanguageByKey } from "../Components/utils/getLanguageByKey";
 import { PageHeader } from "@components";
 import UserModal from "../Components/UsersComponent/UserModal";
 import UserList from "../Components/UsersComponent/UserList";
@@ -24,8 +24,6 @@ import CreatePermissionGroupModal from "../Components/UsersComponent/Roles/Creat
 import UserFilterModal from "../Components/UsersComponent/UserFilterModal";
 import { useUser, useMobile } from "@hooks";
 import { hasStrictPermission } from "../Components/utils/permissions";
-
-const language = localStorage.getItem("language") || "RO";
 
 export const Users = () => {
   const [users, setUsers] = useState([]);
@@ -85,7 +83,7 @@ export const Users = () => {
       setUsers(normalized);
     } catch (err) {
       enqueueSnackbar(
-        translations["Eroare la încărcarea utilizatorilor"][language],
+        getLanguageByKey("Eroare la încărcarea utilizatorilor"),
         { variant: "error" }
       );
     } finally {
@@ -159,7 +157,7 @@ export const Users = () => {
           <Flex align="center" justify="space-between" w="100%">
             <Flex align="center" gap="8">
               <Text fw={700} size="lg">
-                {translations["Utilizatori"][language]}
+                {getLanguageByKey("Utilizatori")}
               </Text>
               <Badge size="md" bg="#0f824c">
                 {filtered.length}
@@ -175,10 +173,10 @@ export const Users = () => {
                   </Menu.Target>
                   <Menu.Dropdown>
                     <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
-                      {translations["Editează grupurile"][language]}
+                      {getLanguageByKey("Editează grupurile")}
                     </Menu.Item>
                     <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
-                      {translations["Editează rolurile"][language]}
+                      {getLanguageByKey("Editează rolurile")}
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
@@ -196,7 +194,7 @@ export const Users = () => {
 
           {/* Второй ряд: Поиск */}
           <TextInput
-            placeholder={translations["Căutare utilizator"][language]}
+            placeholder={getLanguageByKey("Căutare utilizator")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             w="100%"
@@ -213,13 +211,13 @@ export const Users = () => {
               }}
               w="100%"
             >
-              {translations["Adaugă utilizator"][language]}
+              {getLanguageByKey("Adaugă utilizator")}
             </Button>
           )}
         </Stack>
       ) : (
         <PageHeader
-          title={translations["Utilizatori"][language]}
+          title={getLanguageByKey("Utilizatori")}
           count={filtered.length}
           extraInfo={
             <>
@@ -232,10 +230,10 @@ export const Users = () => {
                   </Menu.Target>
                   <Menu.Dropdown>
                     <Menu.Item onClick={() => setModals((m) => ({ ...m, groups: true }))}>
-                      {translations["Editează grupurile"][language]}
+                      {getLanguageByKey("Editează grupurile")}
                     </Menu.Item>
                     <Menu.Item onClick={() => setModals((m) => ({ ...m, permissions: true }))}>
-                      {translations["Editează rolurile"][language]}
+                      {getLanguageByKey("Editează rolurile")}
                     </Menu.Item>
                   </Menu.Dropdown>
                 </Menu>
@@ -250,7 +248,7 @@ export const Users = () => {
               </ActionIcon>
 
               <TextInput
-                placeholder={translations["Căutare utilizator"][language]}
+                placeholder={getLanguageByKey("Căutare utilizator")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="min-w-300"
@@ -265,7 +263,7 @@ export const Users = () => {
                     setModals((m) => ({ ...m, user: true }));
                   }}
                 >
-                  {translations["Adaugă utilizator"][language]}
+                  {getLanguageByKey("Adaugă utilizator")}
                 </Button>
               )}
             </>
