@@ -16,13 +16,7 @@ const normalizeClientContacts = (ticketData) => {
     }
   });
 
-  // Если есть whatsapp или viber, добавляем их
-  if (ticketData.whatsapp) {
-    platforms.add('whatsapp');
-  }
-  if (ticketData.viber) {
-    platforms.add('viber');
-  }
+  // whatsapp и viber уже добавлены в первом проходе
 
   // Создаем опции для каждой платформы
   return Array.from(platforms).map(platform => {
