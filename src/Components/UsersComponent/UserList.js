@@ -359,14 +359,6 @@ const UserList = ({
     },
     {
       align: "center",
-      title: getLanguageByKey("Login"),
-      dataIndex: "username",
-      key: "username",
-      width: 250,
-      render: (username) => username || "—",
-    },
-    {
-      align: "center",
       title: getLanguageByKey("Grup utilizator"),
       dataIndex: "groups",
       key: "groups",
