@@ -227,9 +227,24 @@ export const useClientContacts = (ticketId, lastMessage) => {
     fetchClientContacts();
   }, [fetchClientContacts]);
 
+  // Сбрасываем состояние при изменении ticketId
+  useEffect(() => {
+    setSelectedPlatform(null);
+    setContactOptions([]);
+    setSelectedClient({});
+    setSelectedPageId(null);
+  }, [ticketId]);
+
   // Автоматически выбираем платформу, контакт и page_id из последнего сообщения
   useEffect(() => {
-    if (!lastMessage || !ticketData || platformOptions.length === 0) return;
+    if (!lastMessage || !ticketData || platformOptions.length === 0) {
+      console.log('🔴 Auto-select skipped:', { 
+        hasLastMessage: !!lastMessage, 
+        hasTicketData: !!ticketData, 
+        platformOptionsLength: platformOptions.length 
+      });
+      return;
+    }
 
     const messagePlatform = lastMessage.platform?.toLowerCase();
     const messageClientId = lastMessage.client_id;
@@ -245,29 +260,58 @@ export const useClientContacts = (ticketId, lastMessage) => {
       contactValue = lastMessage.to_reference;
     }
 
-    // Устанавливаем платформу если она еще не выбрана
-    if (!selectedPlatform && messagePlatform && platformOptions.some(p => p.value === messagePlatform)) {
-      setSelectedPlatform(messagePlatform);
+    console.log('🟢 Auto-select data:', {
+      messagePlatform,
+      messageClientId,
+      messagePageId,
+      contactValue,
+      selectedPlatform,
+      contactOptionsLength: contactOptions.length,
+      selectedClientValue: selectedClient.value
+    });
+
+    // 1. Устанавливаем платформу
+    if (messagePlatform && platformOptions.some(p => p.value === messagePlatform)) {
+      if (selectedPlatform !== messagePlatform) {
+        console.log('✅ Setting platform:', messagePlatform);
+        setSelectedPlatform(messagePlatform);
+      }
     }
 
-    // Устанавливаем контакт если он еще не выбран
-    if (selectedPlatform === messagePlatform && contactValue && !selectedClient.payload) {
+    // 2. Устанавливаем page_id
+    if (messagePageId && selectedPageId !== messagePageId) {
+      console.log('✅ Setting page_id:', messagePageId);
+      setSelectedPageId(messagePageId);
+    }
+
+    // 3. Устанавливаем контакт (только после того, как платформа установлена и contactOptions обновлены)
+    if (selectedPlatform === messagePlatform && contactValue && contactOptions.length > 0) {
+      console.log('🔍 Searching for contact:', { 
+        contactValue, 
+        messageClientId,
+        contactOptionsLength: contactOptions.length 
+      });
+      
       // Ищем контакт по contact_value и client_id
       const contact = contactOptions.find(c => 
         c.payload?.contact_value === contactValue && 
         c.payload?.client_id === messageClientId
       );
       
-      if (contact) {
+      console.log('🔍 Found contact:', contact);
+      
+      if (contact && selectedClient.value !== contact.value) {
+        console.log('✅ Setting contact:', contact.value);
         setSelectedClient(contact);
       }
+    } else {
+      console.log('⚠️ Contact selection conditions not met:', {
+        platformMatch: selectedPlatform === messagePlatform,
+        hasContactValue: !!contactValue,
+        hasContactOptions: contactOptions.length > 0
+      });
     }
-
-    // Устанавливаем page_id если он еще не выбран
-    if (!selectedPageId && messagePageId) {
-      setSelectedPageId(messagePageId);
-    }
-  }, [lastMessage, ticketData, platformOptions, contactOptions, selectedPlatform, selectedClient, selectedPageId]);
+  }, [lastMessage, ticketData, platformOptions, contactOptions, selectedPlatform, selectedClient.value, selectedPageId]);
 
   const changePageId = useCallback((pageId) => {
     setSelectedPageId(pageId);

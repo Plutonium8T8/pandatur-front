@@ -17,9 +17,8 @@ import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
 import { RiAttachment2 } from "react-icons/ri";
-import { getLanguageByKey, socialMediaIcons } from "../../../utils";
+import { getLanguageByKey } from "../../../utils";
 import { getEmailsByGroupTitle } from "../../../utils/emailUtils";
-import { getPandaNumbersByGroupTitle } from "../../../utils/pandaNumbersUtils";
 import { templateOptions } from "../../../../FormOptions";
 import { useUploadMediaFile } from "../../../../hooks";
 import { getMediaType } from "../../renderContent";
@@ -53,7 +52,6 @@ export const ChatInput = ({
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [template, setTemplate] = useState();
-  const [pandaNumber, setPandaNumber] = useState(null);
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
   const [ticket, setTicket] = useState(null);
@@ -73,26 +71,6 @@ export const ChatInput = ({
   const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
 
-  // Мемоизированные списки номеров панды по воронке
-  const whatsappNumbers = useMemo(() =>
-    getPandaNumbersByGroupTitle(groupTitle, 'whatsapp'),
-    [groupTitle]
-  );
-
-  const viberNumbers = useMemo(() =>
-    getPandaNumbersByGroupTitle(groupTitle, 'viber'),
-    [groupTitle]
-  );
-
-  const telegramNumbers = useMemo(() =>
-    getPandaNumbersByGroupTitle(groupTitle, 'telegram'),
-    [groupTitle]
-  );
-
-  const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
-  const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
-  const isTelegram = currentClient?.payload?.platform?.toUpperCase() === "TELEGRAM";
-
   // Получаем список page_id для выбранной платформы
   const pageIdOptions = useMemo(() => {
     if (!selectedPlatform) return [];
@@ -103,18 +81,6 @@ export const ChatInput = ({
       label: `${page.page_name} (${page.group_title})`
     }));
   }, [selectedPlatform]);
-
-  // Автоматически выбираем первый подходящий номер при изменении воронки
-  useEffect(() => {
-    if (!pandaNumber && (isWhatsApp || isViber || isTelegram)) {
-      const currentNumbers = isViber ? viberNumbers : (isTelegram ? telegramNumbers : whatsappNumbers);
-      if (currentNumbers.length > 0) {
-        setPandaNumber(currentNumbers[0].value);
-      }
-    }
-  }, [groupTitle, isWhatsApp, isViber, isTelegram, whatsappNumbers, viberNumbers, telegramNumbers, pandaNumber]);
-  const isPhoneChat = isWhatsApp || isViber;
-  const needsPandaNumber = isWhatsApp || isViber || isTelegram;
 
   // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
@@ -204,10 +170,7 @@ export const ChatInput = ({
     setTemplate(null);
   };
 
-  const buildBasePayload = () => ({
-    panda_number: needsPandaNumber ? pandaNumber : undefined,
-    client_phone: isPhoneChat ? currentClient?.payload?.phone : undefined,
-  });
+  const buildBasePayload = () => ({});
 
   const handleMarkAsRead = () => {
     if (!ticketId) return;
@@ -442,33 +405,6 @@ export const ChatInput = ({
                   </Flex>
                 </Flex>
               )}
-              {isWhatsApp && (
-                <Select
-                  className="w-full"
-                  placeholder={getLanguageByKey("select_sender_number")}
-                  value={pandaNumber}
-                  onChange={setPandaNumber}
-                  data={whatsappNumbers}
-                />
-              )}
-              {isViber && (
-                <Select
-                  className="w-full"
-                  placeholder={getLanguageByKey("select_sender_number_viber")}
-                  value={pandaNumber}
-                  onChange={setPandaNumber}
-                  data={viberNumbers}
-                />
-              )}
-              {isTelegram && (
-                <Select
-                  className="w-full"
-                  placeholder={getLanguageByKey("select_sender_number_telegram")}
-                  value={pandaNumber}
-                  onChange={setPandaNumber}
-                  data={telegramNumbers}
-                />
-              )}
             </Flex>
 
             <AttachmentsPreview />
@@ -508,10 +444,7 @@ export const ChatInput = ({
                   disabled={
                     (!message.trim() && attachments.length === 0) ||
                     !currentClient?.payload ||
-                    currentClient.payload.platform === "sipuni" ||
-                    (isWhatsApp && !pandaNumber) ||
-                    (isViber && !pandaNumber) ||
-                    (isTelegram && !pandaNumber)
+                    currentClient.payload.platform === "sipuni"
                   }
                   variant="filled"
                   onClick={sendMessage}
