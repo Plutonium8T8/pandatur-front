@@ -278,6 +278,7 @@ export const ChatMessages = ({
                   sender_id: Number(userId),
                   client_id: selectedClient.payload.id,
                   platform: selectedClient.payload.platform,
+                  page_id: selectedClient.payload.page_id,
                   ticket_id: ticketId,
                   time_sent: dayjs().format(YYYY_MM_DD_HH_mm_ss),
                   messageStatus: MESSAGES_STATUS.PENDING,

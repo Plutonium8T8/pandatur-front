@@ -12,7 +12,19 @@ const normalizeClientContacts = (ticketData) => {
   // Проходим по всем платформам в корне объекта
   Object.keys(ticketData).forEach(key => {
     if (key !== 'clients' && typeof ticketData[key] === 'object' && ticketData[key] !== null) {
-      platforms.add(key);
+      // Проверяем, что у платформы есть контакты (не пустой массив)
+      const platformData = ticketData[key];
+      if (Array.isArray(platformData)) {
+        // Если это массив, проверяем что он не пустой
+        if (platformData.length > 0) {
+          platforms.add(key);
+        }
+      } else {
+        // Если это объект, проверяем что у него есть ключи (контакты)
+        if (Object.keys(platformData).length > 0) {
+          platforms.add(key);
+        }
+      }
     }
   });
 
@@ -136,7 +148,8 @@ export const useClientContacts = (ticketId) => {
           email: platform === 'email' ? contact.contact_value : '',
           contact_value: contact.contact_value,
           is_primary: contact.is_primary,
-          photo: contact.client_photo
+          photo: contact.client_photo,
+          page_id: contact.contact_value // page_id это contact_value для социальных платформ
         },
       };
     });

@@ -22,12 +22,6 @@ export const Chat = () => {
 
   const currentTicket = useMemo(() => {
     const found = tickets?.find((t) => t.id === ticketId);
-    console.log("🎫 Chat - currentTicket:", { 
-      ticketId, 
-      ticketsCount: tickets?.length, 
-      currentTicket: found,
-      client_id: found?.client_id 
-    });
     return found;
   }, [tickets, ticketId]);
 
