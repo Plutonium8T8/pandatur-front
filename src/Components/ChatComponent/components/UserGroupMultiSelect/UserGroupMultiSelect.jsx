@@ -31,7 +31,7 @@ export const UserGroupMultiSelect = ({
   const options = useMemo(() => {
     // Если есть отформатированные данные из useGetTechniciansList, используем их
     if (techniciansData && techniciansData.length > 0) {
-      return techniciansData
+      const filtered = techniciansData
         .filter(item => {
           // Если есть фильтрация по allowedUserIds
           if (allowedUserIds && !item.value.startsWith("__group__")) {
@@ -72,6 +72,30 @@ export const UserGroupMultiSelect = ({
             };
           }
         });
+
+      // Группируем элементы: сначала все группы, затем все пользователи
+      const groups = filtered.filter(item => item.value.startsWith("__group__"));
+      const users = filtered.filter(item => !item.value.startsWith("__group__"));
+
+      // Сортируем группы по алфавиту
+      groups.sort((a, b) => a.label.localeCompare(b.label));
+
+      // Сортируем пользователей по алфавиту
+      users.sort((a, b) => a.label.localeCompare(b.label));
+
+      // Создаем итоговый массив: группа, её пользователи, следующая группа, её пользователи...
+      const result = [];
+      
+      groups.forEach(group => {
+        // Добавляем группу
+        result.push(group);
+        
+        // Добавляем пользователей этой группы
+        const groupUsers = users.filter(user => user.groupName === group.label);
+        result.push(...groupUsers);
+      });
+
+      return result;
     }
 
     // Если есть raw данные пользователей из API, используем их (показываем ВСЕ группы)
@@ -97,8 +121,12 @@ export const UserGroupMultiSelect = ({
       // Создаем опции в формате как в существующей системе
       const options = [];
 
-      // Добавляем группы и пользователей
-      Array.from(allGroups.values()).forEach(group => {
+      // Сортируем группы по алфавиту
+      const sortedGroups = Array.from(allGroups.values())
+        .sort((a, b) => a.name.localeCompare(b.name));
+
+      // Добавляем группы и их пользователей
+      sortedGroups.forEach(group => {
         // Добавляем группу
         options.push({
           value: `__group__${group.id}`,
@@ -111,16 +139,22 @@ export const UserGroupMultiSelect = ({
           user.groups && user.groups.some(g => g.id === group.id)
         );
 
-        groupUsers.forEach(user => {
-          const name = `${user.name} ${user.surname}`.trim();
-          const sipuniId = user.sipuni_id ? ` (SIP: ${user.sipuni_id})` : '';
-          const userId = ` (ID: ${user.id})`;
+        groupUsers
+          .sort((a, b) => {
+            const nameA = `${a.name} ${a.surname}`.trim();
+            const nameB = `${b.name} ${b.surname}`.trim();
+            return nameA.localeCompare(nameB);
+          }) // Сортируем пользователей по алфавиту
+          .forEach(user => {
+            const name = `${user.name} ${user.surname}`.trim();
+            const sipuniId = user.sipuni_id ? ` (SIP: ${user.sipuni_id})` : '';
+            const userId = ` (ID: ${user.id})`;
 
-          options.push({
-            value: String(user.id),
-            label: `${name}${sipuniId}${userId}`
+            options.push({
+              value: String(user.id),
+              label: `${name}${sipuniId}${userId}`
+            });
           });
-        });
       });
 
       return options;
@@ -128,35 +162,45 @@ export const UserGroupMultiSelect = ({
 
     // Fallback: используем данные из UserContext (только группы текущего пользователя)
     if (userGroups && userGroups.length > 0) {
-      const groupOptions = userGroups.map(group => ({
-        value: `__group__${group.id}`,
-        label: group.name,
-        isGroup: true,
-        groupId: group.id,
-        userCount: group.users?.length || 0,
-        disabled: mode === "single"
-      }));
-
-      // Собираем всех пользователей из всех групп
-      const allUsers = userGroups.flatMap(group =>
-        (group.users || []).map(userId => ({
-          id: userId,
+      const options = [];
+      
+      // Сортируем группы по алфавиту
+      const sortedGroups = userGroups.sort((a, b) => a.name.localeCompare(b.name));
+      
+      sortedGroups.forEach(group => {
+        // Добавляем группу
+        options.push({
+          value: `__group__${group.id}`,
+          label: group.name,
+          isGroup: true,
           groupId: group.id,
-          groupName: group.name,
-          name: `User ${userId}`
-        }))
-      );
+          userCount: group.users?.length || 0,
+          disabled: mode === "single"
+        });
 
-      const userOptions = allUsers.map(user => ({
-        value: String(user.id),
-        label: `${user.name} (ID: ${user.id})`,
-        isGroup: false,
-        userId: user.id,
-        groupId: user.groupId,
-        groupName: user.groupName
-      }));
+        // Добавляем пользователей этой группы
+        const groupUsers = (group.users || [])
+          .map(userId => ({
+            id: userId,
+            groupId: group.id,
+            groupName: group.name,
+            name: `User ${userId}`
+          }))
+          .sort((a, b) => a.name.localeCompare(b.name)); // Сортируем пользователей по алфавиту
 
-      return [...groupOptions, ...userOptions];
+        groupUsers.forEach(user => {
+          options.push({
+            value: String(user.id),
+            label: `${user.name} (ID: ${user.id})`,
+            isGroup: false,
+            userId: user.id,
+            groupId: user.groupId,
+            groupName: user.groupName
+          });
+        });
+      });
+
+      return options;
     }
 
     // Если нет данных - возвращаем пустой массив
