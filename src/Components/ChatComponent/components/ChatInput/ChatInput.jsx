@@ -71,16 +71,30 @@ export const ChatInput = ({
   const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
 
-  // Получаем список page_id для выбранной платформы
+  // Получаем список page_id для выбранной платформы, отфильтрованный по group_title тикета
   const pageIdOptions = useMemo(() => {
     if (!selectedPlatform) return [];
     
     const pages = getPagesByType(selectedPlatform);
-    return pages.map(page => ({
+    
+    // Фильтруем страницы по group_title тикета
+    const filteredPages = groupTitle 
+      ? pages.filter(page => page.group_title === groupTitle)
+      : pages;
+    
+    console.log('📄 Page ID options filtered by group_title:', {
+      platform: selectedPlatform,
+      ticketGroupTitle: groupTitle,
+      totalPages: pages.length,
+      filteredPages: filteredPages.length,
+      pages: filteredPages.map(p => `${p.page_name} (${p.group_title})`)
+    });
+    
+    return filteredPages.map(page => ({
       value: page.page_id,
       label: `${page.page_name} (${page.group_title})`
     }));
-  }, [selectedPlatform]);
+  }, [selectedPlatform, groupTitle]);
 
   // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {

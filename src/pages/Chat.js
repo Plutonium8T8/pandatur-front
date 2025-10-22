@@ -75,7 +75,7 @@ export const Chat = () => {
     changePageId,
     loading,
     updateClientData,
-  } = useClientContacts(ticketId, lastMessage);
+  } = useClientContacts(ticketId, lastMessage, currentTicket?.group_title);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 

@@ -224,6 +224,27 @@ export const AppProvider = ({ children }) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
 
+      // Проверяем, что тикет относится к текущей группе
+      const isMatchingGroup = ticket.group_title === groupTitleForApi;
+
+      if (!isMatchingGroup) {
+        // Если group_title не совпадает - удаляем тикет из списков
+        setTickets((prev) => {
+          const exists = prev.find((t) => t.id === ticketId);
+          if (exists) {
+            // Уменьшаем счётчик непрочитанных, если тикет был непрочитан
+            if (exists.unseen_count > 0) {
+              setUnreadCount((prevCount) => Math.max(0, prevCount - exists.unseen_count));
+            }
+            return prev.filter((t) => t.id !== ticketId);
+          }
+          return prev;
+        });
+
+        setChatFilteredTickets((prev) => prev.filter((t) => t.id !== ticketId));
+        return;
+      }
+
       setTickets((prev) => {
         const exists = prev.find((t) => t.id === ticketId);
         

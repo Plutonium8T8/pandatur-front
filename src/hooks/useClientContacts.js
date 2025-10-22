@@ -68,7 +68,7 @@ const normalizeClientContacts = (ticketData) => {
   });
 };
 
-export const useClientContacts = (ticketId, lastMessage) => {
+export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   const { enqueueSnackbar } = useSnackbar();
 
   const [platformOptions, setPlatformOptions] = useState([]);
@@ -345,27 +345,39 @@ export const useClientContacts = (ticketId, lastMessage) => {
       }
     }
 
-    // 2. Устанавливаем page_id (только если он есть в конфигурации)
+    // 2. Устанавливаем page_id (только если он есть в конфигурации и совпадает с group_title)
     if (messagePageId && !selectedPageId && messagePlatform) {
-      // Проверяем, что page_id существует в конфигурации для данной платформы
-      const availablePages = getPagesByType(messagePlatform);
+      // Получаем все страницы для платформы
+      const allPages = getPagesByType(messagePlatform);
+      
+      // Фильтруем по group_title тикета
+      const availablePages = groupTitle 
+        ? allPages.filter(p => p.group_title === groupTitle)
+        : allPages;
+      
       const pageExists = availablePages.some(p => p.page_id === messagePageId);
       
-      console.log('🔍 Checking page_id:', {
+      console.log('🔍 Checking page_id with group_title filter:', {
         messagePageId,
         platform: messagePlatform,
-        availablePagesCount: availablePages.length,
-        pageExists
+        ticketGroupTitle: groupTitle,
+        allPagesCount: allPages.length,
+        filteredPagesCount: availablePages.length,
+        pageExists,
+        filteredPages: availablePages.map(p => `${p.page_name} (${p.group_title})`)
       });
       
       if (pageExists) {
         console.log('✅ Setting page_id from message:', messagePageId);
         setSelectedPageId(messagePageId);
       } else {
-        console.log('⚠️ Page ID not found in config, using first available page');
-        // Если page_id из сообщения нет в конфиге, берем первый доступный
+        console.log('⚠️ Page ID not found in filtered pages, using first available page');
+        // Если page_id из сообщения нет в отфильтрованных страницах, берем первую доступную
         if (availablePages.length > 0) {
+          console.log('✅ Setting first available page:', availablePages[0].page_id);
           setSelectedPageId(availablePages[0].page_id);
+        } else {
+          console.log('❌ No pages available for group_title:', groupTitle);
         }
       }
     } else if (messagePageId && selectedPageId !== messagePageId) {
@@ -422,7 +434,7 @@ export const useClientContacts = (ticketId, lastMessage) => {
         messagePlatform
       });
     }
-  }, [lastMessage, ticketData, platformOptions, contactOptions, selectedPlatform, selectedClient.value, selectedPageId, ticketId]);
+  }, [lastMessage, ticketData, platformOptions, contactOptions, selectedPlatform, selectedClient.value, selectedPageId, ticketId, groupTitle]);
 
   const changePageId = useCallback((pageId) => {
     setSelectedPageId(pageId);
