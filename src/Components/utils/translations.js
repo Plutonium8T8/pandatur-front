@@ -344,9 +344,9 @@ export const translations = {
     EN: "User information",
   },
   username: {
-    RO: "nume de utilizator",
-    RU: "имя пользователя",
-    EN: "username",
+    RO: "Nume de utilizator",
+    RU: "Имя пользователя",
+    EN: "Username",
   },
   email: {
     RO: "email",
@@ -3192,11 +3192,6 @@ export const translations = {
     RU: "Выбрать email",
     EN: "Select email",
   },
-  "Email": {
-    RO: "Email",
-    RU: "Email",
-    EN: "Email",
-  },
   "No subject": {
     RO: "Fără subiect",
     RU: "Без темы",
@@ -3648,11 +3643,6 @@ export const translations = {
     RO: "Task actualizat",
     RU: "Задача обновлена",
     EN: "Task updated"
-  },
-  "Task completed": {
-    RO: "Task finalizat",
-    RU: "Задача выполнена",
-    EN: "Task completed"
   },
   "Client created": {
     RO: "Client creat",
@@ -4688,11 +4678,6 @@ export const translations = {
     RU: "Описание",
     EN: "Description",
   },
-  "tags": {
-    RO: "Etichete",
-    RU: "Теги",
-    EN: "Tags",
-  },
   "author": {
     RO: "Autor",
     RU: "Автор",
@@ -4707,16 +4692,6 @@ export const translations = {
     RO: "Creat",
     RU: "Создано",
     EN: "Created",
-  },
-  "today": {
-    RO: "Astăzi",
-    RU: "Сегодня",
-    EN: "Today",
-  },
-  "tomorrow": {
-    RO: "Mâine",
-    RU: "Завтра",
-    EN: "Tomorrow",
   },
   "lessThan2Hours": {
     RO: "Mai puțin de 2 ore",

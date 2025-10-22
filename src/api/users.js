@@ -56,18 +56,6 @@ export const users = {
     return data;
   },
 
-  getExtendedById: async (id) => {
-    const { data } = await baseAxios.get(`/api/users-extended/${id}`);
-
-    return data;
-  },
-
-  updateExtended: async (id, body) => {
-    const { data } = await baseAxios.patch(`/api/users-extended/${id}`, body);
-
-    return data;
-  },
-
   updateUser: async (id, body) => {
     const { data } = await baseAxios.patch(`/api/users/${id}`, body);
 
@@ -82,6 +70,12 @@ export const users = {
 
   getUsersClientById: async (id) => {
     const { data } = await baseAxios.get(`/api/users-client/${id}`);
+
+    return data;
+  },
+
+  getUsersClientContacts: async (id) => {
+    const { data } = await baseAxios.get(`/api/users-client/${id}/contacts`);
 
     return data;
   },

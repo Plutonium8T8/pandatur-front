@@ -257,7 +257,7 @@ const ChatExtraInfo = ({
         ...generalFields,
       });
 
-      await api.users.updateExtended(selectedUser.payload?.id, {
+      await api.users.getUsersClientContacts(selectedUser.payload?.id, {
         name,
         surname,
         phone,

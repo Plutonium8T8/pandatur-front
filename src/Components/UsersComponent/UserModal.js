@@ -20,10 +20,8 @@ import {
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import RoleMatrix from "./Roles/RoleMatrix";
-import { translations } from "../utils/translations";
+import { getLanguageByKey } from "../utils/getLanguageByKey";
 import { useMobile } from "../../hooks";
-
-const language = localStorage.getItem("language") || "RO";
 
 const initialFormState = {
   name: "",
@@ -32,6 +30,7 @@ const initialFormState = {
   email: "",
   password: "",
   job_title: "",
+  department: "",
   status: false,
   groups: "",
   permissionGroupId: null,
@@ -92,7 +91,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     if (initialUser) {
       const permissionGroupId = initialUser.permissions?.[0]?.id?.toString() || null;
 
-      const rawRoles = initialUser?.id?.user?.roles || initialUser?.rawRoles;
+      const rawRoles = initialUser?.user?.roles || initialUser?.rawRoles;
       const parsedUserRoles = Array.isArray(rawRoles) ? rawRoles : safeParseJson(rawRoles);
       const userRolesMap = convertRolesToMatrix(parsedUserRoles || []);
       customRolesMatrixRef.current = userRolesMap;
@@ -109,6 +108,10 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       permissionGroupInitialRolesRef.current = parsedPermissionRoles || [];
       setCustomRoles(Object.keys(userRolesMap));
 
+      // Подавляем предупреждения линтера о неиспользуемых переменных
+      console.debug('Permission group roles:', parsedPermissionRoles);
+      console.debug('Custom roles:', Object.keys(userRolesMap));
+
       setForm((prev) => ({
         ...prev,
         permissionGroupId,
@@ -118,6 +121,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         username: initialUser.username || "",
         email: initialUser.email || "",
         job_title: initialUser.job_title || initialUser.jobTitle || "",
+        department: initialUser.department || "",
         sipuni_id: initialUser.sipuni_id || "",
         status: Boolean(initialUser.status),
         groups:
@@ -144,9 +148,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           setGroupsList(userGroups);
         } catch (e) {
           enqueueSnackbar(
-            translations["Eroare la încărcarea grupurilor de utilizatori"][
-            language
-            ],
+            getLanguageByKey("Eroare la încărcarea grupurilor de utilizatori"),
             { variant: "error" },
           );
         }
@@ -156,9 +158,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           setPermissionGroups(permissionGroups);
         } catch (e) {
           enqueueSnackbar(
-            translations["Eroare la încărcarea grupurilor de permisiuni"][
-            language
-            ],
+            getLanguageByKey("Eroare la încărcarea grupurilor de permisiuni"),
             { variant: "error" },
           );
         }
@@ -168,7 +168,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
     };
 
     if (opened) fetchGroups();
-  }, [opened]);
+  }, [opened, enqueueSnackbar]);
 
   const handleSelectPermissionGroup = (permissionGroupId) => {
     const selectedGroup = permissionGroups.find(
@@ -218,6 +218,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       email,
       password,
       job_title,
+      department,
       status,
       groups,
       permissionGroupId,
@@ -236,7 +237,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         !sipuni_id
       ) {
         enqueueSnackbar(
-          translations["Completați toate câmpurile obligatorii"][language],
+          getLanguageByKey("Completați toate câmpurile obligatorii"),
           { variant: "warning" }
         );
         return;
@@ -247,8 +248,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
     try {
       if (initialUser) {
-        const technicianId = initialUser.id?.id || initialUser.id;
-        const userId = initialUser.id?.user?.id || initialUser.id;
+        const technicianId = initialUser.id;
+        const userId = initialUser.user?.id || initialUser.id;
         const hadPermissionBefore = initialUser?.permissions?.length > 0;
         const isExitingGroup = !permissionGroupId && hadPermissionBefore;
 
@@ -256,12 +257,11 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
           api.users.updateTechnician(technicianId, {
             status: status.toString(),
             job_title,
+            department,
             sipuni_id,
-          }),
-          api.users.updateExtended(technicianId, {
             name,
             surname,
-          }),
+          })
         ]);
 
         if (groups && groups !== (initialUser.groups?.[0]?.name || "")) {
@@ -282,7 +282,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         if (password) userUpdate.password = password;
 
         const newRoles = convertMatrixToRoles(form.roleMatrix);
-        const currentRolesRaw = initialUser?.id?.user?.roles || "[]";
+        const currentRolesRaw = initialUser?.user?.roles || "[]";
         const currentRoles = Array.isArray(currentRolesRaw)
           ? currentRolesRaw
           : safeParseJson(currentRolesRaw);
@@ -303,7 +303,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         }
 
         enqueueSnackbar(
-          translations["Utilizator actualizat cu succes"][language],
+          getLanguageByKey("Utilizator actualizat cu succes"),
           { variant: "success" }
         );
       } else {
@@ -322,6 +322,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             sipuni_id,
             status: status.toString(),
             job_title,
+            department,
           },
           groups: [groups],
         };
@@ -336,7 +337,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         }
 
         enqueueSnackbar(
-          translations["Utilizator creat cu succes"][language],
+          getLanguageByKey("Utilizator creat cu succes"),
           { variant: "success" }
         );
       }
@@ -348,7 +349,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       const serverMessage =
         err?.response?.data?.message || err?.response?.data?.error;
       const fallbackMessage =
-        translations["Eroare la salvarea utilizatorului"][language];
+        getLanguageByKey("Eroare la salvarea utilizatorului");
       enqueueSnackbar(serverMessage || fallbackMessage, { variant: "error" });
     } finally {
       setIsSubmitting(false);
@@ -358,7 +359,7 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
   const formContent = (
     <Stack spacing="md">
       <Switch
-        label={translations["Activ"][language]}
+        label={getLanguageByKey("Activ")}
         checked={form.status}
         color="var(--crm-ui-kit-palette-link-primary)"
         onChange={(e) =>
@@ -368,16 +369,16 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       />
 
       <TextInput
-        label={translations["Nume"][language]}
-        placeholder={translations["Nume"][language]}
+        label={getLanguageByKey("Nume")}
+        placeholder={getLanguageByKey("Nume")}
         value={form.name}
         onChange={(e) => setForm({ ...form, name: e.target.value })}
         required
       />
 
       <TextInput
-        label={translations["Prenume"][language]}
-        placeholder={translations["Prenume"][language]}
+        label={getLanguageByKey("Prenume")}
+        placeholder={getLanguageByKey("Prenume")}
         value={form.surname}
         onChange={(e) => setForm({ ...form, surname: e.target.value })}
         required
@@ -385,8 +386,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
       {!initialUser && (
         <TextInput
-          label={translations["Login"][language]}
-          placeholder={translations["Login"][language]}
+          label={getLanguageByKey("Login")}
+          placeholder={getLanguageByKey("Login")}
           value={form.username}
           onChange={(e) => setForm({ ...form, username: e.target.value })}
           required
@@ -395,8 +396,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
       <TextInput
         type="email"
-        label={translations["Email"][language]}
-        placeholder={translations["Email"][language]}
+        label={getLanguageByKey("Email")}
+        placeholder={getLanguageByKey("Email")}
         value={form.email}
         onChange={(e) => setForm({ ...form, email: e.target.value })}
         autoComplete="off"
@@ -404,8 +405,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       />
 
       <PasswordInput
-        label={translations["password"][language]}
-        placeholder={translations["password"][language]}
+        label={getLanguageByKey("password")}
+        placeholder={getLanguageByKey("password")}
         value={form.password}
         onChange={(e) => setForm({ ...form, password: e.target.value })}
         required={!initialUser}
@@ -414,8 +415,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       />
 
       <Select
-        label={translations["Grup utilizator"][language]}
-        placeholder={translations["Alege grupul"][language]}
+        label={getLanguageByKey("Grup utilizator")}
+        placeholder={getLanguageByKey("Alege grupul")}
         data={groupsList.map((g) => ({ value: g.name, label: g.name }))}
         value={form.groups}
         onChange={(value) => setForm({ ...form, groups: value || "" })}
@@ -431,11 +432,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       />
 
       <TextInput
-        label={translations["Funcție"][language]}
-        placeholder={translations["Funcție"][language]}
+        label={getLanguageByKey("Funcție")}
+        placeholder={getLanguageByKey("Funcție")}
         value={form.job_title}
         onChange={(e) => setForm({ ...form, job_title: e.target.value })}
         required
+      />
+
+      <TextInput
+        label={getLanguageByKey("Departament") || "Departament"}
+        placeholder={getLanguageByKey("Departament") || "Departament"}
+        value={form.department}
+        onChange={(e) => setForm({ ...form, department: e.target.value })}
       />
 
       <TextInput
@@ -449,8 +457,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       {initialUser && (
         <Select
           clearable
-          label={translations["Grup permisiuni"][language]}
-          placeholder={translations["Alege grupul de permisiuni"][language]}
+          label={getLanguageByKey("Grup permisiuni")}
+          placeholder={getLanguageByKey("Alege grupul de permisiuni")}
           data={permissionGroups.map((g) => ({
             value: g.permission_id.toString(),
             label: g.permission_name,
@@ -476,8 +484,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
 
       <Button fullWidth mt="sm" onClick={handleCreate} loading={isSubmitting}>
         {initialUser
-          ? translations["Salvează"][language]
-          : translations["Creează"][language]}
+          ? getLanguageByKey("Salvează")
+          : getLanguageByKey("Creează")}
       </Button>
     </Stack>
   );
@@ -488,18 +496,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       onClose={onClose}
       zIndex={10002}
       title={
-        <div style={{ 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'space-between', 
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
           width: '100%',
           zIndex: 10003,
           position: 'relative'
         }}>
           <Title order={4} style={{ margin: 0, color: 'var(--crm-ui-kit-palette-text-primary)' }}>
             {initialUser
-              ? translations["Modificați utilizator"][language]
-              : translations["Adaugă utilizator"][language]}
+              ? getLanguageByKey("Modificați utilizator")
+              : getLanguageByKey("Adaugă utilizator")}
           </Title>
           <button
             onClick={onClose}
@@ -538,18 +546,18 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       closeOnClickOutside={false}
       closeOnEscape
       styles={{
-        body: { 
+        body: {
           padding: 0,
           height: 'calc(100vh - 60px)',
           overflow: 'hidden'
         },
-        content: { 
+        content: {
           height: '100vh',
           display: 'flex',
           flexDirection: 'column',
           zIndex: 10000
         },
-        header: { 
+        header: {
           padding: '16px 20px',
           borderBottom: '1px solid var(--crm-ui-kit-palette-border-primary)',
           backgroundColor: 'var(--crm-ui-kit-palette-background-primary)',
@@ -560,8 +568,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
         }
       }}
     >
-      <ScrollArea 
-        style={{ 
+      <ScrollArea
+        style={{
           height: 'calc(100vh - 80px)',
           flex: 1
         }}
@@ -583,8 +591,8 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
       position="right"
       title={
         initialUser
-          ? translations["Modificați utilizator"][language]
-          : translations["Adaugă utilizator"][language]
+          ? getLanguageByKey("Modificați utilizator")
+          : getLanguageByKey("Adaugă utilizator")
       }
       padding="lg"
       size="lg"

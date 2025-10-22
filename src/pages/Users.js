@@ -51,7 +51,8 @@ export const Users = () => {
     (filters.group?.length || 0) > 0 ||
     (filters.role?.length || 0) > 0 ||
     !!filters.status ||
-    !!filters.functie;
+    !!filters.functie ||
+    !!filters.department;
 
   const loadUsers = useCallback(async () => {
     setLoading(true);
@@ -59,21 +60,25 @@ export const Users = () => {
       const response = await api.users.getTechnicianList();
 
       const normalized = response.map((item) => {
-        const personal = item.id || {};
-        const user = personal.user || {};
+        const user = item.user || {};
 
         return {
-          id: personal.id,
-          name: personal.name || "-",
-          surname: personal.surname || "-",
+          id: item.id,
+          name: item.name || "-",
+          surname: item.surname || "-",
           username: user.username || "-",
           email: user.email || "-",
           groups: item.groups || [],
           jobTitle: item.job_title,
+          department: item.department,
           status: item.status,
           permissions: item.permissions || [],
           rawRoles: user.roles || "[]",
           sipuni_id: item.sipuni_id,
+          scheduleGroups: item.scheduleGroups || [],
+          import_success: item.import_success,
+          imported: item.imported,
+          email_confirmed: user.email_confirmed,
         };
       });
 
@@ -99,12 +104,15 @@ export const Users = () => {
       role: filters.role || [],
       status: filters.status || null,
       functie: filters.functie || null,
+      department: filters.department || null,
     };
 
     return users.filter((user) => {
       const matchesSearch =
         user.name.toLowerCase().includes(term) ||
-        user.surname.toLowerCase().includes(term)
+        user.surname.toLowerCase().includes(term) ||
+        user.username.toLowerCase().includes(term) ||
+        (user.email && user.email.toLowerCase().includes(term));
 
       const matchesGroup =
         filtersSafe.group.length === 0 ||
@@ -122,12 +130,16 @@ export const Users = () => {
       const matchesJob =
         !filtersSafe.functie || user.jobTitle === filtersSafe.functie;
 
+      const matchesDepartment =
+        !filtersSafe.department || user.department === filtersSafe.department;
+
       return (
         matchesSearch &&
         matchesGroup &&
         matchesRole &&
         matchesStatus &&
-        matchesJob
+        matchesJob &&
+        matchesDepartment
       );
     });
   }, [users, search, filters]);

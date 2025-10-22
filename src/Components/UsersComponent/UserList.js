@@ -7,6 +7,7 @@ import {
   IoTrash,
 } from "react-icons/io5";
 import { translations } from "../utils/translations";
+import { getLanguageByKey } from "../utils/getLanguageByKey";
 import { api } from "../../api";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
@@ -15,7 +16,6 @@ import { useConfirmPopup, useMobile } from "../../hooks";
 import PermissionGroupAssignModal from "./Roles/PermissionGroupAssignModal";
 import { useUser } from "../../hooks";
 import { hasStrictPermission } from "../utils/permissions";
-
 const language = localStorage.getItem("language") || "RO";
 
 const extractId = (u) => u.id?.user?.id || u.id?.id || u.id;
@@ -56,15 +56,15 @@ const UserList = ({
       const newStatus = (!currentStatus).toString();
       await api.users.updateTechnician(id, { status: newStatus });
       fetchUsers();
-      enqueueSnackbar(
-        currentStatus
-          ? translations["Utilizator dezactivat"][language]
-          : translations["Utilizator activat"][language],
-        { variant: "success" },
-      );
+        enqueueSnackbar(
+          currentStatus
+            ? getLanguageByKey("Utilizator dezactivat")
+            : getLanguageByKey("Utilizator activat"),
+          { variant: "success" },
+        );
     } catch (err) {
       enqueueSnackbar(
-        translations["Eroare la actualizarea statusului"][language],
+        getLanguageByKey("Eroare la actualizarea statusului"),
         { variant: "error" },
       );
     }
@@ -81,14 +81,14 @@ const UserList = ({
       };
 
       await api.users.updateMultipleTechnicians(payload);
-      enqueueSnackbar(translations["Statuturi actualizate"][language], {
+      enqueueSnackbar(getLanguageByKey("Statuturi actualizate"), {
         variant: "success",
       });
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
       enqueueSnackbar(
-        translations["Eroare la schimbarea statusului"][language],
+        getLanguageByKey("Eroare la schimbarea statusului"),
         { variant: "error" },
       );
     }
@@ -100,7 +100,7 @@ const UserList = ({
         ? translations["Sigur doriți să ștergeți utilizatorii selectați?"][
         language
         ]
-        : translations["Sigur doriți să ștergeți utilizatorul?"][language],
+        : getLanguageByKey("Sigur doriți să ștergeți utilizatorul?"),
     loading: false,
   });
 
@@ -108,13 +108,13 @@ const UserList = ({
     confirmDeleteUsers(async () => {
       try {
         await api.users.deleteMultipleUsers({ user_ids: userIds });
-        enqueueSnackbar(translations["Utilizator șters"][language], {
+        enqueueSnackbar(getLanguageByKey("Utilizator șters"), {
           variant: "success",
         });
         fetchUsers();
         if (userIds.length > 1) setSelectedIds([]);
       } catch (err) {
-        enqueueSnackbar(translations["Eroare la ștergere"][language], {
+        enqueueSnackbar(getLanguageByKey("Eroare la ștergere"), {
           variant: "error",
         });
       }
@@ -131,7 +131,7 @@ const UserList = ({
         user_ids: selectedIds,
       });
 
-      enqueueSnackbar(translations["Grup actualizat"][language], {
+      enqueueSnackbar(getLanguageByKey("Grup actualizat"), {
         variant: "success",
       });
 
@@ -139,7 +139,7 @@ const UserList = ({
       setSelectedIds([]);
     } catch (err) {
       enqueueSnackbar(
-        translations["Eroare la actualizarea grupului"][language],
+        getLanguageByKey("Eroare la actualizarea grupului"),
         { variant: "error" }
       );
     }
@@ -151,13 +151,13 @@ const UserList = ({
         permissionGroupId,
         selectedIds,
       );
-      enqueueSnackbar(translations["Grup de permisiuni atribuit"][language], {
+      enqueueSnackbar(getLanguageByKey("Grup de permisiuni atribuit"), {
         variant: "success",
       });
       fetchUsers();
       setSelectedIds([]);
     } catch (err) {
-      enqueueSnackbar(translations["Eroare la atribuirea grupului"][language], {
+      enqueueSnackbar(getLanguageByKey("Eroare la atribuirea grupului"), {
         variant: "error",
       });
     }
@@ -205,8 +205,8 @@ const UserList = ({
                   onClick={() => toggleUserStatus(user.id, user.status)}
                 >
                   {user.status
-                    ? translations["Dezactivați"][language]
-                    : translations["Activați"][language]}
+                    ? getLanguageByKey("Dezactivați")
+                    : getLanguageByKey("Activați")}
                 </Menu.Item>
               )}
               {canEdit && (
@@ -214,7 +214,7 @@ const UserList = ({
                   leftSection={<IoPencil size={16} />}
                   onClick={() => openEditUser(user)}
                 >
-                  {translations["Modificați"][language]}
+                  {getLanguageByKey("Modificați")}
                 </Menu.Item>
               )}
               {canDelete && (
@@ -223,7 +223,7 @@ const UserList = ({
                   onClick={() => handleDeleteUsersWithConfirm([user.id])}
                   color="red"
                 >
-                  {translations["Ștergeți"][language]}
+                  {getLanguageByKey("Ștergeți")}
                 </Menu.Item>
               )}
             </Menu.Dropdown>
@@ -237,12 +237,17 @@ const UserList = ({
           </Group>
 
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">{translations["Email"][language]}:</Text>
-            <Text size="xs" style={{ wordBreak: 'break-word' }}>{user.email}</Text>
+            <Text size="xs" c="dimmed">{getLanguageByKey("Email")}:</Text>
+            <Text size="xs" style={{ wordBreak: 'break-word' }}>{user.email || "—"}</Text>
           </Group>
 
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">{translations["Grup"][language]}:</Text>
+            <Text size="xs" c="dimmed">Username:</Text>
+            <Text size="xs">{user.username || "—"}</Text>
+          </Group>
+
+          <Group justify="space-between">
+            <Text size="xs" c="dimmed">{getLanguageByKey("Grup")}:</Text>
             <Text size="xs">
               {Array.isArray(user.groups)
                 ? user.groups.map((g) => (typeof g === "string" ? g : g.name)).join(", ")
@@ -251,7 +256,7 @@ const UserList = ({
           </Group>
 
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">{translations["Grup permisiuni"][language]}:</Text>
+            <Text size="xs" c="dimmed">{getLanguageByKey("Grup permisiuni")}:</Text>
             <Text size="xs">
               {Array.isArray(user.permissions) && user.permissions.length > 0
                 ? user.permissions[0].name
@@ -260,19 +265,26 @@ const UserList = ({
           </Group>
 
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">{translations["Funcție"][language]}:</Text>
+            <Text size="xs" c="dimmed">{getLanguageByKey("Funcție")}:</Text>
             <Text size="xs">{user.jobTitle || "—"}</Text>
           </Group>
 
+          {user.department && (
+            <Group justify="space-between">
+              <Text size="xs" c="dimmed">{translations["Departament"]?.[language] || "Departament"}:</Text>
+              <Text size="xs">{user.department}</Text>
+            </Group>
+          )}
+
           <Group justify="space-between">
-            <Text size="xs" c="dimmed">{translations["Status"][language]}:</Text>
+            <Text size="xs" c="dimmed">{getLanguageByKey("Status")}:</Text>
             <Badge
               size="xs"
               color={user.status ? "green" : "red"}
             >
               {user.status
-                ? translations["Activ"][language]
-                : translations["Inactiv"][language]}
+                ? getLanguageByKey("Activ")
+                : getLanguageByKey("Inactiv")}
             </Badge>
           </Group>
 
@@ -317,7 +329,7 @@ const UserList = ({
       : []),
     {
       align: "center",
-      title: translations["ID"][language],
+      title: getLanguageByKey("ID"),
       dataIndex: "id",
       key: "id",
       width: 90,
@@ -325,29 +337,37 @@ const UserList = ({
     },
     {
       align: "center",
-      title: translations["Nume"][language],
+      title: getLanguageByKey("Nume"),
       dataIndex: "name",
       key: "name",
       width: 150,
     },
     {
       align: "center",
-      title: translations["Prenume"][language],
+      title: getLanguageByKey("Prenume"),
       dataIndex: "surname",
       key: "surname",
       width: 150,
     },
     {
       align: "center",
-      title: translations["Email"][language],
+      title: getLanguageByKey("Email"),
       dataIndex: "email",
       key: "email",
       width: 250,
-      render: (email) => <div className="break-word">{email}</div>,
+      render: (email) => <div className="break-word">{email || "—"}</div>,
     },
     {
       align: "center",
-      title: translations["Grup"][language],
+      title: getLanguageByKey("Login"),
+      dataIndex: "username",
+      key: "username",
+      width: 250,
+      render: (username) => username || "—",
+    },
+    {
+      align: "center",
+      title: getLanguageByKey("Grup utilizator"),
       dataIndex: "groups",
       key: "groups",
       width: 200,
@@ -358,7 +378,7 @@ const UserList = ({
     },
     {
       align: "center",
-      title: translations["Grup permisiuni"][language],
+      title: getLanguageByKey("Grup permisiuni"),
       dataIndex: "permissions",
       key: "permissions",
       width: 200,
@@ -369,7 +389,7 @@ const UserList = ({
     },
     {
       align: "center",
-      title: translations["Funcție"][language],
+      title: getLanguageByKey("Funcție"),
       dataIndex: "job_title",
       key: "job_title",
       width: 200,
@@ -377,14 +397,22 @@ const UserList = ({
     },
     {
       align: "center",
-      title: translations["Status"][language],
+      title: translations["Departament"]?.[language] || "Departament",
+      dataIndex: "department",
+      key: "department",
+      width: 150,
+      render: (department) => department || "—",
+    },
+    {
+      align: "center",
+      title: getLanguageByKey("Status"),
       dataIndex: "status",
       key: "status",
       width: 110,
       render: (status) =>
         status
-          ? translations["Activ"][language]
-          : translations["Inactiv"][language],
+          ? getLanguageByKey("Activ")
+          : getLanguageByKey("Inactiv"),
     },
     {
       align: "center",
@@ -397,7 +425,7 @@ const UserList = ({
     ...(canEdit || canDelete
       ? [
         {
-          title: translations["Acțiune"][language],
+          title: getLanguageByKey("Acțiune"),
           dataIndex: "action",
           key: "action",
           width: 100,
@@ -422,8 +450,8 @@ const UserList = ({
                     onClick={() => toggleUserStatus(row.id, row.status)}
                   >
                     {row.status
-                      ? translations["Dezactivați"][language]
-                      : translations["Activați"][language]}
+                      ? getLanguageByKey("Dezactivați")
+                      : getLanguageByKey("Activați")}
                   </Menu.Item>
                 )}
                 {canEdit && (
@@ -431,7 +459,7 @@ const UserList = ({
                     leftSection={<IoPencil size={16} />}
                     onClick={() => openEditUser(row)}
                   >
-                    {translations["Modificați"][language]}
+                    {getLanguageByKey("Modificați")}
                   </Menu.Item>
                 )}
                 {canDelete && (
@@ -440,7 +468,7 @@ const UserList = ({
                     onClick={() => handleDeleteUsersWithConfirm([row.id])}
                     color="red"
                   >
-                    {translations["Ștergeți"][language]}
+                    {getLanguageByKey("Ștergeți")}
                   </Menu.Item>
                 )}
               </Menu.Dropdown>
@@ -462,7 +490,7 @@ const UserList = ({
               onClick={handleToggleStatusSelected}
               size={isMobile ? "sm" : "md"}
             >
-              {translations["Schimbǎ status"][language]}
+              {getLanguageByKey("Schimbǎ status")}
             </Button>
           )}
 
@@ -472,7 +500,7 @@ const UserList = ({
               onClick={() => setGroupModalOpen(true)}
               size={isMobile ? "sm" : "md"}
             >
-              {translations["Schimbă grupul"][language]}
+              {getLanguageByKey("Schimbă grupul")}
             </Button>
           )}
 
@@ -483,7 +511,7 @@ const UserList = ({
               onClick={() => setPermissionModalOpen(true)}
               size={isMobile ? "sm" : "md"}
             >
-              {translations["Schimbǎ grup de permisiuni"][language]}
+              {getLanguageByKey("Schimbǎ grup de permisiuni")}
             </Button>
           )}
 
@@ -494,7 +522,7 @@ const UserList = ({
               onClick={() => handleDeleteUsersWithConfirm(selectedIds)}
               size={isMobile ? "sm" : "md"}
             >
-              {translations["Șterge"][language]}
+              {getLanguageByKey("Șterge")}
             </Button>
           )}
         </div>
