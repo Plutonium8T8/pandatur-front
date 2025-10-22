@@ -8,10 +8,16 @@ import Can from "@components/CanComponent/Can";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { tickets } = useApp();
-  const { getUserMessages } = useMessagesContext();
+  const { getUserMessages, messages } = useMessagesContext();
 
   const currentTicket = tickets.find(t => t.id === Number(ticketId));
   
+  // Получаем последнее сообщение для автоматического выбора контакта
+  const lastMessage = React.useMemo(() => {
+    if (!messages || messages.length === 0) return null;
+    return messages[messages.length - 1];
+  }, [messages]);
+
   const {
     platformOptions,
     selectedPlatform,
@@ -19,9 +25,11 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     contactOptions,
     changeContact,
     selectedClient,
+    selectedPageId,
+    changePageId,
     loading,
     updateClientData,
-  } = useClientContacts(ticketId);
+  } = useClientContacts(ticketId, lastMessage);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
@@ -51,6 +59,8 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             changePlatform={changePlatform}
             contactOptions={contactOptions}
             changeContact={changeContact}
+            selectedPageId={selectedPageId}
+            changePageId={changePageId}
             loading={loading}
             technicians={technicians}
             unseenCount={unseenCount}

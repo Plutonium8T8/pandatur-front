@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
-import { useApp, useClientContacts } from "@hooks";
+import { useApp, useClientContacts, useMessagesContext } from "@hooks";
 import { useGetTechniciansList } from "../hooks";
 import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
 import ChatList from "../Components/ChatComponent/ChatList";
@@ -11,6 +11,7 @@ import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
   const { tickets } = useApp();
+  const { messages } = useMessagesContext();
   const { ticketId: ticketIdParam } = useParams();
   const ticketId = useMemo(() => {
     const parsed = Number(ticketIdParam);
@@ -25,6 +26,12 @@ export const Chat = () => {
     return found;
   }, [tickets, ticketId]);
 
+  // Получаем последнее сообщение для автоматического выбора контакта
+  const lastMessage = useMemo(() => {
+    if (!messages || messages.length === 0) return null;
+    return messages[messages.length - 1];
+  }, [messages]);
+
   const {
     platformOptions,
     selectedPlatform,
@@ -32,9 +39,11 @@ export const Chat = () => {
     contactOptions,
     changeContact,
     selectedClient,
+    selectedPageId,
+    changePageId,
     loading,
     updateClientData,
-  } = useClientContacts(ticketId);
+  } = useClientContacts(ticketId, lastMessage);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
@@ -71,6 +80,8 @@ export const Chat = () => {
               changePlatform={changePlatform}
               contactOptions={contactOptions}
               changeContact={changeContact}
+              selectedPageId={selectedPageId}
+              changePageId={changePageId}
               loading={loading}
               technicians={technicians}
               unseenCount={currentTicket?.unseen_count || 0}

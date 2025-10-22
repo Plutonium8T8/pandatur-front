@@ -28,6 +28,7 @@ import Can from "../../../CanComponent/Can";
 import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 import { EmailForm } from "../EmailForm/EmailForm";
+import { getPagesByType } from "../../../../constants/webhookPagesConfig";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -38,6 +39,8 @@ export const ChatInput = ({
   changePlatform,
   contactOptions,
   changeContact,
+  selectedPageId,
+  changePageId,
   currentClient,
   loading,
   onCreateTask,
@@ -89,6 +92,17 @@ export const ChatInput = ({
   const isWhatsApp = currentClient?.payload?.platform?.toUpperCase() === "WHATSAPP";
   const isViber = currentClient?.payload?.platform?.toUpperCase() === "VIBER";
   const isTelegram = currentClient?.payload?.platform?.toUpperCase() === "TELEGRAM";
+
+  // Получаем список page_id для выбранной платформы
+  const pageIdOptions = useMemo(() => {
+    if (!selectedPlatform) return [];
+    
+    const pages = getPagesByType(selectedPlatform);
+    return pages.map(page => ({
+      value: page.page_id,
+      label: `${page.page_name} (${page.group_title})`
+    }));
+  }, [selectedPlatform]);
 
   // Автоматически выбираем первый подходящий номер при изменении воронки
   useEffect(() => {
@@ -332,9 +346,9 @@ export const ChatInput = ({
         {!showEmailForm ? (
           <>
             <Flex w="100%" gap="xs" mb="xs" align="center">
-              {socialMediaIcons[currentClient?.payload?.platform] && (
+              {/* {socialMediaIcons[currentClient?.payload?.platform] && (
                 <Flex>{socialMediaIcons[currentClient.payload.platform]}</Flex>
-              )}
+              )} */}
               {loading ? (
                 <Loader size="xs" />
               ) : (
@@ -407,13 +421,16 @@ export const ChatInput = ({
                       }}
                     />
                     
-                    {/* 4. Void select */}
+                    {/* 4. Page ID select */}
                     <Select
                       searchable
-                      label="Дополнительный селект"
-                      placeholder="Дополнительный селект"
-                      data={[]}
+                      label="Страница Panda"
+                      placeholder="Выберите страницу"
+                      value={selectedPageId}
+                      onChange={changePageId}
+                      data={pageIdOptions}
                       className="w-full"
+                      disabled={!selectedPlatform}
                       styles={{
                         input: {
                           fontSize: '16px',

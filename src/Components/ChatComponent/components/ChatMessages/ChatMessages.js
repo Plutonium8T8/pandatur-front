@@ -11,6 +11,7 @@ import TaskListOverlay from "../../../Task/TaskListOverlay";
 import { GroupedMessages } from "../GroupedMessages";
 import { InlineNoteComposer } from "../../../InlineNoteComposer";
 import { TicketParticipants } from "../../../TicketParticipants";
+import { getPageIdByPlatformAndGroup } from "../../../../constants/webhookPagesConfig";
 import "./ChatMessages.css";
 
 const getSendedMessage = (msj, currentMsj, statusMessage) => {
@@ -50,6 +51,8 @@ export const ChatMessages = ({
   changePlatform,
   contactOptions,
   changeContact,
+  selectedPageId,
+  changePageId,
   loading,
   technicians,
   unseenCount = 0,
@@ -266,6 +269,8 @@ export const ChatMessages = ({
               changePlatform={changePlatform}
               contactOptions={contactOptions}
               changeContact={changeContact}
+              selectedPageId={selectedPageId}
+              changePageId={changePageId}
               ticketId={ticketId}
               unseenCount={unseenCount}
               currentClient={selectedClient}
@@ -274,11 +279,19 @@ export const ChatMessages = ({
               onToggleNoteComposer={handleToggleNoteComposer}
               onSendMessage={(value) => {
                 if (!selectedClient.payload) return;
+                
+                // Получаем page_id из конфигурации по платформе и group_title тикета
+                const pandaPageId = getPageIdByPlatformAndGroup(
+                  selectedClient.payload.platform,
+                  personalInfo?.group_title
+                );
+                
                 sendMessage({
                   sender_id: Number(userId),
-                  client_id: selectedClient.payload.id,
+                  client_id: selectedClient.payload.client_id,
                   platform: selectedClient.payload.platform,
-                  page_id: selectedClient.payload.page_id,
+                  page_id: pandaPageId, // page_id Panda из конфигурации
+                  contact_value: selectedClient.payload.contact_value, // ID клиента (куда отправляем)
                   ticket_id: ticketId,
                   time_sent: dayjs().format(YYYY_MM_DD_HH_mm_ss),
                   messageStatus: MESSAGES_STATUS.PENDING,

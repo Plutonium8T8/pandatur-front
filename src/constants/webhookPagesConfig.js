@@ -368,3 +368,18 @@ export const getGroupTitles = () => {
   const uniqueGroups = [...new Set(allPages.map(page => page.group_title))];
   return uniqueGroups.sort();
 };
+
+// Получить page_id для отправки сообщения по платформе и group_title
+export const getPageIdByPlatformAndGroup = (platform, groupTitle) => {
+  let key;
+  if (platform === 'facebook') key = 'facebooks';
+  else if (platform === 'instagram') key = 'instagrams';
+  else if (platform === 'whatsapp') key = 'whatsapps';
+  else if (platform === 'viber') key = 'vibers';
+  else if (platform === 'telegram') key = 'telegrams';
+  else return null;
+
+  const pages = WEBHOOK_PAGES_CONFIG[key] || [];
+  const page = pages.find(p => p.group_title === groupTitle);
+  return page?.page_id || null;
+};
