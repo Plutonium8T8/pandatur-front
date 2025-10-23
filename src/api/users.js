@@ -81,12 +81,22 @@ export const users = {
   },
 
   getUsersClientContactsByPlatform: async (id, platform) => {
+    const params = platform ? { platform } : {};
+    
     const { data } = await baseAxios.get(`/api/tickets/${id}/clients-by-platform`, {
-      params: {
-        platform,
-      },
+      params,
     });
 
+    return data;
+  },
+
+  addClientContact: async (clientId, body) => {
+    const { data } = await baseAxios.post(`/api/users-client/${clientId}/contacts`, body);
+    return data;
+  },
+
+  updateClientContact: async (clientId, contactId, body) => {
+    const { data } = await baseAxios.put(`/api/users-client/${clientId}/contacts/${contactId}`, body);
     return data;
   },
 };

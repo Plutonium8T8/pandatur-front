@@ -3332,6 +3332,106 @@ export const translations = {
     RU: "Добавить клиента",
     EN: "Add Client",
   },
+  "Adaugă client nou": {
+    RO: "Adaugă client nou",
+    RU: "Добавить нового клиента",
+    EN: "Add New Client",
+  },
+  "Introduceti numele": {
+    RO: "Introduceți numele",
+    RU: "Введите имя",
+    EN: "Enter name",
+  },
+  "Introduceti prenumele": {
+    RO: "Introduceți prenumele",
+    RU: "Введите фамилию",
+    EN: "Enter surname",
+  },
+  "Nu există clienți asociați cu acest ticket": {
+    RO: "Nu există clienți asociați cu acest ticket",
+    RU: "Нет клиентов, связанных с этим тикетом",
+    EN: "No clients associated with this ticket",
+  },
+  "Adaugă contact nou": {
+    RO: "Adaugă contact nou",
+    RU: "Добавить новый контакт",
+    EN: "Add New Contact",
+  },
+  "Platformele sociale se adaugă automat prin mesaje": {
+    RO: "Platformele sociale se adaugă automat prin mesaje",
+    RU: "Социальные платформы добавляются автоматически через сообщения",
+    EN: "Social platforms are added automatically through messages",
+  },
+  "Tip contact": {
+    RO: "Tip contact",
+    RU: "Тип контакта",
+    EN: "Contact Type",
+  },
+  "Selectați tipul": {
+    RO: "Selectați tipul",
+    RU: "Выберите тип",
+    EN: "Select type",
+  },
+  "Valoare contact": {
+    RO: "Valoare contact",
+    RU: "Значение контакта",
+    EN: "Contact Value",
+  },
+  "Introduceți valoarea": {
+    RO: "Introduceți valoarea",
+    RU: "Введите значение",
+    EN: "Enter value",
+  },
+  "Adaugă contact": {
+    RO: "Adaugă contact",
+    RU: "Добавить контакт",
+    EN: "Add Contact",
+  },
+  "Completați cel puțin un câmp": {
+    RO: "Completați cel puțin un câmp",
+    RU: "Заполните хотя бы одно поле",
+    EN: "Fill in at least one field",
+  },
+  "Clientul a fost adăugat cu succes": {
+    RO: "Clientul a fost adăugat cu succes",
+    RU: "Клиент успешно добавлен",
+    EN: "Client added successfully",
+  },
+  "Contactul a fost adăugat cu succes": {
+    RO: "Contactul a fost adăugat cu succes",
+    RU: "Контакт успешно добавлен",
+    EN: "Contact added successfully",
+  },
+  "Eroare la încărcarea datelor clienților": {
+    RO: "Eroare la încărcarea datelor clienților",
+    RU: "Ошибка при загрузке данных клиентов",
+    EN: "Error loading client data",
+  },
+  "Selectați tipul de contact": {
+    RO: "Selectați tipul de contact",
+    RU: "Выберите тип контакта",
+    EN: "Select contact type",
+  },
+  "Introduceți valoarea contactului": {
+    RO: "Introduceți valoarea contactului",
+    RU: "Введите значение контакта",
+    EN: "Enter contact value",
+  },
+  "Introduceți doar cifre": {
+    RO: "Introduceți doar cifre",
+    RU: "Введите только цифры",
+    EN: "Enter digits only",
+  },
+  "Contactul a fost actualizat cu succes": {
+    RO: "Contactul a fost actualizat cu succes",
+    RU: "Контакт успешно обновлен",
+    EN: "Contact updated successfully",
+  },
+  "Eroare la actualizarea contactului": {
+    RO: "Eroare la actualizarea contactului",
+    RU: "Ошибка при обновлении контакта",
+    EN: "Error updating contact",
+  },
   "Contactate": {
     RO: "Contactate",
     RU: "Связались",

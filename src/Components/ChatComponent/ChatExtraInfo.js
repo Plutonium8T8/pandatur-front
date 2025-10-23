@@ -369,11 +369,8 @@ const ChatExtraInfo = ({
             <Divider my="md" size="md" />
 
             <PersonalData4ClientForm
-              key={`personal-${selectedClient.payload?.id}-${ticketId}`}
-              formInstance={form}
-              data={selectedClient.payload}
+              key={`personal-${ticketId}`}
               ticketId={ticketId}
-              onUpdateClientData={onUpdateClientData}
             />
 
             <Divider my="md" size="md" />
