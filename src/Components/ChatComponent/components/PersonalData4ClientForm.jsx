@@ -101,7 +101,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
         }
 
         if (values.contact_type === "telegram") {
-          return /^@?[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid");
+          return /^[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid (fără @)");
         }
 
         return null;
@@ -123,6 +123,10 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
         if (editingContact?.type === "phone") {
           return /^\d+$/.test(value) ? null : getLanguageByKey("Introduceți doar cifre");
+        }
+
+        if (editingContact?.type === "telegram") {
+          return /^[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid (fără @)");
         }
 
         return null;
@@ -238,6 +242,11 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
     contactForm.setFieldValue("contact_value", onlyDigits);
   };
 
+  const handleContactTelegramChange = (e) => {
+    const withoutAt = e.currentTarget.value.replace(/@/g, "");
+    contactForm.setFieldValue("contact_value", withoutAt);
+  };
+
   // Обработчик добавления контакта к клиенту
   const handleAddContact = async (clientId) => {
     if (contactForm.validate().hasErrors) {
@@ -340,6 +349,12 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   // Обработка ввода телефона (только цифры) для редактирования
   const handleEditPhoneChange = (event) => {
     const value = event.target.value.replace(/\D/g, '');
+    editContactForm.setFieldValue('contact_value', value);
+  };
+
+  // Обработка ввода telegram (без @) для редактирования
+  const handleEditTelegramChange = (event) => {
+    const value = event.target.value.replace(/@/g, '');
     editContactForm.setFieldValue('contact_value', value);
   };
 
@@ -810,9 +825,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                         contactForm.values.contact_type === "email"
                           ? "example@email.com"
                           : contactForm.values.contact_type === "phone"
-                            ? "37368939111"
+                            ? "37300000000"
                             : contactForm.values.contact_type === "telegram"
-                              ? "@telegram_username"
+                              ? "telegram username"
                               : "Introduceți username-ul"
                       }
                       leftSection={
@@ -830,7 +845,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       onChange={
                         contactForm.values.contact_type === "phone"
                           ? handleContactPhoneChange
-                          : contactForm.getInputProps("contact_value").onChange
+                          : contactForm.values.contact_type === "telegram"
+                            ? handleContactTelegramChange
+                            : contactForm.getInputProps("contact_value").onChange
                       }
                       value={contactForm.values.contact_value}
                       mb="md"
