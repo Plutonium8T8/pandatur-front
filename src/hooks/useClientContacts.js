@@ -1,456 +1,369 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, startTransition } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "../api";
 import { showServerError } from "@utils";
 import { getPagesByType } from "../constants/webhookPagesConfig";
 
-const normalizeClientContacts = (ticketData) => {
+/** ====================== helpers ====================== */
+
+/** безопасный лог (вырубаем в проде одной переменной) */
+const DEBUG = false;
+const debug = (...args) => { if (DEBUG) console.log("[useClientContacts]", ...args); };
+
+/** приводим платформенные данные к объекту { [contactId]: contactData } */
+function normalizePlatformBlock(block) {
+  if (!block) return {};
+  if (Array.isArray(block)) {
+    // если вдруг пришёл массив — преобразуем к объекту по index.id
+    return block.reduce((acc, item, idx) => {
+      const id = item?.id ?? idx;
+      acc[id] = item || {};
+      return acc;
+    }, {});
+  }
+  if (typeof block === "object") return block;
+  return {};
+}
+
+/** строим быстрый индекс contactId -> client для ticketData.clients */
+function buildClientIndex(clients) {
+  const map = new Map(); // key: contactId(number) -> client
+  (clients || []).forEach((c) => {
+    (c.contacts || []).forEach((ct) => {
+      if (ct?.id != null) map.set(Number.parseInt(ct.id, 10), c);
+    });
+  });
+  return map;
+}
+
+/** из ticketData строим список платформ с контактами */
+function computePlatformOptions(ticketData) {
   if (!ticketData) return [];
 
-  // Собираем уникальные платформы из новой структуры данных
-  const platforms = new Set();
-
-  // Проходим по всем платформам в корне объекта
-  Object.keys(ticketData).forEach(key => {
-    if (key !== 'clients' && typeof ticketData[key] === 'object' && ticketData[key] !== null) {
-      // Проверяем, что у платформы есть контакты (не пустой массив)
-      const platformData = ticketData[key];
-      if (Array.isArray(platformData)) {
-        // Если это массив, проверяем что он не пустой
-        if (platformData.length > 0) {
-          platforms.add(key);
-        }
-      } else {
-        // Если это объект, проверяем что у него есть ключи (контакты)
-        if (Object.keys(platformData).length > 0) {
-          platforms.add(key);
-        }
-      }
+  const options = [];
+  Object.keys(ticketData).forEach((key) => {
+    if (key === "clients") return;
+    const block = normalizePlatformBlock(ticketData[key]);
+    const hasAny = Object.keys(block).length > 0;
+    if (hasAny) {
+      options.push({
+        label: key,
+        value: key,
+        payload: { platform: key },
+      });
     }
   });
 
-  // whatsapp и viber уже добавлены в первом проходе
+  // стабильный порядок (не обяз., но чтобы селект не «плясал»)
+  options.sort((a, b) => a.label.localeCompare(b.label));
+  return options;
+}
 
-  // Создаем опции для каждой платформы
-  return Array.from(platforms).map(platform => {
-    // Собираем контакты для этой платформы
-    let allContacts = [];
+/** формируем опции контактов для выбранной платформы */
+function computeContactOptions(ticketData, selectedPlatform) {
+  if (!ticketData || !selectedPlatform) return [];
+  const block = normalizePlatformBlock(ticketData[selectedPlatform]);
+  const clientIndex = buildClientIndex(ticketData.clients);
 
-    if (ticketData[platform]) {
-      // Для всех платформ используем данные напрямую
-      allContacts = Object.entries(ticketData[platform]).map(([contactId, contactData]) => {
-        // Находим client_id из массива clients по contact_id
-        const client = ticketData.clients?.find(c => 
-          c.contacts?.some(contact => contact.id === parseInt(contactId))
-        );
-        
-        return {
-          id: contactId,
-          contact_type: platform,
-          contact_value: contactData.contact_value,
-          is_primary: contactData.is_primary || false,
-          client_id: client?.id, // используем ID клиента из массива clients
-          client_name: contactData.name,
-          client_surname: contactData.surname,
-          client_photo: client?.photo
-        };
-      });
+  const contacts = Object.entries(block).map(([contactIdRaw, contactData]) => {
+    const contactId = Number.parseInt(contactIdRaw, 10);
+    const client = clientIndex.get(contactId);
+
+    const client_id = client?.id;
+    const name = contactData?.name || client?.name || "";
+    const surname = contactData?.surname || client?.surname || "";
+    const contact_value = contactData?.contact_value || "";
+
+    // лейблы — единая логика
+    let label;
+    if (["whatsapp", "viber", "telegram"].includes(selectedPlatform)) {
+      const fullName = `${name} ${surname || ""}`.trim();
+      label = `${fullName} - ${contact_value}`;
+    } else {
+      label = `${contactId} - ${name} ${surname || ""}`.trim();
     }
 
     return {
-      label: platform,
-      value: platform,
+      label,
+      value: `${client_id ?? "x"}-${contactId}`,
       payload: {
-        platform: platform,
-        allContacts: allContacts
+        id: client_id,
+        client_id,
+        contact_id: contactId,
+        platform: selectedPlatform,
+        name,
+        surname,
+        phone: selectedPlatform === "phone" ? contact_value : "",
+        email: selectedPlatform === "email" ? contact_value : "",
+        contact_value,
+        is_primary: Boolean(contactData?.is_primary),
+        photo: client?.photo,
       },
     };
   });
-};
+
+  // опционально: сортировка по имени, чтобы было стабильно
+  contacts.sort((a, b) => a.label.localeCompare(b.label));
+  return contacts;
+}
+
+/** попытка найти контакт в списке по (contact_value, client_id), потом по contact_value */
+function matchContact(contactOptions, contactValue, clientId) {
+  if (!contactOptions?.length || !contactValue) return null;
+  const full = contactOptions.find(
+    (c) => c?.payload?.contact_value === contactValue && c?.payload?.client_id === clientId
+  );
+  if (full) return full;
+  return contactOptions.find((c) => c?.payload?.contact_value === contactValue) || null;
+}
+
+/** фильтранём page_id по groupTitle */
+function selectPageIdByMessage(platform, messagePageId, groupTitle) {
+  if (!platform) return null;
+  const allPages = getPagesByType(platform) || [];
+  const filtered = groupTitle ? allPages.filter((p) => p.group_title === groupTitle) : allPages;
+  if (!filtered.length) return null;
+  return filtered.some((p) => p.page_id === messagePageId)
+    ? messagePageId
+    : filtered[0].page_id;
+}
+
+/** ====================== хук ====================== */
 
 export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [platformOptions, setPlatformOptions] = useState([]);
+  // минимально необходимый стейт
+  const [ticketData, setTicketData] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [contactOptions, setContactOptions] = useState([]);
-  const [selectedClient, setSelectedClient] = useState({});
+  const [selectedClient, setSelectedClient] = useState({}); // option целиком
   const [selectedPageId, setSelectedPageId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [ticketData, setTicketData] = useState(null);
 
+  // защищаемся от гонок запросов
+  const abortRef = useRef(null);
+  const ticketIdRef = useRef(ticketId);
+  ticketIdRef.current = ticketId;
+
+  /** загрузка ticketData (контактов по платформам) */
   const fetchClientContacts = useCallback(async () => {
-    if (!ticketId) {
-      return;
-    }
+    if (!ticketId) return;
+    if (abortRef.current) abortRef.current.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
 
     setLoading(true);
     try {
-      // Используем новый API для получения клиентов по платформам
-      const response = await api.users.getUsersClientContactsByPlatform(ticketId);
-
-      // Нормализуем данные для платформ
-      const platforms = normalizeClientContacts(response);
-      setPlatformOptions(platforms);
-      setTicketData(response);
-
-      // Выбираем первую платформу по умолчанию
-      if (platforms.length > 0) {
-        setSelectedPlatform(platforms[0].value);
-      }
-
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), {
-        variant: "error",
+      const response = await api.users.getUsersClientContactsByPlatform(ticketId, {
+        signal: controller.signal,
       });
+
+      if (controller.signal.aborted) return; // уже не актуально
+
+      startTransition(() => {
+        setTicketData(response);
+        // сбросим выборы — и дадим авто-логике выставить их ниже
+        setSelectedPlatform(null);
+        setSelectedClient({});
+        setSelectedPageId(null);
+      });
+    } catch (error) {
+      if (error?.name !== "AbortError") {
+        enqueueSnackbar(showServerError(error), { variant: "error" });
+      }
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [ticketId, enqueueSnackbar]);
 
-  const updateContactOptions = useCallback((platform) => {
-    console.log('🔄 updateContactOptions called:', {
-      platform,
-      hasTicketData: !!ticketData,
-      platformData: ticketData?.[platform],
-      ticketDataKeys: ticketData ? Object.keys(ticketData) : []
+  // мемо-вычисления вместо лишних setState
+  const platformOptions = useMemo(
+    () => computePlatformOptions(ticketData),
+    [ticketData]
+  );
+
+  const contactOptions = useMemo(
+    () => computeContactOptions(ticketData, selectedPlatform),
+    [ticketData, selectedPlatform]
+  );
+
+  /** авто-подгрузка при изменении ticketId */
+  useEffect(() => {
+    debug("ticketId changed → refetch + local reset", ticketId);
+    // Мягкий сброс локально — визуально не «мигать»
+    startTransition(() => {
+      setSelectedPlatform(null);
+      setSelectedClient({});
+      setSelectedPageId(null);
     });
+    fetchClientContacts();
+    return () => {
+      if (abortRef.current) abortRef.current.abort();
+    };
+  }, [ticketId, fetchClientContacts]);
 
-    if (!ticketData) {
-      console.log('⚠️ No ticketData, clearing contact options');
-      setContactOptions([]);
-      return;
-    }
+  /** шаг 1: выбрать платформу на основе lastMessage или взять первую доступную */
+  useEffect(() => {
+    if (!ticketData || !platformOptions.length) return;
 
-    // Собираем контакты для выбранной платформы
-    let allContacts = [];
+    // если уже выбрана — пропускаем
+    if (selectedPlatform) return;
 
-    if (ticketData[platform]) {
-      console.log(`✅ Found platform data for ${platform}:`, ticketData[platform]);
-      
-      // Для всех платформ используем данные напрямую
-      allContacts = Object.entries(ticketData[platform]).map(([contactId, contactData]) => {
-        // Находим client_id из массива clients по contact_id
-        const client = ticketData.clients?.find(c => 
-          c.contacts?.some(contact => contact.id === parseInt(contactId))
-        );
-        
-        console.log(`  Contact ${contactId}:`, {
-          contactData,
-          foundClient: client?.id,
-          clientName: contactData.name
-        });
-        
-        return {
-          id: contactId,
-          contact_type: platform,
-          contact_value: contactData.contact_value,
-          is_primary: contactData.is_primary || false,
-          client_id: client?.id, // используем ID клиента из массива clients
-          client_name: contactData.name,
-          client_surname: contactData.surname,
-          client_photo: client?.photo
-        };
-      });
-    } else {
-      console.log(`⚠️ No data found for platform: ${platform}`);
-    }
+    let nextPlatform = null;
 
-    // Создаем опции контактов для выбранной платформы
-    const contacts = allContacts.map(contact => {
-      // Форматируем лейбл в зависимости от платформы
-      let label;
-      if (['whatsapp', 'viber', 'telegram'].includes(platform)) {
-        // Для WhatsApp, Viber, Telegram: имя фамилия - номер
-        const fullName = `${contact.client_name} ${contact.client_surname || ''}`.trim();
-        label = `${fullName} - ${contact.contact_value}`;
-      } else {
-        // Для других платформ: contactId - name - surname
-        label = `${contact.id} - ${contact.client_name} ${contact.client_surname || ''}`;
+    if (lastMessage && lastMessage.ticket_id === ticketId) {
+      const msgPlatform = lastMessage.platform?.toLowerCase();
+      if (msgPlatform && platformOptions.some((p) => p.value === msgPlatform)) {
+        nextPlatform = msgPlatform;
       }
+    }
 
-      const payload = {
-        id: contact.client_id, // client_id из массива clients
-        contact_id: contact.id,
-        platform: platform,
-        name: contact.client_name,
-        surname: contact.client_surname,
-        phone: platform === 'phone' ? contact.contact_value : '',
-        email: platform === 'email' ? contact.contact_value : '',
-        contact_value: contact.contact_value, // ID клиента (куда отправляем)
-        is_primary: contact.is_primary,
-        photo: contact.client_photo,
-        client_id: contact.client_id // явно указываем client_id
-      };
+    if (!nextPlatform) {
+      // дефолт — первая платформа
+      nextPlatform = platformOptions[0]?.value || null;
+    }
 
-      return {
-        label,
-        value: `${contact.client_id}-${contact.id}`,
-        payload,
-      };
-    });
+    if (nextPlatform && nextPlatform !== selectedPlatform) {
+      debug("auto select platform:", nextPlatform);
+      setSelectedPlatform(nextPlatform);
+    }
+  }, [ticketData, platformOptions, lastMessage, ticketId, selectedPlatform]);
 
-    console.log(`📋 Setting ${contacts.length} contact options for ${platform}:`, contacts);
-    setContactOptions(contacts);
-  }, [ticketData]);
+  /** шаг 2: выбрать page_id (по платформе и groupTitle) */
+  useEffect(() => {
+    if (!selectedPlatform) return;
 
+    // если уже выбран — пропускаем
+    if (selectedPageId) return;
+
+    let nextPageId = null;
+
+    if (lastMessage && lastMessage.ticket_id === ticketId) {
+      const candidate = selectPageIdByMessage(
+        selectedPlatform,
+        lastMessage.page_id,
+        groupTitle
+      );
+      if (candidate) {
+        nextPageId = candidate;
+      }
+    }
+
+    // если не нашли через lastMessage — выберем первую релевантную страницу
+    if (!nextPageId) {
+      const all = getPagesByType(selectedPlatform) || [];
+      const filtered = groupTitle ? all.filter((p) => p.group_title === groupTitle) : all;
+      nextPageId = filtered[0]?.page_id || null;
+    }
+
+    if (nextPageId && nextPageId !== selectedPageId) {
+      debug("auto select page_id:", nextPageId);
+      setSelectedPageId(nextPageId);
+    }
+  }, [selectedPlatform, lastMessage, ticketId, groupTitle, selectedPageId]);
+
+  /** шаг 3: выбрать контакт (когда уже известны платформа и contactOptions) */
+  useEffect(() => {
+    if (!selectedPlatform || !contactOptions.length) return;
+
+    // уже выбран — выходим
+    if (selectedClient?.value) return;
+
+    let contactValue = null;
+    let messageClientId = null;
+
+    if (lastMessage && lastMessage.ticket_id === ticketId) {
+      messageClientId = lastMessage.client_id;
+      // входящее → from_reference, исходящее → to_reference
+      contactValue =
+        lastMessage.sender_id === lastMessage.client_id
+          ? lastMessage.from_reference
+          : lastMessage.to_reference;
+
+      // если в сообщении ссылка пустая — попробуем найти по client_id
+      if (!contactValue && ticketData?.[selectedPlatform]) {
+        const block = normalizePlatformBlock(ticketData[selectedPlatform]);
+        const clientIndex = buildClientIndex(ticketData.clients);
+        const entry = Object.entries(block).find(([cid]) => {
+          const client = clientIndex.get(Number.parseInt(cid, 10));
+          return client?.id === messageClientId;
+        });
+        if (entry) contactValue = entry[1]?.contact_value;
+      }
+    }
+
+    const found = matchContact(contactOptions, contactValue, messageClientId);
+    if (found) {
+      debug("auto select contact:", found.value);
+      setSelectedClient(found);
+    } else if (contactOptions.length) {
+      // мягкий дефолт — первый контакт
+      setSelectedClient(contactOptions[0]);
+    }
+  }, [selectedPlatform, contactOptions, selectedClient?.value, lastMessage, ticketId, ticketData]);
+
+  /** публичные коллбеки (стабильные ссылки) */
   const changePlatform = useCallback((platform) => {
-    setSelectedPlatform(platform);
-    updateContactOptions(platform);
-    setSelectedClient({}); // Сбрасываем выбранный контакт
-  }, [updateContactOptions]);
+    startTransition(() => {
+      setSelectedPlatform(platform || null);
+      setSelectedClient({});
+      setSelectedPageId(null); // сбрасываем page_id, чтобы авто-эффект выбрал правильный для новой платформы
+    });
+  }, []);
 
   const changeContact = useCallback((value) => {
-    const contact = contactOptions.find(option => option.value === value);
-    if (contact) {
-      setSelectedClient(contact);
-    }
+    const contact = contactOptions.find((o) => o.value === value);
+    if (contact) setSelectedClient(contact);
   }, [contactOptions]);
 
-  const updateClientData = useCallback((clientId, platform, newData) => {
-    // Обновляем данные в ticketData
-    setTicketData(prev => {
-      if (!prev?.clients) return prev;
+  const changePageId = useCallback((pageId) => {
+    setSelectedPageId(pageId || null);
+  }, []);
 
-      return {
+  /** точечное обновление ФИО/почты/телефона клиента */
+  const updateClientData = useCallback((clientId, platform, newData) => {
+    setTicketData((prev) => {
+      if (!prev?.clients) return prev;
+      const next = {
         ...prev,
-        clients: prev.clients.map(client =>
-          client.id === clientId
+        clients: prev.clients.map((c) =>
+          c.id === clientId
             ? {
-              ...client,
-              name: newData.name || client.name,
-              surname: newData.surname || client.surname,
-              phone: newData.phone || client.phone,
-              email: newData.email || client.email
+              ...c,
+              name: newData.name ?? c.name,
+              surname: newData.surname ?? c.surname,
+              phone: newData.phone ?? c.phone,
+              email: newData.email ?? c.email,
             }
-            : client
-        )
+            : c
+        ),
       };
+      return next;
     });
 
-    // Обновляем selectedClient если это тот же клиент
-    setSelectedClient(prev =>
-      prev.payload?.id === clientId
+    // обновим выбранный контакт, если это он
+    setSelectedClient((prev) =>
+      prev?.payload?.id === clientId
         ? { ...prev, payload: { ...prev.payload, ...newData } }
         : prev
     );
   }, []);
 
-  // Обновляем опции контактов при изменении выбранной платформы
-  useEffect(() => {
-    if (selectedPlatform) {
-      updateContactOptions(selectedPlatform);
-    }
-  }, [selectedPlatform, updateContactOptions]);
-
-  useEffect(() => {
-    fetchClientContacts();
-  }, [fetchClientContacts]);
-
-  // Сбрасываем состояние при изменении ticketId
-  useEffect(() => {
-    console.log('🔄 TicketId changed, resetting state:', ticketId);
-    setSelectedPlatform(null);
-    setContactOptions([]);
-    setSelectedClient({});
-    setSelectedPageId(null);
-    setTicketData(null); // Также сбрасываем ticketData
-    setPlatformOptions([]); // Сбрасываем platformOptions
-  }, [ticketId]);
-
-  // Автоматически выбираем платформу, контакт и page_id из последнего сообщения
-  useEffect(() => {
-    if (!lastMessage || !ticketData || platformOptions.length === 0) {
-      console.log('🔴 Auto-select skipped:', { 
-        hasLastMessage: !!lastMessage, 
-        hasTicketData: !!ticketData, 
-        platformOptionsLength: platformOptions.length 
-      });
-      return;
-    }
-
-    // КРИТИЧНО: Проверяем что сообщение принадлежит текущему тикету
-    if (lastMessage.ticket_id !== ticketId) {
-      console.log('⚠️ Last message belongs to different ticket!', {
-        messageTicketId: lastMessage.ticket_id,
-        currentTicketId: ticketId
-      });
-      return;
-    }
-
-    console.log('📨 Last message structure:', {
-      id: lastMessage.id,
-      ticket_id: lastMessage.ticket_id,
-      platform: lastMessage.platform,
-      client_id: lastMessage.client_id,
-      sender_id: lastMessage.sender_id,
-      from_reference: lastMessage.from_reference,
-      to_reference: lastMessage.to_reference,
-      page_id: lastMessage.page_id,
-      message: lastMessage.message?.substring(0, 50)
-    });
-
-    const messagePlatform = lastMessage.platform?.toLowerCase();
-    const messageClientId = lastMessage.client_id;
-    const messagePageId = lastMessage.page_id;
-    
-    // Определяем contact_value из сообщения
-    let contactValue;
-    if (lastMessage.sender_id === lastMessage.client_id) {
-      // Входящее сообщение - берем from_reference
-      contactValue = lastMessage.from_reference;
-      console.log('📥 Incoming message, using from_reference:', contactValue);
-    } else {
-      // Исходящее сообщение - берем to_reference
-      contactValue = lastMessage.to_reference;
-      console.log('📤 Outgoing message, using to_reference:', contactValue);
-    }
-    
-    // Если contactValue все еще null, пытаемся найти контакт клиента по client_id
-    if (!contactValue && messageClientId && ticketData?.[messagePlatform]) {
-      console.log('⚠️ contactValue is null, trying to find contact by client_id:', messageClientId);
-      
-      // Ищем контакт в данных платформы
-      const platformContacts = ticketData[messagePlatform];
-      const contactEntry = Object.entries(platformContacts).find(([contactId, contactData]) => {
-        const client = ticketData.clients?.find(c => 
-          c.contacts?.some(contact => contact.id === parseInt(contactId))
-        );
-        return client?.id === messageClientId;
-      });
-      
-      if (contactEntry) {
-        contactValue = contactEntry[1].contact_value;
-        console.log('✅ Found contactValue by client_id:', contactValue);
-      } else {
-        console.log('❌ Could not find contact for client_id:', messageClientId);
-      }
-    }
-
-    console.log('🟢 Auto-select data:', {
-      messagePlatform,
-      messageClientId,
-      messagePageId,
-      contactValue,
-      selectedPlatform,
-      contactOptionsLength: contactOptions.length,
-      selectedClientValue: selectedClient.value
-    });
-
-    // 1. Устанавливаем платформу
-    if (messagePlatform && platformOptions.some(p => p.value === messagePlatform)) {
-      if (selectedPlatform !== messagePlatform) {
-        console.log('✅ Setting platform:', messagePlatform);
-        setSelectedPlatform(messagePlatform);
-      }
-    }
-
-    // 2. Устанавливаем page_id (только если он есть в конфигурации и совпадает с group_title)
-    if (messagePageId && !selectedPageId && messagePlatform) {
-      // Получаем все страницы для платформы
-      const allPages = getPagesByType(messagePlatform);
-      
-      // Фильтруем по group_title тикета
-      const availablePages = groupTitle 
-        ? allPages.filter(p => p.group_title === groupTitle)
-        : allPages;
-      
-      const pageExists = availablePages.some(p => p.page_id === messagePageId);
-      
-      console.log('🔍 Checking page_id with group_title filter:', {
-        messagePageId,
-        platform: messagePlatform,
-        ticketGroupTitle: groupTitle,
-        allPagesCount: allPages.length,
-        filteredPagesCount: availablePages.length,
-        pageExists,
-        filteredPages: availablePages.map(p => `${p.page_name} (${p.group_title})`)
-      });
-      
-      if (pageExists) {
-        console.log('✅ Setting page_id from message:', messagePageId);
-        setSelectedPageId(messagePageId);
-      } else {
-        console.log('⚠️ Page ID not found in filtered pages, using first available page');
-        // Если page_id из сообщения нет в отфильтрованных страницах, берем первую доступную
-        if (availablePages.length > 0) {
-          console.log('✅ Setting first available page:', availablePages[0].page_id);
-          setSelectedPageId(availablePages[0].page_id);
-        } else {
-          console.log('❌ No pages available for group_title:', groupTitle);
-        }
-      }
-    } else if (messagePageId && selectedPageId !== messagePageId) {
-      console.log('⚠️ Page ID already set or platform not ready:', {
-        currentPageId: selectedPageId,
-        messagePageId: messagePageId,
-        platformReady: !!messagePlatform
-      });
-    }
-
-    // 3. Устанавливаем контакт (только после того, как платформа установлена и contactOptions обновлены)
-    if (selectedPlatform === messagePlatform && contactValue && contactOptions.length > 0) {
-      console.log('🔍 Searching for contact:', { 
-        contactValue, 
-        messageClientId,
-        contactOptionsLength: contactOptions.length,
-        allContactOptions: contactOptions.map(c => ({
-          value: c.value,
-          label: c.label,
-          contact_value: c.payload?.contact_value,
-          client_id: c.payload?.client_id
-        }))
-      });
-      
-      // Ищем контакт по contact_value и client_id
-      const contact = contactOptions.find(c => 
-        c.payload?.contact_value === contactValue && 
-        c.payload?.client_id === messageClientId
-      );
-      
-      console.log('🔍 Found contact:', contact);
-      
-      if (contact && selectedClient.value !== contact.value) {
-        console.log('✅ Setting contact:', contact.value);
-        setSelectedClient(contact);
-      } else if (!contact) {
-        console.log('❌ Contact not found! Trying to match by contact_value only...');
-        const contactByValue = contactOptions.find(c => 
-          c.payload?.contact_value === contactValue
-        );
-        console.log('🔍 Found by contact_value only:', contactByValue);
-        
-        if (contactByValue && selectedClient.value !== contactByValue.value) {
-          console.log('✅ Setting contact (by contact_value only):', contactByValue.value);
-          setSelectedClient(contactByValue);
-        }
-      }
-    } else {
-      console.log('⚠️ Contact selection conditions not met:', {
-        platformMatch: selectedPlatform === messagePlatform,
-        hasContactValue: !!contactValue,
-        hasContactOptions: contactOptions.length > 0,
-        selectedPlatform,
-        messagePlatform
-      });
-    }
-  }, [lastMessage, ticketData, platformOptions, contactOptions, selectedPlatform, selectedClient.value, selectedPageId, ticketId, groupTitle]);
-
-  const changePageId = useCallback((pageId) => {
-    setSelectedPageId(pageId);
-  }, []);
-
+  /** ====================== api ====================== */
   return {
-    platformOptions,
+    platformOptions,            // memo
     selectedPlatform,
     changePlatform,
-    contactOptions,
+
+    contactOptions,             // memo
     changeContact,
     selectedClient,
+
     selectedPageId,
     changePageId,
+
     loading,
     updateClientData,
-    refetch: fetchClientContacts
+    refetch: fetchClientContacts,
   };
 };

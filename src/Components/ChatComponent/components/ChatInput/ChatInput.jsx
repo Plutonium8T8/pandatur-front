@@ -82,14 +82,6 @@ export const ChatInput = ({
       ? pages.filter(page => page.group_title === groupTitle)
       : pages;
     
-    console.log('📄 Page ID options filtered by group_title:', {
-      platform: selectedPlatform,
-      ticketGroupTitle: groupTitle,
-      totalPages: pages.length,
-      filteredPages: filteredPages.length,
-      pages: filteredPages.map(p => `${p.page_name} (${p.group_title})`)
-    });
-    
     return filteredPages.map(page => ({
       value: page.page_id,
       label: `${page.page_name} (${page.group_title})`
@@ -99,13 +91,7 @@ export const ChatInput = ({
   // Устанавливаем actionNeeded из тикета при загрузке
   useEffect(() => {
     if (ticket) {
-      console.log("🎫 Setting actionNeeded from ticket:", {
-        ticketId,
-        action_needed: ticket.action_needed,
-        action_needed_type: typeof ticket.action_needed
-      });
       setActionNeeded(Boolean(ticket.action_needed));
-      console.log("✅ Set actionNeeded from ticket:", Boolean(ticket.action_needed));
     }
   }, [ticket, ticketId]);
 

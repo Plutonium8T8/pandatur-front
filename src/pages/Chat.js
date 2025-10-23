@@ -29,10 +29,6 @@ export const Chat = () => {
   // Получаем последнее сообщение от клиента для автоматического выбора контакта
   const lastMessage = useMemo(() => {
     if (!messages || messages.length === 0 || !ticketId) {
-      console.log('⚠️ No messages or ticketId:', {
-        messagesLength: messages?.length || 0,
-        ticketId
-      });
       return null;
     }
     
@@ -40,7 +36,6 @@ export const Chat = () => {
     const currentTicketMessages = messages.filter(msg => msg.ticket_id === ticketId);
     
     if (currentTicketMessages.length === 0) {
-      console.log('⚠️ No messages for current ticket:', ticketId);
       return null;
     }
     
@@ -48,19 +43,11 @@ export const Chat = () => {
     for (let i = currentTicketMessages.length - 1; i >= 0; i--) {
       const msg = currentTicketMessages[i];
       if (msg.sender_id === msg.client_id) {
-        console.log('📨 Found last client message:', {
-          id: msg.id,
-          ticket_id: msg.ticket_id,
-          platform: msg.platform,
-          client_id: msg.client_id,
-          message: msg.message?.substring(0, 50)
-        });
         return msg;
       }
     }
     
     // Если не нашли сообщение от клиента, возвращаем последнее сообщение текущего тикета
-    console.log('⚠️ No client messages found, using last message of current ticket');
     return currentTicketMessages[currentTicketMessages.length - 1];
   }, [messages, ticketId]);
 
