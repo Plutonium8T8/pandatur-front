@@ -208,6 +208,34 @@
   opacity: 1;
 }
 
+/* Стили для контейнера платформы с кнопкой удаления */
+.platform-contact-container {
+  position: relative;
+  display: inline-block;
+}
+
+.platform-delete-btn {
+  position: absolute;
+  /* top: 100%; */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  background-color: var(--crm-ui-kit-palette-background-primary);
+  border: 1px solid var(--crm-ui-kit-palette-border-primary);
+  z-index: 1;
+}
+
+.platform-contact-container:hover .platform-delete-btn {
+  opacity: 1;
+}
+
+.platform-delete-btn:hover {
+  background-color: var(--crm-ui-kit-palette-button-danger-hover-background);
+  border-color: var(--crm-ui-kit-palette-button-danger-hover-background);
+}
+
 /* Кнопка редактирования контакта */
 .client-card-contact .mantine-ActionIcon-root {
   opacity: 0.6;

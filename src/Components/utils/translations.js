@@ -3432,6 +3432,46 @@ export const translations = {
     RU: "Ошибка при обновлении контакта",
     EN: "Error updating contact",
   },
+  "Principal": {
+    RO: "Principal",
+    RU: "Основной",
+    EN: "Primary",
+  },
+  "Contactul a fost șters cu succes": {
+    RO: "Contactul a fost șters cu succes",
+    RU: "Контакт успешно удален",
+    EN: "Contact deleted successfully",
+  },
+  "Eroare la ștergerea contactului": {
+    RO: "Eroare la ștergerea contactului",
+    RU: "Ошибка при удалении контакта",
+    EN: "Error deleting contact",
+  },
+  "Confirmare ștergere": {
+    RO: "Confirmare ștergere",
+    RU: "Подтверждение удаления",
+    EN: "Confirm deletion",
+  },
+  "Șterge": {
+    RO: "Șterge",
+    RU: "Удалить",
+    EN: "Delete",
+  },
+  "Sunteți sigur că doriți să ștergeți acest contact?": {
+    RO: "Sunteți sigur că doriți să ștergeți acest contact?",
+    RU: "Вы уверены, что хотите удалить этот контакт?",
+    EN: "Are you sure you want to delete this contact?",
+  },
+  "Clientul a fost actualizat cu succes": {
+    RO: "Clientul a fost actualizat cu succes",
+    RU: "Клиент успешно обновлен",
+    EN: "Client updated successfully",
+  },
+  "Eroare la actualizarea clientului": {
+    RO: "Eroare la actualizarea clientului",
+    RU: "Ошибка при обновлении клиента",
+    EN: "Error updating client",
+  },
   "Contactate": {
     RO: "Contactate",
     RU: "Связались",

@@ -96,7 +96,17 @@ export const users = {
   },
 
   updateClientContact: async (clientId, contactId, body) => {
-    const { data } = await baseAxios.put(`/api/users-client/${clientId}/contacts/${contactId}`, body);
+    const { data } = await baseAxios.patch(`/api/client-contacts/${contactId}`, body);
+    return data;
+  },
+
+  deleteClientContact: async (clientId, contactId) => {
+    const { data } = await baseAxios.delete(`/api/client-contacts/${contactId}`);
+    return data;
+  },
+
+  updateClient: async (clientId, body) => {
+    const { data } = await baseAxios.patch(`/api/users-client/${clientId}`, body);
     return data;
   },
 };

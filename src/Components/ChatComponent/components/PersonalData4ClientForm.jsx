@@ -18,11 +18,12 @@ import {
 import { useEffect, useState, useCallback } from "react";
 import { useForm } from "@mantine/form";
 import { getLanguageByKey } from "../../utils";
-import { LuPlus, LuUser, LuMail, LuPhone, LuChevronDown, LuChevronUp } from "react-icons/lu";
-import { MdEdit, MdClose, MdCheck } from "react-icons/md";
+import { LuPlus, LuUser, LuMail, LuPhone } from "react-icons/lu";
+import { MdEdit, MdClose, MdCheck, MdDelete } from "react-icons/md";
 import { FaFacebook, FaInstagram, FaWhatsapp, FaViber, FaTelegram } from "react-icons/fa";
 import { api } from "../../../api";
 import { useSnackbar } from "notistack";
+import { useConfirmPopup } from "../../../hooks/useConfirmPopup";
 import "./PersonalData4ClientForm.css";
 
 const getContactTypeLabels = () => ({
@@ -60,19 +61,23 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   const [expandedClientId, setExpandedClientId] = useState(null);
   const [isSavingContact, setIsSavingContact] = useState(false);
   const [editingContact, setEditingContact] = useState(null); // { clientId, contactId, type }
+  const [isDeletingContact, setIsDeletingContact] = useState(false);
+  const [editingClient, setEditingClient] = useState(null); // { clientId }
+  const [isSavingClient, setIsSavingClient] = useState(false);
+
+  const confirmDelete = useConfirmPopup({
+    subTitle: getLanguageByKey("Sunteți sigur că doriți să ștergeți acest contact?"),
+    loading: isDeletingContact,
+  });
 
   const form = useForm({
     initialValues: {
       name: "",
       surname: "",
-      phone: "",
-      email: "",
     },
     validate: {
-      email: (value) => {
-        if (!value) return null;
-        return /^\S+@\S+$/.test(value) ? null : getLanguageByKey("Email invalid");
-      },
+      name: (value) => (!value ? getLanguageByKey("Introduceți numele") : null),
+      surname: (value) => (!value ? getLanguageByKey("Introduceți prenumele") : null),
     },
   });
 
@@ -118,6 +123,17 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
         
         return null;
       },
+    },
+  });
+
+  const editClientForm = useForm({
+    initialValues: {
+      name: "",
+      surname: "",
+    },
+    validate: {
+      name: (value) => (!value ? getLanguageByKey("Introduceți numele") : null),
+      surname: (value) => (!value ? getLanguageByKey("Introduceți prenumele") : null),
     },
   });
 
@@ -177,23 +193,13 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
     const values = form.values;
 
-    // Валидация - требуется хотя бы одно поле
-    if (!values.name && !values.surname && !values.phone && !values.email) {
-      enqueueSnackbar(getLanguageByKey("Completați cel puțin un câmp"), {
-        variant: "warning",
-      });
-      return;
-    }
-
     try {
       setIsSaving(true);
       
       await api.tickets.ticket.addClientToTicket({
-        ticket_id: ticketId,
-        name: values.name || null,
-        surname: values.surname || null,
-        phone: values.phone || null,
-        email: values.email || null,
+        ticketId: ticketId,
+        name: values.name,
+        surname: values.surname,
       });
 
       enqueueSnackbar(getLanguageByKey("Clientul a fost adăugat cu succes"), {
@@ -222,10 +228,6 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
     form.reset();
   };
 
-  const handlePhoneChange = (e) => {
-    const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
-    form.setFieldValue("phone", onlyDigits);
-  };
 
   const handleContactPhoneChange = (e) => {
     const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
@@ -337,25 +339,104 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
     editContactForm.setFieldValue('contact_value', value);
   };
 
+  // Удаление контакта
+  const handleDeleteContact = async (clientId, contactId) => {
+    const deleteContact = async () => {
+      try {
+        setIsDeletingContact(true);
+
+        await api.users.deleteClientContact(clientId, contactId);
+
+        enqueueSnackbar(getLanguageByKey("Contactul a fost șters cu succes"), {
+          variant: "success",
+        });
+
+        // Перезагружаем данные клиентов
+        await loadClientsData();
+
+        // Диспатчим событие для обновления данных тикета
+        window.dispatchEvent(new CustomEvent('ticketUpdated', {
+          detail: { ticketId }
+        }));
+      } catch (error) {
+        console.error("Ошибка удаления контакта:", error);
+        enqueueSnackbar(getLanguageByKey("Eroare la ștergerea contactului"), {
+          variant: "error",
+        });
+      } finally {
+        setIsDeletingContact(false);
+      }
+    };
+
+    confirmDelete(deleteContact);
+  };
+
   // Получение всех контактов платформ (не только уникальных типов)
   const getClientPlatformContacts = (contacts) => {
     return contacts.filter((contact) => PLATFORM_ICONS[contact.contact_type]);
   };
 
-  // Получение основного email
-  const getPrimaryEmail = (contacts) => {
-    const emailContact = contacts.find(
-      (c) => c.contact_type === "email" && c.is_primary
-    );
-    return emailContact?.contact_value || null;
+  // Получение всех email контактов
+  const getEmailContacts = (contacts) => {
+    return contacts.filter((c) => c.contact_type === "email");
   };
 
-  // Получение основного телефона
-  const getPrimaryPhone = (contacts) => {
-    const phoneContact = contacts.find(
-      (c) => c.contact_type === "phone" && c.is_primary
-    );
-    return phoneContact?.contact_value || null;
+  // Получение всех телефонных контактов
+  const getPhoneContacts = (contacts) => {
+    return contacts.filter((c) => c.contact_type === "phone");
+  };
+
+  // Начать редактирование клиента
+  const startEditClient = (clientId, currentName, currentSurname) => {
+    setEditingClient({ clientId });
+    editClientForm.setValues({ 
+      name: currentName || "", 
+      surname: currentSurname || "" 
+    });
+  };
+
+  // Отменить редактирование клиента
+  const cancelEditClient = () => {
+    setEditingClient(null);
+    editClientForm.reset();
+  };
+
+  // Сохранить изменения клиента
+  const handleUpdateClient = async () => {
+    if (!editingClient) return;
+
+    const validation = editClientForm.validate();
+    if (validation.hasErrors) return;
+
+    try {
+      setIsSavingClient(true);
+
+      await api.users.updateClient(editingClient.clientId, {
+        name: editClientForm.values.name,
+        surname: editClientForm.values.surname,
+      });
+
+      enqueueSnackbar(getLanguageByKey("Clientul a fost actualizat cu succes"), {
+        variant: "success",
+      });
+
+      cancelEditClient();
+
+      // Перезагружаем данные клиентов
+      await loadClientsData();
+
+      // Диспатчим событие для обновления данных тикета
+      window.dispatchEvent(new CustomEvent('ticketUpdated', {
+        detail: { ticketId }
+      }));
+    } catch (error) {
+      console.error("Ошибка обновления клиента:", error);
+      enqueueSnackbar(getLanguageByKey("Eroare la actualizarea clientului"), {
+        variant: "error",
+      });
+    } finally {
+      setIsSavingClient(false);
+    }
   };
 
   if (loading) {
@@ -373,7 +454,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
       <Flex justify="space-between" align="center" mb="md">
         <Title order={3}>{getLanguageByKey("Date personale")}</Title>
         <ActionIcon onClick={handleAddClient} variant="filled">
-          <LuPlus size={18} />
+          <LuPlus size={24} />
         </ActionIcon>
       </Flex>
 
@@ -389,7 +470,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
           <TextInput
             label={getLanguageByKey("Nume")}
             placeholder={getLanguageByKey("Introduceti numele")}
-            leftSection={<LuUser size={16} />}
+            leftSection={<LuUser size={24} />}
             {...form.getInputProps("name")}
             mb="sm"
           />
@@ -397,29 +478,11 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
           <TextInput
             label={getLanguageByKey("Prenume")}
             placeholder={getLanguageByKey("Introduceti prenumele")}
-            leftSection={<LuUser size={16} />}
+            leftSection={<LuUser size={24} />}
             {...form.getInputProps("surname")}
             mb="sm"
           />
 
-          <TextInput
-            label={getLanguageByKey("Email")}
-            placeholder="example@email.com"
-            type="email"
-            leftSection={<LuMail size={16} />}
-            {...form.getInputProps("email")}
-            mb="sm"
-          />
-
-          <TextInput
-            label={getLanguageByKey("Telefon")}
-            placeholder="37368939111"
-            leftSection={<LuPhone size={16} />}
-            value={form.values.phone}
-            onChange={handlePhoneChange}
-            inputMode="numeric"
-            mb="md"
-          />
 
           <Group grow>
             <Button 
@@ -449,8 +512,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
           {clients.map((client) => {
             const fullName = [client.name, client.surname].filter(Boolean).join(" ") || "—";
             const platformContacts = getClientPlatformContacts(client.contacts);
-            const primaryEmail = getPrimaryEmail(client.contacts);
-            const primaryPhone = getPrimaryPhone(client.contacts);
+            const emailContacts = getEmailContacts(client.contacts);
+            const phoneContacts = getPhoneContacts(client.contacts);
 
             const isExpanded = expandedClientId === client.id;
 
@@ -466,135 +529,215 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                     <LuUser size={24} />
                   </Avatar>
                   <Box style={{ flex: 1 }}>
-                    <Text className="client-card-name">{fullName}</Text>
-                    <Text className="client-card-subtitle">
-                      {getLanguageByKey("ID")}: {client.id}
-                    </Text>
+                    {editingClient?.clientId === client.id ? (
+                      <Box>
+                        <TextInput
+                          placeholder={getLanguageByKey("Introduceti numele")}
+                          leftSection={<LuUser size={24} />}
+                          {...editClientForm.getInputProps("name")}
+                          mb="xs"
+                          rightSection={
+                            <Flex gap="xs" align="center" wrap="nowrap">
+                              <ActionIcon 
+                                size="sm" 
+                                variant="subtle" 
+                                color="red"
+                                onClick={cancelEditClient}
+                                disabled={isSavingClient}
+                              >
+                                <MdClose size={24} />
+                              </ActionIcon>
+                              <ActionIcon 
+                                size="sm" 
+                                variant="subtle" 
+                                color="green"
+                                onClick={handleUpdateClient}
+                                loading={isSavingClient}
+                              >
+                                <MdCheck size={24} />
+                              </ActionIcon>
+                            </Flex>
+                          }
+                        />
+                        <TextInput
+                          placeholder={getLanguageByKey("Introduceti prenumele")}
+                          leftSection={<LuUser size={24} />}
+                          {...editClientForm.getInputProps("surname")}
+                        />
+                      </Box>
+                    ) : (
+                      <>
+                        <Text className="client-card-name" mb="xs">
+                          {fullName}
+                          <ActionIcon 
+                            size="sm" 
+                            variant="subtle"
+                            ml="xs"
+                            onClick={() => {
+                              startEditClient(client.id, client.name, client.surname);
+                            }}
+                          >
+                            <MdEdit size={14} />
+                          </ActionIcon>
+                        </Text>
+                        <Text className="client-card-subtitle">
+                          {getLanguageByKey("ID")}: {client.id}
+                        </Text>
+                      </>
+                    )}
                   </Box>
                   <ActionIcon 
                     onClick={() => toggleClientExpand(client.id)}
                     variant="subtle"
                     size="lg"
                   >
-                    {isExpanded ? <LuChevronUp size={20} /> : <LuChevronDown size={20} />}
+                    <LuPlus size={24} />
                   </ActionIcon>
                 </Flex>
 
-                {/* Email */}
-                {primaryEmail && (
-                  <>
-                    {editingContact?.clientId === client.id && editingContact?.type === "email" ? (
-                      <Box mb="xs">
-                        <TextInput
-                          leftSection={<LuMail size={16} />}
-                          placeholder="example@email.com"
-                          type="email"
-                          {...editContactForm.getInputProps("contact_value")}
-                          rightSection={
-                            <Flex gap="xs" align="center" wrap="nowrap">
+                {/* Email контакты */}
+                {emailContacts.length > 0 && (
+                  <Box mb="xs">
+                    {emailContacts.map((emailContact, index) => (
+                      <Box key={`email-${emailContact.id}-${index}`}>
+                        {editingContact?.clientId === client.id && editingContact?.contactId === emailContact.id ? (
+                          <Box mb="xs">
+                            <TextInput
+                              leftSection={<LuMail size={24} />}
+                              placeholder="example@email.com"
+                              type="email"
+                              {...editContactForm.getInputProps("contact_value")}
+                              rightSection={
+                                <Flex gap="xs" align="center" wrap="nowrap">
+                                  <ActionIcon 
+                                    size="sm" 
+                                    variant="subtle" 
+                                    color="red"
+                                    onClick={cancelEditContact}
+                                    disabled={isSavingContact}
+                                  >
+                                    <MdClose size={24} />
+                                  </ActionIcon>
+                                  <ActionIcon 
+                                    size="sm" 
+                                    variant="subtle" 
+                                    color="green"
+                                    onClick={handleUpdateContact}
+                                    loading={isSavingContact}
+                                  >
+                                    <MdCheck size={24} />
+                                  </ActionIcon>
+                                </Flex>
+                              }
+                            />
+                          </Box>
+                        ) : (
+                          <Flex align="center" gap="sm" mb="xs" className="client-card-contact">
+                            <LuMail size={24} className="client-card-icon" />
+                            <Text className="client-card-contact-text" style={{ flex: 1 }}>
+                              {emailContact.contact_value}
+                            </Text>
+                            <Flex gap="xs">
                               <ActionIcon 
                                 size="sm" 
-                                variant="subtle" 
-                                color="red"
-                                onClick={cancelEditContact}
-                                disabled={isSavingContact}
+                                variant="subtle"
+                                onClick={() => {
+                                  startEditContact(client.id, emailContact.id, "email", emailContact.contact_value);
+                                }}
                               >
-                                <MdClose size={16} />
+                                <MdEdit size={24} />
                               </ActionIcon>
                               <ActionIcon 
                                 size="sm" 
-                                variant="subtle" 
-                                color="green"
-                                onClick={handleUpdateContact}
-                                loading={isSavingContact}
+                                variant="subtle"
+                                color="red"
+                                onClick={() => {
+                                  handleDeleteContact(client.id, emailContact.id);
+                                }}
+                                loading={isDeletingContact}
                               >
-                                <MdCheck size={16} />
+                                <MdDelete size={24} />
                               </ActionIcon>
                             </Flex>
-                          }
-                        />
+                          </Flex>
+                        )}
                       </Box>
-                    ) : (
-                      <Flex align="center" gap="sm" mb="xs" className="client-card-contact">
-                        <LuMail size={16} className="client-card-icon" />
-                        <Text className="client-card-contact-text" style={{ flex: 1 }}>{primaryEmail}</Text>
-                        <ActionIcon 
-                          size="sm" 
-                          variant="subtle"
-                          onClick={() => {
-                            const emailContact = client.contacts.find(
-                              (c) => c.contact_type === "email" && c.is_primary
-                            );
-                            if (emailContact) {
-                              startEditContact(client.id, emailContact.id, "email", emailContact.contact_value);
-                            }
-                          }}
-                        >
-                          <MdEdit size={14} />
-                        </ActionIcon>
-                      </Flex>
-                    )}
-                  </>
+                    ))}
+                  </Box>
                 )}
 
-                {/* Телефон */}
-                {primaryPhone && (
-                  <>
-                    {editingContact?.clientId === client.id && editingContact?.type === "phone" ? (
-                      <Box mb="md">
-                        <TextInput
-                          leftSection={<LuPhone size={16} />}
-                          placeholder="37368939111"
-                          type="text"
-                          inputMode="numeric"
-                          {...editContactForm.getInputProps("contact_value")}
-                          onChange={handleEditPhoneChange}
-                          value={editContactForm.values.contact_value}
-                          rightSection={
-                            <Flex gap="xs" align="center" wrap="nowrap">
+                {/* Телефонные контакты */}
+                {phoneContacts.length > 0 && (
+                  <Box mb="md">
+                    {phoneContacts.map((phoneContact, index) => (
+                      <Box key={`phone-${phoneContact.id}-${index}`}>
+                        {editingContact?.clientId === client.id && editingContact?.contactId === phoneContact.id ? (
+                          <Box mb="xs">
+                            <TextInput
+                              leftSection={<LuPhone size={24} />}
+                              placeholder="37368939111"
+                              type="text"
+                              inputMode="numeric"
+                              {...editContactForm.getInputProps("contact_value")}
+                              onChange={handleEditPhoneChange}
+                              value={editContactForm.values.contact_value}
+                              rightSection={
+                                <Flex gap="xs" align="center" wrap="nowrap">
+                                  <ActionIcon 
+                                    size="sm" 
+                                    variant="subtle" 
+                                    color="red"
+                                    onClick={cancelEditContact}
+                                    disabled={isSavingContact}
+                                  >
+                                    <MdClose size={24} />
+                                  </ActionIcon>
+                                  <ActionIcon 
+                                    size="sm" 
+                                    variant="subtle" 
+                                    color="green"
+                                    onClick={handleUpdateContact}
+                                    loading={isSavingContact}
+                                  >
+                                    <MdCheck size={24} />
+                                  </ActionIcon>
+                                </Flex>
+                              }
+                            />
+                          </Box>
+                        ) : (
+                          <Flex align="center" gap="sm" mb="xs" className="client-card-contact">
+                            <LuPhone size={24} className="client-card-icon" />
+                            <Text className="client-card-contact-text" style={{ flex: 1 }}>
+                              {phoneContact.contact_value}
+                            </Text>
+                            <Flex gap="xs">
                               <ActionIcon 
                                 size="sm" 
-                                variant="subtle" 
-                                color="red"
-                                onClick={cancelEditContact}
-                                disabled={isSavingContact}
+                                variant="subtle"
+                                onClick={() => {
+                                  startEditContact(client.id, phoneContact.id, "phone", phoneContact.contact_value);
+                                }}
                               >
-                                <MdClose size={16} />
+                                <MdEdit size={24} />
                               </ActionIcon>
                               <ActionIcon 
                                 size="sm" 
-                                variant="subtle" 
-                                color="green"
-                                onClick={handleUpdateContact}
-                                loading={isSavingContact}
+                                variant="subtle"
+                                color="red"
+                                onClick={() => {
+                                  handleDeleteContact(client.id, phoneContact.id);
+                                }}
+                                loading={isDeletingContact}
                               >
-                                <MdCheck size={16} />
+                                <MdDelete size={24} />
                               </ActionIcon>
                             </Flex>
-                          }
-                        />
+                          </Flex>
+                        )}
                       </Box>
-                    ) : (
-                      <Flex align="center" gap="sm" mb="md" className="client-card-contact">
-                        <LuPhone size={16} className="client-card-icon" />
-                        <Text className="client-card-contact-text" style={{ flex: 1 }}>{primaryPhone}</Text>
-                        <ActionIcon 
-                          size="sm" 
-                          variant="subtle"
-                          onClick={() => {
-                            const phoneContact = client.contacts.find(
-                              (c) => c.contact_type === "phone" && c.is_primary
-                            );
-                            if (phoneContact) {
-                              startEditContact(client.id, phoneContact.id, "phone", phoneContact.contact_value);
-                            }
-                          }}
-                        >
-                          <MdEdit size={14} />
-                        </ActionIcon>
-                      </Flex>
-                    )}
-                  </>
+                    ))}
+                  </Box>
                 )}
 
                 {/* Платформы */}
@@ -606,18 +749,31 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                         const Icon = PLATFORM_ICONS[contact.contact_type];
                         const labels = getContactTypeLabels();
                         return (
-                          <Tooltip 
-                            key={`${contact.contact_type}-${contact.id}-${index}`} 
-                            label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
-                            position="top"
-                          >
-                            <Box className="platform-icon-container">
-                              <Icon 
-                                size={20} 
-                                style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
-                              />
-                            </Box>
-                          </Tooltip>
+                          <Box key={`${contact.contact_type}-${contact.id}-${index}`} className="platform-contact-container">
+                            <Tooltip 
+                              label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
+                              position="top"
+                            >
+                              <Box className="platform-icon-container">
+                                <Icon 
+                                  size={24} 
+                                  style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
+                                />
+                              </Box>
+                            </Tooltip>
+                            <ActionIcon 
+                              size="xs" 
+                              variant="subtle"
+                              color="red"
+                              className="platform-delete-btn"
+                              onClick={() => {
+                                handleDeleteContact(client.id, contact.id);
+                              }}
+                              loading={isDeletingContact}
+                            >
+                              <MdDelete size={24} />
+                            </ActionIcon>
+                          </Box>
                         );
                       })}
                     </Flex>
@@ -658,9 +814,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       }
                       leftSection={
                         contactForm.values.contact_type === "email" ? (
-                          <LuMail size={16} />
+                          <LuMail size={24} />
                         ) : contactForm.values.contact_type === "phone" ? (
-                          <LuPhone size={16} />
+                          <LuPhone size={24} />
                         ) : null
                       }
                       type={contactForm.values.contact_type === "email" ? "email" : "text"}
