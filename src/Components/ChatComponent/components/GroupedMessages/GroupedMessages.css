@@ -1,0 +1,56 @@
+/* Anchor messages to bottom and grow upwards */
+.grouped-messages-container {
+  display: flex;
+  flex-direction: column;
+  margin-top: auto;
+}
+
+/* Smooth animations for dialog blocks */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation for dialog blocks */
+.dialog-block {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+/* Animation for date dividers */
+.date-divider {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Animation for log clusters */
+.log-cluster {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+/* Animation for notes */
+.chat-note {
+  animation: fadeInUp 0.35s ease-out;
+}
+
+/* Stagger effect for multiple items */
+.grouped-messages-container > * {
+  animation-fill-mode: both;
+}
+
+/* Smooth transitions for interactive elements */
+.dialog-block,
+.log-cluster,
+.chat-note {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dialog-block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+

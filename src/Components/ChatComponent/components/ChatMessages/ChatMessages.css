@@ -9,6 +9,27 @@
 .chat-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
-  /* scroll-behavior: smooth; */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Smooth fade-in animation for chat messages container */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chat-messages {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Smooth scrolling when scrolling through history */
+.chat-messages {
+  scroll-behavior: smooth;
 }

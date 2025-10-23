@@ -92,7 +92,15 @@ export const renderContent = (msg) => {
       return (
         <video
           controls
-          style={{ borderRadius: 8, maxWidth: 500, maxHeight: 500 }}
+          preload="metadata"
+          style={{ 
+            borderRadius: 8, 
+            maxWidth: 500, 
+            maxHeight: 500,
+            opacity: 0,
+            animation: 'fadeIn 0.3s ease-in-out forwards',
+            animationDelay: '0.1s'
+          }}
         >
           <source src={mediaUrl} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}
@@ -115,7 +123,15 @@ export const renderContent = (msg) => {
       return (
         <video
           controls
-          style={{ borderRadius: "8", maxWidth: 500, maxHeight: 500 }}
+          preload="metadata"
+          style={{ 
+            borderRadius: "8", 
+            maxWidth: 500, 
+            maxHeight: 500,
+            opacity: 0,
+            animation: 'fadeIn 0.3s ease-in-out forwards',
+            animationDelay: '0.1s'
+          }}
         >
           <source src={mediaUrl} type="video/mp4" />
           {getLanguageByKey("Acest browser nu suporta video")}

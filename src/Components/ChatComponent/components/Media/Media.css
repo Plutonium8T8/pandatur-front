@@ -1,24 +1,49 @@
+/* Global fadeIn animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .media-wrapper-delete-btn {
   opacity: 0;
   cursor: pointer;
   z-index: 10;
+  transition: opacity 0.2s ease;
 }
 
 .media-wrapper:hover .media-wrapper-delete-btn {
   opacity: 1;
 }
 
+.media-wrapper {
+  animation: fadeIn 0.3s ease-out;
+}
+
 .video-preview {
   max-width: 100%;
   display: inline;
+  opacity: 0;
+  animation: fadeIn 0.3s ease-in-out forwards;
+  animation-delay: 0.1s;
 }
 
 .media-wrapper.media-files {
   border: 1px solid var(--crm-ui-kit-palette-border-default);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.media-wrapper.media-files:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .file-link {
   color: var(--crm-ui-kit-palette-text-primary);
+  transition: color 0.2s ease;
 }
 
 .file-link:hover {
@@ -35,4 +60,9 @@
 
 .media-tabs .mantine-Tabs-root[data-orientation="horizontal"] {
   height: calc(100% - 36px);
+}
+
+/* Smooth animations for media items appearing */
+.media-tabs .mantine-Tabs-panel > div > div {
+  animation: fadeIn 0.3s ease-out;
 }

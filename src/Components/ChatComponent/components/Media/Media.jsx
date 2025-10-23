@@ -175,8 +175,17 @@ export const Media = ({ messages, id }) => {
           <Tabs.Panel className="media-tabs" h="100%" value="media">
             <Flex direction="column" gap="12" mt="md">
               {notesMedia.length ? (
-                notesMedia.map((n) => (
-                  <Flex key={n.id} align="stretch" gap={8}>
+                notesMedia.map((n, index) => (
+                  <Flex 
+                    key={n.id} 
+                    align="stretch" 
+                    gap={8}
+                    style={{
+                      animation: 'fadeIn 0.3s ease-out',
+                      animationDelay: `${index * 0.05}s`,
+                      animationFillMode: 'both'
+                    }}
+                  >
                     <ChatNoteCard
                       note={normalizeNote(n)}
                       techLabel={resolveTechLabel(n)}
@@ -195,8 +204,17 @@ export const Media = ({ messages, id }) => {
           <Tabs.Panel className="media-tabs" h="100%" value="files">
             <Flex direction="column" gap="12" mt="md">
               {notesFiles.length ? (
-                notesFiles.map((n) => (
-                  <Flex key={n.id} align="stretch" gap={8}>
+                notesFiles.map((n, index) => (
+                  <Flex 
+                    key={n.id} 
+                    align="stretch" 
+                    gap={8}
+                    style={{
+                      animation: 'fadeIn 0.3s ease-out',
+                      animationDelay: `${index * 0.05}s`,
+                      animationFillMode: 'both'
+                    }}
+                  >
                     <ChatNoteCard
                       note={normalizeNote(n)}
                       techLabel={resolveTechLabel(n)}
@@ -215,8 +233,17 @@ export const Media = ({ messages, id }) => {
           <Tabs.Panel className="media-tabs" h="100%" value="audio">
             <Flex direction="column" gap="12" mt="md">
               {notesAudio.length ? (
-                notesAudio.map((n) => (
-                  <Flex key={n.id} align="stretch" gap={8}>
+                notesAudio.map((n, index) => (
+                  <Flex 
+                    key={n.id} 
+                    align="stretch" 
+                    gap={8}
+                    style={{
+                      animation: 'fadeIn 0.3s ease-out',
+                      animationDelay: `${index * 0.05}s`,
+                      animationFillMode: 'both'
+                    }}
+                  >
                     <ChatNoteCard
                       note={normalizeNote(n)}
                       techLabel={resolveTechLabel(n)}
@@ -235,8 +262,17 @@ export const Media = ({ messages, id }) => {
           <Tabs.Panel className="media-tabs" h="100%" value="text">
             <Flex direction="column" gap="12" mt="md">
               {notesText.length ? (
-                notesText.map((n) => (
-                  <Flex key={n.id} align="stretch" gap={8}>
+                notesText.map((n, index) => (
+                  <Flex 
+                    key={n.id} 
+                    align="stretch" 
+                    gap={8}
+                    style={{
+                      animation: 'fadeIn 0.3s ease-out',
+                      animationDelay: `${index * 0.05}s`,
+                      animationFillMode: 'both'
+                    }}
+                  >
                     <ChatNoteCard
                       note={normalizeNote(n)}
                       techLabel={resolveTechLabel(n)}
@@ -255,8 +291,17 @@ export const Media = ({ messages, id }) => {
           <Tabs.Panel className="media-tabs" h="100%" value="notes">
             <Flex direction="column" gap="12" mt="md">
               {notesAll.length ? (
-                notesAll.map((n) => (
-                  <Flex key={n.id} align="stretch" gap={8}>
+                notesAll.map((n, index) => (
+                  <Flex 
+                    key={n.id} 
+                    align="stretch" 
+                    gap={8}
+                    style={{
+                      animation: 'fadeIn 0.3s ease-out',
+                      animationDelay: `${index * 0.05}s`,
+                      animationFillMode: 'both'
+                    }}
+                  >
                     <ChatNoteCard
                       note={normalizeNote(n)}
                       techLabel={resolveTechLabel(n)}

@@ -182,7 +182,7 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
     });
   }, [apiNotes, liveNotes, ticketId]);
 
-  // общий список и сортировка
+  // общий список и сортировка (от старых к новым для правильной группировки)
   const allItems = useMemo(
     () => [...messages, ...mergedLogs, ...mergedNotes].sort((a, b) => a.sortTime - b.sortTime),
     [messages, mergedLogs, mergedNotes]
@@ -198,7 +198,7 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
     return map;
   }, [allItems]);
 
-  // отсортированный список дат
+  // отсортированный список дат (от старых к новым)
   const allDates = useMemo(() => {
     return Object.keys(itemsByDate).sort(
       (a, b) => dayjs(a, "DD.MM.YYYY", true).valueOf() - dayjs(b, "DD.MM.YYYY", true).valueOf()
@@ -268,22 +268,22 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
   const hiddenEmailCount = totalEmailCount - visibleEmailCount;
 
   return (
-    <Flex direction="column" gap="xl" h="100%">
-      {/* Кнопка загрузить еще email (если есть скрытые) */}
-      {hiddenEmailCount > 0 && (
-        <Flex justify="center" pt="md">
-          <Button
-            variant="light"
-            size="sm"
-            onClick={() => setVisibleEmailCount(prev => prev + 10)}
-          >
-            {getLanguageByKey("Load more emails")} ({hiddenEmailCount})
-          </Button>
-        </Flex>
-      )}
-
+    <Flex direction="column" gap="xl" className="grouped-messages-container">
       {allDates.length ? (
         <Flex direction="column" gap="xs">
+          {/* Кнопка загрузить еще email (показывается вверху для загрузки старых сообщений) */}
+          {hiddenEmailCount > 0 && (
+            <Flex justify="center" pt="md" pb="md">
+              <Button
+                variant="light"
+                size="sm"
+                onClick={() => setVisibleEmailCount(prev => prev + 10)}
+              >
+                {getLanguageByKey("Load more emails")} ({hiddenEmailCount})
+              </Button>
+            </Flex>
+          )}
+          
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
             const blocks = createDialogBlocks(dayItems);
@@ -291,6 +291,7 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
             return (
               <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
+                  className="date-divider"
                   color="var(--crm-ui-kit-palette-border-default)"
                   label={
                     <Box
@@ -315,11 +316,12 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
                   // Системные логи
                   if (block.logs) {
                     return (
-                      <LogCluster
-                        key={`log-cluster-${date}-${i}`}
-                        logs={block.logs}
-                        technicians={technicians}
-                      />
+                      <div key={`log-cluster-${date}-${i}`} className="log-cluster">
+                        <LogCluster
+                          logs={block.logs}
+                          technicians={technicians}
+                        />
+                      </div>
                     );
                   }
 
@@ -331,11 +333,12 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
                       { label: `#${n.technician_id}` };
 
                     return (
-                      <ChatNoteCard
-                        key={`note-${makeNoteKey(n)}-${i}`}
-                        note={n}
-                        techLabel={tech.label}
-                      />
+                      <div key={`note-${makeNoteKey(n)}-${i}`} className="chat-note">
+                        <ChatNoteCard
+                          note={n}
+                          techLabel={tech.label}
+                        />
+                      </div>
                     );
                   }
 
@@ -345,6 +348,7 @@ const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNote
                     return (
                       <Box
                         key={`dialog-${date}-${i}`}
+                        className="dialog-block"
                         p="md"
                         style={{
                           backgroundColor: "var(--crm-ui-kit-palette-background-primary)",

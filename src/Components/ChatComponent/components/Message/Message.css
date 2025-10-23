@@ -10,3 +10,45 @@
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark-9);
 }
+
+/* Smooth animations for chat messages */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Apply animations to messages */
+.chat-message.received {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.chat-message.sent {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Smooth transitions for message content */
+.chat-message .text {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-message .text:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
