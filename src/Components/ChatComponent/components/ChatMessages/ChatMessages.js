@@ -182,7 +182,8 @@ export const ChatMessages = ({
         </Flex>
       );
     }
-    if (messagesLoading) {
+    // Используем комбинированный loading (сообщения + контакты + выборы)
+    if (loading || messagesLoading) {
       return (
         <Flex h="100%" align="center" justify="center">
           <Spin />

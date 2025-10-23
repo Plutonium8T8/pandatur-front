@@ -7,7 +7,7 @@ import { getPagesByType } from "../constants/webhookPagesConfig";
 /** ====================== helpers ====================== */
 
 /** безопасный лог (вырубаем в проде одной переменной) */
-const DEBUG = true; // Временно включено для отладки
+const DEBUG = false; // Отключено для production
 const debug = (...args) => { if (DEBUG) console.log("[useClientContacts]", ...args); };
 
 /** приводим платформенные данные к объекту { [contactId]: contactData } */
@@ -139,6 +139,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   const [selectedClient, setSelectedClient] = useState({}); // option целиком
   const [selectedPageId, setSelectedPageId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectionReady, setSelectionReady] = useState(false); // флаг готовности всех выборов
 
   // защищаемся от гонок запросов
   const abortRef = useRef(null);
@@ -200,6 +201,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       setSelectedPlatform(null);
       setSelectedClient({});
       setSelectedPageId(null);
+      setSelectionReady(false); // сброс флага готовности
     });
     
     // Сбрасываем ref при смене тикета
@@ -257,6 +259,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       setSelectedPlatform(null);
       setSelectedClient({});
       setSelectedPageId(null);
+      setSelectionReady(false); // сброс флага готовности
     });
   }, [lastMessage]);
 
@@ -434,6 +437,57 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     }
   }, [selectedPlatform, contactOptions, selectedClient?.value, lastMessage, ticketId, ticketData]);
 
+  /** Отслеживаем завершение всех автоматических выборов */
+  useEffect(() => {
+    // Если данные еще грузятся — точно не готовы
+    if (loading) {
+      if (selectionReady) setSelectionReady(false);
+      return;
+    }
+
+    // Если нет платформ вообще — готовы (нечего выбирать)
+    if (!platformOptions.length) {
+      if (!selectionReady) {
+        debug("selection ready: no platforms available");
+        setSelectionReady(true);
+      }
+      return;
+    }
+
+    // Проверяем что все три выбора сделаны
+    const isPlatformSelected = !!selectedPlatform;
+    const isPageIdSelected = !!selectedPageId;
+    const isContactSelected = !!selectedClient?.value;
+
+    const allSelected = isPlatformSelected && isPageIdSelected && isContactSelected;
+
+    debug("selection status:", {
+      isPlatformSelected,
+      isPageIdSelected,
+      isContactSelected,
+      allSelected,
+      selectionReady,
+      platformOptions: platformOptions.length,
+      contactOptions: contactOptions.length
+    });
+
+    if (allSelected && !selectionReady) {
+      debug("✅ All selections complete - setting selectionReady = true");
+      setSelectionReady(true);
+    } else if (!allSelected && selectionReady) {
+      debug("⏳ Selections incomplete - setting selectionReady = false");
+      setSelectionReady(false);
+    }
+  }, [
+    loading,
+    selectedPlatform,
+    selectedPageId,
+    selectedClient?.value,
+    platformOptions.length,
+    contactOptions.length,
+    selectionReady
+  ]);
+
   /** публичные коллбеки (стабильные ссылки) */
   const changePlatform = useCallback((platform) => {
     startTransition(() => {
@@ -495,6 +549,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     changePageId,
 
     loading,
+    selectionReady,             // флаг готовности всех автоматических выборов
     updateClientData,
     refetch: fetchClientContacts,
   };
