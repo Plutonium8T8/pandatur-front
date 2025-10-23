@@ -174,7 +174,8 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, [ticketId, enqueueSnackbar]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketId]); // Убираем enqueueSnackbar из зависимостей - намеренно, чтобы избежать бесконечного цикла
 
   // мемо-вычисления вместо лишних setState
   const platformOptions = useMemo(
@@ -189,6 +190,8 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
   /** авто-подгрузка при изменении ticketId */
   useEffect(() => {
+    if (!ticketId) return;
+    
     debug("ticketId changed → refetch + local reset", ticketId);
     // Мягкий сброс локально — визуально не «мигать»
     startTransition(() => {
@@ -196,11 +199,15 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       setSelectedClient({});
       setSelectedPageId(null);
     });
+    
+    // Вызываем fetchClientContacts напрямую, не через зависимость
     fetchClientContacts();
+    
     return () => {
       if (abortRef.current) abortRef.current.abort();
     };
-  }, [ticketId, fetchClientContacts]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ticketId]); // Убираем fetchClientContacts из зависимостей - намеренно, чтобы избежать бесконечного цикла
 
   /** шаг 1: выбрать платформу на основе lastMessage или взять первую доступную */
   useEffect(() => {

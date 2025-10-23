@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useContext } from "react";
+import { useState, useMemo, useEffect, useContext, useCallback } from "react";
 import { useSnackbar } from "notistack";
 import { api } from "@api";
 import { useUser } from "@hooks";
@@ -31,7 +31,7 @@ export const useMessages = () => {
   const [mediaFiles, setMediaFiles] = useState([]);
   const { userId } = useUser();
 
-  const getUserMessages = async (id) => {
+  const getUserMessages = useCallback(async (id) => {
     setLoading(true);
     try {
       const response = await api.messages.messagesTicketById(id);
@@ -53,7 +53,7 @@ export const useMessages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [enqueueSnackbar, userId]);
 
   const markMessageRead = (id) => {
     setMessages((prevMessages) =>
