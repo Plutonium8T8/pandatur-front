@@ -55,7 +55,9 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     const currentTicketId = Number(ticketId);
     const currentTicketMessages = messages.filter(msg => {
       const platform = msg.platform?.toLowerCase();
-      return msg.ticket_id === currentTicketId && platform !== 'sipuni' && platform !== 'mail';
+      return msg.ticket_id === currentTicketId && 
+             platform !== 'sipuni' && 
+             platform !== 'mail';
     });
     
     console.log("[SingleChat] filtered messages for ticket", { 

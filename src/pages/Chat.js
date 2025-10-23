@@ -40,7 +40,9 @@ export const Chat = () => {
     // Фильтруем сообщения только для текущего тикета и исключаем sipuni/mail
     const currentTicketMessages = messages.filter(msg => {
       const platform = msg.platform?.toLowerCase();
-      return msg.ticket_id === ticketId && platform !== 'sipuni' && platform !== 'mail';
+      return msg.ticket_id === ticketId && 
+             platform !== 'sipuni' && 
+             platform !== 'mail';
     });
     
     console.log("[Chat] filtered messages for ticket", { 

@@ -189,6 +189,8 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   );
 
   /** авто-подгрузка при изменении ticketId */
+  const prevLastMessageRef = useRef(null);
+  
   useEffect(() => {
     if (!ticketId) return;
     
@@ -200,6 +202,9 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       setSelectedPageId(null);
     });
     
+    // Сбрасываем ref при смене тикета
+    prevLastMessageRef.current = null;
+    
     // Вызываем fetchClientContacts напрямую, не через зависимость
     fetchClientContacts();
     
@@ -208,6 +213,52 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]); // Убираем fetchClientContacts из зависимостей - намеренно, чтобы избежать бесконечного цикла
+
+  /** Сбрасываем выборы при изменении lastMessage (новое сообщение через сокет) */
+  useEffect(() => {
+    if (!lastMessage) return;
+    
+    // Пропускаем первый рендер - выборы и так будут сделаны автоматически
+    if (prevLastMessageRef.current === null) {
+      prevLastMessageRef.current = lastMessage;
+      return;
+    }
+    
+    // Создаем уникальный ключ для сообщения (работает даже если id undefined)
+    const createMessageKey = (msg) => {
+      if (!msg) return null;
+      return `${msg.id || 'pending'}_${msg.time_sent}_${msg.platform}_${msg.from_reference}_${msg.to_reference}`;
+    };
+    
+    const prevKey = createMessageKey(prevLastMessageRef.current);
+    const currentKey = createMessageKey(lastMessage);
+    
+    // Проверяем что сообщение действительно изменилось
+    if (prevKey === currentKey) {
+      return;
+    }
+    
+    // client_id может быть массивом [3417] или числом 3417
+    const clientIdRaw = lastMessage.client_id;
+    const clientId = Array.isArray(clientIdRaw) ? clientIdRaw[0] : clientIdRaw;
+    
+    debug("lastMessage changed, resetting selections", {
+      oldMessageId: prevLastMessageRef.current?.id,
+      newMessageId: lastMessage.id,
+      platform: lastMessage.platform,
+      time_sent: lastMessage.time_sent,
+      isIncoming: lastMessage.sender_id === clientId
+    });
+    
+    prevLastMessageRef.current = lastMessage;
+    
+    // Сбрасываем выборы чтобы заново выполнился автоматический детект
+    startTransition(() => {
+      setSelectedPlatform(null);
+      setSelectedClient({});
+      setSelectedPageId(null);
+    });
+  }, [lastMessage]);
 
   /** шаг 1: выбрать платформу на основе lastMessage или взять первую доступную */
   useEffect(() => {
@@ -319,10 +370,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     let messageClientId = null;
 
     if (lastMessage && lastMessage.ticket_id === ticketId) {
-      messageClientId = lastMessage.client_id;
+      // client_id может быть массивом [3417] или числом 3417
+      const clientIdRaw = lastMessage.client_id;
+      messageClientId = Array.isArray(clientIdRaw) ? clientIdRaw[0] : clientIdRaw;
       
       // Определяем контакт клиента в зависимости от направления сообщения
-      if (lastMessage.sender_id === lastMessage.client_id) {
+      if (lastMessage.sender_id === messageClientId) {
         // Входящее сообщение от клиента: берем from_reference
         contactValue = lastMessage.from_reference;
       } else {
@@ -333,7 +386,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       debug("step 3: contact selection from lastMessage", {
         messageClientId,
         contactValue,
-        isIncoming: lastMessage.sender_id === lastMessage.client_id,
+        isIncoming: lastMessage.sender_id === messageClientId,
         from_ref: lastMessage.from_reference,
         to_ref: lastMessage.to_reference
       });
