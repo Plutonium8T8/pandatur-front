@@ -328,20 +328,37 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     let nextPageId = null;
 
     if (lastMessage && lastMessage.ticket_id === ticketId) {
+      // client_id может быть массивом [3417] или числом 3417
+      const clientIdRaw = lastMessage.client_id;
+      const messageClientId = Array.isArray(clientIdRaw) ? clientIdRaw[0] : clientIdRaw;
+      
+      // Определяем направление сообщения
+      const isIncoming = lastMessage.sender_id === messageClientId;
+      
+      // Выбираем page_id в зависимости от направления сообщения
+      // Для входящих: берем to_reference (куда клиент отправил - наша страница)
+      // Для исходящих: берем from_reference (откуда мы отправили - наша страница)
+      const ourPageReference = isIncoming ? lastMessage.to_reference : lastMessage.from_reference;
+      
       debug("step 2: checking lastMessage for page_id", {
         lastMessagePageId: lastMessage.page_id,
+        ourPageReference,
+        isIncoming,
+        from_reference: lastMessage.from_reference,
+        to_reference: lastMessage.to_reference,
         platform: selectedPlatform,
         groupTitle
       });
       
+      // Используем ourPageReference вместо page_id для более точного выбора
       const candidate = selectPageIdByMessage(
         selectedPlatform,
-        lastMessage.page_id,
+        ourPageReference || lastMessage.page_id,
         groupTitle
       );
       if (candidate) {
         nextPageId = candidate;
-        debug("step 2: found page_id from lastMessage:", candidate);
+        debug("step 2: found page_id from lastMessage:", candidate, "via", ourPageReference ? "reference" : "page_id");
       }
     }
 
