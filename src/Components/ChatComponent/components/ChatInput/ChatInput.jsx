@@ -322,12 +322,12 @@ export const ChatInput = ({
                     <Select
                       onChange={changePlatform}
                       className="w-full"
-                      placeholder="Выберите платформу"
+                      placeholder={getLanguageByKey("Selectează platforma")}
                       value={selectedPlatform}
                       data={platformOptions}
                       searchable
                       clearable
-                      label="Платформа"
+                      label={getLanguageByKey("Platforma")}
                       styles={{
                         input: {
                           fontSize: '16px',
@@ -340,7 +340,7 @@ export const ChatInput = ({
                     {/* 2. Template select */}
                     <Select
                       searchable
-                      label="Шаблон"
+                      label={getLanguageByKey("Șablon")}
                       className="w-full"
                       onChange={(value) => {
                         setMessage(value ? templateOptions[value] : "");
@@ -367,10 +367,10 @@ export const ChatInput = ({
                     {/* 3. User pick number (contact) */}
                     <Select
                       onChange={changeContact}
-                      placeholder="Выберите контакт"
+                      placeholder={getLanguageByKey("Selectează contact")}
                       value={currentClient?.value}
                       data={contactOptions}
-                      label="Контакт"
+                      label={getLanguageByKey("Contact")}
                       className="w-full"
                       searchable
                       clearable
@@ -387,8 +387,8 @@ export const ChatInput = ({
                     {/* 4. Page ID select */}
                     <Select
                       searchable
-                      label="Страница Panda"
-                      placeholder="Выберите страницу"
+                      label={getLanguageByKey("Pagina Panda")}
+                      placeholder={getLanguageByKey("Selectează pagina")}
                       value={selectedPageId}
                       onChange={changePageId}
                       data={pageIdOptions}

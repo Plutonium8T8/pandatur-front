@@ -81,19 +81,29 @@ const ChatList = ({ ticketId }) => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
       result = result.filter((ticket) => {
+        // Поиск по ID тикета
         const idMatch = ticket.id.toString().includes(query);
-        const contactMatch = ticket.contact?.toLowerCase().includes(query);
 
         // Поиск по клиентам
         const clientMatches = ticket.clients?.some((client) => {
-          const phoneMatch = client.phone?.toString().toLowerCase().includes(query);
-          const clientIdMatch = client.id?.toString().includes(query);
+          // Поиск по имени клиента
           const nameMatch = client.name?.toLowerCase().includes(query);
           const surnameMatch = client.surname?.toLowerCase().includes(query);
-          return phoneMatch || clientIdMatch || nameMatch || surnameMatch;
+          
+          // Поиск по телефонам (массив phones)
+          const phoneMatch = client.phones?.some(phone => 
+            phone?.toString().toLowerCase().includes(query)
+          ) || false;
+          
+          // Поиск по email (массив emails)
+          const emailMatch = client.emails?.some(email => 
+            email?.toLowerCase().includes(query)
+          ) || false;
+          
+          return nameMatch || surnameMatch || phoneMatch || emailMatch;
         }) || false;
 
-        return idMatch || contactMatch || clientMatches;
+        return idMatch || clientMatches;
       });
     }
 
@@ -104,7 +114,6 @@ const ChatList = ({ ticketId }) => {
     // по убыванию последнего сообщения
     return [...filteredTickets].sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
   }, [filteredTickets]);
-
 
   const ChatItem = useCallback(
     ({ index, style }) => (
@@ -148,7 +157,7 @@ const ChatList = ({ ticketId }) => {
           />
 
           <TextInput
-            placeholder={getLanguageByKey("Cauta dupa Lead, Client, Telefon sau ID")}
+            placeholder={getLanguageByKey("Cauta dupa ID, Nume client, Telefon sau Email")}
             onInput={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>

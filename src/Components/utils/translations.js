@@ -878,6 +878,26 @@ export const translations = {
     RU: "Платформа",
     EN: "Platform"
   },
+  "Platforma": {
+    RO: "Platforma",
+    RU: "Платформа",
+    EN: "Platform"
+  },
+  "Selectează platforma": {
+    RO: "Selectează platforma",
+    RU: "Выберите платформу",
+    EN: "Select platform"
+  },
+  "Pagina Panda": {
+    RO: "Pagina Panda",
+    RU: "Страница Panda",
+    EN: "Panda Page"
+  },
+  "Selectează pagina": {
+    RO: "Selectează pagina",
+    RU: "Выберите страницу",
+    EN: "Select page"
+  },
   "Toate platformele": {
     RO: "Toate platformele",
     RU: "Все платформы",
@@ -3266,6 +3286,11 @@ export const translations = {
     RO: "Caută după Lead, Client, Telefon sau ID",
     RU: "Поиск по Lead, Клиенту, Телефону или ID",
     EN: "Search by Lead, Client, Phone or ID",
+  },
+  "Cauta dupa ID, Nume client, Telefon sau Email": {
+    RO: "Caută după ID, Nume client, Telefon sau Email",
+    RU: "Поиск по ID, имени клиента, телефону или email",
+    EN: "Search by ID, client name, phone or email",
   },
   Plătitor: {
     RO: "Plătitor",
