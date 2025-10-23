@@ -51,9 +51,12 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       return null;
     }
     
-    // Фильтруем сообщения только для текущего тикета
+    // Фильтруем сообщения только для текущего тикета и исключаем sipuni/mail
     const currentTicketId = Number(ticketId);
-    const currentTicketMessages = messages.filter(msg => msg.ticket_id === currentTicketId);
+    const currentTicketMessages = messages.filter(msg => {
+      const platform = msg.platform?.toLowerCase();
+      return msg.ticket_id === currentTicketId && platform !== 'sipuni' && platform !== 'mail';
+    });
     
     console.log("[SingleChat] filtered messages for ticket", { 
       ticketId: currentTicketId, 
