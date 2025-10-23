@@ -95,12 +95,7 @@ const ChatList = ({ ticketId }) => {
             phone?.toString().toLowerCase().includes(query)
           ) || false;
           
-          // Поиск по email (массив emails)
-          const emailMatch = client.emails?.some(email => 
-            email?.toLowerCase().includes(query)
-          ) || false;
-          
-          return nameMatch || surnameMatch || phoneMatch || emailMatch;
+          return nameMatch || surnameMatch || phoneMatch;
         }) || false;
 
         return idMatch || clientMatches;
