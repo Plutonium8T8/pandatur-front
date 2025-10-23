@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Flex, Text, Image, Box } from "@mantine/core";
 import { CiWarning } from "react-icons/ci";
 import { FaHeadphones } from "react-icons/fa6";
@@ -19,7 +20,7 @@ const MESSAGE_STATUS_ICONS = {
   [MESSAGES_STATUS.SUCCESS]: <IoCheckmarkDoneSharp size={16} style={{ color: "var(--crm-ui-kit-palette-link-primary)" }} />,
 };
 
-export const SendedMessage = ({
+const SendedMessageComponent = ({
   msg,
   technician,
   technicians = [],
@@ -131,3 +132,15 @@ export const SendedMessage = ({
     </Flex>
   );
 };
+
+// Мемоизируем компонент для предотвращения лишних ре-рендеров
+export const SendedMessage = memo(SendedMessageComponent, (prevProps, nextProps) => {
+  // Сравниваем только те поля, которые действительно влияют на отображение
+  return (
+    prevProps.msg.id === nextProps.msg.id &&
+    prevProps.msg.message === nextProps.msg.message &&
+    prevProps.msg.messageStatus === nextProps.msg.messageStatus &&
+    prevProps.msg.time_sent === nextProps.msg.time_sent &&
+    prevProps.technician?.value === nextProps.technician?.value
+  );
+});

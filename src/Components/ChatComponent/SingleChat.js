@@ -11,7 +11,7 @@ import { useSnackbar } from "notistack";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { tickets, setTickets } = useApp();
-  const { getUserMessages, messages, loading: messagesLoading } = useMessagesContext();
+  const { getUserMessages, messages, loading: messagesLoading, renderReady } = useMessagesContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoadingTicket, setIsLoadingTicket] = useState(false);
 
@@ -81,10 +81,14 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     loading,
     selectionReady,
     updateClientData,
+    refetch,
   } = useClientContacts(Number(ticketId), lastMessage, currentTicket?.group_title);
 
-  // Комбинированный loading: ждём загрузки сообщений, контактов и завершения автовыборов
-  const isFullyLoading = messagesLoading || loading || !selectionReady || isLoadingTicket;
+  // Комбинированный loading: ждём загрузки сообщений, контактов, завершения автовыборов и рендеринга
+  // Используем useMemo для стабилизации - предотвращаем мигание
+  const isFullyLoading = React.useMemo(() => {
+    return messagesLoading || loading || !selectionReady || isLoadingTicket || !renderReady;
+  }, [messagesLoading, loading, selectionReady, isLoadingTicket, renderReady]);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
@@ -100,6 +104,25 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       fetchSingleTicket(Number(ticketId));
     }
   }, [ticketId, currentTicket, fetchSingleTicket]);
+
+  // Слушаем событие обновления тикета (добавление клиента/контакта)
+  useEffect(() => {
+    const handleTicketUpdate = (event) => {
+      if (event.detail?.ticketId === Number(ticketId)) {
+        console.log('[SingleChat] Ticket updated, refreshing selectors...');
+        // Обновляем селекторы чтобы включить новые контакты
+        if (refetch) {
+          refetch();
+        }
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdate);
+
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdate);
+    };
+  }, [ticketId, refetch]);
 
   const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
 

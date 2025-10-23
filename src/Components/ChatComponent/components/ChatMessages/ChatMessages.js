@@ -137,13 +137,7 @@ export const ChatMessages = ({
     setIsUserAtBottom(scrollHeight - scrollTop <= clientHeight + 50);
   }, []);
 
-  useEffect(() => {
-    if (isUserAtBottom && messageContainerRef.current) {
-      messageContainerRef.current.scrollTo({
-        top: messageContainerRef.current.scrollHeight,
-      });
-    }
-  }, [messages, ticketId, apiNotesFromCtx, isUserAtBottom]);
+  // Удалено: дублирующий эффект, заменен на более точные эффекты выше
 
   useEffect(() => {
     const container = messageContainerRef.current;
@@ -171,8 +165,51 @@ export const ChatMessages = ({
     if (!ticketId) return;
     getUserMessages(Number(ticketId));
     setNoteMode(false);
+    setIsUserAtBottom(true); // Сбрасываем флаг для автоскролла при смене тикета
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]);
+
+  // Автоматический скролл вниз после загрузки сообщений
+  // Используем комбинированный loading для гарантии что все отрендерилось
+  useEffect(() => {
+    // Скроллим вниз только когда загрузка полностью завершена
+    if (!loading && messageContainerRef.current && ticketId) {
+      // Двойной requestAnimationFrame гарантирует что DOM полностью обновился
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (messageContainerRef.current) {
+            const container = messageContainerRef.current;
+            container.scrollTo({
+              top: container.scrollHeight,
+              behavior: 'auto', // Без анимации для мгновенного скролла
+            });
+            setIsUserAtBottom(true);
+            
+            // Дополнительная проверка через короткий таймаут для гарантии
+            // (на случай если контент еще рендерится)
+            setTimeout(() => {
+              if (container) {
+                container.scrollTo({
+                  top: container.scrollHeight,
+                  behavior: 'auto',
+                });
+              }
+            }, 50);
+          }
+        });
+      });
+    }
+  }, [loading, ticketId]);
+  
+  // Дополнительный скролл вниз когда приходят новые сообщения (если пользователь внизу)
+  useEffect(() => {
+    if (isUserAtBottom && messageContainerRef.current && !loading) {
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages.length, isUserAtBottom, loading]);
 
   const renderMessagesContent = () => {
     if (messages.error) {
@@ -233,9 +270,9 @@ export const ChatMessages = ({
         {renderMessagesContent()}
       </Flex>
 
-      {ticketId && !messagesLoading && (
+      {ticketId && (
         <>
-          {noteMode && (
+          {noteMode && !messagesLoading && (
             <div style={{ padding: 16, flexShrink: 0 }}>
               <InlineNoteComposer
                 ticketId={ticketId}
@@ -255,11 +292,13 @@ export const ChatMessages = ({
             </div>
           )}
 
-          <TaskListOverlay
-            ticketId={ticketId}
-            creatingTask={creatingTask}
-            setCreatingTask={setCreatingTask}
-          />
+          {!messagesLoading && (
+            <TaskListOverlay
+              ticketId={ticketId}
+              creatingTask={creatingTask}
+              setCreatingTask={setCreatingTask}
+            />
+          )}
 
           <div style={{ flexShrink: 0 }}>
             <ChatInput

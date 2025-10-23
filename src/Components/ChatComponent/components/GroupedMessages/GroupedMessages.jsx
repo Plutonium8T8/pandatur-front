@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useTransition } from "react";
 import { Flex, Divider, Text, Box, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD_HH_mm_ss, MEDIA_TYPE } from "@app-constants";
@@ -36,6 +36,24 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
   // ОПТИМИЗАЦИЯ: Количество показываемых email сообщений
   const [visibleEmailCount, setVisibleEmailCount] = useState(10);
+  
+  // Стабилизация сообщений - используем отложенное состояние для предотвращения множественных ре-рендеров
+  const [stableMessages, setStableMessages] = useState(rawMessages);
+  const [stableLogs, setStableLogs] = useState(rawLogs);
+  const [isPending, startTransition] = useTransition();
+  
+  // Обновляем стабильные сообщения с задержкой через transition
+  useEffect(() => {
+    startTransition(() => {
+      setStableMessages(rawMessages);
+      setStableLogs(rawLogs);
+    });
+  }, [rawMessages, rawLogs]);
+  
+  // Сбрасываем visibleEmailCount при смене тикета
+  useEffect(() => {
+    setVisibleEmailCount(10);
+  }, [ticketId]);
 
   const technicianMap = useMemo(() => {
     const map = new Map();
@@ -50,7 +68,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
   // ОПТИМИЗАЦИЯ: Подсчет email сообщений и фильтрация
   const { emailMessages, nonEmailMessages, totalEmailCount } = useMemo(() => {
-    const ticketMessages = rawMessages.filter((msg) => Number(msg.ticket_id) === Number(ticketId));
+    const ticketMessages = stableMessages.filter((msg) => Number(msg.ticket_id) === Number(ticketId));
     
     const emails = [];
     const nonEmails = [];
@@ -79,7 +97,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       nonEmailMessages: nonEmails,
       totalEmailCount: emails.length,
     };
-  }, [rawMessages, ticketId, visibleEmailCount]);
+  }, [stableMessages, ticketId, visibleEmailCount]);
 
   // Объединяем отфильтрованные email с остальными сообщениями
   const messages = useMemo(() => {
@@ -101,7 +119,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
   const mergedLogs = useMemo(() => {
     const map = new Map();
 
-    rawLogs
+    stableLogs
       .filter((l) => Number(l.ticket_id) === Number(ticketId))
       .forEach((l) => {
         const key = l.id ?? `${l.timestamp}-${l.subject}`;
@@ -125,7 +143,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         isLive: !!log.__live,
       };
     });
-  }, [rawLogs, liveLogs, ticketId]);
+  }, [stableLogs, liveLogs, ticketId]);
 
   // заметки (мердж статики и live)
   const mergedNotes = useMemo(() => {

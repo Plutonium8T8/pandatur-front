@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
@@ -11,7 +11,7 @@ import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
   const { tickets } = useApp();
-  const { messages, loading: messagesLoading } = useMessagesContext();
+  const { messages, loading: messagesLoading, renderReady } = useMessagesContext();
   const { ticketId: ticketIdParam } = useParams();
   const ticketId = useMemo(() => {
     const parsed = Number(ticketIdParam);
@@ -66,12 +66,35 @@ export const Chat = () => {
     loading,
     selectionReady,
     updateClientData,
+    refetch,
   } = useClientContacts(ticketId, lastMessage, currentTicket?.group_title);
 
-  // Комбинированный loading: ждём загрузки сообщений, контактов и завершения автовыборов
-  const isFullyLoading = messagesLoading || loading || !selectionReady;
+  // Комбинированный loading: ждём загрузки сообщений, контактов, завершения автовыборов и рендеринга
+  // Используем useMemo для стабилизации - предотвращаем мигание
+  const isFullyLoading = useMemo(() => {
+    return messagesLoading || loading || !selectionReady || !renderReady;
+  }, [messagesLoading, loading, selectionReady, renderReady]);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
+
+  // Слушаем событие обновления тикета (добавление клиента/контакта)
+  useEffect(() => {
+    const handleTicketUpdate = (event) => {
+      if (event.detail?.ticketId === ticketId) {
+        console.log('[Chat] Ticket updated, refreshing selectors...');
+        // Обновляем селекторы чтобы включить новые контакты
+        if (refetch) {
+          refetch();
+        }
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdate);
+
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdate);
+    };
+  }, [ticketId, refetch]);
 
   return (
     <Flex h="100%" className="chat-wrapper">

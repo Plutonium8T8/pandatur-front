@@ -322,99 +322,119 @@ export const ChatInput = ({
               {/* {socialMediaIcons[currentClient?.payload?.platform] && (
                 <Flex>{socialMediaIcons[currentClient.payload.platform]}</Flex>
               )} */}
-              {loading ? (
-                <Loader size="xs" />
-              ) : (
-                <Flex direction="column" gap="xs" w="100%">
-                  {/* Первый ряд: Platform + Template */}
-                  <Flex gap="md" w="100%">
-                    {/* 1. Platform select */}
-                    <Select
-                      onChange={changePlatform}
-                      className="w-full"
-                      placeholder={getLanguageByKey("Selectează platforma")}
-                      value={selectedPlatform}
-                      data={platformOptions}
-                      searchable
-                      clearable
-                      label={getLanguageByKey("Platforma")}
-                      styles={{
-                        input: {
-                          fontSize: '16px',
-                          minHeight: '48px',
-                          padding: '12px 16px'
-                        }
-                      }}
-                    />
-                    
-                    {/* 2. Template select */}
-                    <Select
-                      searchable
-                      label={getLanguageByKey("Șablon")}
-                      className="w-full"
-                      onChange={(value) => {
-                        setMessage(value ? templateOptions[value] : "");
-                        setTemplate(value);
-                      }}
-                      value={template}
-                      placeholder={getLanguageByKey("select_message_template")}
-                      data={Object.keys(templateOptions).map((key) => ({
-                        value: key,
-                        label: key,
-                      }))}
-                      styles={{
-                        input: {
-                          fontSize: '16px',
-                          minHeight: '48px',
-                          padding: '12px 16px'
-                        }
-                      }}
-                    />
-                  </Flex>
+              <Flex direction="column" gap="xs" w="100%" style={{ position: 'relative' }}>
+                {loading && (
+                  <Box
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backgroundColor: 'var(--crm-ui-kit-palette-background-primary)',
+                      opacity: 0.9,
+                      backdropFilter: 'blur(3px)',
+                      zIndex: 10,
+                      borderRadius: '8px',
+                    }}
+                  >
+                    <Loader size="md" />
+                  </Box>
+                )}
+                
+                {/* Первый ряд: Platform + Template */}
+                <Flex gap="md" w="100%">
+                  {/* 1. Platform select */}
+                  <Select
+                    onChange={changePlatform}
+                    className="w-full"
+                    placeholder={getLanguageByKey("Selectează platforma")}
+                    value={selectedPlatform}
+                    data={platformOptions}
+                    searchable
+                    clearable
+                    disabled={loading}
+                    label={getLanguageByKey("Platforma")}
+                    styles={{
+                      input: {
+                        fontSize: '16px',
+                        minHeight: '48px',
+                        padding: '12px 16px'
+                      }
+                    }}
+                  />
                   
-                  {/* Второй ряд: User pick number + Void select */}
-                  <Flex gap="md" w="100%">
-                    {/* 3. User pick number (contact) */}
-                    <Select
-                      onChange={changeContact}
-                      placeholder={getLanguageByKey("Selectează contact")}
-                      value={currentClient?.value}
-                      data={contactOptions}
-                      label={getLanguageByKey("Contact")}
-                      className="w-full"
-                      searchable
-                      clearable
-                      disabled={!selectedPlatform}
-                      styles={{
-                        input: {
-                          fontSize: '16px',
-                          minHeight: '48px',
-                          padding: '12px 16px'
-                        }
-                      }}
-                    />
-                    
-                    {/* 4. Page ID select */}
-                    <Select
-                      searchable
-                      label={getLanguageByKey("Pagina Panda")}
-                      placeholder={getLanguageByKey("Selectează pagina")}
-                      value={selectedPageId}
-                      onChange={changePageId}
-                      data={pageIdOptions}
-                      className="w-full"
-                      disabled={!selectedPlatform}
-                      styles={{
-                        input: {
-                          fontSize: '16px',
-                          minHeight: '48px',
-                          padding: '12px 16px',
-                        }
-                      }}
-                    />
-                  </Flex>
+                  {/* 2. Template select */}
+                  <Select
+                    searchable
+                    label={getLanguageByKey("Șablon")}
+                    className="w-full"
+                    disabled={loading}
+                    onChange={(value) => {
+                      setMessage(value ? templateOptions[value] : "");
+                      setTemplate(value);
+                    }}
+                    value={template}
+                    placeholder={getLanguageByKey("select_message_template")}
+                    data={Object.keys(templateOptions).map((key) => ({
+                      value: key,
+                      label: key,
+                    }))}
+                    styles={{
+                      input: {
+                        fontSize: '16px',
+                        minHeight: '48px',
+                        padding: '12px 16px'
+                      }
+                    }}
+                  />
                 </Flex>
-              )}
+                
+                {/* Второй ряд: User pick number + Void select */}
+                <Flex gap="md" w="100%">
+                  {/* 3. User pick number (contact) */}
+                  <Select
+                    onChange={changeContact}
+                    placeholder={getLanguageByKey("Selectează contact")}
+                    value={currentClient?.value}
+                    data={contactOptions}
+                    label={getLanguageByKey("Contact")}
+                    className="w-full"
+                    searchable
+                    clearable
+                    disabled={loading || !selectedPlatform}
+                    styles={{
+                      input: {
+                        fontSize: '16px',
+                        minHeight: '48px',
+                        padding: '12px 16px'
+                      }
+                    }}
+                  />
+                  
+                  {/* 4. Page ID select */}
+                  <Select
+                    searchable
+                    label={getLanguageByKey("Pagina Panda")}
+                    placeholder={getLanguageByKey("Selectează pagina")}
+                    value={selectedPageId}
+                    onChange={changePageId}
+                    data={pageIdOptions}
+                    className="w-full"
+                    disabled={loading || !selectedPlatform}
+                    styles={{
+                      input: {
+                        fontSize: '16px',
+                        minHeight: '48px',
+                        padding: '12px 16px',
+                      }
+                    }}
+                  />
+                </Flex>
+              </Flex>
             </Flex>
 
             <AttachmentsPreview />
@@ -429,6 +449,7 @@ export const ChatInput = ({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={getLanguageByKey("Introduceți mesaj")}
+              disabled={loading}
               onPaste={handlePaste}
               onDragEnter={(e) => {
                 e.preventDefault();
@@ -452,6 +473,7 @@ export const ChatInput = ({
               <Flex gap="xs">
                 <Button
                   disabled={
+                    loading ||
                     (!message.trim() && attachments.length === 0) ||
                     !currentClient?.payload ||
                     currentClient.payload.platform === "sipuni"
@@ -467,6 +489,7 @@ export const ChatInput = ({
                   onClick={clearState} 
                   variant="default" 
                   color="gray"
+                  disabled={loading}
                   styles={{
                     root: {
                       backgroundColor: 'var(--mantine-color-gray-2) !important',
@@ -484,6 +507,7 @@ export const ChatInput = ({
                   <Button
                     onClick={handleMarkAsRead}
                     variant="filled"
+                    disabled={loading}
                     styles={{
                       root: unseenCount > 0 ? {
                         backgroundColor: 'var(--mantine-color-red-6) !important',
@@ -509,6 +533,7 @@ export const ChatInput = ({
                 <Button
                   onClick={handleMarkActionResolved}
                   variant="filled"
+                  disabled={loading}
                   styles={{
                     root: actionNeeded ? {
                       backgroundColor: 'var(--mantine-color-orange-6) !important',
@@ -536,6 +561,7 @@ export const ChatInput = ({
                   onClick={() => setShowEmailForm(true)}
                   variant="default"
                   title="Trimite Email"
+                  disabled={loading}
                 >
                   <FaEnvelope size={20} />
                 </ActionIcon>
@@ -545,15 +571,16 @@ export const ChatInput = ({
                   accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.ppt,.pptx"
                   multiple
                   title={getLanguageByKey("attachFiles")}
+                  disabled={loading}
                 >
                   {(props) => (
-                    <ActionIcon {...props} variant="default" title={getLanguageByKey("attachFiles")}>
+                    <ActionIcon {...props} variant="default" title={getLanguageByKey("attachFiles")} disabled={loading}>
                       <RiAttachment2 size={20} />
                     </ActionIcon>
                   )}
                 </FileButton>
 
-                <ActionIcon onClick={handleEmojiClickButton} variant="default">
+                <ActionIcon onClick={handleEmojiClickButton} variant="default" disabled={loading}>
                   <LuSmile size={20} />
                 </ActionIcon>
 
@@ -561,6 +588,7 @@ export const ChatInput = ({
                   onClick={onToggleNoteComposer}
                   variant="default"
                   title={getLanguageByKey("Заметка")}
+                  disabled={loading}
                 >
                   <LuStickyNote size={20} />
                 </ActionIcon>
@@ -570,6 +598,7 @@ export const ChatInput = ({
                     onClick={onCreateTask}
                     variant="default"
                     title={getLanguageByKey("New Task")}
+                    disabled={loading}
                   >
                     <FaTasks size={20} />
                   </ActionIcon>

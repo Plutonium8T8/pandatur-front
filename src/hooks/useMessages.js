@@ -27,12 +27,14 @@ export const useMessages = () => {
   const [logs, setLogs] = useState([]);
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [renderReady, setRenderReady] = useState(true); // флаг готовности рендеринга
   const [lastMessage, setLastMessage] = useState();
   const [mediaFiles, setMediaFiles] = useState([]);
   const { userId } = useUser();
 
   const getUserMessages = useCallback(async (id) => {
     setLoading(true);
+    setRenderReady(false); // Сбрасываем флаг готовности рендеринга
     try {
       const response = await api.messages.messagesTicketById(id);
       const data = Array.isArray(response?.messages) ? response.messages : [];
@@ -48,8 +50,12 @@ export const useMessages = () => {
       );
       setLastMessage(sortedMessages[sortedMessages.length - 1]);
       setMediaFiles(getMediaFileMessages(data));
+      
+      // Даем небольшую задержку для завершения всех ре-рендеров
+      setTimeout(() => setRenderReady(true), 100);
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
+      setRenderReady(true);
     } finally {
       setLoading(false);
     }
@@ -152,6 +158,7 @@ export const useMessages = () => {
       notes,
       lastMessage,
       loading,
+      renderReady,
       mediaFiles,
       getUserMessages,
       markMessageRead,
@@ -161,6 +168,6 @@ export const useMessages = () => {
       setLogs,
       setNotes,
     }),
-    [messages, logs, notes, lastMessage, mediaFiles, loading]
+    [messages, logs, notes, lastMessage, mediaFiles, loading, renderReady, getUserMessages]
   );
 };

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Flex, Text, Image, Box } from "@mantine/core";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "../../../../app-constants";
 import {
@@ -9,7 +10,7 @@ import { renderContent } from "../../renderContent";
 import { Call } from "./Call";
 import { parseCallParticipants } from "../../../utils/callUtils";
 
-export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
+const ReceivedMessageComponent = ({ personalInfo, msg, technicians = [] }) => {
   const clients = personalInfo?.clients || [];
   const isCall = msg.mtype === MEDIA_TYPE.CALL;
 
@@ -109,3 +110,14 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
     </Flex>
   );
 };
+
+// Мемоизируем компонент для предотвращения лишних ре-рендеров
+export const ReceivedMessage = memo(ReceivedMessageComponent, (prevProps, nextProps) => {
+  // Сравниваем только те поля, которые действительно влияют на отображение
+  return (
+    prevProps.msg.id === nextProps.msg.id &&
+    prevProps.msg.message === nextProps.msg.message &&
+    prevProps.msg.time_sent === nextProps.msg.time_sent &&
+    prevProps.msg.sender_id === nextProps.msg.sender_id
+  );
+});
