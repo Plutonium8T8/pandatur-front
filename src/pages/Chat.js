@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Flex, ActionIcon, Box } from "@mantine/core";
@@ -8,6 +8,7 @@ import ChatExtraInfo from "../Components/ChatComponent/ChatExtraInfo";
 import ChatList from "../Components/ChatComponent/ChatList";
 import { ChatMessages } from "../Components/ChatComponent/components/ChatMessages";
 import Can from "@components/CanComponent/Can";
+import { api } from "../api";
 
 export const Chat = () => {
   const { tickets } = useApp();
@@ -20,11 +21,32 @@ export const Chat = () => {
 
   const { technicians } = useGetTechniciansList();
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const [selectedTicketData, setSelectedTicketData] = useState(null);
 
   const currentTicket = useMemo(() => {
     const found = tickets?.find((t) => t.id === ticketId);
     return found;
   }, [tickets, ticketId]);
+
+  // Загружаем полные данные тикета при изменении ticketId
+  useEffect(() => {
+    const fetchTicketData = async () => {
+      if (!ticketId) {
+        setSelectedTicketData(null);
+        return;
+      }
+
+      try {
+        const ticketData = await api.tickets.getLightById(ticketId);
+        setSelectedTicketData(ticketData);
+      } catch (error) {
+        console.error('Ошибка при загрузке данных тикета:', error);
+        setSelectedTicketData(null);
+      }
+    };
+
+    fetchTicketData();
+  }, [ticketId]);
 
   // Получаем последнее сообщение от клиента для автоматического выбора контакта
   const lastMessage = useMemo(() => {
@@ -116,7 +138,7 @@ export const Chat = () => {
             <ChatExtraInfo
               selectedClient={selectedClient}
               ticketId={ticketId}
-              updatedTicket={currentTicket}
+              updatedTicket={selectedTicketData || currentTicket}
               onUpdateClientData={updateClientData}
             />
           </Can>
