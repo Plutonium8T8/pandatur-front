@@ -154,7 +154,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
     setLoading(true);
     try {
-      const response = await api.users.getUsersClientContactsByPlatform(ticketId, {
+      const response = await api.users.getUsersClientContactsByPlatform(ticketId, null, {
         signal: controller.signal,
       });
 

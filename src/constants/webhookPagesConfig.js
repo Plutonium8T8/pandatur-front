@@ -228,49 +228,49 @@ export const WEBHOOK_PAGES_CONFIG = {
   whatsapps: [
     {
       page_id: "37360991919",
-      page_name: "Panda Tur Chisinau",
+      page_name: "Chisinau - 37360991919",
       type: "phone",
       group_title: "MD"
     },
     {
       page_id: "37369440400",
-      page_name: "Panda Tur Chisinau",
+      page_name: "Chisinau - 37369440400",
       type: "phone",
       group_title: "MD"
     },
     {
       page_id: "37361161919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361161919",
       type: "phone",
       group_title: "RASCANI"
     },
     {
       page_id: "37361001919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361001919",
       type: "phone",
       group_title: "RASCANI"
     },
     {
       page_id: "37361141919",
-      page_name: "Drochia",
+      page_name: "Drochia - 37361141919",
       type: "phone",
       group_title: "DROCHIA"
     },
     {
       page_id: "40720949119",
-      page_name: "Panda Tour Iasi",
+      page_name: "Iasi - 40720949119",
       type: "phone",
       group_title: "RO"
     },
     {
       page_id: "40728932931",
-      page_name: "Panda Tour Bucuresti",
+      page_name: "Bucuresti - 40728932931",
       type: "phone",
       group_title: "RO"
     },
     {
       page_id: "40721205105",
-      page_name: "Panda Tour Brasov",
+      page_name: "Brasov - 40721205105",
       type: "phone",
       group_title: "RO"
     }
@@ -278,31 +278,31 @@ export const WEBHOOK_PAGES_CONFIG = {
   vibers: [
     {
       page_id: "37360991919",
-      page_name: "Panda Tur Chisinau",
+      page_name: "Chisinau - 37360991919",
       type: "phone",
       group_title: "MD"
     },
     {
       page_id: "37361161919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361161919",
       type: "phone",
       group_title: "RASCANI"
     },
     {
       page_id: "37361001919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361001919",
       type: "phone",
       group_title: "RASCANI"
     },
     {
       page_id: "37361141919",
-      page_name: "Drochia",
+      page_name: "Drochia - 37361141919",
       type: "phone",
       group_title: "DROCHIA"
     },
     {
       page_id: "380984284284",
-      page_name: "Catalan",
+      page_name: "Catalan - 380984284284",
       type: "phone",
       group_title: "CATALAN"
     }
@@ -310,37 +310,37 @@ export const WEBHOOK_PAGES_CONFIG = {
   telegrams: [
     {
       page_id: "37360991919",
-      page_name: "Panda Tur Chisinau",
+      page_name: "Chisinau - 37360991919",
       type: "telegram",
       group_title: "MD"
     },
     {
       page_id: "37360361919",
-      page_name: "Panda Tur Chisinau",
+      page_name: "Chisinau - 37360361919",
       type: "telegram",
       group_title: "MD"
     },
     {
       page_id: "37361001919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361001919",
       type: "telegram",
       group_title: "RASCANI"
     },
     {
       page_id: "37361161919",
-      page_name: "Rascani",
+      page_name: "Rascani - 37361161919",
       type: "telegram",
       group_title: "RASCANI"
     },
     {
       page_id: "37361141919",
-      page_name: "Drochia",
+      page_name: "Drochia - 37361141919",
       type: "telegram",
       group_title: "DROCHIA"
     },
     {
       page_id: "380984284284",
-      page_name: "Catalan",
+      page_name: "Catalan - 380984284284",
       type: "telegram",
       group_title: "CATALAN"
     }
