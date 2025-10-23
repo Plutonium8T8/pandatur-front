@@ -42,55 +42,74 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = React.useMemo(() => {
+    const DEBUG_SINGLE_CHAT = false; // Set to true for debugging
+
     if (!messages || messages.length === 0 || !ticketId) {
-      console.log("[SingleChat] lastMessage: no messages or ticketId", { 
-        hasMessages: !!messages, 
-        messagesCount: messages?.length, 
-        ticketId 
-      });
+      if (DEBUG_SINGLE_CHAT) {
+        console.log("[SingleChat] lastMessage: no messages or ticketId", {
+          hasMessages: !!messages,
+          messagesCount: messages?.length,
+          ticketId
+        });
+      }
       return null;
     }
-    
-    // Фильтруем сообщения только для текущего тикета и исключаем sipuni/mail
+
+    // Нормализуем ticketId к числу один раз
     const currentTicketId = Number(ticketId);
-    const currentTicketMessages = messages.filter(msg => {
+
+    // ⚡ OPTIMIZATION: Используем single-pass для фильтрации и поиска max
+    // O(n) вместо O(n) + O(n log n)
+    let lastMsg = null;
+    let lastMsgTime = 0;
+    let filteredCount = 0;
+
+    for (let i = 0; i < messages.length; i++) {
+      const msg = messages[i];
       const platform = msg.platform?.toLowerCase();
-      return msg.ticket_id === currentTicketId && 
-             platform !== 'sipuni' && 
-             platform !== 'mail';
-    });
-    
-    console.log("[SingleChat] filtered messages for ticket", { 
-      ticketId: currentTicketId, 
-      totalMessages: messages.length,
-      currentTicketMessages: currentTicketMessages.length,
-      allTicketIds: [...new Set(messages.map(m => m.ticket_id))]
-    });
-    
-    if (currentTicketMessages.length === 0) {
-      return null;
+
+      // Пропускаем сообщения не для этого тикета или с неподходящей платформой
+      if (msg.ticket_id !== currentTicketId || platform === 'sipuni' || platform === 'mail') {
+        continue;
+      }
+
+      // Пропускаем сообщения не от клиента (только сообщения от клиента)
+      if (msg.sender_id !== msg.client_id) {
+        continue;
+      }
+
+      filteredCount++;
+      const msgTime = new Date(msg.time_sent || msg.created_at || 0).getTime();
+
+      if (msgTime > lastMsgTime) {
+        lastMsgTime = msgTime;
+        lastMsg = msg;
+      }
     }
-    
-    // Сортируем по времени и берем последнее
-    const sortedMessages = [...currentTicketMessages].sort((a, b) => {
-      const timeA = new Date(a.time_sent || a.created_at || 0);
-      const timeB = new Date(b.time_sent || b.created_at || 0);
-      return timeB - timeA; // От новых к старым
-    });
-    
-    const lastMsg = sortedMessages[0];
-    console.log("[SingleChat] lastMessage selected", {
-      id: lastMsg?.id,
-      platform: lastMsg?.platform,
-      time_sent: lastMsg?.time_sent,
-      created_at: lastMsg?.created_at,
-      from_reference: lastMsg?.from_reference,
-      to_reference: lastMsg?.to_reference,
-      client_id: lastMsg?.client_id,
-      sender_id: lastMsg?.sender_id,
-      ticket_id: lastMsg?.ticket_id
-    });
-    
+
+    if (DEBUG_SINGLE_CHAT) {
+      console.log("[SingleChat] filtered messages for ticket", {
+        ticketId: currentTicketId,
+        totalMessages: messages.length,
+        currentTicketMessages: filteredCount,
+        allTicketIds: [...new Set(messages.map(m => m.ticket_id))]
+      });
+
+      if (lastMsg) {
+        console.log("[SingleChat] lastMessage selected", {
+          id: lastMsg.id,
+          platform: lastMsg.platform,
+          time_sent: lastMsg.time_sent,
+          created_at: lastMsg.created_at,
+          from_reference: lastMsg.from_reference,
+          to_reference: lastMsg.to_reference,
+          client_id: lastMsg.client_id,
+          sender_id: lastMsg.sender_id,
+          ticket_id: lastMsg.ticket_id
+        });
+      }
+    }
+
     return lastMsg;
   }, [messages, ticketId]);
 
