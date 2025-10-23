@@ -1,16 +1,44 @@
 import { FaArrowLeft } from "react-icons/fa";
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useApp, useClientContacts, useMessagesContext } from "@hooks";
 import Can from "@components/CanComponent/Can";
+import { api } from "../../api";
+import { showServerError } from "../utils";
+import { useSnackbar } from "notistack";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
-  const { tickets } = useApp();
+  const { tickets, setTickets } = useApp();
   const { getUserMessages, messages } = useMessagesContext();
+  const { enqueueSnackbar } = useSnackbar();
+  const [isLoadingTicket, setIsLoadingTicket] = useState(false);
 
   const currentTicket = tickets.find(t => t.id === Number(ticketId));
+
+  // Функция загрузки конкретного тикета
+  const fetchSingleTicket = useCallback(async (ticketId) => {
+    if (!ticketId) return;
+    
+    setIsLoadingTicket(true);
+    try {
+      const ticket = await api.tickets.ticket.getLightById(ticketId);
+      
+      // Добавляем тикет в глобальное состояние, если его там нет
+      setTickets(prev => {
+        const exists = prev.find(t => t.id === Number(ticketId));
+        if (!exists) {
+          return [...prev, ticket];
+        }
+        return prev;
+      });
+    } catch (error) {
+      enqueueSnackbar(showServerError(error), { variant: "error" });
+    } finally {
+      setIsLoadingTicket(false);
+    }
+  }, [setTickets, enqueueSnackbar]);
   
   // Получаем последнее сообщение от клиента для автоматического выбора контакта
   const lastMessage = React.useMemo(() => {
@@ -59,6 +87,13 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     }
   }, [ticketId, getUserMessages]);
 
+  // Загружаем тикет, если его нет в глобальном состоянии
+  useEffect(() => {
+    if (ticketId && !currentTicket) {
+      fetchSingleTicket(Number(ticketId));
+    }
+  }, [ticketId, currentTicket, fetchSingleTicket]);
+
   const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
 
   return (
@@ -81,7 +116,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             changeContact={changeContact}
             selectedPageId={selectedPageId}
             changePageId={changePageId}
-            loading={loading}
+            loading={loading || isLoadingTicket}
             technicians={technicians}
             unseenCount={unseenCount}
           />
