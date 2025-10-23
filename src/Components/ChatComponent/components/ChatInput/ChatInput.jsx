@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
-import { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
@@ -30,7 +30,7 @@ import { EmailForm } from "../EmailForm/EmailForm";
 import { getPagesByType } from "../../../../constants/webhookPagesConfig";
 import "./ChatInput.css";
 
-export const ChatInput = ({
+const ChatInputComponent = ({
   onSendMessage,
   onHandleFileSelect,
   platformOptions,
@@ -641,3 +641,6 @@ export const ChatInput = ({
     </>
   );
 };
+
+// Export without memo - we use loading overlay approach
+export const ChatInput = ChatInputComponent;

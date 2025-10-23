@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useTransition } from "react";
+import React, { useMemo, useState, useEffect, useTransition } from "react";
 import { Flex, Divider, Text, Box, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD_HH_mm_ss, MEDIA_TYPE } from "@app-constants";
@@ -29,7 +29,7 @@ const makeNoteKey = (n) =>
   `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
 
 
-export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
+const GroupedMessagesComponent = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
   const { liveLogs = [] } = useLiveTicketLogs(ticketId);
   const { liveNotes = [] } = useLiveTicketNotes(ticketId);
@@ -409,3 +409,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     </Flex>
   );
 };
+
+// Export without memo - we use loading overlay approach
+export const GroupedMessages = GroupedMessagesComponent;

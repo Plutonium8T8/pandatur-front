@@ -51,8 +51,10 @@ export const useMessages = () => {
       setLastMessage(sortedMessages[sortedMessages.length - 1]);
       setMediaFiles(getMediaFileMessages(data));
       
-      // Даем небольшую задержку для завершения всех ре-рендеров
-      setTimeout(() => setRenderReady(true), 100);
+      // Используем requestAnimationFrame вместо setTimeout для более точной синхронизации
+      requestAnimationFrame(() => {
+        setRenderReady(true);
+      });
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
       setRenderReady(true);

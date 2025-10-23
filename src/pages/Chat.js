@@ -20,6 +20,7 @@ export const Chat = () => {
 
   const { technicians } = useGetTechniciansList();
   const [isChatListVisible, setIsChatListVisible] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const currentTicket = useMemo(() => {
     const found = tickets?.find((t) => t.id === ticketId);
@@ -69,13 +70,33 @@ export const Chat = () => {
     refetch,
   } = useClientContacts(ticketId, lastMessage, currentTicket?.group_title);
 
-  // Комбинированный loading: ждём загрузки сообщений, контактов, завершения автовыборов и рендеринга
-  // Используем useMemo для стабилизации - предотвращаем мигание
-  const isFullyLoading = useMemo(() => {
-    return messagesLoading || loading || !selectionReady || !renderReady;
-  }, [messagesLoading, loading, selectionReady, renderReady]);
+  // SIMPLIFIED APPROACH: Keep loading overlay until EVERYTHING is stable
+  useEffect(() => {
+    const allDataLoaded = !messagesLoading && !loading;
+    const selectorsPopulated = platformOptions.length === 0 || 
+      (selectedPlatform && selectedPageId && selectedClient?.value);
+    const readyToShow = allDataLoaded && selectionReady && selectorsPopulated;
+    
+    // When everything is ready, wait 100ms for any final state updates, then show
+    if (readyToShow && isInitialLoad) {
+      const timer = setTimeout(() => {
+        setIsInitialLoad(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [messagesLoading, loading, selectionReady, platformOptions.length, selectedPlatform, selectedPageId, selectedClient?.value, isInitialLoad]);
+
+  // Simple boolean - if isInitialLoad is true, show spinner, otherwise show content
+  const isFullyLoading = isInitialLoad;
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
+
+  // Сбрасываем флаг начальной загрузки при смене тикета
+  useEffect(() => {
+    if (ticketId) {
+      setIsInitialLoad(true);
+    }
+  }, [ticketId]);
 
   // Слушаем событие обновления тикета (добавление клиента/контакта)
   useEffect(() => {

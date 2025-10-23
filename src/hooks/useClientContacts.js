@@ -135,11 +135,29 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
   // минимально необходимый стейт
   const [ticketData, setTicketData] = useState(null);
-  const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [selectedClient, setSelectedClient] = useState({}); // option целиком
-  const [selectedPageId, setSelectedPageId] = useState(null);
+  
+  // ОПТИМИЗАЦИЯ: Батчим все селекторы в один стейт чтобы избежать cascade renders
+  const [selectorState, setSelectorState] = useState({
+    selectedPlatform: null,
+    selectedClient: {}, // option целиком
+    selectedPageId: null,
+    selectionReady: false // флаг готовности всех выборов
+  });
+  
+  const { selectedPlatform, selectedClient, selectedPageId, selectionReady } = selectorState;
+  
+  // DEBUG: Log selector state changes
+  useEffect(() => {
+    console.log('[useClientContacts] Selector state changed:', {
+      platform: selectedPlatform,
+      clientValue: selectedClient?.value,
+      pageId: selectedPageId,
+      ready: selectionReady,
+      ticketId
+    });
+  }, [selectedPlatform, selectedClient?.value, selectedPageId, selectionReady, ticketId]);
+  
   const [loading, setLoading] = useState(false);
-  const [selectionReady, setSelectionReady] = useState(false); // флаг готовности всех выборов
 
   // защищаемся от гонок запросов
   const abortRef = useRef(null);
@@ -164,9 +182,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       startTransition(() => {
         setTicketData(response);
         // сбросим выборы — и дадим авто-логике выставить их ниже
-        setSelectedPlatform(null);
-        setSelectedClient({});
-        setSelectedPageId(null);
+        setSelectorState({
+          selectedPlatform: null,
+          selectedClient: {},
+          selectedPageId: null,
+          selectionReady: false
+        });
       });
     } catch (error) {
       if (error?.name !== "AbortError") {
@@ -198,10 +219,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     debug("ticketId changed → refetch + local reset", ticketId);
     // Мягкий сброс локально — визуально не «мигать»
     startTransition(() => {
-      setSelectedPlatform(null);
-      setSelectedClient({});
-      setSelectedPageId(null);
-      setSelectionReady(false); // сброс флага готовности
+      setSelectorState({
+        selectedPlatform: null,
+        selectedClient: {},
+        selectedPageId: null,
+        selectionReady: false
+      });
     });
     
     // Сбрасываем ref при смене тикета
@@ -256,10 +279,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     
     // Сбрасываем выборы чтобы заново выполнился автоматический детект
     startTransition(() => {
-      setSelectedPlatform(null);
-      setSelectedClient({});
-      setSelectedPageId(null);
-      setSelectionReady(false); // сброс флага готовности
+      setSelectorState({
+        selectedPlatform: null,
+        selectedClient: {},
+        selectedPageId: null,
+        selectionReady: false
+      });
     });
   }, [lastMessage]);
 
@@ -317,7 +342,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
     if (nextPlatform && nextPlatform !== selectedPlatform) {
       debug("step 1: auto select platform:", nextPlatform);
-      setSelectedPlatform(nextPlatform);
+      setSelectorState(prev => ({ ...prev, selectedPlatform: nextPlatform }));
     }
   }, [ticketData, platformOptions, lastMessage, ticketId, selectedPlatform]);
 
@@ -375,7 +400,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
     if (nextPageId && nextPageId !== selectedPageId) {
       debug("step 2: auto select page_id:", nextPageId);
-      setSelectedPageId(nextPageId);
+      setSelectorState(prev => ({ ...prev, selectedPageId: nextPageId }));
     }
   }, [selectedPlatform, lastMessage, ticketId, groupTitle, selectedPageId]);
 
@@ -429,11 +454,11 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     const found = matchContact(contactOptions, contactValue, messageClientId);
     if (found) {
       debug("auto select contact:", found.value, found.label);
-      setSelectedClient(found);
+      setSelectorState(prev => ({ ...prev, selectedClient: found }));
     } else if (contactOptions.length) {
       // мягкий дефолт — первый контакт
       debug("auto select first contact as fallback:", contactOptions[0].value);
-      setSelectedClient(contactOptions[0]);
+      setSelectorState(prev => ({ ...prev, selectedClient: contactOptions[0] }));
     }
   }, [selectedPlatform, contactOptions, selectedClient?.value, lastMessage, ticketId, ticketData]);
 
@@ -441,7 +466,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   useEffect(() => {
     // Если данные еще грузятся — точно не готовы
     if (loading) {
-      if (selectionReady) setSelectionReady(false);
+      if (selectionReady) setSelectorState(prev => ({ ...prev, selectionReady: false }));
       return;
     }
 
@@ -449,7 +474,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     if (!platformOptions.length) {
       if (!selectionReady) {
         debug("selection ready: no platforms available");
-        setSelectionReady(true);
+        setSelectorState(prev => ({ ...prev, selectionReady: true }));
       }
       return;
     }
@@ -473,10 +498,10 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
     if (allSelected && !selectionReady) {
       debug("✅ All selections complete - setting selectionReady = true");
-      setSelectionReady(true);
+      setSelectorState(prev => ({ ...prev, selectionReady: true }));
     } else if (!allSelected && selectionReady) {
       debug("⏳ Selections incomplete - setting selectionReady = false");
-      setSelectionReady(false);
+      setSelectorState(prev => ({ ...prev, selectionReady: false }));
     }
   }, [
     loading,
@@ -491,19 +516,22 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   /** публичные коллбеки (стабильные ссылки) */
   const changePlatform = useCallback((platform) => {
     startTransition(() => {
-      setSelectedPlatform(platform || null);
-      setSelectedClient({});
-      setSelectedPageId(null); // сбрасываем page_id, чтобы авто-эффект выбрал правильный для новой платформы
+      setSelectorState({
+        selectedPlatform: platform || null,
+        selectedClient: {},
+        selectedPageId: null, // сбрасываем page_id, чтобы авто-эффект выбрал правильный для новой платформы
+        selectionReady: false
+      });
     });
   }, []);
 
   const changeContact = useCallback((value) => {
     const contact = contactOptions.find((o) => o.value === value);
-    if (contact) setSelectedClient(contact);
+    if (contact) setSelectorState(prev => ({ ...prev, selectedClient: contact }));
   }, [contactOptions]);
 
   const changePageId = useCallback((pageId) => {
-    setSelectedPageId(pageId || null);
+    setSelectorState(prev => ({ ...prev, selectedPageId: pageId || null }));
   }, []);
 
   /** точечное обновление ФИО/почты/телефона клиента */
@@ -528,11 +556,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     });
 
     // обновим выбранный контакт, если это он
-    setSelectedClient((prev) =>
-      prev?.payload?.id === clientId
-        ? { ...prev, payload: { ...prev.payload, ...newData } }
-        : prev
-    );
+    setSelectorState((prev) => {
+      const updatedClient = prev.selectedClient?.payload?.id === clientId
+        ? { ...prev.selectedClient, payload: { ...prev.selectedClient.payload, ...newData } }
+        : prev.selectedClient;
+      return { ...prev, selectedClient: updatedClient };
+    });
   }, []);
 
   /** ====================== api ====================== */

@@ -14,6 +14,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { getUserMessages, messages, loading: messagesLoading, renderReady } = useMessagesContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoadingTicket, setIsLoadingTicket] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const currentTicket = tickets.find(t => t.id === Number(ticketId));
 
@@ -84,16 +85,41 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     refetch,
   } = useClientContacts(Number(ticketId), lastMessage, currentTicket?.group_title);
 
-  // Комбинированный loading: ждём загрузки сообщений, контактов, завершения автовыборов и рендеринга
-  // Используем useMemo для стабилизации - предотвращаем мигание
-  const isFullyLoading = React.useMemo(() => {
-    return messagesLoading || loading || !selectionReady || isLoadingTicket || !renderReady;
-  }, [messagesLoading, loading, selectionReady, isLoadingTicket, renderReady]);
+  // SIMPLIFIED APPROACH: Keep loading overlay until EVERYTHING is stable
+  // Wait for all async operations + verify selectors have actual values + add stability delay
+  useEffect(() => {
+    const allDataLoaded = !messagesLoading && !loading && !isLoadingTicket;
+    const selectorsPopulated = platformOptions.length === 0 || 
+      (selectedPlatform && selectedPageId && selectedClient?.value);
+    const readyToShow = allDataLoaded && selectionReady && selectorsPopulated;
+    
+    console.log('[SingleChat] Ready check:', {
+      allDataLoaded,
+      selectorsPopulated,
+      selectionReady,
+      readyToShow,
+      isInitialLoad
+    });
+    
+    // When everything is ready, wait 100ms for any final state updates, then show
+    if (readyToShow && isInitialLoad) {
+      console.log('[SingleChat] Everything ready - starting reveal timer');
+      const timer = setTimeout(() => {
+        console.log('[SingleChat] Revealing UI now');
+        setIsInitialLoad(false);
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [messagesLoading, loading, isLoadingTicket, selectionReady, platformOptions.length, selectedPlatform, selectedPageId, selectedClient?.value, isInitialLoad]);
+
+  // Simple boolean - if isInitialLoad is true, show spinner, otherwise show content
+  const isFullyLoading = isInitialLoad;
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
   useEffect(() => {
     if (ticketId) {
+      setIsInitialLoad(true);
       getUserMessages(Number(ticketId));
     }
   }, [ticketId, getUserMessages]);

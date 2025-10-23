@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Flex, Text, Paper } from "@mantine/core";
 import dayjs from "dayjs";
 import { useUser, useMessagesContext } from "@hooks";
@@ -42,7 +42,7 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
   return msj;
 };
 
-export const ChatMessages = ({
+const ChatMessagesComponent = ({
   ticketId,
   selectedClient,
   personalInfo,
@@ -172,34 +172,25 @@ export const ChatMessages = ({
   // Автоматический скролл вниз после загрузки сообщений
   // Используем комбинированный loading для гарантии что все отрендерилось
   useEffect(() => {
-    // Скроллим вниз только когда загрузка полностью завершена
-    if (!loading && messageContainerRef.current && ticketId) {
-      // Двойной requestAnimationFrame гарантирует что DOM полностью обновился
+    // Скроллим вниз только когда загрузка полностью завершена и сообщения есть
+    if (!loading && !messagesLoading && messageContainerRef.current && ticketId && messages.length > 0) {
+      // Тройной requestAnimationFrame для гарантии полного рендера
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          if (messageContainerRef.current) {
-            const container = messageContainerRef.current;
-            container.scrollTo({
-              top: container.scrollHeight,
-              behavior: 'auto', // Без анимации для мгновенного скролла
-            });
-            setIsUserAtBottom(true);
-            
-            // Дополнительная проверка через короткий таймаут для гарантии
-            // (на случай если контент еще рендерится)
-            setTimeout(() => {
-              if (container) {
-                container.scrollTo({
-                  top: container.scrollHeight,
-                  behavior: 'auto',
-                });
-              }
-            }, 50);
-          }
+          requestAnimationFrame(() => {
+            if (messageContainerRef.current) {
+              const container = messageContainerRef.current;
+              container.scrollTo({
+                top: container.scrollHeight,
+                behavior: 'auto', // Без анимации для мгновенного скролла
+              });
+              setIsUserAtBottom(true);
+            }
+          });
         });
       });
     }
-  }, [loading, ticketId]);
+  }, [loading, messagesLoading, ticketId, messages.length]);
   
   // Дополнительный скролл вниз когда приходят новые сообщения (если пользователь внизу)
   useEffect(() => {
@@ -210,6 +201,21 @@ export const ChatMessages = ({
       });
     }
   }, [messages.length, isUserAtBottom, loading]);
+
+  // Simplified: No useMemo needed since we hide everything behind loading overlay
+  const renderGroupedMessages = () => {
+    if (ticketId && !loading && !messagesLoading) {
+      return (
+        <GroupedMessages
+          personalInfo={personalInfo}
+          ticketId={ticketId}
+          technicians={technicians}
+          apiNotes={apiNotesFromCtx}
+        />
+      );
+    }
+    return null;
+  };
 
   const renderMessagesContent = () => {
     if (messages.error) {
@@ -231,12 +237,7 @@ export const ChatMessages = ({
     if (ticketId) {
       return (
         <div ref={contentRef}>
-          <GroupedMessages
-            personalInfo={personalInfo}
-            ticketId={ticketId}
-            technicians={technicians}
-            apiNotes={apiNotesFromCtx}
-          />
+          {renderGroupedMessages()}
         </div>
       );
     }
@@ -345,3 +346,7 @@ export const ChatMessages = ({
     </Flex>
   );
 };
+
+// Export without memo - we use loading overlay to hide all renders until ready
+// This is simpler and more reliable than trying to optimize individual renders
+export const ChatMessages = ChatMessagesComponent;
