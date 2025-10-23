@@ -71,6 +71,7 @@ export const ChatMessages = ({
   const contentRef = useRef(null);
   const [isUserAtBottom, setIsUserAtBottom] = useState(true);
   const [creatingTask, setCreatingTask] = useState(false);
+  const isFirstLoadRef = useRef(true); // Флаг первой загрузки
 
   const [noteMode, setNoteMode] = useState(false);
   const [noteSaving, setNoteSaving] = useState(false);
@@ -139,9 +140,23 @@ export const ChatMessages = ({
 
   useEffect(() => {
     if (isUserAtBottom && messageContainerRef.current) {
-      messageContainerRef.current.scrollTo({
-        top: messageContainerRef.current.scrollHeight,
+      // При первой загрузке - мгновенный скролл, потом - плавный
+      const behavior = isFirstLoadRef.current ? 'instant' : 'smooth';
+      
+      // Добавляем небольшую задержку чтобы контент успел отрендериться
+      requestAnimationFrame(() => {
+        if (messageContainerRef.current) {
+          messageContainerRef.current.scrollTo({
+            top: messageContainerRef.current.scrollHeight,
+            behavior: behavior,
+          });
+        }
       });
+      
+      // После первого скролла снимаем флаг
+      if (isFirstLoadRef.current) {
+        isFirstLoadRef.current = false;
+      }
     }
   }, [messages, ticketId, apiNotesFromCtx, isUserAtBottom]);
 
@@ -152,7 +167,15 @@ export const ChatMessages = ({
 
     const ro = new ResizeObserver(() => {
       if (isUserAtBottom) {
-        container.scrollTo({ top: container.scrollHeight });
+        const behavior = isFirstLoadRef.current ? 'instant' : 'smooth';
+        requestAnimationFrame(() => {
+          if (container) {
+            container.scrollTo({ 
+              top: container.scrollHeight,
+              behavior: behavior,
+            });
+          }
+        });
       }
     });
 
@@ -169,6 +192,8 @@ export const ChatMessages = ({
 
   useEffect(() => {
     if (!ticketId) return;
+    // При смене тикета сбрасываем флаг первой загрузки
+    isFirstLoadRef.current = true;
     getUserMessages(Number(ticketId));
     setNoteMode(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,14 +217,12 @@ export const ChatMessages = ({
 
     if (ticketId) {
       return (
-        <div ref={contentRef}>
-          <GroupedMessages
-            personalInfo={personalInfo}
-            ticketId={ticketId}
-            technicians={technicians}
-            apiNotes={apiNotesFromCtx}
-          />
-        </div>
+        <GroupedMessages
+          personalInfo={personalInfo}
+          ticketId={ticketId}
+          technicians={technicians}
+          apiNotes={apiNotesFromCtx}
+        />
       );
     }
 
@@ -223,13 +246,14 @@ export const ChatMessages = ({
       )}
 
       <Flex
-        p="16"
         direction="column"
         className="chat-messages"
         ref={messageContainerRef}
         style={{ flex: 1, overflow: 'auto' }}
       >
-        {renderMessagesContent()}
+        <div ref={contentRef} style={{ padding: '16px', paddingBottom: '32px' }}>
+          {renderMessagesContent()}
+        </div>
       </Flex>
 
       {ticketId && !messagesLoading && (

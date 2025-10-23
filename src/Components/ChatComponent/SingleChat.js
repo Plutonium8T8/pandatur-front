@@ -43,11 +43,6 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = React.useMemo(() => {
     if (!messages || messages.length === 0 || !ticketId) {
-      console.log("[SingleChat] lastMessage: no messages or ticketId", { 
-        hasMessages: !!messages, 
-        messagesCount: messages?.length, 
-        ticketId 
-      });
       return null;
     }
     
@@ -58,13 +53,6 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       return msg.ticket_id === currentTicketId && 
              platform !== 'sipuni' && 
              platform !== 'mail';
-    });
-    
-    console.log("[SingleChat] filtered messages for ticket", { 
-      ticketId: currentTicketId, 
-      totalMessages: messages.length,
-      currentTicketMessages: currentTicketMessages.length,
-      allTicketIds: [...new Set(messages.map(m => m.ticket_id))]
     });
     
     if (currentTicketMessages.length === 0) {
@@ -78,20 +66,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
       return timeB - timeA; // От новых к старым
     });
     
-    const lastMsg = sortedMessages[0];
-    console.log("[SingleChat] lastMessage selected", {
-      id: lastMsg?.id,
-      platform: lastMsg?.platform,
-      time_sent: lastMsg?.time_sent,
-      created_at: lastMsg?.created_at,
-      from_reference: lastMsg?.from_reference,
-      to_reference: lastMsg?.to_reference,
-      client_id: lastMsg?.client_id,
-      sender_id: lastMsg?.sender_id,
-      ticket_id: lastMsg?.ticket_id
-    });
-    
-    return lastMsg;
+    return sortedMessages[0];
   }, [messages, ticketId]);
 
   const {

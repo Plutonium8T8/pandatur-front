@@ -7,7 +7,7 @@ import { getPagesByType } from "../constants/webhookPagesConfig";
 /** ====================== helpers ====================== */
 
 /** безопасный лог (вырубаем в проде одной переменной) */
-const DEBUG = true; // Временно включено для отладки
+const DEBUG = false; // Включайте при необходимости отладки
 const debug = (...args) => { if (DEBUG) console.log("[useClientContacts]", ...args); };
 
 /** приводим платформенные данные к объекту { [contactId]: contactData } */
