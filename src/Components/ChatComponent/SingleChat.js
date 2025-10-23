@@ -14,7 +14,14 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   const { getUserMessages, messages, loading: messagesLoading, renderReady } = useMessagesContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoadingTicket, setIsLoadingTicket] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  
+  // Staged rendering flags - control what appears when
+  const [renderStage, setRenderStage] = useState({
+    dataLoaded: false,      // Stage 1: Data fetched
+    selectorsReady: false,  // Stage 2: Selectors identified and rendered
+    tasksReady: false,      // Stage 3: Tasks rendered
+    messagesReady: false    // Stage 4: Messages rendered
+  });
 
   const currentTicket = tickets.find(t => t.id === Number(ticketId));
 
@@ -85,41 +92,78 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     refetch,
   } = useClientContacts(Number(ticketId), lastMessage, currentTicket?.group_title);
 
-  // SIMPLIFIED APPROACH: Keep loading overlay until EVERYTHING is stable
-  // Wait for all async operations + verify selectors have actual values + add stability delay
+  // STAGED RENDERING FLOW:
+  // Stage 1: Data loaded (messages + tasks fetched)
+  // Stage 2: Selectors ready (identified and rendered)
+  // Stage 3: Tasks ready (rendered)
+  // Stage 4: Messages ready (rendered)
+  
   useEffect(() => {
-    const allDataLoaded = !messagesLoading && !loading && !isLoadingTicket;
+    // Reset stages when ticket changes
+    setRenderStage({
+      dataLoaded: false,
+      selectorsReady: false,
+      tasksReady: false,
+      messagesReady: false
+    });
+  }, [ticketId]);
+  
+  // Stage 1: Check if data is loaded
+  useEffect(() => {
+    const dataLoaded = !messagesLoading && !loading && !isLoadingTicket;
+    
+    if (dataLoaded && !renderStage.dataLoaded) {
+      console.log('[Stage 1] Data loaded - messages and tasks fetched');
+      setRenderStage(prev => ({ ...prev, dataLoaded: true }));
+    }
+  }, [messagesLoading, loading, isLoadingTicket, renderStage.dataLoaded]);
+  
+  // Stage 2: Check if selectors are ready (identified)
+  useEffect(() => {
+    if (!renderStage.dataLoaded) return;
+    
     const selectorsPopulated = platformOptions.length === 0 || 
       (selectedPlatform && selectedPageId && selectedClient?.value);
-    const readyToShow = allDataLoaded && selectionReady && selectorsPopulated;
+    const selectorsReady = selectionReady && selectorsPopulated;
     
-    console.log('[SingleChat] Ready check:', {
-      allDataLoaded,
-      selectorsPopulated,
-      selectionReady,
-      readyToShow,
-      isInitialLoad
-    });
-    
-    // When everything is ready, wait 100ms for any final state updates, then show
-    if (readyToShow && isInitialLoad) {
-      console.log('[SingleChat] Everything ready - starting reveal timer');
-      const timer = setTimeout(() => {
-        console.log('[SingleChat] Revealing UI now');
-        setIsInitialLoad(false);
-      }, 100);
-      return () => clearTimeout(timer);
+    if (selectorsReady && !renderStage.selectorsReady) {
+      console.log('[Stage 2] Selectors identified - rendering selectors');
+      // Small delay to let selector state stabilize
+      setTimeout(() => {
+        setRenderStage(prev => ({ ...prev, selectorsReady: true }));
+      }, 50);
     }
-  }, [messagesLoading, loading, isLoadingTicket, selectionReady, platformOptions.length, selectedPlatform, selectedPageId, selectedClient?.value, isInitialLoad]);
+  }, [renderStage.dataLoaded, renderStage.selectorsReady, selectionReady, platformOptions.length, selectedPlatform, selectedPageId, selectedClient?.value]);
+  
+  // Stage 3: Render tasks after selectors
+  useEffect(() => {
+    if (!renderStage.selectorsReady || renderStage.tasksReady) return;
+    
+    console.log('[Stage 3] Rendering tasks');
+    // Small delay for smooth transition
+    setTimeout(() => {
+      setRenderStage(prev => ({ ...prev, tasksReady: true }));
+    }, 100);
+  }, [renderStage.selectorsReady, renderStage.tasksReady]);
+  
+  // Stage 4: Render messages after tasks
+  useEffect(() => {
+    if (!renderStage.tasksReady || renderStage.messagesReady) return;
+    
+    console.log('[Stage 4] Rendering messages');
+    // Small delay for smooth transition
+    setTimeout(() => {
+      setRenderStage(prev => ({ ...prev, messagesReady: true }));
+    }, 100);
+  }, [renderStage.tasksReady, renderStage.messagesReady]);
 
-  // Simple boolean - if isInitialLoad is true, show spinner, otherwise show content
-  const isFullyLoading = isInitialLoad;
+  // Show loading spinner until at least selectors are ready
+  const isFullyLoading = !renderStage.selectorsReady;
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 
   useEffect(() => {
     if (ticketId) {
-      setIsInitialLoad(true);
       getUserMessages(Number(ticketId));
     }
   }, [ticketId, getUserMessages]);
@@ -175,6 +219,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
             loading={isFullyLoading}
             technicians={technicians}
             unseenCount={unseenCount}
+            renderStage={renderStage}
           />
         </Flex>
       </Can>

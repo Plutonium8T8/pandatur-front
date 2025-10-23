@@ -56,6 +56,7 @@ const ChatMessagesComponent = ({
   loading,
   technicians,
   unseenCount = 0,
+  renderStage = { tasksReady: true, messagesReady: true } // defaults for backwards compatibility
 }) => {
   const { userId } = useUser();
 
@@ -202,9 +203,9 @@ const ChatMessagesComponent = ({
     }
   }, [messages.length, isUserAtBottom, loading]);
 
-  // Simplified: No useMemo needed since we hide everything behind loading overlay
+  // Stage 4: Only render messages when messagesReady
   const renderGroupedMessages = () => {
-    if (ticketId && !loading && !messagesLoading) {
+    if (ticketId && !loading && !messagesLoading && renderStage.messagesReady) {
       return (
         <GroupedMessages
           personalInfo={personalInfo}
@@ -214,6 +215,16 @@ const ChatMessagesComponent = ({
         />
       );
     }
+    
+    // Show placeholder while waiting for messages stage
+    if (ticketId && !loading && !messagesLoading && !renderStage.messagesReady) {
+      return (
+        <Flex h="100%" align="center" justify="center">
+          <Text size="sm" c="dimmed">Loading messages...</Text>
+        </Flex>
+      );
+    }
+    
     return null;
   };
 
@@ -293,7 +304,8 @@ const ChatMessagesComponent = ({
             </div>
           )}
 
-          {!messagesLoading && (
+          {/* Stage 3: Render tasks only when tasksReady */}
+          {renderStage.tasksReady && !messagesLoading && (
             <TaskListOverlay
               ticketId={ticketId}
               creatingTask={creatingTask}
