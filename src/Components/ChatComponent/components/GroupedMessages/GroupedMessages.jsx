@@ -1,4 +1,4 @@
-import { useMemo, useState, memo, startTransition } from "react";
+import { useMemo, useState } from "react";
 import { Flex, Divider, Text, Box, Button } from "@mantine/core";
 import { useMessagesContext } from "@hooks";
 import { YYYY_MM_DD_HH_mm_ss, MEDIA_TYPE } from "@app-constants";
@@ -28,53 +28,6 @@ const toDate = (val) => {
 const makeNoteKey = (n) =>
   `${n.ticket_id}|${n.technician_id}|${n.type}|${String(n.value ?? "").trim()}|${n.created_at}`;
 
-// Мемоизированный компонент для диалогового блока
-const DialogBlock = memo(({ items, technicianMap, personalInfo, technicians, date, blockIndex }) => {
-  return (
-    <Box
-      key={`dialog-${date}-${blockIndex}`}
-      className="dialog-block-animated"
-      p="md"
-      style={{
-        backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
-        borderRadius: "12px",
-        border: "1px solid var(--crm-ui-kit-palette-border-default)",
-        position: "relative",
-      }}
-    >
-      <BackTabs />
-      <Flex direction="column" gap="xs">
-        {items.map((msg) => {
-          // Используем заранее вычисленный флаг
-          const isClientMessage = msg.isClientMessage;
-          const technician = technicianMap.get(Number(msg.sender_id));
-          
-          const messageKey = msg.message_id 
-            ? `msg-${msg.message_id}` 
-            : `${msg.id || 'temp'}-${msg.time_sent}`;
-          
-          return isClientMessage ? (
-            <ReceivedMessage
-              key={messageKey}
-              msg={msg}
-              personalInfo={personalInfo}
-              technicians={technicians}
-            />
-          ) : (
-            <SendedMessage
-              key={messageKey}
-              msg={msg}
-              technician={technician}
-              technicians={technicians}
-            />
-          );
-        })}
-      </Flex>
-    </Box>
-  );
-});
-
-DialogBlock.displayName = 'DialogBlock';
 
 export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes = [] }) => {
   const { messages: rawMessages = [], logs: rawLogs = [] } = useMessagesContext();
@@ -128,19 +81,11 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
     };
   }, [rawMessages, ticketId, visibleEmailCount]);
 
-  // Объединяем отфильтрованные email с остальными сообщениями и определяем тип сообщения
+  // Объединяем отфильтрованные email с остальными сообщениями
   const messages = useMemo(() => {
     return [...emailMessages, ...nonEmailMessages].map((msg) => {
       const d = toDate(msg.time_sent) || new Date(0);
       const dj = dayjs(d);
-      
-      // Определяем, от клиента ли это сообщение
-      const senderIdStr = String(msg.sender_id);
-      const msgClientIds = Array.isArray(msg.client_id)
-        ? msg.client_id.map(String)
-        : [String(msg.client_id)];
-      const isClientMessage = msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
-      
       return {
         ...msg,
         itemType: "message",
@@ -148,10 +93,9 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
         dateDivider: dj.format("DD.MM.YYYY"),
         clientId: Array.isArray(msg.client_id) ? msg.client_id[0] : msg.client_id,
         platform: msg.platform?.toLowerCase?.() || "",
-        isClientMessage, // Добавляем заранее вычисленный флаг
       };
     });
-  }, [emailMessages, nonEmailMessages, clientIds]);
+  }, [emailMessages, nonEmailMessages]);
 
   // логи (мердж статики и live)
   const mergedLogs = useMemo(() => {
@@ -305,13 +249,6 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
   // Количество скрытых email сообщений
   const hiddenEmailCount = totalEmailCount - visibleEmailCount;
 
-  // Обработчик загрузки дополнительных email с плавным переходом
-  const handleLoadMoreEmails = () => {
-    startTransition(() => {
-      setVisibleEmailCount(prev => prev + 10);
-    });
-  };
-
   return (
     <Flex direction="column" gap="xl" h="100%">
       {/* Кнопка загрузить еще email (если есть скрытые) */}
@@ -320,7 +257,7 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
           <Button
             variant="light"
             size="sm"
-            onClick={handleLoadMoreEmails}
+            onClick={() => setVisibleEmailCount(prev => prev + 10)}
           >
             {getLanguageByKey("Load more emails")} ({hiddenEmailCount})
           </Button>
@@ -328,13 +265,13 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
       )}
 
       {allDates.length ? (
-        <Flex direction="column" gap="xs" style={{ transition: 'all 0.3s ease-in-out' }}>
+        <Flex direction="column" gap="xs">
           {allDates.map((date) => {
             const dayItems = itemsByDate[date];
             const blocks = createDialogBlocks(dayItems);
 
             return (
-              <Flex pb="xs" direction="column" gap="md" key={date} style={{ transition: 'opacity 0.2s ease-in' }}>
+              <Flex pb="xs" direction="column" gap="md" key={date}>
                 <Divider
                   color="var(--crm-ui-kit-palette-border-default)"
                   label={
@@ -386,16 +323,57 @@ export const GroupedMessages = ({ personalInfo, ticketId, technicians, apiNotes 
 
                   // Диалоговый блок
                   if (block.type === "dialog") {
+
                     return (
-                      <DialogBlock
+                      <Box
                         key={`dialog-${date}-${i}`}
-                        items={block.items}
-                        technicianMap={technicianMap}
-                        personalInfo={personalInfo}
-                        technicians={technicians}
-                        date={date}
-                        blockIndex={i}
-                      />
+                        p="md"
+                        style={{
+                          backgroundColor: "var(--crm-ui-kit-palette-background-primary)",
+                          borderRadius: "12px",
+                          border: "1px solid var(--crm-ui-kit-palette-border-default)",
+                          position: "relative",
+                        }}
+                      >
+                        {/* Иллюзия открытых вкладок позади */}
+                        <BackTabs />
+
+                        {/* Сообщения в диалоговом блоке */}
+                        <Flex direction="column" gap="xs">
+                          {block.items.map((msg, idx) => {
+                            const senderIdStr = String(msg.sender_id);
+                            const msgClientIds = Array.isArray(msg.client_id)
+                              ? msg.client_id.map(String)
+                              : [String(msg.client_id)];
+                            const isClientMessage =
+                              msgClientIds.includes(senderIdStr) || clientIds.includes(senderIdStr);
+
+                            const technician = technicianMap.get(Number(msg.sender_id));
+                            
+                            // Создаем уникальный ключ на основе message_id
+                            // Для сообщений без message_id используем id или комбинацию полей
+                            const messageKey = msg.message_id 
+                              ? `msg-${msg.message_id}` 
+                              : `${msg.id || 'temp'}-${msg.time_sent}`;
+                            
+                            return isClientMessage ? (
+                              <ReceivedMessage
+                                key={messageKey}
+                                msg={msg}
+                                personalInfo={personalInfo}
+                                technicians={technicians}
+                              />
+                            ) : (
+                              <SendedMessage
+                                key={messageKey}
+                                msg={msg}
+                                technician={technician}
+                                technicians={technicians}
+                              />
+                            );
+                          })}
+                        </Flex>
+                      </Box>
                     );
                   }
 

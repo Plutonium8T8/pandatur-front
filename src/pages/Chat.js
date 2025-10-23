@@ -29,6 +29,11 @@ export const Chat = () => {
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = useMemo(() => {
     if (!messages || messages.length === 0 || !ticketId) {
+      console.log("[Chat] lastMessage: no messages or ticketId", { 
+        hasMessages: !!messages, 
+        messagesCount: messages?.length, 
+        ticketId 
+      });
       return null;
     }
     
@@ -38,6 +43,13 @@ export const Chat = () => {
       return msg.ticket_id === ticketId && 
              platform !== 'sipuni' && 
              platform !== 'mail';
+    });
+    
+    console.log("[Chat] filtered messages for ticket", { 
+      ticketId, 
+      totalMessages: messages.length,
+      currentTicketMessages: currentTicketMessages.length,
+      allTicketIds: [...new Set(messages.map(m => m.ticket_id))]
     });
     
     if (currentTicketMessages.length === 0) {
@@ -51,7 +63,20 @@ export const Chat = () => {
       return timeB - timeA; // От новых к старым
     });
     
-    return sortedMessages[0];
+    const lastMsg = sortedMessages[0];
+    console.log("[Chat] lastMessage selected", {
+      id: lastMsg?.id,
+      platform: lastMsg?.platform,
+      time_sent: lastMsg?.time_sent,
+      created_at: lastMsg?.created_at,
+      from_reference: lastMsg?.from_reference,
+      to_reference: lastMsg?.to_reference,
+      client_id: lastMsg?.client_id,
+      sender_id: lastMsg?.sender_id,
+      ticket_id: lastMsg?.ticket_id
+    });
+    
+    return lastMsg;
   }, [messages, ticketId]);
 
   const {
