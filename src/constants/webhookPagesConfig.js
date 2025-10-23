@@ -314,12 +314,12 @@ export const WEBHOOK_PAGES_CONFIG = {
       type: "telegram",
       group_title: "MD"
     },
-    {
-      page_id: "37360361919",
-      page_name: "Chisinau - 37360361919",
-      type: "telegram",
-      group_title: "MD"
-    },
+    // {
+    //   page_id: "37360361919",
+    //   page_name: "Chisinau - 37360361919",
+    //   type: "telegram",
+    //   group_title: "MD"
+    // },
     {
       page_id: "37361001919",
       page_name: "Rascani - 37361001919",

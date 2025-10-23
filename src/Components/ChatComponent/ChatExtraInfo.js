@@ -255,14 +255,6 @@ const ChatExtraInfo = ({
         ...generalFields,
       });
 
-      // Обновляем данные клиента через новый API метод
-      await api.users.updateUser(selectedClient.payload?.id, {
-        name,
-        surname,
-        phone,
-        email,
-      });
-
       await api.tickets.ticket.create(ticketId, extraFields);
 
       // Диспатчим событие для обновления данных тикета и клиентов
