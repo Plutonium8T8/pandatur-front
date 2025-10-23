@@ -210,12 +210,14 @@ export const AppProvider = ({ children }) => {
     if (
       isLeadsListView &&
       !spinnerTickets &&
-      !tickets.length &&
       groupTitleForApi &&
       workflowOptions.length &&
       !hasLeadsFilterInUrl() &&
       (!urlType || urlType === "light")
     ) {
+      // Сбрасываем состояние и загружаем тикеты
+      setTickets([]);
+      setUnreadCount(0);
       fetchTickets();
     }
   });
