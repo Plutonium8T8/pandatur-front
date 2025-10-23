@@ -197,7 +197,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
       setIsSaving(true);
       
       await api.tickets.ticket.addClientToTicket({
-        ticketId: ticketId,
+        ticket_id: ticketId,
         name: values.name,
         surname: values.surname,
       });
@@ -787,10 +787,6 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                     <Title order={6} mb="xs">
                       {getLanguageByKey("Adaugă contact nou")}
                     </Title>
-                    
-                    <Text size="xs" c="dimmed" mb="md">
-                      {getLanguageByKey("Platformele sociale se adaugă automat prin mesaje")}
-                    </Text>
 
                     <Select
                       label={getLanguageByKey("Tip contact")}
@@ -798,6 +794,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       data={[
                         { value: "phone", label: getLanguageByKey("Telefon") },
                         { value: "email", label: "Email" },
+                        {value: "telegram", label: "Telegram"},
                       ]}
                       {...contactForm.getInputProps("contact_type")}
                       mb="sm"
@@ -810,7 +807,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                           ? "example@email.com"
                           : contactForm.values.contact_type === "phone"
                           ? "37368939111"
-                          : getLanguageByKey("Introduceți valoarea")
+                          : contactForm.values.contact_type === "telegram"
+                          ? "@telegram_username"
+                          : "Introduceți username-ul"
                       }
                       leftSection={
                         contactForm.values.contact_type === "email" ? (

@@ -373,9 +373,9 @@ const ChatExtraInfo = ({
               ticketId={ticketId}
             />
 
-            <Divider my="md" size="md" />
+            {/* <Divider my="md" size="md" /> */}
 
-            <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
+            {/* <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
               <Merge
                 key={`merge-tickets-${ticketId}`}
                 buttonText={getLanguageByKey("combineTickets")}
@@ -397,7 +397,7 @@ const ChatExtraInfo = ({
                 placeholder={getLanguageByKey("Introduceți ID client")}
                 onSubmit={(values) => handleMergeData(values)}
               />
-            </Box>
+            </Box> */}
           </Box>
         </Tabs.Panel>
 
