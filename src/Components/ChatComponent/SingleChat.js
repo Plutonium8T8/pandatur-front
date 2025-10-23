@@ -40,9 +40,14 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     }
   }, [setTickets, enqueueSnackbar]);
   
-  // Получаем последнее сообщение от клиента для автоматического выбора контакта
+  // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = React.useMemo(() => {
     if (!messages || messages.length === 0 || !ticketId) {
+      console.log("[SingleChat] lastMessage: no messages or ticketId", { 
+        hasMessages: !!messages, 
+        messagesCount: messages?.length, 
+        ticketId 
+      });
       return null;
     }
     
@@ -50,20 +55,38 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     const currentTicketId = Number(ticketId);
     const currentTicketMessages = messages.filter(msg => msg.ticket_id === currentTicketId);
     
+    console.log("[SingleChat] filtered messages for ticket", { 
+      ticketId: currentTicketId, 
+      totalMessages: messages.length,
+      currentTicketMessages: currentTicketMessages.length,
+      allTicketIds: [...new Set(messages.map(m => m.ticket_id))]
+    });
+    
     if (currentTicketMessages.length === 0) {
       return null;
     }
     
-    // Ищем последнее сообщение от клиента (где sender_id === client_id)
-    for (let i = currentTicketMessages.length - 1; i >= 0; i--) {
-      const msg = currentTicketMessages[i];
-      if (msg.sender_id === msg.client_id) {
-        return msg;
-      }
-    }
+    // Сортируем по времени и берем последнее
+    const sortedMessages = [...currentTicketMessages].sort((a, b) => {
+      const timeA = new Date(a.time_sent || a.created_at || 0);
+      const timeB = new Date(b.time_sent || b.created_at || 0);
+      return timeB - timeA; // От новых к старым
+    });
     
-    // Если не нашли сообщение от клиента, возвращаем последнее сообщение текущего тикета
-    return currentTicketMessages[currentTicketMessages.length - 1];
+    const lastMsg = sortedMessages[0];
+    console.log("[SingleChat] lastMessage selected", {
+      id: lastMsg?.id,
+      platform: lastMsg?.platform,
+      time_sent: lastMsg?.time_sent,
+      created_at: lastMsg?.created_at,
+      from_reference: lastMsg?.from_reference,
+      to_reference: lastMsg?.to_reference,
+      client_id: lastMsg?.client_id,
+      sender_id: lastMsg?.sender_id,
+      ticket_id: lastMsg?.ticket_id
+    });
+    
+    return lastMsg;
   }, [messages, ticketId]);
 
   const {
@@ -77,7 +100,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     changePageId,
     loading,
     updateClientData,
-  } = useClientContacts(ticketId, lastMessage, currentTicket?.group_title);
+  } = useClientContacts(Number(ticketId), lastMessage, currentTicket?.group_title);
 
   const responsibleId = currentTicket?.technician_id?.toString() ?? null;
 

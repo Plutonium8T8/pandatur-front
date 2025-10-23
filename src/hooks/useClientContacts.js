@@ -7,7 +7,7 @@ import { getPagesByType } from "../constants/webhookPagesConfig";
 /** ====================== helpers ====================== */
 
 /** безопасный лог (вырубаем в проде одной переменной) */
-const DEBUG = false;
+const DEBUG = true; // Временно включено для отладки
 const debug = (...args) => { if (DEBUG) console.log("[useClientContacts]", ...args); };
 
 /** приводим платформенные данные к объекту { [contactId]: contactData } */
@@ -216,22 +216,53 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     // если уже выбрана — пропускаем
     if (selectedPlatform) return;
 
+    debug("step 1: START", {
+      hasLastMessage: !!lastMessage,
+      lastMessageTicketId: lastMessage?.ticket_id,
+      currentTicketId: ticketId,
+      lastMessagePlatform: lastMessage?.platform,
+      availablePlatforms: platformOptions.map(p => p.value)
+    });
+
     let nextPlatform = null;
 
     if (lastMessage && lastMessage.ticket_id === ticketId) {
       const msgPlatform = lastMessage.platform?.toLowerCase();
+      debug("step 1: checking lastMessage for platform", {
+        msgPlatform,
+        availablePlatforms: platformOptions.map(p => p.value),
+        lastMessageId: lastMessage.id,
+        lastMessageTime: lastMessage.time_sent || lastMessage.created_at,
+        from_reference: lastMessage.from_reference,
+        to_reference: lastMessage.to_reference,
+        client_id: lastMessage.client_id,
+        sender_id: lastMessage.sender_id
+      });
+      
       if (msgPlatform && platformOptions.some((p) => p.value === msgPlatform)) {
         nextPlatform = msgPlatform;
+        debug("step 1: platform found in lastMessage:", nextPlatform);
+      } else {
+        debug("step 1: platform from lastMessage not valid", {
+          msgPlatform,
+          platformInOptions: platformOptions.some((p) => p.value === msgPlatform)
+        });
       }
+    } else {
+      debug("step 1: lastMessage not valid", {
+        hasLastMessage: !!lastMessage,
+        ticketIdMatch: lastMessage?.ticket_id === ticketId
+      });
     }
 
     if (!nextPlatform) {
       // дефолт — первая платформа
       nextPlatform = platformOptions[0]?.value || null;
+      debug("step 1: no platform from lastMessage, using first available:", nextPlatform);
     }
 
     if (nextPlatform && nextPlatform !== selectedPlatform) {
-      debug("auto select platform:", nextPlatform);
+      debug("step 1: auto select platform:", nextPlatform);
       setSelectedPlatform(nextPlatform);
     }
   }, [ticketData, platformOptions, lastMessage, ticketId, selectedPlatform]);
@@ -246,6 +277,12 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     let nextPageId = null;
 
     if (lastMessage && lastMessage.ticket_id === ticketId) {
+      debug("step 2: checking lastMessage for page_id", {
+        lastMessagePageId: lastMessage.page_id,
+        platform: selectedPlatform,
+        groupTitle
+      });
+      
       const candidate = selectPageIdByMessage(
         selectedPlatform,
         lastMessage.page_id,
@@ -253,6 +290,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       );
       if (candidate) {
         nextPageId = candidate;
+        debug("step 2: found page_id from lastMessage:", candidate);
       }
     }
 
@@ -261,10 +299,11 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       const all = getPagesByType(selectedPlatform) || [];
       const filtered = groupTitle ? all.filter((p) => p.group_title === groupTitle) : all;
       nextPageId = filtered[0]?.page_id || null;
+      debug("step 2: using first available page_id:", nextPageId, "from", filtered.length, "filtered pages");
     }
 
     if (nextPageId && nextPageId !== selectedPageId) {
-      debug("auto select page_id:", nextPageId);
+      debug("step 2: auto select page_id:", nextPageId);
       setSelectedPageId(nextPageId);
     }
   }, [selectedPlatform, lastMessage, ticketId, groupTitle, selectedPageId]);
@@ -281,11 +320,23 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
     if (lastMessage && lastMessage.ticket_id === ticketId) {
       messageClientId = lastMessage.client_id;
-      // входящее → from_reference, исходящее → to_reference
-      contactValue =
-        lastMessage.sender_id === lastMessage.client_id
-          ? lastMessage.from_reference
-          : lastMessage.to_reference;
+      
+      // Определяем контакт клиента в зависимости от направления сообщения
+      if (lastMessage.sender_id === lastMessage.client_id) {
+        // Входящее сообщение от клиента: берем from_reference
+        contactValue = lastMessage.from_reference;
+      } else {
+        // Исходящее сообщение к клиенту: берем to_reference
+        contactValue = lastMessage.to_reference;
+      }
+
+      debug("step 3: contact selection from lastMessage", {
+        messageClientId,
+        contactValue,
+        isIncoming: lastMessage.sender_id === lastMessage.client_id,
+        from_ref: lastMessage.from_reference,
+        to_ref: lastMessage.to_reference
+      });
 
       // если в сообщении ссылка пустая — попробуем найти по client_id
       if (!contactValue && ticketData?.[selectedPlatform]) {
@@ -295,16 +346,20 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
           const client = clientIndex.get(Number.parseInt(cid, 10));
           return client?.id === messageClientId;
         });
-        if (entry) contactValue = entry[1]?.contact_value;
+        if (entry) {
+          contactValue = entry[1]?.contact_value;
+          debug("step 3: found contactValue by client_id", contactValue);
+        }
       }
     }
 
     const found = matchContact(contactOptions, contactValue, messageClientId);
     if (found) {
-      debug("auto select contact:", found.value);
+      debug("auto select contact:", found.value, found.label);
       setSelectedClient(found);
     } else if (contactOptions.length) {
       // мягкий дефолт — первый контакт
+      debug("auto select first contact as fallback:", contactOptions[0].value);
       setSelectedClient(contactOptions[0]);
     }
   }, [selectedPlatform, contactOptions, selectedClient?.value, lastMessage, ticketId, ticketData]);
