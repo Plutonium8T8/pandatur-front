@@ -3472,6 +3472,16 @@ export const translations = {
     RU: "Ошибка при обновлении клиента",
     EN: "Error updating client",
   },
+  "Username Telegram invalid": {
+    RO: "Username Telegram invalid",
+    RU: "Неверный username Telegram",
+    EN: "Invalid Telegram username",
+  },
+  "Introduceți username-ul": {
+    RO: "Introduceți username-ul",
+    RU: "Введите username",
+    EN: "Enter username",
+  },
   "Contactate": {
     RO: "Contactate",
     RU: "Связались",

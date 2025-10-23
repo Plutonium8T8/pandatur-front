@@ -91,15 +91,19 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
       contact_type: (value) => (!value ? getLanguageByKey("Selectați tipul de contact") : null),
       contact_value: (value, values) => {
         if (!value) return getLanguageByKey("Introduceți valoarea contactului");
-        
+
         if (values.contact_type === "email") {
           return /^\S+@\S+$/.test(value) ? null : getLanguageByKey("Email invalid");
         }
-        
+
         if (values.contact_type === "phone") {
           return /^\d+$/.test(value) ? null : getLanguageByKey("Introduceți doar cifre");
         }
-        
+
+        if (values.contact_type === "telegram") {
+          return /^@?[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid");
+        }
+
         return null;
       },
     },
@@ -112,15 +116,15 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
     validate: {
       contact_value: (value) => {
         if (!value) return getLanguageByKey("Introduceți valoarea contactului");
-        
+
         if (editingContact?.type === "email") {
           return /^\S+@\S+$/.test(value) ? null : getLanguageByKey("Email invalid");
         }
-        
+
         if (editingContact?.type === "phone") {
           return /^\d+$/.test(value) ? null : getLanguageByKey("Introduceți doar cifre");
         }
-        
+
         return null;
       },
     },
@@ -140,12 +144,12 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   // Загрузка данных клиентов
   const loadClientsData = useCallback(async () => {
     if (!ticketId) return;
-    
+
     try {
       setLoading(true);
       // Передаем undefined или null для platform, чтобы получить всех клиентов
       const response = await api.users.getUsersClientContactsByPlatform(ticketId, undefined);
-      
+
       if (response?.clients) {
         setClients(response.clients);
       }
@@ -172,7 +176,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
     };
 
     window.addEventListener('ticketUpdated', handleTicketUpdate);
-    
+
     return () => {
       window.removeEventListener('ticketUpdated', handleTicketUpdate);
     };
@@ -195,7 +199,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
     try {
       setIsSaving(true);
-      
+
       await api.tickets.ticket.addClientToTicket({
         ticket_id: ticketId,
         name: values.name,
@@ -208,7 +212,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
       setShowAddForm(false);
       form.reset();
-      
+
       // Перезагружаем данные клиентов
       await loadClientsData();
 
@@ -389,9 +393,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   // Начать редактирование клиента
   const startEditClient = (clientId, currentName, currentSurname) => {
     setEditingClient({ clientId });
-    editClientForm.setValues({ 
-      name: currentName || "", 
-      surname: currentSurname || "" 
+    editClientForm.setValues({
+      name: currentName || "",
+      surname: currentSurname || ""
     });
   };
 
@@ -465,18 +469,18 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
             <Title order={5} className="add-client-form-title">
               {getLanguageByKey("Adaugă client nou")}
             </Title>
-          </Flex>
-          
-          <TextInput
-            label={getLanguageByKey("Nume")}
+      </Flex>
+
+      <TextInput
+        label={getLanguageByKey("Nume")}
             placeholder={getLanguageByKey("Introduceti numele")}
             leftSection={<LuUser size={24} />}
             {...form.getInputProps("name")}
             mb="sm"
-          />
+      />
 
-          <TextInput
-            label={getLanguageByKey("Prenume")}
+      <TextInput
+        label={getLanguageByKey("Prenume")}
             placeholder={getLanguageByKey("Introduceti prenumele")}
             leftSection={<LuUser size={24} />}
             {...form.getInputProps("surname")}
@@ -485,14 +489,14 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
 
           <Group grow>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={handleCancel}
               disabled={isSaving}
             >
               {getLanguageByKey("Anulează")}
             </Button>
-            <Button 
+            <Button
               onClick={handleSaveClient}
               loading={isSaving}
             >
@@ -521,9 +525,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
               <Box key={client.id} className="client-card">
                 {/* Шапка карточки с аватаром и именем */}
                 <Flex align="center" gap="md" mb="md">
-                  <Avatar 
-                    src={client.photo} 
-                    radius="xl" 
+                  <Avatar
+                    src={client.photo}
+                    radius="xl"
                     size="lg"
                   >
                     <LuUser size={24} />
@@ -538,18 +542,18 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                           mb="xs"
                           rightSection={
                             <Flex gap="xs" align="center" wrap="nowrap">
-                              <ActionIcon 
-                                size="sm" 
-                                variant="subtle" 
+                              <ActionIcon
+                                size="sm"
+                                variant="subtle"
                                 color="red"
                                 onClick={cancelEditClient}
                                 disabled={isSavingClient}
                               >
                                 <MdClose size={24} />
                               </ActionIcon>
-                              <ActionIcon 
-                                size="sm" 
-                                variant="subtle" 
+                              <ActionIcon
+                                size="sm"
+                                variant="subtle"
                                 color="green"
                                 onClick={handleUpdateClient}
                                 loading={isSavingClient}
@@ -569,8 +573,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       <>
                         <Text className="client-card-name" mb="xs">
                           {fullName}
-                          <ActionIcon 
-                            size="sm" 
+                          <ActionIcon
+                            size="sm"
                             variant="subtle"
                             ml="xs"
                             onClick={() => {
@@ -586,7 +590,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       </>
                     )}
                   </Box>
-                  <ActionIcon 
+                  <ActionIcon
                     onClick={() => toggleClientExpand(client.id)}
                     variant="subtle"
                     size="lg"
@@ -609,18 +613,18 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               {...editContactForm.getInputProps("contact_value")}
                               rightSection={
                                 <Flex gap="xs" align="center" wrap="nowrap">
-                                  <ActionIcon 
-                                    size="sm" 
-                                    variant="subtle" 
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
                                     color="red"
                                     onClick={cancelEditContact}
                                     disabled={isSavingContact}
                                   >
                                     <MdClose size={24} />
                                   </ActionIcon>
-                                  <ActionIcon 
-                                    size="sm" 
-                                    variant="subtle" 
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
                                     color="green"
                                     onClick={handleUpdateContact}
                                     loading={isSavingContact}
@@ -638,8 +642,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               {emailContact.contact_value}
                             </Text>
                             <Flex gap="xs">
-                              <ActionIcon 
-                                size="sm" 
+                              <ActionIcon
+                                size="sm"
                                 variant="subtle"
                                 onClick={() => {
                                   startEditContact(client.id, emailContact.id, "email", emailContact.contact_value);
@@ -647,8 +651,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               >
                                 <MdEdit size={24} />
                               </ActionIcon>
-                              <ActionIcon 
-                                size="sm" 
+                              <ActionIcon
+                                size="sm"
                                 variant="subtle"
                                 color="red"
                                 onClick={() => {
@@ -673,7 +677,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       <Box key={`phone-${phoneContact.id}-${index}`}>
                         {editingContact?.clientId === client.id && editingContact?.contactId === phoneContact.id ? (
                           <Box mb="xs">
-                            <TextInput
+      <TextInput
                               leftSection={<LuPhone size={24} />}
                               placeholder="37368939111"
                               type="text"
@@ -683,18 +687,18 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               value={editContactForm.values.contact_value}
                               rightSection={
                                 <Flex gap="xs" align="center" wrap="nowrap">
-                                  <ActionIcon 
-                                    size="sm" 
-                                    variant="subtle" 
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
                                     color="red"
                                     onClick={cancelEditContact}
                                     disabled={isSavingContact}
                                   >
                                     <MdClose size={24} />
                                   </ActionIcon>
-                                  <ActionIcon 
-                                    size="sm" 
-                                    variant="subtle" 
+                                  <ActionIcon
+                                    size="sm"
+                                    variant="subtle"
                                     color="green"
                                     onClick={handleUpdateContact}
                                     loading={isSavingContact}
@@ -712,8 +716,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               {phoneContact.contact_value}
                             </Text>
                             <Flex gap="xs">
-                              <ActionIcon 
-                                size="sm" 
+                              <ActionIcon
+                                size="sm"
                                 variant="subtle"
                                 onClick={() => {
                                   startEditContact(client.id, phoneContact.id, "phone", phoneContact.contact_value);
@@ -721,8 +725,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                               >
                                 <MdEdit size={24} />
                               </ActionIcon>
-                              <ActionIcon 
-                                size="sm" 
+                              <ActionIcon
+                                size="sm"
                                 variant="subtle"
                                 color="red"
                                 onClick={() => {
@@ -750,19 +754,19 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                         const labels = getContactTypeLabels();
                         return (
                           <Box key={`${contact.contact_type}-${contact.id}-${index}`} className="platform-contact-container">
-                            <Tooltip 
+                            <Tooltip
                               label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
                               position="top"
                             >
                               <Box className="platform-icon-container">
-                                <Icon 
-                                  size={24} 
+                                <Icon
+                                  size={24}
                                   style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
                                 />
                               </Box>
                             </Tooltip>
-                            <ActionIcon 
-                              size="xs" 
+                            <ActionIcon
+                              size="xs"
                               variant="subtle"
                               color="red"
                               className="platform-delete-btn"
@@ -794,28 +798,30 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       data={[
                         { value: "phone", label: getLanguageByKey("Telefon") },
                         { value: "email", label: "Email" },
-                        {value: "telegram", label: "Telegram"},
+                        { value: "telegram", label: "Telegram" },
                       ]}
                       {...contactForm.getInputProps("contact_type")}
                       mb="sm"
-                    />
+      />
 
-                    <TextInput
+      <TextInput
                       label={getLanguageByKey("Valoare contact")}
                       placeholder={
                         contactForm.values.contact_type === "email"
                           ? "example@email.com"
                           : contactForm.values.contact_type === "phone"
-                          ? "37368939111"
-                          : contactForm.values.contact_type === "telegram"
-                          ? "@telegram_username"
-                          : "Introduceți username-ul"
+                            ? "37368939111"
+                            : contactForm.values.contact_type === "telegram"
+                              ? "@telegram_username"
+                              : "Introduceți username-ul"
                       }
                       leftSection={
                         contactForm.values.contact_type === "email" ? (
                           <LuMail size={24} />
                         ) : contactForm.values.contact_type === "phone" ? (
                           <LuPhone size={24} />
+                        ) : contactForm.values.contact_type === "telegram" ? (
+                          <FaTelegram size={24} />
                         ) : null
                       }
                       type={contactForm.values.contact_type === "email" ? "email" : "text"}
@@ -831,20 +837,20 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                     />
 
                     <Group grow>
-                      <Button 
-                        variant="outline" 
+                      <Button
+                        variant="outline"
                         onClick={() => toggleClientExpand(client.id)}
                         disabled={isSavingContact}
                       >
-                        {getLanguageByKey("Anulează")}
-                      </Button>
-                      <Button 
+            {getLanguageByKey("Anulează")}
+          </Button>
+                      <Button
                         onClick={() => handleAddContact(client.id)}
                         loading={isSavingContact}
                       >
                         {getLanguageByKey("Adaugă contact")}
-                      </Button>
-                    </Group>
+          </Button>
+        </Group>
                   </Box>
                 </Collapse>
               </Box>
