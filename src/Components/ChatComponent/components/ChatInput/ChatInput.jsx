@@ -170,7 +170,17 @@ export const ChatInput = ({
     setTemplate(null);
   };
 
-  const buildBasePayload = () => ({});
+  const buildBasePayload = () => {
+    // Извлекаем только ID клиента из составного ключа (например, "4492-5843" -> "4492")
+    const clientId = currentClient?.value ? currentClient.value.split('-')[0] : null;
+    
+    return {
+      page_id: selectedPageId,
+      platform: selectedPlatform,
+      client_id: clientId,
+      ticket_id: ticketId,
+    };
+  };
 
   const handleMarkAsRead = () => {
     if (!ticketId) return;
