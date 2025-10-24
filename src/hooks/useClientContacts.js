@@ -212,6 +212,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
 
   /** авто-подгрузка при изменении ticketId */
   const prevLastMessageRef = useRef(null);
+  const initialSelectionMadeRef = useRef(false); // Флаг первичного выбора
   
   useEffect(() => {
     if (!ticketId) return;
@@ -229,6 +230,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     
     // Сбрасываем ref при смене тикета
     prevLastMessageRef.current = null;
+    initialSelectionMadeRef.current = false; // Сбрасываем флаг при смене тикета
     
     // Вызываем fetchClientContacts напрямую, не через зависимость
     fetchClientContacts();
@@ -239,53 +241,30 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ticketId]); // Убираем fetchClientContacts из зависимостей - намеренно, чтобы избежать бесконечного цикла
 
-  /** Сбрасываем выборы при изменении lastMessage (новое сообщение через сокет) */
+  /** Отслеживаем lastMessage только для первоначального выбора */
   useEffect(() => {
     if (!lastMessage) return;
+    
+    // Если первоначальный выбор уже сделан - ничего не делаем
+    if (initialSelectionMadeRef.current) {
+      debug("Initial selection already made, ignoring lastMessage changes");
+      return;
+    }
     
     // Пропускаем первый рендер - выборы и так будут сделаны автоматически
     if (prevLastMessageRef.current === null) {
       prevLastMessageRef.current = lastMessage;
+      debug("First lastMessage received, will use for initial selection");
       return;
     }
     
-    // Создаем уникальный ключ для сообщения (работает даже если id undefined)
-    const createMessageKey = (msg) => {
-      if (!msg) return null;
-      return `${msg.id || 'pending'}_${msg.time_sent}_${msg.platform}_${msg.from_reference}_${msg.to_reference}`;
-    };
-    
-    const prevKey = createMessageKey(prevLastMessageRef.current);
-    const currentKey = createMessageKey(lastMessage);
-    
-    // Проверяем что сообщение действительно изменилось
-    if (prevKey === currentKey) {
-      return;
-    }
-    
-    // client_id может быть массивом [3417] или числом 3417
-    const clientIdRaw = lastMessage.client_id;
-    const clientId = Array.isArray(clientIdRaw) ? clientIdRaw[0] : clientIdRaw;
-    
-    debug("lastMessage changed, resetting selections", {
-      oldMessageId: prevLastMessageRef.current?.id,
-      newMessageId: lastMessage.id,
+    debug("lastMessage available for initial selection", {
+      messageId: lastMessage.id,
       platform: lastMessage.platform,
-      time_sent: lastMessage.time_sent,
-      isIncoming: lastMessage.sender_id === clientId
+      time_sent: lastMessage.time_sent
     });
     
     prevLastMessageRef.current = lastMessage;
-    
-    // Сбрасываем выборы чтобы заново выполнился автоматический детект
-    startTransition(() => {
-      setSelectorState({
-        selectedPlatform: null,
-        selectedClient: {},
-        selectedPageId: null,
-        selectionReady: false
-      });
-    });
   }, [lastMessage]);
 
   /** шаг 1: выбрать платформу на основе lastMessage или взять первую доступную */
@@ -475,6 +454,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
       if (!selectionReady) {
         debug("selection ready: no platforms available");
         setSelectorState(prev => ({ ...prev, selectionReady: true }));
+        initialSelectionMadeRef.current = true; // Помечаем что выбор завершен
       }
       return;
     }
@@ -499,6 +479,7 @@ export const useClientContacts = (ticketId, lastMessage, groupTitle) => {
     if (allSelected && !selectionReady) {
       debug("✅ All selections complete - setting selectionReady = true");
       setSelectorState(prev => ({ ...prev, selectionReady: true }));
+      initialSelectionMadeRef.current = true; // Помечаем что первичный выбор завершен
     } else if (!allSelected && selectionReady) {
       debug("⏳ Selections incomplete - setting selectionReady = false");
       setSelectorState(prev => ({ ...prev, selectionReady: false }));
