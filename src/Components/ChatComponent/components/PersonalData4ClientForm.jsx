@@ -101,7 +101,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
         }
 
         if (values.contact_type === "telegram") {
-          return /^@?[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid");
+          return /^[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid");
         }
 
         return null;
@@ -236,6 +236,11 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   const handleContactPhoneChange = (e) => {
     const onlyDigits = e.currentTarget.value.replace(/\D/g, "");
     contactForm.setFieldValue("contact_value", onlyDigits);
+  };
+
+  const handleContactTelegramChange = (e) => {
+    const valueWithoutAt = e.currentTarget.value.replace(/^@/, "");
+    contactForm.setFieldValue("contact_value", valueWithoutAt);
   };
 
   // Обработчик добавления контакта к клиенту
@@ -469,18 +474,18 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
             <Title order={5} className="add-client-form-title">
               {getLanguageByKey("Adaugă client nou")}
             </Title>
-      </Flex>
+          </Flex>
 
-      <TextInput
-        label={getLanguageByKey("Nume")}
+          <TextInput
+            label={getLanguageByKey("Nume")}
             placeholder={getLanguageByKey("Introduceti numele")}
             leftSection={<LuUser size={24} />}
             {...form.getInputProps("name")}
             mb="sm"
-      />
+          />
 
-      <TextInput
-        label={getLanguageByKey("Prenume")}
+          <TextInput
+            label={getLanguageByKey("Prenume")}
             placeholder={getLanguageByKey("Introduceti prenumele")}
             leftSection={<LuUser size={24} />}
             {...form.getInputProps("surname")}
@@ -677,9 +682,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       <Box key={`phone-${phoneContact.id}-${index}`}>
                         {editingContact?.clientId === client.id && editingContact?.contactId === phoneContact.id ? (
                           <Box mb="xs">
-      <TextInput
+                            <TextInput
                               leftSection={<LuPhone size={24} />}
-                              placeholder="37368939111"
+                              placeholder="37300000000"
                               type="text"
                               inputMode="numeric"
                               {...editContactForm.getInputProps("contact_value")}
@@ -802,9 +807,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       ]}
                       {...contactForm.getInputProps("contact_type")}
                       mb="sm"
-      />
+                    />
 
-      <TextInput
+                    <TextInput
                       label={getLanguageByKey("Valoare contact")}
                       placeholder={
                         contactForm.values.contact_type === "email"
@@ -812,7 +817,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                           : contactForm.values.contact_type === "phone"
                             ? "37368939111"
                             : contactForm.values.contact_type === "telegram"
-                              ? "@telegram_username"
+                              ? "telegram_username"
                               : "Introduceți username-ul"
                       }
                       leftSection={
@@ -830,7 +835,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                       onChange={
                         contactForm.values.contact_type === "phone"
                           ? handleContactPhoneChange
-                          : contactForm.getInputProps("contact_value").onChange
+                          : contactForm.values.contact_type === "telegram"
+                            ? handleContactTelegramChange
+                            : contactForm.getInputProps("contact_value").onChange
                       }
                       value={contactForm.values.contact_value}
                       mb="md"
@@ -842,15 +849,15 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                         onClick={() => toggleClientExpand(client.id)}
                         disabled={isSavingContact}
                       >
-            {getLanguageByKey("Anulează")}
-          </Button>
+                        {getLanguageByKey("Anulează")}
+                      </Button>
                       <Button
                         onClick={() => handleAddContact(client.id)}
                         loading={isSavingContact}
                       >
                         {getLanguageByKey("Adaugă contact")}
-          </Button>
-        </Group>
+                      </Button>
+                    </Group>
                   </Box>
                 </Collapse>
               </Box>
