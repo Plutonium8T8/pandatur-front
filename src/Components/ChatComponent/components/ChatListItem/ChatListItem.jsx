@@ -1,4 +1,4 @@
-import { Box, Flex, Image, Text, Badge, Divider } from "@mantine/core";
+import { Box, Flex, Image, Text, Badge, Divider, Menu, ActionIcon } from "@mantine/core";
 import { Link } from "react-router-dom";
 import { HiSpeakerWave } from "react-icons/hi2";
 import { FaFingerprint } from "react-icons/fa6";
@@ -8,9 +8,15 @@ import { FiLink2 } from "react-icons/fi";
 import { TbPhoto } from "react-icons/tb";
 import { GrAttachment } from "react-icons/gr";
 import { FaEnvelope } from "react-icons/fa";
-import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE } from "@app-constants";
+import { BsThreeDots } from "react-icons/bs";
+import { IoCheckmarkDone } from "react-icons/io5";
+import { MdPendingActions } from "react-icons/md";
+import { useState } from "react";
+import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE, TYPE_SOCKET_EVENTS } from "@app-constants";
 import { Tag } from "@components";
 import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
+import { useSocket, useApp, useUser } from "@hooks";
+import { api } from "../../../../api";
 import "./ChatListItem.css";
 
 const MESSAGE_INDICATOR = {
@@ -74,6 +80,11 @@ const MESSAGE_INDICATOR = {
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const formatDate = parseServerDate(chat.time_sent);
+  const [actionNeeded, setActionNeeded] = useState(chat.action_needed);
+
+  const { userId } = useUser();
+  const { seenMessages, socketRef } = useSocket();
+  const { markMessagesAsRead } = useApp();
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
   const getUserPhoto = () => {
@@ -81,7 +92,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
     if (chat.photo_url && chat.photo_url.trim() !== "") {
       return chat.photo_url;
     }
-    
+
     // Если есть клиенты с фото
     if (chat.clients && chat.clients.length > 0) {
       const clientWithPhoto = chat.clients.find(client => client.photo && client.photo.trim() !== "");
@@ -89,12 +100,56 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         return clientWithPhoto.photo;
       }
     }
-    
+
     // Возвращаем null для использования fallback
     return null;
   };
 
   const userPhoto = getUserPhoto();
+
+  // Обработчик для пометки чата как прочитанного
+  const handleMarkAsRead = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!chat.id) return;
+
+    try {
+      // Отправляем CONNECT через сокет
+      if (socketRef?.current?.readyState === WebSocket.OPEN) {
+        const connectPayload = {
+          type: TYPE_SOCKET_EVENTS.CONNECT,
+          data: { ticket_id: [chat.id] },
+        };
+        socketRef.current.send(JSON.stringify(connectPayload));
+      }
+
+      // Помечаем сообщения как прочитанные
+      seenMessages(chat.id, userId);
+      markMessagesAsRead(chat.id, chat.unseen_count || 0);
+    } catch (error) {
+      console.error("Failed to mark chat as read:", error);
+    }
+  };
+
+  // Обработчик для переключения флага "Не нужна акция"
+  const handleToggleActionNeeded = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!chat.id) return;
+
+    try {
+      const newValue = !actionNeeded;
+      await api.tickets.updateById({
+        id: chat.id,
+        action_needed: newValue ? "true" : "false",
+      });
+      setActionNeeded(newValue);
+    } catch (error) {
+      console.error("Failed to update action_needed:", error);
+    }
+  };
 
   return (
     <div style={style}>
@@ -108,55 +163,91 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
           data-ticket-id={chat.id}
           pos="relative"
         >
-        {chat.unseen_count > 0 && (
-          <Box pos="absolute" right="6px" className="right">
-            <Badge size="md" bg="red" circle className="right-count">
-              {chat.unseen_count}
-            </Badge>
-          </Box>
-        )}
+          {/* Индикатор непрочитанных сообщений */}
+          {chat.unseen_count > 0 && (
+            <Box pos="absolute" right="6px" className="right">
+              <Badge size="md" bg="red" circle className="right-count">
+                {chat.unseen_count}
+              </Badge>
+            </Box>
+          )}
 
-        <Flex gap="12" align="center" w="100%">
-          <Image
-            w={46}
-            h={46}
-            radius="50%"
-            src={userPhoto}
-            fallbackSrc={DEFAULT_PHOTO}
-          />
+          <Flex gap="12" align="center" w="100%">
+            <Image
+              w={46}
+              h={46}
+              radius="50%"
+              src={userPhoto}
+              fallbackSrc={DEFAULT_PHOTO}
+            />
 
-          <Box w="75%">
-            <Text truncate>{chat.contact || "-"}</Text>
-
-            <Flex gap="12">
+            <Box w="75%">
               <Flex align="center" gap="4">
-                <FaFingerprint />
-                <Text>{chat.id || "-"}</Text>
+                <Text truncate>{chat.contact || "-"}</Text>
+
+                {/* Меню с тремя точками рядом с именем */}
+                <Menu position="bottom-start" withinPortal>
+                  <Menu.Target>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      size="xs"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                    >
+                      <BsThreeDots size={14} />
+                    </ActionIcon>
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      leftSection={<IoCheckmarkDone size={16} />}
+                      onClick={handleMarkAsRead}
+                    >
+                      {getLanguageByKey("ReadChat")}
+                    </Menu.Item>
+                    <Menu.Item
+                      leftSection={<MdPendingActions size={16} />}
+                      onClick={handleToggleActionNeeded}
+                      color={actionNeeded ? "orange" : "gray"}
+                    >
+                      {getLanguageByKey("NeedAnswer")}
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
               </Flex>
 
-              {/* <Divider orientation="vertical" />
-              <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag> */}
-            </Flex>
-          </Box>
-        </Flex>
+              <Flex gap="12">
+                <Flex align="center" gap="4">
+                  <FaFingerprint />
+                  <Text>{chat.id || "-"}</Text>
+                </Flex>
 
-        <Flex justify="space-between" gap="6" align="center">
-          <Box mt="4px" w="60%">
-            {MESSAGE_INDICATOR[chat.last_message_type] || (
-              <Text h="20px" c="dimmed" size="sm" truncate>
-                {chat.last_message}
-              </Text>
-            )}
-          </Box>
-          <Text size="sm" c="dimmed">
-            {formatDate ? formatDate.format("DD.MM.YYYY")
-              : null}
-          </Text>
-          <Text size="sm" c="dimmed">
-            {formatDate ? formatDate.format(HH_mm)
-              : null}
-          </Text>
-        </Flex>
+                {/* <Divider orientation="vertical" />
+              <Tag type={priorityTagColors[chat.priority]}>{chat.priority}</Tag> */}
+              </Flex>
+            </Box>
+          </Flex>
+
+          <Flex justify="space-between" gap="6" align="center">
+            <Box mt="4px" w="60%">
+              {MESSAGE_INDICATOR[chat.last_message_type] || (
+                <Text h="20px" c="dimmed" size="sm" truncate>
+                  {chat.last_message}
+                </Text>
+              )}
+            </Box>
+            <Text size="sm" c="dimmed">
+              {formatDate ? formatDate.format("DD.MM.YYYY")
+                : null}
+            </Text>
+            <Text size="sm" c="dimmed">
+              {formatDate ? formatDate.format(HH_mm)
+                : null}
+            </Text>
+          </Flex>
         </Box>
       </Link>
 
