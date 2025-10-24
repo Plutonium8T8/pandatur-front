@@ -6,7 +6,7 @@ import { getPagesByType } from "../constants/webhookPagesConfig";
 
 /** ====================== helpers ====================== */
 
-const DEBUG = true;
+const DEBUG = false;
 const debug = (...args) => { if (DEBUG) console.log("[useClientContacts]", ...args); };
 
 function normalizePlatformBlock(block) {
