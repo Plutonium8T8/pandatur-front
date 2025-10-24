@@ -101,7 +101,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
         }
 
         if (values.contact_type === "telegram") {
-          return /^[a-zA-Z0-9_]{5,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid");
+          return /^[a-zA-Z0-9_]{1,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid (fără @)");
         }
 
         return null;
@@ -123,6 +123,10 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
 
         if (editingContact?.type === "phone") {
           return /^\d+$/.test(value) ? null : getLanguageByKey("Introduceți doar cifre");
+        }
+
+        if (editingContact?.type === "telegram") {
+          return /^[a-zA-Z0-9_]{1,32}$/.test(value) ? null : getLanguageByKey("Username Telegram invalid (fără @)");
         }
 
         return null;
@@ -239,8 +243,8 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   };
 
   const handleContactTelegramChange = (e) => {
-    const valueWithoutAt = e.currentTarget.value.replace(/^@/, "");
-    contactForm.setFieldValue("contact_value", valueWithoutAt);
+    const withoutAt = e.currentTarget.value.replace(/@/g, "");
+    contactForm.setFieldValue("contact_value", withoutAt);
   };
 
   // Обработчик добавления контакта к клиенту
@@ -815,9 +819,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                         contactForm.values.contact_type === "email"
                           ? "example@email.com"
                           : contactForm.values.contact_type === "phone"
-                            ? "37368939111"
+                            ? "37300000000"
                             : contactForm.values.contact_type === "telegram"
-                              ? "telegram_username"
+                              ? "telegram username"
                               : "Introduceți username-ul"
                       }
                       leftSection={
