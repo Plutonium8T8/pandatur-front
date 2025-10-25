@@ -87,6 +87,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const { markMessagesAsRead, getTicketById } = useApp();
 
   // Слушаем обновления тикета через WebSocket
+  // ВАЖНО: НЕ обновляем actionNeeded автоматически - только при явном изменении
   useEffect(() => {
     const handleTicketUpdate = (event) => {
       const { ticketId: updatedTicketId } = event.detail;
@@ -94,7 +95,14 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         // Получаем обновленные данные тикета из AppContext
         const updatedTicket = getTicketById(chat.id);
         if (updatedTicket) {
-          setActionNeeded(Boolean(updatedTicket.action_needed));
+          console.log("🔄 ChatListItem: Ticket updated via WebSocket:", {
+            ticketId: chat.id,
+            localActionNeeded: actionNeeded,
+            serverActionNeeded: updatedTicket.action_needed,
+            unseen_count: updatedTicket.unseen_count
+          });
+          // НЕ обновляем actionNeeded автоматически - только логируем
+          // actionNeeded меняется только при нажатии кнопки NeedAnswer
         }
       }
     };
@@ -104,7 +112,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
     return () => {
       window.removeEventListener('ticketUpdated', handleTicketUpdate);
     };
-  }, [chat.id, getTicketById]);
+  }, [chat.id, getTicketById, actionNeeded]);
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
   const getUserPhoto = () => {
@@ -128,11 +136,18 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const userPhoto = getUserPhoto();
 
   // Обработчик для пометки чата как прочитанного
+  // ВАЖНО: НЕ меняет action_needed - только читает сообщения
   const handleMarkAsRead = async (e) => {
     e.preventDefault();
     e.stopPropagation();
 
     if (!chat.id) return;
+
+    console.log("📖 ChatListItem: Marking chat as read:", {
+      ticketId: chat.id,
+      currentActionNeeded: actionNeeded,
+      unseenCount: chat.unseen_count
+    });
 
     try {
       // Отправляем CONNECT через сокет
@@ -147,6 +162,9 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       // Помечаем сообщения как прочитанные
       seenMessages(chat.id, userId);
       markMessagesAsRead(chat.id, chat.unseen_count || 0);
+      
+      // НЕ меняем action_needed - только читаем чат
+      console.log("✅ ChatListItem: Chat marked as read, actionNeeded remains:", actionNeeded);
     } catch (error) {
       console.error("Failed to mark chat as read:", error);
     }
@@ -166,6 +184,16 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         action_needed: newValue ? "true" : "false",
       });
       setActionNeeded(newValue);
+      
+      // Обновляем тикет в AppContext через событие
+      const updatedTicket = getTicketById(chat.id);
+      if (updatedTicket) {
+        const newTicket = { ...updatedTicket, action_needed: newValue };
+        // Отправляем событие для обновления тикета в AppContext
+        window.dispatchEvent(new CustomEvent('ticketUpdated', { 
+          detail: { ticketId: chat.id, ticket: newTicket } 
+        }));
+      }
       
       // Отправляем SEEN событие через сокет (как в ChatInput)
       if (socketRef?.current?.readyState === WebSocket.OPEN) {

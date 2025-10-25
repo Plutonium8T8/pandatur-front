@@ -95,21 +95,21 @@ export const ChatInput = ({
     }
   }, [ticket, ticketId]);
 
-  // Устанавливаем actionNeeded = true если есть непрочитанные сообщения
+  // НЕ меняем actionNeeded автоматически при изменении unseenCount
+  // actionNeeded меняется только:
+  // 1. При получении сообщения от клиента (в AppContext)
+  // 2. При нажатии кнопки NeedAnswer (handleMarkActionResolved)
   useEffect(() => {
-    // console.log("👀 unseenCount changed:", { 
-    //   unseenCount, 
-    //   currentActionNeeded: actionNeeded,
-    //   ticketActionNeeded: ticket?.action_needed
-    // });
-
-    if (unseenCount > 0) {
-      // console.log("✅ Setting actionNeeded = true due to unseenCount:", unseenCount);
-      setActionNeeded(true);
-    }
+    console.log("👀 unseenCount changed:", { 
+      unseenCount, 
+      currentActionNeeded: actionNeeded,
+      ticketActionNeeded: ticket?.action_needed
+    });
+    // НЕ меняем actionNeeded автоматически - только читаем логи
   }, [unseenCount, actionNeeded, ticket?.action_needed]);
 
   // Слушаем обновления тикета через WebSocket
+  // ВАЖНО: НЕ обновляем actionNeeded автоматически - только при явном изменении
   useEffect(() => {
     const handleTicketUpdate = (event) => {
       const { ticketId: updatedTicketId } = event.detail;
@@ -117,8 +117,13 @@ export const ChatInput = ({
         // Получаем обновленные данные тикета из AppContext
         const updatedTicket = getTicketById(ticketId);
         if (updatedTicket) {
-          console.log("🔄 Ticket updated via WebSocket:", updatedTicketId, "action_needed:", updatedTicket.action_needed);
-          setActionNeeded(Boolean(updatedTicket.action_needed));
+          console.log("🔄 ChatInput: Ticket updated via WebSocket:", {
+            ticketId: updatedTicketId,
+            localActionNeeded: actionNeeded,
+            serverActionNeeded: updatedTicket.action_needed
+          });
+          // НЕ обновляем actionNeeded автоматически - только логируем
+          // actionNeeded меняется только при нажатии кнопки NeedAnswer
           setTicket(updatedTicket);
         }
       }
@@ -129,7 +134,7 @@ export const ChatInput = ({
     return () => {
       window.removeEventListener('ticketUpdated', handleTicketUpdate);
     };
-  }, [ticketId, getTicketById]);
+  }, [ticketId, getTicketById, actionNeeded]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();

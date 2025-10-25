@@ -67,7 +67,18 @@ export const AppProvider = ({ children }) => {
   };
   
   const getTicketById = (ticketId) => {
-    return ticketsMap.current.get(ticketId);
+    const ticket = ticketsMap.current.get(ticketId);
+    console.log("🔍 getTicketById called:", {
+      ticketId,
+      ticketExists: !!ticket,
+      ticket: ticket ? {
+        id: ticket.id,
+        action_needed: ticket.action_needed,
+        unseen_count: ticket.unseen_count
+      } : null,
+      mapSize: ticketsMap.current.size
+    });
+    return ticket;
   };
   
   const getChatFilteredTicketById = (ticketId) => {
@@ -97,11 +108,25 @@ export const AppProvider = ({ children }) => {
     const ticket = getTicketById(ticketId);
     const unseenCount = ticket?.unseen_count || 0;
 
+    console.log("📖 markMessagesAsRead called:", {
+      ticketId,
+      originalTicket: ticket ? {
+        id: ticket.id,
+        action_needed: ticket.action_needed,
+        unseen_count: ticket.unseen_count
+      } : null
+    });
+
     setTickets((prev) => {
       const updated = prev.map((t) => {
         if (t.id === ticketId) {
           const updatedTicket = { ...t, unseen_count: 0 };
-          // Обновляем hash map
+          // Сохраняем action_needed при обновлении через markMessagesAsRead
+          console.log("✅ markMessagesAsRead: Preserving action_needed:", {
+            ticketId,
+            action_needed: updatedTicket.action_needed,
+            unseen_count: updatedTicket.unseen_count
+          });
           ticketsMap.current.set(ticketId, updatedTicket);
           return updatedTicket;
         }
@@ -114,7 +139,7 @@ export const AppProvider = ({ children }) => {
       const updated = prev.map((t) => {
         if (t.id === ticketId) {
           const updatedTicket = { ...t, unseen_count: 0 };
-          // Обновляем hash map
+          // Сохраняем action_needed при обновлении через markMessagesAsRead
           chatFilteredTicketsMap.current.set(ticketId, updatedTicket);
           return updatedTicket;
         }
@@ -279,6 +304,15 @@ export const AppProvider = ({ children }) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
 
+      console.log("🔄 fetchSingleTicket called:", {
+        ticketId,
+        serverTicket: {
+          id: ticket.id,
+          action_needed: ticket.action_needed,
+          unseen_count: ticket.unseen_count
+        }
+      });
+
       // Проверяем, что тикет относится к текущей группе
       const isMatchingGroup = ticket.group_title === groupTitleForApi;
 
@@ -306,6 +340,20 @@ export const AppProvider = ({ children }) => {
       // Обновляем или добавляем тикет в основной список
       setTickets((prev) => {
         const exists = getTicketById(ticketId);
+        
+        console.log("🔄 fetchSingleTicket: Updating ticket:", {
+          ticketId,
+          existingTicket: exists ? {
+            id: exists.id,
+            action_needed: exists.action_needed,
+            unseen_count: exists.unseen_count
+          } : null,
+          serverTicket: {
+            id: ticket.id,
+            action_needed: ticket.action_needed,
+            unseen_count: ticket.unseen_count
+          }
+        });
         
         if (exists) {
           // Обновляем существующий тикет
@@ -393,7 +441,7 @@ export const AppProvider = ({ children }) => {
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
-            // Устанавливаем action_needed: true при получении сообщения от клиента
+            // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
             action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
@@ -423,7 +471,7 @@ export const AppProvider = ({ children }) => {
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
-            // Устанавливаем action_needed: true при получении сообщения от клиента
+            // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
             action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
@@ -447,12 +495,31 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.SEEN: {
         const { ticket_id } = message.data;
         
+        console.log("👁️ SEEN event:", { ticket_id, message: message.data });
+        
         // Используем hash map для быстрого поиска O(1)
         const ticket = getTicketById(ticket_id);
         const unseenCount = ticket?.unseen_count || 0;
 
+        console.log("👁️ SEEN event received:", {
+          ticket_id,
+          originalTicket: ticket ? {
+            id: ticket.id,
+            action_needed: ticket.action_needed,
+            unseen_count: ticket.unseen_count
+          } : null,
+          ticketExists: !!ticket
+        });
+
         if (ticket) {
           const updatedTicket = { ...ticket, unseen_count: 0 };
+          // Сохраняем action_needed при обновлении через SEEN
+          console.log("✅ SEEN: Preserving action_needed:", {
+            ticket_id,
+            action_needed: updatedTicket.action_needed,
+            unseen_count: updatedTicket.unseen_count
+          });
+          
           ticketsMap.current.set(ticket_id, updatedTicket);
           
           setTickets((prev) =>
@@ -464,6 +531,7 @@ export const AppProvider = ({ children }) => {
         const chatTicket = getChatFilteredTicketById(ticket_id);
         if (chatTicket) {
           const updatedChatTicket = { ...chatTicket, unseen_count: 0 };
+          // Сохраняем action_needed при обновлении через SEEN
           chatFilteredTicketsMap.current.set(ticket_id, updatedChatTicket);
           
           setChatFilteredTickets((prev) =>
@@ -482,6 +550,13 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.TICKET: {
         const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
 
+        console.log("🔄 TICKET event received:", {
+          ticket_id,
+          ticket_ids,
+          group_title,
+          workflow
+        });
+
         const idsRaw = Array.isArray(ticket_ids)
           ? ticket_ids
           : (ticket_id ? [ticket_id] : []);
@@ -495,14 +570,28 @@ export const AppProvider = ({ children }) => {
         const isMatchingGroup = group_title === groupTitleForApi;
         const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
 
+        console.log("🔄 TICKET: Processing IDs:", {
+          ids,
+          isMatchingGroup,
+          isMatchingWorkflow,
+          groupTitleForApi,
+          workflowOptions
+        });
+
         if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
           break;
         }
 
         ids.forEach((id) => {
+          console.log("🔄 TICKET: Fetching single ticket:", {
+            id,
+            isMatchingGroup,
+            isMatchingWorkflow
+          });
           try {
             fetchSingleTicket(id);
           } catch (e) {
+            console.error(`Failed to fetch ticket ${id}:`, e);
           }
         });
 
@@ -531,6 +620,16 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
         const { ticket_id, ticket_ids, tickets: ticketsList } = message.data || {};
 
+        console.log("🔄 TICKET_UPDATE received:", {
+          ticket_id,
+          ticket_ids,
+          ticketsList: ticketsList?.map(t => ({
+            id: t.id,
+            technician_id: t.technician_id,
+            workflow: t.workflow
+          }))
+        });
+
         // Если пришел массив tickets с объектами
         if (Array.isArray(ticketsList) && ticketsList.length > 0) {
           ticketsList.forEach((ticketData) => {
@@ -550,6 +649,12 @@ export const AppProvider = ({ children }) => {
 
             if (shouldFetch) {
               // Получаем полный тикет
+              console.log("🔄 TICKET_UPDATE: Fetching single ticket:", {
+                id,
+                technician_id,
+                workflow,
+                shouldFetch
+              });
               try {
                 fetchSingleTicket(id);
               } catch (e) {
@@ -616,6 +721,39 @@ export const AppProvider = ({ children }) => {
     }
     // eslint-disable-next-line
   }, [sendedValue]);
+
+  // Обработчик события ticketUpdated для обновления тикета
+  useEffect(() => {
+    const handleTicketUpdated = (event) => {
+      const { ticketId, ticket } = event.detail;
+      if (ticketId && ticket) {
+        console.log("🔄 AppContext: Updating ticket from event:", {
+          ticketId,
+          action_needed: ticket.action_needed
+        });
+        
+        // Обновляем тикет в основном списке
+        setTickets((prev) => {
+          const updated = prev.map((t) => t.id === ticketId ? ticket : t);
+          ticketsMap.current.set(ticketId, ticket);
+          return updated;
+        });
+        
+        // Обновляем тикет в отфильтрованном списке
+        setChatFilteredTickets((prev) => {
+          const updated = prev.map((t) => t.id === ticketId ? ticket : t);
+          chatFilteredTicketsMap.current.set(ticketId, ticket);
+          return updated;
+        });
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdated);
+    
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdated);
+    };
+  }, []);
 
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
