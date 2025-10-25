@@ -77,9 +77,23 @@ export const useMessages = () => {
         return [...prevMessages, message];
       }
 
-      // Ищем существующее сообщение по message_id
+      // Ищем существующее сообщение по message_id или id
       const existingIndex = prevMessages.findIndex(
-        (msg) => Number(msg.message_id) === Number(message.message_id)
+        (msg) => {
+          // Сравниваем message_id с message_id
+          if (msg.message_id && message.message_id) {
+            return Number(msg.message_id) === Number(message.message_id);
+          }
+          // Сравниваем message_id с id (для сообщений из БД)
+          if (msg.id && message.message_id) {
+            return Number(msg.id) === Number(message.message_id);
+          }
+          // Сравниваем id с message_id (обратный случай)
+          if (msg.message_id && message.id) {
+            return Number(msg.message_id) === Number(message.id);
+          }
+          return false;
+        }
       );
 
       // Если сообщение существует - обновляем его (мердж данных)
@@ -107,7 +121,21 @@ export const useMessages = () => {
     if (FORMAT_MEDIA.includes(message.mtype)) {
       setMediaFiles((prevMedia) => {
         const existingIndex = prevMedia.findIndex(
-          (msg) => Number(msg.message_id) === Number(message.message_id)
+          (msg) => {
+            // Сравниваем message_id с message_id
+            if (msg.message_id && message.message_id) {
+              return Number(msg.message_id) === Number(message.message_id);
+            }
+            // Сравниваем message_id с id (для сообщений из БД)
+            if (msg.id && message.message_id) {
+              return Number(msg.id) === Number(message.message_id);
+            }
+            // Сравниваем id с message_id (обратный случай)
+            if (msg.message_id && message.id) {
+              return Number(msg.message_id) === Number(message.id);
+            }
+            return false;
+          }
         );
         
         if (existingIndex !== -1) {
