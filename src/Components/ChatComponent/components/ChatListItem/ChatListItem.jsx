@@ -86,8 +86,20 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const { seenMessages, socketRef } = useSocket();
   const { markMessagesAsRead, getTicketById } = useApp();
 
+  // Получаем актуальное состояние action_needed из AppContext при загрузке
+  useEffect(() => {
+    const currentTicket = getTicketById(chat.id);
+    if (currentTicket && currentTicket.action_needed !== actionNeeded) {
+      console.log("🔄 ChatListItem: Syncing actionNeeded from AppContext:", {
+        ticketId: chat.id,
+        localActionNeeded: actionNeeded,
+        serverActionNeeded: currentTicket.action_needed
+      });
+      setActionNeeded(Boolean(currentTicket.action_needed));
+    }
+  }, [chat.id, getTicketById, actionNeeded]);
+
   // Слушаем обновления тикета через WebSocket
-  // ВАЖНО: НЕ обновляем actionNeeded автоматически - только при явном изменении
   useEffect(() => {
     const handleTicketUpdate = (event) => {
       const { ticketId: updatedTicketId } = event.detail;
@@ -101,8 +113,8 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
             serverActionNeeded: updatedTicket.action_needed,
             unseen_count: updatedTicket.unseen_count
           });
-          // НЕ обновляем actionNeeded автоматически - только логируем
-          // actionNeeded меняется только при нажатии кнопки NeedAnswer
+          // Обновляем локальное состояние из сервера
+          setActionNeeded(Boolean(updatedTicket.action_needed));
         }
       }
     };
@@ -183,17 +195,8 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         id: chat.id,
         action_needed: newValue ? "true" : "false",
       });
-      setActionNeeded(newValue);
-      
-      // Обновляем тикет в AppContext через событие
-      const updatedTicket = getTicketById(chat.id);
-      if (updatedTicket) {
-        const newTicket = { ...updatedTicket, action_needed: newValue };
-        // Отправляем событие для обновления тикета в AppContext
-        window.dispatchEvent(new CustomEvent('ticketUpdated', { 
-          detail: { ticketId: chat.id, ticket: newTicket } 
-        }));
-      }
+      // НЕ меняем локальное состояние - ждем TICKET_UPDATE от сервера
+      console.log("🔄 NeedAnswer clicked, waiting for TICKET_UPDATE from server");
       
       // Отправляем SEEN событие через сокет (как в ChatInput)
       if (socketRef?.current?.readyState === WebSocket.OPEN) {

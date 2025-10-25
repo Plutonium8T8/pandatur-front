@@ -95,6 +95,20 @@ export const ChatInput = ({
     }
   }, [ticket, ticketId]);
 
+  // Синхронизируем actionNeeded с AppContext при загрузке
+  useEffect(() => {
+    const currentTicket = getTicketById(ticketId);
+    if (currentTicket && currentTicket.action_needed !== actionNeeded) {
+      console.log("🔄 ChatInput: Syncing actionNeeded from AppContext:", {
+        ticketId,
+        localActionNeeded: actionNeeded,
+        serverActionNeeded: currentTicket.action_needed
+      });
+      setActionNeeded(Boolean(currentTicket.action_needed));
+      setTicket(currentTicket);
+    }
+  }, [ticketId, getTicketById, actionNeeded]);
+
   // НЕ меняем actionNeeded автоматически при изменении unseenCount
   // actionNeeded меняется только:
   // 1. При получении сообщения от клиента (в AppContext)
@@ -109,7 +123,6 @@ export const ChatInput = ({
   }, [unseenCount, actionNeeded, ticket?.action_needed]);
 
   // Слушаем обновления тикета через WebSocket
-  // ВАЖНО: НЕ обновляем actionNeeded автоматически - только при явном изменении
   useEffect(() => {
     const handleTicketUpdate = (event) => {
       const { ticketId: updatedTicketId } = event.detail;
@@ -122,8 +135,8 @@ export const ChatInput = ({
             localActionNeeded: actionNeeded,
             serverActionNeeded: updatedTicket.action_needed
           });
-          // НЕ обновляем actionNeeded автоматически - только логируем
-          // actionNeeded меняется только при нажатии кнопки NeedAnswer
+          // Обновляем actionNeeded при получении обновлений от сервера
+          setActionNeeded(Boolean(updatedTicket.action_needed));
           setTicket(updatedTicket);
         }
       }
@@ -211,6 +224,13 @@ export const ChatInput = ({
 
   const handleMarkAsRead = () => {
     if (!ticketId) return;
+    
+    console.log("📖 ChatInput: handleMarkAsRead called:", {
+      ticketId,
+      currentActionNeeded: actionNeeded,
+      ticketActionNeeded: ticket?.action_needed
+    });
+    
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
       const connectPayload = {
         type: TYPE_SOCKET_EVENTS.CONNECT,

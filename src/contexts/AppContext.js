@@ -445,6 +445,22 @@ export const AppProvider = ({ children }) => {
             action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
+          console.log("📨 MESSAGE event:", {
+            ticket_id,
+            isFromClient,
+            isNewMessage,
+            oldActionNeeded: existingTicket.action_needed,
+            newActionNeeded: updatedTicket.action_needed,
+            sender_id,
+            userId
+          });
+
+          // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
+          if (isFromClient && isNewMessage) {
+            console.log("✅ Forcing action_needed: true for client message");
+            updatedTicket.action_needed = true;
+          }
+
           // Обновляем hash map
           ticketsMap.current.set(ticket_id, updatedTicket);
 
@@ -474,6 +490,11 @@ export const AppProvider = ({ children }) => {
             // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
             action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
+
+          // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
+          if (isFromClient && isNewMessage) {
+            updatedTicket.action_needed = true;
+          }
 
           // Обновляем hash map
           chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
@@ -722,38 +743,7 @@ export const AppProvider = ({ children }) => {
     // eslint-disable-next-line
   }, [sendedValue]);
 
-  // Обработчик события ticketUpdated для обновления тикета
-  useEffect(() => {
-    const handleTicketUpdated = (event) => {
-      const { ticketId, ticket } = event.detail;
-      if (ticketId && ticket) {
-        console.log("🔄 AppContext: Updating ticket from event:", {
-          ticketId,
-          action_needed: ticket.action_needed
-        });
-        
-        // Обновляем тикет в основном списке
-        setTickets((prev) => {
-          const updated = prev.map((t) => t.id === ticketId ? ticket : t);
-          ticketsMap.current.set(ticketId, ticket);
-          return updated;
-        });
-        
-        // Обновляем тикет в отфильтрованном списке
-        setChatFilteredTickets((prev) => {
-          const updated = prev.map((t) => t.id === ticketId ? ticket : t);
-          chatFilteredTicketsMap.current.set(ticketId, ticket);
-          return updated;
-        });
-      }
-    };
-
-    window.addEventListener('ticketUpdated', handleTicketUpdated);
-    
-    return () => {
-      window.removeEventListener('ticketUpdated', handleTicketUpdated);
-    };
-  }, []);
+  // Обработчик события ticketUpdated убран - теперь используем TICKET_UPDATE от сервера
 
   useEffect(() => {
     const connectToWebSocketRooms = async () => {
