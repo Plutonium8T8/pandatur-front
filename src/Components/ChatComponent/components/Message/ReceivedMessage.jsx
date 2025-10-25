@@ -75,7 +75,9 @@ export const ReceivedMessage = ({ personalInfo, msg, technicians = [] }) => {
 
   return (
     <Flex w="100%">
-      <Flex w="90%" direction="column" className="chat-message received">
+      <Flex w="90%" direction="column" className="chat-message received" style={{
+        animation: 'fadeIn 0.3s ease-out'
+      }}>
         <Flex gap="8">
           <Image 
             w={36} 

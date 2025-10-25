@@ -86,7 +86,9 @@ export const SendedMessage = ({
 
   return (
     <Flex w="100%" justify="end">
-      <Flex w="90%" direction="column" className="chat-message sent">
+      <Flex w="90%" direction="column" className="chat-message sent" style={{
+        animation: 'fadeIn 0.3s ease-out'
+      }}>
         <Flex justify="end" gap="8">
           <Flex>
             <Flex

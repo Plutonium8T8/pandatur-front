@@ -10,3 +10,15 @@
   background-color: var(--mantine-color-gray-2);
   color: var(--mantine-color-dark-9);
 }
+
+/* Простая анимация появления сообщений */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
