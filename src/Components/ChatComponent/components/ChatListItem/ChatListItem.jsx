@@ -166,6 +166,20 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         action_needed: newValue ? "true" : "false",
       });
       setActionNeeded(newValue);
+      
+      // Отправляем SEEN событие через сокет (как в ChatInput)
+      if (socketRef?.current?.readyState === WebSocket.OPEN) {
+        const connectPayload = {
+          type: TYPE_SOCKET_EVENTS.CONNECT,
+          data: { ticket_id: [chat.id] },
+        };
+        socketRef.current.send(JSON.stringify(connectPayload));
+        console.log("[SEEN] CONNECT отправлен для тикета:", chat.id);
+      }
+      
+      // Помечаем сообщения как прочитанные
+      seenMessages(chat.id, userId);
+      markMessagesAsRead(chat.id, chat.unseen_count || 0);
     } catch (error) {
       console.error("Failed to update action_needed:", error);
     }
