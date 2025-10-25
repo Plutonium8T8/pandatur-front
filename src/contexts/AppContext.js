@@ -349,6 +349,12 @@ export const AppProvider = ({ children }) => {
           )
         );
 
+        // ВАЖНО: Отправляем событие для обновления контекста сообщений
+        // Это позволит новым сообщениям отображаться в чате
+        window.dispatchEvent(new CustomEvent('newMessageFromSocket', { 
+          detail: message.data 
+        }));
+
         break;
       }
 

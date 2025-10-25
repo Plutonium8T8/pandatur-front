@@ -21,7 +21,14 @@ export const MessagesProvider = ({ children }) => {
     // Для сообщений от других пользователей: добавляем/обновляем
     const isFromAnotherUser = Number(incoming.sender_id) !== Number(userId) && Number(incoming.sender_id) !== 1;
     
-    if (isCall || isFromAnotherUser) {
+    // Для сообщений от системы (sender_id = 1): всегда добавляем
+    const isFromSystem = Number(incoming.sender_id) === 1;
+    
+    // ВАЖНО: НЕ добавляем сообщения от текущего пользователя через сокет,
+    // так как они уже добавлены при отправке через API
+    const shouldUpdate = isCall || isFromAnotherUser || isFromSystem;
+    
+    if (shouldUpdate) {
       messages.updateMessage(incoming);
       return;
     }
@@ -59,6 +66,22 @@ export const MessagesProvider = ({ children }) => {
       handleIncomingMessage(sendedValue);
     }
   }, [sendedValue]);
+
+  // Слушаем события от AppContext для обновления сообщений
+  useEffect(() => {
+    const handleNewMessageFromSocket = (event) => {
+      const messageData = event.detail;
+      if (messageData) {
+        handleIncomingMessage({ data: messageData });
+      }
+    };
+
+    window.addEventListener('newMessageFromSocket', handleNewMessageFromSocket);
+    
+    return () => {
+      window.removeEventListener('newMessageFromSocket', handleNewMessageFromSocket);
+    };
+  }, []);
 
   return (
     <MessagesContext.Provider value={messages}>

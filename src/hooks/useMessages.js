@@ -55,7 +55,7 @@ export const useMessages = () => {
     }
   }, [enqueueSnackbar, userId]);
 
-  const markMessageRead = (id) => {
+  const markMessageRead = useCallback((id) => {
     setMessages((prevMessages) =>
       prevMessages.map((msg) => {
         if (msg.ticket_id === id) {
@@ -68,7 +68,7 @@ export const useMessages = () => {
         return msg;
       })
     );
-  };
+  }, [userId]);
 
   const updateMessage = (message) => {
     setMessages((prevMessages) => {
@@ -161,6 +161,6 @@ export const useMessages = () => {
       setLogs,
       setNotes,
     }),
-    [messages, logs, notes, lastMessage, mediaFiles, loading]
+    [messages, logs, notes, lastMessage, mediaFiles, loading, getUserMessages, markMessageRead]
   );
 };
