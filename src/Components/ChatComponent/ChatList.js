@@ -176,9 +176,11 @@ const ChatList = ({ ticketId }) => {
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
-
     // Показываем только тикеты с action_needed: true (они требуют внимания)
-    result = result.filter(ticket => Boolean(ticket.action_needed));
+    // НО только когда НЕ используется фильтр
+    if (!isFiltered) {
+      result = result.filter(ticket => Boolean(ticket.action_needed));
+    }
 
 
     // Фильтр "Мои тикеты" - используем hash map для быстрого доступа
@@ -194,7 +196,7 @@ const ChatList = ({ ticketId }) => {
     }
 
     return result;
-  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex]);
+  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isFiltered]);
 
   const sortedTickets = useMemo(() => {
     // Сортируем по времени последнего сообщения (по убыванию)
