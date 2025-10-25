@@ -61,6 +61,31 @@ export const SendedMessage = ({
 
   const technicianPhoto = getTechnicianPhoto();
 
+  // Определяем статус сообщения для отображения иконки
+  const getMessageStatus = () => {
+    // Если есть messageStatus (сообщения из CRM) - используем его
+    if (msg.messageStatus) {
+      return msg.messageStatus;
+    }
+    
+    // Если есть message_status (сообщения из API) - конвертируем его
+    if (msg.message_status) {
+      switch (msg.message_status) {
+        case 'SENT':
+          return MESSAGES_STATUS.SUCCESS;
+        case 'NOT_SENT':
+          return MESSAGES_STATUS.ERROR;
+        default:
+          return MESSAGES_STATUS.SUCCESS;
+      }
+    }
+    
+    // По умолчанию - SUCCESS
+    return MESSAGES_STATUS.SUCCESS;
+  };
+
+  const messageStatus = getMessageStatus();
+
   if (isCall) {
     const participants = parseCallParticipants(
       msg.call_metadata,
@@ -112,7 +137,7 @@ export const SendedMessage = ({
 
               <Flex justify="end" align="center" gap={4}>
                 <Flex align="center">
-                  {MESSAGE_STATUS_ICONS[msg.messageStatus] || MESSAGE_STATUS_ICONS[MESSAGES_STATUS.SUCCESS]}
+                  {MESSAGE_STATUS_ICONS[messageStatus] || MESSAGE_STATUS_ICONS[MESSAGES_STATUS.SUCCESS]}
                 </Flex>
 
                 <Text size="sm">
