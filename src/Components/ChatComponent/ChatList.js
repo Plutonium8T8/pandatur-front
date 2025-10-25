@@ -176,25 +176,26 @@ const ChatList = ({ ticketId }) => {
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
+    // Показываем только тикеты с action_needed: true (они требуют внимания)
+    result = result.filter(ticket => Boolean(ticket.action_needed));
+
     // Фильтр "Мои тикеты" - используем hash map для быстрого доступа
     if (showMyTickets) {
       const myTickets = searchIndex.byTechnicianId.get(userId) || [];
-      result = myTickets;
+      result = result.filter(ticket => myTickets.includes(ticket));
     }
 
     // Поиск по запросу - используем оптимизированный поиск
     if (searchQuery) {
       const searchResults = searchTickets(searchIndex, searchQuery);
-      result = showMyTickets 
-        ? searchResults.filter(ticket => ticket.technician_id === userId)
-        : searchResults;
+      result = result.filter(ticket => searchResults.includes(ticket));
     }
 
     return result;
   }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex]);
 
   const sortedTickets = useMemo(() => {
-    // по убыванию последнего сообщения
+    // Сортируем по времени последнего сообщения (по убыванию)
     return [...filteredTickets].sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
   }, [filteredTickets]);
 

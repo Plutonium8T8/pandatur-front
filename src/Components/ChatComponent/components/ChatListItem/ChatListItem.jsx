@@ -11,7 +11,7 @@ import { FaEnvelope } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { MdPendingActions } from "react-icons/md";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE, TYPE_SOCKET_EVENTS } from "@app-constants";
 import { Tag } from "@components";
 import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
@@ -84,7 +84,27 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
   const { userId } = useUser();
   const { seenMessages, socketRef } = useSocket();
-  const { markMessagesAsRead } = useApp();
+  const { markMessagesAsRead, getTicketById } = useApp();
+
+  // Слушаем обновления тикета через WebSocket
+  useEffect(() => {
+    const handleTicketUpdate = (event) => {
+      const { ticketId: updatedTicketId } = event.detail;
+      if (updatedTicketId === chat.id) {
+        // Получаем обновленные данные тикета из AppContext
+        const updatedTicket = getTicketById(chat.id);
+        if (updatedTicket) {
+          setActionNeeded(Boolean(updatedTicket.action_needed));
+        }
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdate);
+    
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdate);
+    };
+  }, [chat.id, getTicketById]);
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
   const getUserPhoto = () => {
