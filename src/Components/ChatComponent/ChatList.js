@@ -23,6 +23,105 @@ import { ChatListItem } from "./components";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 
+// Hash map для быстрого поиска тикетов по различным критериям
+const createSearchIndex = (tickets) => {
+  const index = {
+    byId: new Map(),
+    byTechnicianId: new Map(),
+    byClientName: new Map(),
+    byClientPhone: new Map(),
+    byTicketId: new Map()
+  };
+
+  tickets.forEach(ticket => {
+    // Индекс по ID тикета
+    index.byId.set(ticket.id, ticket);
+    index.byTicketId.set(ticket.id.toString(), ticket);
+    
+    // Индекс по technician_id
+    if (ticket.technician_id) {
+      if (!index.byTechnicianId.has(ticket.technician_id)) {
+        index.byTechnicianId.set(ticket.technician_id, []);
+      }
+      index.byTechnicianId.get(ticket.technician_id).push(ticket);
+    }
+    
+    // Индексы по клиентам
+    if (ticket.clients) {
+      ticket.clients.forEach(client => {
+        // По имени
+        if (client.name) {
+          const nameKey = client.name.toLowerCase();
+          if (!index.byClientName.has(nameKey)) {
+            index.byClientName.set(nameKey, []);
+          }
+          index.byClientName.get(nameKey).push(ticket);
+        }
+        
+        // По фамилии
+        if (client.surname) {
+          const surnameKey = client.surname.toLowerCase();
+          if (!index.byClientName.has(surnameKey)) {
+            index.byClientName.set(surnameKey, []);
+          }
+          index.byClientName.get(surnameKey).push(ticket);
+        }
+        
+        // По телефонам
+        if (client.phones) {
+          client.phones.forEach(phone => {
+            if (phone) {
+              const phoneKey = phone.toString().toLowerCase();
+              if (!index.byClientPhone.has(phoneKey)) {
+                index.byClientPhone.set(phoneKey, []);
+              }
+              index.byClientPhone.get(phoneKey).push(ticket);
+            }
+          });
+        }
+      });
+    }
+  });
+  
+  return index;
+};
+
+// Быстрый поиск с использованием hash map
+const searchTickets = (index, query) => {
+  if (!query) return [];
+  
+  const searchTerm = query.toLowerCase();
+  const foundTickets = new Set();
+  
+  // Поиск по ID тикета
+  if (index.byTicketId.has(searchTerm)) {
+    foundTickets.add(index.byTicketId.get(searchTerm));
+  }
+  
+  // Поиск по частичному совпадению ID
+  for (const [ticketId, ticket] of index.byTicketId) {
+    if (ticketId.includes(searchTerm)) {
+      foundTickets.add(ticket);
+    }
+  }
+  
+  // Поиск по имени клиента
+  for (const [name, tickets] of index.byClientName) {
+    if (name.includes(searchTerm)) {
+      tickets.forEach(ticket => foundTickets.add(ticket));
+    }
+  }
+  
+  // Поиск по телефону
+  for (const [phone, tickets] of index.byClientPhone) {
+    if (phone.includes(searchTerm)) {
+      tickets.forEach(ticket => foundTickets.add(ticket));
+    }
+  }
+  
+  return Array.from(foundTickets);
+};
+
 const CHAT_ITEM_HEIGHT = 94;
 
 // безопасно приводим любую дату к timestamp
@@ -71,39 +170,30 @@ const ChatList = ({ ticketId }) => {
     return isFiltered ? chatFilteredTickets : tickets;
   }, [isFiltered, chatFilteredTickets, tickets]);
 
+  // Создаем индекс для быстрого поиска
+  const searchIndex = useMemo(() => {
+    return createSearchIndex(baseTickets);
+  }, [baseTickets]);
+
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
+    // Фильтр "Мои тикеты" - используем hash map для быстрого доступа
     if (showMyTickets) {
-      result = result.filter((t) => t.technician_id === userId);
+      const myTickets = searchIndex.byTechnicianId.get(userId) || [];
+      result = myTickets;
     }
 
+    // Поиск по запросу - используем оптимизированный поиск
     if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter((ticket) => {
-        // Поиск по ID тикета
-        const idMatch = ticket.id.toString().includes(query);
-
-        // Поиск по клиентам
-        const clientMatches = ticket.clients?.some((client) => {
-          // Поиск по имени клиента
-          const nameMatch = client.name?.toLowerCase().includes(query);
-          const surnameMatch = client.surname?.toLowerCase().includes(query);
-          
-          // Поиск по телефонам (массив phones)
-          const phoneMatch = client.phones?.some(phone => 
-            phone?.toString().toLowerCase().includes(query)
-          ) || false;
-          
-          return nameMatch || surnameMatch || phoneMatch;
-        }) || false;
-
-        return idMatch || clientMatches;
-      });
+      const searchResults = searchTickets(searchIndex, searchQuery);
+      result = showMyTickets 
+        ? searchResults.filter(ticket => ticket.technician_id === userId)
+        : searchResults;
     }
 
     return result;
-  }, [baseTickets, showMyTickets, searchQuery, userId]);
+  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex]);
 
   const sortedTickets = useMemo(() => {
     // по убыванию последнего сообщения

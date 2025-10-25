@@ -44,8 +44,35 @@ export const AppProvider = ({ children }) => {
   const [chatSpinner, setChatSpinner] = useState(false);
   const requestIdRef = useRef(0);
   
+  // Hash map для быстрого доступа к тикетам по ID
+  const ticketsMap = useRef(new Map());
+  const chatFilteredTicketsMap = useRef(new Map());
+  
   // Для отслеживания обработанных message_id (чтобы не дублировать счётчик при обновлении сообщений)
   const processedMessageIds = useRef(new Set());
+  
+  // Вспомогательные функции для работы с hash map
+  const updateTicketsMap = (ticketsArray) => {
+    ticketsMap.current.clear();
+    ticketsArray.forEach(ticket => {
+      ticketsMap.current.set(ticket.id, ticket);
+    });
+  };
+  
+  const updateChatFilteredTicketsMap = (ticketsArray) => {
+    chatFilteredTicketsMap.current.clear();
+    ticketsArray.forEach(ticket => {
+      chatFilteredTicketsMap.current.set(ticket.id, ticket);
+    });
+  };
+  
+  const getTicketById = (ticketId) => {
+    return ticketsMap.current.get(ticketId);
+  };
+  
+  const getChatFilteredTicketById = (ticketId) => {
+    return chatFilteredTicketsMap.current.get(ticketId);
+  };
   
   // Получаем данные всех пользователей
   const { technicians } = useGetTechniciansList();
@@ -66,27 +93,35 @@ export const AppProvider = ({ children }) => {
   const markMessagesAsRead = (ticketId, count = 0) => {
     if (!ticketId) return;
 
-    // Находим тикет и получаем количество непрочитанных сообщений
-    const ticket = tickets.find(t => t.id === ticketId);
+    // Используем hash map для быстрого поиска O(1) вместо O(n)
+    const ticket = getTicketById(ticketId);
     const unseenCount = ticket?.unseen_count || 0;
 
-    setTickets((prev) =>
-      prev.map((t) => {
+    setTickets((prev) => {
+      const updated = prev.map((t) => {
         if (t.id === ticketId) {
-          return { ...t, unseen_count: 0 };
+          const updatedTicket = { ...t, unseen_count: 0 };
+          // Обновляем hash map
+          ticketsMap.current.set(ticketId, updatedTicket);
+          return updatedTicket;
         }
         return t;
-      })
-    );
+      });
+      return updated;
+    });
 
-    setChatFilteredTickets((prev) =>
-      prev.map((t) => {
+    setChatFilteredTickets((prev) => {
+      const updated = prev.map((t) => {
         if (t.id === ticketId) {
-          return { ...t, unseen_count: 0 };
+          const updatedTicket = { ...t, unseen_count: 0 };
+          // Обновляем hash map
+          chatFilteredTicketsMap.current.set(ticketId, updatedTicket);
+          return updatedTicket;
         }
         return t;
-      })
-    );
+      });
+      return updated;
+    });
 
     // Уменьшаем общий счетчик на количество прочитанных сообщений
     if (unseenCount > 0) {
@@ -120,7 +155,12 @@ export const AppProvider = ({ children }) => {
 
       setUnreadCount((prev) => prev + totalUnread);
       const processedTickets = normalizeLightTickets(data.tickets);
-      setTickets((prev) => [...prev, ...processedTickets]);
+      setTickets((prev) => {
+        const updated = [...prev, ...processedTickets];
+        // Синхронизируем hash map
+        updateTicketsMap(updated);
+        return updated;
+      });
 
       if (page < totalPages) {
         await getTicketsListRecursively(page + 1, requestId);
@@ -141,6 +181,9 @@ export const AppProvider = ({ children }) => {
     setSpinnerTickets(true);
     setTickets([]);
     setUnreadCount(0);
+    
+    // Очищаем hash map
+    ticketsMap.current.clear();
 
     await getTicketsListRecursively(1, currentRequestId);
   };
@@ -148,6 +191,9 @@ export const AppProvider = ({ children }) => {
   const fetchChatFilteredTickets = async (filters = {}) => {
     setChatSpinner(true);
     setChatFilteredTickets([]);
+    
+    // Очищаем hash map для отфильтрованных тикетов
+    chatFilteredTicketsMap.current.clear();
 
     try {
       const loadPage = async (page = 1) => {
@@ -161,7 +207,12 @@ export const AppProvider = ({ children }) => {
         });
 
         const normalized = normalizeLightTickets(res.tickets);
-        setChatFilteredTickets((prev) => [...prev, ...normalized]);
+        setChatFilteredTickets((prev) => {
+          const updated = [...prev, ...normalized];
+          // Синхронизируем hash map
+          updateChatFilteredTicketsMap(updated);
+          return updated;
+        });
 
         if (page < res.pagination?.total_pages) {
           await loadPage(page + 1);
@@ -218,6 +269,8 @@ export const AppProvider = ({ children }) => {
       // Сбрасываем состояние и загружаем тикеты
       setTickets([]);
       setUnreadCount(0);
+      // Очищаем hash map
+      ticketsMap.current.clear();
       fetchTickets();
     }
   });
@@ -230,40 +283,51 @@ export const AppProvider = ({ children }) => {
       const isMatchingGroup = ticket.group_title === groupTitleForApi;
 
       if (!isMatchingGroup) {
-        // Если group_title не совпадает - удаляем тикет из списков
-        setTickets((prev) => {
-          const exists = prev.find((t) => t.id === ticketId);
-          if (exists) {
-            // Уменьшаем счётчик непрочитанных, если тикет был непрочитан
-            if (exists.unseen_count > 0) {
-              setUnreadCount((prevCount) => Math.max(0, prevCount - exists.unseen_count));
-            }
-            return prev.filter((t) => t.id !== ticketId);
+        // Используем hash map для быстрого поиска O(1)
+        const existingTicket = getTicketById(ticketId);
+        
+        if (existingTicket) {
+          // Уменьшаем счётчик непрочитанных, если тикет был непрочитан
+          if (existingTicket.unseen_count > 0) {
+            setUnreadCount((prevCount) => Math.max(0, prevCount - existingTicket.unseen_count));
           }
-          return prev;
-        });
+          
+          // Удаляем из hash map и массива
+          ticketsMap.current.delete(ticketId);
+          setTickets((prev) => prev.filter((t) => t.id !== ticketId));
+        }
 
+        // Удаляем из chatFilteredTickets
+        chatFilteredTicketsMap.current.delete(ticketId);
         setChatFilteredTickets((prev) => prev.filter((t) => t.id !== ticketId));
         return;
       }
 
+      // Обновляем или добавляем тикет в основной список
       setTickets((prev) => {
-        const exists = prev.find((t) => t.id === ticketId);
+        const exists = getTicketById(ticketId);
         
         if (exists) {
-          return prev.map((t) => (t.id === ticketId ? ticket : t));
+          // Обновляем существующий тикет
+          const updated = prev.map((t) => (t.id === ticketId ? ticket : t));
+          ticketsMap.current.set(ticketId, ticket);
+          return updated;
         } else {
-          return [...prev, ticket];
+          // Добавляем новый тикет
+          const updated = [...prev, ticket];
+          ticketsMap.current.set(ticketId, ticket);
+          return updated;
         }
       });
 
+      // Обновляем только существующие тикеты в отфильтрованном списке
       setChatFilteredTickets((prev) => {
-        const exists = prev.find((t) => t.id === ticketId);
+        const exists = getChatFilteredTicketById(ticketId);
         
-        // Обновляем только существующие тикеты, не добавляем новые
-        // Новые тикеты должны проходить через фильтр при повторном применении фильтра
         if (exists) {
-          return prev.map((t) => (t.id === ticketId ? ticket : t));
+          const updated = prev.map((t) => (t.id === ticketId ? ticket : t));
+          chatFilteredTicketsMap.current.set(ticketId, ticket);
+          return updated;
         }
         
         return prev;
@@ -310,44 +374,59 @@ export const AppProvider = ({ children }) => {
         let increment = 0;
 
         setTickets((prev) => {
-          let found = false;
+          // Используем hash map для быстрого поиска O(1)
+          const existingTicket = getTicketById(ticket_id);
+          
+          if (!existingTicket) {
+            return prev; // Тикет не найден
+          }
 
-          const updated = prev.map((ticket) => {
-            if (ticket.id === ticket_id) {
-              found = true;
-              const newUnseen = ticket.unseen_count + (shouldIncrement ? 1 : 0);
-              if (shouldIncrement) increment = 1;
-              return {
-                ...ticket,
-                unseen_count: newUnseen,
-                last_message_type: mtype,
-                last_message: msgText,
-                time_sent,
-              };
-            }
-            return ticket;
-          });
+          const newUnseen = existingTicket.unseen_count + (shouldIncrement ? 1 : 0);
+          if (shouldIncrement) increment = 1;
 
-          if (increment > 0 && found) {
+          const updatedTicket = {
+            ...existingTicket,
+            unseen_count: newUnseen,
+            last_message_type: mtype,
+            last_message: msgText,
+            time_sent,
+          };
+
+          // Обновляем hash map
+          ticketsMap.current.set(ticket_id, updatedTicket);
+
+          if (increment > 0) {
             setUnreadCount((prev) => prev + increment);
           }
 
-          return updated;
+          return prev.map((ticket) => 
+            ticket.id === ticket_id ? updatedTicket : ticket
+          );
         });
 
-        setChatFilteredTickets((prev) =>
-          prev.map((ticket) =>
-            ticket.id === ticket_id
-              ? {
-                ...ticket,
-                unseen_count: ticket.unseen_count + (shouldIncrement ? 1 : 0),
-                last_message_type: mtype,
-                last_message: msgText,
-                time_sent,
-              }
-              : ticket
-          )
-        );
+        setChatFilteredTickets((prev) => {
+          // Используем hash map для быстрого поиска O(1)
+          const existingTicket = getChatFilteredTicketById(ticket_id);
+          
+          if (!existingTicket) {
+            return prev; // Тикет не найден в отфильтрованном списке
+          }
+
+          const updatedTicket = {
+            ...existingTicket,
+            unseen_count: existingTicket.unseen_count + (shouldIncrement ? 1 : 0),
+            last_message_type: mtype,
+            last_message: msgText,
+            time_sent,
+          };
+
+          // Обновляем hash map
+          chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
+
+          return prev.map((ticket) => 
+            ticket.id === ticket_id ? updatedTicket : ticket
+          );
+        });
 
         // ВАЖНО: Отправляем событие для обновления контекста сообщений
         // Это позволит новым сообщениям отображаться в чате
@@ -361,21 +440,29 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.SEEN: {
         const { ticket_id } = message.data;
         
-        // Находим тикет и получаем количество непрочитанных сообщений
-        const ticket = tickets.find(t => t.id === ticket_id);
+        // Используем hash map для быстрого поиска O(1)
+        const ticket = getTicketById(ticket_id);
         const unseenCount = ticket?.unseen_count || 0;
 
-        setTickets((prev) =>
-          prev.map((ticket) =>
-            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
-          )
-        );
+        if (ticket) {
+          const updatedTicket = { ...ticket, unseen_count: 0 };
+          ticketsMap.current.set(ticket_id, updatedTicket);
+          
+          setTickets((prev) =>
+            prev.map((t) => t.id === ticket_id ? updatedTicket : t)
+          );
+        }
 
-        setChatFilteredTickets((prev) =>
-          prev.map((ticket) =>
-            ticket.id === ticket_id ? { ...ticket, unseen_count: 0 } : ticket
-          )
-        );
+        // Обновляем chatFilteredTickets только если тикет там есть
+        const chatTicket = getChatFilteredTicketById(ticket_id);
+        if (chatTicket) {
+          const updatedChatTicket = { ...chatTicket, unseen_count: 0 };
+          chatFilteredTicketsMap.current.set(ticket_id, updatedChatTicket);
+          
+          setChatFilteredTickets((prev) =>
+            prev.map((t) => t.id === ticket_id ? updatedChatTicket : t)
+          );
+        }
 
         // Уменьшаем общий счетчик на количество прочитанных сообщений
         if (unseenCount > 0) {
@@ -463,14 +550,19 @@ export const AppProvider = ({ children }) => {
               }
             } else {
               // Условия не выполнены - удаляем тикет из списка
-              setTickets((prev) => prev.filter((t) => t.id !== id));
-              setChatFilteredTickets((prev) => prev.filter((t) => t.id !== id));
+              // Используем hash map для быстрого поиска O(1)
+              const removedTicket = getTicketById(id);
               
-              // Уменьшаем счётчик непрочитанных, если тикет был непрочитан
-              const removedTicket = tickets.find(t => t.id === id);
               if (removedTicket?.unseen_count > 0) {
                 setUnreadCount((prev) => Math.max(0, prev - removedTicket.unseen_count));
               }
+              
+              // Удаляем из hash map
+              ticketsMap.current.delete(id);
+              chatFilteredTicketsMap.current.delete(id);
+              
+              setTickets((prev) => prev.filter((t) => t.id !== id));
+              setChatFilteredTickets((prev) => prev.filter((t) => t.id !== id));
             }
           });
         } 
@@ -488,8 +580,9 @@ export const AppProvider = ({ children }) => {
 
           if (ids.length > 0) {
             ids.forEach((id) => {
-              const existsInTickets = tickets.some(t => t.id === id);
-              const existsInChatFiltered = chatFilteredTickets.some(t => t.id === id);
+              // Используем hash map для быстрого поиска O(1)
+              const existsInTickets = ticketsMap.current.has(id);
+              const existsInChatFiltered = chatFilteredTicketsMap.current.has(id);
 
               if (existsInTickets || existsInChatFiltered) {
                 try {
