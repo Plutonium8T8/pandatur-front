@@ -352,6 +352,9 @@ export const AppProvider = ({ children }) => {
         // Сообщение считается от другого пользователя, если sender_id не совпадает с текущим userId и это не система (id=1)
         const isFromAnotherUser = String(sender_id) !== String(userId) && String(sender_id) !== "1";
         
+        // Сообщение от клиента (не от системы и не от текущего пользователя)
+        const isFromClient = String(sender_id) !== String(userId) && String(sender_id) !== "1";
+        
         // Проверяем, было ли это сообщение уже обработано
         // Для звонков: первое событие - создание звонка, второе - обновление с URL записи
         // Нужно увеличить счетчик только один раз
@@ -390,6 +393,8 @@ export const AppProvider = ({ children }) => {
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
+            // Устанавливаем action_needed: true при получении сообщения от клиента
+            action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
           // Обновляем hash map
@@ -418,6 +423,8 @@ export const AppProvider = ({ children }) => {
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
+            // Устанавливаем action_needed: true при получении сообщения от клиента
+            action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
           // Обновляем hash map
