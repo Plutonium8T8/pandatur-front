@@ -67,18 +67,7 @@ export const AppProvider = ({ children }) => {
   };
   
   const getTicketById = (ticketId) => {
-    const ticket = ticketsMap.current.get(ticketId);
-    console.log("🔍 getTicketById called:", {
-      ticketId,
-      ticketExists: !!ticket,
-      ticket: ticket ? {
-        id: ticket.id,
-        action_needed: ticket.action_needed,
-        unseen_count: ticket.unseen_count
-      } : null,
-      mapSize: ticketsMap.current.size
-    });
-    return ticket;
+    return ticketsMap.current.get(ticketId);
   };
   
   const getChatFilteredTicketById = (ticketId) => {
@@ -108,25 +97,12 @@ export const AppProvider = ({ children }) => {
     const ticket = getTicketById(ticketId);
     const unseenCount = ticket?.unseen_count || 0;
 
-    console.log("📖 markMessagesAsRead called:", {
-      ticketId,
-      originalTicket: ticket ? {
-        id: ticket.id,
-        action_needed: ticket.action_needed,
-        unseen_count: ticket.unseen_count
-      } : null
-    });
 
     setTickets((prev) => {
       const updated = prev.map((t) => {
         if (t.id === ticketId) {
           const updatedTicket = { ...t, unseen_count: 0 };
           // Сохраняем action_needed при обновлении через markMessagesAsRead
-          console.log("✅ markMessagesAsRead: Preserving action_needed:", {
-            ticketId,
-            action_needed: updatedTicket.action_needed,
-            unseen_count: updatedTicket.unseen_count
-          });
           ticketsMap.current.set(ticketId, updatedTicket);
           return updatedTicket;
         }
@@ -445,19 +421,9 @@ export const AppProvider = ({ children }) => {
             action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
 
-          console.log("📨 MESSAGE event:", {
-            ticket_id,
-            isFromClient,
-            isNewMessage,
-            oldActionNeeded: existingTicket.action_needed,
-            newActionNeeded: updatedTicket.action_needed,
-            sender_id,
-            userId
-          });
 
           // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
           if (isFromClient && isNewMessage) {
-            console.log("✅ Forcing action_needed: true for client message");
             updatedTicket.action_needed = true;
           }
 
@@ -516,30 +482,15 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.SEEN: {
         const { ticket_id } = message.data;
         
-        console.log("👁️ SEEN event:", { ticket_id, message: message.data });
         
         // Используем hash map для быстрого поиска O(1)
         const ticket = getTicketById(ticket_id);
         const unseenCount = ticket?.unseen_count || 0;
 
-        console.log("👁️ SEEN event received:", {
-          ticket_id,
-          originalTicket: ticket ? {
-            id: ticket.id,
-            action_needed: ticket.action_needed,
-            unseen_count: ticket.unseen_count
-          } : null,
-          ticketExists: !!ticket
-        });
 
         if (ticket) {
           const updatedTicket = { ...ticket, unseen_count: 0 };
           // Сохраняем action_needed при обновлении через SEEN
-          console.log("✅ SEEN: Preserving action_needed:", {
-            ticket_id,
-            action_needed: updatedTicket.action_needed,
-            unseen_count: updatedTicket.unseen_count
-          });
           
           ticketsMap.current.set(ticket_id, updatedTicket);
           

@@ -60,7 +60,7 @@ export const ChatInput = ({
   const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
 
-  const [actionNeeded, setActionNeeded] = useState(false);
+  // Убираем локальное состояние - всегда смотрим на тикет
 
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
@@ -88,66 +88,22 @@ export const ChatInput = ({
     }));
   }, [selectedPlatform, groupTitle]);
 
-  // Устанавливаем actionNeeded из тикета при загрузке
-  useEffect(() => {
-    if (ticket) {
-      setActionNeeded(Boolean(ticket.action_needed));
-    }
-  }, [ticket, ticketId]);
+  // Получаем actionNeeded всегда из тикета
+  const actionNeeded = ticket ? Boolean(ticket.action_needed) : false;
 
-  // Синхронизируем actionNeeded с AppContext при загрузке
+  // Синхронизируем тикет с AppContext при загрузке
   useEffect(() => {
     const currentTicket = getTicketById(ticketId);
-    if (currentTicket && currentTicket.action_needed !== actionNeeded) {
-      console.log("🔄 ChatInput: Syncing actionNeeded from AppContext:", {
-        ticketId,
-        localActionNeeded: actionNeeded,
-        serverActionNeeded: currentTicket.action_needed
-      });
-      setActionNeeded(Boolean(currentTicket.action_needed));
+    if (currentTicket && currentTicket !== ticket) {
       setTicket(currentTicket);
     }
-  }, [ticketId, getTicketById, actionNeeded]);
+  }, [ticketId, getTicketById, ticket]);
 
-  // НЕ меняем actionNeeded автоматически при изменении unseenCount
   // actionNeeded меняется только:
   // 1. При получении сообщения от клиента (в AppContext)
-  // 2. При нажатии кнопки NeedAnswer (handleMarkActionResolved)
-  useEffect(() => {
-    console.log("👀 unseenCount changed:", { 
-      unseenCount, 
-      currentActionNeeded: actionNeeded,
-      ticketActionNeeded: ticket?.action_needed
-    });
-    // НЕ меняем actionNeeded автоматически - только читаем логи
-  }, [unseenCount, actionNeeded, ticket?.action_needed]);
+  // 2. При нажатии кнопки NeedAnswer (через сервер)
 
-  // Слушаем обновления тикета через WebSocket
-  useEffect(() => {
-    const handleTicketUpdate = (event) => {
-      const { ticketId: updatedTicketId } = event.detail;
-      if (updatedTicketId === ticketId) {
-        // Получаем обновленные данные тикета из AppContext
-        const updatedTicket = getTicketById(ticketId);
-        if (updatedTicket) {
-          console.log("🔄 ChatInput: Ticket updated via WebSocket:", {
-            ticketId: updatedTicketId,
-            localActionNeeded: actionNeeded,
-            serverActionNeeded: updatedTicket.action_needed
-          });
-          // Обновляем actionNeeded при получении обновлений от сервера
-          setActionNeeded(Boolean(updatedTicket.action_needed));
-          setTicket(updatedTicket);
-        }
-      }
-    };
-
-    window.addEventListener('ticketUpdated', handleTicketUpdate);
-    
-    return () => {
-      window.removeEventListener('ticketUpdated', handleTicketUpdate);
-    };
-  }, [ticketId, getTicketById, actionNeeded]);
+  // actionNeeded всегда берется из тикета через AppContext
 
   const handleEmojiClickButton = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -225,11 +181,6 @@ export const ChatInput = ({
   const handleMarkAsRead = () => {
     if (!ticketId) return;
     
-    console.log("📖 ChatInput: handleMarkAsRead called:", {
-      ticketId,
-      currentActionNeeded: actionNeeded,
-      ticketActionNeeded: ticket?.action_needed
-    });
     
     if (socketRef?.current?.readyState === WebSocket.OPEN) {
       const connectPayload = {
@@ -237,7 +188,6 @@ export const ChatInput = ({
         data: { ticket_id: [ticketId] },
       };
       socketRef.current.send(JSON.stringify(connectPayload));
-      console.log("[READ] CONNECT отправлен вручную для тикета:", ticketId);
     } else {
       console.warn("[READ] Сокет не готов к CONNECT");
     }
@@ -296,8 +246,7 @@ export const ChatInput = ({
         id: ticketId,
         action_needed: newValue ? "true" : "false",
       });
-      setActionNeeded(newValue);
-      setTicket((prev) => ({ ...prev, action_needed: newValue }));
+      // НЕ меняем локально - ждем TICKET_UPDATE от сервера
       console.log("✅ Successfully updated action_needed to:", newValue);
     } catch (e) {
       console.error("Failed to update action_needed", e);

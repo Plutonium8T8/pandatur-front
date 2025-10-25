@@ -11,10 +11,8 @@ import { FaEnvelope } from "react-icons/fa";
 import { BsThreeDots } from "react-icons/bs";
 import { IoCheckmarkDone } from "react-icons/io5";
 import { MdPendingActions } from "react-icons/md";
-import { useState, useEffect } from "react";
 import { DEFAULT_PHOTO, HH_mm, MEDIA_TYPE, TYPE_SOCKET_EVENTS } from "@app-constants";
-import { Tag } from "@components";
-import { priorityTagColors, parseServerDate, getLanguageByKey } from "@utils";
+import { parseServerDate, getLanguageByKey } from "@utils";
 import { useSocket, useApp, useUser } from "@hooks";
 import { api } from "../../../../api";
 import "./ChatListItem.css";
@@ -80,51 +78,17 @@ const MESSAGE_INDICATOR = {
 
 export const ChatListItem = ({ chat, style, selectTicketId }) => {
   const formatDate = parseServerDate(chat.time_sent);
-  const [actionNeeded, setActionNeeded] = useState(chat.action_needed);
+  // Убираем локальное состояние - всегда смотрим на тикет
 
   const { userId } = useUser();
   const { seenMessages, socketRef } = useSocket();
   const { markMessagesAsRead, getTicketById } = useApp();
 
-  // Получаем актуальное состояние action_needed из AppContext при загрузке
-  useEffect(() => {
-    const currentTicket = getTicketById(chat.id);
-    if (currentTicket && currentTicket.action_needed !== actionNeeded) {
-      console.log("🔄 ChatListItem: Syncing actionNeeded from AppContext:", {
-        ticketId: chat.id,
-        localActionNeeded: actionNeeded,
-        serverActionNeeded: currentTicket.action_needed
-      });
-      setActionNeeded(Boolean(currentTicket.action_needed));
-    }
-  }, [chat.id, getTicketById, actionNeeded]);
+  // Получаем actionNeeded всегда из AppContext
+  const currentTicket = getTicketById(chat.id);
+  const actionNeeded = currentTicket ? Boolean(currentTicket.action_needed) : false;
 
-  // Слушаем обновления тикета через WebSocket
-  useEffect(() => {
-    const handleTicketUpdate = (event) => {
-      const { ticketId: updatedTicketId } = event.detail;
-      if (updatedTicketId === chat.id) {
-        // Получаем обновленные данные тикета из AppContext
-        const updatedTicket = getTicketById(chat.id);
-        if (updatedTicket) {
-          console.log("🔄 ChatListItem: Ticket updated via WebSocket:", {
-            ticketId: chat.id,
-            localActionNeeded: actionNeeded,
-            serverActionNeeded: updatedTicket.action_needed,
-            unseen_count: updatedTicket.unseen_count
-          });
-          // Обновляем локальное состояние из сервера
-          setActionNeeded(Boolean(updatedTicket.action_needed));
-        }
-      }
-    };
-
-    window.addEventListener('ticketUpdated', handleTicketUpdate);
-    
-    return () => {
-      window.removeEventListener('ticketUpdated', handleTicketUpdate);
-    };
-  }, [chat.id, getTicketById, actionNeeded]);
+  // actionNeeded всегда берется из AppContext через getTicketById
 
   // Получаем фото пользователя - сначала из тикета, потом из клиентов
   const getUserPhoto = () => {
@@ -155,11 +119,6 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
     if (!chat.id) return;
 
-    console.log("📖 ChatListItem: Marking chat as read:", {
-      ticketId: chat.id,
-      currentActionNeeded: actionNeeded,
-      unseenCount: chat.unseen_count
-    });
 
     try {
       // Отправляем CONNECT через сокет
@@ -176,7 +135,6 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       markMessagesAsRead(chat.id, chat.unseen_count || 0);
       
       // НЕ меняем action_needed - только читаем чат
-      console.log("✅ ChatListItem: Chat marked as read, actionNeeded remains:", actionNeeded);
     } catch (error) {
       console.error("Failed to mark chat as read:", error);
     }
@@ -196,7 +154,6 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         action_needed: newValue ? "true" : "false",
       });
       // НЕ меняем локальное состояние - ждем TICKET_UPDATE от сервера
-      console.log("🔄 NeedAnswer clicked, waiting for TICKET_UPDATE from server");
       
       // Отправляем SEEN событие через сокет (как в ChatInput)
       if (socketRef?.current?.readyState === WebSocket.OPEN) {
@@ -205,12 +162,11 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
           data: { ticket_id: [chat.id] },
         };
         socketRef.current.send(JSON.stringify(connectPayload));
-        console.log("[SEEN] CONNECT отправлен для тикета:", chat.id);
       }
       
       // Помечаем сообщения как прочитанные
       seenMessages(chat.id, userId);
-      markMessagesAsRead(chat.id, chat.unseen_count || 0);
+      markMessagesAsRead(chat.id, chat.unseen_count);
     } catch (error) {
       console.error("Failed to update action_needed:", error);
     }
