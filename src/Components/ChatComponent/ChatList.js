@@ -139,12 +139,10 @@ const toDate = (val) => {
 };
 
 const getLastMessageTime = (ticket) => {
-  // приоритет: time_sent -> last_message_time -> updated_at -> created_at
+  // приоритет: time_sent -> last_message_time
   const cand =
     ticket?.time_sent ??
-    ticket?.last_message_time ??
-    ticket?.updated_at ??
-    ticket?.created_at;
+    ticket?.last_message_time;
   const d = toDate(cand);
   return d ? d.getTime() : 0;
 };
