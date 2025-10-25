@@ -719,6 +719,9 @@ export const AppProvider = ({ children }) => {
         
         // technicians
         technicians,
+        
+        // utils
+        getTicketById,
       }}
     >
       {children}

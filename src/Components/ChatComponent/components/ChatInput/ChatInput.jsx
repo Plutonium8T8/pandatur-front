@@ -65,7 +65,7 @@ export const ChatInput = ({
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
   const { seenMessages, socketRef } = useSocket();
-  const { markMessagesAsRead } = useApp();
+  const { markMessagesAsRead, getTicketById } = useApp();
 
   // Получаем данные о воронке и email адресах
   const groupTitle = personalInfo?.group_title || "";
@@ -108,6 +108,28 @@ export const ChatInput = ({
       setActionNeeded(true);
     }
   }, [unseenCount, actionNeeded, ticket?.action_needed]);
+
+  // Слушаем обновления тикета через WebSocket
+  useEffect(() => {
+    const handleTicketUpdate = (event) => {
+      const { ticketId: updatedTicketId } = event.detail;
+      if (updatedTicketId === ticketId) {
+        // Получаем обновленные данные тикета из AppContext
+        const updatedTicket = getTicketById(ticketId);
+        if (updatedTicket) {
+          console.log("🔄 Ticket updated via WebSocket:", updatedTicketId, "action_needed:", updatedTicket.action_needed);
+          setActionNeeded(Boolean(updatedTicket.action_needed));
+          setTicket(updatedTicket);
+        }
+      }
+    };
+
+    window.addEventListener('ticketUpdated', handleTicketUpdate);
+    
+    return () => {
+      window.removeEventListener('ticketUpdated', handleTicketUpdate);
+    };
+  }, [ticketId, getTicketById]);
 
   const handleEmojiClickButton = (event) => {
     const rect = event.currentTarget.getBoundingClientRect();
