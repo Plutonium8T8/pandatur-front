@@ -258,8 +258,8 @@ const ChatList = ({ ticketId }) => {
         Boolean(ticket.action_needed) && 
         workflowOptions.includes(ticket.workflow) &&
         !EXCLUDED_WORKFLOWS.includes(ticket.workflow) &&
-        Boolean(ticket.unseen_count) // Обязательно должно быть хотя бы одно непрочитанное сообщение
-        // isLastMessageFromClient(ticket) // Последнее сообщение должно быть от клиента - ЗАКОММЕНТИРОВАНО
+        Boolean(ticket.unseen_count) && // Обязательно должно быть хотя бы одно непрочитанное сообщение
+        isLastMessageFromClient(ticket) // Последнее сообщение должно быть от клиента
       );
     }
 
