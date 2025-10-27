@@ -119,8 +119,8 @@ export const ManageLeadInfoTabs = ({
           <Tabs.Tab value="ticket_info">
             <Text
               size="sm"
-              c={hasErrorsTicketInfoForm ? "red" : "black"}
               truncate="end"
+              data-error={hasErrorsTicketInfoForm ? "true" : undefined}
             >
               {getLanguageByKey("Informații despre tichet")}
             </Text>
@@ -128,8 +128,8 @@ export const ManageLeadInfoTabs = ({
           <Tabs.Tab value="contact">
             <Text
               size="sm"
-              c={hasErrorsContractForm ? "red" : "black"}
               truncate="end"
+              data-error={hasErrorsContractForm ? "true" : undefined}
             >
               {getLanguageByKey("Contract")}
             </Text>
@@ -137,8 +137,8 @@ export const ManageLeadInfoTabs = ({
           <Tabs.Tab value="quality_control">
             <Text
               size="sm"
-              c={hasErrorQualityControl ? "red" : "black"}
               truncate="end"
+              data-error={hasErrorQualityControl ? "true" : undefined}
             >
               {getLanguageByKey("Control calitate")}
             </Text>
