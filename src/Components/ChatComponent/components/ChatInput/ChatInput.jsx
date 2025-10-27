@@ -28,6 +28,7 @@ import { TYPE_SOCKET_EVENTS } from "@app-constants";
 import { api } from "../../../../api";
 import { EmailForm } from "../EmailForm/EmailForm";
 import { getPagesByType } from "../../../../constants/webhookPagesConfig";
+import { socialMediaIcons } from "../../../utils/socialMediaIcons";
 import "./ChatInput.css";
 
 export const ChatInput = ({
@@ -315,9 +316,9 @@ export const ChatInput = ({
         {!showEmailForm ? (
           <>
             <Flex w="100%" gap="xs" mb="xs" align="center">
-              {/* {socialMediaIcons[currentClient?.payload?.platform] && (
-                <Flex>{socialMediaIcons[currentClient.payload.platform]}</Flex>
-              )} */}
+              {selectedPlatform && socialMediaIcons[selectedPlatform] && (
+                <Flex>{socialMediaIcons[selectedPlatform]}</Flex>
+              )}
               {loading ? (
                 <Loader size="xs" />
               ) : (
