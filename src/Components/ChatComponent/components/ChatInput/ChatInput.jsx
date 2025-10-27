@@ -72,6 +72,16 @@ export const ChatInput = ({
   const groupTitle = personalInfo?.group_title || "";
   const fromEmails = getEmailsByGroupTitle(groupTitle);
 
+  // Функция для рендеринга опций с иконками
+  const renderPlatformOption = ({ option }) => (
+    <Flex align="center" justify="space-between" w="100%">
+      <span>{option.label}</span>
+      {socialMediaIcons[option.value] && (
+        <Flex>{socialMediaIcons[option.value]}</Flex>
+      )}
+    </Flex>
+  );
+
   // Получаем список page_id для выбранной платформы, отфильтрованный по group_title тикета
   const pageIdOptions = useMemo(() => {
     if (!selectedPlatform) return [];
@@ -316,9 +326,6 @@ export const ChatInput = ({
         {!showEmailForm ? (
           <>
             <Flex w="100%" gap="xs" mb="xs" align="center">
-              {selectedPlatform && socialMediaIcons[selectedPlatform] && (
-                <Flex>{socialMediaIcons[selectedPlatform]}</Flex>
-              )}
               {loading ? (
                 <Loader size="xs" />
               ) : (
@@ -335,6 +342,10 @@ export const ChatInput = ({
                       searchable
                       clearable
                       label={getLanguageByKey("Platforma")}
+                      renderOption={renderPlatformOption}
+                      rightSection={selectedPlatform && socialMediaIcons[selectedPlatform] ? (
+                        <Flex>{socialMediaIcons[selectedPlatform]}</Flex>
+                      ) : null}
                       styles={{
                         input: {
                           fontSize: '16px',
