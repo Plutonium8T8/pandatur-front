@@ -220,6 +220,34 @@ const ChatList = ({ ticketId }) => {
     return createSearchIndex(baseTickets);
   }, [baseTickets]);
 
+  // Функция для определения, является ли последнее сообщение от клиента
+  const isLastMessageFromClient = (ticket) => {
+    const lastSenderId = ticket.last_message_sender_id;
+
+    if (!lastSenderId) {
+      // Если поле отсутствует, предполагаем что сообщение от клиента
+      // (для совместимости со старыми тикетами)
+      return true;
+    }
+
+    if (!ticket.clients || ticket.clients.length === 0) {
+      // Если нет клиентов, не можем определить
+      return false;
+    }
+
+    // Получаем ID всех клиентов тикета
+    const clientIds = ticket.clients.map(client => Number(client.id));
+    const senderId = Number(lastSenderId);
+
+    // Проверяем, является ли отправитель одним из клиентов
+    // sender_id = 1 означает системное сообщение
+    if (senderId === 1) {
+      return false;
+    }
+
+    return clientIds.includes(senderId);
+  };
+
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
@@ -231,6 +259,7 @@ const ChatList = ({ ticketId }) => {
         workflowOptions.includes(ticket.workflow) &&
         !EXCLUDED_WORKFLOWS.includes(ticket.workflow) &&
         Boolean(ticket.unseen_count) // Обязательно должно быть хотя бы одно непрочитанное сообщение
+        // isLastMessageFromClient(ticket) // Последнее сообщение должно быть от клиента - ЗАКОММЕНТИРОВАНО
       );
     }
 
