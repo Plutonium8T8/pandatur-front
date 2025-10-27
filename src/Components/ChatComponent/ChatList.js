@@ -154,7 +154,7 @@ const ChatList = ({ ticketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions, currentChatFilters } = useApp();
   const { userId } = useUser();
 
-  const [showMyTickets, setShowMyTickets] = useState(false);
+  const [showMyTickets, setShowMyTickets] = useState(true);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
