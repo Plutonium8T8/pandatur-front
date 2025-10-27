@@ -43,6 +43,7 @@ export const AppProvider = ({ children }) => {
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
   const [isChatFiltered, setIsChatFiltered] = useState(false);
+  const [currentChatFilters, setCurrentChatFilters] = useState({});
   const requestIdRef = useRef(0);
   
   // Hash map для быстрого доступа к тикетам по ID
@@ -202,6 +203,7 @@ export const AppProvider = ({ children }) => {
     setChatSpinner(true);
     setChatFilteredTickets([]);
     setIsChatFiltered(true);
+    setCurrentChatFilters(filters); // Сохраняем текущие фильтры
     
     // Очищаем hash map для отфильтрованных тикетов
     chatFilteredTicketsMap.current.clear();
@@ -242,7 +244,56 @@ export const AppProvider = ({ children }) => {
   const resetChatFilters = () => {
     setIsChatFiltered(false);
     setChatFilteredTickets([]);
+    setCurrentChatFilters({});
     chatFilteredTicketsMap.current.clear();
+  };
+
+  // Функция для проверки соответствия тикета примененным фильтрам
+  const doesTicketMatchFilters = (ticket, filters) => {
+    if (!filters || Object.keys(filters).length === 0) return true;
+    
+    // Проверяем workflow
+    if (filters.workflow) {
+      const workflowFilter = Array.isArray(filters.workflow) ? filters.workflow : [filters.workflow];
+      if (!workflowFilter.includes(ticket.workflow)) {
+        return false;
+      }
+    }
+    
+    // Проверяем action_needed
+    if (filters.action_needed !== undefined) {
+      const ticketActionNeeded = Boolean(ticket.action_needed);
+      const filterActionNeeded = Boolean(filters.action_needed);
+      if (ticketActionNeeded !== filterActionNeeded) {
+        return false;
+      }
+    }
+    
+    // Проверяем technician_id
+    if (filters.technician_id) {
+      const technicianFilter = Array.isArray(filters.technician_id) ? filters.technician_id : [filters.technician_id];
+      if (!technicianFilter.includes(String(ticket.technician_id))) {
+        return false;
+      }
+    }
+    
+    // Проверяем priority
+    if (filters.priority) {
+      const priorityFilter = Array.isArray(filters.priority) ? filters.priority : [filters.priority];
+      if (!priorityFilter.includes(ticket.priority)) {
+        return false;
+      }
+    }
+    
+    // Проверяем group_title
+    if (filters.group_title) {
+      const groupFilter = Array.isArray(filters.group_title) ? filters.group_title : [filters.group_title];
+      if (!groupFilter.includes(ticket.group_title)) {
+        return false;
+      }
+    }
+    
+    return true;
   };
 
   const hasLeadsFilterInUrl = () => {
@@ -365,6 +416,20 @@ export const AppProvider = ({ children }) => {
         const exists = getChatFilteredTicketById(ticketId);
         
         if (exists) {
+          // Проверяем, соответствует ли обновленный тикет текущим фильтрам
+          if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
+            if (!doesTicketMatchFilters(ticket, currentChatFilters)) {
+              // Тикет больше не соответствует фильтрам - удаляем его
+              console.log('🗑️ Removing ticket from filtered list (no longer matches filters):', {
+                id: ticket.id,
+                workflow: ticket.workflow,
+                action_needed: ticket.action_needed
+              });
+              chatFilteredTicketsMap.current.delete(ticketId);
+              return prev.filter(t => t.id !== ticketId);
+            }
+          }
+          
           const updated = prev.map((t) => (t.id === ticketId ? ticket : t));
           chatFilteredTicketsMap.current.set(ticketId, ticket);
           return updated;
@@ -821,6 +886,9 @@ export const AppProvider = ({ children }) => {
         isChatFiltered,
         setIsChatFiltered,
         resetChatFilters,
+        currentChatFilters,
+        setCurrentChatFilters,
+        doesTicketMatchFilters,
         
         // technicians
         technicians,

@@ -151,7 +151,7 @@ const getLastMessageTime = (ticket) => {
 };
 
 const ChatList = ({ ticketId }) => {
-  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions, currentChatFilters } = useApp();
   const { userId } = useUser();
 
   const [showMyTickets, setShowMyTickets] = useState(false);
@@ -203,6 +203,13 @@ const ChatList = ({ ticketId }) => {
       }
     }
   }, [fetchChatFilteredTickets, isChatFiltered, setIsChatFiltered]); // Зависимости для восстановления состояния из URL
+
+  // Синхронизируем локальные фильтры с глобальными
+  useEffect(() => {
+    if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
+      setChatFilters(currentChatFilters);
+    }
+  }, [currentChatFilters, isChatFiltered]);
 
   const baseTickets = useMemo(() => {
     return isChatFiltered ? chatFilteredTickets : tickets;
