@@ -67,8 +67,8 @@ export const LeadTable = ({
     if (!technicians || technicians.length === 0) return new Map();
     return new Map(
       technicians
-        .filter((t) => t?.id)
-        .map((t) => [Number(t.id), `${t.surname || ""} ${t.name || ""}`.trim()])
+        .filter((t) => t?.id && t.id.id)
+        .map((t) => [Number(t.id.id), `${t.id.surname || ""} ${t.id.name || ""}`.trim()])
     );
   }, [technicians]);
 
