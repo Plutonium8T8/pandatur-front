@@ -124,6 +124,9 @@ const searchTickets = (index, query) => {
 
 const CHAT_ITEM_HEIGHT = 94;
 
+// Финальные статусы, которые исключаем из показа в чате
+const EXCLUDED_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
+
 // безопасно приводим любую дату к timestamp
 const toDate = (val) => {
   if (!val) return null;
@@ -148,7 +151,7 @@ const getLastMessageTime = (ticket) => {
 };
 
 const ChatList = ({ ticketId }) => {
-  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions } = useApp();
   const { userId } = useUser();
 
   const [showMyTickets, setShowMyTickets] = useState(false);
@@ -199,7 +202,7 @@ const ChatList = ({ ticketId }) => {
         fetchChatFilteredTickets(urlFilters);
       }
     }
-  }, []); // Пустой массив зависимостей - выполняется только при монтировании
+  }, [fetchChatFilteredTickets, isChatFiltered, setIsChatFiltered]); // Зависимости для восстановления состояния из URL
 
   const baseTickets = useMemo(() => {
     return isChatFiltered ? chatFilteredTickets : tickets;
@@ -213,10 +216,14 @@ const ChatList = ({ ticketId }) => {
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
-    // Показываем только тикеты с action_needed: true (они требуют внимания)
+    // Показываем только тикеты с action_needed: true И разрешенными workflow статусами
     // НО только когда НЕ используется фильтр
     if (!isChatFiltered) {
-      result = result.filter(ticket => Boolean(ticket.action_needed));
+      result = result.filter(ticket => 
+        Boolean(ticket.action_needed) && 
+        workflowOptions.includes(ticket.workflow) &&
+        !EXCLUDED_WORKFLOWS.includes(ticket.workflow)
+      );
     }
 
     // Фильтр "Мои тикеты" - используем hash map для быстрого доступа
@@ -232,7 +239,7 @@ const ChatList = ({ ticketId }) => {
     }
 
     return result;
-  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isChatFiltered]);
+  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isChatFiltered, workflowOptions]);
 
   const sortedTickets = useMemo(() => {
     // Сортируем по времени последнего сообщения (по убыванию)
