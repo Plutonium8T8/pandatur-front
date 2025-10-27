@@ -102,6 +102,9 @@ export const parseFiltersFromUrl = (params) => ({
 
     // group_title всегда строка!
     group_title: params.get("group_title") || undefined,
+
+    // ChatList параметры (только серверные фильтры)
+    is_filtered: parseBoolean(params.get("is_filtered")),
 });
 
 export const prepareFiltersForUrl = (filters) => {

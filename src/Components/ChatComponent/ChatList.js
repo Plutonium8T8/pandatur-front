@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useCallback } from "react";
+import { useState, useRef, useMemo, useCallback, useEffect } from "react";
 import { FixedSizeList } from "react-window";
 import { LuFilter } from "react-icons/lu";
 import {
@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { getLanguageByKey } from "../utils";
-import { useUser, useApp, useDOMElementHeight } from "../../hooks";
+import { useUser, useApp, useDOMElementHeight, useChatUrlSync } from "../../hooks";
 import { ChatListItem } from "./components";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
@@ -163,6 +163,44 @@ const ChatList = ({ ticketId }) => {
   const [activeTab, setActiveTab] = useState("filter_ticket");
   const ticketFormRef = useRef();
   const messageFormRef = useRef();
+
+  // URL синхронизация - работает автоматически, не нарушая существующую логику
+  useChatUrlSync({
+    chatFilters,
+    isFiltered,
+    rawSearchQuery,
+    showMyTickets,
+  });
+
+  // Восстановление состояния из URL при первой загрузке (только серверные фильтры)
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlIsFiltered = urlParams.get("is_filtered") === "true";
+    
+    // Восстанавливаем только серверные фильтры (НЕ локальные: search, show_my_tickets)
+    if (urlIsFiltered && !isFiltered) {
+      const urlFilters = {};
+      for (const [key, value] of urlParams.entries()) {
+        if (key === "search" || key === "show_my_tickets" || key === "is_filtered") continue;
+        
+        if (key.endsWith("_from") || key.endsWith("_to")) {
+          const baseKey = key.replace(/_from$|_to$/, "");
+          if (!urlFilters[baseKey]) urlFilters[baseKey] = {};
+          if (key.endsWith("_from")) urlFilters[baseKey].from = value;
+          if (key.endsWith("_to")) urlFilters[baseKey].to = value;
+        } else {
+          const values = urlParams.getAll(key);
+          urlFilters[key] = values.length > 1 ? values : values[0];
+        }
+      }
+      
+      if (Object.keys(urlFilters).length > 0) {
+        setChatFilters(urlFilters);
+        setIsFiltered(true);
+        fetchChatFilteredTickets(urlFilters);
+      }
+    }
+  }, []); // Пустой массив зависимостей - выполняется только при монтировании
 
   const baseTickets = useMemo(() => {
     return isFiltered ? chatFilteredTickets : tickets;
