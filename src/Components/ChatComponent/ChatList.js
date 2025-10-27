@@ -148,10 +148,9 @@ const getLastMessageTime = (ticket) => {
 };
 
 const ChatList = ({ ticketId }) => {
-  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters } = useApp();
   const { userId } = useUser();
 
-  const [isFiltered, setIsFiltered] = useState(false);
   const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
@@ -167,7 +166,7 @@ const ChatList = ({ ticketId }) => {
   // URL синхронизация - работает автоматически, не нарушая существующую логику
   useChatUrlSync({
     chatFilters,
-    isFiltered,
+    isFiltered: isChatFiltered,
     rawSearchQuery,
     showMyTickets,
   });
@@ -178,7 +177,7 @@ const ChatList = ({ ticketId }) => {
     const urlIsFiltered = urlParams.get("is_filtered") === "true";
     
     // Восстанавливаем только серверные фильтры (НЕ локальные: search, show_my_tickets)
-    if (urlIsFiltered && !isFiltered) {
+    if (urlIsFiltered && !isChatFiltered) {
       const urlFilters = {};
       for (const [key, value] of urlParams.entries()) {
         if (key === "search" || key === "show_my_tickets" || key === "is_filtered") continue;
@@ -196,15 +195,15 @@ const ChatList = ({ ticketId }) => {
       
       if (Object.keys(urlFilters).length > 0) {
         setChatFilters(urlFilters);
-        setIsFiltered(true);
+        setIsChatFiltered(true);
         fetchChatFilteredTickets(urlFilters);
       }
     }
   }, []); // Пустой массив зависимостей - выполняется только при монтировании
 
   const baseTickets = useMemo(() => {
-    return isFiltered ? chatFilteredTickets : tickets;
-  }, [isFiltered, chatFilteredTickets, tickets]);
+    return isChatFiltered ? chatFilteredTickets : tickets;
+  }, [isChatFiltered, chatFilteredTickets, tickets]);
 
   // Создаем индекс для быстрого поиска
   const searchIndex = useMemo(() => {
@@ -216,7 +215,7 @@ const ChatList = ({ ticketId }) => {
 
     // Показываем только тикеты с action_needed: true (они требуют внимания)
     // НО только когда НЕ используется фильтр
-    if (!isFiltered) {
+    if (!isChatFiltered) {
       result = result.filter(ticket => Boolean(ticket.action_needed));
     }
 
@@ -233,7 +232,7 @@ const ChatList = ({ ticketId }) => {
     }
 
     return result;
-  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isFiltered]);
+  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isChatFiltered]);
 
   const sortedTickets = useMemo(() => {
     // Сортируем по времени последнего сообщения (по убыванию)
@@ -266,7 +265,7 @@ const ChatList = ({ ticketId }) => {
               </Badge>
             </Flex>
             <ActionIcon
-              variant={isFiltered ? "filled" : "default"}
+              variant={isChatFiltered ? "filled" : "default"}
               size="36"
               onClick={() => setOpenFilter(true)}
             >
@@ -369,7 +368,7 @@ const ChatList = ({ ticketId }) => {
             <Button
               variant="outline"
               onClick={() => {
-                setIsFiltered(false);
+                resetChatFilters();
                 setChatFilters({ action_needed: true });
                 setOpenFilter(false);
               }}
@@ -408,12 +407,12 @@ const ChatList = ({ ticketId }) => {
                 }
 
                 if (Object.keys(combined).length === 0) {
-                  setIsFiltered(false);
+                  resetChatFilters();
                   setChatFilters({ action_needed: true });
                 } else {
                   fetchChatFilteredTickets(combined);
                   setChatFilters(combined);
-                  setIsFiltered(true);
+                  setIsChatFiltered(true);
                 }
 
                 setOpenFilter(false);

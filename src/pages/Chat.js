@@ -10,7 +10,7 @@ import { ChatMessages } from "../Components/ChatComponent/components/ChatMessage
 import Can from "@components/CanComponent/Can";
 
 export const Chat = () => {
-  const { tickets } = useApp();
+  const { tickets, isChatFiltered, getTicketByIdWithFilters } = useApp();
   const { messages } = useMessagesContext();
   const { ticketId: ticketIdParam } = useParams();
   const ticketId = useMemo(() => {
@@ -22,9 +22,9 @@ export const Chat = () => {
   const [isChatListVisible, setIsChatListVisible] = useState(true);
 
   const currentTicket = useMemo(() => {
-    const found = tickets?.find((t) => t.id === ticketId);
-    return found;
-  }, [tickets, ticketId]);
+    // Используем новую функцию для получения тикета с учетом фильтров
+    return getTicketByIdWithFilters(ticketId, isChatFiltered);
+  }, [ticketId, isChatFiltered, getTicketByIdWithFilters]);
 
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = useMemo(() => {

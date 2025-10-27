@@ -42,6 +42,7 @@ export const AppProvider = ({ children }) => {
   const [lightTicketFilters, setLightTicketFilters] = useState({});
   const [chatFilteredTickets, setChatFilteredTickets] = useState([]);
   const [chatSpinner, setChatSpinner] = useState(false);
+  const [isChatFiltered, setIsChatFiltered] = useState(false);
   const requestIdRef = useRef(0);
   
   // Hash map для быстрого доступа к тикетам по ID
@@ -72,6 +73,14 @@ export const AppProvider = ({ children }) => {
   
   const getChatFilteredTicketById = (ticketId) => {
     return chatFilteredTicketsMap.current.get(ticketId);
+  };
+  
+  // Универсальная функция для получения тикета с учетом фильтров
+  const getTicketByIdWithFilters = (ticketId, isFiltered) => {
+    if (isFiltered) {
+      return getChatFilteredTicketById(ticketId) || getTicketById(ticketId);
+    }
+    return getTicketById(ticketId);
   };
   
   // Получаем данные всех пользователей
@@ -192,6 +201,7 @@ export const AppProvider = ({ children }) => {
   const fetchChatFilteredTickets = async (filters = {}) => {
     setChatSpinner(true);
     setChatFilteredTickets([]);
+    setIsChatFiltered(true);
     
     // Очищаем hash map для отфильтрованных тикетов
     chatFilteredTicketsMap.current.clear();
@@ -227,6 +237,12 @@ export const AppProvider = ({ children }) => {
       enqueueSnackbar(showServerError(err), { variant: "error" });
       setChatSpinner(false);
     }
+  };
+
+  const resetChatFilters = () => {
+    setIsChatFiltered(false);
+    setChatFilteredTickets([]);
+    chatFilteredTicketsMap.current.clear();
   };
 
   const hasLeadsFilterInUrl = () => {
@@ -802,12 +818,17 @@ export const AppProvider = ({ children }) => {
         fetchChatFilteredTickets,
         setChatFilteredTickets,
         chatSpinner,
+        isChatFiltered,
+        setIsChatFiltered,
+        resetChatFilters,
         
         // technicians
         technicians,
         
         // utils
         getTicketById,
+        getChatFilteredTicketById,
+        getTicketByIdWithFilters,
       }}
     >
       {children}
