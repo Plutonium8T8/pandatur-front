@@ -154,7 +154,7 @@ const ChatList = ({ ticketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions, currentChatFilters } = useApp();
   const { userId } = useUser();
 
-  const [showMyTickets, setShowMyTickets] = useState(true);
+  const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
@@ -229,7 +229,8 @@ const ChatList = ({ ticketId }) => {
       result = result.filter(ticket => 
         Boolean(ticket.action_needed) && 
         workflowOptions.includes(ticket.workflow) &&
-        !EXCLUDED_WORKFLOWS.includes(ticket.workflow)
+        !EXCLUDED_WORKFLOWS.includes(ticket.workflow) &&
+        Boolean(ticket.unseen_count) // Обязательно должно быть хотя бы одно непрочитанное сообщение
       );
     }
 
