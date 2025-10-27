@@ -156,7 +156,7 @@ const ChatList = ({ ticketId }) => {
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
-  const [chatFilters, setChatFilters] = useState({});
+  const [chatFilters, setChatFilters] = useState({ action_needed: true });
 
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
@@ -332,7 +332,7 @@ const ChatList = ({ ticketId }) => {
               variant="outline"
               onClick={() => {
                 setIsFiltered(false);
-                setChatFilters({});
+                setChatFilters({ action_needed: true });
                 setOpenFilter(false);
               }}
             >
@@ -363,10 +363,15 @@ const ChatList = ({ ticketId }) => {
                 const messageValues = messageFormRef.current?.getValues?.() || {};
 
                 const combined = mergeFilters(ticketValues, messageValues);
+                
+                // Если action_needed не задан явно, устанавливаем его в true по умолчанию
+                if (combined.action_needed === undefined) {
+                  combined.action_needed = true;
+                }
 
                 if (Object.keys(combined).length === 0) {
                   setIsFiltered(false);
-                  setChatFilters({});
+                  setChatFilters({ action_needed: true });
                 } else {
                   fetchChatFilteredTickets(combined);
                   setChatFilters(combined);
