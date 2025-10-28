@@ -1,4 +1,4 @@
-import { createContext, useState, useEffect, useRef, useContext } from "react";
+import { createContext, useState, useEffect, useRef, useContext, useCallback } from "react";
 import { useSnackbar } from "notistack";
 import { useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
@@ -343,7 +343,7 @@ export const AppProvider = ({ children }) => {
     }
   });
 
-  const fetchSingleTicket = async (ticketId) => {
+  const fetchSingleTicket = useCallback(async (ticketId) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
 
@@ -421,9 +421,9 @@ export const AppProvider = ({ children }) => {
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  };
+  }, [groupTitleForApi, enqueueSnackbar, isChatFiltered, currentChatFilters]);
 
-  const handleWebSocketMessage = (message) => {
+  const handleWebSocketMessage = useCallback((message) => {
     switch (message.type) {
       case TYPE_SOCKET_EVENTS.MESSAGE: {
         const { ticket_id, message: msgText, time_sent, mtype, sender_id, message_id } = message.data;
@@ -711,14 +711,13 @@ export const AppProvider = ({ children }) => {
 
       default:
     }
-  };
+  }, [userId, enqueueSnackbar, fetchSingleTicket, groupTitleForApi, isAdmin, socketRef, workflowOptions]); // Добавляем все необходимые зависимости
 
   useEffect(() => {
     if (sendedValue) {
       handleWebSocketMessage(sendedValue);
     }
-    // eslint-disable-next-line
-  }, [sendedValue]);
+  }, [sendedValue, handleWebSocketMessage]);
 
   // Обработчик события ticketUpdated убран - теперь используем TICKET_UPDATE от сервера
 

@@ -123,7 +123,7 @@ export const SocketProvider = ({ children }) => {
       try { socket && socket.close(); } catch { }
       clearTimeout(reconnectTimer);
     };
-  }, [enqueueSnackbar, emit]);
+  }, [enqueueSnackbar]); // Убираем emit из зависимостей, так как он стабилен
 
   return (
     <SocketContext.Provider
