@@ -141,7 +141,7 @@ export const ChatInput = ({
         }
       }
     } catch (e) {
-      console.error(e);
+      // Upload error
     } finally {
       handlers.close();
       requestAnimationFrame(() => textAreaRef.current?.focus());
@@ -200,7 +200,7 @@ export const ChatInput = ({
       };
       socketRef.current.send(JSON.stringify(connectPayload));
     } else {
-      console.warn("[READ] Сокет не готов к CONNECT");
+      // Socket not ready for CONNECT
     }
     seenMessages(ticketId, userId);
     markMessagesAsRead(ticketId, unseenCount);
@@ -239,18 +239,13 @@ export const ChatInput = ({
       handleMarkAsRead();
       clearState();
     } catch (e) {
-      console.error("Failed to send message", e);
+      // Failed to send message
     }
   };
 
   const handleMarkActionResolved = async () => {
     if (!ticketId) return;
     const newValue = !actionNeeded;
-    console.log("🔄 Toggling action_needed:", {
-      current: actionNeeded,
-      new: newValue,
-      ticketId
-    });
 
     try {
       await api.tickets.updateById({
@@ -258,21 +253,21 @@ export const ChatInput = ({
         action_needed: newValue ? "true" : "false",
       });
       // НЕ меняем локально - ждем TICKET_UPDATE от сервера
-      console.log("✅ Successfully updated action_needed to:", newValue);
+      // Successfully updated action_needed
     } catch (e) {
-      console.error("Failed to update action_needed", e);
+      // Failed to update action_needed
     }
     handleMarkAsRead();
   };
 
   const handleEmailSend = async (emailData) => {
     try {
-      console.log("Email sent successfully:", emailData);
+      // Email sent successfully
       setShowEmailForm(false);
       // ✅ email тоже считаем реакцией — помечаем чат прочитанным
       handleMarkAsRead();
     } catch (e) {
-      console.error("Failed to process email response", e);
+      // Failed to process email response
     }
   };
 

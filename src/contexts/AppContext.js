@@ -347,14 +347,6 @@ export const AppProvider = ({ children }) => {
     try {
       const ticket = await api.tickets.ticket.getLightById(ticketId);
 
-      console.log("🔄 fetchSingleTicket called:", {
-        ticketId,
-        serverTicket: {
-          id: ticket.id,
-          action_needed: ticket.action_needed,
-          unseen_count: ticket.unseen_count
-        }
-      });
 
       // Проверяем, что тикет относится к текущей группе
       const isMatchingGroup = ticket.group_title === groupTitleForApi;
@@ -384,19 +376,6 @@ export const AppProvider = ({ children }) => {
       setTickets((prev) => {
         const exists = getTicketById(ticketId);
         
-        console.log("🔄 fetchSingleTicket: Updating ticket:", {
-          ticketId,
-          existingTicket: exists ? {
-            id: exists.id,
-            action_needed: exists.action_needed,
-            unseen_count: exists.unseen_count
-          } : null,
-          serverTicket: {
-            id: ticket.id,
-            action_needed: ticket.action_needed,
-            unseen_count: ticket.unseen_count
-          }
-        });
         
         if (exists) {
           // Обновляем существующий тикет
@@ -420,11 +399,6 @@ export const AppProvider = ({ children }) => {
           if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
             if (!doesTicketMatchFilters(ticket, currentChatFilters)) {
               // Тикет больше не соответствует фильтрам - удаляем его
-              console.log('🗑️ Removing ticket from filtered list (no longer matches filters):', {
-                id: ticket.id,
-                workflow: ticket.workflow,
-                action_needed: ticket.action_needed
-              });
               chatFilteredTicketsMap.current.delete(ticketId);
               return prev.filter(t => t.id !== ticketId);
             }
@@ -608,12 +582,6 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.TICKET: {
         const { ticket_id, ticket_ids, group_title, workflow } = message.data || {};
 
-        console.log("🔄 TICKET event received:", {
-          ticket_id,
-          ticket_ids,
-          group_title,
-          workflow
-        });
 
         const idsRaw = Array.isArray(ticket_ids)
           ? ticket_ids
@@ -628,28 +596,16 @@ export const AppProvider = ({ children }) => {
         const isMatchingGroup = group_title === groupTitleForApi;
         const isMatchingWorkflow = Array.isArray(workflowOptions) && workflowOptions.includes(workflow);
 
-        console.log("🔄 TICKET: Processing IDs:", {
-          ids,
-          isMatchingGroup,
-          isMatchingWorkflow,
-          groupTitleForApi,
-          workflowOptions
-        });
 
         if (!ids.length || !isMatchingGroup || !isMatchingWorkflow) {
           break;
         }
 
         ids.forEach((id) => {
-          console.log("🔄 TICKET: Fetching single ticket:", {
-            id,
-            isMatchingGroup,
-            isMatchingWorkflow
-          });
           try {
             fetchSingleTicket(id);
           } catch (e) {
-            console.error(`Failed to fetch ticket ${id}:`, e);
+            // Failed to fetch ticket
           }
         });
 
@@ -678,15 +634,6 @@ export const AppProvider = ({ children }) => {
       case TYPE_SOCKET_EVENTS.TICKET_UPDATE: {
         const { ticket_id, ticket_ids, tickets: ticketsList } = message.data || {};
 
-        console.log("🔄 TICKET_UPDATE received:", {
-          ticket_id,
-          ticket_ids,
-          ticketsList: ticketsList?.map(t => ({
-            id: t.id,
-            technician_id: t.technician_id,
-            workflow: t.workflow
-          }))
-        });
 
         // Если пришел массив tickets с объектами
         if (Array.isArray(ticketsList) && ticketsList.length > 0) {
@@ -707,16 +654,10 @@ export const AppProvider = ({ children }) => {
 
             if (shouldFetch) {
               // Получаем полный тикет
-              console.log("🔄 TICKET_UPDATE: Fetching single ticket:", {
-                id,
-                technician_id,
-                workflow,
-                shouldFetch
-              });
               try {
                 fetchSingleTicket(id);
               } catch (e) {
-                console.error(`Failed to fetch updated ticket ${id}:`, e);
+                // Failed to fetch updated ticket
               }
             } else {
               // Условия не выполнены - удаляем тикет из списка
@@ -758,7 +699,7 @@ export const AppProvider = ({ children }) => {
                 try {
                   fetchSingleTicket(id);
                 } catch (e) {
-                  console.error(`Failed to fetch updated ticket ${id}:`, e);
+                  // Failed to fetch updated ticket
                 }
               }
             });
@@ -769,7 +710,6 @@ export const AppProvider = ({ children }) => {
       }
 
       default:
-        // console.warn("Invalid socket message type:", message.type);
     }
   };
 
@@ -811,7 +751,6 @@ export const AppProvider = ({ children }) => {
 
         trySend();
       } catch (e) {
-        // console.error("error get id for connect chat room", e);
       }
     };
 
@@ -841,9 +780,7 @@ export const AppProvider = ({ children }) => {
         });
 
         socket.send(socketMessage);
-        // console.log("[Socket] Reconnected and rejoined chat rooms");
       } catch (e) {
-        // console.error("[Socket] Failed to reconnect to chat rooms", e);
       }
     };
 

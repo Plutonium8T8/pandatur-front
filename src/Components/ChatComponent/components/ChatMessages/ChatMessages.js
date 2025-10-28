@@ -31,11 +31,6 @@ const getSendedMessage = (msj, currentMsj, statusMessage) => {
     msj.messageStatus === MESSAGES_STATUS.PENDING;
 
   if (isPendingMatch) {
-    console.log("🔄 Found PENDING message for status update:", {
-      from: "PENDING",
-      to: statusMessage,
-      message: msj.message?.substring(0, 50) + "..."
-    });
     return { ...msj, messageStatus: statusMessage };
   }
 
@@ -97,16 +92,8 @@ export const ChatMessages = ({
         // Отправляем на сервер
         const response = await apiUrl(metadataMsj);
 
-        console.log("📤 Server response:", response);
-
         // Проверяем статус ответа сервера
         const isSuccess = response?.status === "success" || response?.status === "ok";
-
-        console.log("✅ Message status check:", {
-          responseStatus: response?.status,
-          isSuccess,
-          willUpdateTo: isSuccess ? "SUCCESS" : "ERROR"
-        });
 
         if (isSuccess) {
           // Обновляем статус на SUCCESS
@@ -120,7 +107,7 @@ export const ChatMessages = ({
           );
         }
       } catch (error) {
-        console.error("❌ Error sending message:", error);
+        // Error sending message
         // При ошибке API обновляем статус на ERROR
         setMessages((prev) =>
           prev.map((msj) => getSendedMessage(msj, normalizedMessage, MESSAGES_STATUS.ERROR))

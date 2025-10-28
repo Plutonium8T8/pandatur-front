@@ -136,7 +136,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       
       // НЕ меняем action_needed - только читаем чат
     } catch (error) {
-      console.error("Failed to mark chat as read:", error);
+      // Failed to mark chat as read
     }
   };
 
@@ -168,7 +168,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       seenMessages(chat.id, userId);
       markMessagesAsRead(chat.id, chat.unseen_count);
     } catch (error) {
-      console.error("Failed to update action_needed:", error);
+      // Failed to update action_needed
     }
   };
 
