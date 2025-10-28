@@ -594,11 +594,19 @@ Scrieți în Whatsap la numărul +373690440400`,
 
 //////////////////////////
 
-"old oferta trimisa": `Bună ziua 🤗
+"old oferta trimisa RO": `Bună ziua 🤗
 
 Aș dori să Vă întreb dacă ați reușit să analizați oferta primită?
 
 Sau poate mai aveți careva întrebări?
 
 Vă sunt la dispoziție pentru orice întrebare și Vă mulțumesc că ați ales Panda Tur.`,
+
+"old oferta trimisa RU": `Здравствуйте 🤗
+
+Я бы хотел спросить, вы просмотрели полученное предложение?
+
+Или у вас есть какие-то вопросы?
+
+Я готов ответить на любой вопрос и благодарю за выбор Panda Tur.`,
 }
