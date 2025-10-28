@@ -753,74 +753,76 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                 {platformContacts.length > 0 && (
                   <>
                     <Divider className="section-divider" mb="sm" />
-                    <Stack gap="sm">
+                    <Box>
+                      <Flex gap="sm" wrap="wrap" align="center">
+                        {platformContacts.map((contact, index) => {
+                          const Icon = PLATFORM_ICONS[contact.contact_type];
+                          const isContactExpanded = expandedContactId === contact.id;
+
+                          return (
+                            <Box key={`${contact.contact_type}-${contact.id}-${index}`} className="platform-contact-container">
+                              <Box
+                                className="platform-icon-container"
+                                onClick={() => setExpandedContactId(isContactExpanded ? null : contact.id)}
+                                style={{ cursor: 'pointer' }}
+                              >
+                                <Icon
+                                  size={24}
+                                  style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
+                                />
+                              </Box>
+                              <ActionIcon
+                                size="xs"
+                                variant="subtle"
+                                color="red"
+                                className="platform-delete-btn"
+                                onClick={() => {
+                                  handleDeleteContact(client.id, contact.id);
+                                }}
+                                loading={isDeletingContact}
+                              >
+                                <MdDelete size={24} />
+                              </ActionIcon>
+                            </Box>
+                          );
+                        })}
+                      </Flex>
+
+                      {/* Expanded contact details appear below all icons */}
                       {platformContacts.map((contact, index) => {
-                        const Icon = PLATFORM_ICONS[contact.contact_type];
                         const isContactExpanded = expandedContactId === contact.id;
 
                         return (
-                          <Box key={`${contact.contact_type}-${contact.id}-${index}`}>
-                            <Flex gap="sm" align="center">
-                              <Box className="platform-contact-container">
-                                <Box
-                                  className="platform-icon-container"
-                                  onClick={() => setExpandedContactId(isContactExpanded ? null : contact.id)}
-                                  style={{ cursor: 'pointer' }}
-                                >
-                                  <Icon
-                                    size={24}
-                                    style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
-                                  />
+                          <Collapse key={`collapse-${contact.id}-${index}`} in={isContactExpanded}>
+                            <Box mt="xs" p="sm">
+                              <Stack gap="xs">
+                                <Box>
+                                  <Text size="xs" fw={500} c="dimmed">ID:</Text>
+                                  <Text size="sm">{contact.id}</Text>
                                 </Box>
-                                <ActionIcon
-                                  size="xs"
-                                  variant="subtle"
-                                  color="red"
-                                  className="platform-delete-btn"
-                                  onClick={() => {
-                                    handleDeleteContact(client.id, contact.id);
-                                  }}
-                                  loading={isDeletingContact}
-                                >
-                                  <MdDelete size={24} />
-                                </ActionIcon>
-                              </Box>
-                            </Flex>
 
-                            <Collapse in={isContactExpanded}>
-                              <Box
-                                mt="xs"
-                                p="sm"
-                              >
-                                <Stack gap="xs">
+                                <Box>
+                                  <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Tip contact")}:</Text>
+                                  <Text size="sm">{contact.contact_type}</Text>
+                                </Box>
+
+                                <Box>
+                                  <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Valoare contact")}:</Text>
+                                  <Text size="sm">{contact.contact_value}</Text>
+                                </Box>
+
+                                {contact.original_name && (
                                   <Box>
-                                    <Text size="xs" fw={500} c="dimmed">ID:</Text>
-                                    <Text size="sm">{contact.id}</Text>
+                                    <Text size="xs" fw={500} c="dimmed">Original Name:</Text>
+                                    <Text size="sm">{contact.original_name}</Text>
                                   </Box>
-
-                                  <Box>
-                                    <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Tip contact")}:</Text>
-                                    <Text size="sm">{contact.contact_type}</Text>
-                                  </Box>
-
-                                  <Box>
-                                    <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Valoare contact")}:</Text>
-                                    <Text size="sm">{contact.contact_value}</Text>
-                                  </Box>
-
-                                  {contact.original_name && (
-                                    <Box>
-                                      <Text size="xs" fw={500} c="dimmed">Original Name:</Text>
-                                      <Text size="sm">{contact.original_name}</Text>
-                                    </Box>
-                                  )}
-                                </Stack>
-                              </Box>
-                            </Collapse>
-                          </Box>
+                                )}
+                              </Stack>
+                            </Box>
+                          </Collapse>
                         );
                       })}
-                    </Stack>
+                    </Box>
                   </>
                 )}
 
