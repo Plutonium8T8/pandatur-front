@@ -186,6 +186,8 @@ export const ChatInput = ({
       platform: selectedPlatform,
       client_id: clientId,
       ticket_id: ticketId,
+      sender_id: userId,
+      contact_value: currentClient?.payload?.contact_value || null,
     };
   };
 
@@ -221,6 +223,7 @@ export const ChatInput = ({
           media_url: att.media_url,
           message_text: null,
           last_message_type: att.media_type,
+          media_type: att.media_type,
         };
         await Promise.resolve(onSendMessage(payloadFile));
       }
@@ -232,6 +235,7 @@ export const ChatInput = ({
           media_url: null,
           message_text: trimmedText,
           last_message_type: "text",
+          media_type: "text",
         };
         await Promise.resolve(onSendMessage(payloadText));
       }

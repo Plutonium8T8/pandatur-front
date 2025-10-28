@@ -307,6 +307,14 @@ export const WEBHOOK_PAGES_CONFIG = {
       group_title: "CATALAN"
     }
   ],
+  "viber-bots": [
+    {
+      page_id: "viber-bot-pandatur",
+      page_name: "Chisinau - viber-bot-pandatur",
+      type: "viber-bot",
+      group_title: "MD"
+    }
+  ],
   telegrams: [
     {
       page_id: "37360991919",
@@ -377,6 +385,7 @@ export const getPageIdByPlatformAndGroup = (platform, groupTitle) => {
   else if (platform === 'whatsapp') key = 'whatsapps';
   else if (platform === 'viber') key = 'vibers';
   else if (platform === 'telegram') key = 'telegrams';
+  else if (platform === 'viber-bot') key = 'viber-bots';
   else return null;
 
   const pages = WEBHOOK_PAGES_CONFIG[key] || [];

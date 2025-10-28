@@ -31,6 +31,7 @@ const getContactTypeLabels = () => ({
   instagram: "Instagram",
   whatsapp: "WhatsApp",
   viber: "Viber",
+  "viber-bot": "Viber Bot",
   telegram: "Telegram",
   phone: getLanguageByKey("Telefon"),
   email: getLanguageByKey("Email"),
@@ -41,14 +42,20 @@ const CONTACT_TYPE_COLORS = {
   instagram: "#E4405F",
   whatsapp: "#25D366",
   viber: "#7360F2",
+  "viber-bot": "#7360F2",
   telegram: "#0088CC",
 };
+
+const ViberBotIcon = () => (
+  <img src="/viber-bot.svg" alt="Viber Bot" style={{ width: "24px", height: "24px", background: "#7360F2", borderRadius: "12px" }} />
+);
 
 const PLATFORM_ICONS = {
   facebook: FaFacebook,
   instagram: FaInstagram,
   whatsapp: FaWhatsapp,
   viber: FaViber,
+  "viber-bot": ViberBotIcon,
   telegram: FaTelegram,
 };
 
@@ -799,14 +806,9 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                             </Flex>
 
                             <Collapse in={isContactExpanded}>
-                              <Box 
-                                mt="xs" 
-                                p="sm" 
-                                style={{ 
-                                  backgroundColor: 'var(--crm-ui-kit-palette-background-primary)', 
-                                  borderRadius: '8px',
-                                  border: '1px solid var(--crm-ui-kit-palette-border-default)'
-                                }}
+                              <Box
+                                mt="xs"
+                                p="sm"
                               >
                                 <Stack gap="xs">
                                   <Box>

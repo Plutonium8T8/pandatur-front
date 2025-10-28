@@ -49,4 +49,9 @@ export const socialMediaIcons = {
       <FaTelegram color="white" />
     </IconWrapper>
   ),
+  "viber-bot": (
+    <IconWrapper bgColor="#7360F2">
+      <img src="/viber-bot.svg" alt="Viber Bot" style={{ width: "24px", height: "24px" }} />
+    </IconWrapper>
+  )
 };

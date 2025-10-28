@@ -75,6 +75,14 @@ export const messages = {
       });
       return data;
     },
+    
+    viber_bot: async (body) => {
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("/messages/send/viber-bot", body, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data;
+    },
 
     whatsapp: async (body) => {
       const token = Cookies.get("jwt");

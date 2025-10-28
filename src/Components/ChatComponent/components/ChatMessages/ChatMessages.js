@@ -87,6 +87,7 @@ export const ChatMessages = ({
 
         if (normalizedPlatform === "TELEGRAM") apiUrl = api.messages.send.telegram;
         else if (normalizedPlatform === "VIBER") apiUrl = api.messages.send.viber;
+        else if (normalizedPlatform === "VIBER-BOT") apiUrl = api.messages.send.viber_bot;
         else if (normalizedPlatform === "WHATSAPP") apiUrl = api.messages.send.whatsapp;
 
         // Отправляем на сервер
