@@ -64,6 +64,7 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
   const [isDeletingContact, setIsDeletingContact] = useState(false);
   const [editingClient, setEditingClient] = useState(null); // { clientId }
   const [isSavingClient, setIsSavingClient] = useState(false);
+  const [expandedContactId, setExpandedContactId] = useState(null); // Для Collapse с информацией о контакте
 
   const confirmDelete = useConfirmPopup({
     subTitle: getLanguageByKey("Sunteți sigur că doriți să ștergeți acest contact?"),
@@ -757,39 +758,77 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                 {platformContacts.length > 0 && (
                   <>
                     <Divider className="section-divider" mb="sm" />
-                    <Flex gap="sm" wrap="wrap">
+                    <Stack gap="sm">
                       {platformContacts.map((contact, index) => {
                         const Icon = PLATFORM_ICONS[contact.contact_type];
                         const labels = getContactTypeLabels();
+                        const isContactExpanded = expandedContactId === contact.id;
+
                         return (
-                          <Box key={`${contact.contact_type}-${contact.id}-${index}`} className="platform-contact-container">
-                            <Tooltip
-                              label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
-                              position="top"
-                            >
-                              <Box className="platform-icon-container">
-                                <Icon
-                                  size={24}
-                                  style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
-                                />
+                          <Box key={`${contact.contact_type}-${contact.id}-${index}`}>
+                            <Flex gap="sm" align="center">
+                              <Box className="platform-contact-container">
+                                <Tooltip
+                                  label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
+                                  position="top"
+                                >
+                                  <Box
+                                    className="platform-icon-container"
+                                    onClick={() => setExpandedContactId(isContactExpanded ? null : contact.id)}
+                                    style={{ cursor: 'pointer' }}
+                                  >
+                                    <Icon
+                                      size={24}
+                                      style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
+                                    />
+                                  </Box>
+                                </Tooltip>
+                                <ActionIcon
+                                  size="xs"
+                                  variant="subtle"
+                                  color="red"
+                                  className="platform-delete-btn"
+                                  onClick={() => {
+                                    handleDeleteContact(client.id, contact.id);
+                                  }}
+                                  loading={isDeletingContact}
+                                >
+                                  <MdDelete size={24} />
+                                </ActionIcon>
                               </Box>
-                            </Tooltip>
-                            <ActionIcon
-                              size="xs"
-                              variant="subtle"
-                              color="red"
-                              className="platform-delete-btn"
-                              onClick={() => {
-                                handleDeleteContact(client.id, contact.id);
-                              }}
-                              loading={isDeletingContact}
-                            >
-                              <MdDelete size={24} />
-                            </ActionIcon>
+                            </Flex>
+
+                            <Collapse in={isContactExpanded}>
+                              <Box mt="xs" p="sm" style={{ backgroundColor: 'var(--mantine-color-gray-0)', borderRadius: '8px' }}>
+                                <Stack gap="xs">
+                                  <Box>
+                                    <Text size="xs" fw={500} c="dimmed">ID:</Text>
+                                    <Text size="sm">{contact.id}</Text>
+                                  </Box>
+
+                                  <Box>
+                                    <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Tip contact")}:</Text>
+                                    <Text size="sm">{contact.contact_type}</Text>
+                                  </Box>
+
+                                  <Box>
+                                    <Text size="xs" fw={500} c="dimmed">{getLanguageByKey("Valoare contact")}:</Text>
+                                    <Text size="sm">{contact.contact_value}</Text>
+                                  </Box>
+
+                                  {contact.original_name && (
+                                    <Box>
+                                      <Text size="xs" fw={500} c="dimmed">Original Name:</Text>
+                                      <Text size="sm">{contact.original_name}</Text>
+                                    </Box>
+                                  )}
+                                </Stack>
+                              </Box>
+                            </Collapse>
                           </Box>
                         );
                       })}
-                    </Flex>
+                    </Stack>
                   </>
                 )}
 
