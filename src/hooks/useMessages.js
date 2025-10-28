@@ -70,7 +70,7 @@ export const useMessages = () => {
     );
   }, [userId]);
 
-  const updateMessage = (message) => {
+  const updateMessage = useCallback((message) => {
     setMessages((prevMessages) => {
       if (!message?.message_id) {
         // Если нет message_id - просто добавляем (старая логика для совместимости)
@@ -147,15 +147,15 @@ export const useMessages = () => {
         return [...prevMedia, message];
       });
     }
-  };
+  }, []); // Пустой массив зависимостей, так как функция не зависит от внешних переменных
 
-  const markMessageSeen = (id, seenAt) => {
+  const markMessageSeen = useCallback((id, seenAt) => {
     setMessages((prevMessages) =>
       prevMessages.map((msg) =>
         msg.ticket_id === id ? { ...msg, seen_at: seenAt } : msg
       )
     );
-  };
+  }, []);
 
   useEffect(() => {
     if (!onEvent || !offEvent) return;
@@ -189,6 +189,6 @@ export const useMessages = () => {
       setLogs,
       setNotes,
     }),
-    [messages, logs, notes, lastMessage, mediaFiles, loading, getUserMessages, markMessageRead]
+    [messages, logs, notes, lastMessage, mediaFiles, loading, getUserMessages, markMessageRead, updateMessage, markMessageSeen]
   );
 };

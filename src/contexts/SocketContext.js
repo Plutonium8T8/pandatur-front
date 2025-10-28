@@ -102,6 +102,7 @@ export const SocketProvider = ({ children }) => {
       socket.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
+          // Обновляем только если это новое сообщение или другой тип события
           setVal(parsed);
           if (parsed?.type) emit(parsed.type, parsed);
         } catch {
@@ -123,7 +124,7 @@ export const SocketProvider = ({ children }) => {
       try { socket && socket.close(); } catch { }
       clearTimeout(reconnectTimer);
     };
-  }, [enqueueSnackbar]); // Убираем emit из зависимостей, так как он стабилен
+  }, [enqueueSnackbar, emit]); // Добавляем emit обратно в зависимости
 
   return (
     <SocketContext.Provider

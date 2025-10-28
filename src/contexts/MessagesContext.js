@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useCallback } from "react";
+import React, { createContext, useEffect, useCallback, useRef } from "react";
 import { useMessages, useSocket, useUser } from "@hooks";
 import { TYPE_SOCKET_EVENTS, MEDIA_TYPE } from "@app-constants";
 
@@ -10,6 +10,10 @@ export const MessagesProvider = ({ children }) => {
   const messages = useMessages();
   const { sendedValue } = useSocket();
   const { userId } = useUser();
+
+  // Создаем стабильные ссылки на функции
+  const messagesRef = useRef(messages);
+  messagesRef.current = messages;
 
   const handleIncomingMessage = useCallback((message) => {
     const incoming = message.data;
@@ -29,7 +33,7 @@ export const MessagesProvider = ({ children }) => {
     
     // Обработка ошибок для сообщений текущего пользователя
     if (isFromCurrentUser && incoming.message?.startsWith(ERROR_PREFIX)) {
-      messages.setMessages((prev) => {
+      messagesRef.current.setMessages((prev) => {
         const index = prev.findIndex((m) => {
           const isPending = m.messageStatus === "PENDING";
           const sameSender = Number(m.sender_id) === Number(incoming.sender_id);
@@ -57,12 +61,12 @@ export const MessagesProvider = ({ children }) => {
     
     // Для всех остальных сообщений (от других пользователей, системы, звонков)
     if (isCall || isFromAnotherUser || isFromSystem) {
-      messages.updateMessage(incoming);
+      messagesRef.current.updateMessage(incoming);
       return;
     }
     
     // Игнорируем сообщения от текущего пользователя (кроме ошибок)
-  }, [userId, messages]); // Добавляем messages обратно, но используем useRef для стабильности
+  }, [userId]); // Убираем messages из зависимостей, используем useRef
 
   // Обрабатываем сообщения от сокета напрямую (для ошибок от текущего пользователя)
   useEffect(() => {
