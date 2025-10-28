@@ -799,7 +799,15 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                             </Flex>
 
                             <Collapse in={isContactExpanded}>
-                              <Box mt="xs" p="sm" style={{ backgroundColor: 'var(--mantine-color-gray-0)', borderRadius: '8px' }}>
+                              <Box 
+                                mt="xs" 
+                                p="sm" 
+                                style={{ 
+                                  backgroundColor: 'var(--crm-ui-kit-palette-background-primary)', 
+                                  borderRadius: '8px',
+                                  border: '1px solid var(--crm-ui-kit-palette-border-default)'
+                                }}
+                              >
                                 <Stack gap="xs">
                                   <Box>
                                     <Text size="xs" fw={500} c="dimmed">ID:</Text>
