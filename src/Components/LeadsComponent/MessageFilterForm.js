@@ -40,8 +40,8 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
             const existingValues = new Set(formattedTechnicians.map(t => t.value));
             
             const systemOptions = [
-                { value: "0", label: getLanguageByKey("Client") },
-                { value: "1", label: getLanguageByKey("System") },
+                { value: "0", label: getLanguageByKey("Client"), status: true },
+                { value: "1", label: getLanguageByKey("System"), status: true },
             ];
             
             // Фильтруем системные опции, чтобы избежать дублирования
@@ -143,14 +143,14 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
                     clearable
                 />
 
-                <UserGroupMultiSelect
+                {/* <UserGroupMultiSelect
                     label={getLanguageByKey("Selectează autor mesaj")}
                     placeholder={getLanguageByKey("Selectează autor mesaj")}
                     value={senderIds}
                     onChange={setSenderIds}
                     techniciansData={formattedTechnicians}
                     mode="multi"
-                />
+                /> */}
 
                 <UserGroupMultiSelect
                     label={getLanguageByKey("Autor ultim mesaj")}

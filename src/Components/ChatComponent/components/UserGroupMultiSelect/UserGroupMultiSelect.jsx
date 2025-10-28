@@ -91,8 +91,12 @@ export const UserGroupMultiSelect = ({
       // Сортируем пользователей по алфавиту
       users.sort((a, b) => a.label.localeCompare(b.label));
 
-      // Создаем итоговый массив: группа, её пользователи, следующая группа, её пользователи...
+      // Создаем итоговый массив: сначала пользователи без группы, затем группы с пользователями
       const result = [];
+      
+      // Добавляем пользователей без группы (например, Client и System) в начало
+      const usersWithoutGroup = users.filter(user => !user.groupName);
+      result.push(...usersWithoutGroup);
       
       groups.forEach(group => {
         // Добавляем группу
