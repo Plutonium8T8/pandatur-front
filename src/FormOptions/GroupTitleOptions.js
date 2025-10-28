@@ -25,4 +25,5 @@ export const groupTitleOptions = [
     { value: "STAUCENI", label: "Stauceni Franchise" },
     { value: "HANCESTI", label: "Hincesti Franchise" },
     { value: "CIMISLIA", label: "Cimislia Franchise" },
+    {value: "HR", label: "HR"}
 ];

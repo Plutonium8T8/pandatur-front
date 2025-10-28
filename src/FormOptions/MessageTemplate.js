@@ -591,4 +591,14 @@ Scrieți în Whatsap la numărul +373690440400`,
 Напишите в Viber: viber://pa?chatURI=pandatur_viber
 Напишите в Telegram: https://telegram.me/panda_tur_bot
 Напишите в WhatsApp по номеру: +373690440400`,
+
+//////////////////////////
+
+"old oferta trimisa": `Bună ziua 🤗
+
+Aș dori să Vă întreb dacă ați reușit să analizați oferta primită?
+
+Sau poate mai aveți careva întrebări?
+
+Vă sunt la dispoziție pentru orice întrebare și Vă mulțumesc că ați ales Panda Tur.`,
 }
