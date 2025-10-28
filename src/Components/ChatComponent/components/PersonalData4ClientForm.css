@@ -98,13 +98,7 @@
   border-radius: 50%;
   background-color: var(--crm-ui-kit-palette-background-primary);
   border: 1px solid var(--crm-ui-kit-palette-border-primary);
-  transition: transform 0.2s ease, background-color 0.2s ease;
   cursor: pointer;
-}
-
-.platform-icon-container:hover {
-  transform: scale(1.1);
-  background-color: var(--crm-ui-kit-palette-surface-hover-background-color);
 }
 
 /* Стили для форм ввода */

@@ -11,7 +11,6 @@ import {
   Divider,
   Avatar,
   Loader,
-  Tooltip,
   Select,
   Collapse,
 } from "@mantine/core";
@@ -25,17 +24,6 @@ import { api } from "../../../api";
 import { useSnackbar } from "notistack";
 import { useConfirmPopup } from "../../../hooks/useConfirmPopup";
 import "./PersonalData4ClientForm.css";
-
-const getContactTypeLabels = () => ({
-  facebook: "Facebook",
-  instagram: "Instagram",
-  whatsapp: "WhatsApp",
-  viber: "Viber",
-  "viber-bot": "Viber Bot",
-  telegram: "Telegram",
-  phone: getLanguageByKey("Telefon"),
-  email: getLanguageByKey("Email"),
-});
 
 const CONTACT_TYPE_COLORS = {
   facebook: "#1877F2",
@@ -768,28 +756,22 @@ export const PersonalData4ClientForm = ({ ticketId }) => {
                     <Stack gap="sm">
                       {platformContacts.map((contact, index) => {
                         const Icon = PLATFORM_ICONS[contact.contact_type];
-                        const labels = getContactTypeLabels();
                         const isContactExpanded = expandedContactId === contact.id;
 
                         return (
                           <Box key={`${contact.contact_type}-${contact.id}-${index}`}>
                             <Flex gap="sm" align="center">
                               <Box className="platform-contact-container">
-                                <Tooltip
-                                  label={`${labels[contact.contact_type]}: ${contact.contact_value}`}
-                                  position="top"
+                                <Box
+                                  className="platform-icon-container"
+                                  onClick={() => setExpandedContactId(isContactExpanded ? null : contact.id)}
+                                  style={{ cursor: 'pointer' }}
                                 >
-                                  <Box
-                                    className="platform-icon-container"
-                                    onClick={() => setExpandedContactId(isContactExpanded ? null : contact.id)}
-                                    style={{ cursor: 'pointer' }}
-                                  >
-                                    <Icon
-                                      size={24}
-                                      style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
-                                    />
-                                  </Box>
-                                </Tooltip>
+                                  <Icon
+                                    size={24}
+                                    style={{ color: CONTACT_TYPE_COLORS[contact.contact_type] }}
+                                  />
+                                </Box>
                                 <ActionIcon
                                   size="xs"
                                   variant="subtle"
