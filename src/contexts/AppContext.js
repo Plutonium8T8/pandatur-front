@@ -3,7 +3,7 @@ import { useSnackbar } from "notistack";
 import { useLocalStorage, useSocket } from "@hooks";
 import { api } from "../api";
 import { showServerError, getLanguageByKey } from "@utils";
-import { TYPE_SOCKET_EVENTS } from "@app-constants";
+import { TYPE_SOCKET_EVENTS, MEDIA_TYPE } from "@app-constants";
 import { usePathnameWatcher } from "../Components/utils/usePathnameWatcher";
 import { UserContext } from "./UserContext";
 import { useGetTechniciansList } from "../hooks";
@@ -552,10 +552,15 @@ export const AppProvider = ({ children }) => {
         });
 
         // ВАЖНО: Отправляем событие для обновления контекста сообщений
-        // Это позволит новым сообщениям отображаться в чате
-        window.dispatchEvent(new CustomEvent('newMessageFromSocket', { 
-          detail: message.data 
-        }));
+        // ТОЛЬКО для сообщений от других пользователей, системы или звонков
+        // Сообщения от текущего пользователя уже добавлены при отправке через API
+        const shouldSendToMessagesContext = isFromAnotherUser || String(sender_id) === "1" || mtype === MEDIA_TYPE.CALL;
+        
+        if (shouldSendToMessagesContext) {
+          window.dispatchEvent(new CustomEvent('newMessageFromSocket', { 
+            detail: message.data 
+          }));
+        }
 
         break;
       }
