@@ -33,6 +33,14 @@ export const UserGroupMultiSelect = ({
     if (techniciansData && techniciansData.length > 0) {
       const filtered = techniciansData
         .filter(item => {
+          // Фильтруем только активных пользователей (статус true)
+          if (!item.value.startsWith("__group__")) {
+            // Проверяем статус пользователя - показываем только активных
+            if (item.status !== true && item.status !== undefined) {
+              return false;
+            }
+          }
+          
           // Если есть фильтрация по allowedUserIds
           if (allowedUserIds && !item.value.startsWith("__group__")) {
             return allowedUserIds.has(item.value);
@@ -100,9 +108,12 @@ export const UserGroupMultiSelect = ({
 
     // Если есть raw данные пользователей из API, используем их (показываем ВСЕ группы)
     if (usersData && usersData.length > 0) {
-      // Собираем все уникальные группы из данных пользователей
+      // Фильтруем только активных пользователей (статус true)
+      const activeUsers = usersData.filter(user => user.status === true);
+      
+      // Собираем все уникальные группы из данных активных пользователей
       const allGroups = new Map();
-      usersData.forEach(user => {
+      activeUsers.forEach(user => {
         if (user.groups && user.groups.length > 0) {
           user.groups.forEach(group => {
             if (!allGroups.has(group.id)) {
@@ -135,7 +146,7 @@ export const UserGroupMultiSelect = ({
         });
 
         // Добавляем пользователей этой группы
-        const groupUsers = usersData.filter(user =>
+        const groupUsers = activeUsers.filter(user =>
           user.groups && user.groups.some(g => g.id === group.id)
         );
 
@@ -245,10 +256,10 @@ export const UserGroupMultiSelect = ({
           ?.map(item => item.value) || [];
       }
       
-      // Если не нашли в techniciansData, пробуем в usersData
+      // Если не нашли в techniciansData, пробуем в usersData (только активные пользователи)
       if (groupUsers.length === 0 && usersData && usersData.length > 0) {
         groupUsers = usersData
-          .filter(user => user.groups && user.groups.some(g => g.id === groupId))
+          .filter(user => user.status === true && user.groups && user.groups.some(g => g.id === groupId))
           .map(user => String(user.id));
       }
       
@@ -367,15 +378,17 @@ export const UserGroupMultiSelect = ({
               const groupId = option.value.replace("__group__", "");
               let userCount = 0;
               
-              // Считаем пользователей в группе из разных источников данных
+              // Считаем активных пользователей в группе из разных источников данных
               if (techniciansData && techniciansData.length > 0) {
                 const groupName = techniciansData.find(g => g.value === `__group__${groupId}`)?.label;
                 userCount = techniciansData.filter(item => {
-                  return !item.value.startsWith("__group__") && item.groupName === groupName;
+                  return !item.value.startsWith("__group__") && 
+                         item.groupName === groupName && 
+                         item.status === true;
                 }).length;
               } else if (usersData && usersData.length > 0) {
                 userCount = usersData.filter(user => 
-                  user.groups && user.groups.some(g => g.id === groupId)
+                  user.status === true && user.groups && user.groups.some(g => g.id === groupId)
                 ).length;
               } else if (userGroups && userGroups.length > 0) {
                 const group = userGroups.find(g => g.id === groupId);

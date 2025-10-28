@@ -42,6 +42,9 @@ export const useGetTechniciansList = () => {
         data.forEach((item) => {
           const userId = item?.user?.id;
           if (!userId || processedUserIds.has(userId)) return; // Проверяем на дублирование
+          
+          // Фильтруем только активных техников (статус true)
+          if (item.status !== true) return;
 
           processedUserIds.add(userId); // Добавляем ID в Set
           
@@ -56,6 +59,7 @@ export const useGetTechniciansList = () => {
             name: item.name,
             surname: item.surname,
             sipuni_id: item.sipuni_id,
+            status: item.status, // Добавляем статус
             groups: item.groups,
             groupName,
           };
