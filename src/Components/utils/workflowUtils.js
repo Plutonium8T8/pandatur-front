@@ -314,10 +314,10 @@ export const userGroupsToGroupTitle = {
     "IT dep.": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
     "Quality Department": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
     "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
-    "Front Office": ["MD"],
+    "Front Office": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
     "Distribution": [""],
-    "Back Flagman": ["MD", "RO"],
-    "Back Minions": ["MD", "RO"],
+    "Back Flagman": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
+    "Back Minions": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
     "Back Headline": ["MD"],
     "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
 
