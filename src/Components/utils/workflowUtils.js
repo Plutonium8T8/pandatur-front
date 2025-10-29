@@ -131,6 +131,13 @@ export const workflowOptionsHR = [
     "-"
 ];
 
+export const workflowOptionsFranchisePandaTur = [
+    "Incoming",
+    "New!!!",
+    "+",
+    "-"
+];
+
 // limited
 
 export const workflowOptionsLimitedSalesMD = [
@@ -244,6 +251,13 @@ export const workflowOptionsLimitedHR = [
     "-"
 ];
 
+export const workflowOptionsLimitedFranchisePandaTur = [
+    "Incoming",
+    "New!!!",
+    "+",
+    "-"
+];
+
 export const workflowOptionsByGroupTitle = {
     MD: workflowOptionsSalesMD,
     RO: workflowOptionsSalesRO,
@@ -274,6 +288,7 @@ export const workflowOptionsByGroupTitle = {
     CIMISLIA: workflowOptionsFranchise,
     Default: workflowOptionsSalesMD,
     HR: workflowOptionsHR,
+    FranchisePandaTur: workflowOptionsFranchisePandaTur,
 };
 
 export const workflowOptionsLimitedByGroupTitle = {
@@ -306,14 +321,15 @@ export const workflowOptionsLimitedByGroupTitle = {
     CIMISLIA: workflowOptionsLimitedFiliale,
     Default: workflowOptionsLimitedSalesMD,
     HR: workflowOptionsLimitedHR,
+    FranchisePandaTur: workflowOptionsLimitedFranchisePandaTur,
 };
 
 export const userGroupsToGroupTitle = {
     // 10
-    "Admin": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
-    "IT dep.": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
-    "Quality Department": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
-    "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR"],
+    "Admin": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
+    "IT dep.": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
+    "Quality Department": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
+    "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
     "Front Office": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
     "Distribution": [""],
     "Back Flagman": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
