@@ -138,6 +138,12 @@ export const workflowOptionsFranchisePandaTur = [
     "-"
 ];
 
+export const workflowOptionsMarketing = [
+    "Incoming",
+    "New!!!",
+    "+",
+    "-"
+];
 // limited
 
 export const workflowOptionsLimitedSalesMD = [
@@ -258,12 +264,19 @@ export const workflowOptionsLimitedFranchisePandaTur = [
     "-"
 ];
 
+export const workflowOptionsLimitedMarketing = [
+    "Incoming",
+    "New!!!",
+    "+",
+    "-"
+];
+
 export const workflowOptionsByGroupTitle = {
     MD: workflowOptionsSalesMD,
     RO: workflowOptionsSalesRO,
     Filiale: workflowOptionsFiliale,
     Francize: workflowOptionsFranchise,
-    Marketing: workflowOptionsFiliale, // используем общий workflow для маркетинга
+    Marketing: workflowOptionsMarketing,
     IndividualGroups: workflowOptionsIndividualGroups,
     BusinessGroups: workflowOptionsBusinessGroups,
     Agency: workflowOptionsAgency,
@@ -296,7 +309,7 @@ export const workflowOptionsLimitedByGroupTitle = {
     RO: workflowOptionsLimitedSalesRO,
     Filiale: workflowOptionsLimitedFiliale,
     Francize: workflowOptionsLimitedFiliale, // используем общий workflow для франшиз
-    Marketing: workflowOptionsLimitedFiliale, // используем общий workflow для маркетинга
+    Marketing: workflowOptionsLimitedMarketing,
     IndividualGroups: workflowOptionsLimitedIndividualGroups,
     BusinessGroups: workflowOptionsLimitedBusinessGroups,
     Agency: workflowOptionsLimitedAgency,
