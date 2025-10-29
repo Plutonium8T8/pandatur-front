@@ -214,7 +214,7 @@ export const AppProvider = ({ children }) => {
           page,
           type: "light",
           group_title: groupTitleForApi,
-          sort_by: "creation_date",
+          sort_by: "last_interaction_date",
           order: "DESC",
           attributes: filters,
         });
@@ -249,7 +249,7 @@ export const AppProvider = ({ children }) => {
   };
 
   // Функция для проверки соответствия тикета примененным фильтрам
-  const doesTicketMatchFilters = (ticket, filters) => {
+  const doesTicketMatchFilters = useCallback((ticket, filters) => {
     if (!filters || Object.keys(filters).length === 0) return true;
     
     // Проверяем workflow
@@ -293,8 +293,51 @@ export const AppProvider = ({ children }) => {
       }
     }
     
+    // Проверяем unseen (наличие непрочитанных сообщений)
+    if (filters.unseen === "true") {
+      if (!ticket.unseen_count || ticket.unseen_count === 0) {
+        return false;
+      }
+    }
+    
+    // Проверяем last_message_author (0 - клиент, 1 - пользователь)
+    if (filters.last_message_author) {
+      const authorFilter = Array.isArray(filters.last_message_author) ? filters.last_message_author : [filters.last_message_author];
+      
+      // 0 означает клиент - проверяем, что последнее сообщение от клиента
+      if (authorFilter.includes(0)) {
+        const lastSenderId = ticket.last_message_sender_id;
+        
+        // Если last_message_sender_id не установлен, считаем что сообщение от клиента (для совместимости)
+        if (lastSenderId === undefined || lastSenderId === null) {
+          return true;
+        }
+        
+        // Проверяем, является ли отправитель клиентом (не система и не техник)
+        const senderId = Number(lastSenderId);
+        
+        // sender_id = 1 - система, не клиент
+        if (senderId === 1) {
+          return false;
+        }
+        
+        // Проверяем, что sender_id не совпадает с userId (не техник)
+        if (String(senderId) === String(userId)) {
+          return false;
+        }
+        
+        // Проверяем, что отправитель является одним из клиентов тикета
+        if (ticket.clients && ticket.clients.length > 0) {
+          const clientIds = ticket.clients.map(client => Number(client.id));
+          if (!clientIds.includes(senderId)) {
+            return false;
+          }
+        }
+      }
+    }
+    
     return true;
-  };
+  }, [userId]);
 
   const hasLeadsFilterInUrl = () => {
     const params = new URLSearchParams(window.location.search);
@@ -390,20 +433,41 @@ export const AppProvider = ({ children }) => {
         }
       });
 
-      // Обновляем только существующие тикеты в отфильтрованном списке
+      // Обновляем или добавляем тикет в отфильтрованном списке
       setChatFilteredTickets((prev) => {
         const exists = getChatFilteredTicketById(ticketId);
         
-        if (exists) {
-          // Проверяем, соответствует ли обновленный тикет текущим фильтрам
-          if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
-            if (!doesTicketMatchFilters(ticket, currentChatFilters)) {
-              // Тикет больше не соответствует фильтрам - удаляем его
+        // Проверяем, соответствует ли тикет текущим фильтрам
+        if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
+          const matchesFilters = doesTicketMatchFilters(ticket, currentChatFilters);
+          
+          if (!matchesFilters) {
+            // Тикет не соответствует фильтрам
+            if (exists) {
+              // Удаляем существующий тикет, если он больше не соответствует
               chatFilteredTicketsMap.current.delete(ticketId);
               return prev.filter(t => t.id !== ticketId);
             }
+            // Тикета нет и он не соответствует - ничего не делаем
+            return prev;
           }
           
+          // Тикет соответствует фильтрам
+          if (exists) {
+            // Обновляем существующий тикет
+            const updated = prev.map((t) => (t.id === ticketId ? ticket : t));
+            chatFilteredTicketsMap.current.set(ticketId, ticket);
+            return updated;
+          } else {
+            // Добавляем новый тикет, который соответствует фильтрам
+            chatFilteredTicketsMap.current.set(ticketId, ticket);
+            return [ticket, ...prev];
+          }
+        }
+        
+        // Фильтры не активны
+        if (exists) {
+          // Просто обновляем существующий тикет
           const updated = prev.map((t) => (t.id === ticketId ? ticket : t));
           chatFilteredTicketsMap.current.set(ticketId, ticket);
           return updated;
@@ -421,7 +485,7 @@ export const AppProvider = ({ children }) => {
     } catch (error) {
       enqueueSnackbar(showServerError(error), { variant: "error" });
     }
-  }, [groupTitleForApi, enqueueSnackbar, isChatFiltered, currentChatFilters]);
+  }, [groupTitleForApi, enqueueSnackbar, isChatFiltered, currentChatFilters, doesTicketMatchFilters]);
 
   const handleWebSocketMessage = useCallback((message) => {
     switch (message.type) {
@@ -498,18 +562,21 @@ export const AppProvider = ({ children }) => {
           // Используем hash map для быстрого поиска O(1)
           const existingTicket = getChatFilteredTicketById(ticket_id);
           
-          if (!existingTicket) {
-            return prev; // Тикет не найден в отфильтрованном списке
+          // Получаем тикет из основного списка, если его нет в отфильтрованном
+          const ticketFromMain = existingTicket || getTicketById(ticket_id);
+          
+          if (!ticketFromMain) {
+            return prev; // Тикет не найден ни в одном списке
           }
 
           const updatedTicket = {
-            ...existingTicket,
-            unseen_count: existingTicket.unseen_count + (shouldIncrement ? 1 : 0),
+            ...ticketFromMain,
+            unseen_count: ticketFromMain.unseen_count + (shouldIncrement ? 1 : 0),
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
             // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
-            action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
+            action_needed: isFromClient && isNewMessage ? true : ticketFromMain.action_needed,
           };
 
           // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
@@ -517,12 +584,42 @@ export const AppProvider = ({ children }) => {
             updatedTicket.action_needed = true;
           }
 
-          // Обновляем hash map
-          chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
-
-          return prev.map((ticket) => 
-            ticket.id === ticket_id ? updatedTicket : ticket
-          );
+          // Проверяем, соответствует ли обновленный тикет текущим фильтрам чата
+          if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
+            const matchesFilters = doesTicketMatchFilters(updatedTicket, currentChatFilters);
+            
+            if (!matchesFilters) {
+              // Тикет больше не соответствует фильтрам - удаляем его
+              if (existingTicket) {
+                chatFilteredTicketsMap.current.delete(ticket_id);
+                return prev.filter(t => t.id !== ticket_id);
+              }
+              return prev;
+            }
+            
+            // Тикет соответствует фильтрам
+            if (existingTicket) {
+              // Обновляем существующий тикет
+              chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
+              return prev.map((ticket) => 
+                ticket.id === ticket_id ? updatedTicket : ticket
+              );
+            } else {
+              // Добавляем новый тикет, который теперь соответствует фильтрам
+              chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
+              return [updatedTicket, ...prev];
+            }
+          }
+          
+          // Если фильтры не активны, просто обновляем существующий тикет или игнорируем
+          if (existingTicket) {
+            chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
+            return prev.map((ticket) => 
+              ticket.id === ticket_id ? updatedTicket : ticket
+            );
+          }
+          
+          return prev;
         });
 
         // ВАЖНО: Отправляем событие для обновления контекста сообщений
@@ -563,12 +660,29 @@ export const AppProvider = ({ children }) => {
         const chatTicket = getChatFilteredTicketById(ticket_id);
         if (chatTicket) {
           const updatedChatTicket = { ...chatTicket, unseen_count: 0 };
-          // Сохраняем action_needed при обновлении через SEEN
-          chatFilteredTicketsMap.current.set(ticket_id, updatedChatTicket);
           
-          setChatFilteredTickets((prev) =>
-            prev.map((t) => t.id === ticket_id ? updatedChatTicket : t)
-          );
+          // Проверяем, соответствует ли тикет фильтрам после обновления
+          if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
+            const matchesFilters = doesTicketMatchFilters(updatedChatTicket, currentChatFilters);
+            
+            if (!matchesFilters) {
+              // Тикет больше не соответствует фильтрам (например, unseen: "true") - удаляем его
+              chatFilteredTicketsMap.current.delete(ticket_id);
+              setChatFilteredTickets((prev) => prev.filter((t) => t.id !== ticket_id));
+            } else {
+              // Тикет все еще соответствует фильтрам - обновляем
+              chatFilteredTicketsMap.current.set(ticket_id, updatedChatTicket);
+              setChatFilteredTickets((prev) =>
+                prev.map((t) => t.id === ticket_id ? updatedChatTicket : t)
+              );
+            }
+          } else {
+            // Фильтры не активны - просто обновляем
+            chatFilteredTicketsMap.current.set(ticket_id, updatedChatTicket);
+            setChatFilteredTickets((prev) =>
+              prev.map((t) => t.id === ticket_id ? updatedChatTicket : t)
+            );
+          }
         }
 
         // Уменьшаем общий счетчик на количество прочитанных сообщений
@@ -711,7 +825,7 @@ export const AppProvider = ({ children }) => {
 
       default:
     }
-  }, [userId, enqueueSnackbar, fetchSingleTicket, groupTitleForApi, isAdmin, socketRef, workflowOptions]); // Добавляем все необходимые зависимости
+  }, [userId, enqueueSnackbar, fetchSingleTicket, groupTitleForApi, isAdmin, socketRef, workflowOptions, currentChatFilters, doesTicketMatchFilters, isChatFiltered]); // Добавляем все необходимые зависимости
 
   useEffect(() => {
     if (sendedValue) {

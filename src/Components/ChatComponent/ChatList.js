@@ -3,7 +3,6 @@ import { FixedSizeList } from "react-window";
 import { LuFilter } from "react-icons/lu";
 import {
   TextInput,
-  Checkbox,
   Title,
   Flex,
   Box,
@@ -23,11 +22,15 @@ import { ChatListItem } from "./components";
 import { TicketFormTabs } from "../TicketFormTabs";
 import { MessageFilterForm } from "../LeadsComponent/MessageFilterForm";
 
+const CHAT_ITEM_HEIGHT = 94;
+
+// Финальные статусы, которые исключаем из показа в чате
+const EXCLUDED_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat", "Interesat"];
+
 // Hash map для быстрого поиска тикетов по различным критериям
 const createSearchIndex = (tickets) => {
   const index = {
     byId: new Map(),
-    byTechnicianId: new Map(),
     byClientName: new Map(),
     byClientPhone: new Map(),
     byTicketId: new Map()
@@ -37,15 +40,7 @@ const createSearchIndex = (tickets) => {
     // Индекс по ID тикета
     index.byId.set(ticket.id, ticket);
     index.byTicketId.set(ticket.id.toString(), ticket);
-    
-    // Индекс по technician_id
-    if (ticket.technician_id) {
-      if (!index.byTechnicianId.has(ticket.technician_id)) {
-        index.byTechnicianId.set(ticket.technician_id, []);
-      }
-      index.byTechnicianId.get(ticket.technician_id).push(ticket);
-    }
-    
+
     // Индексы по клиентам
     if (ticket.clients) {
       ticket.clients.forEach(client => {
@@ -57,7 +52,7 @@ const createSearchIndex = (tickets) => {
           }
           index.byClientName.get(nameKey).push(ticket);
         }
-        
+
         // По фамилии
         if (client.surname) {
           const surnameKey = client.surname.toLowerCase();
@@ -66,7 +61,7 @@ const createSearchIndex = (tickets) => {
           }
           index.byClientName.get(surnameKey).push(ticket);
         }
-        
+
         // По телефонам
         if (client.phones) {
           client.phones.forEach(phone => {
@@ -82,50 +77,45 @@ const createSearchIndex = (tickets) => {
       });
     }
   });
-  
+
   return index;
 };
 
 // Быстрый поиск с использованием hash map
 const searchTickets = (index, query) => {
   if (!query) return [];
-  
+
   const searchTerm = query.toLowerCase();
   const foundTickets = new Set();
-  
+
   // Поиск по ID тикета
   if (index.byTicketId.has(searchTerm)) {
     foundTickets.add(index.byTicketId.get(searchTerm));
   }
-  
+
   // Поиск по частичному совпадению ID
   for (const [ticketId, ticket] of index.byTicketId) {
     if (ticketId.includes(searchTerm)) {
       foundTickets.add(ticket);
     }
   }
-  
+
   // Поиск по имени клиента
   for (const [name, tickets] of index.byClientName) {
     if (name.includes(searchTerm)) {
       tickets.forEach(ticket => foundTickets.add(ticket));
     }
   }
-  
+
   // Поиск по телефону
   for (const [phone, tickets] of index.byClientPhone) {
     if (phone.includes(searchTerm)) {
       tickets.forEach(ticket => foundTickets.add(ticket));
     }
   }
-  
+
   return Array.from(foundTickets);
 };
-
-const CHAT_ITEM_HEIGHT = 94;
-
-// Финальные статусы, которые исключаем из показа в чате
-const EXCLUDED_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
 
 // безопасно приводим любую дату к timestamp
 const toDate = (val) => {
@@ -151,14 +141,14 @@ const getLastMessageTime = (ticket) => {
 };
 
 const ChatList = ({ ticketId }) => {
-  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, resetChatFilters, workflowOptions, currentChatFilters } = useApp();
+  const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, workflowOptions, currentChatFilters } = useApp();
   const { userId } = useUser();
 
-  const [showMyTickets, setShowMyTickets] = useState(false);
   const [openFilter, setOpenFilter] = useState(false);
   const [rawSearchQuery, setRawSearchQuery] = useState("");
   const [searchQuery] = useDebouncedValue(rawSearchQuery, 300);
   const [chatFilters, setChatFilters] = useState({ action_needed: true });
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const wrapperChatItemRef = useRef(null);
   const wrapperChatHeight = useDOMElementHeight(wrapperChatItemRef);
@@ -171,20 +161,20 @@ const ChatList = ({ ticketId }) => {
     chatFilters,
     isFiltered: isChatFiltered,
     rawSearchQuery,
-    showMyTickets,
+    showMyTickets: false,
   });
 
   // Восстановление состояния из URL при первой загрузке (только серверные фильтры)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const urlIsFiltered = urlParams.get("is_filtered") === "true";
-    
+
     // Восстанавливаем только серверные фильтры (НЕ локальные: search, show_my_tickets)
-    if (urlIsFiltered && !isChatFiltered) {
+    if (urlIsFiltered && !isChatFiltered && isInitialLoad) {
       const urlFilters = {};
       for (const [key, value] of urlParams.entries()) {
         if (key === "search" || key === "show_my_tickets" || key === "is_filtered") continue;
-        
+
         if (key.endsWith("_from") || key.endsWith("_to")) {
           const baseKey = key.replace(/_from$|_to$/, "");
           if (!urlFilters[baseKey]) urlFilters[baseKey] = {};
@@ -195,14 +185,15 @@ const ChatList = ({ ticketId }) => {
           urlFilters[key] = values.length > 1 ? values : values[0];
         }
       }
-      
+
       if (Object.keys(urlFilters).length > 0) {
         setChatFilters(urlFilters);
         setIsChatFiltered(true);
         fetchChatFilteredTickets(urlFilters);
+        setIsInitialLoad(false); // Отмечаем, что загрузка завершена
       }
     }
-  }, [fetchChatFilteredTickets, isChatFiltered, setIsChatFiltered]); // Зависимости для восстановления состояния из URL
+  }, [fetchChatFilteredTickets, isChatFiltered, setIsChatFiltered, isInitialLoad]); // Зависимости для восстановления состояния из URL
 
   // Синхронизируем локальные фильтры с глобальными
   useEffect(() => {
@@ -210,6 +201,26 @@ const ChatList = ({ ticketId }) => {
       setChatFilters(currentChatFilters);
     }
   }, [currentChatFilters, isChatFiltered]);
+
+  // Загружаем тикеты с фильтрами по умолчанию при первой загрузке
+  useEffect(() => {
+    if (isInitialLoad && workflowOptions.length > 0 && !isChatFiltered && userId) {
+      // Формируем дефолтные фильтры
+      const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
+
+      const defaultFilters = {
+        action_needed: true,
+        workflow: filteredWorkflow,
+        technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
+        unseen: "true", // Только тикеты с непрочитанными сообщениями
+        last_message_author: [0]
+      };
+
+      setChatFilters(defaultFilters);
+      fetchChatFilteredTickets(defaultFilters);
+      setIsInitialLoad(false);
+    }
+  }, [isInitialLoad, workflowOptions, isChatFiltered, fetchChatFilteredTickets, userId]);
 
   const baseTickets = useMemo(() => {
     return isChatFiltered ? chatFilteredTickets : tickets;
@@ -220,63 +231,20 @@ const ChatList = ({ ticketId }) => {
     return createSearchIndex(baseTickets);
   }, [baseTickets]);
 
-  // Функция для определения, является ли последнее сообщение от клиента
-  const isLastMessageFromClient = (ticket) => {
-    const lastSenderId = ticket.last_message_sender_id;
-
-    if (!lastSenderId) {
-      // Если поле отсутствует, предполагаем что сообщение от клиента
-      // (для совместимости со старыми тикетами)
-      return true;
-    }
-
-    if (!ticket.clients || ticket.clients.length === 0) {
-      // Если нет клиентов, не можем определить
-      return false;
-    }
-
-    // Получаем ID всех клиентов тикета
-    const clientIds = ticket.clients.map(client => Number(client.id));
-    const senderId = Number(lastSenderId);
-
-    // Проверяем, является ли отправитель одним из клиентов
-    // sender_id = 1 означает системное сообщение
-    if (senderId === 1) {
-      return false;
-    }
-
-    return clientIds.includes(senderId);
-  };
-
   const filteredTickets = useMemo(() => {
     let result = [...baseTickets];
 
-    // Показываем только тикеты с action_needed: true И разрешенными workflow статусами
-    // НО только когда НЕ используется фильтр
-    if (!isChatFiltered) {
-      result = result.filter(ticket => 
-        Boolean(ticket.action_needed) && 
-        workflowOptions.includes(ticket.workflow) &&
-        !EXCLUDED_WORKFLOWS.includes(ticket.workflow) &&
-        Boolean(ticket.unseen_count) && // Обязательно должно быть хотя бы одно непрочитанное сообщение
-        isLastMessageFromClient(ticket) // Последнее сообщение должно быть от клиента
-      );
-    }
+    // Основная фильтрация делается на сервере через fetchChatFilteredTickets
+    // Здесь применяем только локальный поиск по отфильтрованным тикетам
 
-    // Фильтр "Мои тикеты" - используем hash map для быстрого доступа
-    if (showMyTickets) {
-      const myTickets = searchIndex.byTechnicianId.get(userId) || [];
-      result = result.filter(ticket => myTickets.includes(ticket));
-    }
-
-    // Поиск по запросу - используем оптимизированный поиск
+    // Поиск по запросу - ищем в тикетах, которые пришли с сервера
     if (searchQuery) {
       const searchResults = searchTickets(searchIndex, searchQuery);
       result = result.filter(ticket => searchResults.includes(ticket));
     }
 
     return result;
-  }, [baseTickets, showMyTickets, searchQuery, userId, searchIndex, isChatFiltered, workflowOptions]);
+  }, [baseTickets, searchQuery, searchIndex]);
 
   const sortedTickets = useMemo(() => {
     // Сортируем по времени последнего сообщения (по убыванию)
@@ -317,22 +285,16 @@ const ChatList = ({ ticketId }) => {
             </ActionIcon>
           </Flex>
 
-          <Checkbox
-            label={getLanguageByKey("Leadurile mele")}
-            onChange={(e) => setShowMyTickets(e.target.checked)}
-            checked={showMyTickets}
-            color="var(--crm-ui-kit-palette-link-primary)"
-          />
-
           <TextInput
             placeholder={getLanguageByKey("Cauta dupa ID, Nume client, Telefon sau Email")}
-            onInput={(e) => setRawSearchQuery(e.target.value)}
+            value={rawSearchQuery}
+            onChange={(e) => setRawSearchQuery(e.target.value)}
           />
         </Flex>
 
         <Divider color="var(--crm-ui-kit-palette-border-default)" />
 
-        <Box style={{ height: "calc(100% - 127px)", position: "relative" }} ref={wrapperChatItemRef}>
+        <Box style={{ height: "calc(100% - 110px)", position: "relative" }} ref={wrapperChatItemRef}>
           {sortedTickets.length === 0 ? (
             <Flex h="100%" align="center" justify="center" px="md">
               <Text c="dimmed">{getLanguageByKey("Nici un lead")}</Text>
@@ -412,8 +374,17 @@ const ChatList = ({ ticketId }) => {
             <Button
               variant="outline"
               onClick={() => {
-                resetChatFilters();
-                setChatFilters({ action_needed: true });
+                // Возвращаемся к дефолтным фильтрам
+                const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
+                const defaultFilters = {
+                  action_needed: true,
+                  workflow: filteredWorkflow,
+                  technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
+                  unseen: "true", // Только тикеты с непрочитанными сообщениями
+                };
+
+                setChatFilters(defaultFilters);
+                fetchChatFilteredTickets(defaultFilters);
                 setOpenFilter(false);
               }}
             >
@@ -444,15 +415,24 @@ const ChatList = ({ ticketId }) => {
                 const messageValues = messageFormRef.current?.getValues?.() || {};
 
                 const combined = mergeFilters(ticketValues, messageValues);
-                
+
                 // Если action_needed не задан явно, устанавливаем его в true по умолчанию
                 if (combined.action_needed === undefined) {
                   combined.action_needed = true;
                 }
 
+                // Если фильтры пустые, применяем дефолтные
                 if (Object.keys(combined).length === 0) {
-                  resetChatFilters();
-                  setChatFilters({ action_needed: true });
+                  const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
+                  const defaultFilters = {
+                    action_needed: true,
+                    workflow: filteredWorkflow,
+                    technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
+                    unseen: "true", // Только тикеты с непрочитанными сообщениями
+                  };
+
+                  setChatFilters(defaultFilters);
+                  fetchChatFilteredTickets(defaultFilters);
                 } else {
                   fetchChatFilteredTickets(combined);
                   setChatFilters(combined);

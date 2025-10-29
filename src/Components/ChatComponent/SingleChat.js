@@ -43,11 +43,7 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = React.useMemo(() => {
     if (!messages || messages.length === 0 || !ticketId) {
-      console.log("[SingleChat] lastMessage: no messages or ticketId", { 
-        hasMessages: !!messages, 
-        messagesCount: messages?.length, 
-        ticketId 
-      });
+
       return null;
     }
     
