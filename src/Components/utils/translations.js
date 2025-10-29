@@ -45,9 +45,9 @@ export const translations = {
     EN: "Approved with client / 5 days",
   },
   "Contract încheiat": {
-    RO: "Contract încheiat / 1 zi",
-    RU: "Контракт заключён / 1 день",
-    EN: "Contract signed / 1 day",
+    RO: "Contract încheiat",
+    RU: "Контракт заключён",
+    EN: "Contract signed",
   },
   "Realizat cu succes": {
     RO: "Realizat cu succes",
@@ -60,9 +60,9 @@ export const translations = {
     EN: "Closed and not completed",
   },
   "Contract semnat": {
-    RO: "Contract semnat",
-    RU: "Договор подписан",
-    EN: "Contract signed",
+    RO: "Contract semnat / 1 zi",
+    RU: "Договор подписан / 1 день",
+    EN: "Contract signed / 1 day",
   },
   "Plată primită": {
     RO: "Plată primită / 2 zile",
@@ -4902,5 +4902,20 @@ export const translations = {
     RO: "Încarcă mai multe emailuri",
     RU: "Загрузить еще письма",
     EN: "Load more emails",
+  },
+  "New!!!": {
+    RO: "Nou!!!",
+    RU: "Новый!!!",
+    EN: "New!!!",
+  },
+  "+": {
+    RO: "+",
+    RU: "+",
+    EN: "+",
+  },
+  "-": {
+    RO: "-",
+    RU: "-",
+    EN: "-",
   },
 };
