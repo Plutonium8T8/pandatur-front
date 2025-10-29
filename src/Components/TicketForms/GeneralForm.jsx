@@ -5,7 +5,7 @@ import {
   TagsInput,
   Box,
 } from "@mantine/core";
-import { useEffect, useContext, useRef } from "react";
+import { useEffect, useContext, useRef, useMemo } from "react";
 import {
   priorityOptions,
   groupTitleOptions,
@@ -16,12 +16,16 @@ import { parseTags } from "../../stringUtils";
 import { AppContext } from "../../contexts/AppContext";
 import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
 import { formatMultiSelectData } from "../utils/multiSelectUtils";
+import {
+  workflowOptionsByGroupTitle,
+  workflowOptionsLimitedByGroupTitle
+} from "../utils/workflowUtils";
 
 const FINAL_WORKFLOWS = ["Realizat cu succes", "Închis și nerealizat"];
 
 export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
-  const { workflowOptions, accessibleGroupTitles, isAdmin } = useContext(AppContext);
+  const { accessibleGroupTitles, isAdmin } = useContext(AppContext);
   const isInitialized = useRef(false);
 
   const formattedTechnicians = formatMultiSelectData(technicians);
@@ -46,12 +50,49 @@ export const GeneralForm = ({ data, formInstance }) => {
     accessibleGroupTitles.includes(g.value)
   );
 
+  // Получаем текущий group_title из формы
+  const currentGroupTitle = formInstance.getValues().group_title;
+
+  // Сбрасываем workflow при изменении group_title, если текущий workflow не подходит
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const currentWorkflow = formInstance.getValues().workflow;
+
+    if (currentWorkflow && currentGroupTitle) {
+      const workflowMap = isAdmin
+        ? workflowOptionsByGroupTitle
+        : workflowOptionsLimitedByGroupTitle;
+
+      const workflowsForGroup = workflowMap[currentGroupTitle] || workflowMap.Default || [];
+
+      // Если текущий workflow не входит в список для нового group_title, сбрасываем его
+      if (!workflowsForGroup.includes(currentWorkflow)) {
+        formInstance.setFieldValue("workflow", undefined);
+      }
+    }
+  }, [currentGroupTitle, isAdmin, formInstance]);
+
+  // Получаем workflow опции на основе выбранного group_title
+  const filteredWorkflowOptions = useMemo(() => {
+    if (!currentGroupTitle) {
+      return [];
+    }
+
+    // Выбираем нужный маппинг в зависимости от прав пользователя
+    const workflowMap = isAdmin
+      ? workflowOptionsByGroupTitle
+      : workflowOptionsLimitedByGroupTitle;
+
+    // Получаем workflow опции для выбранного group_title
+    const workflowsForGroup = workflowMap[currentGroupTitle] || workflowMap.Default || [];
+
+    return workflowsForGroup.map((w) => ({ value: w, label: w }));
+  }, [currentGroupTitle, isAdmin]);
+
   const currentWorkflow = formInstance.getValues().workflow;
   const isFinalWorkflow = FINAL_WORKFLOWS.includes(currentWorkflow);
   const isWorkflowDisabled = !isAdmin && isFinalWorkflow;
-
-  const filteredWorkflowOptions = workflowOptions
-    .map((w) => ({ value: w, label: w }));
 
   return (
     <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
