@@ -81,7 +81,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
   // Убираем локальное состояние - всегда смотрим на тикет
 
   const { userId } = useUser();
-  const { seenMessages, socketRef } = useSocket();
+  const { socketRef } = useSocket();
   const { markMessagesAsRead, getTicketById } = useApp();
 
   // Получаем actionNeeded всегда из AppContext
@@ -119,7 +119,6 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
 
     if (!chat.id) return;
 
-
     try {
       // Отправляем CONNECT через сокет
       if (socketRef?.current?.readyState === WebSocket.OPEN) {
@@ -130,8 +129,13 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         socketRef.current.send(JSON.stringify(connectPayload));
       }
 
-      // Помечаем сообщения как прочитанные
-      seenMessages(chat.id, userId);
+      // Отправляем seen через API (вместо WebSocket)
+      await api.messages.send.markSeen({ 
+        ticket_id: chat.id, 
+        user_id: userId 
+      });
+      
+      // Локально обновляем UI
       markMessagesAsRead(chat.id, chat.unseen_count || 0);
       
       // НЕ меняем action_needed - только читаем чат
@@ -155,7 +159,7 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
       });
       // НЕ меняем локальное состояние - ждем TICKET_UPDATE от сервера
       
-      // Отправляем SEEN событие через сокет (как в ChatInput)
+      // Отправляем CONNECT через сокет
       if (socketRef?.current?.readyState === WebSocket.OPEN) {
         const connectPayload = {
           type: TYPE_SOCKET_EVENTS.CONNECT,
@@ -164,8 +168,13 @@ export const ChatListItem = ({ chat, style, selectTicketId }) => {
         socketRef.current.send(JSON.stringify(connectPayload));
       }
       
-      // Помечаем сообщения как прочитанные
-      seenMessages(chat.id, userId);
+      // Отправляем seen через API (вместо WebSocket)
+      await api.messages.send.markSeen({ 
+        ticket_id: chat.id, 
+        user_id: userId 
+      });
+      
+      // Локально обновляем UI
       markMessagesAsRead(chat.id, chat.unseen_count);
     } catch (error) {
       // Failed to update action_needed

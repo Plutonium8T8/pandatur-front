@@ -75,7 +75,7 @@ export const messages = {
       });
       return data;
     },
-    
+
     viber_bot: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/viber-bot", body, {
@@ -95,6 +95,14 @@ export const messages = {
     email: async (body) => {
       const token = Cookies.get("jwt");
       const { data } = await baseAxios.post("/messages/send/email", body, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      return data;
+    },
+
+    markSeen: async (body) => {
+      const token = Cookies.get("jwt");
+      const { data } = await baseAxios.post("api/messages-seen", body, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return data;

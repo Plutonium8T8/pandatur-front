@@ -65,7 +65,7 @@ export const ChatInput = ({
 
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
-  const { seenMessages, socketRef } = useSocket();
+  const { socketRef } = useSocket();
   const { markMessagesAsRead, getTicketById } = useApp();
 
   // Получаем данные о воронке и email адресах
@@ -191,21 +191,30 @@ export const ChatInput = ({
     };
   };
 
-  const handleMarkAsRead = () => {
+  const handleMarkAsRead = async () => {
     if (!ticketId) return;
     
-    
-    if (socketRef?.current?.readyState === WebSocket.OPEN) {
-      const connectPayload = {
-        type: TYPE_SOCKET_EVENTS.CONNECT,
-        data: { ticket_id: [ticketId] },
-      };
-      socketRef.current.send(JSON.stringify(connectPayload));
-    } else {
-      // Socket not ready for CONNECT
+    try {
+      // Отправляем CONNECT через сокет
+      if (socketRef?.current?.readyState === WebSocket.OPEN) {
+        const connectPayload = {
+          type: TYPE_SOCKET_EVENTS.CONNECT,
+          data: { ticket_id: [ticketId] },
+        };
+        socketRef.current.send(JSON.stringify(connectPayload));
+      }
+      
+      // Отправляем seen через API (вместо WebSocket)
+      await api.messages.send.markSeen({ 
+        ticket_id: ticketId, 
+        user_id: userId 
+      });
+      
+      // Локально обновляем UI
+      markMessagesAsRead(ticketId, unseenCount);
+    } catch (error) {
+      // Failed to mark messages as read
     }
-    seenMessages(ticketId, userId);
-    markMessagesAsRead(ticketId, unseenCount);
   };
 
   const sendMessage = async () => {
@@ -240,7 +249,7 @@ export const ChatInput = ({
         await Promise.resolve(onSendMessage(payloadText));
       }
 
-      handleMarkAsRead();
+      await handleMarkAsRead();
       clearState();
     } catch (e) {
       // Failed to send message
