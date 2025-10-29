@@ -5,7 +5,7 @@ import {
   TagsInput,
   Box,
 } from "@mantine/core";
-import { useEffect, useContext, useRef, useMemo } from "react";
+import { useEffect, useContext, useRef, useMemo, useState } from "react";
 import {
   priorityOptions,
   groupTitleOptions,
@@ -27,6 +27,9 @@ export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { accessibleGroupTitles, isAdmin } = useContext(AppContext);
   const isInitialized = useRef(false);
+  
+  // Используем состояние для отслеживания изменений group_title
+  const [currentGroupTitle, setCurrentGroupTitle] = useState(formInstance.getValues().group_title);
 
   const formattedTechnicians = formatMultiSelectData(technicians);
 
@@ -42,6 +45,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         group_title: data.group_title,
         description: data.description,
       });
+      setCurrentGroupTitle(data.group_title);
       isInitialized.current = true;
     }
   }, [data, formInstance]);
@@ -49,9 +53,6 @@ export const GeneralForm = ({ data, formInstance }) => {
   const filteredGroupTitleOptions = groupTitleOptions.filter((g) =>
     accessibleGroupTitles.includes(g.value)
   );
-
-  // Получаем текущий group_title из формы
-  const currentGroupTitle = formInstance.getValues().group_title;
 
   // Сбрасываем workflow при изменении group_title, если текущий workflow не подходит
   useEffect(() => {
@@ -103,7 +104,12 @@ export const GeneralForm = ({ data, formInstance }) => {
         searchable
         clearable
         key={formInstance.key("group_title")}
-        {...formInstance.getInputProps("group_title")}
+        value={formInstance.getValues().group_title}
+        onChange={(value) => {
+          formInstance.setFieldValue("group_title", value);
+          setCurrentGroupTitle(value);
+        }}
+        error={formInstance.errors.group_title}
         mb="md"
       />
 
