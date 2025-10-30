@@ -425,7 +425,7 @@ const ChatList = ({ ticketId }) => {
 
                 // Если action_needed не задан явно, устанавливаем его в true по умолчанию
                 if (combined.action_needed === undefined) {
-                  combined.action_needed = true;
+                  combined.action_needed = null;
                 }
 
                 // Если фильтры пустые, применяем дефолтные
