@@ -3472,16 +3472,6 @@ export const translations = {
     RU: "Ошибка при удалении контакта",
     EN: "Error deleting contact",
   },
-  "Confirmare ștergere": {
-    RO: "Confirmare ștergere",
-    RU: "Подтверждение удаления",
-    EN: "Confirm deletion",
-  },
-  "Șterge": {
-    RO: "Șterge",
-    RU: "Удалить",
-    EN: "Delete",
-  },
   "Sunteți sigur că doriți să ștergeți acest contact?": {
     RO: "Sunteți sigur că doriți să ștergeți acest contact?",
     RU: "Вы уверены, что хотите удалить этот контакт?",
