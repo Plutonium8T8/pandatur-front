@@ -27,7 +27,7 @@ export const GeneralForm = ({ data, formInstance }) => {
   const { technicians } = useGetTechniciansList();
   const { accessibleGroupTitles, isAdmin } = useContext(AppContext);
   const isInitialized = useRef(false);
-  
+
   // Используем состояние для отслеживания изменений group_title
   const [currentGroupTitle, setCurrentGroupTitle] = useState(formInstance.getValues().group_title);
 
@@ -119,9 +119,20 @@ export const GeneralForm = ({ data, formInstance }) => {
         data={filteredWorkflowOptions}
         clearable
         searchable
+        required
         disabled={isWorkflowDisabled}
         key={formInstance.key("workflow")}
         {...formInstance.getInputProps("workflow")}
+      />
+
+      <UserGroupMultiSelect
+        mt="md"
+        label={getLanguageByKey("Responsabil")}
+        placeholder={getLanguageByKey("Selectează responsabil")}
+        value={formInstance.getValues().technician_id ? [formInstance.getValues().technician_id] : []}
+        onChange={(value) => formInstance.setFieldValue("technician_id", value[0] || undefined)}
+        techniciansData={formattedTechnicians}
+        mode="single"
       />
 
       <Select
@@ -152,15 +163,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         {...formInstance.getInputProps("tags")}
       />
 
-      <UserGroupMultiSelect
-        mt="md"
-        label={getLanguageByKey("Responsabil")}
-        placeholder={getLanguageByKey("Selectează responsabil")}
-        value={formInstance.getValues().technician_id ? [formInstance.getValues().technician_id] : []}
-        onChange={(value) => formInstance.setFieldValue("technician_id", value[0] || undefined)}
-        techniciansData={formattedTechnicians}
-        mode="single"
-      />
+
 
       <Textarea
         mt="md"

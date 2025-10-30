@@ -409,7 +409,7 @@ export const UserGroupMultiSelect = ({
 
 
   return (
-    <Box>
+    <Box mt="xs">
       <MultiSelect
         label={label}
         placeholder={actualPlaceholder}
@@ -422,7 +422,7 @@ export const UserGroupMultiSelect = ({
         renderOption={renderOption}
         disabled={disabled}
         styles={{
-          label: { fontSize: 13, fontWeight: 500, marginBottom: 8 },
+          label: { fontSize: 14, fontWeight: 500 },
           input: {
             borderRadius: 4,
             fontSize: 14,

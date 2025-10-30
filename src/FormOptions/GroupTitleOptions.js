@@ -8,7 +8,7 @@ export const groupTitleOptions = [
     { value: "BusinessGroups", label: "Business groups" },
     { value: "Agency", label: "Agency" },
     { value: "GreenCard", label: "Green Card" },
-    { value: "SalesUA", label: "SALES UA" },
+    { value: "SalesUA", label: "UA Sales" },
     { value: "ORHEI", label: "Orhei Franchise" },
     { value: "CANTEMIR", label: "Cantemir Franchise" },
     { value: "EDINET", label: "Edinet Franchise" },
