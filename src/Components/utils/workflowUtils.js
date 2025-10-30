@@ -132,10 +132,13 @@ export const workflowOptionsHR = [
 ];
 
 export const workflowOptionsFranchisePandaTur = [
-    "Incoming",
-    "New!!!",
-    "+",
-    "-"
+    "Interesat",
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsMarketing = [
@@ -258,10 +261,12 @@ export const workflowOptionsLimitedHR = [
 ];
 
 export const workflowOptionsLimitedFranchisePandaTur = [
-    "Incoming",
-    "New!!!",
-    "+",
-    "-"
+    "Luat în lucru",
+    "Ofertă trimisă",
+    "Aprobat cu client",
+    "Contract încheiat",
+    "Realizat cu succes",
+    "Închis și nerealizat"
 ];
 
 export const workflowOptionsLimitedMarketing = [
@@ -343,12 +348,12 @@ export const userGroupsToGroupTitle = {
     "IT dep.": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
     "Quality Department": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
     "Marketing": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA", "HR", "FranchisePandaTur"],
-    "Front Office": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
     "Distribution": [""],
-    "Back Flagman": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
-    "Back Minions": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing"],
+    "Front Office": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing", "Filiale", "GreenCard", "FranchisePandaTur"],
+    "Back Flagman": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing", "Filiale", "GreenCard", "FranchisePandaTur"],
+    "Back Minions": ["MD", "RO", "HR", "SalesUA", "IndividualGroups", "Marketing", "Filiale", "GreenCard", "FranchisePandaTur"],
     "Back Headline": ["MD"],
-    "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
+    // "TestGroup": ["MD", "RO", "Filiale", "Francize", "Marketing", "IndividualGroups", "BusinessGroups", "Agency", "GreenCard", "SalesUA", "ORHEI", "CANTEMIR", "EDINET", "DROCHIA", "IALOVENI", "BUIUCANI", "CAUSENI", "SOLDANESTI", "REZINA", "RASCANI", "FranchiseTimisoara", "NISPORENI", "FranchiseCluj", "STAUCENI", "HANCESTI", "CIMISLIA",],
 
     // RO 5
     "Call Centre RO": ["RO"],
