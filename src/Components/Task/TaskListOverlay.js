@@ -256,10 +256,10 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 </Text>
               </Group>
               <Group gap="xs">
-                <Text size="sm" style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}>
+                <text size="sm" style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}>
                   {taskEdits[id]?.scheduled_time ? formatDate(taskEdits[id].scheduled_time) : ""}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
-                </Text>
+                </text>
                 {expandedCard === id ? <FaChevronUp size={14} /> : <FaChevronDown size={14} />}
               </Group>
             </Group>
