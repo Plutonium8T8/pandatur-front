@@ -1,5 +1,5 @@
 import { Select, NumberInput, Box } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { MdOutlineEuroSymbol } from "react-icons/md";
 import { useEffect, useRef } from "react";
 import dayjs from "dayjs";
@@ -46,11 +46,6 @@ export const TicketInfoForm = ({
     }
   }, [data, formInstance]);
 
-  const parseDate = (input) => {
-    const parsed = dayjs(input, YYYY_MM_DD);
-    return parsed.isValid() ? parsed.toDate() : new Date(NaN);
-  };
-
   const getDayPropsWithHighlight = (date) => {
     const isToday = dayjs(date).isSame(dayjs(), 'day');
     return {
@@ -76,59 +71,51 @@ export const TicketInfoForm = ({
         {...formInstance.getInputProps("buget")}
       />
 
-      <DateInput
+      <DatePickerInput
         key={formInstance.key("data_venit_in_oficiu")}
         mt="md"
         label={getLanguageByKey("Data venit in oficiu")}
         placeholder={getLanguageByKey("Selectează data venirii în oficiu")}
-        allowDeselect
         clearable
         valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_venit_in_oficiu")}
-        dateParser={parseDate}
         getDayProps={getDayPropsWithHighlight}
       />
 
-      <DateInput
+      <DatePickerInput
         key={formInstance.key("data_plecarii")}
         mt="md"
         label={getLanguageByKey("Data și ora plecării")}
         placeholder={getLanguageByKey("Data și ora plecării")}
-        allowDeselect
         clearable
         valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_plecarii")}
-        dateParser={parseDate}
         getDayProps={getDayPropsWithHighlight}
       />
 
-      <DateInput
+      <DatePickerInput
         key={formInstance.key("data_intoarcerii")}
         mt="md"
         label={getLanguageByKey("Data și ora întoarcerii")}
         placeholder={getLanguageByKey("Data și ora întoarcerii")}
-        allowDeselect
         clearable
         valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_intoarcerii")}
-        dateParser={parseDate}
         getDayProps={getDayPropsWithHighlight}
       />
 
-      <DateInput
+      <DatePickerInput
         key={formInstance.key("data_cererii_de_retur")}
         mt="md"
         label={getLanguageByKey("Data cererii de retur")}
         placeholder={getLanguageByKey("Data cererii de retur")}
-        allowDeselect
         clearable
         valueFormat={YYYY_MM_DD}
         minDate={setMinDate}
         {...formInstance.getInputProps("data_cererii_de_retur")}
-        dateParser={parseDate}
         getDayProps={getDayPropsWithHighlight}
       />
 

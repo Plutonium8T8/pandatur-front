@@ -12,6 +12,7 @@ import {
   useImperativeHandle,
 } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
+import dayjs from "dayjs";
 import { getLanguageByKey } from "../../utils";
 import { LabelSwitch } from "../../LabelSwitch";
 import { paymentStatusOptions } from "../../../FormOptions";
@@ -118,6 +119,18 @@ export const ContractFormFilter = forwardRef(
       getValues: () => form.getTransformedValues(),
     }));
 
+    const getDayPropsWithHighlight = (date) => {
+      const isToday = dayjs(date).isSame(dayjs(), 'day');
+      return {
+        style: isToday ? {
+          backgroundColor: 'var(--mantine-color-blue-1)',
+          fontWeight: 700,
+          border: '2px solid var(--mantine-color-blue-6)',
+          borderRadius: '50%',
+        } : undefined,
+      };
+    };
+
     return (
       <>
         <form id={idForm}>
@@ -135,7 +148,7 @@ export const ContractFormFilter = forwardRef(
             mt="md"
             label={getLanguageByKey("Data contractului")}
             placeholder={getLanguageByKey("Data contractului")}
-
+            getDayProps={getDayPropsWithHighlight}
             {...form.getInputProps("data_contractului")}
           />
 
@@ -147,7 +160,7 @@ export const ContractFormFilter = forwardRef(
             mt="md"
             label={getLanguageByKey("Data avansului")}
             placeholder={getLanguageByKey("Data avansului")}
-
+            getDayProps={getDayPropsWithHighlight}
             {...form.getInputProps("data_avansului")}
           />
 
@@ -159,7 +172,7 @@ export const ContractFormFilter = forwardRef(
             mt="md"
             label={getLanguageByKey("Data de plată integrală")}
             placeholder={getLanguageByKey("Data de plată integrală")}
-
+            getDayProps={getDayPropsWithHighlight}
             {...form.getInputProps("data_de_plata_integrala")}
           />
 

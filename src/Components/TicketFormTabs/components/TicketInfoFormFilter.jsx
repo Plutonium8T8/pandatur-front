@@ -12,6 +12,7 @@ import {
   useImperativeHandle,
 } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
+import dayjs from "dayjs";
 import { getLanguageByKey } from "../../utils";
 import {
   formatDateOrUndefined,
@@ -95,6 +96,18 @@ export const TicketInfoFormFilter = forwardRef(
       getValues: () => form.getTransformedValues(),
     }));
 
+    const getDayPropsWithHighlight = (date) => {
+      const isToday = dayjs(date).isSame(dayjs(), 'day');
+      return {
+        style: isToday ? {
+          backgroundColor: 'var(--mantine-color-blue-1)',
+          fontWeight: 700,
+          border: '2px solid var(--mantine-color-blue-6)',
+          borderRadius: '50%',
+        } : undefined,
+      };
+    };
+
     return (
       <>
         <form id={idForm}>
@@ -119,6 +132,7 @@ export const TicketInfoFormFilter = forwardRef(
             placeholder={getLanguageByKey("Selectează data venirii în oficiu")}
             key={form.key("data_venit_in_oficiu")}
             {...form.getInputProps("data_venit_in_oficiu")}
+            getDayProps={getDayPropsWithHighlight}
           />
 
           <DatePickerInput
@@ -131,6 +145,7 @@ export const TicketInfoFormFilter = forwardRef(
             placeholder={getLanguageByKey("Data și ora plecării")}
             key={form.key("data_plecarii")}
             {...form.getInputProps("data_plecarii")}
+            getDayProps={getDayPropsWithHighlight}
           />
 
           <DatePickerInput
@@ -143,6 +158,7 @@ export const TicketInfoFormFilter = forwardRef(
             placeholder={getLanguageByKey("Data și ora întoarcerii")}
             key={form.key("data_intoarcerii")}
             {...form.getInputProps("data_intoarcerii")}
+            getDayProps={getDayPropsWithHighlight}
           />
 
           <DatePickerInput
@@ -155,6 +171,7 @@ export const TicketInfoFormFilter = forwardRef(
             placeholder={getLanguageByKey("Data cererii de retur")}
             key={form.key("data_cererii_de_retur")}
             {...form.getInputProps("data_cererii_de_retur")}
+            getDayProps={getDayPropsWithHighlight}
           />
 
           {!hideDisabledInput && (

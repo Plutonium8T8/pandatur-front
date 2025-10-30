@@ -1,5 +1,5 @@
 import { TextInput, Select, NumberInput, Box } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { useEffect, useContext, useRef } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
 import dayjs from "dayjs";
@@ -77,11 +77,10 @@ export const ContractForm = ({
         {...formInstance.getInputProps("numar_de_contract")}
       />
 
-      <DateInput
+      <DatePickerInput
         minDate={setMinDate}
         valueFormat={YYYY_MM_DD}
         clearable
-        allowDeselect
         mt="md"
         label={getLanguageByKey("Data contractului")}
         placeholder={getLanguageByKey("Data contractului")}
@@ -90,11 +89,10 @@ export const ContractForm = ({
         getDayProps={getDayPropsWithHighlight}
       />
 
-      <DateInput
+      <DatePickerInput
         minDate={setMinDate}
         valueFormat={YYYY_MM_DD}
         clearable
-        allowDeselect
         mt="md"
         label={getLanguageByKey("Data avansului")}
         placeholder={getLanguageByKey("Data avansului")}
@@ -103,11 +101,10 @@ export const ContractForm = ({
         getDayProps={getDayPropsWithHighlight}
       />
 
-      <DateInput
+      <DatePickerInput
         minDate={setMinDate}
         valueFormat={YYYY_MM_DD}
         clearable
-        allowDeselect
         mt="md"
         label={getLanguageByKey("Data de plată integrală")}
         placeholder={getLanguageByKey("Data de plată integrală")}
