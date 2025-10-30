@@ -637,11 +637,11 @@ div[class*="mantine-"][class*="Popover-dropdown"] {
   background-color: var(--crm-ui-kit-palette-background-primary) !important;
 }
 
-button[class*="mantine-DatePicker"],
+/* button[class*="mantine-DatePicker"],
 button[class*="mantine-MonthPicker"],
 button[class*="mantine-YearPicker"] {
   color: var(--crm-ui-kit-palette-text-primary) !important;
-}
+} */
 
 button[class*="mantine-DatePicker"]:hover,
 button[class*="mantine-MonthPicker"]:hover,
