@@ -40,7 +40,7 @@ const ChatExtraInfo = ({
   const [isLoadingCombineClient, setIsLoadingClient] = useState(false);
   const [isLoadingInfoTicket, setIsLoadingInfoTicket] = useState(false);
 
-  const { setTickets } = useApp();
+  const { setTickets, isAdmin } = useApp();
   const { getUserMessages, mediaFiles } = useMessagesContext();
 
   const {
@@ -365,31 +365,37 @@ const ChatExtraInfo = ({
               ticketId={ticketId}
             />
 
-            {/* <Divider my="md" size="md" /> */}
+            {isAdmin && (
+              <>
+                <Divider my="md" size="md" />
 
-            {/* <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
-              <Merge
-                key={`merge-tickets-${ticketId}`}
-                buttonText={getLanguageByKey("combineTickets")}
-                loading={isLoadingCombineLead}
-                value={ticketId || ""}
-                onSubmit={(values, resetField) =>
-                  handleMergeClientsData(values, resetField)
-                }
-                placeholder={getLanguageByKey("Introduceți ID lead")}
-              />
-            </Box>
+                <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
+                  <Merge
+                    label={getLanguageByKey("combineTickets")}
+                    key={`merge-tickets-${ticketId}`}
+                    buttonText={getLanguageByKey("combineTickets")}
+                    loading={isLoadingCombineLead}
+                    value={ticketId || ""}
+                    onSubmit={(values, resetField) =>
+                      handleMergeClientsData(values, resetField)
+                    }
+                    placeholder={getLanguageByKey("Introduceți ID lead")}
+                  />
+                </Box>
 
-            <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
-              <Merge
-                key={`merge-clients-${selectedClient.payload?.id}`}
-                buttonText={getLanguageByKey("combineClient")}
-                loading={isLoadingCombineClient}
-                value={selectedClient.payload?.id || ""}
-                placeholder={getLanguageByKey("Introduceți ID client")}
-                onSubmit={(values) => handleMergeData(values)}
-              />
-            </Box> */}
+                <Box mt="md" bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
+                  <Merge
+                    label={getLanguageByKey("combineClient")}
+                    key={`merge-clients-${selectedClient.payload?.id}`}
+                    buttonText={getLanguageByKey("combineClient")}
+                    loading={isLoadingCombineClient}
+                    value={selectedClient.payload?.id || ""}
+                    placeholder={getLanguageByKey("Introduceți ID client")}
+                    onSubmit={(values) => handleMergeData(values)}
+                  />
+                </Box>
+              </>
+            )}
           </Box>
         </Tabs.Panel>
 

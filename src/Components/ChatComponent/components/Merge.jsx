@@ -8,6 +8,7 @@ export const Merge = ({
   onSubmit,
   loading,
   buttonText,
+  label,
 }) => {
   const field = useField({
     initialValue: "",
@@ -53,6 +54,7 @@ export const Merge = ({
       <NumberInput
         hideControls
         mt="md"
+        label={label}
         placeholder={placeholder}
         {...field.getInputProps()}
       />
