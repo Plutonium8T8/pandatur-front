@@ -10,10 +10,16 @@ export const SocketProvider = ({ children }) => {
 
   const socketRef = useRef(null);
   const [val, setVal] = useState(null);
+  const [isConnected, setIsConnected] = useState(false);
 
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 3;
   const reconnectDelay = 10000;
+
+  const pingIntervalRef = useRef(null);
+  const pongTimeoutRef = useRef(null);
+  const pingInterval = 30000; // Отправляем ping каждые 30 секунд
+  const pongTimeout = 10000; // Ожидаем pong 10 секунд
 
   const onOpenCallbacksRef = useRef(new Set());
 
@@ -58,6 +64,37 @@ export const SocketProvider = ({ children }) => {
 
   const sendJSON = useCallback((type, data) => safeSend({ type, data }), [safeSend]);
 
+  const startPingPong = useCallback(() => {
+    // Очищаем предыдущие таймеры
+    if (pingIntervalRef.current) clearInterval(pingIntervalRef.current);
+    if (pongTimeoutRef.current) clearTimeout(pongTimeoutRef.current);
+
+    // Отправляем ping каждые 30 секунд
+    pingIntervalRef.current = setInterval(() => {
+      const sent = safeSend({ type: 'ping' });
+      if (sent) {
+        // Устанавливаем таймаут на получение pong
+        pongTimeoutRef.current = setTimeout(() => {
+          // Если pong не получен, закрываем соединение для переподключения
+          if (socketRef.current) {
+            socketRef.current.close();
+          }
+        }, pongTimeout);
+      }
+    }, pingInterval);
+  }, [safeSend, pongTimeout, pingInterval]);
+
+  const stopPingPong = useCallback(() => {
+    if (pingIntervalRef.current) {
+      clearInterval(pingIntervalRef.current);
+      pingIntervalRef.current = null;
+    }
+    if (pongTimeoutRef.current) {
+      clearTimeout(pongTimeoutRef.current);
+      pongTimeoutRef.current = null;
+    }
+  }, []);
+
   const joinTicketRoom = useCallback((ticketId, clientId) => {
     if (!ticketId || !clientId) return;
     sendJSON(TYPE_SOCKET_EVENTS.TICKET_JOIN, { ticket_id: ticketId, client_id: clientId });
@@ -95,13 +132,26 @@ export const SocketProvider = ({ children }) => {
 
       socket.onopen = () => {
         reconnectAttempts.current = 0;
+        setIsConnected(true);
         enqueueSnackbar(getLanguageByKey("socketConnectionEstablished"), { variant: "success" });
         onOpenCallbacksRef.current.forEach((cb) => { try { cb(); } catch { } });
+        startPingPong();
       };
 
       socket.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
+          
+          // Обрабатываем pong сообщение
+          if (parsed.type === 'pong') {
+            // Очищаем таймаут ожидания pong
+            if (pongTimeoutRef.current) {
+              clearTimeout(pongTimeoutRef.current);
+              pongTimeoutRef.current = null;
+            }
+            return;
+          }
+          
           // Обновляем только если это новое сообщение или другой тип события
           setVal(parsed);
           if (parsed?.type) emit(parsed.type, parsed);
@@ -110,10 +160,13 @@ export const SocketProvider = ({ children }) => {
       };
 
       socket.onerror = () => {
+        setIsConnected(false);
         enqueueSnackbar(getLanguageByKey("unexpectedSocketErrorDetected"), { variant: "info" });
       };
 
       socket.onclose = () => {
+        setIsConnected(false);
+        stopPingPong();
         reconnectAttempts.current += 1;
         reconnectTimer = setTimeout(connect, reconnectDelay);
       };
@@ -121,16 +174,18 @@ export const SocketProvider = ({ children }) => {
 
     connect();
     return () => {
+      stopPingPong();
       try { socket && socket.close(); } catch { }
       clearTimeout(reconnectTimer);
     };
-  }, [enqueueSnackbar, emit]); // Добавляем emit обратно в зависимости
+  }, [enqueueSnackbar, emit, startPingPong, stopPingPong]); // Добавляем зависимости
 
   return (
     <SocketContext.Provider
       value={{
         socketRef,
         sendedValue: val,
+        isConnected,
         sendJSON,
         joinTicketRoom,
         leaveTicketRoom,

@@ -25,8 +25,18 @@ import { safeParseJson } from "../UsersComponent/rolesUtils";
 import { convertRolesToMatrix } from "../UsersComponent/rolesUtils";
 import { hasRouteAccess, hasStrictPermission } from "../utils/permissions";
 import { AppContext } from "../../contexts/AppContext";
+import { SocketContext } from "../../contexts/SocketContext";
 
 const LOGO = "/logo.png";
+
+const ConnectionIndicator = ({ isConnected }) => {
+  return (
+    <span
+      className={`connection-indicator ${isConnected ? 'connected' : 'disconnected'}`}
+      title={isConnected ? 'Подключен к сокету' : 'Нет подключения'}
+    />
+  );
+};
 
 export const SideBar = () => {
   const location = useLocation();
@@ -39,6 +49,7 @@ export const SideBar = () => {
   const { toggleTheme, isDark } = useTheme();
 
   const { customGroupTitle, groupTitleForApi } = useContext(AppContext);
+  const { isConnected } = useContext(SocketContext);
   const currentGroupTitle = customGroupTitle || groupTitleForApi;
 
   const isActive = (page) => {
@@ -72,8 +83,9 @@ export const SideBar = () => {
         <div className="mobile-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img className="logo" src={LOGO} alt="PANDATUR CRM" />
-            <div style={{ fontSize: '12px', fontWeight: 'bold' }}>
+            <div style={{ fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
               {surname} {name}
+              <ConnectionIndicator isConnected={isConnected} />
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -142,7 +154,10 @@ export const SideBar = () => {
           {isMobile && (
             <>
               <MenuItem>
-                {surname} {name} ({userId})
+                <div style={{ display: 'flex', alignItems: 'center',aligntext: 'center', gap: '8px' }}>
+                  {surname} {name} ({userId})
+                  <ConnectionIndicator isConnected={isConnected} />
+                </div>
               </MenuItem>
               <Divider />
               
@@ -304,7 +319,10 @@ export const SideBar = () => {
           {!isMobile && (
             <>
               <MenuItem>
-                {surname} {name} ({userId})
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {surname} {name} ({userId})
+                  <ConnectionIndicator isConnected={isConnected} />
+                </div>
               </MenuItem>
               <Divider />
               <MenuItem icon={<FaSignOutAlt />} onClick={logout}>

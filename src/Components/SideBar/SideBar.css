@@ -49,6 +49,33 @@ aside[class*="css-"] {
   border-right: 1px solid var(--crm-ui-kit-palette-border-default);
 }
 
+/* Индикатор подключения к сокету */
+.connection-indicator {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.connection-indicator.connected {
+  background-color: #4caf50;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.connection-indicator.disconnected {
+  background-color: red;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
 /* Мобильная адаптация */
 @media (max-width: 768px) {
   .ps-sidebar-root {
