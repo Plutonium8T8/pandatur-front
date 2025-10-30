@@ -51,6 +51,18 @@ export const TicketInfoForm = ({
     return parsed.isValid() ? parsed.toDate() : new Date(NaN);
   };
 
+  const getDayPropsWithHighlight = (date) => {
+    const isToday = dayjs(date).isSame(dayjs(), 'day');
+    return {
+      style: isToday ? {
+        backgroundColor: 'var(--mantine-color-blue-1)',
+        fontWeight: 700,
+        border: '2px solid var(--mantine-color-blue-6)',
+        borderRadius: '50%',
+      } : undefined,
+    };
+  };
+
   return (
     <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
       <NumberInput
@@ -75,6 +87,7 @@ export const TicketInfoForm = ({
         minDate={setMinDate}
         {...formInstance.getInputProps("data_venit_in_oficiu")}
         dateParser={parseDate}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <DateInput
@@ -88,6 +101,7 @@ export const TicketInfoForm = ({
         minDate={setMinDate}
         {...formInstance.getInputProps("data_plecarii")}
         dateParser={parseDate}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <DateInput
@@ -101,6 +115,7 @@ export const TicketInfoForm = ({
         minDate={setMinDate}
         {...formInstance.getInputProps("data_intoarcerii")}
         dateParser={parseDate}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <DateInput
@@ -114,6 +129,7 @@ export const TicketInfoForm = ({
         minDate={setMinDate}
         {...formInstance.getInputProps("data_cererii_de_retur")}
         dateParser={parseDate}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       {!hideDisabledInput && (

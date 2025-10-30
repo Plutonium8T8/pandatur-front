@@ -2,6 +2,7 @@ import { TextInput, Select, NumberInput, Box } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useEffect, useContext, useRef } from "react";
 import { MdOutlineEuroSymbol } from "react-icons/md";
+import dayjs from "dayjs";
 import { getLanguageByKey, parseServerDate } from "../utils";
 import { LabelSwitch } from "../LabelSwitch";
 import { paymentStatusOptions } from "../../FormOptions";
@@ -55,6 +56,18 @@ export const ContractForm = ({
     }
   }, [data, formInstance]);
 
+  const getDayPropsWithHighlight = (date) => {
+    const isToday = dayjs(date).isSame(dayjs(), 'day');
+    return {
+      style: isToday ? {
+        backgroundColor: 'var(--mantine-color-blue-1)',
+        fontWeight: 700,
+        border: '2px solid var(--mantine-color-blue-6)',
+        borderRadius: '50%',
+      } : undefined,
+    };
+  };
+
   return (
     <Box bg="var(--crm-ui-kit-palette-background-primary-disabled)" p="md" style={{ borderRadius: 8 }}>
       <TextInput
@@ -74,6 +87,7 @@ export const ContractForm = ({
         placeholder={getLanguageByKey("Data contractului")}
         key={formInstance.key("data_contractului")}
         {...formInstance.getInputProps("data_contractului")}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <DateInput
@@ -86,6 +100,7 @@ export const ContractForm = ({
         placeholder={getLanguageByKey("Data avansului")}
         key={formInstance.key("data_avansului")}
         {...formInstance.getInputProps("data_avansului")}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <DateInput
@@ -98,6 +113,7 @@ export const ContractForm = ({
         placeholder={getLanguageByKey("Data de plată integrală")}
         key={formInstance.key("data_de_plata_integrala")}
         {...formInstance.getInputProps("data_de_plata_integrala")}
+        getDayProps={getDayPropsWithHighlight}
       />
 
       <LabelSwitch
