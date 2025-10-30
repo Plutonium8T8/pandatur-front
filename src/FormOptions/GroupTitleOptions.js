@@ -6,7 +6,6 @@ export const groupTitleOptions = [
     { value: "Filiale", label: "Filiale MD" },
     { value: "IndividualGroups", label: "Individual groups" },
     { value: "BusinessGroups", label: "Business groups" },
-    { value: "Francize", label: "Francize" },
     { value: "Marketing", label: "Marketing" },
     { value: "Agency", label: "Agency" },
     { value: "GreenCard", label: "Green Card" },
