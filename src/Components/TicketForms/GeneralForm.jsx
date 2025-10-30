@@ -102,6 +102,7 @@ export const GeneralForm = ({ data, formInstance }) => {
         placeholder={getLanguageByKey("selectGroup")}
         data={filteredGroupTitleOptions}
         searchable
+        required
         clearable
         key={formInstance.key("group_title")}
         value={formInstance.getValues().group_title}

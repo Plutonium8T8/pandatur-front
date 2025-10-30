@@ -3532,10 +3532,15 @@ export const translations = {
     "RU": "Дополнительная информация",
     "EN": "Additional Information"
   },
+  "ChatRead": {
+    "RO": "Conversație inchisă",
+    "RU": "Беседа закрыта",
+    "EN": "Conversation closed"
+  },
   "ReadChat": {
-    "RO": "Citește chatul",
-    "RU": "Прочитать чат",
-    "EN": "Read chat"
+    RO: "Conversație deschisă",
+    RU: "Беседа открыта",
+    EN: "Conversation opened"
   },
   "NeedAnswer": {
     "RO": "Necesită răspuns",
@@ -3548,14 +3553,14 @@ export const translations = {
     "EN": "No answer needed"
   },
   "Acțiune necesară": {
-    RO: "Necesită acțiune",
-    RU: "Требуется действие",
-    EN: "Action needed"
+    "RO": "Necesită răspuns",
+    "RU": "Нужен ответ",
+    "EN": "Needs answer"
   },
   "Nu acțiune necesară": {
-    RO: "Nu necesită acțiune",
-    RU: "Не требуется действие",
-    EN: "No action needed"
+    "RO": "Nu necesită răspuns",
+    "RU": "Не требует ответа",
+    "EN": "No answer needed"
   },
   "Mesaje necitite": {
     RO: "Mesaje necitite",
@@ -3883,11 +3888,6 @@ export const translations = {
     RO: "Valoare nouă (opțional)",
     RU: "Новое значение (необязательно)",
     EN: "New value (optional)"
-  },
-  "ChatRead": {
-    RO: "Chat citit",
-    RU: "Чат прочитан",
-    EN: "Chat read"
   },
   "CallStats": {
     RO: "Statistici apeluri",
