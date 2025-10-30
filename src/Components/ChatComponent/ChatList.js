@@ -156,6 +156,48 @@ const ChatList = ({ ticketId }) => {
   const ticketFormRef = useRef();
   const messageFormRef = useRef();
 
+  // Функция для создания дефолтных фильтров
+  const getDefaultFilters = useCallback(() => {
+    const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
+    return {
+      action_needed: true,
+      workflow: filteredWorkflow,
+      technician_id: [String(userId)],
+      unseen: "true",
+      last_message_author: [0]
+    };
+  }, [workflowOptions, userId]);
+
+  // Функция для применения фильтров
+  const applyFilters = useCallback((filters) => {
+    setChatFilters(filters);
+    fetchChatFilteredTickets(filters);
+    setIsChatFiltered(true);
+  }, [fetchChatFilteredTickets, setIsChatFiltered]);
+
+  // Функция для сброса фильтров
+  const resetFilters = useCallback(() => {
+    const defaultFilters = getDefaultFilters();
+    applyFilters(defaultFilters);
+  }, [getDefaultFilters, applyFilters]);
+
+  // Вспомогательные функции для работы с фильтрами
+  const isEmpty = useCallback((v) =>
+    v === undefined ||
+    v === null ||
+    v === "" ||
+    (Array.isArray(v) && v.length === 0) ||
+    (typeof v === "object" && Object.keys(v).length === 0)
+  , []);
+
+  const mergeFilters = useCallback((...filters) =>
+    Object.fromEntries(
+      Object.entries(Object.assign({}, ...filters)).filter(
+        ([_, v]) => !isEmpty(v)
+      )
+    )
+  , [isEmpty]);
+
   // URL синхронизация - работает автоматически, не нарушая существующую логику
   useChatUrlSync({
     chatFilters,
@@ -205,22 +247,11 @@ const ChatList = ({ ticketId }) => {
   // Загружаем тикеты с фильтрами по умолчанию при первой загрузке
   useEffect(() => {
     if (isInitialLoad && workflowOptions.length > 0 && !isChatFiltered && userId) {
-      // Формируем дефолтные фильтры
-      const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
-
-      const defaultFilters = {
-        action_needed: true,
-        workflow: filteredWorkflow,
-        technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
-        unseen: "true", // Только тикеты с непрочитанными сообщениями
-        last_message_author: [0]
-      };
-
-      setChatFilters(defaultFilters);
-      fetchChatFilteredTickets(defaultFilters);
+      const defaultFilters = getDefaultFilters();
+      applyFilters(defaultFilters);
       setIsInitialLoad(false);
     }
-  }, [isInitialLoad, workflowOptions, isChatFiltered, fetchChatFilteredTickets, userId]);
+  }, [isInitialLoad, workflowOptions, isChatFiltered, userId, getDefaultFilters, applyFilters]);
 
   const baseTickets = useMemo(() => {
     return isChatFiltered ? chatFilteredTickets : tickets;
@@ -374,17 +405,7 @@ const ChatList = ({ ticketId }) => {
             <Button
               variant="outline"
               onClick={() => {
-                // Возвращаемся к дефолтным фильтрам
-                const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
-                const defaultFilters = {
-                  action_needed: true,
-                  workflow: filteredWorkflow,
-                  technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
-                  unseen: "true", // Только тикеты с непрочитанными сообщениями
-                };
-
-                setChatFilters(defaultFilters);
-                fetchChatFilteredTickets(defaultFilters);
+                resetFilters();
                 setOpenFilter(false);
               }}
             >
@@ -397,20 +418,6 @@ const ChatList = ({ ticketId }) => {
               variant="filled"
               loading={chatSpinner}
               onClick={() => {
-                const isEmpty = (v) =>
-                  v === undefined ||
-                  v === null ||
-                  v === "" ||
-                  (Array.isArray(v) && v.length === 0) ||
-                  (typeof v === "object" && Object.keys(v).length === 0);
-
-                const mergeFilters = (...filters) =>
-                  Object.fromEntries(
-                    Object.entries(Object.assign({}, ...filters)).filter(
-                      ([_, v]) => !isEmpty(v)
-                    )
-                  );
-
                 const ticketValues = ticketFormRef.current?.getValues?.() || {};
                 const messageValues = messageFormRef.current?.getValues?.() || {};
 
@@ -423,20 +430,9 @@ const ChatList = ({ ticketId }) => {
 
                 // Если фильтры пустые, применяем дефолтные
                 if (Object.keys(combined).length === 0) {
-                  const filteredWorkflow = workflowOptions.filter((w) => !EXCLUDED_WORKFLOWS.includes(w));
-                  const defaultFilters = {
-                    action_needed: true,
-                    workflow: filteredWorkflow,
-                    technician_id: [String(userId)], // Устанавливаем текущего пользователя как ответственного (массив строк)
-                    unseen: "true", // Только тикеты с непрочитанными сообщениями
-                  };
-
-                  setChatFilters(defaultFilters);
-                  fetchChatFilteredTickets(defaultFilters);
+                  resetFilters();
                 } else {
-                  fetchChatFilteredTickets(combined);
-                  setChatFilters(combined);
-                  setIsChatFiltered(true);
+                  applyFilters(combined);
                 }
 
                 setOpenFilter(false);

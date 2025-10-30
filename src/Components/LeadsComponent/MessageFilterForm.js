@@ -107,7 +107,7 @@ export const MessageFilterForm = forwardRef(({ initialData, loading }, ref) => {
                 };
             }
             if (lastMessageAuthor?.length) filters.last_message_author = lastMessageAuthor.map(Number);
-            if (action_needed !== null) filters.action_needed = action_needed === "true";
+            if (action_needed !== null) filters.action_needed = action_needed !== null;
             if (unseen !== null) filters.unseen = unseen;
 
             return filters;
