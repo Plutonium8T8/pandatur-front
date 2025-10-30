@@ -167,7 +167,13 @@ export const AppProvider = ({ children }) => {
       setUnreadCount((prev) => prev + totalUnread);
       const processedTickets = normalizeLightTickets(data.tickets);
       setTickets((prev) => {
-        const updated = [...prev, ...processedTickets];
+        // Создаем Set существующих ID для быстрой проверки
+        const existingIds = new Set(prev.map(t => t.id));
+        
+        // Добавляем только новые тикеты (без дубликатов)
+        const newTickets = processedTickets.filter(t => !existingIds.has(t.id));
+        const updated = [...prev, ...newTickets];
+        
         // Синхронизируем hash map
         updateTicketsMap(updated);
         return updated;
@@ -221,7 +227,13 @@ export const AppProvider = ({ children }) => {
 
         const normalized = normalizeLightTickets(res.tickets);
         setChatFilteredTickets((prev) => {
-          const updated = [...prev, ...normalized];
+          // Создаем Set существующих ID для быстрой проверки
+          const existingIds = new Set(prev.map(t => t.id));
+          
+          // Добавляем только новые тикеты (без дубликатов)
+          const newTickets = normalized.filter(t => !existingIds.has(t.id));
+          const updated = [...prev, ...newTickets];
+          
           // Синхронизируем hash map
           updateChatFilteredTicketsMap(updated);
           return updated;
@@ -606,6 +618,16 @@ export const AppProvider = ({ children }) => {
               );
             } else {
               // Добавляем новый тикет, который теперь соответствует фильтрам
+              // Дополнительная проверка: убедимся что тикета нет в массиве (на случай рассинхронизации hash map)
+              const alreadyInArray = prev.some(t => t.id === ticket_id);
+              if (alreadyInArray) {
+                // Тикет уже есть в массиве, просто обновляем его
+                chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
+                return prev.map((ticket) => 
+                  ticket.id === ticket_id ? updatedTicket : ticket
+                );
+              }
+              // Тикета нет - добавляем
               chatFilteredTicketsMap.current.set(ticket_id, updatedTicket);
               return [updatedTicket, ...prev];
             }
