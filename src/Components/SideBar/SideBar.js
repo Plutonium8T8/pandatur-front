@@ -9,7 +9,8 @@ import {
   FaSignOutAlt,
   FaCalendar,
   FaHistory,
-  FaChartPie
+  FaChartPie,
+  FaSync
 } from "react-icons/fa";
 import { FaUsers, FaBars } from "react-icons/fa6";
 import { MdLightMode, MdDarkMode } from "react-icons/md";
@@ -30,11 +31,26 @@ import { SocketContext } from "../../contexts/SocketContext";
 const LOGO = "/logo.png";
 
 const ConnectionIndicator = ({ isConnected }) => {
+  const handleReload = () => {
+    window.location.reload();
+  };
+
   return (
-    <span
-      className={`connection-indicator ${isConnected ? 'connected' : 'disconnected'}`}
-      title={isConnected ? 'Подключен к сокету' : 'Нет подключения'}
-    />
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <span
+        className={`connection-indicator ${isConnected ? 'connected' : 'disconnected'}`}
+        title={isConnected ? 'Подключен к сокету' : 'Нет подключения'}
+      />
+      {!isConnected && (
+        <button
+          onClick={handleReload}
+          className="reconnect-button"
+          title="Перезагрузить страницу"
+        >
+          <FaSync size={30} />
+        </button>
+      )}
+    </div>
   );
 };
 

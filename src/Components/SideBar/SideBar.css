@@ -76,6 +76,31 @@ aside[class*="css-"] {
   }
 }
 
+/* Кнопка переподключения */
+.reconnect-button {
+  background: transparent;
+  border: 1px solid var(--crm-ui-kit-palette-border-primary);
+  border-radius: 4px;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crm-ui-kit-palette-text-primary);
+  transition: all 0.2s ease;
+  width: 30px;
+  height: 30px;
+}
+
+.reconnect-button:hover {
+  background-color: var(--crm-ui-kit-palette-button-classic-hover-background);
+  transform: rotate(180deg);
+}
+
+.reconnect-button:active {
+  transform: scale(0.95) rotate(180deg);
+}
+
 /* Мобильная адаптация */
 @media (max-width: 768px) {
   .ps-sidebar-root {
