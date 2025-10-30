@@ -99,8 +99,10 @@ export const SideBar = () => {
         <div className="mobile-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <img className="logo" src={LOGO} alt="PANDATUR CRM" />
-            <div style={{ fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              {surname} {name}
+            <div style={{ fontSize: '12px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px', minWidth: 0, flex: 1 }}>
+              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {surname} {name}
+              </span>
               <ConnectionIndicator isConnected={isConnected} />
             </div>
           </div>
@@ -161,8 +163,8 @@ export const SideBar = () => {
         />
       )}
 
-      <BaseSideBar 
-        collapsed={isMobile ? false : isCollapsed} 
+      <BaseSideBar
+        collapsed={isMobile ? false : isCollapsed}
         className={isMobile && mobileMenuOpen ? 'mobile-open' : ''}
       >
         <Menu>
@@ -170,15 +172,17 @@ export const SideBar = () => {
           {isMobile && (
             <>
               <MenuItem>
-                <div style={{ display: 'flex', alignItems: 'center',aligntext: 'center', gap: '8px' }}>
-                  {surname} {name} ({userId})
+                <div style={{ display: 'flex', alignItems: 'center', aligntext: 'center', gap: '8px', minWidth: 0 }}>
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {surname} {name} ({userId})
+                  </span>
                   <ConnectionIndicator isConnected={isConnected} />
                 </div>
               </MenuItem>
               <Divider />
-              
+
               {/* Переключатель темы для мобильных */}
-              <MenuItem 
+              <MenuItem
                 icon={isDark ? <MdLightMode /> : <MdDarkMode />}
                 onClick={toggleTheme}
               >
@@ -187,7 +191,7 @@ export const SideBar = () => {
               <Divider />
             </>
           )}
-          
+
           {!isMobile && (
             <MenuItem
               suffix={<FaBars />}
@@ -287,13 +291,13 @@ export const SideBar = () => {
           {!isMobile && (
             <>
               {/* Переключатель темы */}
-              <MenuItem 
+              <MenuItem
                 icon={isDark ? <MdLightMode size={24} /> : <MdDarkMode size={24} />}
                 onClick={toggleTheme}
               >
                 {isDark ? "Light" : "Dark"}
               </MenuItem>
-              
+
               {/* Переключатель языка */}
               <MenuItem>
                 {isCollapsed ? (
@@ -335,10 +339,18 @@ export const SideBar = () => {
           {!isMobile && (
             <>
               <MenuItem>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  {surname} {name} ({userId})
-                  <ConnectionIndicator isConnected={isConnected} />
-                </div>
+                {isCollapsed ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    <ConnectionIndicator isConnected={isConnected} />
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      ({userId}) {surname} {name}
+                    </span>
+                    <ConnectionIndicator isConnected={isConnected} />
+                  </div>
+                )}
               </MenuItem>
               <Divider />
               <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
@@ -346,7 +358,7 @@ export const SideBar = () => {
               </MenuItem>
             </>
           )}
-          
+
           {/* Кнопка logout в мобильном меню */}
           {isMobile && (
             <MenuItem icon={<FaSignOutAlt />} onClick={logout}>
