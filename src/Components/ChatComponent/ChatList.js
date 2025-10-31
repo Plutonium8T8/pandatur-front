@@ -117,29 +117,6 @@ const searchTickets = (index, query) => {
   return Array.from(foundTickets);
 };
 
-// безопасно приводим любую дату к timestamp
-const toDate = (val) => {
-  if (!val) return null;
-  if (val instanceof Date) return isNaN(val.getTime()) ? null : val;
-  if (typeof val === "number") {
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
-  }
-  // поддержим "YYYY-MM-DD HH:mm:ss", ISO, и пр.
-  const s = String(val).trim().replace(" ", "T").replace(/Z$/, "");
-  const d = new Date(s);
-  return isNaN(d.getTime()) ? null : d;
-};
-
-const getLastMessageTime = (ticket) => {
-  // приоритет: time_sent -> last_message_time
-  const cand =
-    ticket?.time_sent ??
-    ticket?.last_message_time;
-  const d = toDate(cand);
-  return d ? d.getTime() : 0;
-};
-
 const ChatList = ({ ticketId }) => {
   const { tickets, chatFilteredTickets, fetchChatFilteredTickets, chatSpinner, isChatFiltered, setIsChatFiltered, workflowOptions, currentChatFilters } = useApp();
   const { userId } = useUser();
@@ -277,20 +254,18 @@ const ChatList = ({ ticketId }) => {
     return result;
   }, [baseTickets, searchQuery, searchIndex]);
 
-  const sortedTickets = useMemo(() => {
-    // Сортируем по времени последнего сообщения (по убыванию)
-    return [...filteredTickets].sort((a, b) => getLastMessageTime(b) - getLastMessageTime(a));
-  }, [filteredTickets]);
+  // ВАЖНО: Сортировка происходит на бэкенде, поэтому используем filteredTickets напрямую
+  // Бэкенд возвращает тикеты уже отсортированными по last_interaction_date или другому полю
 
   const ChatItem = useCallback(
     ({ index, style }) => (
       <ChatListItem
-        chat={sortedTickets[index]}
+        chat={filteredTickets[index]}
         style={style}
         selectTicketId={ticketId}
       />
     ),
-    [sortedTickets, ticketId]
+    [filteredTickets, ticketId]
   );
 
   return (
@@ -304,7 +279,7 @@ const ChatList = ({ ticketId }) => {
                 variant="filled"
                 style={{ backgroundColor: "var(--crm-ui-kit-palette-link-primary)" }}
               >
-                {sortedTickets.length}
+                {filteredTickets.length}
               </Badge>
             </Flex>
             <ActionIcon
@@ -326,14 +301,14 @@ const ChatList = ({ ticketId }) => {
         <Divider color="var(--crm-ui-kit-palette-border-default)" />
 
         <Box style={{ height: "calc(100% - 110px)", position: "relative" }} ref={wrapperChatItemRef}>
-          {sortedTickets.length === 0 ? (
+          {filteredTickets.length === 0 ? (
             <Flex h="100%" align="center" justify="center" px="md">
               <Text c="dimmed">{getLanguageByKey("Nici un lead")}</Text>
             </Flex>
           ) : (
             <FixedSizeList
               height={wrapperChatHeight}
-              itemCount={sortedTickets.length}
+              itemCount={filteredTickets.length}
               itemSize={CHAT_ITEM_HEIGHT}
               width="100%"
             >
@@ -422,11 +397,6 @@ const ChatList = ({ ticketId }) => {
                 const messageValues = messageFormRef.current?.getValues?.() || {};
 
                 const combined = mergeFilters(ticketValues, messageValues);
-
-                // Если action_needed не задан явно, устанавливаем его в true по умолчанию
-                if (combined.action_needed === undefined) {
-                  combined.action_needed = null;
-                }
 
                 // Если фильтры пустые, применяем дефолтные
                 if (Object.keys(combined).length === 0) {

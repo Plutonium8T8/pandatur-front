@@ -481,9 +481,6 @@ export const AppProvider = ({ children }) => {
         // Сообщение считается от другого пользователя, если sender_id не совпадает с текущим userId и это не система (id=1)
         const isFromAnotherUser = String(sender_id) !== String(userId) && String(sender_id) !== "1";
         
-        // Сообщение от клиента (не от системы и не от текущего пользователя)
-        const isFromClient = String(sender_id) !== String(userId) && String(sender_id) !== "1";
-        
         // Проверяем, было ли это сообщение уже обработано
         // Для звонков: первое событие - создание звонка, второе - обновление с URL записи
         const isNewMessage = message_id ? !processedMessageIds.current.has(message_id) : true;
@@ -500,8 +497,8 @@ export const AppProvider = ({ children }) => {
           }
         }
 
-        // ВАЖНО: unseen_count теперь всегда приходит через TICKET_UPDATE
-        // Здесь обновляем только информацию о последнем сообщении и action_needed
+        // ВАЖНО: unseen_count и action_needed теперь всегда приходят через TICKET_UPDATE
+        // Здесь обновляем только информацию о последнем сообщении
 
         setTickets((prev) => {
           // Используем hash map для быстрого поиска O(1)
@@ -514,17 +511,11 @@ export const AppProvider = ({ children }) => {
           const updatedTicket = {
             ...existingTicket,
             // НЕ изменяем unseen_count - он придет через TICKET_UPDATE
+            // НЕ изменяем action_needed - он придет через TICKET_UPDATE
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
-            // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
-            action_needed: isFromClient && isNewMessage ? true : existingTicket.action_needed,
           };
-
-          // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
-          if (isFromClient && isNewMessage) {
-            updatedTicket.action_needed = true;
-          }
 
           // Обновляем hash map
           ticketsMap.current.set(ticket_id, updatedTicket);
@@ -548,17 +539,11 @@ export const AppProvider = ({ children }) => {
           const updatedTicket = {
             ...ticketFromMain,
             // НЕ изменяем unseen_count - он придет через TICKET_UPDATE
+            // НЕ изменяем action_needed - он придет через TICKET_UPDATE
             last_message_type: mtype,
             last_message: msgText,
             time_sent,
-            // Устанавливаем action_needed: true ТОЛЬКО при получении сообщения от клиента
-            action_needed: isFromClient && isNewMessage ? true : ticketFromMain.action_needed,
           };
-
-          // Если это сообщение от клиента, принудительно устанавливаем action_needed: true
-          if (isFromClient && isNewMessage) {
-            updatedTicket.action_needed = true;
-          }
 
           // Проверяем, соответствует ли обновленный тикет текущим фильтрам чата
           if (isChatFiltered && Object.keys(currentChatFilters).length > 0) {
