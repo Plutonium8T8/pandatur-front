@@ -1,44 +1,24 @@
 import { FaArrowLeft } from "react-icons/fa";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, ActionIcon, Box } from "@mantine/core";
 import ChatExtraInfo from "./ChatExtraInfo";
 import { ChatMessages } from "./components";
 import { useApp, useClientContacts, useMessagesContext } from "@hooks";
 import Can from "@components/CanComponent/Can";
-import { api } from "../../api";
-import { showServerError } from "../utils";
-import { useSnackbar } from "notistack";
 
 const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
-  const { tickets, setTickets } = useApp();
+  const { getTicketById, fetchSingleTicket, tickets } = useApp();
   const { getUserMessages, messages } = useMessagesContext();
-  const { enqueueSnackbar } = useSnackbar();
   const [isLoadingTicket, setIsLoadingTicket] = useState(false);
 
-  const currentTicket = tickets.find(t => t.id === Number(ticketId));
-
-  // Функция загрузки конкретного тикета
-  const fetchSingleTicket = useCallback(async (ticketId) => {
-    if (!ticketId) return;
-    
-    setIsLoadingTicket(true);
-    try {
-      const ticket = await api.tickets.ticket.getLightById(ticketId);
-      
-      // Добавляем тикет в глобальное состояние, если его там нет
-      setTickets(prev => {
-        const exists = prev.find(t => t.id === Number(ticketId));
-        if (!exists) {
-          return [...prev, ticket];
-        }
-        return prev;
-      });
-    } catch (error) {
-      enqueueSnackbar(showServerError(error), { variant: "error" });
-    } finally {
-      setIsLoadingTicket(false);
-    }
-  }, [setTickets, enqueueSnackbar]);
+  // ВАЖНО: Всегда получаем тикет из AppContext
+  // Ищем в массиве tickets, чтобы компонент автоматически перерисовывался при обновлении
+  // Тикет обновляется через TICKET_UPDATE и fetchSingleTicket
+  const currentTicket = React.useMemo(() => {
+    if (!ticketId || !tickets?.length) return null;
+    const ticketIdNum = Number(ticketId);
+    return tickets.find(t => t.id === ticketIdNum) || getTicketById(ticketIdNum);
+  }, [ticketId, tickets, getTicketById]); // Подписываемся на tickets для автоматической перерисовки
   
   // Получаем последнее сообщение по времени для автоматического выбора платформы и контакта
   const lastMessage = React.useMemo(() => {
@@ -91,14 +71,27 @@ const SingleChat = ({ technicians, ticketId, onClose, tasks = [] }) => {
     }
   }, [ticketId, getUserMessages]);
 
-  // Загружаем тикет, если его нет в глобальном состоянии
+  // ВАЖНО: При открытии по прямой ссылке ВСЕГДА запрашиваем актуальный тикет
+  // Это гарантирует, что action_needed и другие поля будут актуальными
+  // После этого тикет будет автоматически обновляться через TICKET_UPDATE от сервера
   useEffect(() => {
-    if (ticketId && !currentTicket) {
-      fetchSingleTicket(Number(ticketId));
-    }
-  }, [ticketId, currentTicket, fetchSingleTicket]);
+    if (!ticketId) return;
+    
+    const ticketIdNum = Number(ticketId);
+    if (!ticketIdNum) return;
+    
+    setIsLoadingTicket(true);
+    
+    // ВСЕГДА запрашиваем актуальный тикет при открытии компонента
+    // fetchSingleTicket из AppContext правильно обновит тикет во всех местах
+    fetchSingleTicket(ticketIdNum)
+      .finally(() => {
+        setIsLoadingTicket(false);
+      });
+  }, [ticketId, fetchSingleTicket]);
 
-  const unseenCount = tickets.find(t => t.id === Number(ticketId))?.unseen_count;
+  // Получаем unseen_count из актуального тикета
+  const unseenCount = currentTicket?.unseen_count || 0;
 
   return (
     <div className="chat-container">

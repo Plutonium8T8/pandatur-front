@@ -886,6 +886,7 @@ export const AppProvider = ({ children }) => {
         getTicketById,
         getChatFilteredTicketById,
         getTicketByIdWithFilters,
+        fetchSingleTicket,
       }}
     >
       {children}
