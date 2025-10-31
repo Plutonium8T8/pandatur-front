@@ -18,6 +18,8 @@ export const nameExcursionOptions = [
   "Iași + Shopping la Palas Mall",
   "Maramureș – Mocănița – Cascada Cailor",
   "Sibiu – Sighișoara",
+  "Laponia",
+  "Borsec-Fontana Spa & BiquadFilterNode",
   "Tabără la Munte cu Panda Tur și Iuliana Beregoi",
   "Transfăgărășan – Lacul Bîlea - Ferma de Cerbi – Sibiu – Catelul de Lut –Cetatea Făgăraș",
   "Transfăgărășan + Sighișoara + Lacul Bâlea",

@@ -30,5 +30,6 @@ export const countryOptions = [
   "USA",
   "Zanzibar",
   "Nu este specificat",
-  "Altele"
+  "Laponia",
+  "Altele",
 ]
