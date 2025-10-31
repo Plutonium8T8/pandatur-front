@@ -318,19 +318,45 @@ export const TicketCard = memo(({
             )}
 
             {/* Task count */}
-            <Text
-              size="xs"
-              c={ticket.active_task_count > 0 ? (isMyTicket ? "var(--crm-ui-kit-palette-link-primary)" : "var(--crm-ui-kit-palette-text-secondary-light)") : "var(--crm-ui-kit-palette-text-secondary-light)"}
-              fw={ticket.active_task_count > 0 ? "bold" : "normal"}
-              style={{
-                fontSize: '10px',
-                backgroundColor: ticket.active_task_count > 0 ? (isMyTicket ? "var(--crm-ui-kit-palette-surface-hover-background-color)" : "var(--crm-ui-kit-palette-background-primary)") : 'transparent',
-                padding: ticket.active_task_count > 0 ? '2px 6px' : '0',
-                borderRadius: ticket.active_task_count > 0 ? '4px' : '0'
-              }}
-            >
-              {ticket.active_task_count > 0 ? `${ticket.active_task_count} tasks` : 'No tasks'}
-            </Text>
+            {(() => {
+              const taskCount = ticket.task_count || 0;
+              const tasksStatus = ticket.tasks_status || 'none';
+              
+              // Определяем цвет в зависимости от статуса задач
+              const getTaskColor = () => {
+                switch (tasksStatus) {
+                  case 'none':
+                    return 'orange';
+                  case 'overdue':
+                    return 'red';
+                  case 'today':
+                    return 'green';
+                  case 'upcoming':
+                    return 'blue';
+                  default:
+                    return 'var(--crm-ui-kit-palette-text-secondary-light)';
+                }
+              };
+              
+              const taskColor = getTaskColor();
+              const hasTasks = taskCount > 0;
+              
+              return (
+                <Text
+                  size="xs"
+                  c={taskColor}
+                  fw={hasTasks ? "bold" : "normal"}
+                  style={{
+                    fontSize: '10px',
+                    backgroundColor: hasTasks ? 'var(--crm-ui-kit-palette-surface-hover-background-color)' : 'transparent',
+                    padding: hasTasks ? '2px 6px' : '0',
+                    borderRadius: hasTasks ? '4px' : '0'
+                  }}
+                >
+                  {hasTasks ? `${taskCount} tasks` : 'No tasks'}
+                </Text>
+              );
+            })()}
           </Flex>
         </Box>
       </Card>
