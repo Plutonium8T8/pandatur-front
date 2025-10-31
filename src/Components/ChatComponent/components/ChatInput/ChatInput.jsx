@@ -12,7 +12,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { FaTasks, FaEnvelope } from "react-icons/fa";
-import { useEffect, useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo } from "react";
 import { createPortal } from "react-dom";
 import EmojiPicker from "emoji-picker-react";
 import { LuSmile, LuStickyNote } from "react-icons/lu";
@@ -55,13 +55,10 @@ export const ChatInput = ({
   const [template, setTemplate] = useState();
   const [emojiPickerPosition, setEmojiPickerPosition] = useState({ top: 0, left: 0 });
   const [isDragOver, setIsDragOver] = useState(false);
-  const [ticket, setTicket] = useState(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
 
   const [attachments, setAttachments] = useState([]);
   const textAreaRef = useRef(null);
-
-  // Убираем локальное состояние - всегда смотрим на тикет
 
   const { uploadFile } = useUploadMediaFile();
   const { userId } = useUser();
@@ -99,16 +96,11 @@ export const ChatInput = ({
     }));
   }, [selectedPlatform, groupTitle]);
 
-  // Получаем actionNeeded всегда из тикета
-  const actionNeeded = ticket ? Boolean(ticket.action_needed) : false;
-
-  // Синхронизируем тикет с AppContext при загрузке
-  useEffect(() => {
-    const currentTicket = getTicketById(ticketId);
-    if (currentTicket && currentTicket !== ticket) {
-      setTicket(currentTicket);
-    }
-  }, [ticketId, getTicketById, ticket]);
+  // Получаем actionNeeded всегда из тикета из AppContext
+  // НЕ используем локальное состояние - всегда берем актуальное значение из AppContext
+  // Тикет обновляется автоматически через TICKET_UPDATE от сервера
+  const currentTicketFromContext = getTicketById(ticketId);
+  const actionNeeded = currentTicketFromContext ? Boolean(currentTicketFromContext.action_needed) : false;
 
   // actionNeeded меняется только:
   // 1. При получении сообщения от клиента (в AppContext)
