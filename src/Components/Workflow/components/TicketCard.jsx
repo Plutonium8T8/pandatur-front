@@ -59,39 +59,39 @@ export const TicketCard = memo(({
   const lastMessagePreview = useMemo(() => {
     if (!ticket.last_message) return "";
     const messageType = ticket.last_message_type;
-    
+
     if (messageType === "email") {
       return `📧 ${getLanguageByKey("Email")}`;
     }
-    
+
     if (messageType === "call") {
       return `📞 ${getLanguageByKey("call")}`;
     }
-    
+
     if (messageType === "audio") {
       return `🎵 ${getLanguageByKey("Audio")}`;
     }
-    
+
     if (messageType === "image") {
       return `🖼️ ${getLanguageByKey("Image")}`;
     }
-    
+
     if (messageType === "video") {
       return `🎥 ${getLanguageByKey("Video")}`;
     }
-    
+
     if (messageType === "file") {
       return `📄 ${getLanguageByKey("File")}`;
     }
-    
+
     if (messageType === "ig_reel") {
       return `📱 ${getLanguageByKey("Instagram Reel")}`;
     }
-    
+
     if (messageType === "share") {
       return `🔗 ${getLanguageByKey("Shared Content")}`;
     }
-    
+
     // Для текстовых сообщений и URL показываем содержимое
     return ticket.last_message;
   }, [ticket.last_message, ticket.last_message_type]);
@@ -321,40 +321,38 @@ export const TicketCard = memo(({
             {(() => {
               const taskCount = ticket.task_count || 0;
               const tasksStatus = ticket.tasks_status || 'none';
-              
-              // Определяем цвет в зависимости от статуса задач
+
               const getTaskColor = () => {
                 switch (tasksStatus) {
                   case 'none':
-                    return 'orange';
+                    return '#FF9800'; 
                   case 'overdue':
-                    return 'red';
+                    return '#F44336'; 
                   case 'today':
-                    return 'green';
+                    return '#388E3C'; 
                   case 'upcoming':
-                    return 'blue';
+                    return '#0288D1'; 
                   default:
                     return 'var(--crm-ui-kit-palette-text-secondary-light)';
                 }
               };
-              
+
               const taskColor = getTaskColor();
               const hasTasks = taskCount > 0;
-              
+
               return (
-                <Text
-                  size="xs"
-                  c={taskColor}
-                  fw={hasTasks ? "bold" : "normal"}
+                <text
                   style={{
-                    fontSize: '10px',
-                    backgroundColor: hasTasks ? 'var(--crm-ui-kit-palette-surface-hover-background-color)' : 'transparent',
+                    fontSize: '16px',
+                    fontWeight: '700',
+                    color: taskColor,
+                    backgroundColor: 'transparent',
                     padding: hasTasks ? '2px 6px' : '0',
                     borderRadius: hasTasks ? '4px' : '0'
                   }}
                 >
                   {hasTasks ? `${taskCount} tasks` : 'No tasks'}
-                </Text>
+                </text>
               );
             })()}
           </Flex>
