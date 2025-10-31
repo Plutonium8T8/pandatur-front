@@ -4,7 +4,7 @@ import {
   TextInput, Button, ActionIcon, Loader, Center, Badge
 } from "@mantine/core";
 import { FaChevronDown, FaChevronUp, FaTrash, FaCheck, FaPencil } from "react-icons/fa6";
-import { getDeadlineColor, getBadgeColor, formatTasksToEdits, sortTasksByDate } from "../utils/taskUtils";
+import { formatTasksToEdits, sortTasksByDate } from "../utils/taskUtils";
 import { translations } from "../utils/translations";
 import { api } from "../../api";
 import { TypeTask } from "./OptionsTaskType";
@@ -17,6 +17,66 @@ import dayjs from "dayjs";
 import Can from "../CanComponent/Can";
 import { SocketContext } from "../../contexts/SocketContext";
 import { UserGroupMultiSelect } from "../ChatComponent/components/UserGroupMultiSelect/UserGroupMultiSelect";
+
+// Цвета для статусов задач (те же, что в TicketCard.jsx)
+const TASK_STATUS_COLORS = {
+  none: '#FF9800',      // оранжевый
+  overdue: '#F44336',   // красный
+  today: '#388E3C',    // зеленый
+  upcoming: '#0288D1', // синий
+};
+
+// Функция для определения цвета задачи на основе даты
+const getTaskDateColor = (date) => {
+  if (!date) return TASK_STATUS_COLORS.none;
+  
+  const taskDate = toDate(date);
+  if (!taskDate) return TASK_STATUS_COLORS.none;
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const taskDay = new Date(taskDate);
+  taskDay.setHours(0, 0, 0, 0);
+
+  if (taskDay < today) {
+    return TASK_STATUS_COLORS.overdue; // Просроченные - красный
+  }
+  if (taskDay.getTime() === today.getTime()) {
+    return TASK_STATUS_COLORS.today; // Сегодня - зеленый
+  }
+  return TASK_STATUS_COLORS.upcoming; // Предстоящие - синий
+};
+
+// Функция для определения цвета badge в зависимости от задач
+const getTasksBadgeColor = (tasks = []) => {
+  if (!tasks || tasks.length === 0) return TASK_STATUS_COLORS.none;
+
+  const today = dayjs().startOf("day");
+
+  // Проверяем на просроченные задачи
+  const hasOverdue = tasks.some((task) => {
+    const d = toDate(task?.scheduled_time);
+    return d && dayjs(d).isBefore(today, "day");
+  });
+  if (hasOverdue) return TASK_STATUS_COLORS.overdue;
+
+  // Проверяем на задачи на сегодня
+  const hasToday = tasks.some((task) => {
+    const d = toDate(task?.scheduled_time);
+    return d && dayjs(d).isSame(today, "day");
+  });
+  if (hasToday) return TASK_STATUS_COLORS.today;
+
+  // Проверяем на предстоящие задачи
+  const hasUpcoming = tasks.some((task) => {
+    const d = toDate(task?.scheduled_time);
+    return d && dayjs(d).isAfter(today, "day");
+  });
+  if (hasUpcoming) return TASK_STATUS_COLORS.upcoming;
+
+  return TASK_STATUS_COLORS.none;
+};
 
 const language = localStorage.getItem("language") || "RO";
 
@@ -256,7 +316,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 </Text>
               </Group>
               <Group gap="xs">
-                <text size="sm" style={{ color: getDeadlineColor(taskEdits[id]?.scheduled_time) }}>
+                <text size="sm" style={{ color: getTaskDateColor(taskEdits[id]?.scheduled_time) }}>
                   {taskEdits[id]?.scheduled_time ? formatDate(taskEdits[id].scheduled_time) : ""}{" "}
                   {tasks.find((t) => t.id === id)?.created_for_full_name}
                 </text>
@@ -416,7 +476,7 @@ const TaskListOverlay = ({ ticketId, creatingTask, setCreatingTask }) => {
                 <Badge
                   size="lg"
                   style={{
-                    backgroundColor: getBadgeColor(tasks),
+                    backgroundColor: getTasksBadgeColor(tasks),
                     color: "#ffffff"
                   }}
                 >
