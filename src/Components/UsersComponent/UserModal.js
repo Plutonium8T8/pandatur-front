@@ -312,17 +312,16 @@ const UserModal = ({ opened, onClose, onUserCreated, initialUser = null }) => {
             username,
             email,
             password,
+            // ВАЖНО: name и surname НЕ отправляются в user, они отправляются в technician
             ...(permissionGroupId ? {} : { roles: convertMatrixToRoles(form.roleMatrix) }),
-          },
-          extended: {
-            name,
-            surname,
           },
           technician: {
             sipuni_id,
             status: status.toString(),
             job_title,
             department,
+            name,      // Перемещаем name в technician
+            surname,   // Перемещаем surname в technician
           },
           groups: [groups],
         };
