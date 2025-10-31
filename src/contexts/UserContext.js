@@ -1,4 +1,6 @@
-import React, { createContext, useState, useEffect, useMemo } from "react";
+import React, { createContext, useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { enqueueSnackbar } from "notistack";
 import Cookies from "js-cookie";
 import { api } from "../api";
 import {
@@ -6,10 +8,15 @@ import {
   workflowOptionsLimitedByGroupTitle,
   userGroupsToGroupTitle,
 } from "../Components/utils/workflowUtils";
+import { showServerError, getLanguageByKey } from "../Components/utils";
+import { LoadingOverlay } from "../Components";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const [sessionLoading, setSessionLoading] = useState(true);
+  const sessionFetchedRef = useRef(false); // Флаг для отслеживания, был ли вызван fetchSession
   const [userId, setUserId] = useState(() => {
     const savedUserId = localStorage.getItem("user_id");
     return savedUserId ? Number(savedUserId) : null;
@@ -62,6 +69,83 @@ export const UserProvider = ({ children }) => {
     if (isAdmin) return workflowOptionsByGroupTitle[groupTitleForApi] || [];
     return workflowOptionsLimitedByGroupTitle[groupTitleForApi] || [];
   }, [groupTitleForApi, isAdmin]);
+
+  // Функция для выхода
+  const handleLogout = useCallback(() => {
+    Cookies.remove("jwt");
+    setUserId(null);
+    setName(null);
+    setSurname(null);
+  }, []);
+
+  // Сохраняем стабильные ссылки на функции для использования в fetchSession
+  const navigateRef = useRef(navigate);
+  const handleLogoutRef = useRef(handleLogout);
+  const enqueueSnackbarRef = useRef(enqueueSnackbar);
+  
+  // Обновляем ссылки при изменении
+  navigateRef.current = navigate;
+  handleLogoutRef.current = handleLogout;
+  enqueueSnackbarRef.current = enqueueSnackbar;
+
+  // Проверка сессии (встроенная логика из Session компонента)
+  // Используем useRef для хранения функции без зависимостей, чтобы избежать циклов
+  const fetchSessionRef = useRef();
+  fetchSessionRef.current = async () => {
+    try {
+      const data = await api.auth.session();
+
+      // Проверяем роль пользователя
+      if (data.roles && data.roles.includes("ROLE_USER")) {
+        handleLogoutRef.current();
+        navigateRef.current("/auth");
+        enqueueSnackbarRef.current(getLanguageByKey("accessDenied"), { variant: "error" });
+        return;
+      }
+
+      setUserId(data.user_id);
+      setName(data.username || "");
+      setSurname(data.surname || "");
+
+      // Получаем актуальные pathname и search напрямую из location (без зависимостей)
+      const currentLocation = window.location;
+      const currentPathname = currentLocation.pathname;
+      const currentSearch = currentLocation.search;
+
+      // если уже на нужном path — не делать navigate
+      if (currentPathname === "/auth") {
+        setSessionLoading(false);
+        return;
+      }
+
+      // остаёмся на текущем пути с сохранением query-параметров
+      // Используем replace: true чтобы не создавать новую запись в истории
+      navigateRef.current(`${currentPathname}${currentSearch}`, { replace: true });
+      setSessionLoading(false);
+    } catch (error) {
+      navigateRef.current("/auth");
+      handleLogoutRef.current();
+      enqueueSnackbarRef.current(showServerError(error), { variant: "error" });
+      setSessionLoading(false);
+    }
+  };
+
+  // Проверяем сессию ТОЛЬКО ОДИН РАЗ при монтировании
+  useEffect(() => {
+    // Если уже вызывали - пропускаем
+    if (sessionFetchedRef.current) return;
+    
+    const token = Cookies.get("jwt");
+    if (token) {
+      sessionFetchedRef.current = true;
+      fetchSessionRef.current();
+    } else {
+      setSessionLoading(false);
+      sessionFetchedRef.current = true;
+    }
+    // Вызываем только один раз при монтировании
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (userId) {
@@ -177,7 +261,7 @@ export const UserProvider = ({ children }) => {
         user,
       }}
     >
-      {children}
+      {sessionLoading ? <LoadingOverlay /> : children}
     </UserContext.Provider>
   );
 };

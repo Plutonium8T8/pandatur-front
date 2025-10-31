@@ -3,17 +3,11 @@ import Cookies from "js-cookie";
 import { useNavigate, useLocation } from "react-router-dom";
 import { SnackbarProvider } from "notistack";
 import { ModalsProvider } from "@mantine/modals";
-import {
-  UserProvider,
-  AppProvider,
-  SocketProvider,
-  MessagesProvider,
-} from "@contexts";
+import { AppProviders } from "@contexts";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import dayjs from "dayjs";
 import { AppLayout } from "@layout";
 import { PrivateRoutes, PublicRoutes } from "./AppRoutes";
-import { Session } from "./Session";
 import { MantineProvider } from "./MantineProvider";
 import { publicRoutes } from "./routes";
 import "@mantine/core/styles.css";
@@ -36,7 +30,7 @@ function App() {
     if (!JWT_TOKEN) {
       navigate(publicPaths.includes(pathname) ? pathname : "/auth");
     }
-  }, []);
+  }, [navigate, pathname, publicPaths]);
 
   return (
     <MantineProvider>
@@ -47,19 +41,11 @@ function App() {
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
         >
           {JWT_TOKEN ? (
-            <UserProvider>
-              <Session>
-                <SocketProvider>
-                  <AppProvider>
-                    <MessagesProvider>
-                      <AppLayout>
-                        <PrivateRoutes />
-                      </AppLayout>
-                    </MessagesProvider>
-                  </AppProvider>
-                </SocketProvider>
-              </Session>
-            </UserProvider>
+            <AppProviders>
+              <AppLayout>
+                <PrivateRoutes />
+              </AppLayout>
+            </AppProviders>
           ) : (
             <PublicRoutes />
           )}
